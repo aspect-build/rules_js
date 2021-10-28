@@ -1,0 +1,8 @@
+filegroup(
+    name = "package_content",
+    srcs = glob([
+        "*.bzl",
+        "*.bazel",
+    ]),
+    visibility = ["//mylang:__pkg__"],
+)

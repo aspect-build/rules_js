@@ -1,0 +1,32 @@
+# Cut a release whenever a new tag is pushed to the repo.
+# You should use an annotated tag, like `git tag -a v1.2.3`
+# and put the release notes into the commit message for the tag.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v1
+      - name: check git state is clean
+        run: git status --porcelain
+      - name: bazel test //...
+        env:
+          # Bazelisk will download bazel to here
+          XDG_CACHE_HOME: ~/.cache/bazel-repo
+        run:
+          bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test
+          --config=release //...
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          files: |
+            bazel-out/*/bin/path/to/some/output
