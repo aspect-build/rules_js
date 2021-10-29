@@ -1,26 +1,3 @@
-# Template for Bazel rules
-
-Copy this template to create a Bazel ruleset.
-
-Features:
-
-- follows the official style guide at https://docs.bazel.build/versions/main/skylark/deploying.html
-- includes Bazel formatting as a pre-commit hook (using [buildifier])
-- includes typical toolchain setup
-- CI configured with GitHub Actions
-- Release on GitHub Actions when pushing a tag
-
-See https://docs.bazel.build/versions/main/skylark/deploying.html#readme
-
-[buildifier]: https://github.com/bazelbuild/buildtools/tree/master/buildifier#readme
-
-Ready to get started? Copy this repo, then
-
-1. if you don't need to fetch platform-dependent tools, then remove anything toolchain-related.
-1. delete this section of the README (everything up to the SNIP).
-
----- SNIP ----
-
 # Bazel rules for js
 
 ## Installation
@@ -31,7 +8,7 @@ Include this in your WORKSPACE file:
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "build_aspect_rules_js",
-    url = "https://github.com/myorg/rules_js/releases/download/0.0.0/rules_js-0.0.0.tar.gz",
+    url = "https://github.com/aspect-dev/rules_js/releases/download/0.0.0/rules_js-0.0.0.tar.gz",
     sha256 = "",
 )
 
