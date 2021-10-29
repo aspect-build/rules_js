@@ -1,0 +1,15 @@
+"Internal implementation details"
+
+config_setting(
+    name = "enable_runfiles",
+    values = {"enable_runfiles": "true"},
+)
+
+filegroup(
+    name = "package_content",
+    srcs = glob([
+        "*.bzl",
+        "*.bazel",
+    ]),
+    visibility = ["//js:__pkg__"],
+)

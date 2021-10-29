@@ -1,0 +1,189 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("//js:nodejs_binary.bzl", "nodejs_binary")
+load("//js:nodejs_test.bzl", "nodejs_test")
+
+###########################
+# Fixtures for tests in this file
+
+# Trivial test fixture: a nodejs program that writes to a file
+write_file(
+    name = "js",
+    out = "some.js",
+    content = ["require('fs').writeFileSync(process.argv[2], 'stuff')"],
+)
+
+# The output produced by that program, for assertions
+write_file(
+    name = "write_expected",
+    out = "expected",
+    content = ["stuff"],
+)
+
+# Trivial test fixture: the shortest legal JS program
+write_file(
+    name = "write_one",
+    out = "one.js",
+    content = ["1"],
+)
+
+# For using acorn as our test fixture, this is
+# the serialized AST for the that shortest legal JS program
+write_file(
+    name = "write_expected_one_ast",
+    out = "expected_ast.json",
+    content = [
+        """{"type":"Program","start":0,"end":1,"body":[{"type":"ExpressionStatement","start":0,"end":1,"expression":{"type":"Literal","start":0,"end":1,"value":1,"raw":"1"}}],"sourceType":"script"}\n""",
+    ],
+)
+
+#############################
+# Test case 1
+# Show that you can use the node toolchain together with a genrule().
+# This gives you complete control over starting the interpreter, but you also have to
+# manually handle module resolution.
+genrule(
+    name = "use_node_toolchain",
+    srcs = ["some.js"],
+    outs = ["actual1"],
+    cmd = "$(NODE_PATH) $(execpath some.js) $@",
+    toolchains = ["@node16_toolchains//:resolved_toolchain"],
+    tools = ["@node16_toolchains//:resolved_toolchain"],
+)
+
+diff_test(
+    name = "test_genrule",
+    file1 = "expected",
+    file2 = "actual1",
+)
+
+##########################################################
+# Test case 2
+# Directly invoke a bin from a package from npm to transform inputs to bazel-out
+# Similar to build_bazel_rules_nodejs generated npm_package_bin targets
+
+genrule(
+    name = "call_acorn",
+    srcs = ["one.js"],
+    outs = ["actual2"],
+    cmd = """
+        $(NODE_PATH) \\
+        ./$(execpath @npm_acorn-8.4.0)/bin/acorn \\
+        --compact \\
+        $(execpath one.js) \\
+        > $@""",
+    toolchains = ["@node16_toolchains//:resolved_toolchain"],
+    tools = [
+        "@node16_toolchains//:resolved_toolchain",
+        "@npm_acorn-8.4.0",
+    ],
+)
+
+diff_test(
+    name = "test_acorn",
+    file1 = "actual2",
+    file2 = "expected_ast.json",
+)
+
+################################################
+# Test case 3
+# Run a first-party program that requires a package from npm
+# Use a genrule to prove that works
+
+genrule(
+    name = "require_acorn",
+    srcs = ["require_acorn.js"],
+    outs = ["actual3"],
+    # Note: confusingly, node uses an environment variable NODE_PATH as a "global"
+    # location for module resolutions, but we used the same name for the Make
+    # variable exposed by the nodejs tooling.
+    # One is interpreted by the bash shell, while the other is interpreted by
+    # bazel, so it doesn't cause any problems.
+    # Note, the trailing "/.." on the NODE_PATH variable is because our target
+    # points to the output directory we wrote, named "acorn", but node needs
+    # to start its module search in a directory *containing" one called "acorn"
+    cmd = """
+        NODE_PATH=./$(execpath @npm_acorn-8.4.0)/.. \\
+        $(NODE_PATH) \\
+        ./$(execpath require_acorn.js) \\
+        $@""",
+    toolchains = ["@node16_toolchains//:resolved_toolchain"],
+    tools = [
+        "@node16_toolchains//:resolved_toolchain",
+        "@npm_acorn-8.4.0",
+    ],
+)
+
+diff_test(
+    name = "test_require_acorn",
+    file1 = "actual3",
+    file2 = "expected_ast.json",
+)
+
+####################################################
+# Test case 4
+# Show that a nodejs_binary can be used with run_binary
+# because everything it needs to run is in the runfiles
+
+nodejs_binary(
+    name = "bin",
+    data = ["@npm_acorn-8.4.0"],
+    entry_point = "require_acorn.js",
+)
+
+run_binary(
+    name = "run4",
+    srcs = [],
+    outs = ["actual4"],
+    args = ["$(location actual4)"],
+    tool = ":bin",
+)
+
+diff_test(
+    name = "test_nodejs_binary_under_run_binary",
+    file1 = "expected_ast.json",
+    file2 = "actual4",
+)
+
+################################
+# Test case 5
+# nodejs_test is just a nodejs_binary that exits 0 or non-zero
+
+nodejs_test(
+    name = "test_test",
+    data = ["@npm__types_node-15.12.2"],
+    entry_point = "test.js",
+)
+
+###############################
+# Test case 6
+# a first-party library which we want to run as a program
+
+write_file(
+    name = "write6",
+    out = "case6.js",
+    content = [
+        """require('fs').writeFileSync(process.argv[2], require("@mycorp/mylib").toAst("1"))""",
+    ],
+)
+
+nodejs_binary(
+    name = "bin_w_first_party_static_link",
+    data = ["//test/lib"],
+    entry_point = "case6.js",
+)
+
+run_binary(
+    name = "run6",
+    srcs = [],
+    outs = ["actual6"],
+    args = ["$(location actual6)"],
+    tool = ":bin_w_first_party_static_link",
+)
+
+diff_test(
+    name = "test6",
+    file1 = "expected_ast.json",
+    file2 = "actual6",
+)
