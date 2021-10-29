@@ -1,0 +1,27 @@
+diff --git a/nodejs/BUILD.bazel b/nodejs/BUILD.bazel
+index 56b81a42..73732282 100644
+--- a/nodejs/BUILD.bazel
++++ b/nodejs/BUILD.bazel
+@@ -14,7 +14,8 @@ bzl_library(
+     visibility = ["//visibility:public"],
+     deps = [
+         "//nodejs/private:bzl",
+-        "//third_party/github.com/bazelbuild/bazel-skylib:bzl",
++        "//nodejs/private/providers:bzl",
++        "@bazel_skylib//lib:paths",
+     ],
+ )
+
+diff --git a/nodejs/repositories.bzl b/nodejs/repositories.bzl
+index 494217b7..cfd00a33 100644
+--- a/nodejs/repositories.bzl
++++ b/nodejs/repositories.bzl
+@@ -5,7 +5,7 @@ load("//nodejs/private:node_versions.bzl", "NODE_VERSIONS")
+ load("//nodejs/private:nodejs_repo_host_os_alias.bzl", "nodejs_repo_host_os_alias")
+ load("//nodejs/private:toolchains_repo.bzl", "PLATFORMS", "toolchains_repo")
+ load("//nodejs/private:yarn_versions.bzl", "YARN_VERSIONS")
+-load("//third_party/github.com/bazelbuild/bazel-skylib:lib/paths.bzl", "paths")
++load("@bazel_skylib//lib:paths.bzl", "paths")
+ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+ 
+ DEFAULT_NODE_VERSION = "14.17.5"

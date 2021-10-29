@@ -1,6 +1,6 @@
 "nodejs_binary rule"
 
-load("//js/private:nodejs_binary.bzl", lib = "nodejs_binary")
+load("//js/private:nodejs_binary.bzl", lib = "nodejs_binary_lib")
 
 _nodejs_binary = rule(
     implementation = lib.nodejs_binary_impl,

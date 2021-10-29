@@ -1,4 +1,4 @@
-"Experimental prototype of new nodejs_binary and nodejs_test"
+"nodejs_binary and nodejs_test rules"
 
 load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
 
@@ -122,12 +122,45 @@ def _nodejs_binary_impl(ctx):
     )
 
 # Expose our library as a struct so that nodejs_binary and nodejs_test can both extend it
-nodejs_binary = struct(
+nodejs_binary_lib = struct(
     attrs = {
-        "data": attr.label_list(allow_files = True),
-        "entry_point": attr.label(allow_single_file = True),
-        "is_windows": attr.bool(mandatory = True),
-        "enable_runfiles": attr.bool(mandatory = True),
+        "data": attr.label_list(
+            allow_files = True,
+            doc = """Runtime dependencies of the program.
+
+            The transitive closure of the `data` dependencies will be available in
+            the .runfiles folder for this binary/test.
+
+            You can use the `@bazel/runfiles` npm library to access these files
+            at runtime.
+
+            npm packages are also linked into the `.runfiles/node_modules` folder
+            so they may be resolved directly from runfiles.
+            """,
+        ),
+        "entry_point": attr.label(
+            allow_single_file = True,
+            doc = """The main script which is evaluated by node.js
+
+            This is the module referenced by the `require.main` property in the runtime.
+            """,
+        ),
+        "is_windows": attr.bool(
+            mandatory = True,
+            doc = """Whether the build is being performed on a Windows host platform.
+
+            Typical usage of this rule is via a macro which automatically sets this
+            attribute based on a select() on @bazel_tools//src/conditions:host_windows
+            """,
+        ),
+        "enable_runfiles": attr.bool(
+            mandatory = True,
+            doc = """Whether runfiles are enabled in the current build configuration.
+
+            Typical usage of this rule is via a macro which automatically sets this
+            attribute based on a config_setting rule.
+            """,
+        ),
         "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     },
     nodejs_binary_impl = _nodejs_binary_impl,
@@ -136,4 +169,11 @@ nodejs_binary = struct(
         "@bazel_tools//tools/sh:toolchain_type",
         "@rules_nodejs//nodejs:toolchain_type",
     ],
+)
+
+# For stardoc to generate documentation for the rule rather than a wrapper macro
+nodejs_binary = rule(
+    implementation = nodejs_binary_lib.nodejs_binary_impl,
+    attrs = nodejs_binary_lib.attrs,
+    toolchains = nodejs_binary_lib.toolchains,
 )
