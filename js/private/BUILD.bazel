@@ -1,5 +1,7 @@
 "Internal implementation details"
 
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
 config_setting(
     name = "enable_runfiles",
     values = {"enable_runfiles": "true"},
@@ -12,4 +14,20 @@ filegroup(
         "*.bazel",
     ]),
     visibility = ["//js:__pkg__"],
+)
+
+bzl_library(
+    name = "nodejs_binary",
+    srcs = ["nodejs_binary.bzl"],
+    visibility = ["//js:__subpackages__"],
+    deps = [
+        ":runfiles_utils",
+        "@rules_nodejs//nodejs:providers",
+    ],
+)
+
+bzl_library(
+    name = "runfiles_utils",
+    srcs = ["runfiles_utils.bzl"],
+    visibility = ["//js:__subpackages__"],
 )

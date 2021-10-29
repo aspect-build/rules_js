@@ -5,15 +5,28 @@ workspace(
     name = "build_aspect_rules_js",
 )
 
+load(":internal_deps.bzl", "rules_js_internal_deps")
+
+rules_js_internal_deps()
+
 # Install our "runtime" dependencies which users install as well
 load("//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load(":internal_deps.bzl", "rules_js_internal_deps")
+############################################
+# Gazelle, for generating bzl_library targets
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 
-rules_js_internal_deps()
+go_rules_dependencies()
 
+go_register_toolchains(version = "1.17.2")
+
+gazelle_dependencies()
+
+############################################
+# Fetch node and some npm packages, for local testing
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
