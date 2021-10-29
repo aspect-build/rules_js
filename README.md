@@ -16,16 +16,12 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#readme
 
 Ready to get started? Copy this repo, then
 
-1. search for "com_myorg_rules_mylang" and replace with the name you'll use for your workspace
-1. search for "mylang" and replace with the language/tool your rules are for
-1. rename directory "mylang" similarly
-1. run `pre-commit install` to get lints (see CONTRIBUTING.md)
 1. if you don't need to fetch platform-dependent tools, then remove anything toolchain-related.
 1. delete this section of the README (everything up to the SNIP).
 
 ---- SNIP ----
 
-# Bazel rules for mylang
+# Bazel rules for js
 
 ## Installation
 
@@ -34,22 +30,22 @@ Include this in your WORKSPACE file:
 ```starlark
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
-    name = "com_myorg_rules_mylang",
-    url = "https://github.com/myorg/rules_mylang/releases/download/0.0.0/rules_mylang-0.0.0.tar.gz",
+    name = "build_aspect_rules_js",
+    url = "https://github.com/myorg/rules_js/releases/download/0.0.0/rules_js-0.0.0.tar.gz",
     sha256 = "",
 )
 
-load("@com_myorg_rules_mylang//mylang:repositories.bzl", "mylang_rules_dependencies")
+load("@build_aspect_rules_js//js:repositories.bzl", "js_rules_dependencies")
 
-# This fetches the rules_mylang dependencies, which are:
+# This fetches the rules_js dependencies, which are:
 # - bazel_skylib
 # If you want to have a different version of some dependency,
 # you should fetch it *before* calling this.
 # Alternatively, you can skip calling this function, so long as you've
 # already fetched these dependencies.
-rules_mylang_dependencies()
+rules_js_dependencies()
 ```
 
 > note, in the above, replace the version and sha256 with the one indicated
-> in the release notes for rules_mylang
+> in the release notes for rules_js
 > In the future, our release automation should take care of this.

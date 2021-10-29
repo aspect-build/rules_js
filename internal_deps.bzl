@@ -7,7 +7,7 @@ statement from these, that's a bug in our distribution.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def rules_mylang_internal_deps():
+def rules_js_internal_deps():
     maybe(
         http_archive,
         name = "rules_pkg",

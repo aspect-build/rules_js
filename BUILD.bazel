@@ -3,12 +3,12 @@ load(":version.bzl", "VERSION")
 
 # This declares the release artifact users
 pkg_tar(
-    name = "rules_mylang-" + VERSION,
+    name = "rules_js-" + VERSION,
     srcs = [
         "LICENSE",
         "README.md",
         "version.bzl",
-        "//mylang:package_content",
+        "//js:package_content",
     ],
     extension = "tar.gz",
     # It is all source code, so make it read-only.
