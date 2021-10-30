@@ -2,7 +2,7 @@
 # This is *not* included in the published distribution.
 workspace(
     # see https://docs.bazel.build/versions/main/skylark/deploying.html#workspace
-    name = "build_aspect_rules_js",
+    name = "aspect_rules_js",
 )
 
 load(":internal_deps.bzl", "rules_js_internal_deps")

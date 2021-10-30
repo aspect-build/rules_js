@@ -10,10 +10,13 @@ npm_import repository rule
 npm_import(<a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>)
 </pre>
 
-Import a single npm package into Bazel
+Import a single npm package into Bazel.
 
 Bazel will only fetch the package from an external registry if the package is
 required for the user-requested targets to be build/tested.
+The package will be exposed as a [`nodejs_package`](./nodejs_package) rule in a repository
+named `@npm_[package name]-[version]`, as the default target in that repository.
+(Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 
 This is a repository rule, which should be called from your `WORKSPACE` file
 or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:

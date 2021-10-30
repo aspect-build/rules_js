@@ -32,6 +32,16 @@ bzl_library(
 )
 
 bzl_library(
+    name = "nodejs_package",
+    srcs = ["nodejs_package.bzl"],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@bazel_skylib//lib:paths",
+        "@rules_nodejs//nodejs:bzl",
+    ],
+)
+
+bzl_library(
     name = "runfiles_utils",
     srcs = ["runfiles_utils.bzl"],
     visibility = ["//js:__subpackages__"],
