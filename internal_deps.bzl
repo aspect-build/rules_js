@@ -72,14 +72,3 @@ def rules_js_internal_deps():
             "https://github.com/bazelbuild/stardoc/releases/download/0.5.0/stardoc-0.5.0.tar.gz",
         ],
     )
-
-    # Apply a patch to rules_nodejs so the skylib loads don't come from third_party
-    # remove this once it's fixed upstream
-    maybe(
-        http_archive,
-        name = "rules_nodejs",
-        patch_args = ["-p1"],
-        patches = ["//:patches/rules_nodejs.pr3049.patch"],
-        sha256 = "0028e76baa55c2c5dad22335293a0e9796f37176bd92ccc499178846b7cf43e3",
-        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/4.4.2/rules_nodejs-core-4.4.2.tar.gz"],
-    )

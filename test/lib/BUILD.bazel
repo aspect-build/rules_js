@@ -7,7 +7,6 @@ nodejs_package(
         "index.js",
         "package.json",
     ],
-    remap_paths = {"/test/lib": ""},
     visibility = ["//visibility:public"],
     deps = ["@npm_acorn-8.4.0"],
 )
