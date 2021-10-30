@@ -1,4 +1,4 @@
-"nodejs_binary rule"
+"wrapper macro for nodejs_binary rule"
 
 load("//js/private:nodejs_binary.bzl", lib = "nodejs_binary_lib")
 
@@ -16,7 +16,7 @@ def nodejs_binary(**kwargs):
             "//conditions:default": False,
         }),
         enable_runfiles = select({
-            "@build_aspect_rules_js//js/private:enable_runfiles": True,
+            "@aspect_rules_js//js/private:enable_runfiles": True,
             "//conditions:default": False,
         }),
         **kwargs

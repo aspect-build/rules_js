@@ -22,7 +22,7 @@ def _npm_import_impl(repository_ctx):
         fail("failed to inspect content of npm download: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
 
     repository_ctx.file("BUILD.bazel", """
-load("@build_aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
+load("@aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
 load("@rules_nodejs//third_party/github.com/bazelbuild/bazel-skylib:rules/copy_file.bzl", "copy_file")
 
 # Turn a source directory into a TreeArtifact for RBE-compat
@@ -61,10 +61,13 @@ _npm_import = repository_rule(
 )
 
 def npm_import(integrity, package, version, deps = []):
-    """Import a single npm package into Bazel
+    """Import a single npm package into Bazel.
 
     Bazel will only fetch the package from an external registry if the package is
     required for the user-requested targets to be build/tested.
+    The package will be exposed as a [`nodejs_package`](./nodejs_package) rule in a repository
+    named `@npm_[package name]-[version]`, as the default target in that repository.
+    (Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 
     This is a repository rule, which should be called from your `WORKSPACE` file
     or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:

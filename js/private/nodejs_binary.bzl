@@ -1,10 +1,41 @@
 "nodejs_binary and nodejs_test rules"
 
 load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
-
-# TODO: this should probably come from upstream?
-# load("@rules_nodejs//nodejs/private:runfiles_utils.bzl", "BASH_RLOCATION_FUNCTION", "BATCH_RLOCATION_FUNCTION", "to_manifest_path")
 load("//js/private:runfiles_utils.bzl", "BASH_RLOCATION_FUNCTION", "BATCH_RLOCATION_FUNCTION", "to_manifest_path")
+
+_DOC = """Execute a program in the node.js runtime.
+
+The version of node is determined by Bazel's toolchain selection.
+In the WORKSPACE you used `nodejs_register_toolchains` to provide options to Bazel.
+Then Bazel selects from these options based on the requested target platform.
+Use the 
+[`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
+Bazel option to see more detail about the selection.
+
+### Static linking
+
+This rule executes node with the Global Folders set to Bazel's runfiles folder.
+<https://nodejs.org/docs/latest-v16.x/api/modules.html#loading-from-the-global-folders>
+describes Node's module resolution algorithm.
+By setting the `NODE_PATH` variable, we supply a location for `node_modules` resolution
+outside of the project's source folder.
+This means that all transitive dependencies of the `data` attribute will be available at
+runtime for every execution of this program.
+
+This requires that Bazel was run with
+[`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
+
+In some language runtimes, this concept is called "static linking", so we use the same term
+in aspect_rules_js. This is in contrast to "dynamic linking", where the program needs to
+resolve a module which is declared only in the place where the program is used, generally
+with a `deps` attribute at the callsite.
+
+> Note that some libraries do not follow the semantics of Node.js module resolution,
+> and instead make fixed assumptions about the `node_modules` folder existing in some
+> parent directory of a source file. These libraries will need some patching to work
+> under this "static linker" approach. We expect to provide more detail about how to do
+> this in a future release.
+"""
 
 def _strip_external(path):
     return path[len("external/"):] if path.startswith("external/") else path
@@ -75,7 +106,7 @@ def _bash_launcher(ctx, linkable):
 {rlocation_function}
 set -o pipefail -o errexit -o nounset
 {node_path}
-$(rlocation {node}) \\
+NODE_DEBUG=module $(rlocation {node}) \\
 $(rlocation {entry_point}) \\
 {args} $@
 """.format(
@@ -150,7 +181,7 @@ nodejs_binary_lib = struct(
             doc = """Whether the build is being performed on a Windows host platform.
 
             Typical usage of this rule is via a macro which automatically sets this
-            attribute based on a select() on @bazel_tools//src/conditions:host_windows
+            attribute based on a `select()` on `@bazel_tools//src/conditions:host_windows`.
             """,
         ),
         "enable_runfiles": attr.bool(
@@ -158,14 +189,14 @@ nodejs_binary_lib = struct(
             doc = """Whether runfiles are enabled in the current build configuration.
 
             Typical usage of this rule is via a macro which automatically sets this
-            attribute based on a config_setting rule.
+            attribute based on a `config_setting` rule.
             """,
         ),
         "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     },
     nodejs_binary_impl = _nodejs_binary_impl,
     toolchains = [
-        # TODO: only need bash on non-windows
+        # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
         "@rules_nodejs//nodejs:toolchain_type",
     ],
@@ -173,6 +204,7 @@ nodejs_binary_lib = struct(
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro
 nodejs_binary = rule(
+    doc = _DOC,
     implementation = nodejs_binary_lib.nodejs_binary_impl,
     attrs = nodejs_binary_lib.attrs,
     toolchains = nodejs_binary_lib.toolchains,

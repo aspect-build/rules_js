@@ -17,7 +17,6 @@ gazelle(
 pkg_tar(
     name = "rules_js-" + VERSION,
     srcs = [
-        "LICENSE",
         "README.md",
         "version.bzl",
         "//js:package_content",

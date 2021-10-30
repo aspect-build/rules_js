@@ -1,6 +1,6 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-nodejs_test rule
+wrapper macro for nodejs_test rule
 
 <a id="#nodejs_test"></a>
 
