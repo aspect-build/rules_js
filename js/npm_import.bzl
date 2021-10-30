@@ -1,4 +1,6 @@
-"npm_import repository rule"
+"repository rules for importing packages from npm"
+
+load("//js/private:translate_package_lock.bzl", lib = "translate_package_lock")
 
 def _npm_import_impl(repository_ctx):
     repository_ctx.download_and_extract(
@@ -42,17 +44,18 @@ nodejs_package(
     src = "_{name}",
     package_name = "{package_name}",
     visibility = ["//visibility:public"],
+    deps = {deps},
 )
 """.format(
         name = repository_ctx.name,
         nested_folder = result.stdout.rstrip("\n"),
         package_name = repository_ctx.attr.package,
+        deps = [str(d) for d in repository_ctx.attr.deps],
     ))
 
 _npm_import = repository_rule(
     implementation = _npm_import_impl,
     attrs = {
-        # TODO(alexeagle): wire this up
         "deps": attr.label_list(),
         "integrity": attr.string(),
         "package": attr.string(mandatory = True),
@@ -60,13 +63,17 @@ _npm_import = repository_rule(
     },
 )
 
-def npm_import(integrity, package, version, deps = []):
+def npm_import(integrity, package, version, deps = [], name = None):
     """Import a single npm package into Bazel.
 
-    Bazel will only fetch the package from an external registry if the package is
+    Normally you'd want to use `translate_package_lock` to import all your packages at once.
+    It generates `npm_import` rules.
+    You can create these manually if you want to have exact control.
+
+    Bazel will only fetch the given package from an external registry if the package is
     required for the user-requested targets to be build/tested.
     The package will be exposed as a [`nodejs_package`](./nodejs_package) rule in a repository
-    named `@npm_[package name]-[version]`, as the default target in that repository.
+    with a default name `@npm_[package name]-[version]`, as the default target in that repository.
     (Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 
     This is a repository rule, which should be called from your `WORKSPACE` file
@@ -104,7 +111,9 @@ def npm_import(integrity, package, version, deps = []):
     [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 
     Args:
-        deps: other npm packages this one depends on
+        name: the external repository generated to contain the package content.
+            This argument may be omitted to get the default name documented above.
+        deps: other npm packages this one depends on.
         integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
             This must match the checksum of the file downloaded.
 
@@ -118,9 +127,15 @@ def npm_import(integrity, package, version, deps = []):
     """
 
     _npm_import(
-        name = "npm_{0}-{1}".format(package.replace("@", "_").replace("/", "_"), version),
+        name = name or lib.repository_name(package, version),
         deps = deps,
         integrity = integrity,
         package = package,
         version = version,
     )
+
+translate_package_lock = repository_rule(
+    doc = lib.doc,
+    implementation = lib.implementation,
+    attrs = lib.attrs,
+)

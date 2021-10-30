@@ -34,7 +34,7 @@ nodejs_register_toolchains(
     node_version = "16.9.0",
 )
 
-load("//js:npm_import.bzl", "npm_import")
+load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_package_lock")
 
 # TODO: we should have a translate_package_lock rule like
 # https://github.com/alexeagle/rules_nodejs/blob/stable/internal/npm_tarballs/translate_package_lock.bzl
@@ -48,8 +48,23 @@ npm_import(
     deps = [],
 )
 
+# Manually import a package using explicit coordinates.
+# Just a demonstration of the syntax de-sugaring.
 npm_import(
-    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
-    package = "@types/node",
-    version = "15.12.2",
+    integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
+    package = "acorn",
+    version = "8.4.0",
+    deps = [],
 )
+
+# Read the package-lock.json file to automate creation of remaining npm_import rules
+translate_package_lock(
+    name = "npm_deps",
+    package_lock = "//test:package-lock.json",
+)
+
+# This is the result of translate_package_lock
+load("@npm_deps//:repositories.bzl", "npm_repositories")
+
+# Declare remaining npm_import rules
+npm_repositories()

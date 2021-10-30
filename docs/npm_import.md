@@ -1,21 +1,72 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-npm_import repository rule
+repository rules for importing packages from npm
+
+<a id="#translate_package_lock"></a>
+
+## translate_package_lock
+
+<pre>
+translate_package_lock(<a href="#translate_package_lock-name">name</a>, <a href="#translate_package_lock-package_lock">package_lock</a>, <a href="#translate_package_lock-repo_mapping">repo_mapping</a>)
+</pre>
+
+Repository rule to generate npm_import rules from package-lock.json file.
+
+The npm lockfile format includes all the information needed to define npm_import rules,
+including the integrity hash, as calculated by the package manager.
+
+Instead of manually declaring the `npm_imports`, this helper generates an external repository
+containing a helper starlark module `repositories.bzl`, which supplies a loadable macro
+`npm_repositories`. This macro creates an `npm_import` for each package.
+
+Bazel will only fetch the packages which are required for the requested targets to be analyzed.
+Thus it is performant to convert a very large package-lock.json file without concern for
+users needing to fetch many unnecessary packages.
+
+Typical usage:
+```starlark
+load("@aspect_rules_js//js:npm_import.bzl", "translate_package_lock")
+
+# Read the package-lock.json file to automate creation of remaining npm_import rules
+translate_package_lock(
+    name = "npm_deps",
+    package_lock = "//:package-lock.json",
+)
+
+load("@npm_deps//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
+```
+
+
+**ATTRIBUTES**
+
+
+| Name  | Description | Type | Mandatory | Default |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="translate_package_lock-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+| <a id="translate_package_lock-package_lock"></a>package_lock |  The package-lock.json file.<br><br>        It should use the lockfileVersion 2, which is produced from npm 7 or higher.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
+| <a id="translate_package_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
+
 
 <a id="#npm_import"></a>
 
 ## npm_import
 
 <pre>
-npm_import(<a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>)
+npm_import(<a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-name">name</a>)
 </pre>
 
 Import a single npm package into Bazel.
 
-Bazel will only fetch the package from an external registry if the package is
+Normally you'd want to use `translate_package_lock` to import all your packages at once.
+It generates `npm_import` rules.
+You can create these manually if you want to have exact control.
+
+Bazel will only fetch the given package from an external registry if the package is
 required for the user-requested targets to be build/tested.
 The package will be exposed as a [`nodejs_package`](./nodejs_package) rule in a repository
-named `@npm_[package name]-[version]`, as the default target in that repository.
+with a default name `@npm_[package name]-[version]`, as the default target in that repository.
 (Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 
 This is a repository rule, which should be called from your `WORKSPACE` file
@@ -61,6 +112,7 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 | <a id="npm_import-integrity"></a>integrity |  Expected checksum of the file downloaded, in Subresource Integrity format. This must match the checksum of the file downloaded.<br><br>This is the same as appears in the yarn.lock or package-lock.json file.<br><br>It is a security risk to omit the checksum as remote files can change. At best omitting this field will make your build non-hermetic. It is optional to make development easier but should be set before shipping.   |  none |
 | <a id="npm_import-package"></a>package |  npm package name, such as <code>acorn</code> or <code>@types/node</code>   |  none |
 | <a id="npm_import-version"></a>version |  version of the npm package, such as <code>8.4.0</code>   |  none |
-| <a id="npm_import-deps"></a>deps |  other npm packages this one depends on   |  <code>[]</code> |
+| <a id="npm_import-deps"></a>deps |  other npm packages this one depends on.   |  <code>[]</code> |
+| <a id="npm_import-name"></a>name |  the external repository generated to contain the package content. This argument may be omitted to get the default name documented above.   |  <code>None</code> |
 
 

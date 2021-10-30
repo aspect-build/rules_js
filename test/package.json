@@ -1,0 +1,11 @@
+{
+    "name": "test",
+    "private": true,
+    "directories": {
+        "lib": "lib"
+    },
+    "devDependencies": {
+        "@gregmagolan/test-b": "^0.0.2",
+        "@types/node": "^15.12.2"
+    }
+}
