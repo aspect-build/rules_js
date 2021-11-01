@@ -9,6 +9,7 @@ Features include:
 -   Only downloads packages from npm which are needed for the requested targets to be built/tested.
 -   Bazel downloader caches the npm package files,
     so no fetches are required when the repository rule is cache-busted.
+-   Allows multiple versions of Node.js in the same workspace.
 
 See the [design doc](https://hackmd.io/gu2Nj0TKS068LKAf8KanuA)
 
