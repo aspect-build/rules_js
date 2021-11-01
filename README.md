@@ -1,5 +1,7 @@
 # Bazel rules for js
 
+**EXPERIMENTAL** this code is currently pre-release and not subject to any stability guarantee. It could be archived or there could be major breaking changes.
+
 This ruleset is a high-performance alternative to rules_nodejs.
 The primary difference is that we don't run `npm install` or `yarn install`, instead
 we use a Bazel-idiomatic approach to managing the third-party dependencies.
