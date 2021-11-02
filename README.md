@@ -41,7 +41,7 @@ http_archive(
     sha256 = "",
 )
 
-load("@aspect_rules_js//js:repositories.bzl", "js_rules_dependencies")
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 
 # This fetches the aspect_rules_js dependencies, which are:
 # - bazel_skylib

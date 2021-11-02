@@ -36,3 +36,11 @@ echo "query $OVERRIDE" >> ~/.bazelrc
 ```
 
 This means that any usage of `@rules_js` on your system will point to this folder.
+
+## Releasing
+
+1. Update the constant in `version.bzl`
+1. `git tag v$(grep VERSION version.bzl | cut -d'"' -f2)`
+1. git push --tags
+1. Watch the automation run on GitHub actions
+1. Update the release page with auto-generated release notes

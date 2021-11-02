@@ -106,7 +106,7 @@ def _bash_launcher(ctx, linkable):
 {rlocation_function}
 set -o pipefail -o errexit -o nounset
 {node_path}
-NODE_DEBUG=module $(rlocation {node}) \\
+$(rlocation {node}) \\
 $(rlocation {entry_point}) \\
 {args} $@
 """.format(
