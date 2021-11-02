@@ -59,4 +59,4 @@ rules_js_dependencies()
 
 ## Usage
 
-See the API documentation in the </docs> folder and the example usage in the </test> folder.
+See the API documentation in the [docs](docs/) folder and the example usage in the [test](test/) folder.
