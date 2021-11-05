@@ -36,18 +36,6 @@ nodejs_register_toolchains(
 
 load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_package_lock")
 
-# TODO: we should have a translate_package_lock rule like
-# https://github.com/alexeagle/rules_nodejs/blob/stable/internal/npm_tarballs/translate_package_lock.bzl
-# that automatically creates npm_import rules for everything the project already depends on.
-# That would provide syntax sugar for the typical case where the dependencies were specified in package.json
-# and a package manager already fetched integrity hashes from the registry.
-npm_import(
-    integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
-    package = "acorn",
-    version = "8.4.0",
-    deps = [],
-)
-
 # Manually import a package using explicit coordinates.
 # Just a demonstration of the syntax de-sugaring.
 npm_import(
