@@ -84,8 +84,11 @@ def npm_repositories():
 
 def _aliases_test_impl(ctx):
     env = unittest.begin(ctx)
-    mock_repository_ctx = struct()
-    actual = translate_package_lock.testonly_define_aliases(mock_repository_ctx, _lockfile, False)
+    actual = {}
+    mock_repository_ctx = struct(
+        file = lambda path, content: actual.update({path: content}),
+    )
+    translate_package_lock.testonly_define_aliases(mock_repository_ctx, _lockfile)
     asserts.equals(env, 1, len(actual.items()))
 
     # Note: @gregmagolan/test-a should not appear here since it's only a transitive dependency
