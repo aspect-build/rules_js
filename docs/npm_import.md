@@ -19,6 +19,10 @@ Instead of manually declaring the `npm_imports`, this helper generates an extern
 containing a helper starlark module `repositories.bzl`, which supplies a loadable macro
 `npm_repositories`. This macro creates an `npm_import` for each package.
 
+The generated repository also contains BUILD files declaring targets for the packages
+listed as `dependencies` or `devDependencies` in `package.json`, so you can declare
+dependencies on those packages without having to repeat version information.
+
 Bazel will only fetch the packages which are required for the requested targets to be analyzed.
 Thus it is performant to convert a very large package-lock.json file without concern for
 users needing to fetch many unnecessary packages.
@@ -36,6 +40,18 @@ translate_package_lock(
 load("@npm_deps//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
+```
+
+Next, in your BUILD files you can declare dependencies on the packages using the same external repository.
+
+Following the same example, this might look like:
+
+```starlark
+nodejs_test(
+    name = "test_test",
+    data = ["@npm_deps//@types/node"],
+    entry_point = "test.js",
+)
 ```
 
 
