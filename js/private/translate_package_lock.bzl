@@ -83,10 +83,7 @@ def npm_repositories():
         )])
     return bzl_out
 
-def _define_aliases(repository_ctx, lockfile, do_writes = True):
-    # Return value if do_writes = False
-    aliases = {}
-
+def _define_aliases(repository_ctx, lockfile):
     # The lockfile format refers to the context as the package with empty name.
     # This gives us a way to know which deps the user declared in their package.json
     # (the direct dependencies).
@@ -105,17 +102,7 @@ alias(name = "{package}", actual = "{actual}", visibility = ["//visibility:publi
             package = direct_name.split("/")[-1],
             actual = "@" + _repo_name(direct_name, direct_dep["version"]),
         )
-        if do_writes:
-            repository_ctx.file(direct_name + "/BUILD.bazel", dep_build_content)
-        else:
-            # In a starlark unit test, there is no global mutable data structure
-            # that allows us to capture the writes using a mock repository_ctx
-            # so we need a different return type that lets us assert on what's written.
-            # We could do this for production use as well, but then we'd waste memory
-            # in large package-lock.json files holding references to values
-            # we no longer need.
-            aliases[direct_name + "/BUILD.bazel"] = dep_build_content
-    return None if do_writes else aliases
+        repository_ctx.file(direct_name + "/BUILD.bazel", dep_build_content)
 
 def _translate_package_lock(repository_ctx):
     lock_content = json.decode(repository_ctx.read(repository_ctx.attr.package_lock))
