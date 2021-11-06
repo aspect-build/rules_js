@@ -152,7 +152,7 @@ diff_test(
 
 nodejs_test(
     name = "test_test",
-    data = ["@npm__types_node-15.14.9"],
+    data = ["@npm_deps//@types/node"],
     entry_point = "test.js",
 )
 
@@ -206,7 +206,7 @@ write_file(
 
 nodejs_binary(
     name = "bin7",
-    data = ["@npm__gregmagolan_test-b-0.0.2"],
+    data = ["@npm_deps//@gregmagolan/test-b"],
     entry_point = "case7.js",
 )
 
