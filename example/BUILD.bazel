@@ -170,7 +170,7 @@ write_file(
 
 nodejs_binary(
     name = "bin6",
-    data = ["//test/lib"],
+    data = ["//example/lib"],
     entry_point = "case6.js",
 )
 
