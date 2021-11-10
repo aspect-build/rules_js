@@ -46,6 +46,7 @@ load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 # This fetches the aspect_rules_js dependencies, which are:
 # - bazel_skylib
 # - rules_nodejs
+# - aspect_bazel_lib
 # If you want to have a different version of some dependency,
 # you should fetch it *before* calling this.
 # Alternatively, you can skip calling this function, so long as you've

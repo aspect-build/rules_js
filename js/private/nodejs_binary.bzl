@@ -1,7 +1,8 @@
 "nodejs_binary and nodejs_test rules"
 
 load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
-load("//js/private:runfiles_utils.bzl", "BASH_RLOCATION_FUNCTION", "BATCH_RLOCATION_FUNCTION", "to_manifest_path")
+load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_manifest_path")
+load("@aspect_bazel_lib//lib:windows_utils.bzl", "BATCH_RLOCATION_FUNCTION")
 
 _DOC = """Execute a program in the node.js runtime.
 

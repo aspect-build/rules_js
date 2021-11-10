@@ -1,51 +1,26 @@
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
+load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 
-_DOCS = {
-    "//js/private:nodejs_binary.bzl": "nodejs_binary.md",
-    "//js:nodejs_test.bzl": "nodejs_test.md",
-    "//js/private:nodejs_package.bzl": "nodejs_package.md",
-    "//js:npm_import.bzl": "npm_import.md",
-}
-
-[
-    stardoc(
-        name = md + "_gen",
-        out = md + "_",
-        input = tgt,
-        deps = [tgt.replace(".bzl", "")],
-    )
-    for [
-        tgt,
-        md,
-    ] in _DOCS.items()
-]
-
-[
-    diff_test(
-        name = "check_" + md,
-        failure_message = "Run bazel run //docs:update",
-        file1 = md,
-        file2 = md + "_",
-    )
-    for md in _DOCS.values()
-]
-
-write_file(
-    name = "gen_update",
-    out = "update.sh",
-    content = [
-        "#!/usr/bin/env bash",
-        "cd $BUILD_WORKSPACE_DIRECTORY",
-    ] + [
-        "cp -fv bazel-bin/docs/{0}_ docs/{0}".format(md)
-        for md in _DOCS.values()
-    ],
+stardoc_with_diff_test(
+    bzl_library_target = "//js/private:nodejs_binary",
+    out_label = "//docs:nodejs_binary.md",
 )
 
-sh_binary(
+stardoc_with_diff_test(
+    bzl_library_target = "//js:nodejs_test",
+    out_label = "//docs:nodejs_test.md",
+)
+
+stardoc_with_diff_test(
+    bzl_library_target = "//js/private:nodejs_package",
+    out_label = "//docs:nodejs_package.md",
+)
+
+stardoc_with_diff_test(
+    bzl_library_target = "//js:npm_import",
+    out_label = "//docs:npm_import.md",
+)
+
+update_docs(
     name = "update",
-    srcs = ["update.sh"],
-    data = [md + "_" for md in _DOCS.values()],
+    docs_folder = "docs",
 )
