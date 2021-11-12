@@ -31,3 +31,10 @@ def rules_js_dependencies():
         sha256 = "a2b1b60c51b0193ed1646accf77a28cfd4f4ce1f6c86f32ce11455101be3a9c4",
         urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/4.4.3/rules_nodejs-core-4.4.3.tar.gz"],
     )
+
+    maybe(
+        http_archive,
+        name = "aspect_bazel_lib",
+        sha256 = "7cb2faf813bae1712dcb09b23dd8d68fffd8631a25d54b9ca8ae866ca7debc06",
+        urls = ["https://github.com/aspect-build/bazel-lib/releases/download/v0.2.1/bazel_lib-0.2.1.tar.gz"],
+    )
