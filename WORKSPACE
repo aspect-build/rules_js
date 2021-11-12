@@ -30,7 +30,7 @@ go_register_toolchains(version = "1.17.2")
 gazelle_dependencies()
 
 ############################################
-# Fetch node and some npm packages, for local testing
+# Fetch node and some npm packages, for testing our example
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
@@ -52,7 +52,7 @@ npm_import(
 # Read the package-lock.json file to automate creation of remaining npm_import rules
 translate_package_lock(
     name = "npm_deps",
-    package_lock = "//test:package-lock.json",
+    package_lock = "//example:package-lock.json",
 )
 
 # This is the result of translate_package_lock

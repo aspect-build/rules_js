@@ -60,4 +60,5 @@ rules_js_dependencies()
 
 ## Usage
 
-See the API documentation in the [docs](docs/) folder and the example usage in the [test](test/) folder.
+See the API documentation in the [docs](docs/) folder and the example usage in the [example](example/) folder.
+Note that the example also relies on code in the `/WORKSPACE` file in the root of this repo.
