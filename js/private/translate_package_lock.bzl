@@ -87,8 +87,8 @@ def npm_repositories():
             continue
         deps = []
         if "requires" in dep.keys():
-            for (n, d) in dep["requires"].items():
-                deps.append("@" + _repo_name(n, d))
+            for n in dep["requires"].keys():
+                deps.append("@" + _repo_name(n, [d["version"] for (p, d) in lockfile["dependencies"].items() if p == n][0]))
         bzl_out.extend([_NPM_IMPORT_TMPL.format(
             name = _repo_name(name, dep["version"]),
             package = name,
