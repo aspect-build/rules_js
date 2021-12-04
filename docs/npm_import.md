@@ -70,7 +70,7 @@ nodejs_test(
 ## npm_import
 
 <pre>
-npm_import(<a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-name">name</a>)
+npm_import(<a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-name">name</a>, <a href="#npm_import-patches">patches</a>)
 </pre>
 
 Import a single npm package into Bazel.
@@ -130,5 +130,6 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 | <a id="npm_import-version"></a>version |  version of the npm package, such as <code>8.4.0</code>   |  none |
 | <a id="npm_import-deps"></a>deps |  other npm packages this one depends on.   |  <code>[]</code> |
 | <a id="npm_import-name"></a>name |  the external repository generated to contain the package content. This argument may be omitted to get the default name documented above.   |  <code>None</code> |
+| <a id="npm_import-patches"></a>patches |  patch files to apply onto the downloaded npm package. Paths in the patch file must start with <code>extract_tmp/package</code> where <code>package</code> is the top-level folder in the archive on npm.   |  <code>[]</code> |
 
 

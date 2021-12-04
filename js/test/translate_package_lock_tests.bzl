@@ -31,7 +31,7 @@ _lockfile = json.decode("""
             "integrity": "sha512-b==",
             "dev": true,
             "requires": {
-                "@gregmagolan/test-a": "0.0.1"
+                "@gregmagolan/test-a": "~0.0.1"
             }
         }
     }

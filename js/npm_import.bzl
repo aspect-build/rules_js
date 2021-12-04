@@ -14,6 +14,9 @@ def _npm_import_impl(repository_ctx):
         integrity = repository_ctx.attr.integrity,
     )
 
+    for patch in repository_ctx.attr.patches:
+        repository_ctx.patch(patch)
+
     # npm packages are always published with one top-level directory inside the tarball, but the name is not predictable
     # so we have to run an external program to inspect the downloaded folder.
     if repository_ctx.os.name == "Windows":
@@ -60,10 +63,11 @@ _npm_import = repository_rule(
         "integrity": attr.string(),
         "package": attr.string(mandatory = True),
         "version": attr.string(mandatory = True),
+        "patches": attr.label_list(),
     },
 )
 
-def npm_import(integrity, package, version, deps = [], name = None):
+def npm_import(integrity, package, version, deps = [], name = None, patches = []):
     """Import a single npm package into Bazel.
 
     Normally you'd want to use `translate_package_lock` to import all your packages at once.
@@ -124,6 +128,9 @@ def npm_import(integrity, package, version, deps = [], name = None):
             It is optional to make development easier but should be set before shipping.
         package: npm package name, such as `acorn` or `@types/node`
         version: version of the npm package, such as `8.4.0`
+        patches: patch files to apply onto the downloaded npm package.
+            Paths in the patch file must start with `extract_tmp/package`
+            where `package` is the top-level folder in the archive on npm.
     """
 
     _npm_import(
@@ -131,6 +138,7 @@ def npm_import(integrity, package, version, deps = [], name = None):
         deps = deps,
         integrity = integrity,
         package = package,
+        patches = patches,
         version = version,
     )
 
