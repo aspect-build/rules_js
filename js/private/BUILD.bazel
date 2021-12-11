@@ -12,15 +12,6 @@ config_setting(
     values = {"enable_runfiles": "true"},
 )
 
-filegroup(
-    name = "package_content",
-    srcs = glob([
-        "*.bzl",
-        "*.bazel",
-    ]),
-    visibility = ["//js:__pkg__"],
-)
-
 bzl_library(
     name = "nodejs_binary",
     srcs = ["nodejs_binary.bzl"],
