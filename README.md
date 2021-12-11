@@ -31,32 +31,9 @@ In addition, as a clean rewrite many of the bugs in rules_nodejs are naturally r
 
 ## Installation
 
-Include this in your WORKSPACE file:
-
-```starlark
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-http_archive(
-    name = "aspect_rules_js",
-    sha256 = "29ede06bb95ec0216bc917aa4b49c3340a448a05bfdd1fbc68a82bbbb21a193d",
-    url = "https://github.com/aspect-dev/rules_js/releases/download/v0.1.0/rules_js-0.1.0.tar.gz",
-)
-
-load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
-
-# This fetches the aspect_rules_js dependencies, which are:
-# - bazel_skylib
-# - rules_nodejs
-# - aspect_bazel_lib
-# If you want to have a different version of some dependency,
-# you should fetch it *before* calling this.
-# Alternatively, you can skip calling this function, so long as you've
-# already fetched these dependencies.
-rules_js_dependencies()
-```
-
-> note, in the above, replace the version and sha256 with the one indicated
-> in the release notes for aspect_rules_js
-> In the future, our release automation should take care of this.
+From the release you wish to use:
+<https://github.com/aspect-build/rules_js/releases>
+copy the WORKSPACE snippet into your `WORKSPACE` file.
 
 ## Usage
 
