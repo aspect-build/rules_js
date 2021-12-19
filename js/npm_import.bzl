@@ -49,11 +49,20 @@ nodejs_package(
     visibility = ["//visibility:public"],
     deps = {deps},
 )
+
+# The name of the repo can be affected by repository mapping and may not match
+# our declared "npm_foo-1.2.3" naming. So give a stable label as well to use
+# when declaring dependencies between packages.
+alias(
+    name = "pkg",
+    actual = "{name}",
+    visibility = ["//visibility:public"],
+)
 """.format(
         name = repository_ctx.name,
         nested_folder = result.stdout.rstrip("\n"),
         package_name = repository_ctx.attr.package,
-        deps = [str(d) for d in repository_ctx.attr.deps],
+        deps = [str(d.relative(":pkg")) for d in repository_ctx.attr.deps],
     ))
 
 _npm_import = repository_rule(
