@@ -180,8 +180,8 @@ def _nodejs_binary_impl(ctx):
     # long NODE_PATH composed of all the locations of the packages, or adapt the linker
     # to still fill in the runfiles case.
     # For now we just require it if there's more than one package to resolve
-    if len(linkable) > 1 and not ctx.attr.enable_runfiles:
-        fail("need --enable_runfiles for multiple node_modules to be resolved")
+    if len(linkable) > 1 and ctx.attr.is_windows and not ctx.attr.enable_runfiles:
+        fail("need --enable_runfiles on Windows for multiple node_modules to be resolved")
 
     launcher = _windows_launcher(ctx, linkable) if ctx.attr.is_windows else _bash_launcher(ctx, linkable)
     all_files = ctx.files.data + ctx.files._runfiles_lib + [ctx.file.entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
