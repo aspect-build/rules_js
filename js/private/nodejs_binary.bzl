@@ -143,13 +143,17 @@ def _bash_launcher(ctx, linkable):
         ])
     else:
         node_path = ""
-    node_path = "export NODE_PATH=" + ":".join(node_paths)
+    node_path = ":".join(node_paths)
     ctx.actions.write(
         launcher,
         """#!{bash}
 {rlocation_function}
 set -o pipefail -o errexit -o nounset
-{node_path}
+if [[ -n $NODE_PATH ]]; then
+    export NODE_PATH=$NODE_PATH:{node_path}
+else
+    export NODE_PATH={node_path}
+fi
 $(rlocation {node}) \\
 $(rlocation {entry_point}) \\
 {args} $@

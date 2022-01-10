@@ -1,0 +1,8 @@
+load("//dyn/compiler:compiler.bzl", "compiler")
+
+compiler(
+    name = "lib",
+    deps = [
+        "@npm__gregmagolan_test-b-0.0.2//:pkg"
+    ]
+)

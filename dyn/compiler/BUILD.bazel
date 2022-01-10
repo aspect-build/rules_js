@@ -1,0 +1,9 @@
+load("//js:nodejs_binary.bzl", "nodejs_binary")
+
+
+nodejs_binary(
+    name = "bin",
+    data = ["@npm_acorn-8.4.0//:pkg"],
+    entry_point = "compiler.js",
+    visibility = ["//visibility:public"]
+)
