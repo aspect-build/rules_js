@@ -20,16 +20,14 @@ jobs:
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
-            - name: Mount bazel action cache
+            - name: Mount bazel caches
               uses: actions/cache@v2
               with:
-                  path: '~/.cache/bazel'
-                  key: bazel
-            - name: Mount bazel repo cache
-              uses: actions/cache@v2
-              with:
-                  path: '~/.cache/bazel-repo'
-                  key: bazel-repo
+                  path: |
+                      "~/.cache/bazel"
+                      "~/.cache/bazel-repo"
+                  key: bazel-cache-${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', '**/*.js') }}
+                  restore-keys: bazel-cache-
             - name: bazel test //...
               env:
                   # Bazelisk will download bazel to here
