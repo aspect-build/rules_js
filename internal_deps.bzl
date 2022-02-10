@@ -49,7 +49,7 @@ def rules_js_internal_deps():
         strip_prefix = "bazel-skylib-1.1.1",
         urls = [
             "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/archive/1.1.1.tar.gz",
-            "https://github.com/bazelbuild/bazel-skylib/archive/1.1.1.tar.gz",
+            "https://github.com/bazelbuild/bazel-skylib/archive/refs/tags/1.1.1.tar.gz",
         ],
     )
 
