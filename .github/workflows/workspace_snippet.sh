@@ -19,7 +19,7 @@ http_archive(
     name = "aspect_rules_js",
     sha256 = "${SHA}",
     strip_prefix = "${PREFIX}",
-    url = "https://github.com/aspect-build/rules_js/archive/${TAG}.tar.gz",
+    url = "https://github.com/aspect-build/rules_js/archive/refs/tags/${TAG}.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
