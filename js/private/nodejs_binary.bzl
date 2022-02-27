@@ -189,8 +189,10 @@ def _nodejs_binary_impl(ctx):
         files = all_files,
         transitive_files = depset(all_files),
     )
-    for dep in ctx.attr.data:
-        runfiles = runfiles.merge(dep[DefaultInfo].default_runfiles)
+    runfiles = runfiles.merge_all([
+        dep[DefaultInfo].default_runfiles
+        for dep in ctx.attr.data
+    ])
     return DefaultInfo(
         executable = launcher,
         runfiles = runfiles,
