@@ -59,6 +59,7 @@ _ATTRS = {
 
         This is the module referenced by the `require.main` property in the runtime.
         """,
+        mandatory = True,
     ),
     "is_windows": attr.bool(
         mandatory = True,
@@ -82,7 +83,7 @@ _ATTRS = {
 def _strip_external(path):
     return path[len("external/"):] if path.startswith("external/") else path
 
-def _windows_launcher(ctx, linkable):
+def _windows_launcher(ctx, linkable, args):
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.bat" % ctx.label.name)
 
@@ -118,14 +119,14 @@ if defined args (
             rlocation_function = BATCH_RLOCATION_FUNCTION,
             entry_point = to_manifest_path(ctx, ctx.file.entry_point),
             # FIXME: wire in the args to the batch script
-            args = " ".join(ctx.attr.args),
+            args = " ".join(args),
             node_path = node_path,
         ),
         is_executable = True,
     )
     return launcher
 
-def _bash_launcher(ctx, linkable):
+def _bash_launcher(ctx, linkable, args):
     bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
@@ -158,14 +159,14 @@ $(rlocation {entry_point}) \\
             rlocation_function = BASH_RLOCATION_FUNCTION,
             node = _strip_external(node_bin.target_tool_path),
             entry_point = to_manifest_path(ctx, ctx.file.entry_point),
-            args = " ".join(ctx.attr.args),
+            args = " ".join(args),
             node_path = node_path,
         ),
         is_executable = True,
     )
     return launcher
 
-def _nodejs_binary_impl(ctx):
+def _create_launcher(ctx, args):
     linkable = [
         d
         for d in ctx.attr.data
@@ -182,8 +183,9 @@ def _nodejs_binary_impl(ctx):
     # For now we just require it if there's more than one package to resolve
     if len(linkable) > 1 and ctx.attr.is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for multiple node_modules to be resolved")
-
-    launcher = _windows_launcher(ctx, linkable) if ctx.attr.is_windows else _bash_launcher(ctx, linkable)
+    if args == None:
+        args = ctx.attr.args
+    launcher = _windows_launcher(ctx, linkable, args) if ctx.attr.is_windows else _bash_launcher(ctx, linkable, args)
     all_files = ctx.files.data + ctx.files._runfiles_lib + [ctx.file.entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(
         files = all_files,
@@ -193,14 +195,22 @@ def _nodejs_binary_impl(ctx):
         dep[DefaultInfo].default_runfiles
         for dep in ctx.attr.data
     ])
-    return DefaultInfo(
-        executable = launcher,
+    return struct(
+        exe = launcher,
         runfiles = runfiles,
+    )
+
+def _nodejs_binary_impl(ctx):
+    launcher = _create_launcher(ctx, ctx.attr.args)
+    return DefaultInfo(
+        executable = launcher.exe,
+        runfiles = launcher.runfiles,
     )
 
 # Expose our library as a struct so that nodejs_binary and nodejs_test can both extend it
 nodejs_binary_lib = struct(
     attrs = _ATTRS,
+    create_launcher = _create_launcher,
     nodejs_binary_impl = _nodejs_binary_impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
