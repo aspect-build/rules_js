@@ -27,22 +27,41 @@ Bazel will only fetch the packages which are required for the requested targets 
 Thus it is performant to convert a very large package-lock.json file without concern for
 users needing to fetch many unnecessary packages.
 
-Typical usage:
+**Setup**
+
+In `WORKSPACE`, call the repository rule pointing to your package-lock.json file:
+
 ```starlark
 load("@aspect_rules_js//js:npm_import.bzl", "translate_package_lock")
 
 # Read the package-lock.json file to automate creation of remaining npm_import rules
 translate_package_lock(
+    # Creates a new repository named "@npm_deps"
     name = "npm_deps",
     package_lock = "//:package-lock.json",
 )
+```
 
+Next, there are two choices, either load from the generated repo or check in the generated file.
+The tradeoffs are similar to
+[this rules_python thread](https://github.com/bazelbuild/rules_python/issues/608).
+
+1. Immediately load from the generated `repositories.bzl` file in `WORKSPACE`.
+This is similar to the 
+[`pip_parse`](https://github.com/bazelbuild/rules_python/blob/main/docs/pip.md#pip_parse)
+rule in rules_python for example.
+It has the advantage of also creating aliases for simpler dependencies that don't require
+spelling out the version of the packages.
+However it causes Bazel to eagerly evaluate the `translate_package_lock` rule for every build,
+even if the user didn't ask for anything JavaScript-related.
+
+```starlark
 load("@npm_deps//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
 ```
 
-Next, in your BUILD files you can declare dependencies on the packages using the same external repository.
+In BUILD files, declare dependencies on the packages using the same external repository.
 
 Following the same example, this might look like:
 
@@ -53,6 +72,30 @@ nodejs_test(
     entry_point = "test.js",
 )
 ```
+
+2. Check in the `repositories.bzl` file to version control, and load that instead.
+This makes it easier to ship a ruleset that has its own npm dependencies, as users don't
+have to install those dependencies. It also avoids eager-evaluation of `translate_package_lock`
+for builds that don't need it.
+This is similar to the [`update-repos`](https://github.com/bazelbuild/bazel-gazelle#update-repos)
+approach from bazel-gazelle.
+
+In a BUILD file, use a rule like
+[write_source_files](https://github.com/aspect-build/bazel-lib/blob/main/docs/write_source_files.md)
+to copy the generated file to the repo and test that it stays updated:
+
+```starlark
+write_source_files(
+    name = "update_repos",
+    files = {
+        "repositories.bzl": "@npm_deps//:repositories.bzl",
+    },
+)
+```
+
+Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do so.
+In this case, the aliases are not created, so you get only the `npm_import` behavior
+and must depend on packages with their versioned label like `@npm__types_node-15.12.2`.
 
 
 **ATTRIBUTES**
