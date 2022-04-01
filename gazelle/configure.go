@@ -33,7 +33,7 @@ func (ts *Configurer) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
 // any Configurer.
 func (ts *Configurer) KnownDirectives() []string {
 	return []string{
-		TypeScriptGenerationDirective,
+		TypeScriptExtensionDirective,
 		IgnoreImportsDirective,
 		ValidateImportStatementsDirective,
 		EnvironmentDirective,
@@ -84,7 +84,7 @@ func (ts *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 		case "exclude":
 			// We record the exclude directive since we do manual tree traversal of subdirs.
 			config.AddExcludedPattern(value)
-		case TypeScriptGenerationDirective:
+		case TypeScriptExtensionDirective:
 			switch d.Value {
 			case "enabled":
 				config.SetGenerationEnabled(true)
@@ -92,7 +92,7 @@ func (ts *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 				config.SetGenerationEnabled(false)
 			default:
 				err := fmt.Errorf("invalid value for directive %q: %s: possible values are enabled/disabled",
-					TypeScriptGenerationDirective, d.Value)
+					TypeScriptExtensionDirective, d.Value)
 				log.Fatal(err)
 			}
 		case IgnoreImportsDirective:

@@ -21,10 +21,10 @@ const (
 
 // Directives
 const (
-	// TypeScriptGenerationDirective represents the directive that controls whether
+	// TypeScriptExtensionDirective represents the directive that controls whether
 	// this TypeScript generation is enabled or not. Sub-packages inherit this value.
 	// Can be either "enabled" or "disabled". Defaults to "enabled".
-	TypeScriptGenerationDirective = "ts"
+	TypeScriptExtensionDirective = "typescript_extension"
 	// IgnoreImportsDirective represents the directive that controls the
 	// ignored dependencies from the generated targets.
 	IgnoreImportsDirective = "ts_ignore_imports"
