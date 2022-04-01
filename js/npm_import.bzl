@@ -16,7 +16,7 @@ def _npm_import_impl(repository_ctx):
     )
 
     # Apply patches to the extracted package
-    patch(repository_ctx, patches = repository_ctx.attr.patches[:], patch_args = repository_ctx.attr.patch_args)
+    patch(repository_ctx, patch_args = repository_ctx.attr.patch_args)
 
     # npm packages are always published with one top-level directory inside the tarball, but the name is not predictable
     # so we have to run an external program to inspect the downloaded folder.

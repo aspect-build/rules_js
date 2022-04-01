@@ -4,10 +4,6 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//js:nodejs_binary.bzl", "nodejs_binary")
 load("//js:nodejs_test.bzl", "nodejs_test")
 
-exports_files([
-    "test-a.patch",
-])
-
 ###########################
 # Fixtures for tests in this file
 
