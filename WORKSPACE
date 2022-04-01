@@ -53,6 +53,16 @@ npm_import(
 translate_package_lock(
     name = "npm_deps",
     package_lock = "//example:package-lock.json",
+    patch_args = {
+        "@gregmagolan/test-a@0.0.1": [
+            "-p1",
+        ],
+    },
+    patches = {
+        "@gregmagolan/test-a@0.0.1": [
+            "//example:test-a.patch",
+        ],
+    },
 )
 
 # This is the result of translate_package_lock

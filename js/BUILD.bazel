@@ -44,5 +44,8 @@ bzl_library(
     name = "npm_import",
     srcs = ["npm_import.bzl"],
     visibility = ["//visibility:public"],
-    deps = ["//js/private:translate_package_lock"],
+    deps = [
+        "//js/private:translate_package_lock",
+        "@bazel_tools//tools/build_defs/repo:utils.bzl",
+    ],
 )
