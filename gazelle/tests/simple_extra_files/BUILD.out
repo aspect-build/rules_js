@@ -1,0 +1,9 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "simple_extra_files",
+    srcs = [
+        "main.ts",
+        "subdir/index.ts",
+    ],
+)

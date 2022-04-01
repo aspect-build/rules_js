@@ -1,0 +1,11 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "npm_import_types",
+    srcs = ["main.ts"],
+    deps = [
+        "@npm//@types/jquery",
+        "@npm//@types/lodash",
+        "@npm//lodash",
+    ],
+)

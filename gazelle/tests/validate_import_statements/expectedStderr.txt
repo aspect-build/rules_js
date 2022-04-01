@@ -1,0 +1,3 @@
+gazelle: ERROR: Failed to validate dependencies for target "//:validate_import_statements". Import "bad-import" from "main.ts" is an unknown dependency. Possible solutions:
+	1. Instruct Gazelle to resolve to a known dependency using the gazelle:resolve directive.
+	2. Ignore the dependency with a comment '# gazelle:ts_ignore_imports bad-import' in the BUILD file

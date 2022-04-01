@@ -1,0 +1,2 @@
+# gazelle:ts_srcs_file_glob srcs/**/*.ts
+# gazelle:ts_tests_file_glob tests/**/*.ts

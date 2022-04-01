@@ -1,0 +1,8 @@
+{
+    "name": "npm_unused_import",
+    "version": "0.0.1",
+
+    "dependencies": {
+        "lodash": "1"
+    }
+}

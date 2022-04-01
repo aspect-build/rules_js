@@ -1,14 +1,25 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@bazel_gazelle//:def.bzl", "DEFAULT_LANGUAGES", "gazelle", "gazelle_binary")
 
 gazelle_binary(
     name = "gazelle_bin",
-    languages = ["@bazel_skylib//gazelle/bzl"],
+    languages = DEFAULT_LANGUAGES + ["@bazel_skylib//gazelle/bzl"],
 )
 
+# gazelle:prefix aspect.build/rules_js
 gazelle(
     name = "gazelle",
     gazelle = "gazelle_bin",
+)
+
+gazelle(
+    name = "update_go_deps",
+    args = [
+        "-from_file=go.mod",
+        "-to_macro=gazelle/deps.bzl%gazelle_deps",
+        "-prune",
+    ],
+    command = "update-repos",
 )
 
 bzl_library(

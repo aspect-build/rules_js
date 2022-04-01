@@ -1,0 +1,20 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "npm_import_types_js",
+    srcs = [
+        "non-typed.js",
+        "non-typed.jsx",
+        "non-typed.mjs",
+        "typed.ts",
+        "typed.tsx",
+    ],
+    deps = [
+        "@npm//@types/typed-js",
+        "@npm//@types/typed-ts",
+        "@npm//@types/typed-tsx",
+        "@npm//typed-js",
+        "@npm//typed-ts",
+        "@npm//typed-tsx",
+    ],
+)

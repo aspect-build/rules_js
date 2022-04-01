@@ -1,0 +1,9 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+# gazelle:ts_environment node
+
+ts_project(
+    name = "node_native_types",
+    srcs = ["main.ts"],
+    deps = ["@npm//@types/node"],
+)

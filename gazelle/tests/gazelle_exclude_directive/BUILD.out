@@ -1,0 +1,3 @@
+# gazelle:exclude main.ts
+# gazelle:exclude subdir/ignored.ts
+# gazelle:exclude **/*.ig.ts

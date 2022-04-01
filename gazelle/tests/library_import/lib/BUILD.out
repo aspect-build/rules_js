@@ -1,0 +1,13 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "js_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "lib",
+    srcs = ["lib.ts"],
+)
+
+js_library(
+    name = "named-lib",
+    package_name = "my-library",
+    srcs = [":lib"],
+)

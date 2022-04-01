@@ -1,0 +1,8 @@
+{
+    "name": "npm_scoped_import",
+    "version": "0.0.1",
+
+    "dependencies": {
+        "@angular/core": "*"
+    }
+}

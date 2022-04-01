@@ -1,0 +1,8 @@
+{
+    "name": "node_native_types",
+    "version": "0.0.1",
+
+    "devDependencies": {
+        "@types/node": "*"
+    }
+}

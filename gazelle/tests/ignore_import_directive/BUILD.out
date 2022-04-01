@@ -1,0 +1,11 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+# gazelle:ts_ignore_imports jquery
+
+ts_project(
+    name = "ignore_import_directive",
+    srcs = [
+        "main.ts",
+        "sub/other.ts",
+    ],
+)

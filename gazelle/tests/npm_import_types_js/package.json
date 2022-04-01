@@ -1,0 +1,15 @@
+{
+    "name": "npm_import_types",
+    "version": "0.0.1",
+
+    "dependencies": {
+        "typed-js": "*",
+        "typed-ts": "*",
+        "typed-tsx": "*"
+    },
+    "devDependencies": {
+        "@types/typed-js": "*",
+        "@types/typed-ts": "*",
+        "@types/typed-tsx": "*"
+    }
+}

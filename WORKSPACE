@@ -14,6 +14,10 @@ load("//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
+load("//gazelle:deps.bzl", "gazelle_deps")
+
+gazelle_deps()
+
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
 register_unittest_toolchains()
@@ -27,6 +31,7 @@ go_rules_dependencies()
 
 go_register_toolchains(version = "1.17.2")
 
+# gazelle:repository_macro gazelle/deps.bzl%gazelle_deps
 gazelle_dependencies()
 
 ############################################

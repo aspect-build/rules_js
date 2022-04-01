@@ -1,0 +1,10 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "js_library")
+
+# gazelle:ts_project_naming_convention _$package_name$
+# gazelle:ts_tests_naming_convention _$package_name$_tests
+
+js_library(
+    name = "simple_rule_naming",
+    package_name = "simple_rule_naming-package",
+    srcs = [":_simple_rule_naming"],
+)

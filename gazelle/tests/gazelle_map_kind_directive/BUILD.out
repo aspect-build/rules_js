@@ -1,0 +1,8 @@
+load("//:defs.bzl", "ts_my_project")
+
+# gazelle:map_kind ts_project ts_my_project //:defs.bzl
+
+ts_my_project(
+    name = "gazelle_map_kind_directive",
+    srcs = ["main.ts"],
+)

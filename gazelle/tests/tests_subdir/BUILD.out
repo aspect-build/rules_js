@@ -1,0 +1,12 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "tests_subdir",
+    srcs = ["main.ts"],
+)
+
+ts_project(
+    name = "tests_subdir_tests",
+    srcs = ["tests/main.spec.ts"],
+    deps = [":tests_subdir"],
+)

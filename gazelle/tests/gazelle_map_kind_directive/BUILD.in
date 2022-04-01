@@ -1,0 +1,1 @@
+# gazelle:map_kind ts_project ts_my_project //:defs.bzl

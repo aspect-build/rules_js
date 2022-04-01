@@ -1,0 +1,6 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "subproject",
+    srcs = ["lib.ts"],
+)

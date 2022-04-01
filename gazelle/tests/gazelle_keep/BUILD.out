@@ -1,0 +1,12 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "gazelle_keep",
+    srcs = [
+        "lib.ts",
+        "main.ts",
+    ],
+    deps = [
+        "@npm//@types/jquery",  # keep
+    ],
+)

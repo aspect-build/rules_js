@@ -1,0 +1,2 @@
+# gazelle:ts_npm_package_json my_package.json
+# gazelle:ts_npm_package_workspace my_npm

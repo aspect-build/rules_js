@@ -1,0 +1,8 @@
+{
+    "name": "npm_new_import",
+    "version": "0.0.1",
+
+    "dependencies": {
+        "@types/jquery": "*"
+    }
+}

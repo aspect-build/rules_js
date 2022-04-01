@@ -1,0 +1,12 @@
+{
+    "name": "npm_import_types",
+    "version": "0.0.1",
+
+    "dependencies": {
+        "lodash": "1"
+    },
+    "devDependencies": {
+        "@types/jquery": "*",
+        "@types/lodash": "2"
+    }
+}

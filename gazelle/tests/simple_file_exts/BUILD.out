@@ -1,0 +1,23 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "simple_file_exts",
+    srcs = [
+        "non-typed.js",
+        "non-typed.jsx",
+        "non-typed.mjs",
+        "typed.ts",
+        "typed.tsx",
+    ],
+)
+
+ts_project(
+    name = "simple_file_exts_tests",
+    srcs = [
+        "non-typed.spec.js",
+        "non-typed.spec.jsx",
+        "non-typed.spec.mjs",
+        "typed.spec.ts",
+        "typed.spec.tsx",
+    ],
+)

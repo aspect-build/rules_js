@@ -1,0 +1,10 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+# gazelle:ts_npm_package_json my_package.json
+# gazelle:ts_npm_package_workspace my_npm
+
+ts_project(
+    name = "npm_custom_workspace",
+    srcs = ["main.ts"],
+    deps = ["@my_npm//jquery"],
+)

@@ -1,0 +1,8 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+# gazelle:ts_validate_import_statements false
+
+ts_project(
+    name = "validate_import_statements_off",
+    srcs = ["main.ts"],
+)

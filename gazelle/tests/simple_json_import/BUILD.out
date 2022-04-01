@@ -1,0 +1,9 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "simple_json_import",
+    srcs = [
+        "data.json",
+        "main.ts",
+    ],
+)
