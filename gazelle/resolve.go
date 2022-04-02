@@ -162,7 +162,14 @@ func (ts *TypeScript) ResolveModuleDeps(
 					"which resolves from the package declared at %q.\n",
 					EXPLAIN_DEPENDENCY, from.String(), mod.SourcePath, mod.Path, pkg)
 			}
-
+		} else if pkg, found := ts.GetImportableFile(mod.Path); found {
+			deps.Add(pkg)
+			if EXPLAIN_DEPENDENCY == pkg {
+				log.Printf("Explaining dependency (%s): "+
+					"in the target %q, the file %q imports %q, "+
+					"which resolves from the package declared at %q.\n",
+					EXPLAIN_DEPENDENCY, from.String(), mod.SourcePath, mod.Path, pkg)
+			}
 		} else if pkg, found := cfg.GetNpmPackage(mod.Path); found {
 			deps.Add(pkg)
 			if EXPLAIN_DEPENDENCY == pkg {

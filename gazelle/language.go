@@ -14,12 +14,16 @@ type TypeScript struct {
 
 	// Named packages => bazel targets
 	Packages map[string]string
+
+	// Generated files => bazel targets
+	Generated map[string]string
 }
 
 // NewLanguage initializes a new TypeScript that satisfies the language.Language
 // interface. This is the entrypoint for the extension initialization.
 func NewLanguage() language.Language {
 	return &TypeScript{
-		Packages: make(map[string]string),
+		Packages:  make(map[string]string),
+		Generated: make(map[string]string),
 	}
 }

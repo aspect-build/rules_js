@@ -29,14 +29,32 @@ func (c *TypeScript) GetNamedPackage(imprt string) (string, bool) {
 	return "", false
 }
 
-func (ts *TypeScript) CollectNamedPackages(ruleDir string, rules []*rule.Rule) {
-	for _, r := range rules {
+func (ts *TypeScript) CollectNamedPackages(args language.GenerateArgs) {
+	for _, r := range args.File.Rules {
 		if r.Kind() == "js_library" {
 			if pkg := r.AttrString("package_name"); pkg != "" {
-				ts.Packages[pkg] = "//" + ruleDir + ":" + r.Name()
+				ts.Packages[pkg] = "//" + args.Rel + ":" + r.Name()
 			}
 		}
 	}
+}
+
+func (ts *TypeScript) GetImportableFile(imprt string) (string, bool) {
+	if target := ts.Generated[imprt]; target != "" {
+		return target, true
+	}
+	return "", false
+}
+
+func (ts *TypeScript) CollectImportTargets(args language.GenerateArgs) {
+	// Generated files
+	for _, f := range args.GenFiles {
+		if isSourceFile(f) || isDataFile(f) {
+			ts.Generated[stripImportExtensions(f)] = "//" + args.Rel + ":" + f
+		}
+	}
+
+	// TODO(jbedard): record other generated non-source files (args.OtherGen, ?)
 }
 
 // GenerateRules extracts build metadata from source files in a directory.
@@ -59,8 +77,11 @@ func (ts *TypeScript) GenerateRules(args language.GenerateArgs) language.Generat
 		return language.GenerateResult{}
 	}
 
-	// Collect named modules from this target
-	ts.CollectNamedPackages(args.Rel, args.File.Rules)
+	// Collect named modules from this package
+	ts.CollectNamedPackages(args)
+
+	// Collect other importable targets from this apckage
+	ts.CollectImportTargets(args)
 
 	// Collect all source files
 	sourceFiles, dataFiles, collectErr := collectSourceFiles(cfg, args)
@@ -210,8 +231,6 @@ func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*tre
 			dataFiles.Add(f)
 		}
 	}
-
-	// TODO(jbedard): record generated non-source files (args.GenFiles, args.OtherGen, ?)
 
 	// Sub-Directory files
 	// Find source files throughout the sub-directories of this BUILD.

@@ -1,0 +1,6 @@
+# Generated .js
+genrule(
+    name = "generator",
+    outs = ["genlib.js"],
+    cmd = "echo 'export const ANSWER = 42;' > $@",
+)

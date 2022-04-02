@@ -1,0 +1,14 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+# Generated .js
+genrule(
+    name = "generator",
+    outs = ["genlib.js"],
+    cmd = "echo 'export const ANSWER = 42;' > $@",
+)
+
+ts_project(
+    name = "simple_import_generated",
+    srcs = ["main.ts"],
+    deps = ["//:genlib.js"],
+)
