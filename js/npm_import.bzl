@@ -27,18 +27,16 @@ def _npm_import_impl(repository_ctx):
         fail("failed to inspect content of npm download: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
 
     repository_ctx.file("BUILD.bazel", """
+load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
 load("@aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
-load("@rules_nodejs//third_party/github.com/bazelbuild/bazel-skylib:rules/copy_file.bzl", "copy_file")
 
 # Turn a source directory into a TreeArtifact for RBE-compat
-copy_file(
+copy_directory(
     # The default target in this repository
     name = "_{name}",
     src = "extract_tmp/{nested_folder}",
-    # This attribute comes from rules_nodejs patch of
-    # https://github.com/bazelbuild/bazel-skylib/pull/323
-    is_directory = True,
-    # We must give this as the directory in order for it to appear on NODE_PATH
+    # The directory name must match the package in order for node to find it under
+    # NODE_PATH=runfiles/[out]
     out = "{package_name}",
 )
 

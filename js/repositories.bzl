@@ -7,6 +7,10 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
+versions = struct(
+    bazel_lib = "a23d1b03f7c96dfbd660b4946436a7df3515d647",
+)
+
 # WARNING: any changes in this function may be BREAKING CHANGES for users
 # because we'll fetch a dependency which may be different from one that
 # they were previously fetching later in their WORKSPACE setup, and now
@@ -35,7 +39,8 @@ def rules_js_dependencies():
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "e834c368f36cb336b5b42cd1dd9cd4b6bafa0ad3ed7f92f54a47e5ab436e4f59",
-        strip_prefix = "bazel-lib-0.3.0",
-        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v0.3.0.tar.gz",
+        sha256 = "9306cb42e19221ea8ec76c05481fd508aefb5b37b3e35123f542977dabaa8d4b",
+        strip_prefix = "bazel-lib-" + versions.bazel_lib,
+        #url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.bazel_lib),
+        url = "https://github.com/aspect-build/bazel-lib/archive/{}.tar.gz".format(versions.bazel_lib),
     )
