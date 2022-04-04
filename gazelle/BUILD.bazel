@@ -1,11 +1,13 @@
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@bazel_gazelle//:def.bzl", "gazelle_binary", "gazelle_generation_test")
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 load("//js:nodejs_binary.bzl", "nodejs_binary")
 
 go_library(
     name = "gazelle",
-    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    srcs = glob(
+        ["*.go"],
+        exclude = ["*_test.go"],
+    ),
     importpath = "aspect.build/rules_js/gazelle",
     visibility = ["//visibility:public"],
     deps = [
@@ -41,7 +43,6 @@ nodejs_binary(
             ":node_std_modules",
         ],
     )
-
     for test_workspace in glob(["tests/**/WORKSPACE"])
 ]
 
@@ -52,14 +53,13 @@ nodejs_binary(
         srcs = glob(["%s/**" % test_workspace.replace("/WORKSPACE", "")]),
         visibility = ["//visibility:private"],
     )
-
     for test_workspace in glob(["tests/**/WORKSPACE"])
 ]
 
 # Standalone tests
 [
     go_test(
-        name = "%s_test" % (t.replace("_test.go", "")),
+        name = "%s_test" % t.replace("_test.go", ""),
         srcs = [t],
         embed = [":gazelle"],
     )
