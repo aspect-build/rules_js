@@ -1,0 +1,42 @@
+load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
+load("@aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
+load("@aspect_rules_js//js:nodejs_binary.bzl", "nodejs_binary")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+copy_directory(
+    name = "_npm_typescript",
+    src = "package",
+    out = "typescript",
+)
+
+nodejs_package(
+    name = "npm_typescript",
+    src = "_npm_typescript",
+    package_name = "typescript",
+    visibility = ["//visibility:public"],
+    deps = [],
+)
+
+write_file(
+    name = "write_tsc",
+    out = "tsc.js",
+    content = [
+        "const {dirname} = require('path')",
+        "const tsPath = dirname(require.resolve('typescript'))",
+        "require(tsPath + '/tsc.js')",
+    ],
+)
+
+nodejs_binary(
+    name = "tsc",
+    data = ["npm_typescript"],
+    entry_point = "tsc.js",
+    visibility = ["//visibility:public"],
+)
+
+nodejs_binary(
+    name = "validator",
+    data = ["npm_typescript"],
+    entry_point = "@rules_nodejs//nodejs/private:ts_project_options_validator.js",
+    visibility = ["//visibility:public"],
+)

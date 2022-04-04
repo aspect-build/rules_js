@@ -9,6 +9,7 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 versions = struct(
     bazel_lib = "a23d1b03f7c96dfbd660b4946436a7df3515d647",
+    rules_nodejs = "5.4.0",
 )
 
 # WARNING: any changes in this function may be BREAKING CHANGES for users
@@ -32,8 +33,8 @@ def rules_js_dependencies():
     maybe(
         http_archive,
         name = "rules_nodejs",
-        sha256 = "a2b1b60c51b0193ed1646accf77a28cfd4f4ce1f6c86f32ce11455101be3a9c4",
-        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/4.4.3/rules_nodejs-core-4.4.3.tar.gz"],
+        sha256 = "1f9fca05f4643d15323c2dee12bd5581351873d45457f679f84d0fe0da6839b7",
+        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/{0}/rules_nodejs-core-{0}.tar.gz".format(versions.rules_nodejs)],
     )
 
     maybe(
@@ -43,4 +44,12 @@ def rules_js_dependencies():
         strip_prefix = "bazel-lib-" + versions.bazel_lib,
         #url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.bazel_lib),
         url = "https://github.com/aspect-build/bazel-lib/archive/{}.tar.gz".format(versions.bazel_lib),
+    )
+
+    maybe(
+        http_archive,
+        name = "typescript",
+        build_file = "//ts:BUILD.typescript",
+        sha256 = "70d5d30a8ee92004e529c41fc05d5c7993f7a4ddea33b4c0909896936230964d",
+        urls = ["https://registry.npmjs.org/typescript/-/typescript-4.6.3.tgz"],
     )
