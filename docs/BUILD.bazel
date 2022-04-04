@@ -1,26 +1,23 @@
 load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 
 stardoc_with_diff_test(
+    name = "nodejs_binary",
     bzl_library_target = "//js/private:nodejs_binary",
-    out_label = "//docs:nodejs_binary.md",
 )
 
 stardoc_with_diff_test(
+    name = "nodejs_test",
     bzl_library_target = "//js:nodejs_test",
-    out_label = "//docs:nodejs_test.md",
 )
 
 stardoc_with_diff_test(
+    name = "nodejs_package",
     bzl_library_target = "//js/private:nodejs_package",
-    out_label = "//docs:nodejs_package.md",
 )
 
 stardoc_with_diff_test(
+    name = "npm_import",
     bzl_library_target = "//js:npm_import",
-    out_label = "//docs:npm_import.md",
 )
 
-update_docs(
-    name = "update",
-    docs_folder = "docs",
-)
+update_docs(name = "update")
