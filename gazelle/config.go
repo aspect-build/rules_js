@@ -257,9 +257,7 @@ func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
 			if err != nil {
 				fmt.Printf("WARNING: %s", fmt.Errorf("failed to parse tsconfig %s: %w", c.tsconfig_json, err))
 			}
-			if parsedConfig != nil {
-				tsconfig = parsedConfig
-			}
+			tsconfig = parsedConfig
 		}
 
 		if tsconfig == nil {
