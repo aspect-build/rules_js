@@ -49,7 +49,7 @@ func (ts *TypeScript) GetImportableFile(imprt string) (string, bool) {
 func (ts *TypeScript) CollectImportTargets(args language.GenerateArgs) {
 	// Generated files
 	for _, f := range args.GenFiles {
-		if isSourceFile(f) || isDataFile(f) {
+		if isSourceFileType(f) || isDataFileType(f) {
 			ts.Generated[stripImportExtensions(f)] = "//" + args.Rel + ":" + f
 		}
 	}
@@ -225,9 +225,9 @@ func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*tre
 
 	// Source files
 	for _, f := range args.RegularFiles {
-		if isSourceFile(f) {
+		if isSourceFileType(f) {
 			sourceFiles.Add(f)
-		} else if isDataFile(f) {
+		} else if isDataFileType(f) {
 			dataFiles.Add(f)
 		}
 	}
@@ -260,9 +260,9 @@ func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*tre
 				}
 
 				// Otherwise the file is either source or potentially importable
-				if isSourceFile(f) {
+				if isSourceFileType(f) {
 					sourceFiles.Add(f)
-				} else if isDataFile(f) {
+				} else if isDataFileType(f) {
 					dataFiles.Add(f)
 				}
 
@@ -306,21 +306,21 @@ func checkCollisionErrors(tsProjectTargetName string, args language.GenerateArgs
 }
 
 // If the file is ts-compatible source code that may contain typescript imports
-func isSourceFile(f string) bool {
+func isSourceFileType(f string) bool {
 	ext := filepath.Ext(f)
 
 	// Currently any source files may be parsed as ts and may contain imports
 	return len(ext) > 0 && sourceFileExtensions.Contains(ext[1:])
 }
 
-func isDataFile(f string) bool {
+func isDataFileType(f string) bool {
 	ext := filepath.Ext(f)
 	return len(ext) > 0 && dataFileExtensions.Contains(ext[1:])
 }
 
 // Strip extensions off of a path if it can be imported without the extension
 func stripImportExtensions(f string) string {
-	if !isSourceFile(f) {
+	if !isSourceFileType(f) {
 		return f
 	}
 
@@ -341,7 +341,7 @@ func toWorkspacePath(pkg, importFrom, importPath string) string {
 
 // If the file is an index it can be imported with the directory name
 func isIndexFile(f string) bool {
-	if !isSourceFile(f) {
+	if !isSourceFileType(f) {
 		return false
 	}
 

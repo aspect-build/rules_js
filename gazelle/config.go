@@ -306,7 +306,7 @@ func (c *TypeScriptConfig) SetSourceFileGlob(srcsFileGlob string) {
 	c.srcsFileGlob = srcsFileGlob
 }
 func (c *TypeScriptConfig) IsSourceFile(filePath string) bool {
-	if !isSourceFile(filePath) {
+	if !isSourceFileType(filePath) {
 		return false
 	}
 	if c.srcsFileGlob == "" {
@@ -327,7 +327,7 @@ func (c *TypeScriptConfig) SetTestFileGlob(testsFileGlob string) {
 	c.testsFileGlob = testsFileGlob
 }
 func (c *TypeScriptConfig) IsTestFile(filePath string) bool {
-	if !isSourceFile(filePath) {
+	if !isSourceFileType(filePath) {
 		return false
 	}
 	if c.testsFileGlob == "" {
