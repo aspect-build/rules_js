@@ -28,8 +28,21 @@ func (ts *TypeScript) Imports(c *config.Config, r *rule.Rule, f *rule.File) []re
 	srcs := r.AttrStrings("srcs")
 	provides := make([]resolve.ImportSpec, 0, len(srcs)+1)
 
+	cfgs := c.Exts[languageName].(Configs)
+	cfg := cfgs[f.Pkg]
+
+	baseUrl := cfg.GetTsCompilerOptions().BaseUrl
+
 	for _, src := range srcs {
-		spec := stripImportExtensions(filepath.Clean(filepath.Join(f.Pkg, src)))
+		src = filepath.Clean(filepath.Join(f.Pkg, src))
+
+		spec, err := filepath.Rel(baseUrl, src)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", fmt.Errorf("tsconfig baseUrl error %e", err))
+			spec = src
+		}
+
+		spec = stripImportExtensions(spec)
 
 		provides = append(provides, resolve.ImportSpec{
 			Lang: languageName,
