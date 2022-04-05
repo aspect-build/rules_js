@@ -250,17 +250,27 @@ func (c *TypeScriptConfig) SetTsconfigJSON(tsconfig_json string) {
 }
 func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
 	if c._tsconfig == nil {
+		var tsconfig *TsCompilerOptions
+
 		if c.tsconfig_json != "" {
-			tsconfig, err := ParseTsConfigOptions(c.tsconfig_json)
+			parsedConfig, err := ParseTsConfigOptions(c.tsconfig_json)
 			if err != nil {
 				fmt.Printf("WARNING: %s", fmt.Errorf("failed to parse tsconfig %s: %w", c.tsconfig_json, err))
-				c._tsconfig = DefaultOptions()
-			} else {
-				c._tsconfig = tsconfig
 			}
-		} else {
-			c._tsconfig = DefaultOptions()
+			if parsedConfig != nil {
+				tsconfig = parsedConfig
+			}
 		}
+
+		if tsconfig == nil {
+			if c.parent != nil {
+				tsconfig = c.parent.GetTsCompilerOptions()
+			} else {
+				tsconfig = DefaultOptions()
+			}
+		}
+
+		c._tsconfig = tsconfig
 	}
 
 	return c._tsconfig

@@ -25,7 +25,7 @@ func ParseTsConfigOptions(tsconfigPath string) (*TsCompilerOptions, error) {
 	if err != nil {
 		// Support non-existing tsconfig
 		if os.IsNotExist(err) {
-			return DefaultOptions(), nil
+			return nil, nil
 		}
 
 		return nil, err
