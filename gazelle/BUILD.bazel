@@ -57,14 +57,33 @@ nodejs_binary(
 ]
 
 # Standalone tests
-[
-    go_test(
-        name = "%s_test" % t.replace("_test.go", ""),
-        srcs = [t],
-        embed = [":gazelle"],
-    )
-    for t in glob(["*_test.go"])
-]
+
+# Standalone tests
+go_test(
+    name = "config_test",
+    srcs = ["config_test.go"],
+    data = glob(["ts_test/**"]),
+    embed = [":gazelle"],
+)
+
+go_test(
+    name = "parser_test",
+    srcs = ["parser_test.go"],
+    embed = [":gazelle"],
+)
+
+go_test(
+    name = "generate_test",
+    srcs = ["generate_test.go"],
+    embed = [":gazelle"],
+)
+
+go_test(
+    name = "ts_test",
+    srcs = ["ts_test.go"],
+    data = glob(["ts_test/**"]),
+    embed = [":gazelle"],
+)
 
 gazelle_binary(
     name = "gazelle_js_binary",

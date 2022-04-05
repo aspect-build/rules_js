@@ -25,6 +25,9 @@ const (
 	// this TypeScript generation is enabled or not. Sub-packages inherit this value.
 	// Can be either "enabled" or "disabled". Defaults to "enabled".
 	TypeScriptExtensionDirective = "typescript_extension"
+	// TypeScriptConfigJson represents the tsconfig.json file of the current typescript
+	// compilation
+	TypeScriptConfigJson = "ts_config"
 	// IgnoreImportsDirective represents the directive that controls the
 	// ignored dependencies from the generated targets.
 	IgnoreImportsDirective = "ts_ignore_imports"
@@ -93,6 +96,7 @@ type TypeScriptConfig struct {
 	repoRoot          string
 	npm_package_json  string
 	npm_workspace     string
+	tsconfig_json     string
 	environmentType   EnvironmentType
 
 	excludedPatterns         *treeset.Set
@@ -104,6 +108,7 @@ type TypeScriptConfig struct {
 	testsFileGlob            string
 
 	_npm_packages *treeset.Set
+	_tsconfig     *TsCompilerOptions
 }
 
 // New creates a new TypeScriptConfig.
@@ -116,6 +121,7 @@ func NewTypeScriptConfig(
 		environmentType:          EnvironmentOther,
 		npm_package_json:         "package.json",
 		npm_workspace:            "npm",
+		tsconfig_json:            "tsconfig.json", // TODO: off by default?
 		excludedPatterns:         treeset.NewWithStringComparator(),
 		ignoreDependencies:       treeset.NewWithStringComparator(),
 		validateImportStatements: true,
@@ -125,6 +131,7 @@ func NewTypeScriptConfig(
 		testsFileGlob:            fmt.Sprintf("**/*.{spec,test}.{%s}", strings.Join(sourceFileExtensionsArray, ",")),
 
 		_npm_packages: nil,
+		_tsconfig:     nil,
 	}
 }
 
@@ -143,6 +150,7 @@ func (c *TypeScriptConfig) NewChild() *TypeScriptConfig {
 		environmentType:          c.environmentType,
 		npm_package_json:         c.npm_package_json,
 		npm_workspace:            c.npm_workspace,
+		tsconfig_json:            c.tsconfig_json,
 		excludedPatterns:         c.excludedPatterns,
 		ignoreDependencies:       treeset.NewWithStringComparator(),
 		validateImportStatements: c.validateImportStatements,
@@ -152,6 +160,7 @@ func (c *TypeScriptConfig) NewChild() *TypeScriptConfig {
 		testsFileGlob:            c.testsFileGlob,
 
 		_npm_packages: c._npm_packages,
+		_tsconfig:     c._tsconfig,
 	}
 }
 
@@ -233,6 +242,34 @@ func (c *TypeScriptConfig) GetNpmPackage(imprt string) (string, bool) {
 	DEBUG("GetNpmPackage: %q => None", imprt)
 
 	return "", false
+}
+
+func (c *TypeScriptConfig) SetTsconfigJSON(tsconfig_json string) {
+	c._tsconfig = nil
+	c.tsconfig_json = tsconfig_json
+}
+func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
+	if c._tsconfig == nil {
+		if c.tsconfig_json != "" {
+			tsconfig, err := ParseTsConfigOptions(c.tsconfig_json)
+			if err != nil {
+				fmt.Printf("WARNING: %s", fmt.Errorf("failed to parse tsconfig %s: %w", c.tsconfig_json, err))
+				c._tsconfig = DefaultOptions()
+			} else {
+				c._tsconfig = tsconfig
+			}
+		} else {
+			c._tsconfig = DefaultOptions()
+		}
+	}
+
+	return c._tsconfig
+}
+
+func (c *TypeScriptConfig) IsWithinTsRoot(sourcepath string) bool {
+	root := c.GetTsCompilerOptions().RootDir
+
+	return root == "." || strings.HasPrefix(filepath.Clean(sourcepath), root)
 }
 
 // Adds a dependency to the list of ignored dependencies for

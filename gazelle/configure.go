@@ -119,6 +119,8 @@ func (ts *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 			config.SetNpmWorkspace(value)
 		case NpmPackageJson:
 			config.SetNpmPackageJSON(value)
+		case TypeScriptConfigJson:
+			config.SetTsconfigJSON(value)
 		}
 	}
 }

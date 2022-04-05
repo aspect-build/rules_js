@@ -220,15 +220,19 @@ func isBazelPackage(dir string) bool {
 }
 
 func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*treeset.Set, *treeset.Set, error) {
+	// TODO(jbedard): only collect from within ts rootdirs?
+
 	sourceFiles := treeset.NewWithStringComparator()
 	dataFiles := treeset.NewWithStringComparator()
 
 	// Source files
 	for _, f := range args.RegularFiles {
-		if isSourceFileType(f) {
-			sourceFiles.Add(f)
-		} else if isDataFileType(f) {
-			dataFiles.Add(f)
+		if cfg.IsWithinTsRoot(f) {
+			if isSourceFileType(f) {
+				sourceFiles.Add(f)
+			} else if isDataFileType(f) {
+				dataFiles.Add(f)
+			}
 		}
 	}
 
@@ -257,6 +261,11 @@ func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*tre
 				f, _ := filepath.Rel(args.Dir, filePath)
 				if cfg.IsFileExcluded(f) {
 					return nil
+				}
+
+				// Exclude files outside of a declared typescript root directory
+				if !cfg.IsWithinTsRoot(f) {
+					return filepath.SkipDir
 				}
 
 				// Otherwise the file is either source or potentially importable
