@@ -94,6 +94,7 @@ type TypeScriptConfig struct {
 
 	generationEnabled bool
 	repoRoot          string
+	configDir         string
 	npm_package_json  string
 	npm_workspace     string
 	tsconfig_json     string
@@ -118,6 +119,7 @@ func NewTypeScriptConfig(
 	return &TypeScriptConfig{
 		generationEnabled:        true,
 		repoRoot:                 repoRoot,
+		configDir:                ".",
 		environmentType:          EnvironmentOther,
 		npm_package_json:         "package.json",
 		npm_workspace:            "npm",
@@ -142,11 +144,12 @@ func (c *TypeScriptConfig) Parent() *TypeScriptConfig {
 
 // NewChild creates a new child TypeScriptConfig. It inherits desired values from the
 // current TypeScriptConfig and sets itself as the parent to the child.
-func (c *TypeScriptConfig) NewChild() *TypeScriptConfig {
+func (c *TypeScriptConfig) NewChild(childPath string) *TypeScriptConfig {
 	return &TypeScriptConfig{
 		parent:                   c,
 		generationEnabled:        c.generationEnabled,
 		repoRoot:                 c.repoRoot,
+		configDir:                childPath,
 		environmentType:          c.environmentType,
 		npm_package_json:         c.npm_package_json,
 		npm_workspace:            c.npm_workspace,
@@ -245,6 +248,10 @@ func (c *TypeScriptConfig) GetNpmPackage(imprt string) (string, bool) {
 }
 
 func (c *TypeScriptConfig) SetTsconfigJSON(tsconfig_json string) {
+	if c._tsconfig != nil {
+		fmt.Printf("ERROR: %s", fmt.Errorf("tsconfig %s already parsed", c.tsconfig_json))
+	}
+
 	c._tsconfig = nil
 	c.tsconfig_json = tsconfig_json
 }
@@ -252,11 +259,15 @@ func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
 	if c._tsconfig == nil {
 		var tsconfig *TsCompilerOptions
 
+		// If the tsconfig option is set try loading it
 		if c.tsconfig_json != "" {
-			parsedConfig, err := ParseTsConfigOptions(c.tsconfig_json)
+			tsconfigPath := filepath.Join(c.configDir, c.tsconfig_json)
+
+			parsedConfig, err := ParseTsConfigOptions(c.repoRoot, tsconfigPath)
 			if err != nil {
-				fmt.Printf("WARNING: %s", fmt.Errorf("failed to parse tsconfig %s: %w", c.tsconfig_json, err))
+				fmt.Printf("WARNING: %s", fmt.Errorf("failed to parse tsconfig %s in %s: %w", c.tsconfig_json, c.configDir, err))
 			}
+
 			tsconfig = parsedConfig
 		}
 

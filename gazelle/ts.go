@@ -20,11 +20,12 @@ type tsConfigOptions struct {
 
 // ParseTsConfigOptions loads a tsconfig.json file and return the compilerOptions config
 // TODO(jbedard): support multi-file configs, use native TypeScript tsconfig loader
-func ParseTsConfigOptions(tsconfigPath string) (*TsCompilerOptions, error) {
-	content, err := os.ReadFile(tsconfigPath)
+func ParseTsConfigOptions(rootDir, tsconfigPath string) (*TsCompilerOptions, error) {
+	content, err := os.ReadFile(filepath.Join(rootDir, tsconfigPath))
 	if err != nil {
 		// Support non-existing tsconfig
 		if os.IsNotExist(err) {
+			DEBUG("%s / %s not found\n", rootDir, tsconfigPath)
 			return nil, nil
 		}
 
@@ -38,16 +39,16 @@ func ParseTsConfigOptions(tsconfigPath string) (*TsCompilerOptions, error) {
 
 	compilerOptions := allRes.CompilerOptions
 
-	return normalizeOptions(&compilerOptions), nil
+	return normalizeOptions(filepath.Dir(tsconfigPath), &compilerOptions), nil
 }
 
 func DefaultOptions() *TsCompilerOptions {
-	return normalizeOptions(&TsCompilerOptions{})
+	return normalizeOptions("", &TsCompilerOptions{})
 }
 
-func normalizeOptions(compilerOptions *TsCompilerOptions) *TsCompilerOptions {
-	compilerOptions.BaseUrl = filepath.Clean(compilerOptions.BaseUrl)
-	compilerOptions.RootDir = filepath.Clean(compilerOptions.RootDir)
+func normalizeOptions(configDir string, compilerOptions *TsCompilerOptions) *TsCompilerOptions {
+	compilerOptions.BaseUrl = filepath.Join(configDir, filepath.Clean(compilerOptions.BaseUrl))
+	compilerOptions.RootDir = filepath.Join(configDir, filepath.Clean(compilerOptions.RootDir))
 
 	return compilerOptions
 }

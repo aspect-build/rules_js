@@ -69,7 +69,7 @@ func (ts *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 	config, exists := configs[rel]
 	if !exists {
 		parent := configs.ParentForPackage(rel)
-		config = parent.NewChild()
+		config = parent.NewChild(rel)
 		configs[rel] = config
 	}
 

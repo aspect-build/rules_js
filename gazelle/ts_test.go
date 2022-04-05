@@ -7,12 +7,12 @@ import (
 )
 
 func parseTest(t *testing.T, configPath string) *TsCompilerOptions {
-	runfile, err := bazel.Runfile("gazelle/ts_test/" + configPath)
+	testDataDir, err := bazel.Runfile("gazelle/ts_test/")
 	if err != nil {
 		t.Fatalf("cannot lookup runfile: %v", err)
 	}
 
-	options, err := ParseTsConfigOptions(runfile)
+	options, err := ParseTsConfigOptions(testDataDir, configPath)
 	if err != nil {
 		t.Fatalf("failed to parse options: %v", err)
 	}

@@ -7,13 +7,13 @@ import (
 )
 
 func createTsConfigOptions(t *testing.T, configPath string) *TypeScriptConfig {
-	runfile, err := bazel.Runfile("gazelle/ts_test/" + configPath)
+	testDataDir, err := bazel.Runfile("gazelle/ts_test/")
 	if err != nil {
 		t.Fatalf("cannot lookup runfile: %v", err)
 	}
 
-	cf := NewTypeScriptConfig("root")
-	cf.SetTsconfigJSON(runfile)
+	cf := NewTypeScriptConfig(testDataDir)
+	cf.SetTsconfigJSON(configPath)
 	return cf
 }
 
