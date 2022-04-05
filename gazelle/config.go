@@ -204,7 +204,7 @@ func (c *TypeScriptConfig) GetNpmPackages() *treeset.Set {
 		packages, err := parsePackageJSONFile(c.npm_workspace, filepath.Join(c.repoRoot, c.npm_package_json))
 
 		if err != nil {
-			fmt.Sprintln("WARNING: ", fmt.Errorf("failed to parse package.json %s: %w", c.npm_package_json, err))
+			fmt.Printf("WARNING: %s\n", fmt.Errorf("failed to parse package.json %s: %w", c.npm_package_json, err))
 			packages = treeset.NewWithStringComparator()
 		}
 
@@ -347,6 +347,10 @@ func (c *TypeScriptConfig) IsTestFile(filePath string) bool {
 func parsePackageJSONFile(npm_workspace, npm_package_json string) (*treeset.Set, error) {
 	content, err := os.ReadFile(npm_package_json)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return treeset.NewWithStringComparator(), nil
+		}
+
 		return nil, err
 	}
 
