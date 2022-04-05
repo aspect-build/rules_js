@@ -36,25 +36,32 @@ func (ts *TypeScript) Imports(c *config.Config, r *rule.Rule, f *rule.File) []re
 	for _, src := range srcs {
 		src = filepath.Clean(filepath.Join(f.Pkg, src))
 
-		spec, err := filepath.Rel(baseUrl, src)
+		// Can be imported by full path
+		specs := []string{src}
+
+		// Can potentially be imported by baseUrl
+		rebasedSrc, err := filepath.Rel(baseUrl, src)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", fmt.Errorf("tsconfig baseUrl error %e", err))
-			spec = src
+		} else if rebasedSrc != src {
+			specs = append(specs, rebasedSrc)
 		}
 
-		spec = stripImportExtensions(spec)
+		for _, spec := range specs {
+			spec = stripImportExtensions(spec)
 
-		provides = append(provides, resolve.ImportSpec{
-			Lang: languageName,
-			Imp:  spec,
-		})
-
-		// Index files can also be imported using only the directory
-		if isIndexFile(src) {
 			provides = append(provides, resolve.ImportSpec{
 				Lang: languageName,
-				Imp:  strings.TrimRight(filepath.Dir(spec), indexFileName),
+				Imp:  spec,
 			})
+
+			// Index files can also be imported using only the directory
+			if isIndexFile(src) {
+				provides = append(provides, resolve.ImportSpec{
+					Lang: languageName,
+					Imp:  strings.TrimRight(filepath.Dir(spec), indexFileName),
+				})
+			}
 		}
 	}
 
