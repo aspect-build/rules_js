@@ -265,6 +265,8 @@ func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*tre
 					return nil
 				}
 
+				f = filepath.Join(cfg.configDir, f)
+
 				// Exclude files outside of a declared typescript root directory
 				if !cfg.IsWithinTsRoot(f) {
 					return filepath.SkipDir
