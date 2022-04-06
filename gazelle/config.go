@@ -299,6 +299,7 @@ func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
 func (c *TypeScriptConfig) IsWithinTsRoot(sourcepath string) bool {
 	root := c.GetTsCompilerOptions().RootDir
 
+	// TODO(jbedard) fix: use propper directory-contains
 	return root == "." || strings.HasPrefix(filepath.Clean(sourcepath), root)
 }
 
