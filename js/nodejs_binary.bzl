@@ -1,13 +1,16 @@
 "wrapper macro for nodejs_binary rule"
 
-load("//js/private:nodejs_binary.bzl", lib = "nodejs_binary_lib")
+load("//js/private:nodejs_binary.bzl", _lib = "nodejs_binary_lib")
 
 _nodejs_binary = rule(
-    implementation = lib.nodejs_binary_impl,
-    attrs = lib.attrs,
+    implementation = _lib.nodejs_binary_impl,
+    attrs = _lib.attrs,
     executable = True,
-    toolchains = lib.toolchains,
+    toolchains = _lib.toolchains,
 )
+
+# export the starlark library as a public API
+lib = _lib
 
 def nodejs_binary(**kwargs):
     _nodejs_binary(

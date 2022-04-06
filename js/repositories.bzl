@@ -7,6 +7,14 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
+versions = struct(
+    bazel_lib = "0.8.3",
+    rules_nodejs = "5.4.0",
+    # Users can easily override the typescript version just by declaring their own http_archive
+    # named "npm_typescript" prior to calling rules_js_dependencies.
+    typescript = "4.6.3",
+)
+
 # WARNING: any changes in this function may be BREAKING CHANGES for users
 # because we'll fetch a dependency which may be different from one that
 # they were previously fetching later in their WORKSPACE setup, and now
@@ -28,14 +36,22 @@ def rules_js_dependencies():
     maybe(
         http_archive,
         name = "rules_nodejs",
-        sha256 = "a2b1b60c51b0193ed1646accf77a28cfd4f4ce1f6c86f32ce11455101be3a9c4",
-        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/4.4.3/rules_nodejs-core-4.4.3.tar.gz"],
+        sha256 = "1f9fca05f4643d15323c2dee12bd5581351873d45457f679f84d0fe0da6839b7",
+        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/{0}/rules_nodejs-core-{0}.tar.gz".format(versions.rules_nodejs)],
     )
 
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "e834c368f36cb336b5b42cd1dd9cd4b6bafa0ad3ed7f92f54a47e5ab436e4f59",
-        strip_prefix = "bazel-lib-0.3.0",
-        url = "https://github.com/aspect-build/bazel-lib/archive/v0.3.0.tar.gz",
+        sha256 = "b3de6702d48904e8dbe9b45d29e5f07d3258d826981fda87424462b36f16b35f",
+        strip_prefix = "bazel-lib-" + versions.bazel_lib,
+        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.bazel_lib),
+    )
+
+    maybe(
+        http_archive,
+        name = "npm_typescript",
+        build_file = "@aspect_rules_js//ts:BUILD.typescript",
+        sha256 = "70d5d30a8ee92004e529c41fc05d5c7993f7a4ddea33b4c0909896936230964d",
+        urls = ["https://registry.npmjs.org/typescript/-/typescript-{}.tgz".format(versions.typescript)],
     )
