@@ -1,0 +1,10 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+
+ts_project(
+    name = "tsconfig_rootdirs",
+    srcs = [
+        "srcA/main_a.ts",
+        "srcB/main_b.ts",
+    ],
+    tsconfig = "//:tsconfig.json",
+)
