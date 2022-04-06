@@ -227,7 +227,7 @@ func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*tre
 
 	// Source files
 	for _, f := range args.RegularFiles {
-		fullPath := filepath.Join(cfg.configDir, f)
+		fullPath := filepath.Join(args.Dir, f)
 
 		if cfg.IsWithinTsRoot(fullPath) {
 			if isSourceFileType(f) {
