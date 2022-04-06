@@ -47,15 +47,16 @@ def ts_project_macro(
         incremental = False,
         emit_declaration_only = False,
         ts_build_info_file = None,
-        tsc = "@typescript//:tsc",
+        tsc = "@npm_typescript//:tsc",
         validate = True,
-        validator = "@typescript//:validator",
+        validator = "@npm_typescript//:validator",
         declaration_dir = None,
         out_dir = None,
         root_dir = None,
         **kwargs):
-    """Compiles one TypeScript project using `tsc --project`
+    """Compiles one TypeScript project using `tsc --project`.
 
+    For the list of args, see the ts_project rule.
     """
 
     if srcs == None:
