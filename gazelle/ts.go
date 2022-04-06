@@ -10,6 +10,10 @@ import (
 // TODO(jbedard): rootDirs in addition to rootDir
 
 type TsCompilerOptions struct {
+	// The directory the options were loaded from
+	ConfigDir string
+
+	// tsconfig.json values
 	BaseUrl string `json:"baseUrl"`
 	RootDir string `json:"rootDir"`
 }
@@ -47,6 +51,7 @@ func DefaultOptions() *TsCompilerOptions {
 }
 
 func normalizeOptions(configDir string, compilerOptions *TsCompilerOptions) *TsCompilerOptions {
+	compilerOptions.ConfigDir = configDir
 	compilerOptions.BaseUrl = filepath.Join(configDir, filepath.Clean(compilerOptions.BaseUrl))
 	compilerOptions.RootDir = filepath.Join(configDir, filepath.Clean(compilerOptions.RootDir))
 

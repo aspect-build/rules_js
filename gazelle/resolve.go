@@ -97,12 +97,20 @@ func (ts *TypeScript) Resolve(
 	modulesRaw interface{},
 	from label.Label,
 ) {
+	cfgs := c.Exts[languageName].(Configs)
+	cfg := cfgs[from.Pkg]
+
 	deps := ts.ResolveModuleDeps(c, ix, modulesRaw.(*treeset.Set), from)
 
 	DEBUG("RESOLVED(%s): %s => %s", from.Name, modulesRaw.(*treeset.Set).Values(), deps.Values())
 
 	if !deps.Empty() {
 		r.SetAttr("deps", convertDependencySetToExpr(deps))
+	}
+
+	tsconfig := cfg.GetTsConfigRule()
+	if tsconfig != "" {
+		r.SetAttr("tsconfig", tsconfig)
 	}
 }
 

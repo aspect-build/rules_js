@@ -3,4 +3,5 @@ load("@npm//@bazel/typescript:index.bzl", "ts_project")
 ts_project(
     name = "tsconfig_rootdir",
     srcs = ["src/main.ts"],
+    tsconfig = "//:tsconfig.json",
 )

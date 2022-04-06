@@ -3,5 +3,6 @@ load("@npm//@bazel/typescript:index.bzl", "ts_project")
 ts_project(
     name = "app",
     srcs = ["app.ts"],
+    tsconfig = "//:tsconfig.json",
     deps = ["//src/lib"],
 )

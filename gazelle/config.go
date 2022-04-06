@@ -255,6 +255,17 @@ func (c *TypeScriptConfig) SetTsconfigJSON(tsconfig_json string) {
 	c._tsconfig = nil
 	c.tsconfig_json = tsconfig_json
 }
+func (c *TypeScriptConfig) GetTsConfigRule() string {
+	configDir := c.GetTsCompilerOptions().ConfigDir
+	if configDir == "" {
+		return ""
+	}
+	if configDir == "." {
+		configDir = ""
+	}
+
+	return "//" + configDir + ":" + c.tsconfig_json
+}
 func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
 	if c._tsconfig == nil {
 		var tsconfig *TsCompilerOptions
