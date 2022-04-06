@@ -220,8 +220,6 @@ func isBazelPackage(dir string) bool {
 }
 
 func collectSourceFiles(cfg *TypeScriptConfig, args language.GenerateArgs) (*treeset.Set, *treeset.Set, error) {
-	// TODO(jbedard): only collect from within ts rootdirs?
-
 	sourceFiles := treeset.NewWithStringComparator()
 	dataFiles := treeset.NewWithStringComparator()
 
