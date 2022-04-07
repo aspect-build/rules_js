@@ -5,9 +5,7 @@ load("@rules_nodejs//nodejs/private:ts_project.bzl", _ts_project_lib = "ts_proje
 
 # buildifier: disable=bzl-visibility
 load("@rules_nodejs//nodejs/private:ts_validate_options.bzl", validate_lib = "lib")
-
 load("//js:merge_deps.bzl", "merge_deps")
-
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
 validate_options = rule(
@@ -17,7 +15,7 @@ validate_options = rule(
 
 def _run_tsc(ctx, link_workspace_root, executable = "tsc", **kwargs):
     # TODO: get name of the deps attribute from somewhere?
-    (tools, env) = merge_deps(ctx, tool_attr =  executable, dep_attr = "deps")
+    (tools, env) = merge_deps(ctx, tool_attr = executable, dep_attr = "deps")
     ctx.actions.run(
         executable = ctx.executable.tsc,
         tools = [tools],

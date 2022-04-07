@@ -1,8 +1,10 @@
+"Rollup bundler implmentation"
+
 load("//js:merge_deps.bzl", "merge_deps")
 
 def _impl(ctx):
-    (tools, env) = merge_deps(ctx, tool_attr =  "_rollup_bin", dep_attr = "deps")
-    
+    (tools, env) = merge_deps(ctx, tool_attr = "_rollup_bin", dep_attr = "deps")
+
     output = ctx.actions.declare_directory("output")
 
     args = ctx.actions.args()
@@ -21,25 +23,23 @@ def _impl(ctx):
         arguments = [args],
         outputs = [output],
         tools = [tools],
-        env = env
+        env = env,
     )
 
     return [
-        DefaultInfo(files = depset([output]))
+        DefaultInfo(files = depset([output])),
     ]
-    
-
 
 rollup_bundle = rule(
     implementation = _impl,
     attrs = {
         "deps": attr.label_list(),
         "srcs": attr.label_list(allow_files = True),
-        "config_file": attr.label(allow_single_file = True,),
+        "config_file": attr.label(allow_single_file = True),
         "_rollup_bin": attr.label(
             default = "//rollup:bin",
             executable = True,
-            cfg = "target"
-        )
-    }
+            cfg = "target",
+        ),
+    },
 )

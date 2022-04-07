@@ -1,10 +1,24 @@
+"Dependency merging helper"
+
 def merge_deps(ctx, tool_attr, dep_attr):
-    """
-    Collects third-party dependecies and merges them with first-party dependencies provides them as tools for actions to consume those dependecies.
+    """Merges third-party dependencies  with first-party dependencies.
+
+    Typical usage of this helper goes
+    ```
+    (tools, env) = merge_deps(ctx, tool_attr = "_tool", dep_attr = "deps")
+    ctx.actions.run(
+        ...
+        tools = [tools],
+        env = env,
+    )
+    ```
+
     Args:
         ctx: Action context
-        tool_attr:Name of the attribute to get tool from
+        tool_attr: Name of the attribute to get tool from
         dep_attr: Name of the attribute to collect deps from
+    Returns:
+        A tuple containing (tools, env)
     """
     symlinks = []
 
@@ -18,9 +32,9 @@ def merge_deps(ctx, tool_attr, dep_attr):
         symlinks.append(output)
         ctx.actions.symlink(
             output = output,
-            target_file = symlink.target_file
+            target_file = symlink.target_file,
         )
-    
+
     tools = depset(getattr(ctx.files, dep_attr), transitive = [depset(symlinks)])
 
     env = {

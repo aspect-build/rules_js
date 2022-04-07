@@ -1,3 +1,3 @@
 const a: string = 'a'
 
-console.log(process.env);
+console.log(process.env)

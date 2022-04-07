@@ -5,6 +5,6 @@ ts_project(
     srcs = ["foo.ts"],
     declaration = True,
     deps = [
-        "@npm_deps//@types/node"
+        "@npm_deps//@types/node",
     ],
 )

@@ -225,17 +225,16 @@ diff_test(
     file2 = "actual7",
 )
 
-
 rollup_bundle(
     name = "bundle",
     srcs = [
         "require_acorn.js",
     ],
+    config_file = ":rollup.config.js",
     deps = [
-        "@npm_deps//@gregmagolan/test-b",
         "@npm_acorn-8.4.0",
+        "@npm_deps//@gregmagolan/test-b",
         "@npm_deps//@rollup/plugin-commonjs",
-        "@npm_deps//@rollup/plugin-node-resolve"
+        "@npm_deps//@rollup/plugin-node-resolve",
     ],
-    config_file = ":rollup.config.js"
 )

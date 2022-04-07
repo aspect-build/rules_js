@@ -7,5 +7,5 @@ nodejs_package(
         "index.js",
         "package.json",
     ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )

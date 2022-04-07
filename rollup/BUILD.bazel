@@ -1,12 +1,11 @@
 load("//js:nodejs_binary.bzl", "nodejs_binary")
 
-
 nodejs_binary(
     name = "bin",
     data = [
-        "@npm_rollup-2.70.1//:pkg", 
-        "//linker"
+        "//linker",
+        "@npm_rollup-2.70.1//:pkg",
     ],
     entry_point = "rollup.js",
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )

@@ -1,7 +1,7 @@
-const {link} = require("@rules_js/linker");
+const { link } = require('@rules_js/linker')
 
-console.log(process.cwd());
+console.log(process.cwd())
 
-link();
+link()
 
-require("rollup/dist/bin/rollup");
+require('rollup/dist/bin/rollup')

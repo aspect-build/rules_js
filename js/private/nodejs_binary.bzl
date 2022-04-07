@@ -90,7 +90,14 @@ def _windows_launcher(ctx, linkable, args):
     if len(linkable):
         p = linkable[0][LinkablePackageInfo].package_name
         dots = "/".join([".."] * len(p.split("/")))
-        node_path = "call :rlocation \"node_modules/{0}\" node_path\nset NODE_PATH=!node_path!/{1}".format(p, dots)
+        node_path = """
+call :rlocation \"node_modules/{0}\" node_path
+if defined NODE_PATH (
+    set NODE_PATH=!node_path!/{1}
+) else (
+    set NODE_PATH=%NODE_PATH%;!node_path!/{1}
+)
+""".format(p, dots)
     else:
         node_path = ""
 
