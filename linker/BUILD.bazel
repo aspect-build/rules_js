@@ -1,0 +1,11 @@
+load("//js:nodejs_package.bzl", "nodejs_package")
+
+nodejs_package(
+    name = "linker",
+    package_name = "@rules_js/linker",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"]
+)

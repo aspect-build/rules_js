@@ -3,6 +3,7 @@ load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("//js:nodejs_binary.bzl", "nodejs_binary")
 load("//js:nodejs_test.bzl", "nodejs_test")
+load("//rollup:rollup.bzl", "rollup_bundle")
 
 ###########################
 # Fixtures for tests in this file
@@ -222,4 +223,19 @@ diff_test(
     name = "test7",
     file1 = "expected7",
     file2 = "actual7",
+)
+
+
+rollup_bundle(
+    name = "bundle",
+    srcs = [
+        "require_acorn.js",
+    ],
+    deps = [
+        "@npm_deps//@gregmagolan/test-b",
+        "@npm_acorn-8.4.0",
+        "@npm_deps//@rollup/plugin-commonjs",
+        "@npm_deps//@rollup/plugin-node-resolve"
+    ],
+    config_file = ":rollup.config.js"
 )

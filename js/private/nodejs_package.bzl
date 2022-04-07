@@ -1,7 +1,7 @@
 "nodejs_package rule"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
+load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo", "declaration_info",)
 
 _DOC = """Defines a library that executes in a node.js runtime.
     
@@ -152,6 +152,11 @@ def _nodejs_package_impl(ctx):
     return [
         DefaultInfo(files = files, runfiles = runfiles),
         LinkablePackageInfo(package_name = ctx.attr.package_name, files = [output]),
+        # TODO: figure this out why we need this
+        declaration_info(
+            declarations = files,
+            deps = ctx.attr.deps,
+        )
     ]
 
 nodejs_package_lib = struct(

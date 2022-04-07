@@ -150,7 +150,7 @@ def _bash_launcher(ctx, linkable, args):
         """#!{bash}
 {rlocation_function}
 set -o pipefail -o errexit -o nounset
-if [[ -n $NODE_PATH ]]; then
+if [[ -n "${{NODE_PATH-}}" ]]; then
     export NODE_PATH=$NODE_PATH:{node_path}
 else
     export NODE_PATH={node_path}

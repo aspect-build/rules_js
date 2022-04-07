@@ -16,6 +16,9 @@ nodejs_package(
     src = "_npm_typescript",
     package_name = "typescript",
     visibility = ["//visibility:public"],
+    deps = [
+        "@aspect_rules_js//linker"
+    ]
 )
 
 # Needed to address the entry_point within the typescript package
@@ -26,6 +29,8 @@ write_file(
     out = "tsc.js",
     content = [
         "const {dirname} = require('path')",
+        "const {link} = require('@rules_js/linker')",
+        "link()",
         "const tsPath = dirname(require.resolve('typescript'))",
         "require(tsPath + '/tsc.js')",
     ],

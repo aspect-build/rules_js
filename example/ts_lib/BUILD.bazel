@@ -4,4 +4,7 @@ ts_project(
     name = "ts",
     srcs = ["foo.ts"],
     declaration = True,
+    deps = [
+        "@npm_deps//@types/node"
+    ],
 )
