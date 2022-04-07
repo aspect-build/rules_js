@@ -1,7 +1,7 @@
 "nodejs_package rule"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
+load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo", "declaration_info")
 
 _DOC = """Defines a library that executes in a node.js runtime.
     
@@ -152,6 +152,10 @@ def _nodejs_package_impl(ctx):
     return [
         DefaultInfo(files = files, runfiles = runfiles),
         LinkablePackageInfo(package_name = ctx.attr.package_name, files = [output]),
+        # Assume every npm package publishes typings, rather than make this conditional
+        # on an action that inspects the package.json for a typings field and looks for
+        # .d.ts files in the package.
+        declaration_info(declarations = depset([output]), deps = ctx.attr.deps),
     ]
 
 nodejs_package_lib = struct(
