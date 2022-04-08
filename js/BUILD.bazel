@@ -1,6 +1,7 @@
 "Public API"
 
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load(":nodejs_binary.bzl", "nodejs_binary")
 
 exports_files(
     glob(["*.bzl"]),
@@ -48,4 +49,10 @@ bzl_library(
         "//js/private:translate_package_lock",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",
     ],
+)
+
+nodejs_binary(
+    name = "postinstall",
+    entry_point = "//js/private:postinstall.js",
+    visibility = ["//visibility:public"],
 )

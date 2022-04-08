@@ -7,6 +7,11 @@ exports_files(
     visibility = ["//docs:__pkg__"],
 )
 
+exports_files(
+    ["postinstall.js"],
+    visibility = ["//js:__pkg__"],
+)
+
 config_setting(
     name = "enable_runfiles",
     values = {"enable_runfiles": "true"},

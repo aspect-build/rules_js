@@ -27,23 +27,50 @@ def _npm_import_impl(repository_ctx):
     if result.return_code:
         fail("failed to inspect content of npm download: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
 
-    repository_ctx.file("BUILD.bazel", """
-load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
+    nested_folder = result.stdout.rstrip("\n")
+
+    # Remove any spaces in the nested folder name
+    if " " in nested_folder:
+        new_nested_folder = nested_folder.replace(" ", "_")
+        if repository_ctx.os.name == "Windows":
+            result = repository_ctx.execute(["move", "extract_tmp\\%s" % nested_folder, "extract_tmp\\%s" % new_nested_folder])
+        else:
+            result = repository_ctx.execute(["mv", "extract_tmp/%s" % nested_folder, "extract_tmp/%s" % new_nested_folder])
+        if result.return_code:
+            fail("failed to rename nested package folder that had spaces: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.stdout, result.stderr))
+        nested_folder = new_nested_folder
+
+    package_path = "extract_tmp" + _sep(repository_ctx) + nested_folder
+    has_posinstall = _has_postinstall(repository_ctx, package_path)
+    build_content = ""
+
+    if has_posinstall:
+        build_content += """load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
+
+# Run postinstall on the npm package
+run_binary(
+    name = "_{name}_postinstall",
+    srcs = ["extract_tmp/{nested_folder}"],
+    args = [ "$(location extract_tmp/{nested_folder})", "$(@D)"],
+    tool = "@aspect_rules_js//js:postinstall",
+    output_dir = True,
+)
+
+"""
+    build_content += """load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
 load("@aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
 
-# Turn a source directory into a TreeArtifact for RBE-compat
+# The directory name must match the package in order for node to find it under
+# NODE_PATH=runfiles/[out]
 copy_directory(
-    # The default target in this repository
-    name = "_{name}",
-    src = "extract_tmp/{nested_folder}",
-    # The directory name must match the package in order for node to find it under
-    # NODE_PATH=runfiles/[out]
+    name ="_{name}",
+    src = ":{copy_directory_src}",
     out = "{package_name}",
 )
 
 nodejs_package(
     name = "{name}",
-    src = "_{name}",
+    src = ":_{name}",
     package_name = "{package_name}",
     visibility = ["//visibility:public"],
     deps = {deps},
@@ -57,12 +84,16 @@ alias(
     actual = "{name}",
     visibility = ["//visibility:public"],
 )
-""".format(
+"""
+    build_content = build_content.format(
         name = repository_ctx.name,
-        nested_folder = result.stdout.rstrip("\n"),
+        nested_folder = nested_folder,
         package_name = repository_ctx.attr.package,
         deps = [str(d.relative(":pkg")) for d in repository_ctx.attr.deps],
-    ))
+        copy_directory_src = ("_%s_postinstall" % repository_ctx.name) if has_posinstall else ("extract_tmp/%s" % nested_folder)
+    )
+
+    repository_ctx.file("BUILD.bazel", build_content)
 
 _npm_import = repository_rule(
     implementation = _npm_import_impl,
@@ -159,3 +190,13 @@ translate_package_lock = repository_rule(
     implementation = lib.implementation,
     attrs = lib.attrs,
 )
+
+def _has_postinstall(repository_ctx, package_path):
+    pkg_json_path = package_path + _sep(repository_ctx) + "package.json"
+    pkg_json_content = json.decode(repository_ctx.read(pkg_json_path))
+    return "scripts" in pkg_json_content and "postinstall" in pkg_json_content["scripts"]
+
+def _sep(repository_ctx):
+    if repository_ctx.os.name == "Windows":
+        return "\\"
+    return "/"

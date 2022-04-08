@@ -223,3 +223,33 @@ diff_test(
     file1 = "expected7",
     file2 = "actual7",
 )
+
+#######################################
+# Test case 8
+# postinstall creates a file
+# The @aspect-test/qar package's postinstall creates a data.json file
+
+write_file(
+    name = "postinstall_file_exists_test",
+    out = "postinstall_file_exists_test.js",
+    content = ["""
+const fs = require("fs");
+const path = require("path");
+const packageDir = process.argv[2];
+
+const content = JSON.parse(fs.readFileSync(path.join(packageDir, "data.json")));
+if (content.random !== '42') {
+    console.error("expected random to be '42'")
+    process.exit(1);
+}
+"""]
+)
+
+nodejs_test(
+    name = "test8",
+    entry_point = ":postinstall_file_exists_test",
+    args = ["$(location @npm__aspect-test_qar-4.0.0)"],
+    data = [
+        "@npm__aspect-test_qar-4.0.0//:pkg",
+    ]
+)
