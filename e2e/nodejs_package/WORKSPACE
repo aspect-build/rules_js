@@ -1,0 +1,33 @@
+local_repository(
+  name = "aspect_rules_js",
+  path = "../.."
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "node16",
+    node_version = "16.9.0",
+)
+
+load("@aspect_rules_js//js:translate_pnpm_lock.bzl", "translate_pnpm_lock")
+
+translate_pnpm_lock(
+    name = "npm",
+    # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
+    pnpm_lock = "//:pnpm-lock.json",
+    patch_args = {
+        "@aspect-test/qar@4.0.0": ["-p1"],
+    },
+    patches = {
+        "@aspect-test/qar@4.0.0": ["//:qar.patch"],
+    },
+)
+
+load("@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()

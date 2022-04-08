@@ -17,6 +17,7 @@ bzl_library(
     srcs = ["nodejs_binary.bzl"],
     visibility = ["//:__subpackages__"],
     deps = [
+        "@aspect_bazel_lib//lib:copy_file",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
         "@rules_nodejs//nodejs:bzl",
@@ -28,13 +29,36 @@ bzl_library(
     srcs = ["nodejs_package.bzl"],
     visibility = ["//:__subpackages__"],
     deps = [
+        "@aspect_bazel_lib//lib:copy_directory",
         "@bazel_skylib//lib:paths",
         "@rules_nodejs//nodejs:bzl",
+        ":npm_utils",
     ],
 )
 
 bzl_library(
-    name = "translate_package_lock",
-    srcs = ["translate_package_lock.bzl"],
+    name = "npm_import",
+    srcs = ["npm_import.bzl"],
     visibility = ["//js:__subpackages__"],
+    deps = [
+        "@aspect_bazel_lib//lib:repo_utils",
+        ":npm_utils",
+    ],
+)
+
+bzl_library(
+    name = "npm_utils",
+    srcs = ["npm_utils.bzl"],
+    visibility = ["//js:__subpackages__"],
+)
+
+bzl_library(
+    name = "translate_pnpm_lock",
+    srcs = ["translate_pnpm_lock.bzl"],
+    visibility = ["//js:__subpackages__"],
+    deps = [
+        "@bazel_skylib//lib:dicts",
+        "@bazel_skylib//lib:paths",
+        ":npm_utils",
+    ],
 )

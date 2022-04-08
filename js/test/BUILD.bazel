@@ -1,3 +1,0 @@
-load(":translate_package_lock_tests.bzl", "translate_package_lock_tests")
-
-translate_package_lock_tests(name = "test_translate_package_lock")

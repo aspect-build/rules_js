@@ -1,8 +1,26 @@
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@example_npm_deps//:nodejs_packages.bzl", "nodejs_packages")
+load("@example_npm_deps//:package.bzl", "package", "package_dir")
+load("@example_npm_deps__acorn-8.4.0//:nodejs_package.bzl", nodejs_package_acorn = "nodejs_package")
 load("//js:nodejs_binary.bzl", "nodejs_binary")
+load("//js:nodejs_package.bzl", "nodejs_package")
 load("//js:nodejs_test.bzl", "nodejs_test")
+
+###########################
+
+nodejs_package_acorn()
+
+nodejs_packages()
+
+nodejs_package(
+    name = package("@mycorp/mylib").name,
+    src = "//example/lib",
+    package_name = "@mycorp/mylib",
+    deps = [package("acorn")],
+)
 
 ###########################
 # Fixtures for tests in this file
@@ -65,19 +83,20 @@ diff_test(
 
 genrule(
     name = "call_acorn",
-    srcs = ["one.js"],
+    srcs = [
+        "one.js",
+        package("acorn"),
+        package_dir("acorn"),
+    ],
     outs = ["actual2"],
     cmd = """
         $(NODE_PATH) \\
-        ./$(execpath @npm_acorn-8.4.0)/bin/acorn \\
+        ./$(execpath %s)/bin/acorn \\
         --compact \\
         $(execpath one.js) \\
-        > $@""",
+        > $@""" % package_dir("acorn"),
     toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = [
-        "@node16_toolchains//:resolved_toolchain",
-        "@npm_acorn-8.4.0",
-    ],
+    tools = ["@node16_toolchains//:resolved_toolchain"],
 )
 
 diff_test(
@@ -91,28 +110,24 @@ diff_test(
 # Run a first-party program that requires a package from npm
 # Use a genrule to prove that works
 
+copy_to_bin(
+    name = "require_acorn_js",
+    srcs = ["require_acorn.js"],
+)
+
 genrule(
     name = "require_acorn",
-    srcs = ["require_acorn.js"],
+    srcs = [
+        ":require_acorn_js",
+        package("acorn"),
+    ],
     outs = ["actual3"],
-    # Note: confusingly, node uses an environment variable NODE_PATH as a "global"
-    # location for module resolutions, but we used the same name for the Make
-    # variable exposed by the nodejs tooling.
-    # One is interpreted by the bash shell, while the other is interpreted by
-    # bazel, so it doesn't cause any problems.
-    # Note, the trailing "/.." on the NODE_PATH variable is because our target
-    # points to the output directory we wrote, named "acorn", but node needs
-    # to start its module search in a directory *containing* one called "acorn"
     cmd = """
-        NODE_PATH=./$(execpath @npm_acorn-8.4.0)/.. \\
         $(NODE_PATH) \\
-        ./$(execpath require_acorn.js) \\
+        ./$(execpath :require_acorn_js) \\
         $@""",
     toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = [
-        "@node16_toolchains//:resolved_toolchain",
-        "@npm_acorn-8.4.0",
-    ],
+    tools = ["@node16_toolchains//:resolved_toolchain",],
 )
 
 diff_test(
@@ -128,7 +143,7 @@ diff_test(
 
 nodejs_binary(
     name = "bin",
-    data = ["@npm_acorn-8.4.0"],
+    data = [package("acorn")],
     entry_point = "require_acorn.js",
 )
 
@@ -136,7 +151,7 @@ run_binary(
     name = "run4",
     srcs = [],
     outs = ["actual4"],
-    args = ["$(location actual4)"],
+    args = ["$(execpath actual4)"],
     tool = ":bin",
 )
 
@@ -152,7 +167,7 @@ diff_test(
 
 nodejs_test(
     name = "test_test",
-    data = ["@npm_deps//@types/node"],
+    data = ["@example_npm_deps//@types/node"],
     entry_point = "test.js",
 )
 
@@ -170,15 +185,14 @@ write_file(
 
 nodejs_binary(
     name = "bin6",
-    data = ["//example/lib"],
+    data = [package("@mycorp/mylib")],
     entry_point = "case6.js",
 )
 
 run_binary(
     name = "run6",
-    srcs = [],
     outs = ["actual6"],
-    args = ["$(location actual6)"],
+    args = ["$(execpath actual6)"],
     tool = ":bin6",
 )
 
@@ -206,7 +220,7 @@ write_file(
 
 nodejs_binary(
     name = "bin7",
-    data = ["@npm_deps//@gregmagolan/test-b"],
+    data = ["@example_npm_deps//@gregmagolan/test-b"],
     entry_point = "case7.js",
 )
 
@@ -214,7 +228,7 @@ run_binary(
     name = "run7",
     srcs = [],
     outs = ["actual7"],
-    args = ["$(location actual7)"],
+    args = ["$(execpath actual7)"],
     tool = ":bin7",
 )
 

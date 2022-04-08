@@ -45,7 +45,16 @@ bzl_library(
     srcs = ["npm_import.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//js/private:translate_package_lock",
-        "@bazel_tools//tools/build_defs/repo:utils.bzl",
+        "//js/private:npm_import",
+        "//js/private:npm_utils",
+    ],
+)
+
+bzl_library(
+    name = "translate_pnpm_lock",
+    srcs = ["translate_pnpm_lock.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//js/private:translate_pnpm_lock",
     ],
 )

@@ -1,0 +1,25 @@
+lockfileVersion: 5.3
+
+specifiers:
+  '@gregmagolan/test-b': ^0.0.2
+  '@types/node': ^15.12.2
+
+devDependencies:
+  '@gregmagolan/test-b': 0.0.2
+  '@types/node': 15.14.9
+
+packages:
+
+  /@gregmagolan/test-a/0.0.1:
+    resolution: {integrity: sha512-nMZ3MKkXZ+uYbrm8R3dfdt3v1gOOLtf88CdDciWxMYGLr29oVjQG11y2fz4IRBR6R7hI2Gj+G9sHZ69wLTnjfA==}
+    dev: true
+
+  /@gregmagolan/test-b/0.0.2:
+    resolution: {integrity: sha512-h+LeJUbUued9XyQwxKMUdklGiGxPYJ1RvTAK9612ctCiMS2Fn0wu/Au5kHsMHxm8l4bOfpgAWmQ0OQQy7wUBCg==}
+    dependencies:
+      '@gregmagolan/test-a': 0.0.1
+    dev: true
+
+  /@types/node/15.14.9:
+    resolution: {integrity: sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==}
+    dev: true
