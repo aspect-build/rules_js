@@ -1,0 +1,3 @@
+load(":translate_pnpm_lock_tests.bzl", "translate_pnpm_lock_tests")
+
+translate_pnpm_lock_tests(name = "test_translate_pnpm_lock")

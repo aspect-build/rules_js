@@ -1,8 +1,8 @@
 "nodejs_binary and nodejs_test rules"
 
-load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_manifest_path")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "BATCH_RLOCATION_FUNCTION")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file_action")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -83,16 +83,9 @@ _ATTRS = {
 def _strip_external(path):
     return path[len("external/"):] if path.startswith("external/") else path
 
-def _windows_launcher(ctx, linkable, args):
+def _windows_launcher(ctx, entry_point, args):
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.bat" % ctx.label.name)
-
-    if len(linkable):
-        p = linkable[0][LinkablePackageInfo].package_name
-        dots = "/".join([".."] * len(p.split("/")))
-        node_path = "call :rlocation \"node_modules/{0}\" node_path\nset NODE_PATH=!node_path!/{1}".format(p, dots)
-    else:
-        node_path = ""
 
     ctx.actions.write(
         output = launcher,
@@ -106,7 +99,6 @@ call :rlocation "{entry_point}" entry_point
 
 for %%a in ("!node!") do set "node_dir=%%~dpa"
 set PATH=%node_dir%;%PATH%
-{node_path}
 set args=%*
 rem Escape \ and * in args before passsing it with double quote
 if defined args (
@@ -117,76 +109,53 @@ if defined args (
 """.format(
             node = _strip_external(node_bin.target_tool_path),
             rlocation_function = BATCH_RLOCATION_FUNCTION,
-            entry_point = to_manifest_path(ctx, ctx.file.entry_point),
+            entry_point = to_manifest_path(ctx, entry_point),
             # FIXME: wire in the args to the batch script
             args = " ".join(args),
-            node_path = node_path,
         ),
         is_executable = True,
     )
     return launcher
 
-def _bash_launcher(ctx, linkable, args):
+def _bash_launcher(ctx, entry_point, args):
     bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
 
-    # The working directory in a bazel binary is runfiles/my_wksp
-    node_paths = ["$(pwd)/../node_modules"]
-    if len(linkable):
-        pkgs = [link[LinkablePackageInfo].package_name for link in linkable]
-        node_paths.extend([
-            "$(rlocation node_modules/{0})/{1}".format(
-                p,
-                "/".join([".."] * len(p.split("/"))),
-            )
-            for p in pkgs
-        ])
-    else:
-        node_path = ""
-    node_path = "export NODE_PATH=" + ":".join(node_paths)
     ctx.actions.write(
         launcher,
         """#!{bash}
 {rlocation_function}
 set -o pipefail -o errexit -o nounset
-{node_path}
 $(rlocation {node}) \\
 $(rlocation {entry_point}) \\
-{args} $@
+$@
 """.format(
             bash = bash_bin,
             rlocation_function = BASH_RLOCATION_FUNCTION,
             node = _strip_external(node_bin.target_tool_path),
-            entry_point = to_manifest_path(ctx, ctx.file.entry_point),
+            entry_point = to_manifest_path(ctx, entry_point),
             args = " ".join(args),
-            node_path = node_path,
         ),
         is_executable = True,
     )
     return launcher
 
 def _create_launcher(ctx, args):
-    linkable = [
-        d
-        for d in ctx.attr.data
-        if LinkablePackageInfo in d and
-           len(d[LinkablePackageInfo].files) == 1 and
-           d[LinkablePackageInfo].files[0].is_directory
-    ]
-
-    # We use the root_symlinks feature of runfiles to make a node_modules directory
-    # containing all our modules, but you need to have --enable_runfiles for that to
-    # exist on the disk. If it doesn't we can probably do something else, like a very
-    # long NODE_PATH composed of all the locations of the packages, or adapt the linker
-    # to still fill in the runfiles case.
-    # For now we just require it if there's more than one package to resolve
-    if len(linkable) > 1 and ctx.attr.is_windows and not ctx.attr.enable_runfiles:
-        fail("need --enable_runfiles on Windows for multiple node_modules to be resolved")
     if args == None:
         args = ctx.attr.args
-    launcher = _windows_launcher(ctx, linkable, args) if ctx.attr.is_windows else _bash_launcher(ctx, linkable, args)
-    all_files = ctx.files.data + ctx.files._runfiles_lib + [ctx.file.entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
+
+    # copy the entry_point to bazel-out if it is a source file
+    if ctx.file.entry_point.is_source:
+        entry_point = ctx.actions.declare_file(ctx.file.entry_point.basename, sibling = ctx.file.entry_point)
+        copy_file_action(ctx, ctx.file.entry_point, entry_point, is_windows = ctx.attr.is_windows)
+    else:
+        entry_point = ctx.file.entry_point
+
+    # create the launcer
+    launcher = _windows_launcher(ctx, entry_point, args) if ctx.attr.is_windows else _bash_launcher(ctx, entry_point, args)
+
+    all_files = ctx.files.data + ctx.files._runfiles_lib + [entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(
         files = all_files,
         transitive_files = depset(all_files),
@@ -210,7 +179,6 @@ def _nodejs_binary_impl(ctx):
 # Expose our library as a struct so that nodejs_binary and nodejs_test can both extend it
 nodejs_binary_lib = struct(
     attrs = _ATTRS,
-    create_launcher = _create_launcher,
     nodejs_binary_impl = _nodejs_binary_impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced

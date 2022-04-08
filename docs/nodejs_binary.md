@@ -56,25 +56,6 @@ with a `deps` attribute at the callsite.
 | <a id="nodejs_binary-is_windows"></a>is_windows |  Whether the build is being performed on a Windows host platform.<br><br>        Typical usage of this rule is via a macro which automatically sets this         attribute based on a <code>select()</code> on <code>@bazel_tools//src/conditions:host_windows</code>.   | Boolean | required |  |
 
 
-<a id="#nodejs_binary_lib.create_launcher"></a>
-
-## nodejs_binary_lib.create_launcher
-
-<pre>
-nodejs_binary_lib.create_launcher(<a href="#nodejs_binary_lib.create_launcher-ctx">ctx</a>, <a href="#nodejs_binary_lib.create_launcher-args">args</a>)
-</pre>
-
-
-
-**PARAMETERS**
-
-
-| Name  | Description | Default Value |
-| :------------- | :------------- | :------------- |
-| <a id="nodejs_binary_lib.create_launcher-ctx"></a>ctx |  <p align="center"> - </p>   |  none |
-| <a id="nodejs_binary_lib.create_launcher-args"></a>args |  <p align="center"> - </p>   |  none |
-
-
 <a id="#nodejs_binary_lib.nodejs_binary_impl"></a>
 
 ## nodejs_binary_lib.nodejs_binary_impl

@@ -1,19 +1,12 @@
 "BUILD file inserted into @npm_typescript repository"
-load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
 load("@aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
 load("@aspect_rules_js//js:nodejs_binary.bzl", "nodejs_binary")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-
-# For RBE compatibility, the package must be a TreeArtifact in bazel-out
-copy_directory(
-    name = "_npm_typescript",
-    src = "package",
-    out = "typescript",
-)
 
 nodejs_package(
     name = "npm_typescript",
-    src = "_npm_typescript",
+    src = ":package",
     package_name = "typescript",
     visibility = ["//visibility:public"],
 )
@@ -38,9 +31,15 @@ nodejs_binary(
     visibility = ["//visibility:public"],
 )
 
+copy_file(
+    name = "ts_project_options_validator_js",
+    src = "@rules_nodejs//nodejs/private:ts_project_options_validator.js",
+    out = "ts_project_options_validator.js",
+)
+
 nodejs_binary(
     name = "validator",
     data = ["npm_typescript"],
-    entry_point = "@rules_nodejs//nodejs/private:ts_project_options_validator.js",
+    entry_point = ":ts_project_options_validator.js",
     visibility = ["//visibility:public"],
 )

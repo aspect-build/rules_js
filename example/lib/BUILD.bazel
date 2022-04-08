@@ -1,12 +1,10 @@
-load("//js:nodejs_package.bzl", "nodejs_package")
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 
-nodejs_package(
+copy_to_directory(
     name = "lib",
-    package_name = "@mycorp/mylib",
     srcs = [
         "index.js",
         "package.json",
     ],
     visibility = ["//visibility:public"],
-    deps = ["@npm_acorn-8.4.0"],
 )

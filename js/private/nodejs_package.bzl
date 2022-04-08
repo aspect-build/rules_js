@@ -1,40 +1,47 @@
 "nodejs_package rule"
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
+load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
+load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
+load(":npm_utils.bzl", "npm_utils")
 
-_DOC = """Defines a library that executes in a node.js runtime.
-    
+NodejsPackageInfo = provider(
+    fields = {
+        "link_package": "package that this nodejs package is linked at",
+        "name": "name of this nodejs package",
+        "version": "version of this nodejs package",
+        "virtual_store_directory": "the TreeArtifact of this nodejs package's virtual store location"
+    },
+)
+
+VIRTUAL_STORE_ROOT = ".aspect_rules_js"
+
+_DOC = """Defines a nodejs package that is linked into a node_modules tree.
+
 The term "package" is defined at
 <https://nodejs.org/docs/latest-v16.x/api/packages.html>
 
-To be compatible with Bazel's remote execution protocol,
-all source files are copied to an an output directory,
-which is 
+The nodejs package is linked with a pnpm style symlinked node_modules output tree.
 
-NB: This rule is not yet tested on Windows
+See https://pnpm.io/symlinked-node-modules-structure for more information on
+the symlinked node_modules structure.
+Npm may also support a symlinked node_modules structure called
+"Isolated mode" in the future:
+https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 """
 
 _ATTRS = {
     "src": attr.label(
         allow_single_file = True,
-        doc = """A TreeArtifact containing the npm package files.
-        
-        Exactly one of `src` or `srcs` should be set.
-        """,
-    ),
-    "srcs": attr.label_list(
-        allow_files = True,
-        doc = """Files to copy into the package directory.
-        
-        Exactly one of `src` or `srcs` should be set.
-        """,
+        doc = """A source directory or TreeArtifact containing the package files.
+
+Can be left unspecified to allow for circular deps between nodejs_packages.        
+""",
     ),
     "deps": attr.label_list(
-        doc = """Other packages this one depends on.
+        doc = """Other nodejs packages this one depends on.
 
         This should include *all* modules the program may need at runtime.
-        
+
         > In typical usage, a node.js program sometimes requires modules which were
         > never declared as dependencies.
         > This pattern is typically used when the program has conditional behavior
@@ -46,124 +53,149 @@ _ATTRS = {
         > In contrast, Bazel makes it possible to make builds hermetic, which means that
         > all dependencies of a program must be declared when running in Bazel's sandbox.
         """,
+        providers = [NodejsPackageInfo],
     ),
     "package_name": attr.string(
+        # TODO: validate that name matches in an action if src is set
         doc = "Must match the `name` field in the `package.json` file for this package.",
         mandatory = True,
     ),
-    "remap_paths": attr.string_dict(),
+    "package_version": attr.string(
+        # TODO: validate that version matches in an action if src is set
+        doc = "Must match the `version` field in the `package.json` file for this package.",
+        default = "0.0.0",
+    ),
+    "transitive": attr.bool(
+        doc = "If True, this is a transitive nodejs_package which is not linked as a top-level node_module",
+    ),
     "is_windows": attr.bool(mandatory = True),
 }
 
-# Hints for Bazel spawn strategy
-_execution_requirements = {
-    # Copying files is entirely IO-bound and there is no point doing this work remotely.
-    # Also, remote-execution does not allow source directory inputs, see
-    # https://github.com/bazelbuild/bazel/commit/c64421bc35214f0414e4f4226cc953e8c55fa0d2
-    # So we must not attempt to execute remotely in that case.
-    "no-remote-exec": "1",
-}
-
-def _dst_path(ctx, src, dst, remap_paths):
-    flat_path = src.path if src.is_source else "/".join(src.path.split("/")[3:])
-    dst_path = flat_path
-    for k, v in remap_paths.items():
-        k = k.strip()
-        v = v.strip().strip("/")
-        if not k:
-            fail("invalid empty key in remap_paths")
-
-        # determine if it is path relative to the current package
-        is_relative = not k.startswith("/")
-        k = k.strip("/")
-
-        # allow for relative paths expressed with ./path
-        if k.startswith("./"):
-            k = k[2:]
-
-        # if relative add the package name to the path
-        if is_relative and ctx.label.package:
-            k = "/".join([ctx.label.package, k])
-
-        # if flat_path starts with key then substitute key for value
-        if flat_path.startswith(k):
-            dst_path = v + flat_path[len(k):] if v else flat_path[len(k) + 1:]
-    return dst.path + "/" + dst_path
-
-def _copy_bash(ctx, srcs, dst):
-    cmds = [
-        "set -o errexit -o nounset -o pipefail",
-        "mkdir -p \"%s\"" % dst.path,
-    ]
-    for src in srcs:
-        dst_path = _dst_path(ctx, src, dst, ctx.attr.remap_paths)
-        cmds.append("""
-if [[ ! -e "{src}" ]]; then echo "file '{src}' does not exist"; exit 1; fi
-if [[ -f "{src}" ]]; then
-    mkdir -p "{dst_dir}"
-    cp -f "{src}" "{dst}"
-else
-    mkdir -p "{dst}"
-    cp -rf "{src}/" "{dst}"
-fi
-""".format(src = src.path, dst_dir = paths.dirname(dst_path), dst = dst_path))
-        # print("%s -> %s" % (src.path, dst_path))
-
-    ctx.actions.run_shell(
-        inputs = srcs,
-        outputs = [dst],
-        command = "\n".join(cmds),
-        mnemonic = "PkgNpm",
-        progress_message = "Copying files to nodejs_package directory",
-        use_default_shell_env = True,
-        execution_requirements = _execution_requirements,
-    )
-
-def _nodejs_package_impl(ctx):
-    if ctx.attr.src and ctx.attr.srcs:
-        fail("Only one of src or srcs may be set")
-    if not ctx.attr.src and not ctx.attr.srcs:
-        fail("At least one of src or srcs must be set")
-    if ctx.attr.src and not ctx.file.src.is_directory:
-        fail("src must be a directory (a TreeArtifact produced by another rule)")
-
-    package_name = ctx.attr.package_name.strip()
-    if not package_name:
+def _impl(ctx):
+    if ctx.file.src and not ctx.file.src.is_source and not ctx.file.src.is_directory:
+        fail("src must a source directory or TreeArtifact if set")
+    if not ctx.attr.package_name:
         fail("package_name attr must not be empty")
-    if ctx.attr.srcs:
-        output = ctx.actions.declare_directory(package_name)
-        if ctx.attr.is_windows:
-            fail("not yet implemented")
-        else:
-            _copy_bash(ctx, ctx.files.srcs, output)
-    else:
-        output = ctx.file.src
+    if not ctx.attr.package_version:
+        fail("package_version attr must not be empty")
 
-    files = depset(direct = [output])
-    runfiles = ctx.runfiles(
-        files = [output],
-        transitive_files = depset([output]),
-        root_symlinks = {
-            "node_modules/" + package_name: output,
-        },
-    )
+    virtual_store_name = npm_utils.virtual_store_name(ctx.attr.package_name, ctx.attr.package_version)
+
+    virtual_store_out = None
+    node_modules_directory = None
+    direct_files = []
+
+    if ctx.file.src:
+        # output the package as a TreeArtifact to its virtual store location
+        virtual_store_out = ctx.actions.declare_directory(
+            "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package_name}".format(
+                package_name = ctx.attr.package_name,
+                virtual_store_name = virtual_store_name,
+                virtual_store_root = VIRTUAL_STORE_ROOT,
+            )
+        )
+        copy_directory_action(ctx, ctx.file.src, virtual_store_out, ctx.attr.is_windows)
+        direct_files.append(virtual_store_out)
+
+        if not ctx.attr.transitive:
+            # symlink the package's path in the virtual store to the root of the node_modules
+            root_symlink = ctx.actions.declare_file(
+                "node_modules/{package_name}".format(package_name = ctx.attr.package_name)
+            )
+            ctx.actions.symlink(
+                output = root_symlink,
+                target_file = virtual_store_out,
+            )
+            direct_files.append(root_symlink)
+            node_modules_directory = root_symlink
+
+        for dep in ctx.attr.deps:
+            # symlink the package's direct deps to its virtual store location
+            dep_link_package = dep[NodejsPackageInfo].link_package
+            if dep_link_package != ctx.label.package:
+                if not ctx.label.package.startwith(dep_link_package + "/"):
+                    msg = """nodejs_package in %s package cannot depend on nodejs_package in %s package.
+deps of nodejs_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
+                    fail(msg)
+            dep_name = dep[NodejsPackageInfo].name
+            dep_version = dep[NodejsPackageInfo].version
+            dep_virtual_store_directory = dep[NodejsPackageInfo].virtual_store_directory
+            dep_symlink_path = "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_name}".format(
+                dep_name = dep_name,
+                virtual_store_name = virtual_store_name,
+                virtual_store_root = VIRTUAL_STORE_ROOT,
+            )
+            if dep_virtual_store_directory:
+                dep_symlink = ctx.actions.declare_file(dep_symlink_path)
+                ctx.actions.symlink(
+                    output = dep_symlink,
+                    target_file = dep_virtual_store_directory,
+                )
+            else:
+                print("""
+====================================================================================================
+WARNING: dangling symlinks are experimental and require --experimental_allow_unresolved_symlinks
+
+In the latest version of Bazel (5.1.1 at time of authoring), this flag is not propogated to the
+"host" and "exec" configurations which breaks if you use this a target as a "tool" that is built
+under the "host" and "exec" configs. Dangling symlinks are also not supported with remote execution.
+See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for more information.
+====================================================================================================
+""")
+                dep_symlink = ctx.actions.declare_symlink(dep_symlink_path)
+                execpath = "/".join([p for p in [ctx.bin_dir.path, ctx.label.workspace_root, ctx.label.package] if p])
+                ctx.actions.symlink(
+                    output = dep_symlink,
+                    target_path = "{execpath}/node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_name}".format(
+                        execpath = execpath,
+                        dep_name = dep_name,
+                        virtual_store_name = npm_utils.virtual_store_name(dep_name, dep_version),
+                        virtual_store_root = VIRTUAL_STORE_ROOT,
+                    )
+                )
+            direct_files.append(dep_symlink)
+
+    direct_files = depset(direct = direct_files)
+
+    files_depsets = [direct_files]
+    runfiles = ctx.runfiles(transitive_files = direct_files)
     for dep in ctx.attr.deps:
+        files_depsets.append(dep[DefaultInfo].files)
         runfiles = runfiles.merge(dep[DefaultInfo].data_runfiles)
-    return [
-        DefaultInfo(files = files, runfiles = runfiles),
-        LinkablePackageInfo(package_name = ctx.attr.package_name, files = [output]),
+
+    result = [
+        DefaultInfo(files = depset(transitive = files_depsets), runfiles = runfiles),
+        # Always assume that packages provide typings, so we don't need to use an action to
+        # inspect the package.json#typings field or search for .d.ts files in the package.
+        declaration_info(
+            declarations = direct_files,
+            deps = ctx.attr.deps,
+        ),
+        NodejsPackageInfo(
+            link_package = ctx.label.package,
+            name = ctx.attr.package_name,
+            version = ctx.attr.package_version,
+            virtual_store_directory = virtual_store_out,
+        ),
     ]
+    if node_modules_directory:
+        # Provide a "node_modules_directory" output group for use in $(execpath) and $(rootpath)
+        result.append(OutputGroupInfo(
+            node_modules_directory = depset([node_modules_directory]),
+        ))
+
+    return result
 
 nodejs_package_lib = struct(
     attrs = _ATTRS,
-    nodejs_package_impl = _nodejs_package_impl,
-    provides = [DefaultInfo],
+    impl = _impl,
+    provides = [DefaultInfo, DeclarationInfo, NodejsPackageInfo],
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro
 nodejs_package = rule(
     doc = _DOC,
-    implementation = nodejs_package_lib.nodejs_package_impl,
+    implementation = nodejs_package_lib.impl,
     attrs = nodejs_package_lib.attrs,
     provides = nodejs_package_lib.provides,
 )
