@@ -9,6 +9,11 @@ exports_files(
 
 exports_files(["nodejs_binary.sh.tpl"])
 
+exports_files(
+    ["postinstall.js"],
+    visibility = ["//js:__pkg__"],
+)
+
 config_setting(
     name = "enable_runfiles",
     values = {"enable_runfiles": "true"},

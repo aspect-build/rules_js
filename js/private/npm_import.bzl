@@ -77,13 +77,24 @@ def is_windows_os(rctx):
 
 # TODO: handle npm packages with lifecycle hooks; src will be the output of the postinstall rule instead
 _NODEJS_PACKAGE_TMPL = \
-"""def nodejs_package():
+"""load("@aspect_rules_js//js:run_binary.bzl", "run_binary")
+
+def nodejs_package():
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
         fail("The nodejs_package() macro loaded from {nodejs_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 
+    run_binary(
+        name = "_{namespace}__{bazel_name}_postinstall",
+        srcs = ["@{rctx_name}//:{dir}"],
+        args = [ "../../../$(execpath @{rctx_name}//:{dir})", "../../../$(@D)"],
+        tool = "@aspect_rules_js//js:postinstall",
+        output_dir = True,
+    )
+
     _nodejs_package(
         name = "{namespace}__{bazel_name}",
-        src = "@{rctx_name}//:{dir}",
+        src = ":_{namespace}__{bazel_name}_postinstall",
+        # src = "@{rctx_name}//:{dir}",
         package_name = "{package_name}",
         package_version = "{package_version}",
         visibility = ["//visibility:public"],{maybe_transitive}{maybe_deps}

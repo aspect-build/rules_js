@@ -222,7 +222,7 @@ write_file(
 
 nodejs_binary(
     name = "bin7",
-    data = ["@example_npm_deps//@gregmagolan/test-b"],
+    data = [package("@gregmagolan/test-b")],
     entry_point = "case7.js",
 )
 
