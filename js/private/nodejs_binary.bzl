@@ -6,36 +6,24 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_
 
 _DOC = """Execute a program in the node.js runtime.
 
-The version of node is determined by Bazel's toolchain selection.
-In the WORKSPACE you used `nodejs_register_toolchains` to provide options to Bazel.
-Then Bazel selects from these options based on the requested target platform.
-Use the 
+The version of node is determined by Bazel's toolchain selection. In the WORKSPACE you used
+`nodejs_register_toolchains` to provide options to Bazel. Then Bazel selects from these options
+based on the requested target platform. Use the
 [`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
 Bazel option to see more detail about the selection.
 
-### Static linking
+For node_modules resolution support and to prevent node programs for following symlinks back to the
+user source tree when outside of the sandbox, this rule always copies the entry_point to the output
+tree (if it is not already there) and run the programs from the entry points's runfiles location.
 
-This rule executes node with the Global Folders set to Bazel's runfiles folder.
-<https://nodejs.org/docs/latest-v16.x/api/modules.html#loading-from-the-global-folders>
-describes Node's module resolution algorithm.
-By setting the `NODE_PATH` variable, we supply a location for `node_modules` resolution
-outside of the project's source folder.
-This means that all transitive dependencies of the `data` attribute will be available at
-runtime for every execution of this program.
+Data files that are not already in the output tree are also copied there so that node programs can
+find them when outside of the sandbox and so that they don't follow symlinks back to the user source
+tree.
 
-This requires that Bazel was run with
+TODO: link to rule_js nodejs_package linker design doc
+
+This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
-
-In some language runtimes, this concept is called "static linking", so we use the same term
-in aspect_rules_js. This is in contrast to "dynamic linking", where the program needs to
-resolve a module which is declared only in the place where the program is used, generally
-with a `deps` attribute at the callsite.
-
-> Note that some libraries do not follow the semantics of Node.js module resolution,
-> and instead make fixed assumptions about the `node_modules` folder existing in some
-> parent directory of a source file. These libraries will need some patching to work
-> under this "static linker" approach. We expect to provide more detail about how to do
-> this in a future release.
 """
 
 _ATTRS = {
@@ -169,12 +157,8 @@ def _create_launcher(ctx):
     if ctx.attr.is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")
 
-    # For node_modules resolution support and to prevent node programs for following
-    # symlinks back to the user source tree when outside of the sandbox, always copy
-    # the entry_point to bazel-out (if it is a source file) and run the program from there.
-    # Also do this for data files so that node programs can find them when outside of the sandbox
-    # and so that they don't follow symlinks back to the user source tree.
-    # TODO: link to rule_js nodejs_package linker design doc
+    # Copy entry and data files that are not already in the output tree to the output tree.
+    # See docstring at the top of this file for more info.
     output_entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows = ctx.attr.is_windows)
     output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = ctx.attr.is_windows)
 
