@@ -1,8 +1,8 @@
 "nodejs_binary and nodejs_test rules"
 
-load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_manifest_path")
+load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "BATCH_RLOCATION_FUNCTION")
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -80,24 +80,26 @@ _ATTRS = {
     "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
 }
 
-def _strip_external(path):
-    return path[len("external/"):] if path.startswith("external/") else path
+# Do the opposite of _to_manifest_path in
+# https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
+# to get back to the short_path.
+# TODO: fix toolchain so we don't have to do this
+def _target_tool_short_path(path):
+    return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
 def _windows_launcher(ctx, entry_point, args):
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.bat" % ctx.label.name)
 
+    # TODO: fix windows launcher for build actions
     ctx.actions.write(
         output = launcher,
         content = r"""@echo off
 SETLOCAL ENABLEEXTENSIONS
 SETLOCAL ENABLEDELAYEDEXPANSION
-set RUNFILES_MANIFEST_ONLY=1
 {rlocation_function}
-call :rlocation "{node}" node
-call :rlocation "{entry_point}" entry_point
 
-for %%a in ("!node!") do set "node_dir=%%~dpa"
+for %%a in ("{node}") do set "node_dir=%%~dpa"
 set PATH=%node_dir%;%PATH%
 set args=%*
 rem Escape \ and * in args before passsing it with double quote
@@ -105,12 +107,11 @@ if defined args (
   set args=!args:\=\\\\!
   set args=!args:"=\"!
 )
-"!node!" "!entry_point!" "!args!"
+"{node}" "{entry_point}" "!args!"
 """.format(
-            node = _strip_external(node_bin.target_tool_path),
             rlocation_function = BATCH_RLOCATION_FUNCTION,
-            entry_point = to_manifest_path(ctx, entry_point),
-            # FIXME: wire in the args to the batch script
+            node = _target_tool_short_path(node_bin.target_tool_path),
+            entry_point = entry_point.short_path,
             args = " ".join(args),
         ),
         is_executable = True,
@@ -122,38 +123,65 @@ def _bash_launcher(ctx, entry_point, args):
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
 
+    # NB: {rlocation_function} required to set RUNFILES_DIR for build actions that
+    # use this nodejs_binary as a tool where cwd is the execroot
     ctx.actions.write(
         launcher,
         """#!{bash}
 {rlocation_function}
 set -o pipefail -o errexit -o nounset
-$(rlocation {node}) \\
-$(rlocation {entry_point}) \\
-$@
+if [[ "${{RUNFILES_DIR:-}}" ]]; then
+    node="$RUNFILES_DIR/{workspace_name}/{node}"
+else
+    node="{node}"
+fi
+if [ ! -f "$node" ]; then
+    printf "\n>>>> FAIL: The node binary '$node' not found in runfiles. <<<<\n\n" >&2
+    exit 1
+fi
+if [ ! -x "$node" ]; then
+    printf "\n>>>> FAIL: The node binary '$node' is not executable. <<<<\n\n" >&2
+    exit 1
+fi
+if [[ "${{RUNFILES_DIR:-}}" ]]; then
+    entry_point="$RUNFILES_DIR/{workspace_name}/{entry_point}"
+else
+    entry_point="{entry_point}"
+fi
+if [ ! -f "$entry_point" ]; then
+    printf "\n>>>> FAIL: The entry_point '$entry_point' not found in runfiles. <<<<\n\n" >&2
+    exit 1
+fi
+"$node" "$entry_point" "$@"
 """.format(
             bash = bash_bin,
             rlocation_function = BASH_RLOCATION_FUNCTION,
-            node = _strip_external(node_bin.target_tool_path),
-            entry_point = to_manifest_path(ctx, entry_point),
+            node = _target_tool_short_path(node_bin.target_tool_path),
+            entry_point = entry_point.short_path,
+            workspace_name = ctx.workspace_name,
             args = " ".join(args),
         ),
         is_executable = True,
     )
     return launcher
 
-def _create_launcher(ctx, args):
-    if args == None:
-        args = ctx.attr.args
+def _create_launcher(ctx):
+    if ctx.attr.is_windows and not ctx.attr.enable_runfiles:
+        fail("need --enable_runfiles on Windows for to support rules_js")
 
-    # For node_modules resolution support, always copy the entry_point to bazel-out
-    # (if it is a source file) and run the program from the output tree.
+    # For node_modules resolution support and to prevent node programs for following
+    # symlinks back to the user source tree when outside of the sandbox, always copy
+    # the entry_point to bazel-out (if it is a source file) and run the program from there.
+    # Also do this for data files so that node programs can find them when outside of the sandbox
+    # and so that they don't follow symlinks back to the user source tree.
     # TODO: link to rule_js nodejs_package linker design doc
-    entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows =  ctx.attr.is_windows)
+    output_entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows = ctx.attr.is_windows)
+    output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = ctx.attr.is_windows)
 
     # create the launcer
-    launcher = _windows_launcher(ctx, entry_point, args) if ctx.attr.is_windows else _bash_launcher(ctx, entry_point, args)
+    launcher = _windows_launcher(ctx, output_entry_point, ctx.attr.args) if ctx.attr.is_windows else _bash_launcher(ctx, output_entry_point, ctx.attr.args)
 
-    all_files = ctx.files.data + ctx.files._runfiles_lib + [entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
+    all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(
         files = all_files,
         transitive_files = depset(all_files),
@@ -168,7 +196,7 @@ def _create_launcher(ctx, args):
     )
 
 def _nodejs_binary_impl(ctx):
-    launcher = _create_launcher(ctx, ctx.attr.args)
+    launcher = _create_launcher(ctx)
     return DefaultInfo(
         executable = launcher.exe,
         runfiles = launcher.runfiles,
