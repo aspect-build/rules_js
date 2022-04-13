@@ -1,44 +1,61 @@
 "js_binary and js_test rules"
 
-load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
-load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_manifest_path")
-load("@aspect_bazel_lib//lib:windows_utils.bzl", "BATCH_RLOCATION_FUNCTION")
+load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
+load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
+load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 
 _DOC = """Execute a program in the node.js runtime.
 
-The version of node is determined by Bazel's toolchain selection.
-In the WORKSPACE you used `nodejs_register_toolchains` to provide options to Bazel.
-Then Bazel selects from these options based on the requested target platform.
-Use the 
+The version of node is determined by Bazel's toolchain selection. In the WORKSPACE you used
+`nodejs_register_toolchains` to provide options to Bazel. Then Bazel selects from these options
+based on the requested target platform. Use the
 [`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
 Bazel option to see more detail about the selection.
 
-### Static linking
+For node_modules resolution support and to prevent node programs for following symlinks back to the
+user source tree when outside of the sandbox, this rule always copies the entry_point to the output
+tree (if it is not already there) and run the programs from the entry points's runfiles location.
 
-This rule executes node with the Global Folders set to Bazel's runfiles folder.
-<https://nodejs.org/docs/latest-v16.x/api/modules.html#loading-from-the-global-folders>
-describes Node's module resolution algorithm.
-By setting the `NODE_PATH` variable, we supply a location for `node_modules` resolution
-outside of the project's source folder.
-This means that all transitive dependencies of the `data` attribute will be available at
-runtime for every execution of this program.
+Data files that are not already in the output tree are also copied there so that node programs can
+find them when outside of the sandbox and so that they don't follow symlinks back to the user source
+tree.
 
-This requires that Bazel was run with
+TODO: link to rule_js node_package linker design doc
+
+This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
-
-In some language runtimes, this concept is called "static linking", so we use the same term
-in aspect_rules_js. This is in contrast to "dynamic linking", where the program needs to
-resolve a module which is declared only in the place where the program is used, generally
-with a `deps` attribute at the callsite.
-
-> Note that some libraries do not follow the semantics of Node.js module resolution,
-> and instead make fixed assumptions about the `node_modules` folder existing in some
-> parent directory of a source file. These libraries will need some patching to work
-> under this "static linker" approach. We expect to provide more detail about how to do
-> this in a future release.
 """
 
 _ATTRS = {
+    "chdir": attr.string(
+        doc = """Working directory to run the binary or test in, relative to the workspace.
+
+        By default, `js_binary` runs in the root of the output tree.
+
+        To run in the directory containing the `js_binary` use
+
+            chdir = package_name()
+
+        (or if you're in a macro, use `native.package_name()`)
+
+        WARNING: this will affect other paths passed to the program, either as arguments or in configuration files,
+        which are workspace-relative.
+
+        You may need `../../` segments to re-relativize such paths to the new working directory.
+        In a `BUILD` file you could do something like this to point to the output path:
+
+        ```python
+        js_binary(
+            ...
+            chdir = package_name(),
+            # ../.. segments to re-relative paths from the chdir back to workspace;
+            # add an additional 3 segments to account for running js_binary running
+            # in the root of the output tree
+            args = ["/".join([".."] * len(package_name().split("/")) + "$(rootpath //path/to/some:file)"],
+        )
+        ```""",
+    ),
     "data": attr.label_list(
         allow_files = True,
         doc = """Runtime dependencies of the program.
@@ -77,116 +94,84 @@ _ATTRS = {
         attribute based on a `config_setting` rule.
         """,
     ),
+    "env": attr.string_dict(
+        doc = """Environment variables of the action.
+
+        Subject to `$(location)` and make variable expansion.""",
+    ),
+    "expected_exit_code": attr.int(
+        doc = """The expected exit code.
+
+        Can be used to write tests that are expected to fail.""",
+        default = 0,
+    ),
+    "_launcher_template": attr.label(
+        default = Label("//js/private:js_binary.sh.tpl"),
+        allow_single_file = True,
+    ),
     "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
 }
 
-def _strip_external(path):
-    return path[len("external/"):] if path.startswith("external/") else path
+_ENV_SET = """export {var}=\"{value}\""""
+_ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
 
-def _windows_launcher(ctx, linkable, args):
-    node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
-    launcher = ctx.actions.declare_file("_%s_launcher.bat" % ctx.label.name)
+# Do the opposite of _to_manifest_path in
+# https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
+# to get back to the short_path.
+# TODO: fix toolchain so we don't have to do this
+def _target_tool_short_path(path):
+    return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
-    if len(linkable):
-        p = linkable[0][LinkablePackageInfo].package_name
-        dots = "/".join([".."] * len(p.split("/")))
-        node_path = "call :rlocation \"node_modules/{0}\" node_path\nset NODE_PATH=!node_path!/{1}".format(p, dots)
-    else:
-        node_path = ""
-
-    ctx.actions.write(
-        output = launcher,
-        content = r"""@echo off
-SETLOCAL ENABLEEXTENSIONS
-SETLOCAL ENABLEDELAYEDEXPANSION
-set RUNFILES_MANIFEST_ONLY=1
-{rlocation_function}
-call :rlocation "{node}" node
-call :rlocation "{entry_point}" entry_point
-
-for %%a in ("!node!") do set "node_dir=%%~dpa"
-set PATH=%node_dir%;%PATH%
-{node_path}
-set args=%*
-rem Escape \ and * in args before passsing it with double quote
-if defined args (
-  set args=!args:\=\\\\!
-  set args=!args:"=\"!
-)
-"!node!" "!entry_point!" "!args!"
-""".format(
-            node = _strip_external(node_bin.target_tool_path),
-            rlocation_function = BATCH_RLOCATION_FUNCTION,
-            entry_point = to_manifest_path(ctx, ctx.file.entry_point),
-            # FIXME: wire in the args to the batch script
-            args = " ".join(args),
-            node_path = node_path,
-        ),
-        is_executable = True,
-    )
-    return launcher
-
-def _bash_launcher(ctx, linkable, args):
+def _bash_launcher(ctx, entry_point, args):
     bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
 
-    # The working directory in a bazel binary is runfiles/my_wksp
-    node_paths = ["$(pwd)/../node_modules"]
-    if len(linkable):
-        pkgs = [link[LinkablePackageInfo].package_name for link in linkable]
-        node_paths.extend([
-            "$(rlocation node_modules/{0})/{1}".format(
-                p,
-                "/".join([".."] * len(p.split("/"))),
-            )
-            for p in pkgs
-        ])
-    else:
-        node_path = ""
-    node_path = "export NODE_PATH=" + ":".join(node_paths)
-    ctx.actions.write(
-        launcher,
-        """#!{bash}
-{rlocation_function}
-set -o pipefail -o errexit -o nounset
-{node_path}
-$(rlocation {node}) \\
-$(rlocation {entry_point}) \\
-{args} $@
-""".format(
-            bash = bash_bin,
-            rlocation_function = BASH_RLOCATION_FUNCTION,
-            node = _strip_external(node_bin.target_tool_path),
-            entry_point = to_manifest_path(ctx, ctx.file.entry_point),
-            args = " ".join(args),
-            node_path = node_path,
-        ),
+    envs = []
+    for [key, value] in ctx.attr.env.items():
+        envs.append(_ENV_SET.format(
+            var = key,
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
+        ))
+    if ctx.attr.chdir:
+        envs.append(_ENV_SET_IFF_NOT_SET.format(
+            var = "JS_BINARY__CHDIR",
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
+        ))
+
+    launcher_subst = {
+        "{bash}": bash_bin,
+        "{rlocation_function}": BASH_RLOCATION_FUNCTION,
+        "{node}": _target_tool_short_path(node_bin.target_tool_path),
+        "{entry_point}": entry_point.short_path,
+        "{workspace_name}": ctx.workspace_name,
+        "{args}": " ".join(args),
+        "{env}": "\n".join(envs),
+        "{expected_exit_code}": str(ctx.attr.expected_exit_code),
+    }
+
+    ctx.actions.expand_template(
+        template = ctx.file._launcher_template,
+        output = launcher,
+        substitutions = launcher_subst,
         is_executable = True,
     )
+
     return launcher
 
-def _create_launcher(ctx, args):
-    linkable = [
-        d
-        for d in ctx.attr.data
-        if LinkablePackageInfo in d and
-           len(d[LinkablePackageInfo].files) == 1 and
-           d[LinkablePackageInfo].files[0].is_directory
-    ]
+def _create_launcher(ctx):
+    if ctx.attr.is_windows and not ctx.attr.enable_runfiles:
+        fail("need --enable_runfiles on Windows for to support rules_js")
 
-    # We use the root_symlinks feature of runfiles to make a node_modules directory
-    # containing all our modules, but you need to have --enable_runfiles for that to
-    # exist on the disk. If it doesn't we can probably do something else, like a very
-    # long NODE_PATH composed of all the locations of the packages, or adapt the linker
-    # to still fill in the runfiles case.
-    # For now we just require it if there's more than one package to resolve
-    if len(linkable) > 1 and ctx.attr.is_windows and not ctx.attr.enable_runfiles:
-        fail("need --enable_runfiles on Windows for multiple node_modules to be resolved")
-    if args == None:
-        args = ctx.attr.args
-    launcher = _windows_launcher(ctx, linkable, args) if ctx.attr.is_windows else _bash_launcher(ctx, linkable, args)
-    all_files = ctx.files.data + ctx.files._runfiles_lib + [ctx.file.entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
+    # Copy entry and data files that are not already in the output tree to the output tree.
+    # See docstring at the top of this file for more info.
+    output_entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows = ctx.attr.is_windows)
+    output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = ctx.attr.is_windows)
+
+    bash_launcher = _bash_launcher(ctx, output_entry_point, ctx.attr.args)
+    launcher = create_windows_native_launcher_script(ctx, ctx.outputs.launcher_sh) if ctx.attr.is_windows else bash_launcher
+
+    all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(
         files = all_files,
         transitive_files = depset(all_files),
@@ -201,7 +186,7 @@ def _create_launcher(ctx, args):
     )
 
 def _js_binary_impl(ctx):
-    launcher = _create_launcher(ctx, ctx.attr.args)
+    launcher = _create_launcher(ctx)
     return DefaultInfo(
         executable = launcher.exe,
         runfiles = launcher.runfiles,
@@ -210,7 +195,6 @@ def _js_binary_impl(ctx):
 # Expose our library as a struct so that js_binary and js_test can both extend it
 js_binary_lib = struct(
     attrs = _ATTRS,
-    create_launcher = _create_launcher,
     js_binary_impl = _js_binary_impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced

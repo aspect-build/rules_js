@@ -4,7 +4,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//js/private:translate_package_lock.bzl", "translate_package_lock")
+load("//js/private:translate_pnpm_lock.bzl", "translate_pnpm_lock")
 
 _lockfile = json.decode("""
 {
@@ -40,8 +40,8 @@ _lockfile = json.decode("""
 
 def _naming_test_impl(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "npm_acorn-10.2.3", translate_package_lock.repository_name("acorn", "10.2.3"))
-    asserts.equals(env, "npm__types_node-11.2.3", translate_package_lock.repository_name("@types/node", "11.2.3"))
+    asserts.equals(env, "npm_acorn-10.2.3", translate_pnpm_lock.repository_name("acorn", "10.2.3"))
+    asserts.equals(env, "npm__types_node-11.2.3", translate_pnpm_lock.repository_name("@types/node", "11.2.3"))
     return unittest.end(env)
 
 def _repository_bzl_test_impl(ctx):
@@ -72,7 +72,7 @@ def npm_repositories():
         deps = ["@npm__gregmagolan_test-a-0.0.1"],
     )
 """
-    actual = translate_package_lock.testonly_import_dependencies(_lockfile)
+    actual = translate_pnpm_lock.testonly_import_dependencies(_lockfile)
     asserts.equals(env, 3, len(actual))
     asserts.equals(env, expected_header, actual[0])
     asserts.equals(env, expected_a, actual[1])
@@ -82,10 +82,10 @@ def npm_repositories():
 def _aliases_test_impl(ctx):
     env = unittest.begin(ctx)
     actual = {}
-    mock_repository_ctx = struct(
+    mock_rctx = struct(
         file = lambda path, content: actual.update({path: content}),
     )
-    translate_package_lock.testonly_define_aliases(mock_repository_ctx, _lockfile)
+    translate_pnpm_lock.testonly_define_aliases(mock_rctx, _lockfile)
     asserts.equals(env, 1, len(actual.items()))
 
     # Note: @gregmagolan/test-a should not appear here since it's only a transitive dependency
@@ -104,5 +104,5 @@ t0_test = unittest.make(_naming_test_impl)
 t1_test = unittest.make(_repository_bzl_test_impl)
 t2_test = unittest.make(_aliases_test_impl)
 
-def translate_package_lock_tests(name):
+def translate_pnpm_lock_tests(name):
     unittest.suite(name, t0_test, t1_test, t2_test)

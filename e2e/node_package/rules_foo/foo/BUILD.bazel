@@ -1,0 +1,12 @@
+load("@rules_foo_npm//:node_modules.bzl", "node_modules")
+load("@aspect_rules_js//js:js_binary.bzl", "js_binary")
+
+node_modules()
+
+js_binary(
+    name = "main",
+    data = [
+        "@rules_foo_npm//@aspect-test/bar",
+    ],
+    entry_point = "main.js",
+)

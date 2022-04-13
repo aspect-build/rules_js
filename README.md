@@ -6,6 +6,10 @@ It could be archived or there could be major breaking changes.
 This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
 accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 
+The primary difference is that we don't run `npm install` or `yarn install`, instead
+we use a Bazel-idiomatic approach to managing the third-party dependencies adapted from
+[pnpm](https://pnpm.io/), similar to how [Rush](https://rushjs.io/) manages packages.
+
 ![Block Diagram](./block_diagram.svg)
 
 The common layer here is the `rules_nodejs` Bazel module, documented as the "core" in

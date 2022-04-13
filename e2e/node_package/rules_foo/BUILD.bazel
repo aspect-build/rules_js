@@ -1,0 +1,8 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+
+write_source_files(
+    name = "write_foobar",
+    files = {
+        "npm_repositories.bzl": "@rules_foo_npm//:repositories.bzl",
+    },
+)

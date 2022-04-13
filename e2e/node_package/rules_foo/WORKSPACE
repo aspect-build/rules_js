@@ -1,0 +1,22 @@
+# This workspace is loaded as a local_repository
+workspace(name = "rules_foo")
+
+local_repository(
+    name = "aspect_rules_js",
+    path = "../../..",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "node16",
+    node_version = "16.9.0",
+)
+
+load("@rules_foo//:repositories.bzl", rules_foo_repositories = "repositories")
+
+rules_foo_repositories()

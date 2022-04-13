@@ -1,0 +1,10 @@
+--- a/package.json
++++ b/package.json
+@@ -7,6 +7,6 @@
+   "main": "index.js",
+   "bin": { "qar": "bin.js" },
+   "scripts": {
+-    "postinstall": "echo \"{\\\"random\\\":\\\"42\\\"}\" > data.json"
++    "postinstall": "echo \"{\\\"random\\\":\\\"43\\\"}\" > data.json"
+   }
+ }
