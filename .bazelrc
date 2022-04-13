@@ -4,7 +4,7 @@
 
 # Recommended when using copy_directory, see
 # https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_directory.md
---host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
+startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
