@@ -1,0 +1,13 @@
+{
+  "name": "simple",
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "@aspect-test/bar": "2.0.0"
+  },
+  "devDependencies": {
+    "@aspect-test/foo": "2.0.0"
+  },
+  "optionalDependencies": {
+    "@aspect-test/qar": "4.0.0"
+  }
+}

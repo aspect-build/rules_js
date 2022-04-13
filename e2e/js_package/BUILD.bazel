@@ -1,0 +1,3 @@
+load("@npm//:js_packages.bzl", "js_packages")
+
+js_packages()

@@ -1,8 +1,26 @@
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@example_npm_deps//:js_packages.bzl", "js_packages")
+load("@example_npm_deps//:package.bzl", "package", "package_dir")
+load("@example_npm_deps__acorn-8.4.0//:js_package.bzl", js_package_acorn = "js_package")
 load("//js:js_binary.bzl", "js_binary")
+load("//js:js_package.bzl", "js_package")
 load("//js:js_test.bzl", "js_test")
+load("//js:run_js_binary.bzl", "run_js_binary")
+
+###########################
+
+js_package_acorn()
+
+js_packages()
+
+js_package(
+    name = package("@mycorp/mylib").name,
+    src = "//example/lib",
+    package_name = "@mycorp/mylib",
+    deps = [package("acorn")],
+)
 
 ###########################
 # Fixtures for tests in this file
@@ -65,19 +83,20 @@ diff_test(
 
 genrule(
     name = "call_acorn",
-    srcs = ["one.js"],
+    srcs = [
+        "one.js",
+        package("acorn"),
+        package_dir("acorn"),
+    ],
     outs = ["actual2"],
     cmd = """
         $(NODE_PATH) \\
-        ./$(execpath @npm_acorn-8.4.0)/bin/acorn \\
+        ./$(execpath %s)/bin/acorn \\
         --compact \\
         $(execpath one.js) \\
-        > $@""",
+        > $@""" % package_dir("acorn"),
     toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = [
-        "@node16_toolchains//:resolved_toolchain",
-        "@npm_acorn-8.4.0",
-    ],
+    tools = ["@node16_toolchains//:resolved_toolchain"],
 )
 
 diff_test(
@@ -91,28 +110,24 @@ diff_test(
 # Run a first-party program that requires a package from npm
 # Use a genrule to prove that works
 
+copy_to_bin(
+    name = "require_acorn_js",
+    srcs = ["require_acorn.js"],
+)
+
 genrule(
     name = "require_acorn",
-    srcs = ["require_acorn.js"],
+    srcs = [
+        ":require_acorn_js",
+        package("acorn"),
+    ],
     outs = ["actual3"],
-    # Note: confusingly, node uses an environment variable NODE_PATH as a "global"
-    # location for module resolutions, but we used the same name for the Make
-    # variable exposed by the nodejs tooling.
-    # One is interpreted by the bash shell, while the other is interpreted by
-    # bazel, so it doesn't cause any problems.
-    # Note, the trailing "/.." on the NODE_PATH variable is because our target
-    # points to the output directory we wrote, named "acorn", but node needs
-    # to start its module search in a directory *containing* one called "acorn"
     cmd = """
-        NODE_PATH=./$(execpath @npm_acorn-8.4.0)/.. \\
         $(NODE_PATH) \\
-        ./$(execpath require_acorn.js) \\
+        ./$(execpath :require_acorn_js) \\
         $@""",
     toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = [
-        "@node16_toolchains//:resolved_toolchain",
-        "@npm_acorn-8.4.0",
-    ],
+    tools = ["@node16_toolchains//:resolved_toolchain",],
 )
 
 diff_test(
@@ -123,25 +138,26 @@ diff_test(
 
 ####################################################
 # Test case 4
-# Show that a js_binary can be used with run_binary
+# Show that a js_binary can be used with run_js_binary
 # because everything it needs to run is in the runfiles
 
 js_binary(
     name = "bin",
-    data = ["@npm_acorn-8.4.0"],
+    data = [package("acorn")],
     entry_point = "require_acorn.js",
 )
 
-run_binary(
+run_js_binary(
     name = "run4",
     srcs = [],
     outs = ["actual4"],
-    args = ["$(location actual4)"],
+    args = ["actual4"],
+    chdir = package_name(),
     tool = ":bin",
 )
 
 diff_test(
-    name = "test_js_binary_under_run_binary",
+    name = "test_js_binary_under_run_js_binary",
     file1 = "expected_ast.json",
     file2 = "actual4",
 )
@@ -152,7 +168,7 @@ diff_test(
 
 js_test(
     name = "test_test",
-    data = ["@npm_deps//@types/node"],
+    data = ["@example_npm_deps//@types/node"],
     entry_point = "test.js",
 )
 
@@ -170,15 +186,15 @@ write_file(
 
 js_binary(
     name = "bin6",
-    data = ["//example/lib"],
+    data = [package("@mycorp/mylib")],
     entry_point = "case6.js",
 )
 
-run_binary(
+run_js_binary(
     name = "run6",
-    srcs = [],
     outs = ["actual6"],
-    args = ["$(location actual6)"],
+    args = ["actual6"],
+    chdir = package_name(),
     tool = ":bin6",
 )
 
@@ -206,15 +222,15 @@ write_file(
 
 js_binary(
     name = "bin7",
-    data = ["@npm_deps//@gregmagolan/test-b"],
+    data = ["@example_npm_deps//@gregmagolan/test-b"],
     entry_point = "case7.js",
 )
 
-run_binary(
+run_js_binary(
     name = "run7",
     srcs = [],
     outs = ["actual7"],
-    args = ["$(location actual7)"],
+    args = ["example/actual7"],
     tool = ":bin7",
 )
 
@@ -222,4 +238,171 @@ diff_test(
     name = "test7",
     file1 = "expected7",
     file2 = "actual7",
+)
+
+#######################################
+# Test case 8
+# run_js_binary with copy_srcs_to_bin = True
+write_file(
+    name = "write8",
+    out = "case8.js",
+    content = ["""
+require('fs').writeFileSync(process.argv[2], JSON.stringify(require(require('path').join(process.cwd(), "case8.json"))))"""],
+)
+
+write_file(
+    name = "expected8",
+    out = "expected8.txt",
+    content = ["{\"case7\":42}"],
+)
+
+js_binary(
+    name = "bin8",
+    entry_point = "case8.js",
+)
+
+run_js_binary(
+    name = "run8",
+    srcs = ["case8.json"],
+    outs = ["actual8"],
+    args = ["actual8"],
+    chdir = package_name(),
+    tool = ":bin8",
+)
+
+diff_test(
+    name = "test8",
+    file1 = "expected8",
+    file2 = "actual8",
+)
+
+#######################################
+# Test case 9
+# set env variable
+
+write_file(
+    name = "write9",
+    out = "case9.js",
+    content = ["require('fs').writeFileSync(process.argv[2], process.env.FOO)"],
+)
+
+write_file(
+    name = "expected9",
+    out = "expected9.txt",
+    content = ["BAR"],
+)
+
+js_binary(
+    name = "bin9",
+    entry_point = "case9.js",
+    env = {
+        "FOO": "BAR"
+    },
+)
+
+run_js_binary(
+    name = "run9",
+    outs = ["actual9"],
+    args = ["../../../$@"],
+    tool = ":bin9",
+)
+
+diff_test(
+    name = "test9",
+    file1 = "expected9",
+    file2 = "actual9",
+)
+
+#######################################
+# Test case 10
+# set env variable
+
+write_file(
+    name = "write10",
+    out = "case10.js",
+    content = ["""process.stdout.write("to stdout")
+process.stderr.write("to stderr")
+require('fs').writeFileSync(process.argv[2], process.env.FOO)
+process.exit(42)
+"""],
+)
+
+write_file(
+    name = "expected10",
+    out = "expected10.txt",
+    content = ["BAR"],
+)
+
+write_file(
+    name = "expected10_stdout",
+    out = "expected10_stdout.txt",
+    content = ["to stdout"],
+)
+
+write_file(
+    name = "expected10_stderr",
+    out = "expected10_stderr.txt",
+    content = ["to stderr"],
+)
+
+write_file(
+    name = "expected10_result",
+    out = "expected10_result.txt",
+    content = ["42"],
+)
+
+js_binary(
+    name = "bin10",
+    entry_point = "case10.js",
+    env = {
+        "FOO": "BAR"
+    },
+)
+
+js_test(
+    name = "test10_test",
+    entry_point = "case10.js",
+    args = ["dummy"],
+    env = {
+        "FOO": "BAR",
+        "JS_BINARY__EXPECTED_EXIT_CODE": "42",
+        "JS_BINARY__VERBOSE": "1",
+    },
+)
+
+run_js_binary(
+    name = "run10",
+    outs = [
+        "actual10",
+    ],
+    stdout = "actual10_stdout",
+    stderr = "actual10_stderr",
+    exit_code_out = "actual10_result",
+    chdir = package_name(),
+    args = ["actual10"],
+    tool = ":bin10",
+)
+
+diff_test(
+    name = "test10",
+    file1 = "expected10",
+    file2 = "actual10",
+)
+
+diff_test(
+    name = "test10_stdout",
+    file1 = "expected10_stdout",
+    file2 = "actual10_stdout",
+)
+
+diff_test(
+    name = "test10_stderr",
+    file1 = "expected10_stderr",
+    file2 = "actual10_stderr",
+)
+
+diff_test(
+    name = "test10_result",
+    file1 = "expected10_result",
+    file2 = "actual10_result",
 )
