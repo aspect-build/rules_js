@@ -256,18 +256,18 @@ def _impl(rctx):
         ),
     ]
 
-    node_modules_bzl_file = "node_modules.bzl"
-    node_modules_header_bzl = list(generated_by_lines)  # deep copy
-    node_modules_body_bzl = [
+    link_node_package_bzl_file = "link_node_packages.bzl"
+    link_node_package_bzl_header = list(generated_by_lines)  # deep copy
+    link_node_package_bzl_body = [
         """
 # buildifier: disable=unnamed-macro
-def node_modules():
-    "Generated node_package target generators corresponding to npm packages in @{pnpm_lock_wksp}{pnpm_lock}"
+def link_node_packages():
+    "Generated list of link_node_package target generators corresponding to npm packages in @{pnpm_lock_wksp}{pnpm_lock}"
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
-        fail("The node_modules() macro loaded from {node_modules_bzl_file} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
+        fail("The link_node_packages() macro loaded from {link_node_package_bzl_file} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 """.format(
             link_package_guard = link_package,
-            node_modules_bzl_file = "@{}//:{}".format(rctx.name, node_modules_bzl_file),
+            link_node_package_bzl_file = "@{}//:{}".format(rctx.name, link_node_package_bzl_file),
             pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
             pnpm_lock = str(rctx.attr.pnpm_lock),
         ),
@@ -349,13 +349,13 @@ def node_modules():
             maybe_enable_lifecycle_hooks = maybe_enable_lifecycle_hooks,
         ))
 
-        node_modules_header_bzl.append(
-            """load("@{repo_name}//:node_package.bzl", node_package_{i} = "node_package")""".format(
+        link_node_package_bzl_header.append(
+            """load("@{repo_name}//:link_node_package.bzl", link_{i} = "link_node_package")""".format(
                 i = i,
                 repo_name = repo_name,
             ),
         )
-        node_modules_body_bzl.append("    node_package_{i}()".format(i = i))
+        link_node_package_bzl_body.append("    link_{i}()".format(i = i))
 
         # Only generate macros for direct dependencies.
         if has_bin and not indirect:
@@ -385,9 +385,9 @@ def node_modules():
     ]
 
     rctx.file("repositories.bzl", "\n".join(repositories_bzl))
-    rctx.file(node_modules_bzl_file, "\n".join(node_modules_header_bzl + node_modules_body_bzl))
+    rctx.file(link_node_package_bzl_file, "\n".join(link_node_package_bzl_header + link_node_package_bzl_body))
     rctx.file("package.bzl", "\n".join(package_bzl))
-    rctx.file("BUILD.bazel", "exports_files([\"repositories.bzl\", \"node_modules.bzl\", \"package.bzl\"])")
+    rctx.file("BUILD.bazel", "exports_files([\"repositories.bzl\", \"link_node_packages.bzl\", \"package.bzl\"])")
 
 translate_pnpm_lock = struct(
     doc = _DOC,

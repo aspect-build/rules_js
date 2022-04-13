@@ -1,0 +1,3 @@
+load("@npm//:link_node_packages.bzl", "link_node_packages")
+
+link_node_packages()

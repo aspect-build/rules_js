@@ -34,7 +34,7 @@ Data files that are not already in the output tree are also copied there so that
 find them when outside of the sandbox and so that they don't follow symlinks back to the user source
 tree.
 
-TODO: link to rule_js node_package linker design doc
+TODO: link to rules_js linker design doc
 
 This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
