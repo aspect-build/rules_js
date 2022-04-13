@@ -17,7 +17,7 @@ bzl_library(
     srcs = ["nodejs_binary.bzl"],
     visibility = ["//:__subpackages__"],
     deps = [
-        "@aspect_bazel_lib//lib:copy_file",
+        "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
         "@rules_nodejs//nodejs:bzl",
