@@ -1,0 +1,19 @@
+# This workspace is loaded as a local_repository
+workspace(name = "rules_foo")
+
+local_repository(
+    name = "aspect_rules_js",
+    path = "../../..",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "js_dependencies")
+
+js_dependencies()
+
+load("@aspect_rules_js//js:configure.bzl", "js_configure")
+
+js_configure()
+
+load("@rules_foo//:repositories.bzl", rules_foo_repositories = "repositories")
+
+rules_foo_repositories()

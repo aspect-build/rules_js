@@ -1,0 +1,33 @@
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "js_dependencies")
+
+js_dependencies()
+
+load("@aspect_rules_js//js:configure.bzl", "js_configure")
+
+js_configure()
+
+load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
+
+translate_pnpm_lock(
+    name = "npm",
+    enable_lifecycle_hooks = False,
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+
+load("@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
+
+local_repository(
+    name = "rules_foo",
+    path = "./rules_foo",
+)
+
+load("@rules_foo//:repositories.bzl", rules_foo_repositories = "repositories")
+
+rules_foo_repositories()
