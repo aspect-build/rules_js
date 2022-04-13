@@ -1,0 +1,24 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+
+js_binary(
+    name = "main",
+    args = ["foo"],
+    data = [
+        "@npm//@aspect-test/a",
+        "@npm//@aspect-test/b",
+        "@npm//@aspect-test/c",
+    ],
+    entry_point = "main.js",
+)
+
+js_test(
+    name = "test",
+    args = ["foo"],
+    data = [
+        "@npm//@aspect-test/a",
+        "@npm//@aspect-test/b",
+        "@npm//@aspect-test/c",
+    ],
+    entry_point = "main.js",
+    verbose = True,
+)
