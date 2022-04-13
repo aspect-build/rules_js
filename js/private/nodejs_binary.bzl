@@ -2,7 +2,7 @@
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_manifest_path")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "BATCH_RLOCATION_FUNCTION")
-load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file_action")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -145,12 +145,10 @@ def _create_launcher(ctx, args):
     if args == None:
         args = ctx.attr.args
 
-    # copy the entry_point to bazel-out if it is a source file
-    if ctx.file.entry_point.is_source:
-        entry_point = ctx.actions.declare_file(ctx.file.entry_point.basename, sibling = ctx.file.entry_point)
-        copy_file_action(ctx, ctx.file.entry_point, entry_point, is_windows = ctx.attr.is_windows)
-    else:
-        entry_point = ctx.file.entry_point
+    # For node_modules resolution support, always copy the entry_point to bazel-out
+    # (if it is a source file) and run the program from the output tree.
+    # TODO: link to rule_js nodejs_package linker design doc
+    entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows =  ctx.attr.is_windows)
 
     # create the launcer
     launcher = _windows_launcher(ctx, entry_point, args) if ctx.attr.is_windows else _bash_launcher(ctx, entry_point, args)
