@@ -1,0 +1,34 @@
+# Bazel settings that apply to this repository.
+# Take care to document any settings that you expect users to apply.
+# Settings that apply only to CI are in .github/workflows/ci.bazelrc
+
+# Allow the Bazel server to check directory sources for changes.
+# Recommended when using copy_directory, see
+# https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_directory.md
+startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
+
+# In general, the rules in this repository assume that runfiles
+# are enabled as we do not support no runfiles case.
+#
+# If you are developing on Windows, you must either run bazel
+# with administrator priviledges or enable developer mode. If
+# you do not you may hit this error on Windows:
+#
+#   Bazel needs to create symlinks to build the runfiles tree.
+#   Creating symlinks on Windows requires one of the following:
+#       1. Bazel is run with administrator privileges.
+#       2. The system version is Windows 10 Creators Update (1703) or later
+#          and developer mode is enabled.
+build --enable_runfiles
+
+# Turn off legacy external runfiles
+# This prevents accidentally depending on this feature, which Bazel will remove.
+build --nolegacy_external_runfiles
+
+# Turn on --incompatible_strict_action_env which was on by default
+# in Bazel 0.21.0 but turned off again in 0.22.0. Follow
+# https://github.com/bazelbuild/bazel/issues/7026 for more details.
+# This flag is needed to so that postinstall scripts can be executed
+# on the host.
+# See https://github.com/angular/angular/issues/27514.
+build --incompatible_strict_action_env

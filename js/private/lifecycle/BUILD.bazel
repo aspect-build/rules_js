@@ -1,0 +1,10 @@
+"Private lifecycle files"
+
+load("//js:js_binary.bzl", "js_binary")
+
+js_binary(
+    name = "lifecycle-hooks",
+    data = glob(["min/**"]),
+    entry_point = "min/index.js",
+    visibility = ["//visibility:public"],
+)
