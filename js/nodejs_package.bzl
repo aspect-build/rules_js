@@ -21,8 +21,8 @@ def nodejs_package(name, **kwargs):
     # Create a {name}_dir target which exposes the node_modules_directory output group
     # for use in $(execpath) and $(rootpath)
     src = kwargs.get("src", None)
-    transitive = kwargs.get("transitive", False)
-    if src and not transitive:
+    indirect = kwargs.get("indirect", False)
+    if src and not indirect:
         native.filegroup(
             name = "%s__dir" % name,
             srcs = [":%s" % name],

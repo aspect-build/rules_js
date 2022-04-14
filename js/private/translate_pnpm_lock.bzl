@@ -213,7 +213,7 @@ _NPM_IMPORT_TMPL = \
         package_name = "{package_name}",
         package_version = "{package_version}",
         namespace = "{namespace}",
-        {maybe_deps}{maybe_transitive}{maybe_patches}{maybe_patch_args}
+        {maybe_deps}{maybe_indirect}{maybe_patches}{maybe_patch_args}
     )
 """
 
@@ -306,7 +306,7 @@ def _impl(rctx):
 
         repo_name = "%s__%s" % (rctx.name, npm_utils.bazel_name(name, version))
 
-        transitive = False if versioned_name in direct_dependencies else True
+        indirect = False if versioned_name in direct_dependencies else True
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             name = repo_name,
@@ -315,8 +315,8 @@ def _impl(rctx):
             package_version = version,
             integrity = package.get("integrity"),
             namespace = rctx.name,
-            maybe_transitive = """
-        transitive = True,""" if transitive else "",
+            maybe_indirect = """
+        indirect = True,""" if indirect else "",
             maybe_deps = ("""
         deps = %s,""" % deps) if len(deps) > 0 else "",
             maybe_patches = ("""
@@ -332,7 +332,7 @@ def _impl(rctx):
             ))
         nodejs_packages_bzl.append("    nodejs_package_{i}()".format(i = i))
 
-        if not transitive:
+        if not indirect:
             # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
             # @repo_name//name:dir and @repo_name//@scope/name:dir
             rctx.file("%s/BUILD.bazel" % name, _ALIAS_TMPL.format(

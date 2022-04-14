@@ -86,7 +86,7 @@ _NODEJS_PACKAGE_TMPL = \
         src = "@{rctx_name}//:{dir}",
         package_name = "{package_name}",
         package_version = "{package_version}",
-        visibility = ["//visibility:public"],{maybe_transitive}{maybe_deps}
+        visibility = ["//visibility:public"],{maybe_indirect}{maybe_deps}
     )
 """
 
@@ -94,7 +94,7 @@ _NODEJS_PACKAGE_EXPERIMENTAL_REF_DEPS_TMPL = _NODEJS_PACKAGE_TMPL + \
 """    _nodejs_package(
         name = "{namespace}__{bazel_name}__ref",
         package_name = "{package_name}",
-        package_version = "{package_version}",{maybe_transitive}
+        package_version = "{package_version}",{maybe_indirect}
     )
 """
 
@@ -166,14 +166,14 @@ def _impl(rctx):
         rctx_name = rctx.name,
         nodejs_package_bzl = "@%s//:%s" % (rctx.name, nodejs_package_bzl_file),
         bazel_name = bazel_name,
-        maybe_transitive = """
-        transitive = True,""" if rctx.attr.transitive else "",
+        maybe_indirect = """
+        indirect = True,""" if rctx.attr.indirect else "",
         maybe_deps = ("""
         deps = %s,""" % deps) if len(deps) > 0 else "",
     )]
 
     # Add an namespace if this is a direct dependency
-    if not rctx.attr.transitive:
+    if not rctx.attr.indirect:
         nodejs_package_bzl.append(_ALIAS_TMPL.format(
             alias = npm_utils.alias_target_name(rctx.attr.namespace, rctx.attr.package_name),
             namespace = rctx.attr.namespace,
@@ -220,8 +220,8 @@ _ATTRS = {
     "patches": attr.label_list(
         doc = """Patch files to apply onto the downloaded npm package.""",
     ),
-    "transitive": attr.bool(
-        doc = """If True, this is a transitive npm dependency which is not linked as a top-level node_module.""",
+    "indirect": attr.bool(
+        doc = """If True, this is a indirect npm dependency which will not be linked as a top-level node_module.""",
     ),
     "namespace": attr.string(
         doc = """The namespace prefix to use. Convienence aliases will be created

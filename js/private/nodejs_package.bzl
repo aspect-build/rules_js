@@ -65,8 +65,8 @@ Can be left unspecified to allow for circular deps between nodejs_packages.
         doc = "Must match the `version` field in the `package.json` file for this package.",
         default = "0.0.0",
     ),
-    "transitive": attr.bool(
-        doc = "If True, this is a transitive nodejs_package which is not linked as a top-level node_module",
+    "indirect": attr.bool(
+        doc = "If True, this is an indirect nodejs_package which will not linked as a top-level node_module",
     ),
     "is_windows": attr.bool(mandatory = True),
 }
@@ -97,8 +97,9 @@ def _impl(ctx):
         copy_directory_action(ctx, ctx.file.src, virtual_store_out, ctx.attr.is_windows)
         direct_files.append(virtual_store_out)
 
-        if not ctx.attr.transitive:
+        if not ctx.attr.indirect:
             # symlink the package's path in the virtual store to the root of the node_modules
+            # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
                 "node_modules/{package_name}".format(package_name = ctx.attr.package_name)
             )
