@@ -47,7 +47,6 @@ npm_import(
     integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     package_name = "acorn",
     package_version = "8.4.0",
-    namespace = "example_npm_deps",
     link_package_guard = "example",
 )
 
