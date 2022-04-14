@@ -8,7 +8,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 versions = struct(
-    aspect_bazel_lib = "0.9.4",
+    aspect_bazel_lib = "0.9.5",
     rules_nodejs = "5.4.0",
     # Users can easily override the typescript version just by declaring their own http_archive
     # named "npm_typescript" prior to calling rules_js_dependencies.
@@ -33,7 +33,7 @@ def rules_js_dependencies():
         ],
     )
 
-    # TEMP TEMP
+    # TEMP TEMP >>> rules_nodejs overide
     maybe(
         http_archive,
         name = "rules_nodejs",
@@ -41,7 +41,7 @@ def rules_js_dependencies():
         strip_prefix = "rules_nodejs-cd48e24da0f44b9f49cb4b0254a8747b987970fe",
         url = "https://github.com/gregmagolan/rules_nodejs/archive/cd48e24da0f44b9f49cb4b0254a8747b987970fe.tar.gz",
     )
-    # TEMP TEMP
+    # TEMP TEMP <<< rules_nodejs overide
 
     maybe(
         http_archive,
@@ -50,20 +50,10 @@ def rules_js_dependencies():
         urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/{0}/rules_nodejs-core-{0}.tar.gz".format(versions.rules_nodejs)],
     )
 
-    # TEMP TEMP
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "3a61afcfad63d69615c6995902b82679afb65d91f9612e935a375e83471db7fc",
-        strip_prefix = "bazel-lib-5cad49ef5594e4c021664d5f2a008896387b1a5c",
-        url = "https://github.com/gregmagolan/bazel-lib/archive/5cad49ef5594e4c021664d5f2a008896387b1a5c.tar.gz",
-    )
-    # TEMP TEMP
-
-    maybe(
-        http_archive,
-        name = "aspect_bazel_lib",
-        sha256 = "f8ae724cd54c3284892ebaf5a308ed0760a18cc0cc73ff64e0325b7556437201",
+        sha256 = "b5bdbfe570f5463607b7eff24f239c2f7ec9b2edc8db45a225e9575c4366b410",
         strip_prefix = "bazel-lib-{}".format(versions.aspect_bazel_lib),
         url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.aspect_bazel_lib),
     )
