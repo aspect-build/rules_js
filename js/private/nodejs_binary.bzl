@@ -46,13 +46,13 @@ _ATTRS = {
         In a `BUILD` file you could do something like this to point to the output path:
 
         ```python
-        run_binary(
+        nodejs_binary(
             ...
             chdir = package_name(),
             # ../.. segments to re-relative paths from the chdir back to workspace;
             # add an additional 3 segments to account for running nodejs_binary running
             # in the root of the output tree
-            args = ["/".join([".."] * (3 + len(package_name().split("/"))) + ["$@"])],
+            args = ["/".join([".."] * len(package_name().split("/")) + "$(rootpath //path/to/some:file)"],
         )
         ```""",
     ),
