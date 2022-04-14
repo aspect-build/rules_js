@@ -7,6 +7,8 @@ exports_files(
     visibility = ["//docs:__pkg__"],
 )
 
+exports_files(["nodejs_binary.sh.tpl"])
+
 config_setting(
     name = "enable_runfiles",
     values = {"enable_runfiles": "true"},
@@ -18,6 +20,7 @@ bzl_library(
     visibility = ["//:__subpackages__"],
     deps = [
         "@aspect_bazel_lib//lib:copy_to_bin",
+        "@aspect_bazel_lib//lib:expand_make_vars",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
         "@rules_nodejs//nodejs:bzl",

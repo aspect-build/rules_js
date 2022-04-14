@@ -38,27 +38,6 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 | <a id="nodejs_package-transitive"></a>transitive |  If True, this is a transitive nodejs_package which is not linked as a top-level node_module   | Boolean | optional | False |
 
 
-<a id="#NodejsPackageInfo"></a>
-
-## NodejsPackageInfo
-
-<pre>
-NodejsPackageInfo(<a href="#NodejsPackageInfo-link_package">link_package</a>, <a href="#NodejsPackageInfo-name">name</a>, <a href="#NodejsPackageInfo-version">version</a>, <a href="#NodejsPackageInfo-virtual_store_directory">virtual_store_directory</a>)
-</pre>
-
-
-
-**FIELDS**
-
-
-| Name  | Description |
-| :------------- | :------------- |
-| <a id="NodejsPackageInfo-link_package"></a>link_package |  package that this nodejs package is linked at    |
-| <a id="NodejsPackageInfo-name"></a>name |  name of this nodejs package    |
-| <a id="NodejsPackageInfo-version"></a>version |  version of this nodejs package    |
-| <a id="NodejsPackageInfo-virtual_store_directory"></a>virtual_store_directory |  the TreeArtifact of this nodejs package's virtual store location    |
-
-
 <a id="#nodejs_package_lib.impl"></a>
 
 ## nodejs_package_lib.impl

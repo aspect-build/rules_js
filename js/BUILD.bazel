@@ -58,3 +58,14 @@ bzl_library(
         "//js/private:translate_pnpm_lock",
     ],
 )
+
+bzl_library(
+    name = "run_binary",
+    srcs = ["run_binary.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@aspect_bazel_lib//lib:run_binary",
+        "@aspect_bazel_lib//lib:copy_to_bin",
+        "@bazel_skylib//lib:dicts",
+    ],
+)

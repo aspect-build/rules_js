@@ -4,7 +4,7 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":npm_utils.bzl", "npm_utils")
 
-NodejsPackageInfo = provider(
+_NodejsPackageInfo = provider(
     fields = {
         "link_package": "package that this nodejs package is linked at",
         "name": "name of this nodejs package",
@@ -53,7 +53,7 @@ Can be left unspecified to allow for circular deps between nodejs_packages.
         > In contrast, Bazel makes it possible to make builds hermetic, which means that
         > all dependencies of a program must be declared when running in Bazel's sandbox.
         """,
-        providers = [NodejsPackageInfo],
+        providers = [_NodejsPackageInfo],
     ),
     "package_name": attr.string(
         # TODO: validate that name matches in an action if src is set
@@ -111,15 +111,15 @@ def _impl(ctx):
 
         for dep in ctx.attr.deps:
             # symlink the package's direct deps to its virtual store location
-            dep_link_package = dep[NodejsPackageInfo].link_package
+            dep_link_package = dep[_NodejsPackageInfo].link_package
             if dep_link_package != ctx.label.package:
                 if not ctx.label.package.startwith(dep_link_package + "/"):
                     msg = """nodejs_package in %s package cannot depend on nodejs_package in %s package.
 deps of nodejs_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
                     fail(msg)
-            dep_name = dep[NodejsPackageInfo].name
-            dep_version = dep[NodejsPackageInfo].version
-            dep_virtual_store_directory = dep[NodejsPackageInfo].virtual_store_directory
+            dep_name = dep[_NodejsPackageInfo].name
+            dep_version = dep[_NodejsPackageInfo].version
+            dep_virtual_store_directory = dep[_NodejsPackageInfo].virtual_store_directory
             dep_symlink_path = "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_name}".format(
                 dep_name = dep_name,
                 virtual_store_name = virtual_store_name,
@@ -171,7 +171,7 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
             declarations = direct_files,
             deps = ctx.attr.deps,
         ),
-        NodejsPackageInfo(
+        _NodejsPackageInfo(
             link_package = ctx.label.package,
             name = ctx.attr.package_name,
             version = ctx.attr.package_version,
@@ -189,7 +189,7 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
 nodejs_package_lib = struct(
     attrs = _ATTRS,
     impl = _impl,
-    provides = [DefaultInfo, DeclarationInfo, NodejsPackageInfo],
+    provides = [DefaultInfo, DeclarationInfo, _NodejsPackageInfo],
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro

@@ -1,5 +1,4 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@example_npm_deps//:nodejs_packages.bzl", "nodejs_packages")
@@ -8,6 +7,7 @@ load("@example_npm_deps__acorn-8.4.0//:nodejs_package.bzl", nodejs_package_acorn
 load("//js:nodejs_binary.bzl", "nodejs_binary")
 load("//js:nodejs_package.bzl", "nodejs_package")
 load("//js:nodejs_test.bzl", "nodejs_test")
+load("//js:run_binary.bzl", "run_binary")
 
 ###########################
 
@@ -151,7 +151,8 @@ run_binary(
     name = "run4",
     srcs = [],
     outs = ["actual4"],
-    args = ["$(execpath actual4)"],
+    args = ["actual4"],
+    chdir = package_name(),
     tool = ":bin",
 )
 
@@ -192,7 +193,8 @@ nodejs_binary(
 run_binary(
     name = "run6",
     outs = ["actual6"],
-    args = ["$(execpath actual6)"],
+    args = ["actual6"],
+    chdir = package_name(),
     tool = ":bin6",
 )
 
@@ -228,7 +230,7 @@ run_binary(
     name = "run7",
     srcs = [],
     outs = ["actual7"],
-    args = ["$(execpath actual7)"],
+    args = ["example/actual7"],
     tool = ":bin7",
 )
 
@@ -236,4 +238,41 @@ diff_test(
     name = "test7",
     file1 = "expected7",
     file2 = "actual7",
+)
+
+#######################################
+# Test case 8
+# run_binary with copy_srcs_to_bin = True
+write_file(
+    name = "write8",
+    out = "case8.js",
+    content = ["""
+require('fs').writeFileSync(process.argv[2], JSON.stringify(require(require('path').join(process.cwd(), "case8.json"))))"""],
+)
+
+write_file(
+    name = "expected8",
+    out = "expected8.txt",
+    content = ["{\"case7\":42}"],
+)
+
+nodejs_binary(
+    name = "bin8",
+    entry_point = "case8.js",
+)
+
+run_binary(
+    name = "run8",
+    srcs = ["case8.json"],
+    outs = ["actual8"],
+    args = ["actual8"],
+    chdir = package_name(),
+    tool = ":bin8",
+    copy_srcs_to_bin = True,
+)
+
+diff_test(
+    name = "test8",
+    file1 = "expected8",
+    file2 = "actual8",
 )
