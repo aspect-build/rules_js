@@ -95,6 +95,8 @@ def run_binary(
         )
         all_srcs.append(":%s" % copy_to_bin_name)
 
+    # Automatically add common and useful make variables to the environment for run_binary targets
+    # under rules_js
     extra_env = {
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
@@ -106,6 +108,8 @@ def run_binary(
         "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
     }
 
+    # Change working directory if `chdir` is set and the tool is a nodejs_binary; this is handled
+    # internally in nodejs_binary when the BAZEL_CHDIR is set
     if chdir:
         extra_env["BAZEL_CHDIR"] = chdir
 
