@@ -33,12 +33,32 @@ def rules_js_dependencies():
         ],
     )
 
+    # TEMP TEMP
+    maybe(
+        http_archive,
+        name = "rules_nodejs",
+        sha256 = "48146434180db3f5be9be0890d58cf3250cc81acc652a04816aea0c0d06cfbd9",
+        strip_prefix = "rules_nodejs-cd48e24da0f44b9f49cb4b0254a8747b987970fe",
+        url = "https://github.com/gregmagolan/rules_nodejs/archive/cd48e24da0f44b9f49cb4b0254a8747b987970fe.tar.gz",
+    )
+    # TEMP TEMP
+
     maybe(
         http_archive,
         name = "rules_nodejs",
         sha256 = "1f9fca05f4643d15323c2dee12bd5581351873d45457f679f84d0fe0da6839b7",
         urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/{0}/rules_nodejs-core-{0}.tar.gz".format(versions.rules_nodejs)],
     )
+
+    # TEMP TEMP
+    maybe(
+        http_archive,
+        name = "aspect_bazel_lib",
+        sha256 = "3a61afcfad63d69615c6995902b82679afb65d91f9612e935a375e83471db7fc",
+        strip_prefix = "bazel-lib-5cad49ef5594e4c021664d5f2a008896387b1a5c",
+        url = "https://github.com/gregmagolan/bazel-lib/archive/5cad49ef5594e4c021664d5f2a008896387b1a5c.tar.gz",
+    )
+    # TEMP TEMP
 
     maybe(
         http_archive,
