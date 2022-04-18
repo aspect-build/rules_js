@@ -71,3 +71,13 @@ load("@example_npm_deps//:repositories.bzl", "npm_repositories")
 
 # Declare remaining npm_import rules
 npm_repositories()
+
+# Try to translate dependencies resolved by pnpm with peer dependency version
+translate_pnpm_lock(
+    name = "example_npm_peer_deps",
+    pnpm_lock = "//peer_deps:pnpm-lock.json",
+)
+
+load("@example_npm_peer_deps//:repositories.bzl", "npm_repositories")
+
+npm_repositories()

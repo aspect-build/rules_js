@@ -1,0 +1,10 @@
+load("@example_npm_peer_deps//:nodejs_packages.bzl", "nodejs_packages")
+load("//js:nodejs_test.bzl", "nodejs_test")
+
+nodejs_packages()
+
+nodejs_test(
+    name = "peer_deps_test",
+    data = ["@example_npm_peer_deps//react"],
+    entry_point = "@example_npm_peer_deps//test-peer-dependencies-package/index.js",
+)
