@@ -189,7 +189,7 @@ def _process_lockfile(lockfile, prod, dev, no_optional):
             "dev": dev,
             "optional": optional,
             "has_bin": has_bin,
-            "requires_build":  requires_build
+            "requires_build": requires_build,
         }
         dependencies = []
         package_deps = packageSnapshot.get("dependencies")
@@ -206,7 +206,7 @@ def _process_lockfile(lockfile, prod, dev, no_optional):
     }
 
 _NPM_IMPORT_TMPL = \
-"""    npm_import(
+    """    npm_import(
         name = "{name}",
         integrity = "{integrity}",
         link_package_guard = "{link_package_guard}",
@@ -217,7 +217,7 @@ _NPM_IMPORT_TMPL = \
 """
 
 _ALIAS_TMPL = \
-"""load("//:package.bzl", "package", "package_dir")
+    """load("//:package.bzl", "package", "package_dir")
 
 alias(
     name = "{basename}",
@@ -232,7 +232,7 @@ alias(
 )"""
 
 _PACKAGE_TMPL = \
-"""
+    """
 load("@aspect_rules_js//js/private:npm_utils.bzl", "npm_utils")
 
 def package(name):
@@ -273,9 +273,10 @@ def _impl(rctx):
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
         fail("The nodejs_packages() macro loaded from {nodejs_packages_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")        
 """.format(
-    link_package_guard = link_package,
-    nodejs_packages_bzl = "@%s//:%s" % (rctx.name, nodejs_packages_bzl_file),
-)]
+            link_package_guard = link_package,
+            nodejs_packages_bzl = "@%s//:%s" % (rctx.name, nodejs_packages_bzl_file),
+        ),
+    ]
 
     for (i, v) in enumerate(packages.items()):
         (versioned_name, package) = v
@@ -288,10 +289,10 @@ def _impl(rctx):
         requires_build = package.get("requires_build")
 
         if rctx.attr.prod and dev:
-            # when prod attribute is set, skip devDependencies 
+            # when prod attribute is set, skip devDependencies
             continue
         if rctx.attr.dev and not dev:
-            # when dev attribute is set, skip (non-dev) dependencies 
+            # when dev attribute is set, skip (non-dev) dependencies
             continue
         if rctx.attr.no_optional and optional:
             # when no_optional attribute is set, skip optionalDependencies
@@ -327,16 +328,17 @@ def _impl(rctx):
             """load("@{repo_name}//:nodejs_package.bzl", nodejs_package_{i} = "nodejs_package")""".format(
                 i = i,
                 repo_name = repo_name,
-            ))
+            ),
+        )
         nodejs_packages_bzl.append("    nodejs_package_{i}()".format(i = i))
 
         if not indirect:
             # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
             # @repo_name//name:dir and @repo_name//@scope/name:dir
             rctx.file("%s/BUILD.bazel" % name, _ALIAS_TMPL.format(
-            basename = paths.basename(name),
-            name = name,
-        ))
+                basename = paths.basename(name),
+                name = name,
+            ))
 
     package_bzl = [_PACKAGE_TMPL.format(
         namespace = npm_utils.nodejs_package_target_namespace,
@@ -349,7 +351,7 @@ def _impl(rctx):
     rctx.file("repositories.bzl", "\n".join(generated_by_line + repositories_bzl))
     rctx.file(nodejs_packages_bzl_file, "\n".join(generated_by_line + nodejs_packages_header_bzl + empty_line + nodejs_packages_bzl + empty_line))
     rctx.file("package.bzl", "\n".join(generated_by_line + package_bzl))
-    rctx.file("BUILD.bazel", "")
+    rctx.file("BUILD.bazel", "exports_files([\"repositories.bzl\"])")
 
 translate_pnpm_lock = struct(
     doc = _DOC,
