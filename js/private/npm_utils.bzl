@@ -38,7 +38,8 @@ def _strip_peer_dep_version(version):
 
 def _versioned_name(name, version):
     "Make a developer-friendly name for a package name and version"
-    return "%s@%s" % (name, version)
+    escaped_version = _normalize_version(version)
+    return "%s@%s" % (name, escaped_version)
 
 def _virtual_store_name(name, version):
     "Make a virtual store name for a given package and version"

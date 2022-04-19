@@ -5,14 +5,28 @@ workspace(
     name = "aspect_rules_js",
 )
 
-load(":internal_deps.bzl", "rules_js_internal_deps")
+load(":internal_deps.bzl", "js_internal_deps")
 
-rules_js_internal_deps()
+js_internal_deps()
 
 # Install our "runtime" dependencies which users install as well
-load("//js:repositories.bzl", "rules_js_dependencies")
+load("//js:repositories.bzl", "js_dependencies")
 
-rules_js_dependencies()
+js_dependencies()
+
+load("//js:configure.bzl", "js_configure")
+
+js_configure()
+
+load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
+
+translate_pnpm_lock(
+    name = "aspect_rules_js_lifecycle_npm_deps",
+    # Avoid a circular dependency on the lifecycle hooks package,
+    # which is used when enable_lifecycle_hooks = True
+    enable_lifecycle_hooks = False,
+    pnpm_lock = "@aspect_rules_js//js/private/lifecycle:pnpm-lock.json",
+)
 
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
@@ -30,15 +44,7 @@ go_register_toolchains(version = "1.17.2")
 gazelle_dependencies()
 
 ############################################
-# Fetch node and some npm packages, for testing our example
-load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
-
-nodejs_register_toolchains(
-    name = "node16",
-    node_version = "16.9.0",
-)
-
-load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
+# Fetch some npm packages for testing our example
 
 # Manually import a package using explicit coordinates.
 # Just a demonstration of the syntax de-sugaring.
@@ -62,10 +68,14 @@ translate_pnpm_lock(
     },
     # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
     pnpm_lock = "//example:pnpm-lock.json",
+    postinstall = {
+        "@aspect-test/qar": "echo 'moo' > cow.txt",
+        "@aspect-test/qar@4.0.0": "echo 'mooo' >> cow.txt",
+    },
 )
 
 # This is the result of translate_pnpm_lock
-load("@example_npm_deps//:repositories.bzl", "npm_repositories")
+load("@example_npm_deps//:repositories.bzl", example_npm_repositories = "npm_repositories")
 
 # Declare remaining npm_import rules
-npm_repositories()
+example_npm_repositories()

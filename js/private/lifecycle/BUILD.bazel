@@ -1,0 +1,28 @@
+"Private lifecycle files"
+
+load("//js:js_binary.bzl", "js_binary")
+load(":node_modules.bzl", "node_modules")
+load(":package.bzl", "package")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+
+node_modules()
+
+js_binary(
+    name = "lifecycle-hooks",
+    data = [
+        package("@pnpm/lifecycle"),
+    ],
+    entry_point = ":lifecycle-hooks.js",
+    visibility = ["//visibility:public"],
+)
+
+# Vendor files from translate_pnpm_lock in WORKSPACE so that the transitive
+# close of the lifecycle deps can be set up in js_configure()
+write_source_files(
+    name = "lifecycle_repo_vendored_files",
+    files = {
+        "repositories.bzl": "@aspect_rules_js_lifecycle_npm_deps//:repositories.bzl",
+        "node_modules.bzl": "@aspect_rules_js_lifecycle_npm_deps//:node_modules.bzl",
+        "package.bzl": "@aspect_rules_js_lifecycle_npm_deps//:package.bzl",
+    },
+)

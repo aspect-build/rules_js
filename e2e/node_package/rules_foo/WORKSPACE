@@ -6,9 +6,9 @@ local_repository(
     path = "../../..",
 )
 
-load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+load("@aspect_rules_js//js:repositories.bzl", "js_dependencies")
 
-rules_js_dependencies()
+js_dependencies()
 
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 

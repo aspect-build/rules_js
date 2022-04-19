@@ -3,16 +3,13 @@ local_repository(
     path = "../..",
 )
 
-load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+load("@aspect_rules_js//js:repositories.bzl", "js_dependencies")
 
-rules_js_dependencies()
+js_dependencies()
 
-load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+load("@aspect_rules_js//js:configure.bzl", "js_configure")
 
-nodejs_register_toolchains(
-    name = "node16",
-    node_version = "16.9.0",
-)
+js_configure()
 
 load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 

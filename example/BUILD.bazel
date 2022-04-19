@@ -427,3 +427,57 @@ diff_test(
     file1 = "expected10_result",
     file2 = "actual10_result",
 )
+
+#######################################
+# Test case 11
+# postinstall creates a file
+# The @aspect-test/qar package's postinstall creates a data.json file
+
+write_file(
+    name = "write11",
+    out = "case11.js",
+    content = ["""
+const content = require('@aspect-test/qar/data.json')
+if (content.random !== '42') {
+    console.error("expected random to be '42'")
+    process.exit(1);
+}
+"""],
+)
+
+js_test(
+    name = "test11",
+    data = [
+        package("@aspect-test/qar"),
+    ],
+    entry_point = "case11.js",
+)
+
+#######################################
+# Test case 12
+# custom postinstall creates a file
+# See postinstall on @aspect-test/qar in WORKSPACE
+
+write_file(
+    name = "write12",
+    out = "case12.js",
+    content = ["""
+const fs = require('fs')
+const path = require('path')
+const content = fs.readFileSync(path.join(process.argv[2], 'cow.txt'), 'utf-8')
+console.log(content)
+if (!/^moo\\s+mooo\\s*$/.test(content)) {
+    console.error("expected file to contain cow sounds")
+    process.exit(1);
+}
+"""],
+)
+
+js_test(
+    name = "test12",
+    args = ["$(rootpath %s)" % package_dir("@aspect-test/qar")],
+    data = [
+        package_dir("@aspect-test/qar"),
+    ],
+    entry_point = "case12.js",
+)
