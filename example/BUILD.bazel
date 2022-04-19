@@ -276,3 +276,40 @@ diff_test(
     file1 = "expected8",
     file2 = "actual8",
 )
+
+#######################################
+# Test case 9
+# set env variable
+
+write_file(
+    name = "write9",
+    out = "case9.js",
+    content = ["require('fs').writeFileSync(process.argv[2], process.env.FOO)"],
+)
+
+write_file(
+    name = "expected9",
+    out = "expected9.txt",
+    content = ["BAR"],
+)
+
+nodejs_binary(
+    name = "bin9",
+    entry_point = "case9.js",
+    env = {
+        "FOO": "BAR"
+    },
+)
+
+run_binary(
+    name = "run9",
+    outs = ["actual9"],
+    args = ["../../../$@"],
+    tool = ":bin9",
+)
+
+diff_test(
+    name = "test9",
+    file1 = "expected9",
+    file2 = "actual9",
+)

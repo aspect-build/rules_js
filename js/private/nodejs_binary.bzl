@@ -127,16 +127,16 @@ def _bash_launcher(ctx, entry_point, args):
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
 
-    envs = {}
+    envs = []
     for [key, value] in ctx.attr.env.items():
         envs.append(_ENV_SET.format(
             var = key,
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.srcs).split(" ")]),
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
         ))
     if ctx.attr.chdir:
         envs.append(_ENV_SET_IFF_NOT_SET.format(
             var = "BAZEL_CHDIR",
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.srcs).split(" ")]),
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
         ))
 
     launcher_subst = {
