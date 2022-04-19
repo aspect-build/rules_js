@@ -1,0 +1,8 @@
+{
+    "name": "lifecycle-deps",
+    "private": true,
+    "dependencies": {
+        "@pnpm/lifecycle": "13.0.0",
+        "@pnpm/logger": "4.0.0"
+    }
+}

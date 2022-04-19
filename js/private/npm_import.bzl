@@ -1,6 +1,6 @@
 "Repository rules for importing packages from npm"
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch")
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "os_name", "patch")
 load(":npm_utils.bzl", "npm_utils")
 
 _DOC = """Import a single npm package into Bazel.
@@ -75,18 +75,33 @@ def is_windows_os(rctx):
     os_name = rctx.os.name.lower()
     return os_name.find("windows") != -1
 
-# TODO: handle npm packages with lifecycle hooks; src will be the output of the postinstall rule instead
 _NODEJS_PACKAGE_TMPL = \
-    """def node_package():
+    """{maybe_load_run_js_binary}
+def node_package():
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
         fail("The node_package() macro loaded from {node_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 
+    {maybe_lifecycle_hooks}
+
     _node_package(
         name = "{namespace}__{bazel_name}",
-        src = "@{rctx_name}//:{dir}",
+        src = "{nodejs_package_src}",
         package = "{package}",
         version = "{version}",
-        visibility = ["//visibility:public"],{maybe_indirect}{maybe_deps}
+        deps = {deps},
+        visibility = ["//visibility:public"],{maybe_indirect}
+    )
+"""
+
+_RUN_LIFECYCLE_HOOKS_TMPL = """# Run lifecycle hooks on the package
+    run_js_binary(
+        name = "{namespace}__{bazel_name}_postinstall",
+        srcs = ["@{rctx_name}//:{dir}"] + {deps},
+        # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
+        args = [ "../../../$(execpath @{rctx_name}//:{dir})", "../../../$(@D)"],
+        copy_srcs_to_bin = False,
+        tool = "@aspect_rules_js//js/private/lifecycle:lifecycle-hooks",
+        output_dir = True,
     )
 """
 
@@ -153,6 +168,11 @@ def _impl(rctx):
 
     node_package_bzl_file = "node_package.bzl"
 
+    if rctx.attr.postinstall and rctx.attr.enable_lifecycle_hooks:
+        _inject_custom_postinstall(rctx, dirname, rctx.attr.postinstall)
+
+    enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(rctx, dirname)
+
     bazel_name = npm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
     node_package_tmpl = _NODEJS_PACKAGE_EXPERIMENTAL_REF_DEPS_TMPL if rctx.attr.experimental_reference_deps else _NODEJS_PACKAGE_TMPL
     node_package_bzl = [node_package_tmpl.format(
@@ -164,10 +184,18 @@ def _impl(rctx):
         rctx_name = rctx.name,
         node_package_bzl = "@%s//:%s" % (rctx.name, node_package_bzl_file),
         bazel_name = bazel_name,
+        deps = "%s" % deps,
         maybe_indirect = """
         indirect = True,""" if rctx.attr.indirect else "",
-        maybe_deps = ("""
-        deps = %s,""" % deps) if len(deps) > 0 else "",
+        nodejs_package_src = ":%s__%s_postinstall" % (npm_utils.node_package_target_namespace, bazel_name) if enable_lifecycle_hooks else "@%s//:%s" % (rctx.name, dirname),
+        maybe_load_run_js_binary = "load(\"@aspect_rules_js//js:run_js_binary.bzl\", \"run_js_binary\")" if enable_lifecycle_hooks else "",
+        maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
+            namespace = npm_utils.node_package_target_namespace,
+            dir = dirname,
+            rctx_name = rctx.name,
+            bazel_name = bazel_name,
+            deps = "%s" % deps,
+        ) if enable_lifecycle_hooks else "",
     )]
 
     # Add an namespace if this is a direct dependency
@@ -218,6 +246,9 @@ _ATTRS = {
     "patches": attr.label_list(
         doc = """Patch files to apply onto the downloaded npm package.""",
     ),
+    "postinstall": attr.string(
+        doc = """Custom string postinstall script to run against the installed npm package. Runs after any existing lifecycle hooks.""",
+    ),
     "indirect": attr.bool(
         doc = """If True, this is a indirect npm dependency which will not be linked as a top-level node_module.""",
     ),
@@ -232,10 +263,18 @@ _ATTRS = {
         location.""",
         default = ".",
     ),
+    "enable_lifecycle_hooks": attr.bool(
+        doc = """If true, runs lifecycle hooks declared in this package and the custom postinstall script if one exists.""",
+        default = True,
+    ),
     "experimental_reference_deps": attr.bool(
         doc = """Experimental reference deps allow dep to support circular deps between npm packages.
         This feature depends on dangling symlinks, however, which is still experimental in bazel,
         has issues with "host" and "exec" configurations, and does not yet work with remote exection.""",
+    ),
+    "yq_repository": attr.string(
+        doc = """The basename for the yq toolchain repository from @aspect_bazel_lib.""",
+        default = "yq",
     ),
 }
 
@@ -244,3 +283,33 @@ npm_import = struct(
     implementation = _impl,
     attrs = _ATTRS,
 )
+
+def _inject_custom_postinstall(rctx, package_path, custom_postinstall):
+    pkg_json_path = package_path + _sep(rctx) + "package.json"
+    rctx.execute([_yq_bin(rctx), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
+
+def _yq_bin(rctx):
+    # Parse the resolved host platform from the yq_host repo
+    content = rctx.read(rctx.path(Label("@%s_host//:index.bzl" % rctx.attr.yq_repository)))
+    search_str = "host_platform=\""
+    start_index = content.index(search_str) + len(search_str)
+    end_index = content.index("\"", start_index)
+    host_platform = content[start_index:end_index]
+
+    # Return the path to the yq binary
+    return rctx.path(Label("@%s_%s//:yq%s" % (rctx.attr.yq_repository, host_platform, ".exe" if os_name(rctx) == "windows" else "")))
+
+def _has_lifecycle_hooks(rctx, package_path):
+    pkg_json_path = package_path + _sep(rctx) + "package.json"
+    pkg_json = json.decode(rctx.read(pkg_json_path))
+    return "scripts" in pkg_json and (
+        "preinstall" in pkg_json["scripts"] or
+        "install" in pkg_json["scripts"] or
+        "postinstall" in pkg_json["scripts"] or
+        "_rules_js_postinstall" in pkg_json["scripts"]
+    )
+
+def _sep(rctx):
+    if rctx.os.name == "Windows":
+        return "\\"
+    return "/"
