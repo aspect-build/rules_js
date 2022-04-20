@@ -1,4 +1,4 @@
-"nodejs_binary and nodejs_test rules"
+"js_binary and js_test rules"
 
 load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_manifest_path")
@@ -200,18 +200,18 @@ def _create_launcher(ctx, args):
         runfiles = runfiles,
     )
 
-def _nodejs_binary_impl(ctx):
+def _js_binary_impl(ctx):
     launcher = _create_launcher(ctx, ctx.attr.args)
     return DefaultInfo(
         executable = launcher.exe,
         runfiles = launcher.runfiles,
     )
 
-# Expose our library as a struct so that nodejs_binary and nodejs_test can both extend it
-nodejs_binary_lib = struct(
+# Expose our library as a struct so that js_binary and js_test can both extend it
+js_binary_lib = struct(
     attrs = _ATTRS,
     create_launcher = _create_launcher,
-    nodejs_binary_impl = _nodejs_binary_impl,
+    js_binary_impl = _js_binary_impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
@@ -220,9 +220,9 @@ nodejs_binary_lib = struct(
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro
-nodejs_binary = rule(
+js_binary = rule(
     doc = _DOC,
-    implementation = nodejs_binary_lib.nodejs_binary_impl,
-    attrs = nodejs_binary_lib.attrs,
-    toolchains = nodejs_binary_lib.toolchains,
+    implementation = js_binary_lib.js_binary_impl,
+    attrs = js_binary_lib.attrs,
+    toolchains = js_binary_lib.toolchains,
 )

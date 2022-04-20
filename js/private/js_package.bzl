@@ -1,4 +1,4 @@
-"nodejs_package rule"
+"js_package rule"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "LinkablePackageInfo")
@@ -114,12 +114,12 @@ fi
         outputs = [dst],
         command = "\n".join(cmds),
         mnemonic = "PkgNpm",
-        progress_message = "Copying files to nodejs_package directory",
+        progress_message = "Copying files to js_package directory",
         use_default_shell_env = True,
         execution_requirements = _execution_requirements,
     )
 
-def _nodejs_package_impl(ctx):
+def _js_package_impl(ctx):
     if ctx.attr.src and ctx.attr.srcs:
         fail("Only one of src or srcs may be set")
     if not ctx.attr.src and not ctx.attr.srcs:
@@ -154,16 +154,16 @@ def _nodejs_package_impl(ctx):
         LinkablePackageInfo(package_name = ctx.attr.package_name, files = [output]),
     ]
 
-nodejs_package_lib = struct(
+js_package_lib = struct(
     attrs = _ATTRS,
-    nodejs_package_impl = _nodejs_package_impl,
+    js_package_impl = _js_package_impl,
     provides = [DefaultInfo],
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro
-nodejs_package = rule(
+js_package = rule(
     doc = _DOC,
-    implementation = nodejs_package_lib.nodejs_package_impl,
-    attrs = nodejs_package_lib.attrs,
-    provides = nodejs_package_lib.provides,
+    implementation = js_package_lib.js_package_impl,
+    attrs = js_package_lib.attrs,
+    provides = js_package_lib.provides,
 )

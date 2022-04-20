@@ -56,7 +56,7 @@ In BUILD files, declare dependencies on the packages using the same external rep
 Following the same example, this might look like:
 
 ```starlark
-nodejs_test(
+js_test(
     name = "test_test",
     data = ["@npm_deps//@types/node"],
     entry_point = "test.js",
