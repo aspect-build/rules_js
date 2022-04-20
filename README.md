@@ -29,6 +29,8 @@ In addition, as a clean rewrite many of the bugs in rules_nodejs are naturally r
 -   We use gazelle to generate bzl_library targets so users can always generate documentation
     for rules that reference these. [#2874](https://github.com/bazelbuild/rules_nodejs/issues/2874)
 
+_Need help?_ This ruleset has support provided by https://aspect.dev.
+
 ## Installation
 
 From the release you wish to use:
