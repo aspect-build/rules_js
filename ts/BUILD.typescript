@@ -1,7 +1,7 @@
 "BUILD file inserted into @npm_typescript repository"
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
-load("@aspect_rules_js//js:nodejs_package.bzl", "nodejs_package")
-load("@aspect_rules_js//js:nodejs_binary.bzl", "nodejs_binary")
+load("@aspect_rules_js//js:js_package.bzl", "js_package")
+load("@aspect_rules_js//js:js_binary.bzl", "js_binary")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 # For RBE compatibility, the package must be a TreeArtifact in bazel-out
@@ -11,7 +11,7 @@ copy_directory(
     out = "typescript",
 )
 
-nodejs_package(
+js_package(
     name = "npm_typescript",
     src = "_npm_typescript",
     package_name = "typescript",
@@ -19,7 +19,7 @@ nodejs_package(
 )
 
 # Needed to address the entry_point within the typescript package
-# since the nodejs_binary implementation in rules_js doesn't support
+# since the js_binary implementation in rules_js doesn't support
 # $(rootpath) expansions yet.
 write_file(
     name = "write_tsc",
@@ -31,14 +31,14 @@ write_file(
     ],
 )
 
-nodejs_binary(
+js_binary(
     name = "tsc",
     data = ["npm_typescript"],
     entry_point = "tsc.js",
     visibility = ["//visibility:public"],
 )
 
-nodejs_binary(
+js_binary(
     name = "validator",
     data = ["npm_typescript"],
     entry_point = "@rules_nodejs//nodejs/private:ts_project_options_validator.js",

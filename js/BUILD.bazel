@@ -8,21 +8,21 @@ exports_files(
 )
 
 bzl_library(
-    name = "nodejs_binary",
-    srcs = ["nodejs_binary.bzl"],
+    name = "js_binary",
+    srcs = ["js_binary.bzl"],
     visibility = ["//visibility:public"],
-    deps = ["//js/private:nodejs_binary"],
+    deps = ["//js/private:js_binary"],
 )
 
 bzl_library(
-    name = "nodejs_test",
+    name = "js_test",
     visibility = ["//visibility:public"],
-    deps = ["//js/private:nodejs_binary"],
+    deps = ["//js/private:js_binary"],
 )
 
 bzl_library(
-    name = "nodejs_package",
-    srcs = ["nodejs_package.bzl"],
+    name = "js_package",
+    srcs = ["js_package.bzl"],
     visibility = ["//visibility:public"],
     deps = [
         "@bazel_skylib//lib:paths",

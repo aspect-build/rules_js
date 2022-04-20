@@ -1,8 +1,8 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
-load("//js:nodejs_binary.bzl", "nodejs_binary")
-load("//js:nodejs_test.bzl", "nodejs_test")
+load("//js:js_binary.bzl", "js_binary")
+load("//js:js_test.bzl", "js_test")
 
 ###########################
 # Fixtures for tests in this file
@@ -123,10 +123,10 @@ diff_test(
 
 ####################################################
 # Test case 4
-# Show that a nodejs_binary can be used with run_binary
+# Show that a js_binary can be used with run_binary
 # because everything it needs to run is in the runfiles
 
-nodejs_binary(
+js_binary(
     name = "bin",
     data = ["@npm_acorn-8.4.0"],
     entry_point = "require_acorn.js",
@@ -141,16 +141,16 @@ run_binary(
 )
 
 diff_test(
-    name = "test_nodejs_binary_under_run_binary",
+    name = "test_js_binary_under_run_binary",
     file1 = "expected_ast.json",
     file2 = "actual4",
 )
 
 ################################
 # Test case 5
-# nodejs_test is just a nodejs_binary
+# js_test is just a js_binary
 
-nodejs_test(
+js_test(
     name = "test_test",
     data = ["@npm_deps//@types/node"],
     entry_point = "test.js",
@@ -168,7 +168,7 @@ write_file(
     ],
 )
 
-nodejs_binary(
+js_binary(
     name = "bin6",
     data = ["//example/lib"],
     entry_point = "case6.js",
@@ -204,7 +204,7 @@ write_file(
     content = ["test-b-0.0.2/test-a-0.0.1"],
 )
 
-nodejs_binary(
+js_binary(
     name = "bin7",
     data = ["@npm_deps//@gregmagolan/test-b"],
     entry_point = "case7.js",

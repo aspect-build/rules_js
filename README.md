@@ -24,7 +24,7 @@ In addition, as a clean rewrite many of the bugs in rules_nodejs are naturally r
 
 -   Drop four years of accumulated complexity.
 -   No Bash dependency on Windows, [#1102](https://github.com/bazelbuild/rules_nodejs/issues/1102)
--   nodejs_binary can be used as the `tool` in a genrule [#1553](https://github.com/bazelbuild/rules_nodejs/issues/1553), [#2600](https://github.com/bazelbuild/rules_nodejs/issues/2600)
+-   js_binary can be used as the `tool` in a genrule [#1553](https://github.com/bazelbuild/rules_nodejs/issues/1553), [#2600](https://github.com/bazelbuild/rules_nodejs/issues/2600)
 -   Repository layout matches the distribution so you can trivially patch or point to sources.
 -   We use gazelle to generate bzl_library targets so users can always generate documentation
     for rules that reference these. [#2874](https://github.com/bazelbuild/rules_nodejs/issues/2874)

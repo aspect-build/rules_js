@@ -66,7 +66,7 @@ In BUILD files, declare dependencies on the packages using the same external rep
 Following the same example, this might look like:
 
 ```starlark
-nodejs_test(
+js_test(
     name = "test_test",
     data = ["@npm_deps//@types/node"],
     entry_point = "test.js",
@@ -126,7 +126,7 @@ You can create these manually if you want to have exact control.
 
 Bazel will only fetch the given package from an external registry if the package is
 required for the user-requested targets to be build/tested.
-The package will be exposed as a [`nodejs_package`](./nodejs_package) rule in a repository
+The package will be exposed as a [`js_package`](./js_package) rule in a repository
 with a default name `@npm_[package name]-[version]`, as the default target in that repository.
 (Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 

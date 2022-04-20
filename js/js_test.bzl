@@ -1,21 +1,21 @@
-"wrapper macro for nodejs_test rule"
+"wrapper macro for js_test rule"
 
-load("//js/private:nodejs_binary.bzl", lib = "nodejs_binary_lib")
+load("//js/private:js_binary.bzl", lib = "js_binary_lib")
 
-_nodejs_test = rule(
-    implementation = lib.nodejs_binary_impl,
+_js_test = rule(
+    implementation = lib.js_binary_impl,
     attrs = lib.attrs,
     test = True,
     toolchains = lib.toolchains,
 )
 
-def nodejs_test(**kwargs):
-    """Alias of nodejs_binary which can be used with `bazel test`
+def js_test(**kwargs):
+    """Alias of js_binary which can be used with `bazel test`
 
     Args:
-      **kwargs: see nodejs_binary attributes
+      **kwargs: see js_binary attributes
     """
-    _nodejs_test(
+    _js_test(
         is_windows = select({
             "@bazel_tools//src/conditions:host_windows": True,
             "//conditions:default": False,
