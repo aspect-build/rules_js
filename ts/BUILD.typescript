@@ -7,7 +7,7 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 node_package(
     name = "npm_typescript",
     src = ":package",
-    package_name = "typescript",
+    package = "typescript",
     visibility = ["//visibility:public"],
 )
 

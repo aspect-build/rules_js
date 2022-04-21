@@ -17,8 +17,8 @@ node_modules()
 
 node_package(
     name = package("@mycorp/mylib").name,
-    package_name = "@mycorp/mylib",
     src = "//example/lib",
+    package = "@mycorp/mylib",
     deps = [package("acorn")],
 )
 

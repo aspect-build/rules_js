@@ -167,8 +167,8 @@ def _process_lockfile(lockfile, prod, dev, no_optional):
         if len(path_segments) != 2 and len(path_segments) != 3:
             msg = "unsupported package path %s" % packagePath
             fail(msg)
-        package_name = "/".join(path_segments[0:-1])
-        package_version = path_segments[-1]
+        package = "/".join(path_segments[0:-1])
+        version = path_segments[-1]
         resolution = packageSnapshot.get("resolution")
         if not resolution:
             msg = "package %s has no resolution field" % packagePath
@@ -181,9 +181,9 @@ def _process_lockfile(lockfile, prod, dev, no_optional):
         optional = resolution.get("optional", False)
         has_bin = resolution.get("hasBin", False)
         requires_build = resolution.get("requiresBuild", False)
-        package = {
-            "name": package_name,
-            "version": package_version,
+        package_info = {
+            "name": package,
+            "version": version,
             "integrity": integrity,
             "dependencies": {},
             "dev": dev,
@@ -198,8 +198,8 @@ def _process_lockfile(lockfile, prod, dev, no_optional):
                 normalized_version = npm_utils.normalize_version(dep_version)
                 dependencies.append(npm_utils.versioned_name(dep_name, normalized_version))
         if dependencies:
-            package["dependencies"] = dependencies
-        packages[npm_utils.versioned_name(package_name, package_version)] = package
+            package_info["dependencies"] = dependencies
+        packages[npm_utils.versioned_name(package, version)] = package_info
     return {
         "dependencies": direct_dependencies,
         "packages": packages,
@@ -210,8 +210,8 @@ _NPM_IMPORT_TMPL = \
         name = "{name}",
         integrity = "{integrity}",
         link_package_guard = "{link_package_guard}",
-        package_name = "{package_name}",
-        package_version = "{package_version}",{maybe_deps}{maybe_indirect}{maybe_patches}{maybe_patch_args}
+        package = "{package}",
+        version = "{version}",{maybe_deps}{maybe_indirect}{maybe_patches}{maybe_patch_args}
     )
 """
 
@@ -310,8 +310,8 @@ def _impl(rctx):
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             name = repo_name,
             link_package_guard = link_package,
-            package_name = name,
-            package_version = version,
+            package = name,
+            version = version,
             integrity = package.get("integrity"),
             maybe_indirect = """
         indirect = True,""" if indirect else "",
