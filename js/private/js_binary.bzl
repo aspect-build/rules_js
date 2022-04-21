@@ -99,6 +99,12 @@ _ATTRS = {
 
         Subject to `$(location)` and make variable expansion.""",
     ),
+    "node_options": attr.string_list(
+        doc = """Options to pass to the node.
+
+        https://nodejs.org/api/cli.html
+        """,
+    ),
     "expected_exit_code": attr.int(
         doc = """The expected exit code.
 
@@ -114,6 +120,7 @@ _ATTRS = {
 
 _ENV_SET = """export {var}=\"{value}\""""
 _ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
+_NODE_OPTION = """NODE_OPTIONS+=(\"{value}\")"""
 
 # Do the opposite of _to_manifest_path in
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
@@ -139,6 +146,12 @@ def _bash_launcher(ctx, entry_point, args):
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
         ))
 
+    node_options = []
+    for node_option in ctx.attr.node_options:
+        node_options.append(_NODE_OPTION.format(
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, node_option, ctx.attr.data).split(" ")]),
+        ))
+
     launcher_subst = {
         "{bash}": bash_bin,
         "{rlocation_function}": BASH_RLOCATION_FUNCTION,
@@ -147,6 +160,7 @@ def _bash_launcher(ctx, entry_point, args):
         "{workspace_name}": ctx.workspace_name,
         "{args}": " ".join(args),
         "{env}": "\n".join(envs),
+        "{node_options}": "\n".join(node_options),
         "{expected_exit_code}": str(ctx.attr.expected_exit_code),
     }
 

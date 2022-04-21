@@ -242,7 +242,7 @@ diff_test(
 
 #######################################
 # Test case 8
-# run_js_binary with copy_srcs_to_bin = True
+# run_js_binary
 write_file(
     name = "write8",
     out = "case8.js",
@@ -278,18 +278,18 @@ diff_test(
 
 #######################################
 # Test case 9
-# set env variable
+# set env variable and node_options
 
 write_file(
     name = "write9",
     out = "case9.js",
-    content = ["require('fs').writeFileSync(process.argv[2], process.env.FOO)"],
+    content = ["require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)"],
 )
 
 write_file(
     name = "expected9",
     out = "expected9.txt",
-    content = ["BAR"],
+    content = ["BARbin9"],
 )
 
 js_binary(
@@ -298,6 +298,10 @@ js_binary(
     env = {
         "FOO": "BAR",
     },
+    node_options = [
+        "--title=bin9",
+        "--throw-deprecation",
+    ],
 )
 
 run_js_binary(
@@ -315,14 +319,14 @@ diff_test(
 
 #######################################
 # Test case 10
-# set env variable
+# capture stdout, stderr & exit code and --node_options
 
 write_file(
     name = "write10",
     out = "case10.js",
     content = ["""process.stdout.write("to stdout")
 process.stderr.write("to stderr")
-require('fs').writeFileSync(process.argv[2], process.env.FOO)
+require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)
 process.exit(42)
 """],
 )
@@ -330,7 +334,7 @@ process.exit(42)
 write_file(
     name = "expected10",
     out = "expected10.txt",
-    content = ["BAR"],
+    content = ["BARbin10"],
 )
 
 write_file(
@@ -375,7 +379,10 @@ run_js_binary(
     outs = [
         "actual10",
     ],
-    args = ["actual10"],
+    args = [
+        "--node_options=--title=bin10",
+        "actual10",
+    ],
     chdir = package_name(),
     exit_code_out = "actual10_result",
     stderr = "actual10_stderr",
