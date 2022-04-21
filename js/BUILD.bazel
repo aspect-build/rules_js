@@ -47,14 +47,6 @@ bzl_library(
     deps = [
         "//js/private:npm_import",
         "//js/private:npm_utils",
-    ],
-)
-
-bzl_library(
-    name = "translate_pnpm_lock",
-    srcs = ["translate_pnpm_lock.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [
         "//js/private:translate_pnpm_lock",
     ],
 )

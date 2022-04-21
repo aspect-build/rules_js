@@ -1,6 +1,6 @@
 "Shows how a custom ruleset can export its npm dependencies"
 
-load("@aspect_rules_js//js:translate_pnpm_lock.bzl", "translate_pnpm_lock")
+load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 
 def repositories():
     translate_pnpm_lock(

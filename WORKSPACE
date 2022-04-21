@@ -38,7 +38,7 @@ nodejs_register_toolchains(
     node_version = "16.9.0",
 )
 
-load("@aspect_rules_js//js:npm_import.bzl", "npm_import")
+load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
 
 # Manually import a package using explicit coordinates.
 # Just a demonstration of the syntax de-sugaring.
@@ -49,8 +49,6 @@ npm_import(
     link_package_guard = "example",
     package_version = "8.4.0",
 )
-
-load("@aspect_rules_js//js:translate_pnpm_lock.bzl", "translate_pnpm_lock")
 
 # Read the pnpm-lock.json file to automate creation of remaining npm_import rules
 translate_pnpm_lock(
