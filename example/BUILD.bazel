@@ -397,10 +397,13 @@ js_test(
     name = "test_peer",
     data = [
         "@example_npm_deps//@rollup/plugin-commonjs",
+        "@example_npm_deps//mobx-react",
+        "@example_npm_deps//react",
     ],
     entry_point = "peer.js",
 )
 
+## Diff tests
 diff_test(
     name = "test10",
     file1 = "expected10",

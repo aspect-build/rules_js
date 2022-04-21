@@ -1,6 +1,9 @@
 const cjs = require('@rollup/plugin-commonjs/package.json')
 const rollup = require('rollup')
 const assert = require('assert')
-
+const react = require('react')
+const mobx = require('mobx-react/package.json')
+assert.equal(react.version, '17.0.2')
+assert.equal(mobx.version, '7.3.0')
 assert.equal(cjs.version, '21.1.0')
 assert.equal(rollup.VERSION, '2.70.2')
