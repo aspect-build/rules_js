@@ -3,12 +3,12 @@
 load("//js/private:node_package.bzl", lib = "node_package_lib")
 
 _node_package = rule(
-    doc = """Defines a nodejs package that is linked into a node_modules tree.
+    doc = """Defines a node package that is linked into a node_modules tree.
 
 The term "package" is defined at
 <https://nodejs.org/docs/latest-v16.x/api/packages.html>
 
-The nodejs package is linked with a pnpm style symlinked node_modules output tree.
+The node package is linked with a pnpm style symlinked node_modules output tree.
 
 See https://pnpm.io/symlinked-node-modules-structure for more information on
 the symlinked node_modules structure.

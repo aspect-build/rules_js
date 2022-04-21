@@ -7,10 +7,10 @@ load(":npm_utils.bzl", "npm_utils")
 _NodejsPackageInfo = provider(
     doc = "Internal use only",
     fields = {
-        "link_package": "package that this nodejs package is linked at",
-        "name": "name of this nodejs package",
-        "version": "version of this nodejs package",
-        "virtual_store_directory": "the TreeArtifact of this nodejs package's virtual store location",
+        "link_package": "package that this node package is linked at",
+        "name": "name of this node package",
+        "version": "version of this node package",
+        "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
     },
 )
 
@@ -25,7 +25,7 @@ Can be left unspecified to allow for circular deps between `node_package`s.
 """,
     ),
     "deps": attr.label_list(
-        doc = """Other nodejs packages this one depends on.
+        doc = """Other node packages this one depends on.
 
         This should include *all* modules the program may need at runtime.
 
@@ -53,7 +53,7 @@ Can be left unspecified to allow for circular deps between `node_package`s.
         default = "0.0.0",
     ),
     "indirect": attr.bool(
-        doc = "If True, this is an indirect node_package which will not linked as a top-level node_module",
+        doc = "If True, this is an indirect node_package which will not linked at the top-level of node_modules",
     ),
     "is_windows": attr.bool(mandatory = True),
 }
