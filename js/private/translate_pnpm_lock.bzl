@@ -195,11 +195,11 @@ def _process_lockfile(lockfile, prod, dev, no_optional):
         package_deps = packageSnapshot.get("dependencies")
         if package_deps:
             for (dep_name, dep_version) in package_deps.items():
-                dependencies.append(npm_utils.versioned_name(dep_name, dep_version))
+                normalized_version = npm_utils.normalize_version(dep_version)
+                dependencies.append(npm_utils.versioned_name(dep_name, normalized_version))
         if dependencies:
             package["dependencies"] = dependencies
         packages[npm_utils.versioned_name(package_name, package_version)] = package
-
     return {
         "dependencies": direct_dependencies,
         "packages": packages,
