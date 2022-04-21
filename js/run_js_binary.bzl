@@ -8,20 +8,20 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
 def run_js_binary(
-    name,
-    tool,
-    env = {},
-    srcs = [],
-    output_dir = False,
-    outs = [],
-    args = [],
-    chdir = None,
-    stdout = None,
-    stderr = None,
-    exit_code_out = None,
-    silent_on_success = True,
-    copy_srcs_to_bin = True,
-    **kwargs):
+        name,
+        tool,
+        env = {},
+        srcs = [],
+        output_dir = False,
+        outs = [],
+        args = [],
+        chdir = None,
+        stdout = None,
+        stderr = None,
+        exit_code_out = None,
+        silent_on_success = True,
+        copy_srcs_to_bin = True,
+        **kwargs):
     """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
 
     This rule does not require Bash `native.genrule`.
@@ -129,7 +129,7 @@ def run_js_binary(
     if exit_code_out:
         extra_env["JS_BINARY__CAPTURE_EXIT_CODE"] = "%s$(rootpath %s)" % (chdir_prefix, exit_code_out)
         extra_outs.append(exit_code_out)
-    
+
     # Configure silent on success
     if silent_on_success:
         extra_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
@@ -142,5 +142,5 @@ def run_js_binary(
         output_dir = output_dir,
         outs = outs + extra_outs,
         args = args,
-        **kwargs,
+        **kwargs
     )

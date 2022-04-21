@@ -21,7 +21,7 @@ Data files that are not already in the output tree are also copied there so that
 find them when outside of the sandbox and so that they don't follow symlinks back to the user source
 tree.
 
-TODO: link to rule_js js_package linker design doc
+TODO: link to rule_js node_package linker design doc
 
 This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
@@ -97,7 +97,7 @@ _ATTRS = {
     "env": attr.string_dict(
         doc = """Environment variables of the action.
 
-        Subject to `$(location)` and make variable expansion."""
+        Subject to `$(location)` and make variable expansion.""",
     ),
     "expected_exit_code": attr.int(
         doc = """The expected exit code.
@@ -140,7 +140,7 @@ def _bash_launcher(ctx, entry_point, args):
         ))
 
     launcher_subst = {
-        "{bash}":  bash_bin,
+        "{bash}": bash_bin,
         "{rlocation_function}": BASH_RLOCATION_FUNCTION,
         "{node}": _target_tool_short_path(node_bin.target_tool_path),
         "{entry_point}": entry_point.short_path,
@@ -168,7 +168,7 @@ def _create_launcher(ctx):
     output_entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows = ctx.attr.is_windows)
     output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = ctx.attr.is_windows)
 
-    bash_launcher =  _bash_launcher(ctx, output_entry_point, ctx.attr.args)
+    bash_launcher = _bash_launcher(ctx, output_entry_point, ctx.attr.args)
     launcher = create_windows_native_launcher_script(ctx, ctx.outputs.launcher_sh) if ctx.attr.is_windows else bash_launcher
 
     all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files

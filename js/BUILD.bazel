@@ -21,8 +21,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "js_package",
-    srcs = ["js_package.bzl"],
+    name = "node_package",
+    srcs = ["node_package.bzl"],
     visibility = ["//visibility:public"],
     deps = [
         "@bazel_skylib//lib:paths",
@@ -64,8 +64,8 @@ bzl_library(
     srcs = ["run_js_binary.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "@aspect_bazel_lib//lib:run_binary",
         "@aspect_bazel_lib//lib:copy_to_bin",
+        "@aspect_bazel_lib//lib:run_binary",
         "@bazel_skylib//lib:dicts",
     ],
 )

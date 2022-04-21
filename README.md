@@ -7,7 +7,8 @@ Our goal is to eventually have rough feature parity with rules_nodejs "builtin",
 This ruleset is a high-performance alternative to rules_nodejs.
 
 The primary difference is that we don't run `npm install` or `yarn install`, instead
-we use a Bazel-idiomatic approach to managing the third-party dependencies.
+we use a Bazel-idiomatic approach to managing the third-party dependencies adapted from
+[pnpm](https://pnpm.io/), similar to how [Rush](https://rushjs.io/) manages packages.
 
 Features include:
 

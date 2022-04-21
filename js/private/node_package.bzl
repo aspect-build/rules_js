@@ -1,40 +1,27 @@
-"js_package rule"
+"node_package rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":npm_utils.bzl", "npm_utils")
 
 _NodejsPackageInfo = provider(
+    doc = "Internal use only",
     fields = {
         "link_package": "package that this nodejs package is linked at",
         "name": "name of this nodejs package",
         "version": "version of this nodejs package",
-        "virtual_store_directory": "the TreeArtifact of this nodejs package's virtual store location"
+        "virtual_store_directory": "the TreeArtifact of this nodejs package's virtual store location",
     },
 )
 
 VIRTUAL_STORE_ROOT = ".aspect_rules_js"
-
-_DOC = """Defines a nodejs package that is linked into a node_modules tree.
-
-The term "package" is defined at
-<https://nodejs.org/docs/latest-v16.x/api/packages.html>
-
-The nodejs package is linked with a pnpm style symlinked node_modules output tree.
-
-See https://pnpm.io/symlinked-node-modules-structure for more information on
-the symlinked node_modules structure.
-Npm may also support a symlinked node_modules structure called
-"Isolated mode" in the future:
-https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
-"""
 
 _ATTRS = {
     "src": attr.label(
         allow_single_file = True,
         doc = """A source directory or TreeArtifact containing the package files.
 
-Can be left unspecified to allow for circular deps between js_packages.        
+Can be left unspecified to allow for circular deps between `node_package`s.        
 """,
     ),
     "deps": attr.label_list(
@@ -66,7 +53,7 @@ Can be left unspecified to allow for circular deps between js_packages.
         default = "0.0.0",
     ),
     "indirect": attr.bool(
-        doc = "If True, this is an indirect js_package which will not linked as a top-level node_module",
+        doc = "If True, this is an indirect node_package which will not linked as a top-level node_module",
     ),
     "is_windows": attr.bool(mandatory = True),
 }
@@ -92,7 +79,7 @@ def _impl(ctx):
                 package_name = ctx.attr.package_name,
                 virtual_store_name = virtual_store_name,
                 virtual_store_root = VIRTUAL_STORE_ROOT,
-            )
+            ),
         )
         copy_directory_action(ctx, ctx.file.src, virtual_store_out, ctx.attr.is_windows)
         direct_files.append(virtual_store_out)
@@ -101,7 +88,7 @@ def _impl(ctx):
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
-                "node_modules/{package_name}".format(package_name = ctx.attr.package_name)
+                "node_modules/{package_name}".format(package_name = ctx.attr.package_name),
             )
             ctx.actions.symlink(
                 output = root_symlink,
@@ -115,8 +102,8 @@ def _impl(ctx):
             dep_link_package = dep[_NodejsPackageInfo].link_package
             if dep_link_package != ctx.label.package:
                 if not ctx.label.package.startwith(dep_link_package + "/"):
-                    msg = """js_package in %s package cannot depend on js_package in %s package.
-deps of js_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
+                    msg = """node_package in %s package cannot depend on node_package in %s package.
+deps of node_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
                     fail(msg)
             dep_name = dep[_NodejsPackageInfo].name
             dep_version = dep[_NodejsPackageInfo].version
@@ -133,6 +120,7 @@ deps of js_package must be in the same package or in a parent package.""" % (ctx
                     target_file = dep_virtual_store_directory,
                 )
             else:
+                # buildifier: disable=print
                 print("""
 ====================================================================================================
 WARNING: dangling symlinks are experimental and require --experimental_allow_unresolved_symlinks
@@ -152,7 +140,7 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
                         dep_name = dep_name,
                         virtual_store_name = npm_utils.virtual_store_name(dep_name, dep_version),
                         virtual_store_root = VIRTUAL_STORE_ROOT,
-                    )
+                    ),
                 )
             direct_files.append(dep_symlink)
 
@@ -187,16 +175,15 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
 
     return result
 
-js_package_lib = struct(
+node_package_lib = struct(
     attrs = _ATTRS,
     impl = _impl,
     provides = [DefaultInfo, DeclarationInfo, _NodejsPackageInfo],
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro
-js_package = rule(
-    doc = _DOC,
-    implementation = js_package_lib.impl,
-    attrs = js_package_lib.attrs,
-    provides = js_package_lib.provides,
+node_package = rule(
+    implementation = node_package_lib.impl,
+    attrs = node_package_lib.attrs,
+    provides = node_package_lib.provides,
 )

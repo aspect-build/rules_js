@@ -1,10 +1,10 @@
 "BUILD file inserted into @npm_typescript repository"
-load("@aspect_rules_js//js:js_package.bzl", "js_package")
+load("@aspect_rules_js//js:node_package.bzl", "node_package")
 load("@aspect_rules_js//js:js_binary.bzl", "js_binary")
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
-js_package(
+node_package(
     name = "npm_typescript",
     src = ":package",
     package_name = "typescript",

@@ -22,6 +22,8 @@ versions = struct(
 # changes in this function should be marked as BREAKING in the commit message
 # and released only in semver majors.
 def rules_js_dependencies():
+    "Dependencies for users of aspect_rules_js"
+
     # The minimal version of bazel_skylib we require
     maybe(
         http_archive,

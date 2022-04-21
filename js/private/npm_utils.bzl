@@ -24,5 +24,5 @@ npm_utils = struct(
     virtual_store_name = _virtual_store_name,
     alias_target_name = _alias_target_name,
     # Prefix namespace to use for generated js_binary targets and aliases
-    js_package_target_namespace = "npm",
+    node_package_target_namespace = "npm",
 )

@@ -44,10 +44,10 @@ load("@aspect_rules_js//js:npm_import.bzl", "npm_import")
 # Just a demonstration of the syntax de-sugaring.
 npm_import(
     name = "example_npm_deps__acorn-8.4.0",
-    integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     package_name = "acorn",
-    package_version = "8.4.0",
+    integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     link_package_guard = "example",
+    package_version = "8.4.0",
 )
 
 load("@aspect_rules_js//js:translate_pnpm_lock.bzl", "translate_pnpm_lock")
@@ -55,8 +55,6 @@ load("@aspect_rules_js//js:translate_pnpm_lock.bzl", "translate_pnpm_lock")
 # Read the pnpm-lock.json file to automate creation of remaining npm_import rules
 translate_pnpm_lock(
     name = "example_npm_deps",
-    # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
-    pnpm_lock = "//example:pnpm-lock.json",
     patch_args = {
         "@gregmagolan/test-a": ["-p1"],
     },
@@ -64,6 +62,8 @@ translate_pnpm_lock(
         "@gregmagolan/test-a": ["//example:test-a.patch"],
         "@gregmagolan/test-a@0.0.1": ["//example:test-a@0.0.1.patch"],
     },
+    # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
+    pnpm_lock = "//example:pnpm-lock.json",
 )
 
 # This is the result of translate_pnpm_lock

@@ -2,22 +2,22 @@ load("@aspect_rules_js//js:js_binary.bzl", "js_binary")
 
 js_binary(
     name = "main",
-    entry_point = "main.js",
+    args = ["foo"],
     data = [
         "@npm//@aspect-test/bar",
         "@npm//@aspect-test/foo",
         "@npm//@aspect-test/qar",
     ],
-    args = ["foo"]
+    entry_point = "main.js",
 )
 
 js_binary(
     name = "main_alt",
-    entry_point = "main.js",
+    args = ["bar"],
     data = [
         "@npm//@aspect-test/bar",
         "@npm//@aspect-test/foo",
         "@npm//@aspect-test/qar",
     ],
-    args = ["bar"]
+    entry_point = "main.js",
 )

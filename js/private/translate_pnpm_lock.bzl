@@ -265,15 +265,15 @@ def _impl(rctx):
         "def npm_repositories():",
     ]
 
-    js_packages_bzl_file = "js_packages.bzl"
-    js_packages_header_bzl = []
-    js_packages_bzl = [
-        """def js_packages():
+    node_modules_bzl_file = "node_modules.bzl"
+    node_modules_header_bzl = []
+    node_modules_bzl = [
+        """def node_modules():
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
-        fail("The js_packages() macro loaded from {js_packages_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")        
+        fail("The node_modules() macro loaded from {node_modules_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")        
 """.format(
             link_package_guard = link_package,
-            js_packages_bzl = "@%s//:%s" % (rctx.name, js_packages_bzl_file),
+            node_modules_bzl = "@%s//:%s" % (rctx.name, node_modules_bzl_file),
         ),
     ]
 
@@ -323,13 +323,13 @@ def _impl(rctx):
         patch_args = %s,""" % patch_args) if len(patches) > 0 and len(patch_args) > 0 else "",
         ))
 
-        js_packages_header_bzl.append(
-            """load("@{repo_name}//:js_package.bzl", js_package_{i} = "js_package")""".format(
+        node_modules_header_bzl.append(
+            """load("@{repo_name}//:node_package.bzl", node_package_{i} = "node_package")""".format(
                 i = i,
                 repo_name = repo_name,
             ),
         )
-        js_packages_bzl.append("    js_package_{i}()".format(i = i))
+        node_modules_bzl.append("    node_package_{i}()".format(i = i))
 
         if not indirect:
             # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
@@ -341,7 +341,7 @@ def _impl(rctx):
 
     package_bzl = [_PACKAGE_TMPL.format(
         workspace = rctx.attr.pnpm_lock.workspace_name,
-        namespace = npm_utils.js_package_target_namespace,
+        namespace = npm_utils.node_package_target_namespace,
         link_package = link_package,
     )]
 
@@ -349,7 +349,7 @@ def _impl(rctx):
     empty_line = [""]
 
     rctx.file("repositories.bzl", "\n".join(generated_by_line + repositories_bzl))
-    rctx.file(js_packages_bzl_file, "\n".join(generated_by_line + js_packages_header_bzl + empty_line + js_packages_bzl + empty_line))
+    rctx.file(node_modules_bzl_file, "\n".join(generated_by_line + node_modules_header_bzl + empty_line + node_modules_bzl + empty_line))
     rctx.file("package.bzl", "\n".join(generated_by_line + package_bzl))
     rctx.file("BUILD.bazel", "exports_files([\"repositories.bzl\"])")
 

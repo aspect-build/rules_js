@@ -188,10 +188,10 @@ We can determine the above structure from pnpm lock file alone.
 
 For a given package such as `@aspect-test/bar@2.0.0` we would need the following output artifacts:
 
-* `//path/to/package:node_modules/.bin/bar`: output file
-* `//path/to/package:node_modules/.bazel/@aspect-test+bar@2.0.0/node_modules/@aspect-test/bar`: output tree artifact
-* `//path/to/package:node_modules/.bazel/@aspect-test+bar@2.0.0/node_modules/@aspect-test/qar`: output symlink -> `../../../@aspect-test+qar@1.0.0/node_modules/@aspect-test/qar`
-* `//path/to/package:node_modules/@aspect-test/bar`: output symlink -> `../.bazel/@aspect-test+bar@2.0.0/node_modules/@aspect-test/bar`
+-   `//path/to/package:node_modules/.bin/bar`: output file
+-   `//path/to/package:node_modules/.bazel/@aspect-test+bar@2.0.0/node_modules/@aspect-test/bar`: output tree artifact
+-   `//path/to/package:node_modules/.bazel/@aspect-test+bar@2.0.0/node_modules/@aspect-test/qar`: output symlink -> `../../../@aspect-test+qar@1.0.0/node_modules/@aspect-test/qar`
+-   `//path/to/package:node_modules/@aspect-test/bar`: output symlink -> `../.bazel/@aspect-test+bar@2.0.0/node_modules/@aspect-test/bar`
 
 Key to this approach is that these output artifacts are in the same package as the `package.json` file.
 

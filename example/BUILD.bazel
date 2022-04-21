@@ -1,24 +1,24 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@example_npm_deps//:js_packages.bzl", "js_packages")
+load("@example_npm_deps//:node_modules.bzl", "node_modules")
 load("@example_npm_deps//:package.bzl", "package", "package_dir")
-load("@example_npm_deps__acorn-8.4.0//:js_package.bzl", js_package_acorn = "js_package")
+load("@example_npm_deps__acorn-8.4.0//:node_package.bzl", node_package_acorn = "node_package")
 load("//js:js_binary.bzl", "js_binary")
-load("//js:js_package.bzl", "js_package")
+load("//js:node_package.bzl", "node_package")
 load("//js:js_test.bzl", "js_test")
 load("//js:run_js_binary.bzl", "run_js_binary")
 
 ###########################
 
-js_package_acorn()
+node_package_acorn()
 
-js_packages()
+node_modules()
 
-js_package(
+node_package(
     name = package("@mycorp/mylib").name,
-    src = "//example/lib",
     package_name = "@mycorp/mylib",
+    src = "//example/lib",
     deps = [package("acorn")],
 )
 
@@ -127,7 +127,7 @@ genrule(
         ./$(execpath :require_acorn_js) \\
         $@""",
     toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = ["@node16_toolchains//:resolved_toolchain",],
+    tools = ["@node16_toolchains//:resolved_toolchain"],
 )
 
 diff_test(
@@ -296,7 +296,7 @@ js_binary(
     name = "bin9",
     entry_point = "case9.js",
     env = {
-        "FOO": "BAR"
+        "FOO": "BAR",
     },
 )
 
@@ -355,14 +355,14 @@ js_binary(
     name = "bin10",
     entry_point = "case10.js",
     env = {
-        "FOO": "BAR"
+        "FOO": "BAR",
     },
 )
 
 js_test(
     name = "test10_test",
-    entry_point = "case10.js",
     args = ["dummy"],
+    entry_point = "case10.js",
     env = {
         "FOO": "BAR",
         "JS_BINARY__EXPECTED_EXIT_CODE": "42",
@@ -375,11 +375,11 @@ run_js_binary(
     outs = [
         "actual10",
     ],
-    stdout = "actual10_stdout",
-    stderr = "actual10_stderr",
-    exit_code_out = "actual10_result",
-    chdir = package_name(),
     args = ["actual10"],
+    chdir = package_name(),
+    exit_code_out = "actual10_result",
+    stderr = "actual10_stderr",
+    stdout = "actual10_stdout",
     tool = ":bin10",
 )
 

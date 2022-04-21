@@ -28,14 +28,14 @@ bzl_library(
 )
 
 bzl_library(
-    name = "js_package",
-    srcs = ["js_package.bzl"],
+    name = "node_package",
+    srcs = ["node_package.bzl"],
     visibility = ["//:__subpackages__"],
     deps = [
+        ":npm_utils",
         "@aspect_bazel_lib//lib:copy_directory",
         "@bazel_skylib//lib:paths",
         "@rules_nodejs//nodejs:bzl",
-        ":npm_utils",
     ],
 )
 
@@ -44,8 +44,8 @@ bzl_library(
     srcs = ["npm_import.bzl"],
     visibility = ["//js:__subpackages__"],
     deps = [
-        "@aspect_bazel_lib//lib:repo_utils",
         ":npm_utils",
+        "@aspect_bazel_lib//lib:repo_utils",
     ],
 )
 
@@ -60,8 +60,8 @@ bzl_library(
     srcs = ["translate_pnpm_lock.bzl"],
     visibility = ["//js:__subpackages__"],
     deps = [
+        ":npm_utils",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
-        ":npm_utils",
     ],
 )
