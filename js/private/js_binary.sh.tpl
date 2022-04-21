@@ -190,23 +190,38 @@ _exit() {
   exit $EXIT_CODE
 }
 
-set +e
+NODE_OPTIONS=()
+{node_options}
+
+ARGS=()
+ALL_ARGS=("$@")
+for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
+  case "$ARG" in
+    # Let users pass through arguments to node itself
+    --node_options=*) NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
+    # Remaining argv is collected to pass to the program
+    *) ARGS+=( "$ARG" )
+  esac
+done
 
 # ==============================================================================
 # Run the main program
 # ==============================================================================
 
 if [ "${JS_BINARY__VERBOSE:-}" ]; then
-    echo "${LOG_PREFIX}: running: $node $entry_point $@" >&2
+    echo "${LOG_PREFIX}: running: "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}" >&2
 fi
+
+set +e
+
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "$node" "$entry_point" "$@" <&0 >$STDOUT_CAPTURE 2>$STDERR_CAPTURE &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >$STDOUT_CAPTURE 2>$STDERR_CAPTURE &
 elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "$node" "$entry_point" "$@" <&0 >$STDOUT_CAPTURE &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >$STDOUT_CAPTURE &
 elif [ "${STDERR_CAPTURE:-}" ]; then
-    "$node" "$entry_point" "$@" <&0 2>$STDERR_CAPTURE &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>$STDERR_CAPTURE &
 else
-    "$node" "$entry_point" "$@" <&0 &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 fi
 
 # ==============================================================================
