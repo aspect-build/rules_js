@@ -4,11 +4,11 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":npm_utils.bzl", "npm_utils")
 
-_NodejsPackageInfo = provider(
+_NodePackageInfo = provider(
     doc = "Internal use only",
     fields = {
         "link_package": "package that this node package is linked at",
-        "name": "name of this node package",
+        "package": "name of this node package",
         "version": "version of this node package",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
     },
@@ -40,14 +40,14 @@ Can be left unspecified to allow for circular deps between `node_package`s.
         > In contrast, Bazel makes it possible to make builds hermetic, which means that
         > all dependencies of a program must be declared when running in Bazel's sandbox.
         """,
-        providers = [_NodejsPackageInfo],
+        providers = [_NodePackageInfo],
     ),
-    "package_name": attr.string(
+    "package": attr.string(
         # TODO: validate that name matches in an action if src is set
         doc = "Must match the `name` field in the `package.json` file for this package.",
         mandatory = True,
     ),
-    "package_version": attr.string(
+    "version": attr.string(
         # TODO: validate that version matches in an action if src is set
         doc = "Must match the `version` field in the `package.json` file for this package.",
         default = "0.0.0",
@@ -61,12 +61,12 @@ Can be left unspecified to allow for circular deps between `node_package`s.
 def _impl(ctx):
     if ctx.file.src and not ctx.file.src.is_source and not ctx.file.src.is_directory:
         fail("src must a source directory or TreeArtifact if set")
-    if not ctx.attr.package_name:
-        fail("package_name attr must not be empty")
-    if not ctx.attr.package_version:
-        fail("package_version attr must not be empty")
+    if not ctx.attr.package:
+        fail("package attr must not be empty")
+    if not ctx.attr.version:
+        fail("version attr must not be empty")
 
-    virtual_store_name = npm_utils.virtual_store_name(ctx.attr.package_name, ctx.attr.package_version)
+    virtual_store_name = npm_utils.virtual_store_name(ctx.attr.package, ctx.attr.version)
 
     virtual_store_out = None
     node_modules_directory = None
@@ -75,8 +75,8 @@ def _impl(ctx):
     if ctx.file.src:
         # output the package as a TreeArtifact to its virtual store location
         virtual_store_out = ctx.actions.declare_directory(
-            "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package_name}".format(
-                package_name = ctx.attr.package_name,
+            "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}".format(
+                package = ctx.attr.package,
                 virtual_store_name = virtual_store_name,
                 virtual_store_root = VIRTUAL_STORE_ROOT,
             ),
@@ -88,7 +88,7 @@ def _impl(ctx):
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
-                "node_modules/{package_name}".format(package_name = ctx.attr.package_name),
+                "node_modules/{package}".format(package = ctx.attr.package),
             )
             ctx.actions.symlink(
                 output = root_symlink,
@@ -99,17 +99,17 @@ def _impl(ctx):
 
         for dep in ctx.attr.deps:
             # symlink the package's direct deps to its virtual store location
-            dep_link_package = dep[_NodejsPackageInfo].link_package
+            dep_link_package = dep[_NodePackageInfo].link_package
             if dep_link_package != ctx.label.package:
                 if not ctx.label.package.startwith(dep_link_package + "/"):
                     msg = """node_package in %s package cannot depend on node_package in %s package.
 deps of node_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
                     fail(msg)
-            dep_name = dep[_NodejsPackageInfo].name
-            dep_version = dep[_NodejsPackageInfo].version
-            dep_virtual_store_directory = dep[_NodejsPackageInfo].virtual_store_directory
-            dep_symlink_path = "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_name}".format(
-                dep_name = dep_name,
+            dep_package = dep[_NodePackageInfo].package
+            dep_version = dep[_NodePackageInfo].version
+            dep_virtual_store_directory = dep[_NodePackageInfo].virtual_store_directory
+            dep_symlink_path = "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_package}".format(
+                dep_package = dep_package,
                 virtual_store_name = virtual_store_name,
                 virtual_store_root = VIRTUAL_STORE_ROOT,
             )
@@ -135,10 +135,10 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
                 execpath = "/".join([p for p in [ctx.bin_dir.path, ctx.label.workspace_root, ctx.label.package] if p])
                 ctx.actions.symlink(
                     output = dep_symlink,
-                    target_path = "{execpath}/node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_name}".format(
+                    target_path = "{execpath}/node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_package}".format(
                         execpath = execpath,
-                        dep_name = dep_name,
-                        virtual_store_name = npm_utils.virtual_store_name(dep_name, dep_version),
+                        dep_package = dep_package,
+                        virtual_store_name = npm_utils.virtual_store_name(dep_package, dep_version),
                         virtual_store_root = VIRTUAL_STORE_ROOT,
                     ),
                 )
@@ -160,10 +160,10 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
             declarations = direct_files,
             deps = ctx.attr.deps,
         ),
-        _NodejsPackageInfo(
+        _NodePackageInfo(
             link_package = ctx.label.package,
-            name = ctx.attr.package_name,
-            version = ctx.attr.package_version,
+            package = ctx.attr.package,
+            version = ctx.attr.version,
             virtual_store_directory = virtual_store_out,
         ),
     ]
@@ -178,7 +178,7 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
 node_package_lib = struct(
     attrs = _ATTRS,
     impl = _impl,
-    provides = [DefaultInfo, DeclarationInfo, _NodejsPackageInfo],
+    provides = [DefaultInfo, DeclarationInfo, _NodePackageInfo],
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro

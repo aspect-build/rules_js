@@ -7,8 +7,8 @@ def npm_repositories():
         name = "rules_foo_npm__at_aspect-test_bar_2.0.0",
         integrity = "sha512-rznoX5QANJCysyASyjthuU7s8jEOHZ5QA8XLejhYQ2vTf5Ft6Xu1dKWllMmkihHMw+O/VYvsL0kyfbLguhNTIw==",
         link_package_guard = "foo",
-        package_name = "@aspect-test/bar",
-        package_version = "2.0.0",
+        package = "@aspect-test/bar",
+        version = "2.0.0",
         deps = ["@aspect-test/qar@1.0.0"],
     )
 
@@ -16,7 +16,7 @@ def npm_repositories():
         name = "rules_foo_npm__at_aspect-test_qar_1.0.0",
         integrity = "sha512-AJMwCXbBj/OC0L4oWQSFlF7pytxlhJTtDBaq1zdNLzA8m0bqhGEM+AN/WJv+j/q88WoaKdELDDWHqE6aIDsMpA==",
         link_package_guard = "foo",
-        package_name = "@aspect-test/qar",
-        package_version = "1.0.0",
+        package = "@aspect-test/qar",
+        version = "1.0.0",
         indirect = True,
     )

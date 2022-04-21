@@ -44,10 +44,10 @@ load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
 # Just a demonstration of the syntax de-sugaring.
 npm_import(
     name = "example_npm_deps__acorn-8.4.0",
-    package_name = "acorn",
     integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     link_package_guard = "example",
-    package_version = "8.4.0",
+    package = "acorn",
+    version = "8.4.0",
 )
 
 # Read the pnpm-lock.json file to automate creation of remaining npm_import rules
