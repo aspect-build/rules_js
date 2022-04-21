@@ -120,7 +120,7 @@ def _impl(rctx):
             rctx.attr.package_name,
             # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
             rctx.attr.package_name.split("/")[-1],
-            rctx.attr.package_version,
+            npm_utils.strip_peer_dep_version(rctx.attr.package_version),
         ),
         integrity = rctx.attr.integrity,
     )
