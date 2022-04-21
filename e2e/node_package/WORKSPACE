@@ -40,7 +40,3 @@ local_repository(
 load("@rules_foo//:repositories.bzl", rules_foo_repositories = "repositories")
 
 rules_foo_repositories()
-
-load("@rules_foo_npm//:repositories.bzl", rules_foo_npm_repositories = "npm_repositories")
-
-rules_foo_npm_repositories()
