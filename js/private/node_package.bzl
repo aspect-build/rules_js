@@ -53,7 +53,7 @@ Can be left unspecified to allow for circular deps between `node_package`s.
         default = "0.0.0",
     ),
     "indirect": attr.bool(
-        doc = "If True, this is an indirect node_package which will not linked as a top-level node_module",
+        doc = "If True, this is an indirect node_package which will not linked at the top-level of node_modules",
     ),
     "is_windows": attr.bool(mandatory = True),
 }
