@@ -4,9 +4,9 @@ js_binary(
     name = "main",
     args = ["foo"],
     data = [
-        "@npm//@aspect-test/bar",
-        "@npm//@aspect-test/foo",
-        "@npm//@aspect-test/qar",
+        "@npm//@aspect-test/a",
+        "@npm//@aspect-test/b",
+        "@npm//@aspect-test/c",
     ],
     entry_point = "main.js",
 )
@@ -15,9 +15,9 @@ js_binary(
     name = "main_alt",
     args = ["bar"],
     data = [
-        "@npm//@aspect-test/bar",
-        "@npm//@aspect-test/foo",
-        "@npm//@aspect-test/qar",
+        "@npm//@aspect-test/a",
+        "@npm//@aspect-test/b",
+        "@npm//@aspect-test/c",
     ],
     entry_point = "main.js",
 )

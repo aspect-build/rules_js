@@ -2,15 +2,18 @@
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
-load(":npm_utils.bzl", "npm_utils")
+load(":pnpm_utils.bzl", "pnpm_utils")
 
 _NodePackageInfo = provider(
     doc = "Internal use only",
     fields = {
+        "label": "the label of the target the created this provider",
         "link_package": "package that this node package is linked at",
         "package": "name of this node package",
         "version": "version of this node package",
+        "dep_refs": "list of dependency ref targets",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
+        "node_modules_directory": "the symlink of this package at the root of the node_modules if this is a direct npm dependency",
     },
 )
 
@@ -55,6 +58,10 @@ Can be left unspecified to allow for circular deps between `node_package`s.
     "indirect": attr.bool(
         doc = "If True, this is an indirect node_package which will not linked at the top-level of node_modules",
     ),
+    "root_dir": attr.string(
+        doc = "For internal use only",
+        default = "node_modules",
+    ),
     "is_windows": attr.bool(mandatory = True),
 }
 
@@ -66,16 +73,18 @@ def _impl(ctx):
     if not ctx.attr.version:
         fail("version attr must not be empty")
 
-    virtual_store_name = npm_utils.virtual_store_name(ctx.attr.package, ctx.attr.version)
+    virtual_store_name = pnpm_utils.virtual_store_name(ctx.attr.package, ctx.attr.version)
 
     virtual_store_out = None
     node_modules_directory = None
     direct_files = []
+    dep_refs = []
 
     if ctx.file.src:
         # output the package as a TreeArtifact to its virtual store location
         virtual_store_out = ctx.actions.declare_directory(
-            "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}".format(
+            "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}".format(
+                root_dir = ctx.attr.root_dir,
                 package = ctx.attr.package,
                 virtual_store_name = virtual_store_name,
                 virtual_store_root = VIRTUAL_STORE_ROOT,
@@ -88,7 +97,10 @@ def _impl(ctx):
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
-                "node_modules/{package}".format(package = ctx.attr.package),
+                "{root_dir}/{package}".format(
+                    root_dir = ctx.attr.root_dir,
+                    package = ctx.attr.package,
+                ),
             )
             ctx.actions.symlink(
                 output = root_symlink,
@@ -108,41 +120,64 @@ deps of node_package must be in the same package or in a parent package.""" % (c
             dep_package = dep[_NodePackageInfo].package
             dep_version = dep[_NodePackageInfo].version
             dep_virtual_store_directory = dep[_NodePackageInfo].virtual_store_directory
-            dep_symlink_path = "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_package}".format(
-                dep_package = dep_package,
-                virtual_store_name = virtual_store_name,
-                virtual_store_root = VIRTUAL_STORE_ROOT,
-            )
             if dep_virtual_store_directory:
+                dep_symlink_path = "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_package}".format(
+                    root_dir = ctx.attr.root_dir,
+                    dep_package = dep_package,
+                    virtual_store_name = virtual_store_name,
+                    virtual_store_root = VIRTUAL_STORE_ROOT,
+                )
                 dep_symlink = ctx.actions.declare_file(dep_symlink_path)
                 ctx.actions.symlink(
                     output = dep_symlink,
                     target_file = dep_virtual_store_directory,
                 )
+                direct_files.append(dep_symlink)
             else:
-                # buildifier: disable=print
-                print("""
-====================================================================================================
-WARNING: dangling symlinks are experimental and require --experimental_allow_unresolved_symlinks
-
-In the latest version of Bazel (5.1.1 at time of authoring), this flag is not propogated to the
-"host" and "exec" configurations which breaks if you use this a target as a "tool" that is built
-under the "host" and "exec" configs. Dangling symlinks are also not supported with remote execution.
-See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for more information.
-====================================================================================================
-""")
-                dep_symlink = ctx.actions.declare_symlink(dep_symlink_path)
-                execpath = "/".join([p for p in [ctx.bin_dir.path, ctx.label.workspace_root, ctx.label.package] if p])
-                ctx.actions.symlink(
-                    output = dep_symlink,
-                    target_path = "{execpath}/node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_package}".format(
-                        execpath = execpath,
-                        dep_package = dep_package,
-                        virtual_store_name = npm_utils.virtual_store_name(dep_package, dep_version),
-                        virtual_store_root = VIRTUAL_STORE_ROOT,
-                    ),
-                )
-            direct_files.append(dep_symlink)
+                # this is a ref node_package, a downstream terminal node_package
+                # for this npm depedency will create the dep symlinks for this dep;
+                # this pattern is used to break circular dependencies between 3rd
+                # party npm deps; it is not recommended for 1st party deps
+                dep_refs.append(dep)
+    else:
+        # if ctx.attr.src is _not_ set and ctx.attr.deps is, this is a terminal
+        # package with deps being the transitive closure of deps;
+        # this pattern is used to break circular dependencies between 3rd
+        # party npm deps; it is not recommended for 1st party deps
+        deps_map = {}
+        for dep in ctx.attr.deps:
+            # create a map of deps that have virtual store directories
+            if dep[_NodePackageInfo].virtual_store_directory:
+                dep_package = dep[_NodePackageInfo].package
+                dep_version = dep[_NodePackageInfo].version
+                deps_map[pnpm_utils.pnpm_name(dep_package, dep_version)] = dep
+        for dep in ctx.attr.deps:
+            dep_package = dep[_NodePackageInfo].package
+            dep_version = dep[_NodePackageInfo].version
+            dep_virtual_store_name = pnpm_utils.virtual_store_name(dep_package, dep_version)
+            dep_refs = dep[_NodePackageInfo].dep_refs
+            if dep_package == ctx.attr.package and dep_version == ctx.attr.version:
+                # provide the node_modules director for this package found in the transitive_closure
+                node_modules_directory = dep[_NodePackageInfo].node_modules_directory
+            if dep_refs:
+                for dep_ref in dep_refs:
+                    dep_ref_package = dep_ref[_NodePackageInfo].package
+                    dep_ref_version = dep_ref[_NodePackageInfo].version
+                    actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
+                    dep_ref_virtual_store_directory = actual_dep[_NodePackageInfo].virtual_store_directory
+                    if dep_ref_virtual_store_directory:
+                        dep_symlink_path = "{root_dir}/{virtual_store_root}/{dep_virtual_store_name}/node_modules/{dep_package}".format(
+                            root_dir = ctx.attr.root_dir,
+                            dep_package = dep_ref_package,
+                            dep_virtual_store_name = dep_virtual_store_name,
+                            virtual_store_root = VIRTUAL_STORE_ROOT,
+                        )
+                        dep_symlink = ctx.actions.declare_file(dep_symlink_path)
+                        ctx.actions.symlink(
+                            output = dep_symlink,
+                            target_file = dep_ref_virtual_store_directory,
+                        )
+                        direct_files.append(dep_symlink)
 
     direct_files = depset(direct = direct_files)
 
@@ -161,9 +196,12 @@ See https://github.com/bazelbuild/bazel/issues/10298#issuecomment-558031652 for 
             deps = ctx.attr.deps,
         ),
         _NodePackageInfo(
+            label = ctx.label,
             link_package = ctx.label.package,
             package = ctx.attr.package,
             version = ctx.attr.version,
+            dep_refs = dep_refs,
+            node_modules_directory = node_modules_directory,
             virtual_store_directory = virtual_store_out,
         ),
     ]

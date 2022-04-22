@@ -1,10 +1,10 @@
 "Macros for setting up rules_js"
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_yq_toolchains")
-load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", "DEFAULT_YQ_VERSION", "register_yq_toolchains")
+load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
 load("@aspect_rules_js//js/private/lifecycle:repositories.bzl", lifecycle_npm_repositories = "npm_repositories")
 
-def js_configure(node_name = "node16", node_version = "16.9.0", yq_name = "yq", yq_version = "4.24.5"):
+def js_configure(node_name = "nodejs", node_version = DEFAULT_NODE_VERSION, yq_name = "yq", yq_version = DEFAULT_YQ_VERSION):
     """Register toolchains and set up dependencies for rules_js.
 
     Args:

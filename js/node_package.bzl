@@ -37,11 +37,10 @@ def node_package(name, **kwargs):
         **kwargs
     )
 
-    # Create a {name}_dir target which exposes the node_modules_directory output group
-    # for use in $(execpath) and $(rootpath)
-    src = kwargs.get("src", None)
-    indirect = kwargs.get("indirect", False)
-    if src and not indirect:
+    # If not indirect, create a {name}__dir
+    # filegroup target that provides a single file which is the root
+    # node_modules directory for use in $(execpath) and $(rootpath)
+    if not kwargs.get("indirect", False):
         native.filegroup(
             name = "%s__dir" % name,
             srcs = [":%s" % name],

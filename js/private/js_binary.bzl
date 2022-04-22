@@ -135,7 +135,7 @@ def _bash_launcher(ctx, entry_point, args):
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
 
     envs = []
-    for [key, value] in ctx.attr.env.items():
+    for (key, value) in ctx.attr.env.items():
         envs.append(_ENV_SET.format(
             var = key,
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),

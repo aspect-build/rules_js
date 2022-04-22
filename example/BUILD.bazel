@@ -66,8 +66,8 @@ genrule(
     srcs = ["some.js"],
     outs = ["actual1"],
     cmd = "$(NODE_PATH) $(execpath some.js) $@",
-    toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = ["@node16_toolchains//:resolved_toolchain"],
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    tools = ["@nodejs_toolchains//:resolved_toolchain"],
 )
 
 diff_test(
@@ -95,8 +95,8 @@ genrule(
         --compact \\
         $(execpath one.js) \\
         > $@""" % package_dir("acorn"),
-    toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = ["@node16_toolchains//:resolved_toolchain"],
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    tools = ["@nodejs_toolchains//:resolved_toolchain"],
 )
 
 diff_test(
@@ -126,8 +126,8 @@ genrule(
         $(NODE_PATH) \\
         ./$(execpath :require_acorn_js) \\
         $@""",
-    toolchains = ["@node16_toolchains//:resolved_toolchain"],
-    tools = ["@node16_toolchains//:resolved_toolchain"],
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    tools = ["@nodejs_toolchains//:resolved_toolchain"],
 )
 
 diff_test(
@@ -431,15 +431,15 @@ diff_test(
 #######################################
 # Test case 11
 # postinstall creates a file
-# The @aspect-test/qar package's postinstall creates a data.json file
+# The @aspect-test/c package's postinstall creates a data.json file
 
 write_file(
     name = "write11",
     out = "case11.js",
     content = ["""
-const content = require('@aspect-test/qar/data.json')
-if (content.random !== '42') {
-    console.error("expected random to be '42'")
+const content = require('@aspect-test/c/data.json')
+if (content.answer !== '42*') {
+    console.error(`expected answer to be '42*', but got '${content.answer}'`)
     process.exit(1);
 }
 """],
@@ -448,7 +448,7 @@ if (content.random !== '42') {
 js_test(
     name = "test11",
     data = [
-        package("@aspect-test/qar"),
+        package("@aspect-test/c"),
     ],
     entry_point = "case11.js",
 )
@@ -456,7 +456,7 @@ js_test(
 #######################################
 # Test case 12
 # custom postinstall creates a file
-# See postinstall on @aspect-test/qar in WORKSPACE
+# See postinstall on @aspect-test/c in WORKSPACE
 
 write_file(
     name = "write12",
@@ -475,9 +475,9 @@ if (!/^moo\\s+mooo\\s*$/.test(content)) {
 
 js_test(
     name = "test12",
-    args = ["$(rootpath %s)" % package_dir("@aspect-test/qar")],
+    args = ["$(rootpath %s)" % package_dir("@aspect-test/c")],
     data = [
-        package_dir("@aspect-test/qar"),
+        package_dir("@aspect-test/c"),
     ],
     entry_point = "case12.js",
 )

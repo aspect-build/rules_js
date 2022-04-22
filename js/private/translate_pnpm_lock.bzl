@@ -1,8 +1,8 @@
 "Convert pnpm lock file into starlark Bazel fetches"
 
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os")
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load(":npm_utils.bzl", "npm_utils")
+load(":pnpm_utils.bzl", "pnpm_utils")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
 
@@ -137,84 +137,42 @@ _ATTRS = {
         doc = """If true, runs lifecycle hooks on installed packages as well as any custom postinstall scripts""",
         default = True,
     ),
+    "node_repository": attr.string(
+        doc = """The basename for the node toolchain repository from @build_bazel_rules_nodejs.""",
+        default = "nodejs",
+    ),
 }
 
-def _process_lockfile(lockfile, prod, dev, no_optional):
-    lock_version = lockfile.get("lockfileVersion")
-    if not lock_version:
-        fail("unknown lockfile version")
+def _node_bin(rctx):
+    # Parse the resolved host platform from yq host repo //:index.bzl
+    content = rctx.read(rctx.path(Label("@%s_host//:index.bzl" % rctx.attr.node_repository)))
+    search_str = "host_platform=\""
+    start_index = content.index(search_str) + len(search_str)
+    end_index = content.index("\"", start_index)
+    host_platform = content[start_index:end_index]
 
-    # We don't test this program with spec versions other than 5.3, so just error.
-    # If users hit this we can add test coverage and expand the supported range.
-    if str(lock_version) != "5.3":
-        msg = "translate_pnpm_lock only works with pnpm lockfile version 5.3, found %s" % lock_version
-        fail(msg)
+    # Return the path to the node binary
+    return rctx.path(Label("@%s_%s//:bin/node%s" % (rctx.attr.node_repository, host_platform, ".exe" if is_windows_os(rctx) else "")))
 
-    lock_dependencies = {}
-    if not prod:
-        lock_dependencies = dicts.add(lock_dependencies, lockfile.get("devDependencies", {}))
-    if not dev:
-        lock_dependencies = dicts.add(lock_dependencies, lockfile.get("dependencies", {}))
-    if not no_optional:
-        lock_dependencies = dicts.add(lock_dependencies, lockfile.get("optionalDependencies", {}))
-    if not lock_dependencies:
-        fail("no direct dependencies to translate in lockfile")
-
-    direct_dependencies = []
-    for (dep_name, dep_version) in lock_dependencies.items():
-        direct_dependencies.append(npm_utils.versioned_name(dep_name, dep_version))
-
-    lock_packages = lockfile.get("packages")
-    if not lock_packages:
-        fail("no packages in lockfile")
-
-    packages = {}
-
-    for (packagePath, packageSnapshot) in lock_packages.items():
-        if not packagePath.startswith("/"):
-            msg = "unsupported package path %s" % packagePath
-            fail(msg)
-        path_segments = packagePath[1:].split("/")
-        if len(path_segments) != 2 and len(path_segments) != 3:
-            msg = "unsupported package path %s" % packagePath
-            fail(msg)
-        package = "/".join(path_segments[0:-1])
-        version = path_segments[-1]
-        resolution = packageSnapshot.get("resolution")
-        if not resolution:
-            msg = "package %s has no resolution field" % packagePath
-            fail(msg)
-        integrity = resolution.get("integrity")
-        if not integrity:
-            msg = "package %s resolution has no itegrity field" % packagePath
-            fail(msg)
-        dev = resolution.get("dev", False)
-        optional = resolution.get("optional", False)
-        has_bin = resolution.get("hasBin", False)
-        requires_build = resolution.get("requiresBuild", False)
-        package_info = {
-            "name": package,
-            "version": version,
-            "integrity": integrity,
-            "dependencies": {},
-            "dev": dev,
-            "optional": optional,
-            "has_bin": has_bin,
-            "requires_build": requires_build,
-        }
-        dependencies = []
-        package_deps = packageSnapshot.get("dependencies")
-        if package_deps:
-            for (dep_name, dep_version) in package_deps.items():
-                normalized_version = npm_utils.normalize_version(dep_version)
-                dependencies.append(npm_utils.versioned_name(dep_name, normalized_version))
-        if dependencies:
-            package_info["dependencies"] = dependencies
-        packages[npm_utils.versioned_name(package, version)] = package_info
-    return {
-        "dependencies": direct_dependencies,
-        "packages": packages,
-    }
+def _process_lockfile(rctx):
+    translated_json_path = rctx.path("translated.json")
+    cmd = [
+        _node_bin(rctx),
+        rctx.path(Label("@aspect_rules_js//js/private:translate_pnpm_lock.js")),
+        rctx.path(rctx.attr.pnpm_lock),
+        translated_json_path,
+    ]
+    env = {}
+    if rctx.attr.prod:
+        env.append("TRANSLATE_PACKAGE_LOCK_PROD")
+    if rctx.attr.dev:
+        env.append("TRANSLATE_PACKAGE_LOCK_DEV")
+    if rctx.attr.no_optional:
+        env.append("TRANSLATE_PACKAGE_LOCK_NO_OPTIONAL")
+    result = rctx.execute(cmd, environment = env, quiet = False)
+    if result.return_code:
+        fail("translate_pnpm_lock.js failed: %s" % result.stderr)
+    return json.decode(rctx.read(translated_json_path))
 
 _NPM_IMPORT_TMPL = \
     """    npm_import(
@@ -222,7 +180,7 @@ _NPM_IMPORT_TMPL = \
         integrity = "{integrity}",
         link_package_guard = "{link_package_guard}",
         package = "{package}",
-        version = "{version}",{maybe_deps}{maybe_indirect}{maybe_patches}{maybe_patch_args}{maybe_postinstall}{maybe_enable_lifecycle_hooks}
+        version = "{pnpm_version}",{maybe_deps}{maybe_transitive_closure}{maybe_indirect}{maybe_patches}{maybe_patch_args}{maybe_postinstall}{maybe_enable_lifecycle_hooks}
     )
 """
 
@@ -243,25 +201,44 @@ alias(
 
 _PACKAGE_TMPL = \
     """
-load("@aspect_rules_js//js/private:npm_utils.bzl", "npm_utils")
+load("@aspect_rules_js//js/private:pnpm_utils.bzl", "pnpm_utils")
 
 def package(name):
-    return Label("@{workspace}//{link_package}:{namespace}__" + npm_utils.alias_target_name(name))
+    return Label("@{workspace}//{link_package}:{{namespace}}{{bazel_name}}".format(
+        namespace = pnpm_utils.node_package_target_namespace,
+        bazel_name = pnpm_utils.bazel_name(name),
+    ))
 
 def package_dir(name):
-    return Label("@{workspace}//{link_package}:{namespace}__" + npm_utils.alias_target_name(name) + "__dir")
+    return Label("@{workspace}//{link_package}:{{namespace}}{{bazel_name}}__dir".format(
+        namespace = pnpm_utils.node_package_target_namespace,
+        bazel_name = pnpm_utils.bazel_name(name),
+    ))
 """
+
+def _to_dict_attr(dict, tab):
+    if not len(dict):
+        return "{}"
+    result = "{"
+    for k, v in dict.items():
+        result += "\n%s    \"%s\": \"%s\"," % (tab, k, v)
+    result += "\n%s}" % tab
+    return result
+
+def _to_dict_list_attr(dict, tab):
+    if not len(dict):
+        return "{}"
+    result = "{"
+    for k, v in dict.items():
+        result += "\n%s    \"%s\": %s," % (tab, k, v)
+    result += "\n%s}" % tab
+    return result
 
 def _impl(rctx):
     if rctx.attr.prod and rctx.attr.dev:
         fail("prod and dev attributes cannot both be set to true")
 
-    lockfile = _process_lockfile(
-        lockfile = json.decode(rctx.read(rctx.attr.pnpm_lock)),
-        prod = rctx.attr.prod,
-        dev = rctx.attr.dev,
-        no_optional = rctx.attr.no_optional,
-    )
+    lockfile = _process_lockfile(rctx)
 
     link_package = rctx.attr.package
     if link_package == ".":
@@ -273,6 +250,7 @@ def _impl(rctx):
     repositories_bzl = [
         """load("@aspect_rules_js//js:npm_import.bzl", "npm_import")""",
         "",
+        "# buildifier: disable=function-docstring",
         "def npm_repositories():",
     ]
 
@@ -290,14 +268,16 @@ def node_modules():
     ]
 
     for (i, v) in enumerate(packages.items()):
-        (versioned_name, package) = v
-        name = package.get("name")
-        version = package.get("version")
-        deps = package.get("dependencies")
-        dev = package.get("dev")
-        optional = package.get("optional")
-        has_bin = package.get("has_bin")
-        requires_build = package.get("requires_build")
+        (package, package_info) = v
+        name = package_info.get("name")
+        pnpm_version = package_info.get("pnpmVersion")
+        deps = package_info.get("dependencies")
+        dev = package_info.get("dev")
+        optional = package_info.get("optional")
+        has_bin = package_info.get("hasBin")
+        requires_build = package_info.get("requiresBuild")
+        integrity = package_info.get("integrity")
+        transitive_closure = package_info.get("transitiveClosure")
 
         if rctx.attr.prod and dev:
             # when prod attribute is set, skip devDependencies
@@ -309,32 +289,36 @@ def node_modules():
             # when no_optional attribute is set, skip optionalDependencies
             continue
 
+        friendly_name = pnpm_utils.friendly_name(name, pnpm_utils.strip_peer_dep_version(pnpm_version))
+
         patches = rctx.attr.patches.get(name, [])[:]
-        patches.extend(rctx.attr.patches.get(versioned_name, []))
+        patches.extend(rctx.attr.patches.get(friendly_name, []))
 
         patch_args = rctx.attr.patch_args.get(name, [])[:]
-        patch_args.extend(rctx.attr.patch_args.get(versioned_name, []))
+        patch_args.extend(rctx.attr.patch_args.get(friendly_name, []))
 
         postinstall = rctx.attr.postinstall.get(name)
         if not postinstall:
-            postinstall = rctx.attr.postinstall.get(versioned_name)
-        elif rctx.attr.postinstall.get(versioned_name):
-            postinstall = "%s && %s" % (postinstall, rctx.attr.postinstall.get(versioned_name))
+            postinstall = rctx.attr.postinstall.get(friendly_name)
+        elif rctx.attr.postinstall.get(friendly_name):
+            postinstall = "%s && %s" % (postinstall, rctx.attr.postinstall.get(friendly_name))
 
-        repo_name = "%s__%s" % (rctx.name, npm_utils.bazel_name(name, version))
+        repo_name = "%s__%s" % (rctx.name, pnpm_utils.bazel_name(name, pnpm_version))
 
-        indirect = False if versioned_name in direct_dependencies else True
+        indirect = False if package in direct_dependencies else True
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             name = repo_name,
             link_package_guard = link_package,
             package = name,
-            version = version,
-            integrity = package.get("integrity"),
+            pnpm_version = pnpm_version,
+            integrity = integrity,
             maybe_indirect = """
         indirect = True,""" if indirect else "",
             maybe_deps = ("""
-        deps = %s,""" % deps) if len(deps) > 0 else "",
+        deps = %s,""" % _to_dict_attr(deps, "        ")) if len(deps) > 0 else "",
+            maybe_transitive_closure = ("""
+        transitive_closure = %s,""" % _to_dict_list_attr(transitive_closure, "        ")) if len(transitive_closure) > 0 else "",
             maybe_patches = ("""
         patches = %s,""" % patches) if len(patches) > 0 else "",
             maybe_patch_args = ("""
@@ -363,7 +347,6 @@ def node_modules():
 
     package_bzl = [_PACKAGE_TMPL.format(
         workspace = rctx.attr.pnpm_lock.workspace_name,
-        namespace = npm_utils.node_package_target_namespace,
         link_package = link_package,
     )]
 

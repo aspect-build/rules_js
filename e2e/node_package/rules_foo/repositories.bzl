@@ -8,6 +8,7 @@ def repositories():
         name = "rules_foo_npm",
         # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
         pnpm_lock = "@rules_foo//foo:pnpm-lock.json",
+        enable_lifecycle_hooks = False,
     )
 
     # The following comes from inlining the result of the translate_pnpm_lock call.

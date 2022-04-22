@@ -69,8 +69,8 @@ translate_pnpm_lock(
     # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
     pnpm_lock = "//example:pnpm-lock.json",
     postinstall = {
-        "@aspect-test/qar": "echo 'moo' > cow.txt",
-        "@aspect-test/qar@4.0.0": "echo 'mooo' >> cow.txt",
+        "@aspect-test/c": "echo 'moo' > cow.txt",
+        "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",
     },
 )
 

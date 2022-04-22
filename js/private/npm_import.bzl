@@ -1,7 +1,7 @@
 "Repository rules for importing packages from npm"
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "os_name", "patch")
-load(":npm_utils.bzl", "npm_utils")
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os", "patch")
+load(":pnpm_utils.bzl", "pnpm_utils")
 
 _DOC = """Import a single npm package into Bazel.
 
@@ -17,7 +17,7 @@ or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
 
 ```starlark
 npm_import(
-    name = "npm__types_node-15.2.2",
+    name = "npm__at_types_node_15.12.2",
     package = "@types/node",
     version = "15.12.2",
     integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
@@ -37,7 +37,7 @@ To consume the downloaded package in rules, it must be "linked" into the link pa
 package's `BUILD.bazel` file:
 
 ```
-load("@npm__types_node-15.2.2//:node_package.bzl", node_package_types_node = "node_package")
+load("@npm__at_types_node_15.12.2//:node_package.bzl", node_package_types_node = "node_package")
 
 node_package_types_node()
 ```
@@ -71,63 +71,108 @@ common --experimental_downloader_config=.bazel_downloader_config
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 """
 
-def is_windows_os(rctx):
-    os_name = rctx.os.name.lower()
-    return os_name.find("windows") != -1
-
-_NODEJS_PACKAGE_TMPL = \
-    """{maybe_load_run_js_binary}
+_NODEJS_PACKAGE_TMPL = """{maybe_load_run_js_binary}
 def node_package():
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
         fail("The node_package() macro loaded from {node_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 
-    {maybe_lifecycle_hooks}
-
+    # ref node_package used to prevent circular deps
     _node_package(
-        name = "{namespace}__{bazel_name}",
-        src = "{nodejs_package_src}",
+        name = "{namespace}{bazel_name}__ref",
         package = "{package}",
         version = "{version}",
+        indirect = True,
+    )
+
+    # pre-lifecycle refs package linked to _lc/node_modules for use in postinstall actions
+    _node_package(
+        name = "{namespace}{bazel_name}__lc_pkg",
+        src = "@{rctx_name}//:{extract_dirname}",
+        package = "{package}",
+        version = "{version}",
+        # direct dep references
+        deps = {ref_deps},
+        root_dir = "_lc/node_modules",
+        # don't build this unless it is asked for
+        tags = ["manual"],
+        visibility = ["//visibility:public"],{maybe_indirect}
+    )
+
+    # terminal pre-lifecycle package linked to _lc/node_modules for use in postinstall actions
+    _node_package(
+        name = "{namespace}{bazel_name}__lc",
+        package = "{package}",
+        version = "{version}",
+        # transitive closure of {namespace}*__lc_pkg deps
+        deps = {lc_deps},
+        root_dir = "_lc/node_modules",
+        # don't build this unless it is asked for
+        tags = ["manual"],
+        visibility = ["//visibility:public"],{maybe_indirect}
+    )
+    {maybe_lifecycle_hooks}
+    # refs package for use in terminal package transitive closure
+    _node_package(
+        name = "{namespace}{bazel_name}__pkg",
+        src = "{node_package_src}",
+        package = "{package}",
+        version = "{version}",
+        # direct dep references
+        deps = {ref_deps},
+        visibility = ["//visibility:public"],{maybe_indirect}
+    )
+
+    # terminal package target with transitive closure of postinstall npm packages
+    _node_package(
+        name = "{namespace}{bazel_name}",{maybe_node_package_src}
+        package = "{package}",
+        version = "{version}",
+        # transitive closure of {namespace}*__pkg deps
         deps = {deps},
         visibility = ["//visibility:public"],{maybe_indirect}
     )
 """
 
-_RUN_LIFECYCLE_HOOKS_TMPL = """# Run lifecycle hooks on the package
+_RUN_LIFECYCLE_HOOKS_TMPL = """# runs lifecycle hooks on the package
     run_js_binary(
-        name = "{namespace}__{bazel_name}_postinstall",
-        srcs = ["@{rctx_name}//:{dir}"] + {deps},
+        name = "{namespace}{bazel_name}_postinstall",
+        srcs = [
+            "@{rctx_name}//:{extract_dirname}",
+            ":{namespace}{bazel_name}__lc"
+        ],
         # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
-        args = [ "../../../$(execpath @{rctx_name}//:{dir})", "../../../$(@D)"],
+        args = [ "../../../$(execpath @{rctx_name}//:{extract_dirname})", "../../../$(@D)"],
         copy_srcs_to_bin = False,
         tool = "@aspect_rules_js//js/private/lifecycle:lifecycle-hooks",
         output_dir = True,
     )
 """
 
-_NODEJS_PACKAGE_EXPERIMENTAL_REF_DEPS_TMPL = _NODEJS_PACKAGE_TMPL + \
-                                             """   _node_package(
-        name = "{namespace}__{bazel_name}__ref",
-        package = "{package}",
-        version = "{version}",{maybe_indirect}
-    )
-"""
-
-_ALIAS_TMPL = \
-    """    native.alias(
-        name = "{namespace}__{alias}",
-        actual = ":{namespace}__{bazel_name}",
+_ALIAS_TMPL = """    native.alias(
+        name = "{namespace}{alias}",
+        actual = ":{namespace}{bazel_name}",
         visibility = ["//visibility:public"],
     )
 
     native.alias(
-        name = "{namespace}__{alias}__dir",
-        actual = ":{namespace}__{bazel_name}__dir",
+        name = "{namespace}{alias}__dir",
+        actual = ":{namespace}{bazel_name}__dir",
         visibility = ["//visibility:public"],
     )
 """
 
+def _to_list_attr(list, tab):
+    if not list:
+        return "[]"
+    result = "["
+    for v in list:
+        result += "\n%s    \"%s\"," % (tab, v)
+    result += "\n%s]" % tab
+    return result
+
 def _impl(rctx):
+    numeric_version = pnpm_utils.strip_peer_dep_version(rctx.attr.version)
+
     tarball = "package.tgz"
     rctx.download(
         output = tarball,
@@ -135,74 +180,113 @@ def _impl(rctx):
             rctx.attr.package,
             # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
             rctx.attr.package.split("/")[-1],
-            npm_utils.strip_peer_dep_version(rctx.attr.version),
+            numeric_version,
         ),
         integrity = rctx.attr.integrity,
     )
 
-    dirname = "package"
-    mkdir_args = ["mkdir", "-p", dirname] if not is_windows_os(rctx) else ["cmd", "/c", "if not exist {dir} (mkdir {dir})".format(dir = dirname.replace("/", "\\"))]
+    extract_dirname = "package"
+    mkdir_args = ["mkdir", "-p", extract_dirname] if not is_windows_os(rctx) else ["cmd", "/c", "if not exist {extract_dirname} (mkdir {extract_dirname})".format(extract_dirname = extract_dirname.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
-        msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (dirname, result.stdout, result.stderr)
+        msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (extract_dirname, result.stdout, result.stderr)
         fail(msg)
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    untar_args = ["tar", "-xf", tarball, "--strip-components", str(1), "-C", dirname]
+    untar_args = ["tar", "-xf", tarball, "--strip-components", str(1), "-C", extract_dirname]
     result = rctx.execute(untar_args)
     if result.return_code:
-        msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (dirname, result.stdout, result.stderr)
+        msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (extract_dirname, result.stdout, result.stderr)
         fail(msg)
 
-    rctx.file("BUILD.bazel", "exports_files([\"{dir}\"])".format(dir = dirname))
+    rctx.file("BUILD.bazel", "exports_files([\"{extract_dirname}\"])".format(extract_dirname = extract_dirname))
 
+    ref_deps = []
+    lc_deps = []
     deps = []
-    for dep in rctx.attr.deps:
-        parsed_dep = npm_utils.parse_dependency_string(dep)
-        dep_target = "{namespace}__{bazel_name}__ref" if rctx.attr.experimental_reference_deps else "{namespace}__{bazel_name}"
-        deps.append(dep_target.format(
-            namespace = npm_utils.node_package_target_namespace,
-            bazel_name = npm_utils.bazel_name(parsed_dep.name, parsed_dep.version),
+
+    for (dep_name, dep_version) in rctx.attr.deps.items():
+        ref_deps.append("{namespace}{bazel_name}__ref".format(
+            namespace = pnpm_utils.node_package_target_namespace,
+            bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
         ))
+
+    transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
+    if transitive_closure_pattern:
+        # transitive closure deps pattern is used for breaking circular deps;
+        # this pattern is used to break circular dependencies between 3rd
+        # party npm deps; it is not recommended for 1st party deps
+        for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
+            for dep_version in dep_versions:
+                lc_deps.append("{namespace}{bazel_name}__lc_pkg".format(
+                    namespace = pnpm_utils.node_package_target_namespace,
+                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                ))
+                deps.append("{namespace}{bazel_name}__pkg".format(
+                    namespace = pnpm_utils.node_package_target_namespace,
+                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                ))
+    else:
+        for (dep_name, dep_versions) in rctx.attr.deps.items():
+            for dep_version in dep_versions:
+                lc_deps.append("{namespace}{bazel_name}__lc".format(
+                    namespace = pnpm_utils.node_package_target_namespace,
+                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                ))
+                deps.append("{namespace}{bazel_name}".format(
+                    namespace = pnpm_utils.node_package_target_namespace,
+                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                ))
 
     node_package_bzl_file = "node_package.bzl"
 
     if rctx.attr.postinstall and rctx.attr.enable_lifecycle_hooks:
-        _inject_custom_postinstall(rctx, dirname, rctx.attr.postinstall)
+        _inject_custom_postinstall(rctx, extract_dirname, rctx.attr.postinstall)
 
-    enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(rctx, dirname)
+    enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(rctx, extract_dirname)
 
-    bazel_name = npm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
-    node_package_tmpl = _NODEJS_PACKAGE_EXPERIMENTAL_REF_DEPS_TMPL if rctx.attr.experimental_reference_deps else _NODEJS_PACKAGE_TMPL
-    node_package_bzl = [node_package_tmpl.format(
-        namespace = npm_utils.node_package_target_namespace,
-        dir = dirname,
+    bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
+
+    if enable_lifecycle_hooks:
+        node_package_src = ":{namespace}{bazel_name}_postinstall".format(
+            namespace = pnpm_utils.node_package_target_namespace,
+            bazel_name = bazel_name,
+        )
+    else:
+        node_package_src = "@%s//:%s" % (rctx.name, extract_dirname)
+
+    node_package_bzl = [_NODEJS_PACKAGE_TMPL.format(
+        namespace = pnpm_utils.node_package_target_namespace,
+        extract_dirname = extract_dirname,
         link_package_guard = rctx.attr.link_package_guard,
         package = rctx.attr.package,
         version = rctx.attr.version,
         rctx_name = rctx.name,
         node_package_bzl = "@%s//:%s" % (rctx.name, node_package_bzl_file),
         bazel_name = bazel_name,
-        deps = "%s" % deps,
+        ref_deps = _to_list_attr(ref_deps, "        "),
+        lc_deps = _to_list_attr(lc_deps, "        "),
+        deps = _to_list_attr(deps, "        "),
         maybe_indirect = """
         indirect = True,""" if rctx.attr.indirect else "",
-        nodejs_package_src = ":%s__%s_postinstall" % (npm_utils.node_package_target_namespace, bazel_name) if enable_lifecycle_hooks else "@%s//:%s" % (rctx.name, dirname),
+        node_package_src = node_package_src,
+        maybe_node_package_src = """
+        src = \"%s\",""" % node_package_src if not transitive_closure_pattern else "",
         maybe_load_run_js_binary = "load(\"@aspect_rules_js//js:run_js_binary.bzl\", \"run_js_binary\")" if enable_lifecycle_hooks else "",
         maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
-            namespace = npm_utils.node_package_target_namespace,
-            dir = dirname,
+            namespace = pnpm_utils.node_package_target_namespace,
+            extract_dirname = extract_dirname,
             rctx_name = rctx.name,
             bazel_name = bazel_name,
-            deps = "%s" % deps,
         ) if enable_lifecycle_hooks else "",
     )]
 
     # Add an namespace if this is a direct dependency
     if not rctx.attr.indirect:
         node_package_bzl.append(_ALIAS_TMPL.format(
-            alias = npm_utils.alias_target_name(rctx.attr.package),
-            namespace = npm_utils.node_package_target_namespace,
+            alias = pnpm_utils.bazel_name(rctx.attr.package),
+            namespace = pnpm_utils.node_package_target_namespace,
             bazel_name = bazel_name,
         ))
 
@@ -214,11 +298,16 @@ def _impl(rctx):
     rctx.file(node_package_bzl_file, "\n".join(bzl_header + node_package_bzl))
 
     # Apply patches to the extracted package
-    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = dirname)
+    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = extract_dirname)
 
 _ATTRS = {
-    "deps": attr.string_list(
-        doc = """Other npm packages this one depends on""",
+    "deps": attr.string_dict(
+        doc = """A dict other npm packages this one depends on where the key is
+        the package name and value is the version""",
+    ),
+    "transitive_closure": attr.string_list_dict(
+        doc = """A dict all npm packages this one depends on directly or transitively where the key
+        is the package name and value is a list of version(s) depended on in the closure.""",
     ),
     "integrity": attr.string(
         doc = """Expected checksum of the file downloaded, in Subresource Integrity format.
@@ -267,11 +356,6 @@ _ATTRS = {
         doc = """If true, runs lifecycle hooks declared in this package and the custom postinstall script if one exists.""",
         default = True,
     ),
-    "experimental_reference_deps": attr.bool(
-        doc = """Experimental reference deps allow dep to support circular deps between npm packages.
-        This feature depends on dangling symlinks, however, which is still experimental in bazel,
-        has issues with "host" and "exec" configurations, and does not yet work with remote exection.""",
-    ),
     "yq_repository": attr.string(
         doc = """The basename for the yq toolchain repository from @aspect_bazel_lib.""",
         default = "yq",
@@ -289,7 +373,7 @@ def _inject_custom_postinstall(rctx, package_path, custom_postinstall):
     rctx.execute([_yq_bin(rctx), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
 
 def _yq_bin(rctx):
-    # Parse the resolved host platform from the yq_host repo
+    # Parse the resolved host platform from yq host repo //:index.bzl
     content = rctx.read(rctx.path(Label("@%s_host//:index.bzl" % rctx.attr.yq_repository)))
     search_str = "host_platform=\""
     start_index = content.index(search_str) + len(search_str)
@@ -297,7 +381,7 @@ def _yq_bin(rctx):
     host_platform = content[start_index:end_index]
 
     # Return the path to the yq binary
-    return rctx.path(Label("@%s_%s//:yq%s" % (rctx.attr.yq_repository, host_platform, ".exe" if os_name(rctx) == "windows" else "")))
+    return rctx.path(Label("@%s_%s//:yq%s" % (rctx.attr.yq_repository, host_platform, ".exe" if is_windows_os(rctx) else "")))
 
 def _has_lifecycle_hooks(rctx, package_path):
     pkg_json_path = package_path + _sep(rctx) + "package.json"

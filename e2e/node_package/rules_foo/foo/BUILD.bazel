@@ -6,7 +6,7 @@ node_modules()
 js_binary(
     name = "main",
     data = [
-        "@rules_foo_npm//@aspect-test/bar",
+        "@rules_foo_npm//@aspect-test/a",
     ],
     entry_point = "main.js",
 )

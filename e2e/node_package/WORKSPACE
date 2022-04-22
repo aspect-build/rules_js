@@ -15,12 +15,7 @@ load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 
 translate_pnpm_lock(
     name = "npm",
-    patch_args = {
-        "@aspect-test/qar@4.0.0": ["-p1"],
-    },
-    patches = {
-        "@aspect-test/qar@4.0.0": ["//:qar.patch"],
-    },
+    enable_lifecycle_hooks = False,
     # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
     pnpm_lock = "//:pnpm-lock.json",
 )

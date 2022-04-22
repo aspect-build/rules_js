@@ -46,7 +46,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/private:npm_import",
-        "//js/private:npm_utils",
+        "//js/private:pnpm_utils",
         "//js/private:translate_pnpm_lock",
     ],
 )

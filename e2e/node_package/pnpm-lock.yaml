@@ -1,62 +1,76 @@
 lockfileVersion: 5.3
 
 specifiers:
-    '@aspect-test/bar': 2.0.0
-    '@aspect-test/foo': 2.0.0
-    '@aspect-test/qar': 4.0.0
+    '@aspect-test/a': 5.0.0
+    '@aspect-test/b': 5.0.0
+    '@aspect-test/c': 2.0.0
 
 dependencies:
-    '@aspect-test/bar': 2.0.0
+    '@aspect-test/a': 5.0.0
 
 optionalDependencies:
-    '@aspect-test/qar': 4.0.0
+    '@aspect-test/c': 2.0.0
 
 devDependencies:
-    '@aspect-test/foo': 2.0.0
+    '@aspect-test/b': 5.0.0
 
 packages:
-    /@aspect-test/bar/2.0.0:
+    /@aspect-test/a/5.0.0:
         resolution:
             {
-                integrity: sha512-rznoX5QANJCysyASyjthuU7s8jEOHZ5QA8XLejhYQ2vTf5Ft6Xu1dKWllMmkihHMw+O/VYvsL0kyfbLguhNTIw==,
+                integrity: sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==,
             }
         hasBin: true
         dependencies:
-            '@aspect-test/qar': 1.0.0
-        dev: false
+            '@aspect-test/b': 5.0.0
+            '@aspect-test/c': 1.0.0
+            '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
 
-    /@aspect-test/foo/2.0.0:
+    /@aspect-test/b/5.0.0:
         resolution:
             {
-                integrity: sha512-KE2iDnkiYd8LKQjeaQ0xVrm9Rl8zS8BPWI0zfAMQEzC1CoerMUCAluNdu4h80IUEbhx2dViYA4s7wp5OMvhczQ==,
+                integrity: sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==,
             }
         hasBin: true
         dependencies:
-            '@aspect-test/qar': 2.0.0
-        dev: true
+            '@aspect-test/a': 5.0.0
+            '@aspect-test/c': 2.0.0
+            '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
 
-    /@aspect-test/qar/1.0.0:
+    /@aspect-test/c/1.0.0:
         resolution:
             {
-                integrity: sha512-AJMwCXbBj/OC0L4oWQSFlF7pytxlhJTtDBaq1zdNLzA8m0bqhGEM+AN/WJv+j/q88WoaKdELDDWHqE6aIDsMpA==,
-            }
-        hasBin: true
-        dev: false
-
-    /@aspect-test/qar/2.0.0:
-        resolution:
-            {
-                integrity: sha512-LKaptU5aHEUbVdE3jUEdRllPqFc8mgmVXtuDcv8qIulp6g/GHJpgQnXdHZXfk+6HPG6WtktI8hvcUU2FzuD0aw==,
-            }
-        hasBin: true
-        dev: true
-
-    /@aspect-test/qar/4.0.0:
-        resolution:
-            {
-                integrity: sha512-7ZgVjqenonr3uGs+SPqU/FY3hZCafZC29s/aK2D5vHPXddJdnEh0ksFsLFMpTevB8T+du3MZuF0zzCdQ/AKuhA==,
+                integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==,
             }
         hasBin: true
         requiresBuild: true
-        dev: false
-        optional: true
+
+    /@aspect-test/c/2.0.0:
+        resolution:
+            {
+                integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==,
+            }
+        hasBin: true
+        requiresBuild: true
+
+    /@aspect-test/d/2.0.0_@aspect-test+c@1.0.0:
+        resolution:
+            {
+                integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==,
+            }
+        hasBin: true
+        peerDependencies:
+            '@aspect-test/c': x.x.x
+        dependencies:
+            '@aspect-test/c': 1.0.0
+
+    /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
+        resolution:
+            {
+                integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==,
+            }
+        hasBin: true
+        peerDependencies:
+            '@aspect-test/c': x.x.x
+        dependencies:
+            '@aspect-test/c': 2.0.0
