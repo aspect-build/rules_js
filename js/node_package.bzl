@@ -45,4 +45,6 @@ def node_package(name, **kwargs):
             name = "%s__dir" % name,
             srcs = [":%s" % name],
             output_group = "node_modules_directory",
+            tags = kwargs.get("tags", None),
+            visibility = kwargs.get("visibility", []),
         )
