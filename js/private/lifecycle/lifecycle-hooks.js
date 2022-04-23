@@ -32,7 +32,7 @@ async function main(argv) {
     ) {
         // node_modules folder that the node_package dependency targets which are in the same bazel package output
         const nodeModulesPath = path.resolve(
-            path.join(outputDir, '..', 'node_modules')
+            path.join(outputDir, '..', '_lc', 'node_modules')
         )
 
         // If the package we're running postinstall on has no deps, then node_modules
