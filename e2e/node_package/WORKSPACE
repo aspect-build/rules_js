@@ -16,8 +16,7 @@ load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 translate_pnpm_lock(
     name = "npm",
     enable_lifecycle_hooks = False,
-    # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
-    pnpm_lock = "//:pnpm-lock.json",
+    pnpm_lock = "//:pnpm-lock.yaml",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")

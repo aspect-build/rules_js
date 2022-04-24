@@ -2,6 +2,7 @@
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os", "patch")
 load(":pnpm_utils.bzl", "pnpm_utils")
+load(":yq.bzl", "yq_bin")
 
 _DOC = """Import a single npm package into Bazel.
 
@@ -370,18 +371,7 @@ npm_import = struct(
 
 def _inject_custom_postinstall(rctx, package_path, custom_postinstall):
     pkg_json_path = package_path + _sep(rctx) + "package.json"
-    rctx.execute([_yq_bin(rctx), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
-
-def _yq_bin(rctx):
-    # Parse the resolved host platform from yq host repo //:index.bzl
-    content = rctx.read(rctx.path(Label("@%s_host//:index.bzl" % rctx.attr.yq_repository)))
-    search_str = "host_platform=\""
-    start_index = content.index(search_str) + len(search_str)
-    end_index = content.index("\"", start_index)
-    host_platform = content[start_index:end_index]
-
-    # Return the path to the yq binary
-    return rctx.path(Label("@%s_%s//:yq%s" % (rctx.attr.yq_repository, host_platform, ".exe" if is_windows_os(rctx) else "")))
+    rctx.execute([yq_bin(rctx, rctx.attr.yq_repository), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
 
 def _has_lifecycle_hooks(rctx, package_path):
     pkg_json_path = package_path + _sep(rctx) + "package.json"

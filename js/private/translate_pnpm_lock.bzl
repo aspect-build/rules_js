@@ -3,6 +3,7 @@
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":pnpm_utils.bzl", "pnpm_utils")
+load(":yq.bzl", "yq_bin")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
 
@@ -20,21 +21,21 @@ listed as `dependencies` or `devDependencies` in `package.json`, so you can decl
 dependencies on those packages without having to repeat version information.
 
 Bazel will only fetch the packages which are required for the requested targets to be analyzed.
-Thus it is performant to convert a very large package-lock.json file without concern for
+Thus it is performant to convert a very large pnpm-lock.yaml file without concern for
 users needing to fetch many unnecessary packages.
 
 **Setup**
 
-In `WORKSPACE`, call the repository rule pointing to your package-lock.json file:
+In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
 
 ```starlark
 load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 
-# Read the pnpm-lock.json file to automate creation of remaining npm_import rules
+# Read the pnpm-lock.yaml file to automate creation of remaining npm_import rules
 translate_pnpm_lock(
     # Creates a new repository named "@npm_deps"
     name = "npm_deps",
-    pnpm_lock = "//:pnpm-lock.json",
+    pnpm_lock = "//:pnpm-lock.yaml",
 )
 ```
 
@@ -96,7 +97,7 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 
 _ATTRS = {
     "pnpm_lock": attr.label(
-        doc = """The pnpm-lock.json file.""",
+        doc = """The pnpm-lock.yaml file.""",
         mandatory = True,
     ),
     "package": attr.string(
@@ -141,6 +142,10 @@ _ATTRS = {
         doc = """The basename for the node toolchain repository from @build_bazel_rules_nodejs.""",
         default = "nodejs",
     ),
+    "yq_repository": attr.string(
+        doc = """The basename for the yq toolchain repository from @aspect_bazel_lib.""",
+        default = "yq",
+    ),
 }
 
 def _node_bin(rctx):
@@ -155,11 +160,17 @@ def _node_bin(rctx):
     return rctx.path(Label("@%s_%s//:bin/node%s" % (rctx.attr.node_repository, host_platform, ".exe" if is_windows_os(rctx) else "")))
 
 def _process_lockfile(rctx):
+    json_lockfile_path = rctx.path("pnpm-lock.json")
+    result = rctx.execute([yq_bin(rctx, rctx.attr.yq_repository), "-o=json", ".", rctx.path(rctx.attr.pnpm_lock)])
+    if result.return_code != 0:
+        fail("failed to convert pnpm lockfile to json: %s" % result.stderr)
+    rctx.file(json_lockfile_path, result.stdout)
+
     translated_json_path = rctx.path("translated.json")
     cmd = [
         _node_bin(rctx),
         rctx.path(Label("@aspect_rules_js//js/private:translate_pnpm_lock.js")),
-        rctx.path(rctx.attr.pnpm_lock),
+        json_lockfile_path,
         translated_json_path,
     ]
     env = {}
