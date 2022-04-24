@@ -25,7 +25,7 @@ translate_pnpm_lock(
     # Avoid a circular dependency on the lifecycle hooks package,
     # which is used when enable_lifecycle_hooks = True
     enable_lifecycle_hooks = False,
-    pnpm_lock = "@aspect_rules_js//js/private/lifecycle:pnpm-lock.json",
+    pnpm_lock = "@aspect_rules_js//js/private/lifecycle:pnpm-lock.yaml",
 )
 
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
@@ -66,8 +66,7 @@ translate_pnpm_lock(
         "@gregmagolan/test-a": ["//example:test-a.patch"],
         "@gregmagolan/test-a@0.0.1": ["//example:test-a@0.0.1.patch"],
     },
-    # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
-    pnpm_lock = "//example:pnpm-lock.json",
+    pnpm_lock = "//example:pnpm-lock.yaml",
     postinstall = {
         "@aspect-test/c": "echo 'moo' > cow.txt",
         "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",

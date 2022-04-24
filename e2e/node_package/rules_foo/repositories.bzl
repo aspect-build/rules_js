@@ -6,8 +6,7 @@ load(":npm_repositories.bzl", "npm_repositories")
 def repositories():
     translate_pnpm_lock(
         name = "rules_foo_npm",
-        # yq -o=json -I=2 '.' pnpm-lock.yaml > pnpm-lock.json
-        pnpm_lock = "@rules_foo//foo:pnpm-lock.json",
+        pnpm_lock = "@rules_foo//foo:pnpm-lock.yaml",
         enable_lifecycle_hooks = False,
     )
 

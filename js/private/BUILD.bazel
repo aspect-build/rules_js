@@ -45,6 +45,7 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
     deps = [
         ":pnpm_utils",
+        ":yq",
         "@aspect_bazel_lib//lib:repo_utils",
     ],
 )
@@ -61,7 +62,14 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
     deps = [
         ":pnpm_utils",
+        ":yq",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
     ],
+)
+
+bzl_library(
+    name = "yq",
+    srcs = ["yq.bzl"],
+    visibility = ["//js:__subpackages__"],
 )
