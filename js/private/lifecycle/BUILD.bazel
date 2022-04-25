@@ -5,6 +5,6 @@ load("//js:js_binary.bzl", "js_binary")
 js_binary(
     name = "lifecycle-hooks",
     data = glob(["min/**"]),
-    entry_point = "min/index.js",
+    entry_point = "min/index.min.js",
     visibility = ["//visibility:public"],
 )

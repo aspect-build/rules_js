@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o errexit -o nounset
 # Bundle our program with its two dependencies, because they're large:
 # ┌─────────────────┬──────────────┬────────┐
 # │ name            │ children     │ size   │
@@ -12,3 +13,7 @@
 # This avoids users having to fetch all those packages just to run the postinstall hooks.
 
 npx @vercel/ncc@0.33.4 build lifecycle-hooks.js -o min
+# ascii_only avoids bad unicode conversions, fixing
+# https://github.com/aspect-build/rules_js/issues/45
+npx terser@5.12.1 min/index.js -b ascii_only=true > min/index.min.js
+rm min/index.js
