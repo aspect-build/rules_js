@@ -43,5 +43,5 @@ pnpm_utils = struct(
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_version = _strip_peer_dep_version,
     # Prefix namespace to use for generated js_binary targets and aliases
-    node_package_target_namespace = "np__",
+    node_package_target_namespace = "npm__",
 )
