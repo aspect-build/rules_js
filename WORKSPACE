@@ -18,16 +18,6 @@ load("//js:configure.bzl", "js_configure")
 
 js_configure()
 
-load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
-
-translate_pnpm_lock(
-    name = "aspect_rules_js_lifecycle_npm_deps",
-    # Avoid a circular dependency on the lifecycle hooks package,
-    # which is used when enable_lifecycle_hooks = True
-    enable_lifecycle_hooks = False,
-    pnpm_lock = "@aspect_rules_js//js/private/lifecycle:pnpm-lock.yaml",
-)
-
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
 register_unittest_toolchains()
@@ -45,6 +35,8 @@ gazelle_dependencies()
 
 ############################################
 # Fetch some npm packages for testing our example
+
+load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
 
 # Manually import a package using explicit coordinates.
 # Just a demonstration of the syntax de-sugaring.

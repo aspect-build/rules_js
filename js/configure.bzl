@@ -2,7 +2,6 @@
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "DEFAULT_YQ_VERSION", "register_yq_toolchains")
 load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
-load("@aspect_rules_js//js/private/lifecycle:repositories.bzl", lifecycle_npm_repositories = "npm_repositories")
 
 def js_configure(node_name = "nodejs", node_version = DEFAULT_NODE_VERSION, yq_name = "yq", yq_version = DEFAULT_YQ_VERSION):
     """Register toolchains and set up dependencies for rules_js.
@@ -14,9 +13,6 @@ def js_configure(node_name = "nodejs", node_version = DEFAULT_NODE_VERSION, yq_n
         yq_version: Version of yq to install
     """
     js_register_toolchains(node_name = node_name, node_version = node_version, yq_name = yq_name, yq_version = yq_version)
-
-    # Install deps for lifecycle hook execution
-    lifecycle_npm_repositories()
 
 def js_register_toolchains(node_name, node_version, yq_name, yq_version):
     """Register toolchains for rules_js.
