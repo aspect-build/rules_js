@@ -126,7 +126,7 @@ You can create these manually if you want to have exact control.
 
 Bazel will only fetch the given package from an external registry if the package is
 required for the user-requested targets to be build/tested.
-The package will be exposed as a [`js_package`](./js_package) rule in a repository
+The package will be exposed as a [`node_package`](./node_package) rule in a repository
 with a default name `@npm_[package name]-[version]`, as the default target in that repository.
 (Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 

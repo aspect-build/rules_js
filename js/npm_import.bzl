@@ -29,7 +29,7 @@ def _npm_import_impl(repository_ctx):
 
     repository_ctx.file("BUILD.bazel", """
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory")
-load("@aspect_rules_js//js:js_package.bzl", "js_package")
+load("@aspect_rules_js//js:node_package.bzl", "node_package")
 
 # Turn a source directory into a TreeArtifact for RBE-compat
 copy_directory(
@@ -41,7 +41,7 @@ copy_directory(
     out = "{package_name}",
 )
 
-js_package(
+node_package(
     name = "{name}",
     src = "_{name}",
     package_name = "{package_name}",
@@ -85,7 +85,7 @@ def npm_import(integrity, package, version, deps = [], name = None, patches = []
 
     Bazel will only fetch the given package from an external registry if the package is
     required for the user-requested targets to be build/tested.
-    The package will be exposed as a [`js_package`](./js_package) rule in a repository
+    The package will be exposed as a [`node_package`](./node_package) rule in a repository
     with a default name `@npm_[package name]-[version]`, as the default target in that repository.
     (Characters in the package name which are not legal in Bazel repository names are converted to underscore.)
 
