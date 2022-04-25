@@ -1,6 +1,6 @@
-load("//js:js_package.bzl", "js_package")
+load("//js:node_package.bzl", "node_package")
 
-js_package(
+node_package(
     name = "lib",
     package_name = "@mycorp/mylib",
     srcs = [

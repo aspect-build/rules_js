@@ -24,8 +24,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "js_package",
-    srcs = ["js_package.bzl"],
+    name = "node_package",
+    srcs = ["node_package.bzl"],
     visibility = ["//:__subpackages__"],
     deps = [
         "@bazel_skylib//lib:paths",

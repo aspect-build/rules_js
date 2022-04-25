@@ -1,17 +1,17 @@
-"wrapper macro for js_package rule"
+"wrapper macro for node_package rule"
 
-load("//js/private:js_package.bzl", lib = "js_package_lib")
+load("//js/private:node_package.bzl", lib = "node_package_lib")
 
-_js_package = rule(
-    implementation = lib.js_package_impl,
+_node_package = rule(
+    implementation = lib.node_package_impl,
     provides = lib.provides,
     attrs = lib.attrs,
 )
 
-def js_package(name, remap_paths = None, **kwargs):
+def node_package(name, remap_paths = None, **kwargs):
     if remap_paths == None:
         remap_paths = {"/" + native.package_name(): ""}
-    _js_package(
+    _node_package(
         name = name,
         remap_paths = remap_paths,
         is_windows = select({
