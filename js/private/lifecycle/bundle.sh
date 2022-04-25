@@ -11,4 +11,4 @@
 # └─────────────────┴──────────────┴────────┘
 # This avoids users having to fetch all those packages just to run the postinstall hooks.
 
-npx @vercel/ncc@0.33.4 build lifecycle-hooks.js -o min -m
+npx @vercel/ncc@0.33.4 build lifecycle-hooks.js -o min
