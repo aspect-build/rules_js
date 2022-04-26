@@ -229,16 +229,15 @@ def _impl(rctx):
                     bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
                 ))
     else:
-        for (dep_name, dep_versions) in rctx.attr.deps.items():
-            for dep_version in dep_versions:
-                lc_deps.append("{namespace}{bazel_name}__lc".format(
-                    namespace = pnpm_utils.node_package_target_namespace,
-                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                ))
-                deps.append("{namespace}{bazel_name}".format(
-                    namespace = pnpm_utils.node_package_target_namespace,
-                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                ))
+        for (dep_name, dep_version) in rctx.attr.deps.items():
+            lc_deps.append("{namespace}{bazel_name}__lc".format(
+                namespace = pnpm_utils.node_package_target_namespace,
+                bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+            ))
+            deps.append("{namespace}{bazel_name}".format(
+                namespace = pnpm_utils.node_package_target_namespace,
+                bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+            ))
 
     node_package_bzl_file = "node_package.bzl"
 
