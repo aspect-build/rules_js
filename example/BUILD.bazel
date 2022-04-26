@@ -4,9 +4,8 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@example_npm_deps//:node_modules.bzl", "node_modules")
 load("@example_npm_deps//:package.bzl", "package", "package_dir")
 load("@example_npm_deps__acorn-8.4.0//:node_package.bzl", node_package_acorn = "node_package")
-load("//js:js_binary.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary", "js_test")
 load("//js:node_package.bzl", "node_package")
-load("//js:js_test.bzl", "js_test")
 load("//js:run_js_binary.bzl", "run_js_binary")
 
 ###########################

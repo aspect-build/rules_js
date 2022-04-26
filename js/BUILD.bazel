@@ -8,14 +8,8 @@ exports_files(
 )
 
 bzl_library(
-    name = "js_binary",
-    srcs = ["js_binary.bzl"],
-    visibility = ["//visibility:public"],
-    deps = ["//js/private:js_binary"],
-)
-
-bzl_library(
-    name = "js_test",
+    name = "defs",
+    srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
     deps = ["//js/private:js_binary"],
 )

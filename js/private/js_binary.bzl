@@ -1,4 +1,11 @@
-"js_binary and js_test rules"
+"""Rules for running JavaScript programs under Bazel, as tools or with `bazel run` or `bazel test`.
+
+Load these with
+
+```starlark
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+```
+"""
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
@@ -217,10 +224,18 @@ js_binary_lib = struct(
     ],
 )
 
-# For stardoc to generate documentation for the rule rather than a wrapper macro
 js_binary = rule(
     doc = _DOC,
     implementation = js_binary_lib.js_binary_impl,
     attrs = js_binary_lib.attrs,
+    executable = True,
+    toolchains = js_binary_lib.toolchains,
+)
+
+js_test = rule(
+    doc = "Identical to js_binary, but usable under `bazel test`.",
+    implementation = js_binary_lib.js_binary_impl,
+    attrs = js_binary_lib.attrs,
+    test = True,
     toolchains = js_binary_lib.toolchains,
 )

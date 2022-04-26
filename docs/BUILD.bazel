@@ -6,11 +6,6 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
-    name = "js_test",
-    bzl_library_target = "//js:js_test",
-)
-
-stardoc_with_diff_test(
     name = "node_package",
     bzl_library_target = "//js/private:node_package",
 )
