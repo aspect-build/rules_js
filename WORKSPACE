@@ -10,9 +10,9 @@ load(":internal_deps.bzl", "js_internal_deps")
 js_internal_deps()
 
 # Install our "runtime" dependencies which users install as well
-load("//js:repositories.bzl", "js_dependencies")
+load("//js:repositories.bzl", "rules_js_dependencies")
 
-js_dependencies()
+rules_js_dependencies()
 
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
