@@ -8,7 +8,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 versions = struct(
-    bazel_lib = "0.8.3",
+    aspect_bazel_lib = "0.9.8",
     rules_nodejs = "5.4.0",
     # Users can easily override the typescript version just by declaring their own http_archive
     # named "npm_typescript" prior to calling rules_js_dependencies.
@@ -21,7 +21,9 @@ versions = struct(
 # ours took precedence. Such breakages are challenging for users, so any
 # changes in this function should be marked as BREAKING in the commit message
 # and released only in semver majors.
-def rules_js_dependencies():
+def js_dependencies():
+    "Dependencies for users of aspect_rules_js"
+
     # The minimal version of bazel_skylib we require
     maybe(
         http_archive,
@@ -43,9 +45,9 @@ def rules_js_dependencies():
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "b3de6702d48904e8dbe9b45d29e5f07d3258d826981fda87424462b36f16b35f",
-        strip_prefix = "bazel-lib-" + versions.bazel_lib,
-        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.bazel_lib),
+        sha256 = "2f6f04a002a9f988ae79107a91a8498892fb03bee978a8bf841eb1bd9fded2ea",
+        strip_prefix = "bazel-lib-{}".format(versions.aspect_bazel_lib),
+        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.aspect_bazel_lib),
     )
 
     maybe(

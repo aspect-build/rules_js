@@ -5,14 +5,27 @@ workspace(
     name = "aspect_rules_js",
 )
 
-load(":internal_deps.bzl", "rules_js_internal_deps")
+load(":internal_deps.bzl", "js_internal_deps")
 
-rules_js_internal_deps()
+js_internal_deps()
 
 # Install our "runtime" dependencies which users install as well
-load("//js:repositories.bzl", "rules_js_dependencies")
+load("//js:repositories.bzl", "js_dependencies")
 
-rules_js_dependencies()
+js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "nodejs",
+    node_version = "16.9.0",
+)
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "DEFAULT_YQ_VERSION", "register_yq_toolchains")
+
+register_yq_toolchains(
+    version = DEFAULT_YQ_VERSION,
+)
 
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
@@ -30,46 +43,39 @@ go_register_toolchains(version = "1.17.2")
 gazelle_dependencies()
 
 ############################################
-# Fetch node and some npm packages, for testing our example
-load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+# Fetch some npm packages for testing our example
 
-nodejs_register_toolchains(
-    name = "node16",
-    node_version = "16.9.0",
-)
-
-load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_package_lock")
+load("@aspect_rules_js//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
 
 # Manually import a package using explicit coordinates.
 # Just a demonstration of the syntax de-sugaring.
 npm_import(
+    name = "example_npm_deps__acorn-8.4.0",
     integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
+    link_package_guard = "example",
     package = "acorn",
     version = "8.4.0",
-    deps = [],
 )
 
-# Read the package-lock.json file to automate creation of remaining npm_import rules
-translate_package_lock(
-    name = "npm_deps",
-    package_lock = "//example:package-lock.json",
+# Read the pnpm-lock.json file to automate creation of remaining npm_import rules
+translate_pnpm_lock(
+    name = "example_npm_deps",
     patch_args = {
-        "@gregmagolan/test-a": [
-            "-p1",
-        ],
+        "@gregmagolan/test-a": ["-p1"],
     },
     patches = {
-        "@gregmagolan/test-a": [
-            "//example:test-a.patch",
-        ],
-        "@gregmagolan/test-a@0.0.1": [
-            "//example:test-a@0.0.1.patch",
-        ],
+        "@gregmagolan/test-a": ["//example:test-a.patch"],
+        "@gregmagolan/test-a@0.0.1": ["//example:test-a@0.0.1.patch"],
+    },
+    pnpm_lock = "//example:pnpm-lock.yaml",
+    postinstall = {
+        "@aspect-test/c": "echo 'moo' > cow.txt",
+        "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",
     },
 )
 
-# This is the result of translate_package_lock
-load("@npm_deps//:repositories.bzl", "npm_repositories")
+# This is the result of translate_pnpm_lock
+load("@example_npm_deps//:repositories.bzl", example_npm_repositories = "npm_repositories")
 
 # Declare remaining npm_import rules
-npm_repositories()
+example_npm_repositories()

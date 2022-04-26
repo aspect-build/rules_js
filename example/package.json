@@ -5,7 +5,15 @@
         "lib": "lib"
     },
     "devDependencies": {
+        "@aspect-test/a": "5.0.0",
+        "@aspect-test/b": "5.0.0",
+        "@aspect-test/c": "2.0.0",
         "@gregmagolan/test-b": "^0.0.2",
-        "@types/node": "^15.12.2"
+        "@types/node": "^15.12.2",
+        "rollup": "^2.70.2",
+        "@rollup/plugin-commonjs": "^21.1.0",
+        "mobx-react": "^7.3.0",
+        "mobx": "^6.1.0",
+        "react": "^17"
     }
 }
