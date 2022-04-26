@@ -43,11 +43,11 @@ load("@npm__at_types_node_15.12.2//:node_package.bzl", node_package_types_node =
 node_package_types_node()
 ```
 
-The instantiates an `js_binary` target for this package that can be referenced by the alias
+This instantiates a `node_package` target for this package that can be referenced by the alias
 `@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
 The `npm` prefix of these alias is configurable via the `namespace` attribute.
 
-When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock files with:
+When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
 
 ```
 load("@npm//:node_modules.bzl", "node_modules")
@@ -72,12 +72,12 @@ common --experimental_downloader_config=.bazel_downloader_config
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 """
 
-_NODEJS_PACKAGE_TMPL = """{maybe_load_run_js_binary}
+_NODEJS_PACKAGE_TMPL = """
 def node_package():
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
         fail("The node_package() macro loaded from {node_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 
-    # ref node_package used to prevent circular deps
+    # reference node package used to avoid circular deps
     _node_package(
         name = "{namespace}{bazel_name}__ref",
         package = "{package}",
@@ -85,7 +85,8 @@ def node_package():
         indirect = True,
     )
 
-    # pre-lifecycle refs package linked to _lc/node_modules for use in postinstall actions
+    # pre-lifecycle node package with reference deps for use in pre-lifecycle terminal node packages
+    # (linked into lifecycle node_modules tree _lc/node_modules)
     _node_package(
         name = "{namespace}{bazel_name}__lc_pkg",
         src = "@{rctx_name}//:{extract_dirname}",
@@ -98,21 +99,9 @@ def node_package():
         tags = ["manual"],
         visibility = ["//visibility:public"],{maybe_indirect}
     )
-
-    # terminal pre-lifecycle package linked to _lc/node_modules for use in postinstall actions
-    _node_package(
-        name = "{namespace}{bazel_name}__lc",
-        package = "{package}",
-        version = "{version}",
-        # transitive closure of {namespace}*__lc_pkg deps
-        deps = {lc_deps},
-        root_dir = "_lc/node_modules",
-        # don't build this unless it is asked for
-        tags = ["manual"],
-        visibility = ["//visibility:public"],{maybe_indirect}
-    )
     {maybe_lifecycle_hooks}
-    # refs package for use in terminal package transitive closure
+    # post-lifecycle node package with reference deps for use in terminal node package with
+    # transitive closure
     _node_package(
         name = "{namespace}{bazel_name}__pkg",
         src = "{node_package_src}",
@@ -123,7 +112,7 @@ def node_package():
         visibility = ["//visibility:public"],{maybe_indirect}
     )
 
-    # terminal package target with transitive closure of postinstall npm packages
+    # terminal node package with transitive closure of node package dependencies
     _node_package(
         name = "{namespace}{bazel_name}",{maybe_node_package_src}
         package = "{package}",
@@ -134,9 +123,22 @@ def node_package():
     )
 """
 
-_RUN_LIFECYCLE_HOOKS_TMPL = """# runs lifecycle hooks on the package
-    run_js_binary(
-        name = "{namespace}{bazel_name}_postinstall",
+_RUN_LIFECYCLE_HOOKS_TMPL = """
+    # terminal pre-lifecycle node package for use in lifecycle build target below
+    # (linked into lifecycle node_modules tree _lc/node_modules)
+    _node_package(
+        name = "{namespace}{bazel_name}__lc",
+        package = "{package}",
+        version = "{version}",
+        # transitive closure of {namespace}*__lc_pkg deps
+        deps = {lc_deps},
+        root_dir = "_lc/node_modules",
+        visibility = ["//visibility:public"],{maybe_indirect}
+    )
+
+    # runs lifecycle hooks on the package
+    _run_js_binary(
+        name = "{namespace}{bazel_name}__lifecycle",
         srcs = [
             "@{rctx_name}//:{extract_dirname}",
             ":{namespace}{bazel_name}__lc"
@@ -239,8 +241,6 @@ def _impl(rctx):
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
             ))
 
-    node_package_bzl_file = "node_package.bzl"
-
     if rctx.attr.postinstall and rctx.attr.enable_lifecycle_hooks:
         _inject_custom_postinstall(rctx, extract_dirname, rctx.attr.postinstall)
 
@@ -249,12 +249,14 @@ def _impl(rctx):
     bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
     if enable_lifecycle_hooks:
-        node_package_src = ":{namespace}{bazel_name}_postinstall".format(
+        node_package_src = ":{namespace}{bazel_name}__lifecycle".format(
             namespace = pnpm_utils.node_package_target_namespace,
             bazel_name = bazel_name,
         )
     else:
         node_package_src = "@%s//:%s" % (rctx.name, extract_dirname)
+
+    node_package_bzl_file = "node_package.bzl"
 
     node_package_bzl = [_NODEJS_PACKAGE_TMPL.format(
         namespace = pnpm_utils.node_package_target_namespace,
@@ -266,19 +268,22 @@ def _impl(rctx):
         node_package_bzl = "@%s//:%s" % (rctx.name, node_package_bzl_file),
         bazel_name = bazel_name,
         ref_deps = _to_list_attr(ref_deps, "        "),
-        lc_deps = _to_list_attr(lc_deps, "        "),
         deps = _to_list_attr(deps, "        "),
         maybe_indirect = """
         indirect = True,""" if rctx.attr.indirect else "",
         node_package_src = node_package_src,
         maybe_node_package_src = """
         src = \"%s\",""" % node_package_src if not transitive_closure_pattern else "",
-        maybe_load_run_js_binary = "load(\"@aspect_rules_js//js:run_js_binary.bzl\", \"run_js_binary\")" if enable_lifecycle_hooks else "",
         maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
             namespace = pnpm_utils.node_package_target_namespace,
             extract_dirname = extract_dirname,
             rctx_name = rctx.name,
             bazel_name = bazel_name,
+            package = rctx.attr.package,
+            version = rctx.attr.version,
+            lc_deps = _to_list_attr(lc_deps, "        "),
+            maybe_indirect = """
+            indirect = True,""" if rctx.attr.indirect else "",
         ) if enable_lifecycle_hooks else "",
     )]
 
@@ -290,12 +295,14 @@ def _impl(rctx):
             bazel_name = bazel_name,
         ))
 
-    bzl_header = [
+    node_package_bzl_header = [
         "# @generated by npm_import.bzl",
         """load("@aspect_rules_js//js:node_package.bzl", _node_package = "node_package")""",
-        "",
     ]
-    rctx.file(node_package_bzl_file, "\n".join(bzl_header + node_package_bzl))
+    if enable_lifecycle_hooks:
+        node_package_bzl_header.append("""load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""")
+
+    rctx.file(node_package_bzl_file, "\n".join(node_package_bzl_header + node_package_bzl))
 
     # Apply patches to the extracted package
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = extract_dirname)

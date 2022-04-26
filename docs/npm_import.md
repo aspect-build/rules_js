@@ -50,11 +50,11 @@ load("@npm__at_types_node_15.12.2//:node_package.bzl", node_package_types_node =
 node_package_types_node()
 ```
 
-The instantiates an `js_binary` target for this package that can be referenced by the alias
+This instantiates a `node_package` target for this package that can be referenced by the alias
 `@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
 The `npm` prefix of these alias is configurable via the `namespace` attribute.
 
-When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock files with:
+When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
 
 ```
 load("@npm//:node_modules.bzl", "node_modules")
