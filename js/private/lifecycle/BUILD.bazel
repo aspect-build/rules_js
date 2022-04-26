@@ -1,6 +1,6 @@
 "Private lifecycle files"
 
-load("//js:js_binary.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary")
 
 js_binary(
     name = "lifecycle-hooks",

@@ -1,6 +1,13 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-js_binary and js_test rules
+Rules for running JavaScript programs under Bazel, as tools or with `bazel run` or `bazel test`.
+
+Load these with
+
+```starlark
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+```
+
 
 <a id="#js_binary"></a>
 
@@ -47,6 +54,33 @@ This rules requires that Bazel was run with
 | <a id="js_binary-expected_exit_code"></a>expected_exit_code |  The expected exit code.<br><br>        Can be used to write tests that are expected to fail.   | Integer | optional | 0 |
 | <a id="js_binary-is_windows"></a>is_windows |  Whether the build is being performed on a Windows host platform.<br><br>        Typical usage of this rule is via a macro which automatically sets this         attribute based on a <code>select()</code> on <code>@bazel_tools//src/conditions:host_windows</code>.   | Boolean | required |  |
 | <a id="js_binary-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
+
+
+<a id="#js_test"></a>
+
+## js_test
+
+<pre>
+js_test(<a href="#js_test-name">name</a>, <a href="#js_test-chdir">chdir</a>, <a href="#js_test-data">data</a>, <a href="#js_test-enable_runfiles">enable_runfiles</a>, <a href="#js_test-entry_point">entry_point</a>, <a href="#js_test-env">env</a>, <a href="#js_test-expected_exit_code">expected_exit_code</a>, <a href="#js_test-is_windows">is_windows</a>,
+        <a href="#js_test-node_options">node_options</a>)
+</pre>
+
+Identical to js_binary, but usable under `bazel test`.
+
+**ATTRIBUTES**
+
+
+| Name  | Description | Type | Mandatory | Default |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="js_test-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+| <a id="js_test-chdir"></a>chdir |  Working directory to run the binary or test in, relative to the workspace.<br><br>        By default, <code>js_binary</code> runs in the root of the output tree.<br><br>        To run in the directory containing the <code>js_binary</code> use<br><br>            chdir = package_name()<br><br>        (or if you're in a macro, use <code>native.package_name()</code>)<br><br>        WARNING: this will affect other paths passed to the program, either as arguments or in configuration files,         which are workspace-relative.<br><br>        You may need <code>../../</code> segments to re-relativize such paths to the new working directory.         In a <code>BUILD</code> file you could do something like this to point to the output path:<br><br>        <pre><code>python         js_binary(             ...             chdir = package_name(),             # ../.. segments to re-relative paths from the chdir back to workspace;             # add an additional 3 segments to account for running js_binary running             # in the root of the output tree             args = ["/".join([".."] * len(package_name().split("/")) + "$(rootpath //path/to/some:file)"],         )         </code></pre>   | String | optional | "" |
+| <a id="js_test-data"></a>data |  Runtime dependencies of the program.<br><br>        The transitive closure of the <code>data</code> dependencies will be available in         the .runfiles folder for this binary/test.<br><br>        You can use the <code>@bazel/runfiles</code> npm library to access these files         at runtime.<br><br>        npm packages are also linked into the <code>.runfiles/node_modules</code> folder         so they may be resolved directly from runfiles.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| <a id="js_test-enable_runfiles"></a>enable_runfiles |  Whether runfiles are enabled in the current build configuration.<br><br>        Typical usage of this rule is via a macro which automatically sets this         attribute based on a <code>config_setting</code> rule.   | Boolean | required |  |
+| <a id="js_test-entry_point"></a>entry_point |  The main script which is evaluated by node.js<br><br>        This is the module referenced by the <code>require.main</code> property in the runtime.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
+| <a id="js_test-env"></a>env |  Environment variables of the action.<br><br>        Subject to <code>$(location)</code> and make variable expansion.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
+| <a id="js_test-expected_exit_code"></a>expected_exit_code |  The expected exit code.<br><br>        Can be used to write tests that are expected to fail.   | Integer | optional | 0 |
+| <a id="js_test-is_windows"></a>is_windows |  Whether the build is being performed on a Windows host platform.<br><br>        Typical usage of this rule is via a macro which automatically sets this         attribute based on a <code>select()</code> on <code>@bazel_tools//src/conditions:host_windows</code>.   | Boolean | required |  |
+| <a id="js_test-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
 
 
 <a id="#js_binary_lib.js_binary_impl"></a>
