@@ -10,9 +10,6 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 versions = struct(
     aspect_bazel_lib = "0.9.8",
     rules_nodejs = "5.4.0",
-    # Users can easily override the typescript version just by declaring their own http_archive
-    # named "npm_typescript" prior to calling rules_js_dependencies.
-    typescript = "4.6.3",
 )
 
 # WARNING: any changes in this function may be BREAKING CHANGES for users
@@ -48,12 +45,4 @@ def js_dependencies():
         sha256 = "2f6f04a002a9f988ae79107a91a8498892fb03bee978a8bf841eb1bd9fded2ea",
         strip_prefix = "bazel-lib-{}".format(versions.aspect_bazel_lib),
         url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.aspect_bazel_lib),
-    )
-
-    maybe(
-        http_archive,
-        name = "npm_typescript",
-        build_file = "@aspect_rules_js//ts:BUILD.typescript",
-        sha256 = "70d5d30a8ee92004e529c41fc05d5c7993f7a4ddea33b4c0909896936230964d",
-        urls = ["https://registry.npmjs.org/typescript/-/typescript-{}.tgz".format(versions.typescript)],
     )
