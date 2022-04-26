@@ -1,14 +1,14 @@
-const {
-    mkdirSync,
-    copyFileSync,
-    readdirSync,
-    readFileSync,
-    existsSync,
-    statSync,
-} = require('fs')
+const fs = require('fs')
 const path = require('path')
 const { runPostinstallHooks } = require('@pnpm/lifecycle')
 const runLifecycleHook = require('@pnpm/lifecycle').default
+
+async function mkdirp(p) {
+    if (p && !fs.existsSync(p)) {
+        await mkdirp(path.dirname(p))
+        await fs.promises.mkdir(p)
+    }
+}
 
 async function main(argv) {
     if (argv.length !== 2) {
@@ -18,10 +18,10 @@ async function main(argv) {
     const packageDir = argv[0]
     const outputDir = argv[1]
 
-    copyPackageContents(packageDir, outputDir)
+    await copyPackageContents(packageDir, outputDir)
 
     const packageJson = JSON.parse(
-        readFileSync(path.join(packageDir, 'package.json'))
+        await fs.promises.readFile(path.join(packageDir, 'package.json'))
     )
 
     if (
@@ -38,9 +38,7 @@ async function main(argv) {
         // If the package we're running postinstall on has no deps, then node_modules
         // won't exist in the sandbox. The lifecycle functions provided by pnpm require
         // it to exist, so create an empty folder if needed.
-        if (!existsSync(nodeModulesPath)) {
-            mkdirSync(nodeModulesPath)
-        }
+        await mkdirp(nodeModulesPath)
 
         const opts = {
             pkgRoot: path.resolve(outputDir),
@@ -61,25 +59,30 @@ async function main(argv) {
 }
 
 // Copy contents of a package dir to a destination dir (without copying the package dir itself)
-function copyPackageContents(packageDir, destDir) {
-    readdirSync(packageDir).forEach((file) => {
-        copyRecursiveSync(path.join(packageDir, file), path.join(destDir, file))
+async function copyPackageContents(packageDir, destDir) {
+    const contents = await fs.promises.readdir(packageDir)
+    contents.forEach(async (file) => {
+        await copyRecursive(
+            path.join(packageDir, file),
+            path.join(destDir, file)
+        )
     })
 }
 
 // Recursively copy files and folders
-function copyRecursiveSync(src, dest) {
-    const stats = statSync(src)
+async function copyRecursive(src, dest) {
+    const stats = await fs.promises.stat(src)
     if (stats.isDirectory()) {
-        mkdirSync(dest)
-        readdirSync(src).forEach(function (fileName) {
-            copyRecursiveSync(
+        await mkdirp(dest)
+        const contents = await fs.promises.readdir(src)
+        contents.forEach(async (fileName) => {
+            await copyRecursive(
                 path.join(src, fileName),
                 path.join(dest, fileName)
             )
         })
     } else {
-        copyFileSync(src, dest)
+        await fs.promises.copyFile(src, dest)
     }
 }
 
