@@ -1,0 +1,32 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@nodejs_host//:index.bzl", "host_platform")
+load("//js:defs.bzl", "js_binary")
+
+####################################################################################################
+# Write a js_binary launcher to the source tree so it is shell checked on commit
+
+write_file(
+    name = "shellcheck_js",
+    out = "shellcheck.js",
+)
+
+js_binary(
+    name = "shellcheck_launcher",
+    entry_point = "shellcheck.js",
+)
+
+# For consistency on different platform, replace the host nodejs platform to linux_amd64
+genrule(
+    name = "shell_launcher_sed",
+    srcs = [":shellcheck_launcher"],
+    outs = ["shellcheck_launcher_sed.sh"],
+    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#%s#linux_amd64#\" > $@" % host_platform,
+)
+
+write_source_files(
+    name = "write_shellcheck_launcher",
+    files = {
+        "shellcheck_launcher.sh": ":shell_launcher_sed",
+    },
+)

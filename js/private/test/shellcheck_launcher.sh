@@ -2,12 +2,22 @@
 
 # shellcheck disable=SC1090
 {
-{rlocation_function}
+
+# --- begin runfiles.bash initialization v2 ---
+set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+source "$0.runfiles/$f" 2>/dev/null || \
+source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+{ echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
+# --- end runfiles.bash initialization v2 ---
+
 }
 
 set -o pipefail -o errexit -o nounset
 
-{env}
+
 
 LOG_PREFIX="aspect_rules_js[js_binary]"
 
@@ -118,13 +128,13 @@ export RUNFILES
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     # We in runfiles
-    node="$PWD/{node}"
-    entry_point="$PWD/{entry_point}"
+    node="$PWD/../nodejs_linux_amd64/bin/nodejs/bin/node"
+    entry_point="$PWD/js/private/test/shellcheck.js"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
-    node="$RUNFILES/{workspace_name}/{node}"
-    entry_point="$RUNFILES/{workspace_name}/{entry_point}"
+    node="$RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
+    entry_point="$RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
         printf "\nERROR: %s: BAZEL_BINDIR must be set in environment when not running out of runfiles so js_binary can run out of the output tree on build actions\n" "$LOG_PREFIX" >&2
         exit 1
@@ -196,7 +206,7 @@ _exit() {
 }
 
 NODE_OPTIONS=()
-{node_options}
+
 
 ARGS=()
 ALL_ARGS=("$@")
