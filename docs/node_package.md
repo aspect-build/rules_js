@@ -7,7 +7,8 @@ node_package rule
 ## node_package
 
 <pre>
-node_package(<a href="#node_package-name">name</a>, <a href="#node_package-deps">deps</a>, <a href="#node_package-indirect">indirect</a>, <a href="#node_package-is_windows">is_windows</a>, <a href="#node_package-package">package</a>, <a href="#node_package-root_dir">root_dir</a>, <a href="#node_package-src">src</a>, <a href="#node_package-version">version</a>)
+node_package(<a href="#node_package-name">name</a>, <a href="#node_package-always_output_bins">always_output_bins</a>, <a href="#node_package-bins">bins</a>, <a href="#node_package-deps">deps</a>, <a href="#node_package-indirect">indirect</a>, <a href="#node_package-is_windows">is_windows</a>, <a href="#node_package-package">package</a>, <a href="#node_package-root_dir">root_dir</a>, <a href="#node_package-src">src</a>,
+             <a href="#node_package-version">version</a>)
 </pre>
 
 
@@ -18,6 +19,8 @@ node_package(<a href="#node_package-name">name</a>, <a href="#node_package-deps"
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="node_package-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+| <a id="node_package-always_output_bins"></a>always_output_bins |  If True, always output bins entry points. If False, bin entry points         are only outputted when src is set.   | Boolean | optional | False |
+| <a id="node_package-bins"></a>bins |  A dict of bin entry point names to entry point paths for this package.<br><br>        This should mirror what is in the <code>bin</code> field of the package.json of the package.         See https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | <a id="node_package-deps"></a>deps |  Other node packages this one depends on.<br><br>        This should include *all* modules the program may need at runtime.<br><br>        &gt; In typical usage, a node.js program sometimes requires modules which were         &gt; never declared as dependencies.         &gt; This pattern is typically used when the program has conditional behavior         &gt; that is enabled when the module is found (like a plugin) but the program         &gt; also runs without the dependency.         &gt;          &gt; This is possible because node.js doesn't enforce the dependencies are sound.         &gt; All files under <code>node_modules</code> are available to any program.         &gt; In contrast, Bazel makes it possible to make builds hermetic, which means that         &gt; all dependencies of a program must be declared when running in Bazel's sandbox.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | <a id="node_package-indirect"></a>indirect |  If True, this is an indirect node_package which will not linked at the top-level of node_modules   | Boolean | optional | False |
 | <a id="node_package-is_windows"></a>is_windows |  -   | Boolean | required |  |

@@ -124,7 +124,7 @@ common --experimental_downloader_config=.bazel_downloader_config
 ## translate_pnpm_lock
 
 <pre>
-translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-enable_lifecycle_hooks">enable_lifecycle_hooks</a>, <a href="#translate_pnpm_lock-no_lifecycle_hooks">no_lifecycle_hooks</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>,
+translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-enable_lifecycle_hooks">enable_lifecycle_hooks</a>, <a href="#translate_pnpm_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>,
                     <a href="#translate_pnpm_lock-node_repository">node_repository</a>, <a href="#translate_pnpm_lock-package">package</a>, <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-postinstall">postinstall</a>, <a href="#translate_pnpm_lock-prod">prod</a>,
                     <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-yq_repository">yq_repository</a>)
 </pre>
@@ -227,7 +227,7 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 | <a id="translate_pnpm_lock-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
 | <a id="translate_pnpm_lock-dev"></a>dev |  If true, only install devDependencies   | Boolean | optional | False |
 | <a id="translate_pnpm_lock-enable_lifecycle_hooks"></a>enable_lifecycle_hooks |  If true, runs lifecycle hooks on installed packages as well as any custom postinstall scripts   | Boolean | optional | True |
-| <a id="translate_pnpm_lock-no_lifecycle_hooks"></a>no_lifecycle_hooks |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to not run lifecycle hooks on   | List of strings | optional | [] |
+| <a id="translate_pnpm_lock-lifecycle_hooks_exclude"></a>lifecycle_hooks_exclude |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to not run lifecycle hooks on   | List of strings | optional | [] |
 | <a id="translate_pnpm_lock-no_optional"></a>no_optional |  If true, optionalDependencies are not installed   | Boolean | optional | False |
 | <a id="translate_pnpm_lock-node_repository"></a>node_repository |  The basename for the node toolchain repository from @build_bazel_rules_nodejs.   | String | optional | "nodejs" |
 | <a id="translate_pnpm_lock-package"></a>package |  The package to "link" the generated npm dependencies to. By default, the package of the pnpm_lock         target is used.   | String | optional | "." |

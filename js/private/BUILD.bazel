@@ -45,6 +45,7 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
     deps = [
         ":pnpm_utils",
+        ":starlark_codegen_utils",
         ":yq",
         "@aspect_bazel_lib//lib:repo_utils",
     ],
@@ -56,6 +57,7 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
     deps = [
         ":pnpm_utils",
+        ":starlark_codegen_utils",
         ":yq",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
@@ -72,5 +74,11 @@ bzl_library(
 bzl_library(
     name = "pnpm_utils",
     srcs = ["pnpm_utils.bzl"],
+    visibility = ["//js:__subpackages__"],
+)
+
+bzl_library(
+    name = "starlark_codegen_utils",
+    srcs = ["starlark_codegen_utils.bzl"],
     visibility = ["//js:__subpackages__"],
 )
