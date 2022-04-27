@@ -2,6 +2,7 @@
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":yq.bzl", "yq_bin")
 
@@ -133,6 +134,10 @@ _ATTRS = {
     ),
     "no_optional": attr.bool(
         doc = """If true, optionalDependencies are not installed""",
+    ),
+    "no_lifecycle_hooks": attr.string_list(
+        doc = """A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
+        to not run lifecycle hooks on""",
     ),
     "enable_lifecycle_hooks": attr.bool(
         doc = """If true, runs lifecycle hooks on installed packages as well as any custom postinstall scripts""",
@@ -283,6 +288,7 @@ def node_modules():
         name = package_info.get("name")
         pnpm_version = package_info.get("pnpmVersion")
         deps = package_info.get("dependencies")
+        optional_deps = package_info.get("optionalDependencies")
         dev = package_info.get("dev")
         optional = package_info.get("optional")
         has_bin = package_info.get("hasBin")
@@ -299,6 +305,9 @@ def node_modules():
         if rctx.attr.no_optional and optional:
             # when no_optional attribute is set, skip optionalDependencies
             continue
+
+        if not rctx.attr.no_optional:
+            deps = dicts.add(optional_deps, deps)
 
         friendly_name = pnpm_utils.friendly_name(name, pnpm_utils.strip_peer_dep_version(pnpm_version))
 
@@ -317,6 +326,8 @@ def node_modules():
         repo_name = "%s__%s" % (rctx.name, pnpm_utils.bazel_name(name, pnpm_version))
 
         indirect = False if package in direct_dependencies else True
+
+        no_lifecycle_hooks = not rctx.attr.enable_lifecycle_hooks or name in rctx.attr.no_lifecycle_hooks or friendly_name in rctx.attr.no_lifecycle_hooks
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             name = repo_name,
@@ -337,7 +348,7 @@ def node_modules():
             maybe_postinstall = ("""
         postinstall = \"%s\",""" % postinstall) if postinstall else "",
             maybe_enable_lifecycle_hooks = """
-        enable_lifecycle_hooks = False,""" if not rctx.attr.enable_lifecycle_hooks else "",
+        enable_lifecycle_hooks = False,""" if no_lifecycle_hooks else "",
         ))
 
         node_modules_header_bzl.append(
