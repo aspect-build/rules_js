@@ -273,7 +273,7 @@ def _impl(rctx):
 
     pkg_json = json.decode(rctx.read(pkg_json_path))
 
-    bins = _parse_bins(pkg_json)
+    bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
     enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(pkg_json)
 
@@ -427,5 +427,9 @@ def _has_lifecycle_hooks(pkg_json):
         "_rules_js_postinstall" in pkg_json["scripts"]
     )
 
-def _parse_bins(pkg_json):
-    return pkg_json.get("bin", {})
+def _get_bin_entries(pkg_json, package):
+    # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
+    bin = pkg_json.get("bin", {})
+    if type(bin) != "dict":
+        bin = {pnpm_utils.binary_name(package): bin}
+    return bin
