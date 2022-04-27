@@ -7,6 +7,7 @@ specifiers:
     '@gregmagolan/test-b': ^0.0.2
     '@rollup/plugin-commonjs': ^21.1.0
     '@types/node': ^15.12.2
+    bufferutil: 4.0.1
     mobx: ^6.1.0
     mobx-react: ^7.3.0
     react: ^17
@@ -19,6 +20,7 @@ devDependencies:
     '@gregmagolan/test-b': 0.0.2
     '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
     '@types/node': 15.14.9
+    bufferutil: 4.0.1
     mobx: 6.5.0
     mobx-react: 7.3.0_mobx@6.5.0+react@17.0.2
     react: 17.0.2
@@ -177,6 +179,16 @@ packages:
         dependencies:
             balanced-match: 1.0.2
             concat-map: 0.0.1
+        dev: true
+
+    /bufferutil/4.0.1:
+        resolution:
+            {
+                integrity: sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==,
+            }
+        requiresBuild: true
+        dependencies:
+            node-gyp-build: 3.7.0
         dev: true
 
     /commondir/1.0.1:
@@ -360,6 +372,14 @@ packages:
             {
                 integrity: sha512-pHZ/cySF00FVENDWIDzJyoObFahK6Eg4d0papqm6d7yMkxWTZ/S/csqJX1A3PsYy4t5k3z2QnlwuCfMW5lSEwA==,
             }
+        dev: true
+
+    /node-gyp-build/3.7.0:
+        resolution:
+            {
+                integrity: sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==,
+            }
+        hasBin: true
         dev: true
 
     /object-assign/4.1.1:
