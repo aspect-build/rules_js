@@ -1,6 +1,7 @@
 "node_package rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":pnpm_utils.bzl", "pnpm_utils")
 
@@ -12,12 +13,11 @@ _NodePackageInfo = provider(
         "package": "name of this node package",
         "version": "version of this node package",
         "dep_refs": "list of dependency ref targets",
+        "bins": "A dict of bin names to paths for this package",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
         "node_modules_directory": "the symlink of this package at the root of the node_modules if this is a direct npm dependency",
     },
 )
-
-VIRTUAL_STORE_ROOT = ".aspect_rules_js"
 
 _ATTRS = {
     "src": attr.label(
@@ -26,6 +26,16 @@ _ATTRS = {
 
 Can be left unspecified to allow for circular deps between `node_package`s.        
 """,
+    ),
+    "bins": attr.string_dict(
+        doc = """A dict of bin entry point names to entry point paths for this package.
+
+        This should mirror what is in the `bin` field of the package.json of the package.
+        See https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin.""",
+    ),
+    "always_output_bins": attr.bool(
+        doc = """If True, always output bins entry points. If False, bin entry points
+        are only outputted when src is set.""",
     ),
     "deps": attr.label_list(
         doc = """Other node packages this one depends on.
@@ -65,6 +75,16 @@ Can be left unspecified to allow for circular deps between `node_package`s.
     "is_windows": attr.bool(mandatory = True),
 }
 
+_BIN_SH_TEMPLATE = """#!/usr/bin/env bash
+exec node "../{package}/{bin_path}" "$@"
+"""
+
+def _normalize_bin_path(bin_path):
+    result = bin_path.replace("\\", "/")
+    if result.startswith("./"):
+        result = result[2:]
+    return result
+
 def _impl(ctx):
     if ctx.file.src and not ctx.file.src.is_source and not ctx.file.src.is_directory:
         fail("src must a source directory or TreeArtifact if set")
@@ -78,17 +98,50 @@ def _impl(ctx):
     virtual_store_out = None
     node_modules_directory = None
     direct_files = []
-    dep_refs = []
+    direct_dep_refs = []
+
+    if ctx.file.src or ctx.attr.always_output_bins:
+        # output bins for this package
+        for (bin_name, bin_path) in ctx.attr.bins.items():
+            # output a bin entry point this bin
+            bin_out = ctx.actions.declare_file(
+                # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/.bin/{bin_name}"
+                paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ".bin", bin_name),
+            )
+            ctx.actions.write(
+                bin_out,
+                _BIN_SH_TEMPLATE.format(
+                    package = ctx.attr.package,
+                    bin_path = _normalize_bin_path(bin_path),
+                ),
+                is_executable = True,
+            )
+            direct_files.append(bin_out)
+
+        # output bins for direct deps
+        for dep in ctx.attr.deps:
+            dep_package = dep[_NodePackageInfo].package
+            for (bin_name, bin_path) in dep[_NodePackageInfo].bins.items():
+                # output a bin entry point this bin
+                bin_out = ctx.actions.declare_file(
+                    # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/.bin/{bin_name}"
+                    paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ".bin", bin_name),
+                )
+                ctx.actions.write(
+                    bin_out,
+                    _BIN_SH_TEMPLATE.format(
+                        package = dep_package,
+                        bin_path = _normalize_bin_path(bin_path),
+                    ),
+                    is_executable = True,
+                )
+                direct_files.append(bin_out)
 
     if ctx.file.src:
         # output the package as a TreeArtifact to its virtual store location
         virtual_store_out = ctx.actions.declare_directory(
-            "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}".format(
-                root_dir = ctx.attr.root_dir,
-                package = ctx.attr.package,
-                virtual_store_name = virtual_store_name,
-                virtual_store_root = VIRTUAL_STORE_ROOT,
-            ),
+            # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+            paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ctx.attr.package),
         )
         copy_directory_action(ctx, ctx.file.src, virtual_store_out, ctx.attr.is_windows)
         direct_files.append(virtual_store_out)
@@ -97,10 +150,8 @@ def _impl(ctx):
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
-                "{root_dir}/{package}".format(
-                    root_dir = ctx.attr.root_dir,
-                    package = ctx.attr.package,
-                ),
+                # "{root_dir}/{package}"
+                paths.join(ctx.attr.root_dir, ctx.attr.package),
             )
             ctx.actions.symlink(
                 output = root_symlink,
@@ -121,12 +172,8 @@ deps of node_package must be in the same package or in a parent package.""" % (c
             dep_version = dep[_NodePackageInfo].version
             dep_virtual_store_directory = dep[_NodePackageInfo].virtual_store_directory
             if dep_virtual_store_directory:
-                dep_symlink_path = "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{dep_package}".format(
-                    root_dir = ctx.attr.root_dir,
-                    dep_package = dep_package,
-                    virtual_store_name = virtual_store_name,
-                    virtual_store_root = VIRTUAL_STORE_ROOT,
-                )
+                # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
                 dep_symlink = ctx.actions.declare_file(dep_symlink_path)
                 ctx.actions.symlink(
                     output = dep_symlink,
@@ -138,7 +185,7 @@ deps of node_package must be in the same package or in a parent package.""" % (c
                 # for this npm depedency will create the dep symlinks for this dep;
                 # this pattern is used to break circular dependencies between 3rd
                 # party npm deps; it is not recommended for 1st party deps
-                dep_refs.append(dep)
+                direct_dep_refs.append(dep)
     else:
         # if ctx.attr.src is _not_ set and ctx.attr.deps is, this is a terminal
         # package with deps being the transitive closure of deps;
@@ -151,6 +198,11 @@ deps of node_package must be in the same package or in a parent package.""" % (c
                 dep_package = dep[_NodePackageInfo].package
                 dep_version = dep[_NodePackageInfo].version
                 deps_map[pnpm_utils.pnpm_name(dep_package, dep_version)] = dep
+            else:
+                # this is a ref node_package, a downstream terminal node_package # for this npm
+                # depedency will create the dep symlinks for this dep; this pattern is used to break
+                # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
+                direct_dep_refs.append(dep)
         for dep in ctx.attr.deps:
             dep_package = dep[_NodePackageInfo].package
             dep_version = dep[_NodePackageInfo].version
@@ -159,25 +211,20 @@ deps of node_package must be in the same package or in a parent package.""" % (c
             if dep_package == ctx.attr.package and dep_version == ctx.attr.version:
                 # provide the node_modules directory for this package found in the transitive_closure
                 node_modules_directory = dep[_NodePackageInfo].node_modules_directory
-            if dep_refs:
-                for dep_ref in dep_refs:
-                    dep_ref_package = dep_ref[_NodePackageInfo].package
-                    dep_ref_version = dep_ref[_NodePackageInfo].version
-                    actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
-                    dep_ref_virtual_store_directory = actual_dep[_NodePackageInfo].virtual_store_directory
-                    if dep_ref_virtual_store_directory:
-                        dep_symlink_path = "{root_dir}/{virtual_store_root}/{dep_virtual_store_name}/node_modules/{dep_package}".format(
-                            root_dir = ctx.attr.root_dir,
-                            dep_package = dep_ref_package,
-                            dep_virtual_store_name = dep_virtual_store_name,
-                            virtual_store_root = VIRTUAL_STORE_ROOT,
-                        )
-                        dep_symlink = ctx.actions.declare_file(dep_symlink_path)
-                        ctx.actions.symlink(
-                            output = dep_symlink,
-                            target_file = dep_ref_virtual_store_directory,
-                        )
-                        direct_files.append(dep_symlink)
+            for dep_ref in dep_refs:
+                dep_ref_package = dep_ref[_NodePackageInfo].package
+                dep_ref_version = dep_ref[_NodePackageInfo].version
+                actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
+                dep_ref_virtual_store_directory = actual_dep[_NodePackageInfo].virtual_store_directory
+                if dep_ref_virtual_store_directory:
+                    # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                    dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
+                    dep_symlink = ctx.actions.declare_file(dep_symlink_path)
+                    ctx.actions.symlink(
+                        output = dep_symlink,
+                        target_file = dep_ref_virtual_store_directory,
+                    )
+                    direct_files.append(dep_symlink)
 
     direct_files = depset(direct = direct_files)
 
@@ -200,7 +247,8 @@ deps of node_package must be in the same package or in a parent package.""" % (c
             link_package = ctx.label.package,
             package = ctx.attr.package,
             version = ctx.attr.version,
-            dep_refs = dep_refs,
+            dep_refs = direct_dep_refs,
+            bins = ctx.attr.bins,
             node_modules_directory = node_modules_directory,
             virtual_store_directory = virtual_store_out,
         ),

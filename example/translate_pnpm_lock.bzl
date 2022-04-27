@@ -19,9 +19,4 @@ def translate_pnpm_lock():
             "@aspect-test/c": "echo 'moo' > cow.txt",
             "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",
         },
-        no_lifecycle_hooks = [
-            # TODO: fix bufferutil postinstall error "sh: node-gyp-build: command not found"
-            # by creating .bin entry points for deps with bins
-            "bufferutil",
-        ],
     )

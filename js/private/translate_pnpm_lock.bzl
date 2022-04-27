@@ -4,6 +4,7 @@ load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
+load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":yq.bzl", "yq_bin")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
@@ -135,7 +136,7 @@ _ATTRS = {
     "no_optional": attr.bool(
         doc = """If true, optionalDependencies are not installed""",
     ),
-    "no_lifecycle_hooks": attr.string_list(
+    "lifecycle_hooks_exclude": attr.string_list(
         doc = """A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
         to not run lifecycle hooks on""",
     ),
@@ -232,24 +233,6 @@ def package_dir(name):
     ))
 """
 
-def _to_dict_attr(dict, tab):
-    if not len(dict):
-        return "{}"
-    result = "{"
-    for k, v in dict.items():
-        result += "\n%s    \"%s\": \"%s\"," % (tab, k, v)
-    result += "\n%s}" % tab
-    return result
-
-def _to_dict_list_attr(dict, tab):
-    if not len(dict):
-        return "{}"
-    result = "{"
-    for k, v in dict.items():
-        result += "\n%s    \"%s\": %s," % (tab, k, v)
-    result += "\n%s}" % tab
-    return result
-
 def _impl(rctx):
     if rctx.attr.prod and rctx.attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -327,7 +310,22 @@ def node_modules():
 
         indirect = False if package in direct_dependencies else True
 
-        no_lifecycle_hooks = not rctx.attr.enable_lifecycle_hooks or name in rctx.attr.no_lifecycle_hooks or friendly_name in rctx.attr.no_lifecycle_hooks
+        lifecycle_hooks_exclude = not rctx.attr.enable_lifecycle_hooks or name in rctx.attr.lifecycle_hooks_exclude or friendly_name in rctx.attr.lifecycle_hooks_exclude
+
+        maybe_indirect = """
+        indirect = True,""" if indirect else ""
+        maybe_deps = ("""
+        deps = %s,""" % starlark_codegen_utils.to_dict_attr(deps, 2)) if len(deps) > 0 else ""
+        maybe_transitive_closure = ("""
+        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(transitive_closure, 2)) if len(transitive_closure) > 0 else ""
+        maybe_patches = ("""
+        patches = %s,""" % patches) if len(patches) > 0 else ""
+        maybe_patch_args = ("""
+        patch_args = %s,""" % patch_args) if len(patches) > 0 and len(patch_args) > 0 else ""
+        maybe_postinstall = ("""
+        postinstall = \"%s\",""" % postinstall) if postinstall else ""
+        maybe_enable_lifecycle_hooks = """
+        enable_lifecycle_hooks = False,""" if lifecycle_hooks_exclude else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             name = repo_name,
@@ -335,20 +333,13 @@ def node_modules():
             package = name,
             pnpm_version = pnpm_version,
             integrity = integrity,
-            maybe_indirect = """
-        indirect = True,""" if indirect else "",
-            maybe_deps = ("""
-        deps = %s,""" % _to_dict_attr(deps, "        ")) if len(deps) > 0 else "",
-            maybe_transitive_closure = ("""
-        transitive_closure = %s,""" % _to_dict_list_attr(transitive_closure, "        ")) if len(transitive_closure) > 0 else "",
-            maybe_patches = ("""
-        patches = %s,""" % patches) if len(patches) > 0 else "",
-            maybe_patch_args = ("""
-        patch_args = %s,""" % patch_args) if len(patches) > 0 and len(patch_args) > 0 else "",
-            maybe_postinstall = ("""
-        postinstall = \"%s\",""" % postinstall) if postinstall else "",
-            maybe_enable_lifecycle_hooks = """
-        enable_lifecycle_hooks = False,""" if no_lifecycle_hooks else "",
+            maybe_indirect = maybe_indirect,
+            maybe_deps = maybe_deps,
+            maybe_transitive_closure = maybe_transitive_closure,
+            maybe_patches = maybe_patches,
+            maybe_patch_args = maybe_patch_args,
+            maybe_postinstall = maybe_postinstall,
+            maybe_enable_lifecycle_hooks = maybe_enable_lifecycle_hooks,
         ))
 
         node_modules_header_bzl.append(

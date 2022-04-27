@@ -1,7 +1,9 @@
 "Repository rules for importing packages from npm"
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os", "patch")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":pnpm_utils.bzl", "pnpm_utils")
+load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":yq.bzl", "yq_bin")
 
 _DOC = """Import a single npm package into Bazel.
@@ -82,7 +84,7 @@ def node_package():
         name = "{namespace}{bazel_name}__ref",
         package = "{package}",
         version = "{version}",
-        indirect = True,
+        indirect = True,{maybe_bins}
     )
 
     # pre-lifecycle node package with reference deps for use in pre-lifecycle terminal node packages
@@ -97,8 +99,9 @@ def node_package():
         root_dir = "_lc/node_modules",
         # don't build this unless it is asked for
         tags = ["manual"],
-        visibility = ["//visibility:public"],{maybe_indirect}
+        visibility = ["//visibility:public"],{maybe_indirect}{maybe_bins}
     )
+
     {maybe_lifecycle_hooks}
     # post-lifecycle node package with reference deps for use in terminal node package with
     # transitive closure
@@ -109,7 +112,7 @@ def node_package():
         version = "{version}",
         # direct dep references
         deps = {ref_deps},
-        visibility = ["//visibility:public"],{maybe_indirect}
+        visibility = ["//visibility:public"],{maybe_indirect}{maybe_bins}
     )
 
     # terminal node package with transitive closure of node package dependencies
@@ -124,6 +127,20 @@ def node_package():
 """
 
 _RUN_LIFECYCLE_HOOKS_TMPL = """
+    # post-lifecycle node package with reference deps for use in terminal node package with
+    # transitive closure
+    _node_package(
+        name = "{namespace}{bazel_name}__lc_pkg_lite",
+        package = "{package}",
+        version = "{version}",
+        # direct dep references
+        deps = {ref_deps},
+        root_dir = "_lc/node_modules",
+        # output bins when src is not set
+        always_output_bins = True,
+        visibility = ["//visibility:public"],{maybe_indirect}{maybe_bins}
+    )
+
     # terminal pre-lifecycle node package for use in lifecycle build target below
     # (linked into lifecycle node_modules tree _lc/node_modules)
     _node_package(
@@ -137,7 +154,7 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
     )
 
     # runs lifecycle hooks on the package
-    lifecycle_target_name = "_lc/node_modules/.aspect_rules_js/%s/node_modules/{package}" % pnpm_utils.virtual_store_name("{package}", "{version}")
+    lifecycle_target_name = "_lc/node_modules/{virtual_store_root}/%s/node_modules/{package}" % pnpm_utils.virtual_store_name("{package}", "{version}")
 
     _run_js_binary(
         name = lifecycle_target_name,
@@ -171,15 +188,6 @@ _ALIAS_TMPL = """    native.alias(
         visibility = ["//visibility:public"],
     )
 """
-
-def _to_list_attr(list, tab):
-    if not list:
-        return "[]"
-    result = "["
-    for v in list:
-        result += "\n%s    \"%s\"," % (tab, v)
-    result += "\n%s]" % tab
-    return result
 
 def _impl(rctx):
     numeric_version = pnpm_utils.strip_peer_dep_version(rctx.attr.version)
@@ -234,7 +242,7 @@ def _impl(rctx):
                     # special case for lifecycle transitive closure deps; do not depend on
                     # the __lc_pkg of this package as that will be the output directory
                     # of the lifecycle action
-                    lc_deps.append("{namespace}{bazel_name}__ref".format(
+                    lc_deps.append("{namespace}{bazel_name}__lc_pkg_lite".format(
                         namespace = pnpm_utils.node_package_target_namespace,
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
                     ))
@@ -258,10 +266,16 @@ def _impl(rctx):
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
             ))
 
-    if rctx.attr.postinstall and rctx.attr.enable_lifecycle_hooks:
-        _inject_custom_postinstall(rctx, extract_dirname, rctx.attr.postinstall)
+    pkg_json_path = paths.join(extract_dirname, "package.json")
 
-    enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(rctx, extract_dirname)
+    if rctx.attr.postinstall and rctx.attr.enable_lifecycle_hooks:
+        _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.postinstall)
+
+    pkg_json = json.decode(rctx.read(pkg_json_path))
+
+    bins = _parse_bins(pkg_json)
+
+    enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(pkg_json)
 
     bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
@@ -275,6 +289,26 @@ def _impl(rctx):
 
     node_package_bzl_file = "node_package.bzl"
 
+    maybe_bins = """
+        bins = %s,""" % starlark_codegen_utils.to_dict_attr(bins, 2) if bins else ""
+    maybe_indirect = """
+        indirect = True,""" if rctx.attr.indirect else ""
+    maybe_node_package_src = """
+        src = \"%s\",""" % node_package_src if not transitive_closure_pattern else ""
+    maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
+        namespace = pnpm_utils.node_package_target_namespace,
+        extract_dirname = extract_dirname,
+        rctx_name = rctx.name,
+        bazel_name = bazel_name,
+        ref_deps = ref_deps,
+        virtual_store_root = pnpm_utils.virtual_store_root,
+        package = rctx.attr.package,
+        version = rctx.attr.version,
+        lc_deps = starlark_codegen_utils.to_list_attr(lc_deps, 2),
+        maybe_bins = maybe_bins,
+        maybe_indirect = maybe_indirect,
+    ) if enable_lifecycle_hooks else ""
+
     node_package_bzl = [_NODEJS_PACKAGE_TMPL.format(
         namespace = pnpm_utils.node_package_target_namespace,
         extract_dirname = extract_dirname,
@@ -284,24 +318,13 @@ def _impl(rctx):
         rctx_name = rctx.name,
         node_package_bzl = "@%s//:%s" % (rctx.name, node_package_bzl_file),
         bazel_name = bazel_name,
-        ref_deps = _to_list_attr(ref_deps, "        "),
-        deps = _to_list_attr(deps, "        "),
-        maybe_indirect = """
-        indirect = True,""" if rctx.attr.indirect else "",
+        ref_deps = starlark_codegen_utils.to_list_attr(ref_deps, 2),
+        deps = starlark_codegen_utils.to_list_attr(deps, 2),
         node_package_src = node_package_src,
-        maybe_node_package_src = """
-        src = \"%s\",""" % node_package_src if not transitive_closure_pattern else "",
-        maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
-            namespace = pnpm_utils.node_package_target_namespace,
-            extract_dirname = extract_dirname,
-            rctx_name = rctx.name,
-            bazel_name = bazel_name,
-            package = rctx.attr.package,
-            version = rctx.attr.version,
-            lc_deps = _to_list_attr(lc_deps, "        "),
-            maybe_indirect = """
-            indirect = True,""" if rctx.attr.indirect else "",
-        ) if enable_lifecycle_hooks else "",
+        maybe_bins = maybe_bins,
+        maybe_indirect = maybe_indirect,
+        maybe_node_package_src = maybe_node_package_src,
+        maybe_lifecycle_hooks = maybe_lifecycle_hooks,
     )]
 
     # Add an namespace if this is a direct dependency
@@ -393,13 +416,10 @@ npm_import = struct(
     attrs = _ATTRS,
 )
 
-def _inject_custom_postinstall(rctx, package_path, custom_postinstall):
-    pkg_json_path = package_path + _sep(rctx) + "package.json"
+def _inject_custom_postinstall(rctx, pkg_json_path, custom_postinstall):
     rctx.execute([yq_bin(rctx, rctx.attr.yq_repository), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
 
-def _has_lifecycle_hooks(rctx, package_path):
-    pkg_json_path = package_path + _sep(rctx) + "package.json"
-    pkg_json = json.decode(rctx.read(pkg_json_path))
+def _has_lifecycle_hooks(pkg_json):
     return "scripts" in pkg_json and (
         "preinstall" in pkg_json["scripts"] or
         "install" in pkg_json["scripts"] or
@@ -407,7 +427,5 @@ def _has_lifecycle_hooks(rctx, package_path):
         "_rules_js_postinstall" in pkg_json["scripts"]
     )
 
-def _sep(rctx):
-    if rctx.os.name == "Windows":
-        return "\\"
-    return "/"
+def _parse_bins(pkg_json):
+    return pkg_json.get("bin", {})
