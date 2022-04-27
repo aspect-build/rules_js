@@ -15,6 +15,7 @@
         "mobx-react": "^7.3.0",
         "mobx": "^6.1.0",
         "react": "^17",
-        "bufferutil": "4.0.1"
+        "bufferutil": "4.0.1",
+        "esbuild": "0.14.38"
     }
 }
