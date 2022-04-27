@@ -209,6 +209,10 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
   esac
 done
 
+# Put bazel managed node on the path
+PATH="$(dirname "$node"):$PATH"
+export PATH
+
 # ==============================================================================
 # Run the main program
 # ==============================================================================
