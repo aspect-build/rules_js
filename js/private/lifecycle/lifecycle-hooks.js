@@ -40,11 +40,30 @@ async function main(argv) {
         // it to exist, so create an empty folder if needed.
         await mkdirp(nodeModulesPath)
 
+        // export interface RunLifecycleHookOptions {
+        //     args?: string[];
+        //     depPath: string;
+        //     extraBinPaths?: string[];
+        //     extraEnv?: Record<string, string>;
+        //     initCwd?: string;
+        //     optional?: boolean;
+        //     pkgRoot: string;
+        //     rawConfig: object;
+        //     rootModulesDir: string;
+        //     scriptShell?: string;
+        //     silent?: boolean;
+        //     scriptsPrependNodePath?: boolean | 'warn-only';
+        //     shellEmulator?: boolean;
+        //     stdio?: string;
+        //     unsafePerm: boolean;
+        // }
         const opts = {
             pkgRoot: path.resolve(outputDir),
             rawConfig: {
                 stdio: 'inherit',
             },
+            silent: false,
+            stdio: 'inherit',
             rootModulesDir: nodeModulesPath,
             unsafePerm: true, // Don't run under a specific user/group
         }
@@ -52,6 +71,7 @@ async function main(argv) {
         // Runs preinstall, install, and postinstall hooks
         await runPostinstallHooks(opts)
 
+        // Run user specified postinstall hook
         if (packageJson.scripts?._rules_js_postinstall) {
             await runLifecycleHook('_rules_js_postinstall', packageJson, opts)
         }
@@ -87,5 +107,10 @@ async function copyRecursive(src, dest) {
 }
 
 ;(async () => {
-    await main(process.argv.slice(2))
+    try {
+        await main(process.argv.slice(2))
+    } catch (e) {
+        console.error(e)
+        process.exit(1)
+    }
 })()
