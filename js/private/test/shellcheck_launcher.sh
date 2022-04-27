@@ -172,7 +172,7 @@ if [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
     STDOUT_CAPTURE_IS_NOT_AN_OUTPUT=true
     STDOUT_CAPTURE=$(mktemp)
   fi
-  if [ -z "${STDOUT_CAPTURE:-}" ]; then
+  if [ -z "${STDERR_CAPTURE:-}" ]; then
     STDERR_CAPTURE_IS_NOT_AN_OUTPUT=true
     STDERR_CAPTURE=$(mktemp)
   fi
