@@ -1,0 +1,8 @@
+{
+    "name": "@mycorp/package-a",
+    "private": true,
+    "devDependencies": {
+        "rollup": "^2.70.2",
+        "@rollup/plugin-commonjs": "^21.1.0"
+    }
+}

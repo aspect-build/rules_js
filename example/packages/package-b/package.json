@@ -1,0 +1,9 @@
+{
+    "name": "@mycorp/package-b",
+    "private": true,
+    "devDependencies": {
+        "mobx-react": "^7.3.0",
+        "mobx": "^6.1.0",
+        "react": "^17"
+    }
+}
