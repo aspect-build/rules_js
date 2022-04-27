@@ -31,14 +31,7 @@ async function main(argv) {
         packageJson.scripts?._rules_js_postinstall
     ) {
         // node_modules folder that the node_package dependency targets which are in the same bazel package output
-        const nodeModulesPath = path.resolve(
-            path.join(outputDir, '..', '_lc', 'node_modules')
-        )
-
-        // If the package we're running postinstall on has no deps, then node_modules
-        // won't exist in the sandbox. The lifecycle functions provided by pnpm require
-        // it to exist, so create an empty folder if needed.
-        await mkdirp(nodeModulesPath)
+        const nodeModulesPath = path.resolve(path.join(outputDir, '..'))
 
         // export interface RunLifecycleHookOptions {
         //     args?: string[];
