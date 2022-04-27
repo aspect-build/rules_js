@@ -1,3 +1,4 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
@@ -479,4 +480,13 @@ js_test(
         package_dir("@aspect-test/c"),
     ],
     entry_point = "case12.js",
+)
+
+# gazelle:exclude npm_imports.bzl
+
+bzl_library(
+    name = "translate_pnpm_lock",
+    srcs = ["translate_pnpm_lock.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["@aspect_rules_js//js:npm_import"],
 )
