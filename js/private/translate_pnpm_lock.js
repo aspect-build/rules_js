@@ -19,7 +19,12 @@ function parsePnpmName(pnpmName) {
     return [name, version]
 }
 
-function gatherTransitiveClosure(packages, deps, transitiveClosure) {
+function gatherTransitiveClosure(
+    packages,
+    noOptional,
+    deps,
+    transitiveClosure
+) {
     if (!deps) {
         return
     }
@@ -32,9 +37,17 @@ function gatherTransitiveClosure(packages, deps, transitiveClosure) {
             continue
         }
         transitiveClosure[name].push(version)
+        const packageInfo = packages[pnpmName(name, version)]
+        const dependencies = noOptional
+            ? packageInfo.dependencies
+            : {
+                  ...packageInfo.dependencies,
+                  ...packageInfo.optionalDependencies,
+              }
         gatherTransitiveClosure(
             packages,
-            packages[pnpmName(name, version)].dependencies,
+            noOptional,
+            dependencies,
             transitiveClosure
         )
     }
@@ -73,15 +86,14 @@ async function main(argv) {
         process.exit(1)
     }
 
+    const prod = !!process.env.TRANSLATE_PACKAGE_LOCK_PROD
+    const dev = !!process.env.TRANSLATE_PACKAGE_LOCK_DEV
+    const noOptional = !!process.env.TRANSLATE_PACKAGE_LOCK_NO_OPTIONAL
+
     const lockDependencies = {
-        ...(!process.env.TRANSLATE_PACKAGE_LOCK_PROD && lockfile.devDependencies
-            ? lockfile.devDependencies
-            : {}),
-        ...(!process.env.TRANSLATE_PACKAGE_LOCK_DEV && lockfile.dependencies
-            ? lockfile.dependencies
-            : {}),
-        ...(!process.env.TRANSLATE_PACKAGE_LOCK_NO_OPTIONAL &&
-        lockfile.optionalDependencies
+        ...(!prod && lockfile.devDependencies ? lockfile.devDependencies : {}),
+        ...(!dev && lockfile.dependencies ? lockfile.dependencies : {}),
+        ...(!noOptional && lockfile.optionalDependencies
             ? lockfile.optionalDependencies
             : {}),
     }
@@ -114,11 +126,13 @@ async function main(argv) {
         const hasBin = !!packageSnapshot.hasBin
         const requiresBuild = !!packageSnapshot.requiresBuild
         const dependencies = packageSnapshot.dependencies || {}
+        const optionalDependencies = packageSnapshot.optionalDependencies || {}
         packages[package] = {
             name,
             pnpmVersion,
             integrity,
             dependencies,
+            optionalDependencies,
             dev,
             optional,
             hasBin,
@@ -130,9 +144,16 @@ async function main(argv) {
         const packageInfo = packages[package]
         const transitiveClosure = {}
         transitiveClosure[packageInfo.name] = [packageInfo.pnpmVersion]
+        const dependencies = noOptional
+            ? packageInfo.dependencies
+            : {
+                  ...packageInfo.dependencies,
+                  ...packageInfo.optionalDependencies,
+              }
         gatherTransitiveClosure(
             packages,
-            packageInfo.dependencies,
+            noOptional,
+            dependencies,
             transitiveClosure
         )
         packageInfo.transitiveClosure = transitiveClosure

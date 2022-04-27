@@ -137,8 +137,10 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
     )
 
     # runs lifecycle hooks on the package
+    lifecycle_target_name = "_lc/node_modules/.aspect_rules_js/%s/node_modules/{package}" % pnpm_utils.virtual_store_name("{package}", "{version}")
+
     _run_js_binary(
-        name = "{namespace}{bazel_name}__lifecycle",
+        name = lifecycle_target_name,
         srcs = [
             "@{rctx_name}//:{extract_dirname}",
             ":{namespace}{bazel_name}__lc"
@@ -148,6 +150,12 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
         copy_srcs_to_bin = False,
         tool = "@aspect_rules_js//js/private/lifecycle:lifecycle-hooks",
         output_dir = True,
+    )
+
+    native.alias(
+        name = "{namespace}{bazel_name}__lifecycle",
+        actual = lifecycle_target_name,
+        visibility = ["//visibility:public"],
     )
 """
 
@@ -222,10 +230,19 @@ def _impl(rctx):
         # party npm deps; it is not recommended for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
-                lc_deps.append("{namespace}{bazel_name}__lc_pkg".format(
-                    namespace = pnpm_utils.node_package_target_namespace,
-                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                ))
+                if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
+                    # special case for lifecycle transitive closure deps; do not depend on
+                    # the __lc_pkg of this package as that will be the output directory
+                    # of the lifecycle action
+                    lc_deps.append("{namespace}{bazel_name}__ref".format(
+                        namespace = pnpm_utils.node_package_target_namespace,
+                        bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                    ))
+                else:
+                    lc_deps.append("{namespace}{bazel_name}__lc_pkg".format(
+                        namespace = pnpm_utils.node_package_target_namespace,
+                        bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                    ))
                 deps.append("{namespace}{bazel_name}__pkg".format(
                     namespace = pnpm_utils.node_package_target_namespace,
                     bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
@@ -300,7 +317,8 @@ def _impl(rctx):
         """load("@aspect_rules_js//js:node_package.bzl", _node_package = "node_package")""",
     ]
     if enable_lifecycle_hooks:
-        node_package_bzl_header.append("""load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""")
+        node_package_bzl_header.append("""load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")
+load("@aspect_rules_js//js/private:pnpm_utils.bzl", "pnpm_utils")""")
 
     rctx.file(node_package_bzl_file, "\n".join(node_package_bzl_header + node_package_bzl))
 
