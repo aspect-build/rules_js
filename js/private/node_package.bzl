@@ -157,7 +157,7 @@ deps of node_package must be in the same package or in a parent package.""" % (c
             dep_virtual_store_name = pnpm_utils.virtual_store_name(dep_package, dep_version)
             dep_refs = dep[_NodePackageInfo].dep_refs
             if dep_package == ctx.attr.package and dep_version == ctx.attr.version:
-                # provide the node_modules director for this package found in the transitive_closure
+                # provide the node_modules directory for this package found in the transitive_closure
                 node_modules_directory = dep[_NodePackageInfo].node_modules_directory
             if dep_refs:
                 for dep_ref in dep_refs:
