@@ -473,7 +473,7 @@ js_test(
 #######################################
 # Test case 12
 # custom postinstall creates a file
-# See postinstall on @aspect-test/c in WORKSPACE
+# See postinstall on @aspect-test/c in example translate_pnpm_lock
 
 write_file(
     name = "write12",
@@ -624,4 +624,32 @@ uvu_test(
         "@example_npm_deps//uvu",
         package("@mycorp/mylib"),
     ],
+)
+
+#######################################
+# Test case 16
+# global custom postinstall creates a file
+# See global postinstall in example translate_pnpm_lock
+
+write_file(
+    name = "write16",
+    out = "case16.js",
+    content = ["""
+const fs = require('fs')
+const path = require('path')
+const content = fs.readFileSync(path.join(process.argv[2], 'global_cow.txt'), 'utf-8')
+if (content !== 'mooooo\\n') {
+    console.error("expected global postinstall file 'global_cow.txt' to contain cow sounds'")
+    process.exit(1);
+}
+"""],
+)
+
+js_test(
+    name = "test16",
+    args = ["$(rootpath %s)" % package_dir("@aspect-test/c")],
+    data = [
+        package_dir("@aspect-test/c"),
+    ],
+    entry_point = "case16.js",
 )

@@ -217,17 +217,19 @@ deps of link_node_package must be in the same package or in a parent package."""
             for dep_ref in dep_refs:
                 dep_ref_package = dep_ref[_LinkNodePackageInfo].package
                 dep_ref_version = dep_ref[_LinkNodePackageInfo].version
-                actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
-                dep_ref_virtual_store_directory = actual_dep[_LinkNodePackageInfo].virtual_store_directory
-                if dep_ref_virtual_store_directory:
-                    # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                    dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
-                    dep_symlink = ctx.actions.declare_file(dep_symlink_path)
-                    ctx.actions.symlink(
-                        output = dep_symlink,
-                        target_file = dep_ref_virtual_store_directory,
-                    )
-                    direct_files.append(dep_symlink)
+                pnpm_name = pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)
+                if pnpm_name in deps_map:
+                    actual_dep = deps_map[pnpm_name]
+                    dep_ref_virtual_store_directory = actual_dep[_LinkNodePackageInfo].virtual_store_directory
+                    if dep_ref_virtual_store_directory:
+                        # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                        dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
+                        dep_symlink = ctx.actions.declare_file(dep_symlink_path)
+                        ctx.actions.symlink(
+                            output = dep_symlink,
+                            target_file = dep_ref_virtual_store_directory,
+                        )
+                        direct_files.append(dep_symlink)
 
     direct_files = depset(direct = direct_files)
 

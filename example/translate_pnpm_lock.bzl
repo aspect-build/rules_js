@@ -18,5 +18,6 @@ def translate_pnpm_lock():
         postinstall = {
             "@aspect-test/c": "echo 'moo' > cow.txt",
             "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",
+            "*": "echo 'moooo' > global_cow.txt",
         },
     )

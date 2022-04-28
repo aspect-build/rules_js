@@ -122,9 +122,8 @@ _ATTRS = {
     "postinstall": attr.string_dict(
         doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
         to a string postinstall script to apply to the downloaded npm package after its existing postinstall script runs.
-        If the version is left out of the package name, the script will run on every version of the npm package. If
-        postinstall scripts exists for a package as well as for a specific version, the script for the versioned package
-        will be appended with `&&` to the non-versioned package script.""",
+        The wildcard entry "*" will apply the corresponding postinstall script globally to all packages. For packages
+        where several entries apply, the order of execution is package-version, package, global.""",
     ),
     "prod": attr.bool(
         doc = """If true, only install dependencies""",
@@ -307,11 +306,12 @@ def link_node_packages():
         patch_args = rctx.attr.patch_args.get(name, [])[:]
         patch_args.extend(rctx.attr.patch_args.get(friendly_name, []))
 
-        postinstall = rctx.attr.postinstall.get(name)
-        if not postinstall:
-            postinstall = rctx.attr.postinstall.get(friendly_name)
-        elif rctx.attr.postinstall.get(friendly_name):
-            postinstall = "%s && %s" % (postinstall, rctx.attr.postinstall.get(friendly_name))
+        package_postinstall = rctx.attr.postinstall.get(name)
+        package_version_postinstall = rctx.attr.postinstall.get(friendly_name)
+        global_postinstall = rctx.attr.postinstall.get("*")
+
+        all_postinstalls = [p for p in [package_postinstall, package_version_postinstall, global_postinstall] if p != None]
+        postinstall = " && ".join(all_postinstalls) if len(all_postinstalls) > 0 else None
 
         repo_name = "%s__%s" % (rctx.name, pnpm_utils.bazel_name(name, pnpm_version))
 
