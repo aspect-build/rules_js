@@ -46,8 +46,8 @@ bzl_library(
     deps = [
         ":pnpm_utils",
         ":starlark_codegen_utils",
-        ":yq",
         "@aspect_bazel_lib//lib:repo_utils",
+        "@aspect_bazel_lib_host//:defs",
     ],
 )
 
@@ -58,17 +58,10 @@ bzl_library(
     deps = [
         ":pnpm_utils",
         ":starlark_codegen_utils",
-        ":yq",
+        "@aspect_bazel_lib_host//:defs",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
     ],
-)
-
-bzl_library(
-    name = "yq",
-    srcs = ["yq.bzl"],
-    visibility = ["//js:__subpackages__"],
-    deps = ["@aspect_bazel_lib//lib:repo_utils"],
 )
 
 bzl_library(

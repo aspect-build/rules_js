@@ -1,11 +1,11 @@
 "Convert pnpm lock file into starlark Bazel fetches"
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os")
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_host")
+load("@aspect_bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":yq.bzl", "yq_bin")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
 
@@ -148,11 +148,17 @@ _ATTRS = {
         doc = """The basename for the node toolchain repository from @build_bazel_rules_nodejs.""",
         default = "nodejs",
     ),
-    "yq_repository": attr.string(
-        doc = """The basename for the yq toolchain repository from @aspect_bazel_lib.""",
-        default = "yq",
+    "yq": attr.label(
+        doc = """The label to the yq binary to use.""",
+        default = "@yq_{0}//:yq{1}".format(host.platform, host.exe_if_windows),
+    ),
+    "yq_path": attr.label(
+        doc = """The path to the yq binary to use. If set, this is used instead of the `yq` attribute""",
     ),
 }
+
+def _yq_path(rctx):
+    return rctx.path(rctx.attr.yq_path) if rctx.attr.yq_path else rctx.path(rctx.attr.yq)
 
 def _node_bin(rctx):
     # Parse the resolved host platform from yq host repo //:index.bzl
@@ -163,11 +169,11 @@ def _node_bin(rctx):
     host_platform = content[start_index:end_index]
 
     # Return the path to the node binary
-    return rctx.path(Label("@%s_%s//:bin/node%s" % (rctx.attr.node_repository, host_platform, ".exe" if is_windows_os(rctx) else "")))
+    return rctx.path(Label("@%s_%s//:bin/node%s" % (rctx.attr.node_repository, host_platform, ".exe" if is_windows_host(rctx) else "")))
 
 def _process_lockfile(rctx):
     json_lockfile_path = rctx.path("pnpm-lock.json")
-    result = rctx.execute([yq_bin(rctx, rctx.attr.yq_repository), "-o=json", ".", rctx.path(rctx.attr.pnpm_lock)])
+    result = rctx.execute([_yq_path(rctx), "-o=json", ".", rctx.path(rctx.attr.pnpm_lock)])
     if result.return_code != 0:
         fail("failed to convert pnpm lockfile to json: %s" % result.stderr)
     rctx.file(json_lockfile_path, result.stdout)

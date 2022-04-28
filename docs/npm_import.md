@@ -27,7 +27,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 
 <pre>
 npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-enable_lifecycle_hooks">enable_lifecycle_hooks</a>, <a href="#npm_import-indirect">indirect</a>, <a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-link_package_guard">link_package_guard</a>, <a href="#npm_import-package">package</a>,
-           <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>, <a href="#npm_import-postinstall">postinstall</a>, <a href="#npm_import-repo_mapping">repo_mapping</a>, <a href="#npm_import-transitive_closure">transitive_closure</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-yq_repository">yq_repository</a>)
+           <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>, <a href="#npm_import-postinstall">postinstall</a>, <a href="#npm_import-repo_mapping">repo_mapping</a>, <a href="#npm_import-transitive_closure">transitive_closure</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-yq">yq</a>, <a href="#npm_import-yq_path">yq_path</a>)
 </pre>
 
 Import a single npm package into Bazel.
@@ -116,7 +116,8 @@ common --experimental_downloader_config=.bazel_downloader_config
 | <a id="npm_import-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
 | <a id="npm_import-transitive_closure"></a>transitive_closure |  A dict all npm packages this one depends on directly or transitively where the key         is the package name and value is a list of version(s) depended on in the closure.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
 | <a id="npm_import-version"></a>version |  Version of the npm package, such as <code>8.4.0</code>   | String | required |  |
-| <a id="npm_import-yq_repository"></a>yq_repository |  The basename for the yq toolchain repository from @aspect_bazel_lib.   | String | optional | "yq" |
+| <a id="npm_import-yq"></a>yq |  The label to the yq binary to use.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | @yq_darwin_amd64//:yq |
+| <a id="npm_import-yq_path"></a>yq_path |  The path to the yq binary to use. If set, this is used instead of the <code>yq</code> attribute   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | None |
 
 
 <a id="#translate_pnpm_lock"></a>
@@ -126,7 +127,7 @@ common --experimental_downloader_config=.bazel_downloader_config
 <pre>
 translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-enable_lifecycle_hooks">enable_lifecycle_hooks</a>, <a href="#translate_pnpm_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>,
                     <a href="#translate_pnpm_lock-node_repository">node_repository</a>, <a href="#translate_pnpm_lock-package">package</a>, <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-postinstall">postinstall</a>, <a href="#translate_pnpm_lock-prod">prod</a>,
-                    <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-yq_repository">yq_repository</a>)
+                    <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-yq">yq</a>, <a href="#translate_pnpm_lock-yq_path">yq_path</a>)
 </pre>
 
 Repository rule to generate npm_import rules from pnpm lock file.
@@ -237,6 +238,7 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 | <a id="translate_pnpm_lock-postinstall"></a>postinstall |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a string postinstall script to apply to the downloaded npm package after its existing postinstall script runs.         If the version is left out of the package name, the script will run on every version of the npm package. If         postinstall scripts exists for a package as well as for a specific version, the script for the versioned package         will be appended with <code>&&</code> to the non-versioned package script.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | <a id="translate_pnpm_lock-prod"></a>prod |  If true, only install dependencies   | Boolean | optional | False |
 | <a id="translate_pnpm_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
-| <a id="translate_pnpm_lock-yq_repository"></a>yq_repository |  The basename for the yq toolchain repository from @aspect_bazel_lib.   | String | optional | "yq" |
+| <a id="translate_pnpm_lock-yq"></a>yq |  The label to the yq binary to use.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | @yq_darwin_amd64//:yq |
+| <a id="translate_pnpm_lock-yq_path"></a>yq_path |  The path to the yq binary to use. If set, this is used instead of the <code>yq</code> attribute   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | None |
 
 

@@ -1,10 +1,10 @@
 "Repository rules for importing packages from npm"
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os", "patch")
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_host", "patch")
+load("@aspect_bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":yq.bzl", "yq_bin")
 
 _DOC = """Import a single npm package into Bazel.
 
@@ -205,7 +205,7 @@ def _impl(rctx):
     )
 
     extract_dirname = "package"
-    mkdir_args = ["mkdir", "-p", extract_dirname] if not is_windows_os(rctx) else ["cmd", "/c", "if not exist {extract_dirname} (mkdir {extract_dirname})".format(extract_dirname = extract_dirname.replace("/", "\\"))]
+    mkdir_args = ["mkdir", "-p", extract_dirname] if not is_windows_host(rctx) else ["cmd", "/c", "if not exist {extract_dirname} (mkdir {extract_dirname})".format(extract_dirname = extract_dirname.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
         msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (extract_dirname, result.stdout, result.stderr)
@@ -404,9 +404,12 @@ _ATTRS = {
         doc = """If true, runs lifecycle hooks declared in this package and the custom postinstall script if one exists.""",
         default = True,
     ),
-    "yq_repository": attr.string(
-        doc = """The basename for the yq toolchain repository from @aspect_bazel_lib.""",
-        default = "yq",
+    "yq": attr.label(
+        doc = """The label to the yq binary to use.""",
+        default = "@yq_{0}//:yq{1}".format(host.platform, host.exe_if_windows),
+    ),
+    "yq_path": attr.label(
+        doc = """The path to the yq binary to use. If set, this is used instead of the `yq` attribute""",
     ),
 }
 
@@ -416,8 +419,11 @@ npm_import = struct(
     attrs = _ATTRS,
 )
 
+def _yq_path(rctx):
+    return rctx.path(rctx.attr.yq_path) if rctx.attr.yq_path else rctx.path(rctx.attr.yq)
+
 def _inject_custom_postinstall(rctx, pkg_json_path, custom_postinstall):
-    rctx.execute([yq_bin(rctx, rctx.attr.yq_repository), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
+    rctx.execute([_yq_path(rctx), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
 
 def _has_lifecycle_hooks(pkg_json):
     return "scripts" in pkg_json and (
