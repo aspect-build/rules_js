@@ -1,5 +1,5 @@
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@example_npm_deps//:node_modules.bzl", "node_modules")
@@ -8,6 +8,9 @@ load("@example_npm_deps__acorn-8.4.0//:node_package.bzl", node_package_acorn = "
 load("//js:defs.bzl", "js_binary", "js_test")
 load("//js:node_package.bzl", "node_package")
 load("//js:run_js_binary.bzl", "run_js_binary")
+
+# gazelle:exclude npm_imports.bzl
+# gazelle:exclude translate_pnpm_lock.bzl
 
 ###########################
 
@@ -482,11 +485,39 @@ js_test(
     entry_point = "case12.js",
 )
 
-# gazelle:exclude npm_imports.bzl
+####################################################
+# Test case 13
+# Show that a js_binary can use a DirectoryPathInfo entry point
 
-bzl_library(
-    name = "translate_pnpm_lock",
-    srcs = ["translate_pnpm_lock.bzl"],
-    visibility = ["//visibility:public"],
-    deps = ["@aspect_rules_js//js:npm_import"],
+directory_path(
+    name = "acorn_entry_point",
+    directory = package_dir("acorn"),
+    path = "bin/acorn",
+)
+
+js_binary(
+    name = "acorn_bin",
+    args = ["--help"],
+    entry_point = ":acorn_entry_point",
+)
+
+run_js_binary(
+    name = "run13",
+    args = ["--help"],
+    stdout = "actual13",
+    tool = ":acorn_bin",
+)
+
+write_file(
+    name = "expected13",
+    out = "expected13.txt",
+    content = ["""usage: acorn [--ecma3|--ecma5|--ecma6|--ecma7|--ecma8|--ecma9|...|--ecma2015|--ecma2016|--ecma2017|--ecma2018|...]
+        [--tokenize] [--locations] [---allow-hash-bang] [--allow-await-outside-function] [--compact] [--silent] [--module] [--help] [--] [infile]
+"""],
+)
+
+diff_test(
+    name = "test13",
+    file1 = ":expected13",
+    file2 = ":actual13",
 )

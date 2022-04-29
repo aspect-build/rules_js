@@ -147,6 +147,8 @@ def _impl(ctx):
         direct_files.append(virtual_store_out)
 
         if not ctx.attr.indirect:
+            node_modules_directory = virtual_store_out
+
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
@@ -158,7 +160,6 @@ def _impl(ctx):
                 target_file = virtual_store_out,
             )
             direct_files.append(root_symlink)
-            node_modules_directory = root_symlink
 
         for dep in ctx.attr.deps:
             # symlink the package's direct deps to its virtual store location
