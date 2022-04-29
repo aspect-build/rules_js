@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@nodejs_host//:index.bzl", "host_platform")
+load("@aspect_bazel_lib_host//:defs.bzl", "host")
 load("//js:defs.bzl", "js_binary")
 
 ####################################################################################################
@@ -21,7 +21,7 @@ genrule(
     name = "shell_launcher_sed",
     srcs = [":shellcheck_launcher"],
     outs = ["shellcheck_launcher_sed.sh"],
-    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#%s#linux_amd64#\" > $@" % host_platform,
+    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#%s#linux_amd64#\" > $@" % host.platform,
 )
 
 write_source_files(
