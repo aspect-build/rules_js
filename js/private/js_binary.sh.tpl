@@ -119,12 +119,12 @@ export RUNFILES
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     # We in runfiles
     node="$PWD/{node}"
-    entry_point="$PWD/{entry_point}"
+    entry_point="$PWD/{entry_point_path}"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
     node="$RUNFILES/{workspace_name}/{node}"
-    entry_point="$RUNFILES/{workspace_name}/{entry_point}"
+    entry_point="$RUNFILES/{workspace_name}/{entry_point_path}"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
         printf "\nERROR: %s: BAZEL_BINDIR must be set in environment when not running out of runfiles so js_binary can run out of the output tree on build actions\n" "$LOG_PREFIX" >&2
         exit 1

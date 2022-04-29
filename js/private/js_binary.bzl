@@ -11,6 +11,7 @@ load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
+load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -78,10 +79,16 @@ _ATTRS = {
         """,
     ),
     "entry_point": attr.label(
-        allow_single_file = True,
-        doc = """The main script which is evaluated by node.js
+        allow_files = True,
+        doc = """The main script which is evaluated by node.js.
 
         This is the module referenced by the `require.main` property in the runtime.
+
+        This must be a target that provides a single file or a `DirectoryPathInfo`
+        from `@aspect_bazel_lib//lib::directory_path.bzl`.
+        
+        See https://github.com/aspect-build/bazel-lib/blob/main/docs/directory_path.md
+        for more info on creating a target that provides a `DirectoryPathInfo`.
         """,
         mandatory = True,
     ),
@@ -136,7 +143,7 @@ _NODE_OPTION = """NODE_OPTIONS+=(\"{value}\")"""
 def _target_tool_short_path(path):
     return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
-def _bash_launcher(ctx, entry_point, args):
+def _bash_launcher(ctx, entry_point_path, args):
     bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
@@ -163,7 +170,7 @@ def _bash_launcher(ctx, entry_point, args):
         "{bash}": bash_bin,
         "{rlocation_function}": BASH_RLOCATION_FUNCTION,
         "{node}": _target_tool_short_path(node_bin.target_tool_path),
-        "{entry_point}": entry_point.short_path,
+        "{entry_point_path}": entry_point_path,
         "{workspace_name}": ctx.workspace_name,
         "{args}": " ".join(args),
         "{env}": "\n".join(envs),
@@ -184,12 +191,24 @@ def _create_launcher(ctx):
     if ctx.attr.is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")
 
-    # Copy entry and data files that are not already in the output tree to the output tree.
-    # See docstring at the top of this file for more info.
-    output_entry_point = copy_file_to_bin_action(ctx, ctx.file.entry_point, is_windows = ctx.attr.is_windows)
+    if DirectoryPathInfo in ctx.attr.entry_point:
+        output_entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
+        entry_point_path = "/".join([
+            ctx.attr.entry_point[DirectoryPathInfo].directory.short_path,
+            ctx.attr.entry_point[DirectoryPathInfo].path,
+        ])
+    else:
+        if len(ctx.files.entry_point) != 1:
+            fail("entry_point must be a single file or a target that provides a DirectoryPathInfo")
+
+        # Copy entry and data files that are not already in the output tree to the output tree.
+        # See docstring at the top of this file for more info.
+        output_entry_point = copy_file_to_bin_action(ctx, ctx.files.entry_point[0], is_windows = ctx.attr.is_windows)
+        entry_point_path = output_entry_point.short_path
+
     output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = ctx.attr.is_windows)
 
-    bash_launcher = _bash_launcher(ctx, output_entry_point, ctx.attr.args)
+    bash_launcher = _bash_launcher(ctx, entry_point_path, ctx.attr.args)
     launcher = create_windows_native_launcher_script(ctx, ctx.outputs.launcher_sh) if ctx.attr.is_windows else bash_launcher
 
     all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files

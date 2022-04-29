@@ -20,6 +20,7 @@ bzl_library(
     visibility = ["//:__subpackages__"],
     deps = [
         "@aspect_bazel_lib//lib:copy_to_bin",
+        "@aspect_bazel_lib//lib:directory_path",
         "@aspect_bazel_lib//lib:expand_make_vars",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
