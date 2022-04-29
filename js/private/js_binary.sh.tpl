@@ -2,14 +2,19 @@
 
 # shellcheck disable=SC1090
 {
-{rlocation_function}
+{{rlocation_function}}
 }
 
 set -o pipefail -o errexit -o nounset
 
-{env}
+{{envs}}
 
-LOG_PREFIX="aspect_rules_js[js_binary]"
+# https://docs.bazel.build/versions/main/test-encyclopedia.html#initial-conditions
+if [ "${TEST_TARGET:-}" ]; then
+    LOG_PREFIX="aspect_rules_js[js_test]"
+else
+    LOG_PREFIX="aspect_rules_js[js_binary]"
+fi
 
 # ==============================================================================
 # Initialize RUNFILES environment variable
@@ -118,13 +123,13 @@ export RUNFILES
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     # We in runfiles
-    node="$PWD/{node}"
-    entry_point="$PWD/{entry_point_path}"
+    node="$PWD/{{node}}"
+    entry_point="$PWD/{{entry_point_path}}"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
-    node="$RUNFILES/{workspace_name}/{node}"
-    entry_point="$RUNFILES/{workspace_name}/{entry_point_path}"
+    node="$RUNFILES/{{workspace_name}}/{{node}}"
+    entry_point="$RUNFILES/{{workspace_name}}/{{entry_point_path}}"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
         printf "\nERROR: %s: BAZEL_BINDIR must be set in environment when not running out of runfiles so js_binary can run out of the output tree on build actions\n" "$LOG_PREFIX" >&2
         exit 1
@@ -196,7 +201,7 @@ _exit() {
 }
 
 NODE_OPTIONS=()
-{node_options}
+{{node_options}}
 
 ARGS=()
 ALL_ARGS=("$@")

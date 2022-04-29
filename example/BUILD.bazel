@@ -374,9 +374,21 @@ js_test(
     entry_point = "case10.js",
     env = {
         "FOO": "BAR",
-        "JS_BINARY__EXPECTED_EXIT_CODE": "42",
-        "JS_BINARY__VERBOSE": "1",
     },
+    expected_exit_code = 42,
+    verbose = True,
+)
+
+# bazel run //example:test10_binary
+js_binary(
+    name = "test10_binary",
+    args = ["dummy"],
+    entry_point = "case10.js",
+    env = {
+        "FOO": "BAR",
+    },
+    expected_exit_code = 42,
+    verbose = True,
 )
 
 run_js_binary(

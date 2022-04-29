@@ -125,6 +125,9 @@ _ATTRS = {
         Can be used to write tests that are expected to fail.""",
         default = 0,
     ),
+    "verbose": attr.bool(
+        doc = """Produce verbose output.""",
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -159,6 +162,16 @@ def _bash_launcher(ctx, entry_point_path, args):
             var = "JS_BINARY__CHDIR",
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
         ))
+    if ctx.attr.expected_exit_code:
+        envs.append(_ENV_SET.format(
+            var = "JS_BINARY__EXPECTED_EXIT_CODE",
+            value = str(ctx.attr.expected_exit_code),
+        ))
+    if ctx.attr.verbose:
+        envs.append(_ENV_SET.format(
+            var = "JS_BINARY__VERBOSE",
+            value = "1",
+        ))
 
     node_options = []
     for node_option in ctx.attr.node_options:
@@ -167,15 +180,12 @@ def _bash_launcher(ctx, entry_point_path, args):
         ))
 
     launcher_subst = {
-        "{bash}": bash_bin,
-        "{rlocation_function}": BASH_RLOCATION_FUNCTION,
-        "{node}": _target_tool_short_path(node_bin.target_tool_path),
-        "{entry_point_path}": entry_point_path,
-        "{workspace_name}": ctx.workspace_name,
-        "{args}": " ".join(args),
-        "{env}": "\n".join(envs),
-        "{node_options}": "\n".join(node_options),
-        "{expected_exit_code}": str(ctx.attr.expected_exit_code),
+        "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
+        "{{node}}": _target_tool_short_path(node_bin.target_tool_path),
+        "{{entry_point_path}}": entry_point_path,
+        "{{workspace_name}}": ctx.workspace_name,
+        "{{envs}}": "\n".join(envs),
+        "{{node_options}}": "\n".join(node_options),
     }
 
     ctx.actions.expand_template(
