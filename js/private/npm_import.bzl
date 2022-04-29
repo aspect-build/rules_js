@@ -14,7 +14,7 @@ def link_js_package():
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
         fail("The link_js_package() macro loaded from {link_js_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 
-    # reference node package used to avoid circular deps
+    # reference target used to avoid circular deps
     _link_js_package(
         name = "{namespace}{bazel_name}__ref",
         package = "{package}",
@@ -23,19 +23,17 @@ def link_js_package():
     )
 
     {maybe_lifecycle_hooks}
-    # post-lifecycle node package with reference deps for use in terminal node package with
-    # transitive closure
+    # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _link_js_package(
         name = "{namespace}{bazel_name}__pkg",
-        src = "{js_package_src}",
+        src = "{pkg_src_target}",
         package = "{package}",
         version = "{version}",
         # direct dep references
-        deps = {ref_deps},
-        visibility = ["//visibility:public"],{maybe_indirect}
+        deps = {ref_deps},{maybe_indirect}
     )
 
-    # terminal node package with transitive closure of node package dependencies
+    # terminal target with transitive closure of all node package dependencies
     _link_js_package(
         name = "{namespace}{bazel_name}",{maybe_js_package_src}
         package = "{package}",
@@ -47,40 +45,35 @@ def link_js_package():
 """
 
 _RUN_LIFECYCLE_HOOKS_TMPL = """
-    # post-lifecycle node package with reference deps for use in terminal node package with
-    # transitive closure
+    # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
     _link_js_package(
         name = "{namespace}{bazel_name}__pkg_lite",
         package = "{package}",
         version = "{version}",
         # direct dep references
         deps = {ref_deps},
-        visibility = ["//visibility:public"],{maybe_indirect}
+        indirect = True,
     )
 
-    # terminal pre-lifecycle node package for use in lifecycle build target below
+    # terminal pre-lifecycle target for use in lifecycle build target below
     _link_js_package(
-        name = "{namespace}{bazel_name}__lc",
+        name = "{namespace}{bazel_name}__pkg_lc",
         package = "{package}",
         version = "{version}",
         # transitive closure of {namespace}*__pkg deps with a carve out for {namespace}{bazel_name}__pkg_lite
-        deps = {lc_deps},
-        visibility = ["//visibility:public"],{maybe_indirect}
+        deps = {lc_deps},{maybe_indirect}
     )
 
-    # runs lifecycle hooks on the package
-    lifecycle_target_name = "node_modules/{virtual_store_root}/%s/node_modules/{package}" % _pnpm_utils.virtual_store_name("{package}", "{version}")
-
     _run_js_binary(
-        name = lifecycle_target_name,
+        name = "{lifecycle_target_name}",
         srcs = [
-            "@{rctx_name}_sources//:{extract_to_dirname}",
-            ":{namespace}{bazel_name}__lc"
+            "{js_package_target}",
+            ":{namespace}{bazel_name}__pkg_lc"
         ],
         # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
         args = [
             "{package}",
-            "../../../$(execpath @{rctx_name}_sources//:{extract_to_dirname})",
+            "../../../$(execpath {js_package_target})",
             "../../../$(@D)",
         ],
         copy_srcs_to_bin = False,
@@ -88,10 +81,12 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
         output_dir = True,
     )
 
-    native.alias(
-        name = "{namespace}{bazel_name}__lifecycle",
-        actual = lifecycle_target_name,
-        visibility = ["//visibility:public"],
+    # post-lifecycle js_package
+    _js_package(
+        name = "{namespace}{bazel_name}__jsp",
+        src = ":{lifecycle_target_name}",
+        package = "{package}",
+        version = "{version}",
     )
 """
 
@@ -148,6 +143,16 @@ def {bin_name}_binary(name, **kwargs):
         entry_point = ":%s__entry_point" % name,
         **kwargs
     )
+"""
+
+_JS_PACKAGE_TMPL = """
+_js_package(
+    name = "jsp",
+    src = ":{extract_to_dirname}",
+    package = "{package}",
+    version = "{version}",
+    visibility = ["//visibility:public"],
+)
 """
 
 _TARBALL_FILENAME = "package.tgz"
@@ -226,7 +231,20 @@ def _impl_sources(rctx):
     # Apply patches to the extracted package
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
 
-    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_EXTRACT_TO_DIRNAME] + ([bin_bzl_file] if bin_bzl_file else [])))
+    build_file = generated_by_lines + [
+        """load("@aspect_rules_js//js:defs.bzl", _js_package = "js_package")""",
+    ]
+
+    build_file.append(_JS_PACKAGE_TMPL.format(
+        extract_to_dirname = _EXTRACT_TO_DIRNAME,
+        package = rctx.attr.package,
+        version = rctx.attr.version,
+    ))
+
+    if bin_bzl_file:
+        build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr([bin_bzl_file]))
+
+    rctx.file("BUILD.bazel", "\n".join(build_file))
 
 def _impl(rctx):
     ref_deps = []
@@ -276,18 +294,22 @@ def _impl(rctx):
 
     bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
-    if rctx.attr.lifecycle_build_target:
-        js_package_src = ":{namespace}{bazel_name}__lifecycle".format(
-            namespace = pnpm_utils.js_package_target_namespace,
-            bazel_name = bazel_name,
-        )
-    else:
-        js_package_src = "@{}_sources//:{}".format(rctx.name, _EXTRACT_TO_DIRNAME)
+    virtual_store_name = pnpm_utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+
+    # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+    lifecycle_target_name = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
+
+    js_package_target = "@{}_sources//:jsp".format(rctx.name)
+
+    pkg_src_target = "{namespace}{bazel_name}__jsp".format(
+        namespace = pnpm_utils.js_package_target_namespace,
+        bazel_name = bazel_name,
+    ) if rctx.attr.lifecycle_build_target else js_package_target
 
     maybe_indirect = """
         indirect = True,""" if rctx.attr.indirect else ""
     maybe_js_package_src = """
-        src = \"%s\",""" % js_package_src if not transitive_closure_pattern else ""
+        src = \"%s\",""" % js_package_target if not transitive_closure_pattern else ""
     maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
         namespace = pnpm_utils.js_package_target_namespace,
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
@@ -298,6 +320,8 @@ def _impl(rctx):
         package = rctx.attr.package,
         version = rctx.attr.version,
         lc_deps = starlark_codegen_utils.to_list_attr(lc_deps, 2),
+        js_package_target = js_package_target,
+        lifecycle_target_name = lifecycle_target_name,
         maybe_indirect = maybe_indirect,
     ) if rctx.attr.lifecycle_build_target else ""
 
@@ -312,7 +336,7 @@ def _impl(rctx):
         bazel_name = bazel_name,
         ref_deps = starlark_codegen_utils.to_list_attr(ref_deps, 2),
         deps = starlark_codegen_utils.to_list_attr(deps, 2),
-        js_package_src = js_package_src,
+        pkg_src_target = pkg_src_target,
         maybe_indirect = maybe_indirect,
         maybe_js_package_src = maybe_js_package_src,
         maybe_lifecycle_hooks = maybe_lifecycle_hooks,
@@ -329,11 +353,12 @@ def _impl(rctx):
         ))
 
     link_js_package_bzl_header = generated_by_lines + [
-        """load("@aspect_rules_js//js:%s", _link_js_package = "link_js_package")""" % _LINK_JS_PACKAGE_BZL_FILENAME,
+        """load("@aspect_rules_js//js/private:link_js_package_internal.bzl", _link_js_package = "link_js_package_internal")""",
     ]
     if rctx.attr.lifecycle_build_target:
         link_js_package_bzl_header.extend([
             """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
+            """load("@aspect_rules_js//js:defs.bzl", _js_package = "js_package")""",
             """load("@aspect_rules_js//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")""",
         ])
 

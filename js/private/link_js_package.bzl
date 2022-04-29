@@ -4,6 +4,7 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":pnpm_utils.bzl", "pnpm_utils")
+load(":js_package.bzl", "JsPackageInfo")
 
 _LinkJsPackageInfo = provider(
     doc = "Internal use only",
@@ -14,17 +15,29 @@ _LinkJsPackageInfo = provider(
         "version": "version of this node package",
         "dep_refs": "list of dependency ref targets",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
-        "linked_js_package_dir": "the symlink of this package at the root of the node_modules if this is a direct npm dependency",
     },
 )
 
+_DOC = """Defines a node package that is linked into a node_modules tree.
+
+The term "package" is defined at
+<https://nodejs.org/docs/latest-v16.x/api/packages.html>
+
+The node package is linked with a pnpm style symlinked node_modules output tree.
+
+See https://pnpm.io/symlinked-node-modules-structure for more information on
+the symlinked node_modules structure.
+Npm may also support a symlinked node_modules structure called
+"Isolated mode" in the future:
+https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
+"""
+
 _ATTRS = {
     "src": attr.label(
-        allow_single_file = True,
-        doc = """A source directory or TreeArtifact containing the package files.
-
-Can be left unspecified to allow for circular deps between `link_js_package`s.        
-""",
+        doc = """A js_package target or or any other target that provides a JsPackageInfo.
+        """,
+        providers = [JsPackageInfo],
+        mandatory = True,
     ),
     "deps": attr.label_list(
         doc = """Other node packages this one depends on.
@@ -44,22 +57,8 @@ Can be left unspecified to allow for circular deps between `link_js_package`s.
         """,
         providers = [_LinkJsPackageInfo],
     ),
-    "package": attr.string(
-        # TODO: validate that name matches in an action if src is set
-        doc = "Must match the `name` field in the `package.json` file for this package.",
-        mandatory = True,
-    ),
-    "version": attr.string(
-        # TODO: validate that version matches in an action if src is set
-        doc = "Must match the `version` field in the `package.json` file for this package.",
-        default = "0.0.0",
-    ),
     "indirect": attr.bool(
         doc = "If True, this is an indirect link_js_package which will not linked at the top-level of node_modules",
-    ),
-    "root_dir": attr.string(
-        doc = "For internal use only",
-        default = "node_modules",
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
@@ -67,45 +66,52 @@ Can be left unspecified to allow for circular deps between `link_js_package`s.
 def _impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
-    if ctx.file.src and not ctx.file.src.is_source and not ctx.file.src.is_directory:
-        fail("src must a source directory or TreeArtifact if set")
-    if not ctx.attr.package:
-        fail("package attr must not be empty")
-    if not ctx.attr.version:
-        fail("version attr must not be empty")
+    if ctx.attr.src:
+        package = ctx.attr.src[JsPackageInfo].package
+        version = ctx.attr.src[JsPackageInfo].version
+        if hasattr(ctx.attr, "package") and ctx.attr.package and ctx.attr.package != package:
+            fail("package must match JsPackageInfo of src if both are specified")
+        if hasattr(ctx.attr, "version") and ctx.attr.version and ctx.attr.version != version:
+            fail("version must match JsPackageInfo of src if both are specified")
+    else:
+        if not ctx.attr.package:
+            fail("package attr must be set if src is not set")
+        if not ctx.attr.version:
+            fail("version attr must not be empty if src is not set")
+        package = ctx.attr.package
+        version = ctx.attr.version
 
-    virtual_store_name = pnpm_utils.virtual_store_name(ctx.attr.package, ctx.attr.version)
+    virtual_store_name = pnpm_utils.virtual_store_name(package, version)
 
-    virtual_store_out = None
-    linked_js_package_dir = None
+    virtual_store_directory = None
     direct_files = []
     direct_dep_refs = []
 
-    if ctx.file.src:
-        # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-        virtual_store_out_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ctx.attr.package)
-        if ctx.file.src.short_path == paths.join(ctx.label.package, virtual_store_out_path):
+    if ctx.attr.src:
+        # output the package as a TreeArtifact to its virtual store location
+        # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+        virtual_store_directory_path = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", package)
+
+        src_directory = ctx.attr.src[JsPackageInfo].directory
+        if src_directory.short_path == paths.join(ctx.label.package, virtual_store_directory_path):
             # the input is already the desired output; this is the pattern for
             # packages with lifecycle hooks
-            virtual_store_out = ctx.file.src
+            virtual_store_directory = src_directory
         else:
-            # output the package as a TreeArtifact to its virtual store location
-            virtual_store_out = ctx.actions.declare_directory(virtual_store_out_path)
-            copy_directory_action(ctx, ctx.file.src, virtual_store_out, is_windows = is_windows)
-            direct_files.append(virtual_store_out)
+            virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
+            copy_directory_action(ctx, src_directory, virtual_store_directory, is_windows = is_windows)
+        direct_files.append(virtual_store_directory)
 
         if not ctx.attr.indirect:
-            linked_js_package_dir = virtual_store_out
-
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
             root_symlink = ctx.actions.declare_file(
-                # "{root_dir}/{package}"
-                paths.join(ctx.attr.root_dir, ctx.attr.package),
+                # "node_modules/{package}"
+                paths.join("node_modules", package),
             )
             ctx.actions.symlink(
                 output = root_symlink,
-                target_file = virtual_store_out,
+                target_file = virtual_store_directory,
             )
             direct_files.append(root_symlink)
 
@@ -121,8 +127,8 @@ deps of link_js_package must be in the same package or in a parent package.""" %
             dep_version = dep[_LinkJsPackageInfo].version
             dep_virtual_store_directory = dep[_LinkJsPackageInfo].virtual_store_directory
             if dep_virtual_store_directory:
-                # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
+                # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                dep_symlink_path = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
                 dep_symlink = ctx.actions.declare_file(dep_symlink_path)
                 ctx.actions.symlink(
                     output = dep_symlink,
@@ -157,17 +163,19 @@ deps of link_js_package must be in the same package or in a parent package.""" %
             dep_version = dep[_LinkJsPackageInfo].version
             dep_virtual_store_name = pnpm_utils.virtual_store_name(dep_package, dep_version)
             dep_refs = dep[_LinkJsPackageInfo].dep_refs
-            if dep_package == ctx.attr.package and dep_version == ctx.attr.version:
-                # provide the node_modules directory for this package found in the transitive_closure
-                linked_js_package_dir = dep[_LinkJsPackageInfo].linked_js_package_dir
+            if dep_package == package and dep_version == version:
+                # provide the node_modules directory for this package if found in the transitive_closure
+                virtual_store_directory = dep[_LinkJsPackageInfo].virtual_store_directory
+                if virtual_store_directory:
+                    direct_files.append(virtual_store_directory)
             for dep_ref in dep_refs:
                 dep_ref_package = dep_ref[_LinkJsPackageInfo].package
                 dep_ref_version = dep_ref[_LinkJsPackageInfo].version
                 actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
                 dep_ref_virtual_store_directory = actual_dep[_LinkJsPackageInfo].virtual_store_directory
                 if dep_ref_virtual_store_directory:
-                    # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                    dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
+                    # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                    dep_symlink_path = paths.join("node_modules", pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
                     dep_symlink = ctx.actions.declare_file(dep_symlink_path)
                     ctx.actions.symlink(
                         output = dep_symlink,
@@ -176,7 +184,6 @@ deps of link_js_package must be in the same package or in a parent package.""" %
                     direct_files.append(dep_symlink)
 
     direct_files = depset(direct = direct_files)
-
     files_depsets = [direct_files]
     runfiles = ctx.runfiles(transitive_files = direct_files)
     for dep in ctx.attr.deps:
@@ -194,30 +201,30 @@ deps of link_js_package must be in the same package or in a parent package.""" %
         _LinkJsPackageInfo(
             label = ctx.label,
             link_package = ctx.label.package,
-            package = ctx.attr.package,
-            version = ctx.attr.version,
+            package = package,
+            version = version,
             dep_refs = direct_dep_refs,
-            linked_js_package_dir = linked_js_package_dir,
-            virtual_store_directory = virtual_store_out,
+            virtual_store_directory = virtual_store_directory,
         ),
     ]
-    if linked_js_package_dir:
+    if not ctx.attr.indirect and virtual_store_directory:
         # Provide a "linked_js_package_dir" output group for use in $(execpath) and $(rootpath)
+        # if this is a direct dependency
         result.append(OutputGroupInfo(
-            linked_js_package_dir = depset([linked_js_package_dir]),
+            linked_js_package_dir = depset([virtual_store_directory]),
         ))
 
     return result
 
 link_js_package_lib = struct(
     attrs = _ATTRS,
-    impl = _impl,
+    implementation = _impl,
     provides = [DefaultInfo, DeclarationInfo, _LinkJsPackageInfo],
 )
 
-# For stardoc to generate documentation for the rule rather than a wrapper macro
 link_js_package = rule(
-    implementation = link_js_package_lib.impl,
+    doc = _DOC,
+    implementation = link_js_package_lib.implementation,
     attrs = link_js_package_lib.attrs,
     provides = link_js_package_lib.provides,
 )

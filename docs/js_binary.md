@@ -83,12 +83,12 @@ Identical to js_binary, but usable under `bazel test`.
 | <a id="js_test-verbose"></a>verbose |  Produce verbose output.   | Boolean | optional | False |
 
 
-<a id="#js_binary_lib.js_binary_impl"></a>
+<a id="#js_binary_lib.implementation"></a>
 
-## js_binary_lib.js_binary_impl
+## js_binary_lib.implementation
 
 <pre>
-js_binary_lib.js_binary_impl(<a href="#js_binary_lib.js_binary_impl-ctx">ctx</a>)
+js_binary_lib.implementation(<a href="#js_binary_lib.implementation-ctx">ctx</a>)
 </pre>
 
 
@@ -98,6 +98,6 @@ js_binary_lib.js_binary_impl(<a href="#js_binary_lib.js_binary_impl-ctx">ctx</a>
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="js_binary_lib.js_binary_impl-ctx"></a>ctx |  <p align="center"> - </p>   |  none |
+| <a id="js_binary_lib.implementation-ctx"></a>ctx |  <p align="center"> - </p>   |  none |
 
 

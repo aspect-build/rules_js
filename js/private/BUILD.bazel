@@ -29,10 +29,23 @@ bzl_library(
 )
 
 bzl_library(
+    name = "js_package",
+    srcs = ["js_package.bzl"],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@aspect_bazel_lib//lib:copy_directory",
+        "@aspect_bazel_lib//lib:copy_to_directory",
+        "@bazel_skylib//lib:dicts",
+        "@rules_nodejs//nodejs:bzl",
+    ],
+)
+
+bzl_library(
     name = "link_js_package",
     srcs = ["link_js_package.bzl"],
     visibility = ["//:__subpackages__"],
     deps = [
+        ":js_package",
         ":pnpm_utils",
         "@aspect_bazel_lib//lib:copy_directory",
         "@bazel_skylib//lib:paths",

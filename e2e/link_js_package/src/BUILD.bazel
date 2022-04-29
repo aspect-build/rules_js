@@ -4,6 +4,7 @@ js_binary(
     name = "main",
     args = ["foo"],
     data = [
+        "//:linked_e2e_lib",
         "@npm//@aspect-test/a",
         "@npm//@aspect-test/b",
         "@npm//@aspect-test/c",
@@ -15,6 +16,7 @@ js_test(
     name = "test",
     args = ["foo"],
     data = [
+        "//:linked_e2e_lib",
         "@npm//@aspect-test/a",
         "@npm//@aspect-test/b",
         "@npm//@aspect-test/c",
