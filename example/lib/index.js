@@ -7,4 +7,8 @@ function toAst(program) {
     return JSON.stringify(acorn.parse(program, { ecmaVersion: 2020 })) + '\n'
 }
 
-module.exports = { toAst }
+function getAcornVersion() {
+    return acorn.version
+}
+
+module.exports = { toAst, getAcornVersion }

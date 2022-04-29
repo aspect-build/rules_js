@@ -13,6 +13,7 @@
         "rollup": "^2.70.2",
         "@rollup/plugin-commonjs": "^21.1.0",
         "mobx-react": "^7.3.0",
+        "uvu": "^0.5.3",
         "mobx": "^6.1.0",
         "react": "^17",
         "bufferutil": "4.0.1",
