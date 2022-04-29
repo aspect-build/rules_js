@@ -28,6 +28,10 @@ load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
 register_unittest_toolchains()
 
+load("@aspect_bazel_lib//lib:host_repo.bzl", "host_repo")
+
+host_repo(name = "aspect_bazel_lib_host")
+
 ############################################
 # Gazelle, for generating bzl_library targets
 
