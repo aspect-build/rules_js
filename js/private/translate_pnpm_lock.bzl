@@ -1,11 +1,10 @@
 "Convert pnpm lock file into starlark Bazel fetches"
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "is_windows_os")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":yq.bzl", "yq_bin")
+load(":repo_toolchains.bzl", "node_path", "yq_path")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
 
@@ -144,37 +143,28 @@ _ATTRS = {
         doc = """If true, runs lifecycle hooks on installed packages as well as any custom postinstall scripts""",
         default = True,
     ),
-    "node_repository": attr.string(
-        doc = """The basename for the node toolchain repository from @build_bazel_rules_nodejs.""",
-        default = "nodejs",
+    "node": attr.label(
+        doc = """The label to the node binary to use.
+        If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
+        default = "@nodejs_host//:bin/node",
     ),
-    "yq_repository": attr.string(
-        doc = """The basename for the yq toolchain repository from @aspect_bazel_lib.""",
-        default = "yq",
+    "yq": attr.label(
+        doc = """The label to the yq binary to use.
+        If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
+        default = "@yq//:yq",
     ),
 }
 
-def _node_bin(rctx):
-    # Parse the resolved host platform from yq host repo //:index.bzl
-    content = rctx.read(rctx.path(Label("@%s_host//:index.bzl" % rctx.attr.node_repository)))
-    search_str = "host_platform=\""
-    start_index = content.index(search_str) + len(search_str)
-    end_index = content.index("\"", start_index)
-    host_platform = content[start_index:end_index]
-
-    # Return the path to the node binary
-    return rctx.path(Label("@%s_%s//:bin/node%s" % (rctx.attr.node_repository, host_platform, ".exe" if is_windows_os(rctx) else "")))
-
 def _process_lockfile(rctx):
     json_lockfile_path = rctx.path("pnpm-lock.json")
-    result = rctx.execute([yq_bin(rctx, rctx.attr.yq_repository), "-o=json", ".", rctx.path(rctx.attr.pnpm_lock)])
+    result = rctx.execute([yq_path(rctx), "-o=json", ".", rctx.path(rctx.attr.pnpm_lock)])
     if result.return_code != 0:
         fail("failed to convert pnpm lockfile to json: %s" % result.stderr)
     rctx.file(json_lockfile_path, result.stdout)
 
     translated_json_path = rctx.path("translated.json")
     cmd = [
-        _node_bin(rctx),
+        node_path(rctx),
         rctx.path(Label("@aspect_rules_js//js/private:translate_pnpm_lock.js")),
         json_lockfile_path,
         translated_json_path,

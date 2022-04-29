@@ -8,8 +8,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 versions = struct(
-    aspect_bazel_lib = "0.9.8",
-    rules_nodejs = "5.4.0",
+    aspect_bazel_lib = "0.11.0",
+    rules_nodejs = "5.4.2",
 )
 
 # WARNING: any changes in this function may be BREAKING CHANGES for users
@@ -32,14 +32,14 @@ def rules_js_dependencies():
     maybe(
         http_archive,
         name = "rules_nodejs",
-        sha256 = "1f9fca05f4643d15323c2dee12bd5581351873d45457f679f84d0fe0da6839b7",
+        sha256 = "26766278d815a6e2c43d2f6c9c72fde3fec8729e84138ffa4dabee47edc7702a",
         urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/{0}/rules_nodejs-core-{0}.tar.gz".format(versions.rules_nodejs)],
     )
 
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "2f6f04a002a9f988ae79107a91a8498892fb03bee978a8bf841eb1bd9fded2ea",
+        sha256 = "14e84b21189d857539c083df223c8ae2eb58f56beb3da3ec746db1265f689c7a",
         strip_prefix = "bazel-lib-{}".format(versions.aspect_bazel_lib),
         url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.aspect_bazel_lib),
     )
