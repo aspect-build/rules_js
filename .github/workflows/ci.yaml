@@ -16,10 +16,18 @@ jobs:
         # The type of runner that the job will run on
         runs-on: ubuntu-latest
 
+        strategy:
+            matrix:
+                folder:
+                    - '.'
+                    - 'e2e/node_package'
+                    - 'e2e/node_package/rules_foo'
+
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
+            - uses: bazelbuild/setup-bazelisk@v1
             - name: Mount bazel caches
               uses: actions/cache@v2
               with:
@@ -32,4 +40,5 @@ jobs:
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
-              run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
+              working-directory: ${{ matrix.folder }}
+              run: bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...

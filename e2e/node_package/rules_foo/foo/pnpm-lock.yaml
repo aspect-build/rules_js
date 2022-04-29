@@ -1,0 +1,74 @@
+lockfileVersion: 5.3
+
+specifiers:
+    '@aspect-test/a': 5.0.0
+
+dependencies:
+    '@aspect-test/a': 5.0.0
+
+packages:
+    /@aspect-test/a/5.0.0:
+        resolution:
+            {
+                integrity: sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==,
+            }
+        hasBin: true
+        dependencies:
+            '@aspect-test/b': 5.0.0
+            '@aspect-test/c': 1.0.0
+            '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
+        dev: false
+
+    /@aspect-test/b/5.0.0:
+        resolution:
+            {
+                integrity: sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==,
+            }
+        hasBin: true
+        dependencies:
+            '@aspect-test/a': 5.0.0
+            '@aspect-test/c': 2.0.0
+            '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
+        dev: false
+
+    /@aspect-test/c/1.0.0:
+        resolution:
+            {
+                integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==,
+            }
+        hasBin: true
+        requiresBuild: true
+        dev: false
+
+    /@aspect-test/c/2.0.0:
+        resolution:
+            {
+                integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==,
+            }
+        hasBin: true
+        requiresBuild: true
+        dev: false
+
+    /@aspect-test/d/2.0.0_@aspect-test+c@1.0.0:
+        resolution:
+            {
+                integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==,
+            }
+        hasBin: true
+        peerDependencies:
+            '@aspect-test/c': x.x.x
+        dependencies:
+            '@aspect-test/c': 1.0.0
+        dev: false
+
+    /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
+        resolution:
+            {
+                integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==,
+            }
+        hasBin: true
+        peerDependencies:
+            '@aspect-test/c': x.x.x
+        dependencies:
+            '@aspect-test/c': 2.0.0
+        dev: false
