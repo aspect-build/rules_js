@@ -1,3 +1,0 @@
-load("@npm//:node_modules.bzl", "node_modules")
-
-node_modules()

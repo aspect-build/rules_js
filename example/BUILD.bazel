@@ -2,13 +2,13 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@example_npm_deps//:node_modules.bzl", "node_modules")
+load("@example_npm_deps//:link_node_packages.bzl", "link_node_packages")
 load("@example_npm_deps//:package.bzl", "package", "package_dir")
 load("@example_npm_deps//uvu:package_json.bzl", uvu_bin = "bin")
-load("@example_npm_deps__acorn-8.4.0//:node_package.bzl", node_package_acorn = "node_package")
+load("@example_npm_deps__acorn-8.4.0//:link_node_package.bzl", link_acorn = "link_node_package")
 load("@example_npm_deps__rollup_2.70.2//:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
 load("//js:defs.bzl", "js_binary", "js_test")
-load("//js:node_package.bzl", "node_package")
+load("//js:link_node_package.bzl", "link_node_package")
 load("//js:run_js_binary.bzl", "run_js_binary")
 
 # gazelle:exclude npm_imports.bzl
@@ -16,11 +16,11 @@ load("//js:run_js_binary.bzl", "run_js_binary")
 
 ###########################
 
-node_package_acorn()
+link_acorn()
 
-node_modules()
+link_node_packages()
 
-node_package(
+link_node_package(
     name = package("@mycorp/mylib").name,
     src = "//example/lib",
     package = "@mycorp/mylib",

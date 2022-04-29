@@ -40,25 +40,25 @@ To consume the downloaded package in rules, it must be "linked" into the link pa
 package's `BUILD.bazel` file:
 
 ```
-load("@npm__at_types_node_15.12.2//:node_package.bzl", node_package_types_node = "node_package")
+load("@npm__at_types_node_15.12.2//:link_node_package.bzl", link_types_node = "link_node_package")
 
-node_package_types_node()
+link_types_node()
 ```
 
-This instantiates a `node_package` target for this package that can be referenced by the alias
+This instantiates a `link_node_package` target for this package that can be referenced by the alias
 `@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
 The `npm` prefix of these alias is configurable via the `namespace` attribute.
 
 When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
 
 ```
-load("@npm//:node_modules.bzl", "node_modules")
+load("@npm//:link_node_packages.bzl", "link_node_packages")
 
-node_modules()
+link_node_packages()
 ```
 
 `translate_pnpm_lock` also creates convienence aliases in the external repository that reference
-the linked `node_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
+the `link_node_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
 
 To change the proxy URL we use to fetch, configure the Bazel downloader:
 
@@ -74,15 +74,15 @@ common --experimental_downloader_config=.bazel_downloader_config
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 """
 
-_NODEJS_PACKAGE_TMPL = """
+_LINK_NODE_PACKAGE_TMPL = """
 # buildifier: disable=unnamed-macro
-def node_package():
-    "Generated intermediate and terminal node_package targets for npm package {package}@{version}"
+def link_node_package():
+    "Generated intermediate and terminal link_node_package targets for npm package {package}@{version}"
     if "{link_package_guard}" != "." and native.package_name() != "{link_package_guard}":
-        fail("The node_package() macro loaded from {node_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
+        fail("The link_node_package() macro loaded from {link_node_package_bzl} may only be called in the '{link_package_guard}' package. Move the call to the '{link_package_guard}' package BUILD file.")
 
     # reference node package used to avoid circular deps
-    _node_package(
+    _link_node_package(
         name = "{namespace}{bazel_name}__ref",
         package = "{package}",
         version = "{version}",
@@ -91,7 +91,7 @@ def node_package():
 
     # pre-lifecycle node package with reference deps for use in pre-lifecycle terminal node packages
     # (linked into lifecycle node_modules tree _lc/node_modules)
-    _node_package(
+    _link_node_package(
         name = "{namespace}{bazel_name}__lc_pkg",
         src = "@{rctx_name}//:{extract_dirname}",
         package = "{package}",
@@ -107,7 +107,7 @@ def node_package():
     {maybe_lifecycle_hooks}
     # post-lifecycle node package with reference deps for use in terminal node package with
     # transitive closure
-    _node_package(
+    _link_node_package(
         name = "{namespace}{bazel_name}__pkg",
         src = "{node_package_src}",
         package = "{package}",
@@ -118,7 +118,7 @@ def node_package():
     )
 
     # terminal node package with transitive closure of node package dependencies
-    _node_package(
+    _link_node_package(
         name = "{namespace}{bazel_name}",{maybe_node_package_src}
         package = "{package}",
         version = "{version}",
@@ -131,7 +131,7 @@ def node_package():
 _RUN_LIFECYCLE_HOOKS_TMPL = """
     # post-lifecycle node package with reference deps for use in terminal node package with
     # transitive closure
-    _node_package(
+    _link_node_package(
         name = "{namespace}{bazel_name}__lc_pkg_lite",
         package = "{package}",
         version = "{version}",
@@ -145,7 +145,7 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
 
     # terminal pre-lifecycle node package for use in lifecycle build target below
     # (linked into lifecycle node_modules tree _lc/node_modules)
-    _node_package(
+    _link_node_package(
         name = "{namespace}{bazel_name}__lc",
         package = "{package}",
         version = "{version}",
@@ -331,7 +331,7 @@ def _impl(rctx):
     else:
         node_package_src = "@%s//:%s" % (rctx.name, extract_dirname)
 
-    node_package_bzl_file = "node_package.bzl"
+    link_node_package_bzl_file = "link_node_package.bzl"
 
     maybe_bins = """
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(bins, 2) if bins else ""
@@ -353,14 +353,14 @@ def _impl(rctx):
         maybe_indirect = maybe_indirect,
     ) if enable_lifecycle_hooks else ""
 
-    node_package_bzl = [_NODEJS_PACKAGE_TMPL.format(
+    link_node_package_bzl = [_LINK_NODE_PACKAGE_TMPL.format(
         namespace = pnpm_utils.node_package_target_namespace,
         extract_dirname = extract_dirname,
         link_package_guard = rctx.attr.link_package_guard,
         package = rctx.attr.package,
         version = rctx.attr.version,
         rctx_name = rctx.name,
-        node_package_bzl = "@%s//:%s" % (rctx.name, node_package_bzl_file),
+        link_node_package_bzl = "@%s//:%s" % (rctx.name, link_node_package_bzl_file),
         bazel_name = bazel_name,
         ref_deps = starlark_codegen_utils.to_list_attr(ref_deps, 2),
         deps = starlark_codegen_utils.to_list_attr(deps, 2),
@@ -405,22 +405,22 @@ def _impl(rctx):
 
     # Add an namespace if this is a direct dependency
     if not rctx.attr.indirect:
-        node_package_bzl.append(_ALIAS_TMPL.format(
+        link_node_package_bzl.append(_ALIAS_TMPL.format(
             alias = pnpm_utils.bazel_name(rctx.attr.package),
             namespace = pnpm_utils.node_package_target_namespace,
             bazel_name = bazel_name,
         ))
 
-    node_package_bzl_header = generated_by_lines + [
-        """load("@aspect_rules_js//js:node_package.bzl", _node_package = "node_package")""",
+    link_node_package_bzl_header = generated_by_lines + [
+        """load("@aspect_rules_js//js:link_node_package.bzl", _link_node_package = "link_node_package")""",
     ]
     if enable_lifecycle_hooks:
-        node_package_bzl_header.extend([
+        link_node_package_bzl_header.extend([
             """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
             """load("@aspect_rules_js//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")""",
         ])
 
-    rctx.file(node_package_bzl_file, "\n".join(node_package_bzl_header + node_package_bzl))
+    rctx.file(link_node_package_bzl_file, "\n".join(link_node_package_bzl_header + link_node_package_bzl))
 
     # Apply patches to the extracted package
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = extract_dirname)
@@ -467,8 +467,8 @@ _ATTRS = {
         doc = """If True, this is a indirect npm dependency which will not be linked as a top-level node_module.""",
     ),
     "link_package_guard": attr.string(
-        doc = """When explictly set, check that the generated node_package() marcro
-        in package.bzl is called within the specified package.
+        doc = """When explictly set, check that the generated link_node_package() macro
+        from link_node_package.bzl is called within the specified package.
 
         Default value of "." implies no gaurd.
 

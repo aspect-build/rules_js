@@ -30,7 +30,8 @@ async function main(argv) {
         packageJson.scripts?.postinstall ||
         packageJson.scripts?._rules_js_postinstall
     ) {
-        // node_modules folder that the node_package dependency targets which are in the same bazel package output
+        // root of node_modules folder for this package is up one level from the outputDir in the
+        // symlinked node_modules structure
         const nodeModulesPath = path.resolve(path.join(outputDir, '..'))
 
         // export interface RunLifecycleHookOptions {
