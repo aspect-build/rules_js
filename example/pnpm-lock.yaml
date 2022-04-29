@@ -13,6 +13,7 @@ specifiers:
     mobx-react: ^7.3.0
     react: ^17
     rollup: ^2.70.2
+    uvu: ^0.5.3
     webpack-bundle-analyzer: 4.5.0
 
 devDependencies:
@@ -28,6 +29,7 @@ devDependencies:
     mobx-react: 7.3.0_mobx@6.5.0+react@17.0.2
     react: 17.0.2
     rollup: 2.70.2
+    uvu: 0.5.3
     webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
 packages:
@@ -271,6 +273,22 @@ packages:
 
     /concat-map/0.0.1:
         resolution: { integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s= }
+        dev: true
+
+    /dequal/2.0.2:
+        resolution:
+            {
+                integrity: sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==,
+            }
+        engines: { node: '>=6' }
+        dev: true
+
+    /diff/5.0.0:
+        resolution:
+            {
+                integrity: sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==,
+            }
+        engines: { node: '>=0.3.1' }
         dev: true
 
     /duplexer/0.1.2:
@@ -668,6 +686,14 @@ packages:
             }
         dev: true
 
+    /kleur/4.1.4:
+        resolution:
+            {
+                integrity: sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==,
+            }
+        engines: { node: '>=6' }
+        dev: true
+
     /lodash/4.17.21:
         resolution:
             {
@@ -749,6 +775,14 @@ packages:
             {
                 integrity: sha512-pHZ/cySF00FVENDWIDzJyoObFahK6Eg4d0papqm6d7yMkxWTZ/S/csqJX1A3PsYy4t5k3z2QnlwuCfMW5lSEwA==,
             }
+        dev: true
+
+    /mri/1.2.0:
+        resolution:
+            {
+                integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==,
+            }
+        engines: { node: '>=4' }
         dev: true
 
     /mrmime/1.0.0:
@@ -840,6 +874,16 @@ packages:
             fsevents: 2.3.2
         dev: true
 
+    /sade/1.8.1:
+        resolution:
+            {
+                integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==,
+            }
+        engines: { node: '>=6' }
+        dependencies:
+            mri: 1.2.0
+        dev: true
+
     /sirv/1.0.19:
         resolution:
             {
@@ -883,6 +927,20 @@ packages:
                 integrity: sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==,
             }
         engines: { node: '>=6' }
+        dev: true
+
+    /uvu/0.5.3:
+        resolution:
+            {
+                integrity: sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==,
+            }
+        engines: { node: '>=8' }
+        hasBin: true
+        dependencies:
+            dequal: 2.0.2
+            diff: 5.0.0
+            kleur: 4.1.4
+            sade: 1.8.1
         dev: true
 
     /webpack-bundle-analyzer/4.5.0_bufferutil@4.0.1:

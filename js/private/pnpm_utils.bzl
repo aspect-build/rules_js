@@ -36,20 +36,12 @@ def _virtual_store_name(name, pnpm_version):
     escaped = name.replace("/", "+")
     return "%s@%s" % (escaped, pnpm_version)
 
-def _binary_name(name):
-    "Takes the last portion of package name"
-
-    # @aspect-test/b -> b
-    # rollup -> rollup
-    return name.rsplit("/", 1)[-1]
-
 pnpm_utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_version = _strip_peer_dep_version,
-    binary_name = _binary_name,
     # Prefix namespace to use for generated js_binary targets and aliases
     node_package_target_namespace = "np__",
     # Symlinked node_modules structure virtual store path under node_modules
