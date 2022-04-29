@@ -143,12 +143,14 @@ _ATTRS = {
         doc = """If true, runs lifecycle hooks on installed packages as well as any custom postinstall scripts""",
         default = True,
     ),
-    "node_repository": attr.string(
-        doc = """The basename for the node toolchain repository from @build_bazel_rules_nodejs.""",
-        default = "nodejs",
+    "node": attr.label(
+        doc = """The label to the node binary to use.
+        If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
+        default = "@nodejs_host//:bin/node",
     ),
     "yq": attr.label(
-        doc = """The label to the yq binary to use. If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
+        doc = """The label to the yq binary to use.
+        If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
         default = "@yq//:yq",
     ),
 }
