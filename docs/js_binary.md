@@ -15,7 +15,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 
 <pre>
 js_binary(<a href="#js_binary-name">name</a>, <a href="#js_binary-chdir">chdir</a>, <a href="#js_binary-data">data</a>, <a href="#js_binary-enable_runfiles">enable_runfiles</a>, <a href="#js_binary-entry_point">entry_point</a>, <a href="#js_binary-env">env</a>, <a href="#js_binary-expected_exit_code">expected_exit_code</a>, <a href="#js_binary-is_windows">is_windows</a>,
-          <a href="#js_binary-node_options">node_options</a>)
+          <a href="#js_binary-node_options">node_options</a>, <a href="#js_binary-verbose">verbose</a>)
 </pre>
 
 Execute a program in the node.js runtime.
@@ -54,6 +54,7 @@ This rules requires that Bazel was run with
 | <a id="js_binary-expected_exit_code"></a>expected_exit_code |  The expected exit code.<br><br>        Can be used to write tests that are expected to fail.   | Integer | optional | 0 |
 | <a id="js_binary-is_windows"></a>is_windows |  Whether the build is being performed on a Windows host platform.<br><br>        Typical usage of this rule is via a macro which automatically sets this         attribute based on a <code>select()</code> on <code>@bazel_tools//src/conditions:host_windows</code>.   | Boolean | required |  |
 | <a id="js_binary-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
+| <a id="js_binary-verbose"></a>verbose |  Produce verbose output.   | Boolean | optional | False |
 
 
 <a id="#js_test"></a>
@@ -62,7 +63,7 @@ This rules requires that Bazel was run with
 
 <pre>
 js_test(<a href="#js_test-name">name</a>, <a href="#js_test-chdir">chdir</a>, <a href="#js_test-data">data</a>, <a href="#js_test-enable_runfiles">enable_runfiles</a>, <a href="#js_test-entry_point">entry_point</a>, <a href="#js_test-env">env</a>, <a href="#js_test-expected_exit_code">expected_exit_code</a>, <a href="#js_test-is_windows">is_windows</a>,
-        <a href="#js_test-node_options">node_options</a>)
+        <a href="#js_test-node_options">node_options</a>, <a href="#js_test-verbose">verbose</a>)
 </pre>
 
 Identical to js_binary, but usable under `bazel test`.
@@ -81,6 +82,7 @@ Identical to js_binary, but usable under `bazel test`.
 | <a id="js_test-expected_exit_code"></a>expected_exit_code |  The expected exit code.<br><br>        Can be used to write tests that are expected to fail.   | Integer | optional | 0 |
 | <a id="js_test-is_windows"></a>is_windows |  Whether the build is being performed on a Windows host platform.<br><br>        Typical usage of this rule is via a macro which automatically sets this         attribute based on a <code>select()</code> on <code>@bazel_tools//src/conditions:host_windows</code>.   | Boolean | required |  |
 | <a id="js_test-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
+| <a id="js_test-verbose"></a>verbose |  Produce verbose output.   | Boolean | optional | False |
 
 
 <a id="#js_binary_lib.js_binary_impl"></a>

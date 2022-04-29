@@ -19,7 +19,12 @@ set -o pipefail -o errexit -o nounset
 
 
 
-LOG_PREFIX="aspect_rules_js[js_binary]"
+# https://docs.bazel.build/versions/main/test-encyclopedia.html#initial-conditions
+if [ "${TEST_TARGET:-}" ]; then
+    LOG_PREFIX="aspect_rules_js[js_test]"
+else
+    LOG_PREFIX="aspect_rules_js[js_binary]"
+fi
 
 # ==============================================================================
 # Initialize RUNFILES environment variable
