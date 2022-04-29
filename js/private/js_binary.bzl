@@ -92,14 +92,6 @@ _ATTRS = {
         """,
         mandatory = True,
     ),
-    "is_windows": attr.bool(
-        mandatory = True,
-        doc = """Whether the build is being performed on a Windows host platform.
-
-        Typical usage of this rule is via a macro which automatically sets this
-        attribute based on a `select()` on `@bazel_tools//src/conditions:host_windows`.
-        """,
-    ),
     "enable_runfiles": attr.bool(
         mandatory = True,
         doc = """Whether runfiles are enabled in the current build configuration.
@@ -133,6 +125,7 @@ _ATTRS = {
         allow_single_file = True,
     ),
     "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
+    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
 _ENV_SET = """export {var}=\"{value}\""""
@@ -198,7 +191,9 @@ def _bash_launcher(ctx, entry_point_path, args):
     return launcher
 
 def _create_launcher(ctx):
-    if ctx.attr.is_windows and not ctx.attr.enable_runfiles:
+    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+
+    if is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")
 
     if DirectoryPathInfo in ctx.attr.entry_point:
@@ -213,13 +208,13 @@ def _create_launcher(ctx):
 
         # Copy entry and data files that are not already in the output tree to the output tree.
         # See docstring at the top of this file for more info.
-        output_entry_point = copy_file_to_bin_action(ctx, ctx.files.entry_point[0], is_windows = ctx.attr.is_windows)
+        output_entry_point = copy_file_to_bin_action(ctx, ctx.files.entry_point[0], is_windows = is_windows)
         entry_point_path = output_entry_point.short_path
 
-    output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = ctx.attr.is_windows)
+    output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows)
 
     bash_launcher = _bash_launcher(ctx, entry_point_path, ctx.attr.args)
-    launcher = create_windows_native_launcher_script(ctx, ctx.outputs.launcher_sh) if ctx.attr.is_windows else bash_launcher
+    launcher = create_windows_native_launcher_script(ctx, ctx.outputs.launcher_sh) if is_windows else bash_launcher
 
     all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(

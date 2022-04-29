@@ -72,7 +72,7 @@ Can be left unspecified to allow for circular deps between `node_package`s.
         doc = "For internal use only",
         default = "node_modules",
     ),
-    "is_windows": attr.bool(mandatory = True),
+    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
 _BIN_SH_TEMPLATE = """#!/usr/bin/env bash
@@ -86,6 +86,8 @@ def _normalize_bin_path(bin_path):
     return result
 
 def _impl(ctx):
+    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+
     if ctx.file.src and not ctx.file.src.is_source and not ctx.file.src.is_directory:
         fail("src must a source directory or TreeArtifact if set")
     if not ctx.attr.package:
@@ -143,7 +145,7 @@ def _impl(ctx):
             # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
             paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ctx.attr.package),
         )
-        copy_directory_action(ctx, ctx.file.src, virtual_store_out, ctx.attr.is_windows)
+        copy_directory_action(ctx, ctx.file.src, virtual_store_out, is_windows = is_windows)
         direct_files.append(virtual_store_out)
 
         if not ctx.attr.indirect:

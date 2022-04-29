@@ -30,10 +30,6 @@ def node_package(name, **kwargs):
     """
     _node_package(
         name = name,
-        is_windows = select({
-            "@bazel_tools//src/conditions:host_windows": True,
-            "//conditions:default": False,
-        }),
         **kwargs
     )
 
