@@ -7,30 +7,24 @@ import (
 	"path/filepath"
 )
 
-// TypeScript options normalized and relevant to gazelle
-type TsOptions struct {
+// TODO(jbedard): rootDirs in addition to rootDir
+
+type TsCompilerOptions struct {
 	// The directory the options were loaded from
 	ConfigDir string
 
-	// A directory which absolute paths may resolve to
-	BaseDir string
-
-	// Directories which may contain sources.
-	// Empty allows source from any directory
-	RootDirs []string
+	// tsconfig.json values
+	BaseUrl string `json:"baseUrl"`
+	RootDir string `json:"rootDir"`
 }
 
-// tsconfig.json structure
 type tsConfigOptions struct {
-	CompilerOptions struct {
-		BaseUrl  string   `json:"baseUrl"`
-		RootDir  string   `json:"rootDir"`
-		RootDirs []string `json:"rootDirs"`
-	} `json:"compilerOptions"`
+	CompilerOptions TsCompilerOptions `json:"compilerOptions"`
 }
 
 // ParseTsConfigOptions loads a tsconfig.json file and return the compilerOptions config
-func ParseTsConfigOptions(rootDir, tsconfigPath string) (*TsOptions, error) {
+// TODO(jbedard): support multi-file configs, use native TypeScript tsconfig loader
+func ParseTsConfigOptions(rootDir, tsconfigPath string) (*TsCompilerOptions, error) {
 	content, err := os.ReadFile(filepath.Join(rootDir, tsconfigPath))
 	if err != nil {
 		// Support non-existing tsconfig
@@ -41,36 +35,25 @@ func ParseTsConfigOptions(rootDir, tsconfigPath string) (*TsOptions, error) {
 
 		return nil, err
 	}
-	var tsconfig tsConfigOptions
-	if err := json.Unmarshal(content, &tsconfig); err != nil {
+
+	var allRes tsConfigOptions
+	if err := json.Unmarshal(content, &allRes); err != nil {
 		return nil, fmt.Errorf("failed to parse: %w", err)
 	}
-	compilerOptions := tsconfig.CompilerOptions
 
-	configDir := filepath.Dir(tsconfigPath)
-	baseDir := filepath.Join(configDir, filepath.Clean(compilerOptions.BaseUrl))
+	compilerOptions := allRes.CompilerOptions
 
-	// Combine the tsconfig rootDir + rootDirs, normalizing relative to the configDir
-	rootDirs := compilerOptions.RootDirs
-	rootDirs = append(rootDirs, compilerOptions.RootDir)
-
-	normalizedRootDirs := []string{}
-	for _, d := range rootDirs {
-		dir := filepath.Join(configDir, filepath.Clean(d))
-		if dir != "" && dir != "." {
-			normalizedRootDirs = append(normalizedRootDirs, dir)
-		}
-	}
-
-	tsOptions := TsOptions{
-		ConfigDir: configDir,
-		BaseDir:   baseDir,
-		RootDirs:  normalizedRootDirs,
-	}
-
-	return &tsOptions, nil
+	return normalizeOptions(filepath.Dir(tsconfigPath), &compilerOptions), nil
 }
 
-func DefaultOptions() *TsOptions {
-	return &TsOptions{}
+func DefaultOptions() *TsCompilerOptions {
+	return normalizeOptions("", &TsCompilerOptions{})
+}
+
+func normalizeOptions(configDir string, compilerOptions *TsCompilerOptions) *TsCompilerOptions {
+	compilerOptions.ConfigDir = configDir
+	compilerOptions.BaseUrl = filepath.Join(configDir, filepath.Clean(compilerOptions.BaseUrl))
+	compilerOptions.RootDir = filepath.Join(configDir, filepath.Clean(compilerOptions.RootDir))
+
+	return compilerOptions
 }

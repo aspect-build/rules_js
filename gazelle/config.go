@@ -109,7 +109,7 @@ type TypeScriptConfig struct {
 	testsFileGlob            string
 
 	_npm_packages *treeset.Set
-	_tsconfig     *TsOptions
+	_tsconfig     *TsCompilerOptions
 }
 
 // New creates a new TypeScriptConfig.
@@ -266,9 +266,9 @@ func (c *TypeScriptConfig) GetTsConfigRule() string {
 
 	return "//" + configDir + ":" + c.tsconfig_json
 }
-func (c *TypeScriptConfig) GetTsCompilerOptions() *TsOptions {
+func (c *TypeScriptConfig) GetTsCompilerOptions() *TsCompilerOptions {
 	if c._tsconfig == nil {
-		var tsconfig *TsOptions
+		var tsconfig *TsCompilerOptions
 
 		// If the tsconfig option is set try loading it
 		if c.tsconfig_json != "" {
@@ -297,22 +297,10 @@ func (c *TypeScriptConfig) GetTsCompilerOptions() *TsOptions {
 }
 
 func (c *TypeScriptConfig) IsWithinTsRoot(sourcepath string) bool {
-	rootDirs := c.GetTsCompilerOptions().RootDirs
+	root := c.GetTsCompilerOptions().RootDir
 
-	if len(rootDirs) == 0 {
-		return true
-	}
-
-	for _, root := range rootDirs {
-		// TODO(jbedard) fix: use propper directory-contains
-		if root == "." || strings.HasPrefix(filepath.Clean(sourcepath), root) {
-			return true
-		}
-	}
-
-	DEBUG("Source %s not in roots %s", sourcepath, rootDirs)
-
-	return false
+	// TODO(jbedard) fix: use propper directory-contains
+	return root == "." || strings.HasPrefix(filepath.Clean(sourcepath), root)
 }
 
 // Adds a dependency to the list of ignored dependencies for

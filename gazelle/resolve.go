@@ -31,7 +31,7 @@ func (ts *TypeScript) Imports(c *config.Config, r *rule.Rule, f *rule.File) []re
 	cfgs := c.Exts[languageName].(Configs)
 	cfg := cfgs[f.Pkg]
 
-	baseDir := cfg.GetTsCompilerOptions().BaseDir
+	baseUrl := cfg.GetTsCompilerOptions().BaseUrl
 
 	for _, src := range srcs {
 		src = filepath.Clean(filepath.Join(f.Pkg, src))
@@ -39,10 +39,10 @@ func (ts *TypeScript) Imports(c *config.Config, r *rule.Rule, f *rule.File) []re
 		// Can be imported by full path
 		specs := []string{src}
 
-		// Can potentially be imported by baseDir
-		rebasedSrc, err := filepath.Rel(baseDir, src)
+		// Can potentially be imported by baseUrl
+		rebasedSrc, err := filepath.Rel(baseUrl, src)
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", fmt.Errorf("tsconfig baseDir error %e", err))
+			fmt.Printf("ERROR: %s\n", fmt.Errorf("tsconfig baseUrl error %e", err))
 		} else if rebasedSrc != src {
 			specs = append(specs, rebasedSrc)
 		}
