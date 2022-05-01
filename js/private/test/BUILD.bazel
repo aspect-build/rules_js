@@ -2,6 +2,12 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@aspect_bazel_lib_host//:defs.bzl", "host")
 load("//js:defs.bzl", "js_binary")
+load(":pnpm_utils_tests.bzl", "pnpm_utils_tests")
+
+# gazelle:exclude *_checked.bzl
+
+# Unit tests
+pnpm_utils_tests(name = "test_pnpm_utils")
 
 ####################################################################################################
 # Write a js_binary launcher to the source tree so it is shell checked on commit
@@ -28,5 +34,13 @@ write_source_files(
     name = "write_shellcheck_launcher",
     files = {
         "shellcheck_launcher.sh": ":shell_launcher_sed",
+    },
+)
+
+write_source_files(
+    name = "write_translate_pnpm_lock",
+    files = {
+        "repositories_checked.bzl": "@example_npm_deps//:repositories.bzl",
+        "package_json_checked.bzl": "@example_npm_deps__rollup_2.70.2//:package_json.bzl",
     },
 )
