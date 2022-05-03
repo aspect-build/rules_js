@@ -1,11 +1,11 @@
-"link_node_package rule"
+"link_js_package rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":pnpm_utils.bzl", "pnpm_utils")
 
-_LinkNodePackageInfo = provider(
+_LinkJsPackageInfo = provider(
     doc = "Internal use only",
     fields = {
         "label": "the label of the target the created this provider",
@@ -15,7 +15,7 @@ _LinkNodePackageInfo = provider(
         "dep_refs": "list of dependency ref targets",
         "bins": "A dict of bin names to paths for this package",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
-        "linked_node_package_dir": "the symlink of this package at the root of the node_modules if this is a direct npm dependency",
+        "linked_js_package_dir": "the symlink of this package at the root of the node_modules if this is a direct npm dependency",
     },
 )
 
@@ -24,7 +24,7 @@ _ATTRS = {
         allow_single_file = True,
         doc = """A source directory or TreeArtifact containing the package files.
 
-Can be left unspecified to allow for circular deps between `link_node_package`s.        
+Can be left unspecified to allow for circular deps between `link_js_package`s.        
 """,
     ),
     "bins": attr.string_dict(
@@ -53,7 +53,7 @@ Can be left unspecified to allow for circular deps between `link_node_package`s.
         > In contrast, Bazel makes it possible to make builds hermetic, which means that
         > all dependencies of a program must be declared when running in Bazel's sandbox.
         """,
-        providers = [_LinkNodePackageInfo],
+        providers = [_LinkJsPackageInfo],
     ),
     "package": attr.string(
         # TODO: validate that name matches in an action if src is set
@@ -66,7 +66,7 @@ Can be left unspecified to allow for circular deps between `link_node_package`s.
         default = "0.0.0",
     ),
     "indirect": attr.bool(
-        doc = "If True, this is an indirect link_node_package which will not linked at the top-level of node_modules",
+        doc = "If True, this is an indirect link_js_package which will not linked at the top-level of node_modules",
     ),
     "root_dir": attr.string(
         doc = "For internal use only",
@@ -98,7 +98,7 @@ def _impl(ctx):
     virtual_store_name = pnpm_utils.virtual_store_name(ctx.attr.package, ctx.attr.version)
 
     virtual_store_out = None
-    linked_node_package_dir = None
+    linked_js_package_dir = None
     direct_files = []
     direct_dep_refs = []
 
@@ -122,8 +122,8 @@ def _impl(ctx):
 
         # output bins for direct deps
         for dep in ctx.attr.deps:
-            dep_package = dep[_LinkNodePackageInfo].package
-            for (bin_name, bin_path) in dep[_LinkNodePackageInfo].bins.items():
+            dep_package = dep[_LinkJsPackageInfo].package
+            for (bin_name, bin_path) in dep[_LinkJsPackageInfo].bins.items():
                 # output a bin entry point this bin
                 bin_out = ctx.actions.declare_file(
                     # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/.bin/{bin_name}"
@@ -153,7 +153,7 @@ def _impl(ctx):
             direct_files.append(virtual_store_out)
 
         if not ctx.attr.indirect:
-            linked_node_package_dir = virtual_store_out
+            linked_js_package_dir = virtual_store_out
 
             # symlink the package's path in the virtual store to the root of the node_modules
             # if it is a direct dependency
@@ -169,15 +169,15 @@ def _impl(ctx):
 
         for dep in ctx.attr.deps:
             # symlink the package's direct deps to its virtual store location
-            dep_link_package = dep[_LinkNodePackageInfo].link_package
+            dep_link_package = dep[_LinkJsPackageInfo].link_package
             if dep_link_package != ctx.label.package:
                 if not ctx.label.package.startwith(dep_link_package + "/"):
-                    msg = """link_node_package in %s package cannot depend on link_node_package in %s package.
-deps of link_node_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
+                    msg = """link_js_package in %s package cannot depend on link_js_package in %s package.
+deps of link_js_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
                     fail(msg)
-            dep_package = dep[_LinkNodePackageInfo].package
-            dep_version = dep[_LinkNodePackageInfo].version
-            dep_virtual_store_directory = dep[_LinkNodePackageInfo].virtual_store_directory
+            dep_package = dep[_LinkJsPackageInfo].package
+            dep_version = dep[_LinkJsPackageInfo].version
+            dep_virtual_store_directory = dep[_LinkJsPackageInfo].virtual_store_directory
             if dep_virtual_store_directory:
                 # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                 dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
@@ -188,7 +188,7 @@ deps of link_node_package must be in the same package or in a parent package."""
                 )
                 direct_files.append(dep_symlink)
             else:
-                # this is a ref link_node_package, a downstream terminal link_node_package
+                # this is a ref link_js_package, a downstream terminal link_js_package
                 # for this npm depedency will create the dep symlinks for this dep;
                 # this pattern is used to break circular dependencies between 3rd
                 # party npm deps; it is not recommended for 1st party deps
@@ -201,28 +201,28 @@ deps of link_node_package must be in the same package or in a parent package."""
         deps_map = {}
         for dep in ctx.attr.deps:
             # create a map of deps that have virtual store directories
-            if dep[_LinkNodePackageInfo].virtual_store_directory:
-                dep_package = dep[_LinkNodePackageInfo].package
-                dep_version = dep[_LinkNodePackageInfo].version
+            if dep[_LinkJsPackageInfo].virtual_store_directory:
+                dep_package = dep[_LinkJsPackageInfo].package
+                dep_version = dep[_LinkJsPackageInfo].version
                 deps_map[pnpm_utils.pnpm_name(dep_package, dep_version)] = dep
             else:
-                # this is a ref link_node_package, a downstream terminal link_node_package # for this npm
+                # this is a ref link_js_package, a downstream terminal link_js_package # for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
                 direct_dep_refs.append(dep)
         for dep in ctx.attr.deps:
-            dep_package = dep[_LinkNodePackageInfo].package
-            dep_version = dep[_LinkNodePackageInfo].version
+            dep_package = dep[_LinkJsPackageInfo].package
+            dep_version = dep[_LinkJsPackageInfo].version
             dep_virtual_store_name = pnpm_utils.virtual_store_name(dep_package, dep_version)
-            dep_refs = dep[_LinkNodePackageInfo].dep_refs
+            dep_refs = dep[_LinkJsPackageInfo].dep_refs
             if dep_package == ctx.attr.package and dep_version == ctx.attr.version:
                 # provide the node_modules directory for this package found in the transitive_closure
-                linked_node_package_dir = dep[_LinkNodePackageInfo].linked_node_package_dir
+                linked_js_package_dir = dep[_LinkJsPackageInfo].linked_js_package_dir
             for dep_ref in dep_refs:
-                dep_ref_package = dep_ref[_LinkNodePackageInfo].package
-                dep_ref_version = dep_ref[_LinkNodePackageInfo].version
+                dep_ref_package = dep_ref[_LinkJsPackageInfo].package
+                dep_ref_version = dep_ref[_LinkJsPackageInfo].version
                 actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
-                dep_ref_virtual_store_directory = actual_dep[_LinkNodePackageInfo].virtual_store_directory
+                dep_ref_virtual_store_directory = actual_dep[_LinkJsPackageInfo].virtual_store_directory
                 if dep_ref_virtual_store_directory:
                     # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                     dep_symlink_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
@@ -249,34 +249,34 @@ deps of link_node_package must be in the same package or in a parent package."""
             declarations = direct_files,
             deps = ctx.attr.deps,
         ),
-        _LinkNodePackageInfo(
+        _LinkJsPackageInfo(
             label = ctx.label,
             link_package = ctx.label.package,
             package = ctx.attr.package,
             version = ctx.attr.version,
             dep_refs = direct_dep_refs,
             bins = ctx.attr.bins,
-            linked_node_package_dir = linked_node_package_dir,
+            linked_js_package_dir = linked_js_package_dir,
             virtual_store_directory = virtual_store_out,
         ),
     ]
-    if linked_node_package_dir:
-        # Provide a "linked_node_package_dir" output group for use in $(execpath) and $(rootpath)
+    if linked_js_package_dir:
+        # Provide a "linked_js_package_dir" output group for use in $(execpath) and $(rootpath)
         result.append(OutputGroupInfo(
-            linked_node_package_dir = depset([linked_node_package_dir]),
+            linked_js_package_dir = depset([linked_js_package_dir]),
         ))
 
     return result
 
-link_node_package_lib = struct(
+link_js_package_lib = struct(
     attrs = _ATTRS,
     impl = _impl,
-    provides = [DefaultInfo, DeclarationInfo, _LinkNodePackageInfo],
+    provides = [DefaultInfo, DeclarationInfo, _LinkJsPackageInfo],
 )
 
 # For stardoc to generate documentation for the rule rather than a wrapper macro
-link_node_package = rule(
-    implementation = link_node_package_lib.impl,
-    attrs = link_node_package_lib.attrs,
-    provides = link_node_package_lib.provides,
+link_js_package = rule(
+    implementation = link_js_package_lib.impl,
+    attrs = link_js_package_lib.attrs,
+    provides = link_js_package_lib.provides,
 )
