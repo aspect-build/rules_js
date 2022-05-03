@@ -140,13 +140,17 @@ def _impl(ctx):
                 direct_files.append(bin_out)
 
     if ctx.file.src:
-        # output the package as a TreeArtifact to its virtual store location
-        virtual_store_out = ctx.actions.declare_directory(
-            # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-            paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ctx.attr.package),
-        )
-        copy_directory_action(ctx, ctx.file.src, virtual_store_out, is_windows = is_windows)
-        direct_files.append(virtual_store_out)
+        # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+        virtual_store_out_path = paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ctx.attr.package)
+        if ctx.file.src.short_path == paths.join(ctx.label.package, virtual_store_out_path):
+            # the input is already the desired output; this is the pattern for
+            # packages with lifecycle hooks
+            virtual_store_out = ctx.file.src
+        else:
+            # output the package as a TreeArtifact to its virtual store location
+            virtual_store_out = ctx.actions.declare_directory(virtual_store_out_path)
+            copy_directory_action(ctx, ctx.file.src, virtual_store_out, is_windows = is_windows)
+            direct_files.append(virtual_store_out)
 
         if not ctx.attr.indirect:
             linked_node_package_dir = virtual_store_out
