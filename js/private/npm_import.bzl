@@ -89,21 +89,6 @@ def link_node_package():
         indirect = True,{maybe_bins}
     )
 
-    # pre-lifecycle node package with reference deps for use in pre-lifecycle terminal node packages
-    # (linked into lifecycle node_modules tree _lc/node_modules)
-    _link_node_package(
-        name = "{namespace}{bazel_name}__lc_pkg",
-        src = "@{rctx_name}//:{extract_dirname}",
-        package = "{package}",
-        version = "{version}",
-        # direct dep references
-        deps = {ref_deps},
-        root_dir = "_lc/node_modules",
-        # don't build this unless it is asked for
-        tags = ["manual"],
-        visibility = ["//visibility:public"],{maybe_indirect}{maybe_bins}
-    )
-
     {maybe_lifecycle_hooks}
     # post-lifecycle node package with reference deps for use in terminal node package with
     # transitive closure
@@ -132,31 +117,28 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
     # post-lifecycle node package with reference deps for use in terminal node package with
     # transitive closure
     _link_node_package(
-        name = "{namespace}{bazel_name}__lc_pkg_lite",
+        name = "{namespace}{bazel_name}__pkg_lite",
         package = "{package}",
         version = "{version}",
         # direct dep references
         deps = {ref_deps},
-        root_dir = "_lc/node_modules",
         # output bins when src is not set
         always_output_bins = True,
         visibility = ["//visibility:public"],{maybe_indirect}{maybe_bins}
     )
 
     # terminal pre-lifecycle node package for use in lifecycle build target below
-    # (linked into lifecycle node_modules tree _lc/node_modules)
     _link_node_package(
         name = "{namespace}{bazel_name}__lc",
         package = "{package}",
         version = "{version}",
-        # transitive closure of {namespace}*__lc_pkg deps
+        # transitive closure of {namespace}*__pkg deps with a carve out for {namespace}{bazel_name}__pkg_lite
         deps = {lc_deps},
-        root_dir = "_lc/node_modules",
         visibility = ["//visibility:public"],{maybe_indirect}
     )
 
     # runs lifecycle hooks on the package
-    lifecycle_target_name = "_lc/node_modules/{virtual_store_root}/%s/node_modules/{package}" % _pnpm_utils.virtual_store_name("{package}", "{version}")
+    lifecycle_target_name = "node_modules/{virtual_store_root}/%s/node_modules/{package}" % _pnpm_utils.virtual_store_name("{package}", "{version}")
 
     _run_js_binary(
         name = lifecycle_target_name,
@@ -284,14 +266,14 @@ def _impl(rctx):
             for dep_version in dep_versions:
                 if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
                     # special case for lifecycle transitive closure deps; do not depend on
-                    # the __lc_pkg of this package as that will be the output directory
+                    # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
-                    lc_deps.append("{namespace}{bazel_name}__lc_pkg_lite".format(
+                    lc_deps.append("{namespace}{bazel_name}__pkg_lite".format(
                         namespace = pnpm_utils.node_package_target_namespace,
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
                     ))
                 else:
-                    lc_deps.append("{namespace}{bazel_name}__lc_pkg".format(
+                    lc_deps.append("{namespace}{bazel_name}__pkg".format(
                         namespace = pnpm_utils.node_package_target_namespace,
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
                     ))
@@ -301,7 +283,7 @@ def _impl(rctx):
                 ))
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
-            lc_deps.append("{namespace}{bazel_name}__lc".format(
+            lc_deps.append("{namespace}{bazel_name}".format(
                 namespace = pnpm_utils.node_package_target_namespace,
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
             ))
