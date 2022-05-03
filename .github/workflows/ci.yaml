@@ -20,8 +20,8 @@ jobs:
             matrix:
                 folder:
                     - '.'
-                    - 'e2e/link_node_package'
-                    - 'e2e/link_node_package/rules_foo'
+                    - 'e2e/link_js_package'
+                    - 'e2e/link_js_package/rules_foo'
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:

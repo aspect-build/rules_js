@@ -43,7 +43,7 @@ pnpm_utils = struct(
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_version = _strip_peer_dep_version,
     # Prefix namespace to use for generated js_binary targets and aliases
-    node_package_target_namespace = "np__",
+    js_package_target_namespace = "jsp__",
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
 )
