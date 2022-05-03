@@ -183,7 +183,7 @@ def {bin_name}(name, **kwargs):
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-    )   
+    )
     _run_js_binary(
         name = name,
         tool = ":%s__js_binary" % name,
@@ -199,8 +199,8 @@ def {bin_name}_test(name, **kwargs):
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        **kwargs,
-    )   
+        **kwargs
+    )
 
 def {bin_name}_binary(name, **kwargs):
     _directory_path(
@@ -211,8 +211,8 @@ def {bin_name}_binary(name, **kwargs):
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        **kwargs,
-    )   
+        **kwargs
+    )
 """
 
 def _impl(rctx):
@@ -244,8 +244,6 @@ def _impl(rctx):
     if result.return_code:
         msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (extract_dirname, result.stdout, result.stderr)
         fail(msg)
-
-    rctx.file("BUILD.bazel", "exports_files([\"{extract_dirname}\"])".format(extract_dirname = extract_dirname))
 
     ref_deps = []
     lc_deps = []
@@ -361,8 +359,9 @@ def _impl(rctx):
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-    bin_bzl_file = "package_json.bzl"
+    bin_bzl_file = None
     if not rctx.attr.indirect and bins:
+        bin_bzl_file = "package_json.bzl"
         bin_bzl = generated_by_lines + [
             """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
             """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test")""",
@@ -379,7 +378,7 @@ def _impl(rctx):
             )
 
         rctx.file(bin_bzl_file, "\n".join(bin_bzl + [
-            "bin = struct(%s)" % ",\n".join([
+            "bin = struct(%s)\n" % ",\n".join([
                 "{name} = {name}, {name}_test = {name}_test, {name}_binary = {name}_binary".format(name = name)
                 for name in bins
             ]),
@@ -394,7 +393,7 @@ def _impl(rctx):
         ))
 
     link_node_package_bzl_header = generated_by_lines + [
-        """load("@aspect_rules_js//js:link_node_package.bzl", _link_node_package = "link_node_package")""",
+        """load("@aspect_rules_js//js:{link_node_package_bzl_file}", _link_node_package = "link_node_package")""".format(link_node_package_bzl_file = link_node_package_bzl_file),
     ]
     if enable_lifecycle_hooks:
         link_node_package_bzl_header.extend([
@@ -403,6 +402,7 @@ def _impl(rctx):
         ])
 
     rctx.file(link_node_package_bzl_file, "\n".join(link_node_package_bzl_header + link_node_package_bzl))
+    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([extract_dirname, link_node_package_bzl_file] + ([bin_bzl_file] if bin_bzl_file else [])))
 
     # Apply patches to the extracted package
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = extract_dirname)

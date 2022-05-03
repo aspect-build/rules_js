@@ -1,3 +1,4 @@
 docs/*.md linguist-generated=true
 pnpm-lock.yaml linguist-generated=true
 e2e/link_node_package/rules_foo/npm_repositories.bzl linguist-generated=true
+js/private/test/*_checked.bzl linguist-generated=true
