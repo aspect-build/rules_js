@@ -1,3 +1,10 @@
 load("@npm//:link_js_packages.bzl", "link_js_packages")
+load("@aspect_rules_js//js:defs.bzl", "link_js_package")
 
 link_js_packages()
+
+link_js_package(
+    name = "linked_e2e_lib",
+    src = "//lib",
+    visibility = ["//visibility:public"],
+)

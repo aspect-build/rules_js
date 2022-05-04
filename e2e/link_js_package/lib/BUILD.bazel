@@ -1,4 +1,4 @@
-load("//js:defs.bzl", "js_package")
+load("@aspect_rules_js//js:defs.bzl", "js_package")
 
 js_package(
     name = "lib",
@@ -6,6 +6,6 @@ js_package(
         "index.js",
         "package.json",
     ],
-    package = "@mycorp/mylib",
+    package = "@e2e/lib",
     visibility = ["//visibility:public"],
 )

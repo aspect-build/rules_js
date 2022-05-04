@@ -11,16 +11,10 @@ bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
-    deps = ["//js/private:js_binary"],
-)
-
-bzl_library(
-    name = "link_js_package",
-    srcs = ["link_js_package.bzl"],
-    visibility = ["//visibility:public"],
     deps = [
-        "@bazel_skylib//lib:paths",
-        "@rules_nodejs//nodejs:bzl",
+        "//js/private:js_binary",
+        "//js/private:js_package",
+        "//js/private:link_js_package",
     ],
 )
 

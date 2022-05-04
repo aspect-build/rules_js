@@ -230,17 +230,16 @@ def _create_launcher(ctx):
         runfiles = runfiles,
     )
 
-def _js_binary_impl(ctx):
+def _impl(ctx):
     launcher = _create_launcher(ctx)
     return DefaultInfo(
         executable = launcher.exe,
         runfiles = launcher.runfiles,
     )
 
-# Expose our library as a struct so that js_binary and js_test can both extend it
 js_binary_lib = struct(
     attrs = _ATTRS,
-    js_binary_impl = _js_binary_impl,
+    implementation = _impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
@@ -250,7 +249,7 @@ js_binary_lib = struct(
 
 js_binary = rule(
     doc = _DOC,
-    implementation = js_binary_lib.js_binary_impl,
+    implementation = js_binary_lib.implementation,
     attrs = js_binary_lib.attrs,
     executable = True,
     toolchains = js_binary_lib.toolchains,
@@ -258,7 +257,7 @@ js_binary = rule(
 
 js_test = rule(
     doc = "Identical to js_binary, but usable under `bazel test`.",
-    implementation = js_binary_lib.js_binary_impl,
+    implementation = js_binary_lib.implementation,
     attrs = js_binary_lib.attrs,
     test = True,
     toolchains = js_binary_lib.toolchains,
