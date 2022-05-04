@@ -41,6 +41,6 @@ write_source_files(
     name = "write_translate_pnpm_lock",
     files = {
         "repositories_checked.bzl": "@example_npm_deps//:repositories.bzl",
-        "package_json_checked.bzl": "@example_npm_deps__rollup_2.70.2//:package_json.bzl",
+        "package_json_checked.bzl": "@example_npm_deps__rollup_2.70.2_sources//:package_json.bzl",
     },
 )

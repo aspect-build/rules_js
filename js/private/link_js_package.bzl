@@ -13,7 +13,6 @@ _LinkJsPackageInfo = provider(
         "package": "name of this node package",
         "version": "version of this node package",
         "dep_refs": "list of dependency ref targets",
-        "bins": "A dict of bin names to paths for this package",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
         "linked_js_package_dir": "the symlink of this package at the root of the node_modules if this is a direct npm dependency",
     },
@@ -26,16 +25,6 @@ _ATTRS = {
 
 Can be left unspecified to allow for circular deps between `link_js_package`s.        
 """,
-    ),
-    "bins": attr.string_dict(
-        doc = """A dict of bin entry point names to entry point paths for this package.
-
-        This should mirror what is in the `bin` field of the package.json of the package.
-        See https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin.""",
-    ),
-    "always_output_bins": attr.bool(
-        doc = """If True, always output bins entry points. If False, bin entry points
-        are only outputted when src is set.""",
     ),
     "deps": attr.label_list(
         doc = """Other node packages this one depends on.
@@ -75,16 +64,6 @@ Can be left unspecified to allow for circular deps between `link_js_package`s.
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-_BIN_SH_TEMPLATE = """#!/usr/bin/env bash
-exec node "../{package}/{bin_path}" "$@"
-"""
-
-def _normalize_bin_path(bin_path):
-    result = bin_path.replace("\\", "/")
-    if result.startswith("./"):
-        result = result[2:]
-    return result
-
 def _impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
@@ -101,43 +80,6 @@ def _impl(ctx):
     linked_js_package_dir = None
     direct_files = []
     direct_dep_refs = []
-
-    if ctx.file.src or ctx.attr.always_output_bins:
-        # output bins for this package
-        for (bin_name, bin_path) in ctx.attr.bins.items():
-            # output a bin entry point this bin
-            bin_out = ctx.actions.declare_file(
-                # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/.bin/{bin_name}"
-                paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ".bin", bin_name),
-            )
-            ctx.actions.write(
-                bin_out,
-                _BIN_SH_TEMPLATE.format(
-                    package = ctx.attr.package,
-                    bin_path = _normalize_bin_path(bin_path),
-                ),
-                is_executable = True,
-            )
-            direct_files.append(bin_out)
-
-        # output bins for direct deps
-        for dep in ctx.attr.deps:
-            dep_package = dep[_LinkJsPackageInfo].package
-            for (bin_name, bin_path) in dep[_LinkJsPackageInfo].bins.items():
-                # output a bin entry point this bin
-                bin_out = ctx.actions.declare_file(
-                    # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/.bin/{bin_name}"
-                    paths.join(ctx.attr.root_dir, pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", ".bin", bin_name),
-                )
-                ctx.actions.write(
-                    bin_out,
-                    _BIN_SH_TEMPLATE.format(
-                        package = dep_package,
-                        bin_path = _normalize_bin_path(bin_path),
-                    ),
-                    is_executable = True,
-                )
-                direct_files.append(bin_out)
 
     if ctx.file.src:
         # "{root_dir}/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
@@ -255,7 +197,6 @@ deps of link_js_package must be in the same package or in a parent package.""" %
             package = ctx.attr.package,
             version = ctx.attr.version,
             dep_refs = direct_dep_refs,
-            bins = ctx.attr.bins,
             linked_js_package_dir = linked_js_package_dir,
             virtual_store_directory = virtual_store_out,
         ),
