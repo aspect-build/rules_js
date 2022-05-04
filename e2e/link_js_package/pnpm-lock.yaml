@@ -4,9 +4,11 @@ specifiers:
     '@aspect-test/a': 5.0.0
     '@aspect-test/b': 5.0.0
     '@aspect-test/c': 2.0.0
+    unused: 0.2.2
 
 dependencies:
     '@aspect-test/a': 5.0.0
+    unused: 0.2.2
 
 optionalDependencies:
     '@aspect-test/c': 2.0.0
@@ -74,3 +76,34 @@ packages:
             '@aspect-test/c': x.x.x
         dependencies:
             '@aspect-test/c': 2.0.0
+
+    /esprima/1.0.0:
+        resolution: { integrity: sha1-XwVxuUqH1RmbHzAqfifrGF5GaFA= }
+        engines: { node: '>=0.4.0' }
+        hasBin: true
+        dev: false
+
+    /minimist/0.0.10:
+        resolution: { integrity: sha1-3j+YVD2/lggr5IrRoMfNqDYwHc8= }
+        dev: false
+
+    /optimist/0.6.0:
+        resolution: { integrity: sha1-aUJIJvNAX3nxQub8PZrljU27kgA= }
+        dependencies:
+            minimist: 0.0.10
+            wordwrap: 0.0.3
+        dev: false
+
+    /unused/0.2.2:
+        resolution: { integrity: sha1-zhJIBInz3ZPRDxt6yDzA1YQj6qA= }
+        engines: { node: '>= 0.4.0' }
+        hasBin: true
+        dependencies:
+            esprima: 1.0.0
+            optimist: 0.6.0
+        dev: false
+
+    /wordwrap/0.0.3:
+        resolution: { integrity: sha1-o9XabNXAvAAI03I0u68b7WMFkQc= }
+        engines: { node: '>=0.4.0' }
+        dev: false

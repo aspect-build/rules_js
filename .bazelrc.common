@@ -32,3 +32,9 @@ build --nolegacy_external_runfiles
 # on the host.
 # See https://github.com/angular/angular/issues/27514.
 build --incompatible_strict_action_env
+
+# Allow tests to assert on what remote repositories are fetched
+# and ensure our repository rules are deterministic
+build --experimental_repository_resolved_file=resolved.bzl
+build --experimental_repository_hash_file=resolved.bzl
+build --experimental_verify_repository_rules=@aspect_rules_js//js:npm_import.bzl%translate_pnpm_lock
