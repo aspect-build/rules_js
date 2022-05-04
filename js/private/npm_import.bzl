@@ -79,6 +79,7 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
         ],
         # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
         args = [
+            "{package}",
             "../../../$(execpath @{rctx_name}_sources//:{extract_to_dirname})",
             "../../../$(@D)",
         ],
