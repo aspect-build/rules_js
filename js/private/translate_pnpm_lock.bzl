@@ -357,15 +357,6 @@ def link_js_packages():
         )
         link_js_package_bzl_body.append("    link_{i}()".format(i = i))
 
-        # Only generate macros for direct dependencies.
-        if has_bin and not indirect:
-            rctx.file("%s/package_json.bzl" % name, "\n".join([
-                _BIN_TMPL.format(
-                    repo_name = repo_name,
-                    name = name,
-                ),
-            ]))
-
         if not indirect:
             # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
             # @repo_name//name:dir and @repo_name//@scope/name:dir
@@ -375,6 +366,15 @@ def link_js_packages():
                     name = name,
                 ),
             ]))
+
+            if has_bin:
+                # Generate a package_json.bzl file if there are bin entries
+                rctx.file("%s/package_json.bzl" % name, "\n".join([
+                    _BIN_TMPL.format(
+                        repo_name = repo_name,
+                        name = name,
+                    ),
+                ]))
 
     package_bzl = generated_by_lines + [
         _PACKAGE_TMPL.format(
