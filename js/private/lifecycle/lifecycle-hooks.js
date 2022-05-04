@@ -10,13 +10,13 @@ async function mkdirp(p) {
     }
 }
 
-async function main(argv) {
-    if (argv.length !== 2) {
+async function main(args) {
+    if (args.length !== 2) {
         console.error('Usage: node lifecycle-hooks.js [packageDir] [outputDir]')
         process.exit(1)
     }
-    const packageDir = argv[0]
-    const outputDir = argv[1]
+    const packageDir = args[0]
+    const outputDir = args[1]
 
     await copyPackageContents(packageDir, outputDir)
 
@@ -24,51 +24,50 @@ async function main(argv) {
         await fs.promises.readFile(path.join(packageDir, 'package.json'))
     )
 
-    if (
-        packageJson.scripts?.preinstall ||
-        packageJson.scripts?.install ||
-        packageJson.scripts?.postinstall ||
-        packageJson.scripts?._rules_js_postinstall
-    ) {
-        // root of node_modules folder for this package is up one level from the outputDir in the
-        // symlinked node_modules structure
-        const nodeModulesPath = path.resolve(path.join(outputDir, '..'))
+    // root of node_modules folder for this package is up one level from the outputDir in the
+    // symlinked node_modules structure
+    const nodeModulesPath = path.resolve(path.join(outputDir, '..'))
 
-        // export interface RunLifecycleHookOptions {
-        //     args?: string[];
-        //     depPath: string;
-        //     extraBinPaths?: string[];
-        //     extraEnv?: Record<string, string>;
-        //     initCwd?: string;
-        //     optional?: boolean;
-        //     pkgRoot: string;
-        //     rawConfig: object;
-        //     rootModulesDir: string;
-        //     scriptShell?: string;
-        //     silent?: boolean;
-        //     scriptsPrependNodePath?: boolean | 'warn-only';
-        //     shellEmulator?: boolean;
-        //     stdio?: string;
-        //     unsafePerm: boolean;
-        // }
-        const opts = {
-            pkgRoot: path.resolve(outputDir),
-            rawConfig: {
-                stdio: 'inherit',
-            },
-            silent: false,
+    // export interface RunLifecycleHookOptions {
+    //     args?: string[];
+    //     depPath: string;
+    //     extraBinPaths?: string[];
+    //     extraEnv?: Record<string, string>;
+    //     initCwd?: string;
+    //     optional?: boolean;
+    //     pkgRoot: string;
+    //     rawConfig: object;
+    //     rootModulesDir: string;
+    //     scriptShell?: string;
+    //     silent?: boolean;
+    //     scriptsPrependNodePath?: boolean | 'warn-only';
+    //     shellEmulator?: boolean;
+    //     stdio?: string;
+    //     unsafePerm: boolean;
+    // }
+    const opts = {
+        pkgRoot: path.resolve(outputDir),
+        rawConfig: {
             stdio: 'inherit',
-            rootModulesDir: nodeModulesPath,
-            unsafePerm: true, // Don't run under a specific user/group
-        }
+        },
+        silent: false,
+        stdio: 'inherit',
+        rootModulesDir: nodeModulesPath,
+        unsafePerm: true, // Don't run under a specific user/group
+    }
 
+    if (packageJson.scripts?._rules_js_run_lifecycle_hooks) {
         // Runs preinstall, install, and postinstall hooks
         await runPostinstallHooks(opts)
+    }
 
-        // Run user specified postinstall hook
-        if (packageJson.scripts?._rules_js_postinstall) {
-            await runLifecycleHook('_rules_js_postinstall', packageJson, opts)
-        }
+    if (packageJson.scripts?._rules_js_custom_postinstall) {
+        // Run user specified custom postinstall hook
+        await runLifecycleHook(
+            '_rules_js_custom_postinstall',
+            packageJson,
+            opts
+        )
     }
 }
 

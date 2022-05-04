@@ -53,6 +53,7 @@ def npm_repositories():
             "@aspect-test/c": ["1.0.0"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -65,6 +66,7 @@ def npm_repositories():
             "@aspect-test/c": ["2.0.0"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(

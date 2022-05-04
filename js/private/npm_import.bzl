@@ -2,77 +2,10 @@
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":repo_toolchains.bzl", "yq_path")
-
-_DOC = """Import a single npm package into Bazel.
-
-Normally you'd want to use `translate_pnpm_lock` to import all your packages at once.
-It generates `npm_import` rules.
-You can create these manually if you want to have exact control.
-
-Bazel will only fetch the given package from an external registry if the package is
-required for the user-requested targets to be build/tested.
-
-This is a repository rule, which should be called from your `WORKSPACE` file
-or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
-
-```starlark
-npm_import(
-    name = "npm__at_types_node_15.12.2",
-    package = "@types/node",
-    version = "15.12.2",
-    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
-)
-```
-
-> This is similar to Bazel rules in other ecosystems named "_import" like
-> `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
-> `go_repository` is also a model for this rule.
-
-The name of this repository should contain the version number, so that multiple versions of the same
-package don't collide.
-(Note that the npm ecosystem always supports multiple versions of a library depending on where
-it is required, unlike other languages like Go or Python.)
-
-To consume the downloaded package in rules, it must be "linked" into the link package in the
-package's `BUILD.bazel` file:
-
-```
-load("@npm__at_types_node_15.12.2//:link_js_package.bzl", link_types_node = "link_js_package")
-
-link_types_node()
-```
-
-This instantiates a `link_js_package` target for this package that can be referenced by the alias
-`@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
-The `npm` prefix of these alias is configurable via the `namespace` attribute.
-
-When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
-
-```
-load("@npm//:link_js_packages.bzl", "link_js_packages")
-
-link_js_packages()
-```
-
-`translate_pnpm_lock` also creates convienence aliases in the external repository that reference
-the `link_js_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
-
-To change the proxy URL we use to fetch, configure the Bazel downloader:
-
-1. Make a file containing a rewrite rule like
-
-    rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2
-
-1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
-
-1. Point bazel to the config with a line in .bazelrc like
-common --experimental_downloader_config=.bazel_downloader_config
-
-[UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
-"""
 
 _LINK_JS_PACKAGE_TMPL = """
 # buildifier: disable=unnamed-macro
@@ -143,11 +76,14 @@ _RUN_LIFECYCLE_HOOKS_TMPL = """
     _run_js_binary(
         name = lifecycle_target_name,
         srcs = [
-            "@{rctx_name}//:{extract_dirname}",
+            "@{rctx_name}_sources//:{extract_to_dirname}",
             ":{namespace}{bazel_name}__lc"
         ],
         # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
-        args = [ "../../../$(execpath @{rctx_name}//:{extract_dirname})", "../../../$(@D)"],
+        args = [
+            "../../../$(execpath @{rctx_name}_sources//:{extract_to_dirname})",
+            "../../../$(@D)",
+        ],
         copy_srcs_to_bin = False,
         tool = "@aspect_rules_js//js/private/lifecycle:lifecycle-hooks",
         output_dir = True,
@@ -215,15 +151,15 @@ def {bin_name}_binary(name, **kwargs):
     )
 """
 
-_EXTRACT_DIRNAME = "package"
+_TARBALL_FILENAME = "package.tgz"
+_EXTRACT_TO_DIRNAME = "package"
 _LINK_JS_PACKAGE_BZL_FILENAME = "link_js_package.bzl"
 
-def _impl(rctx):
+def _impl_sources(rctx):
     numeric_version = pnpm_utils.strip_peer_dep_version(rctx.attr.version)
 
-    tarball = "package.tgz"
     rctx.download(
-        output = tarball,
+        output = _TARBALL_FILENAME,
         url = "https://registry.npmjs.org/{0}/-/{1}-{2}.tgz".format(
             rctx.attr.package,
             # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
@@ -233,20 +169,34 @@ def _impl(rctx):
         integrity = rctx.attr.integrity,
     )
 
-    mkdir_args = ["mkdir", "-p", _EXTRACT_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_dirname} (mkdir {extract_dirname})".format(_EXTRACT_DIRNAME = _EXTRACT_DIRNAME.replace("/", "\\"))]
+    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(_EXTRACT_TO_DIRNAME = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
-        msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_DIRNAME, result.stdout, result.stderr)
+        msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
         fail(msg)
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    untar_args = ["tar", "-xf", tarball, "--strip-components", str(1), "-C", _EXTRACT_DIRNAME]
+    untar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME]
     result = rctx.execute(untar_args)
     if result.return_code:
-        msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_DIRNAME, result.stdout, result.stderr)
+        msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
         fail(msg)
 
+    pkg_json_path = paths.join(_EXTRACT_TO_DIRNAME, "package.json")
+
+    if rctx.attr.run_lifecycle_hooks:
+        _inject_run_lifecycle_hooks(rctx, pkg_json_path)
+
+    if rctx.attr.custom_postinstall:
+        _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.custom_postinstall)
+
+    # Apply patches to the extracted package
+    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
+
+    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_EXTRACT_TO_DIRNAME]))
+
+def _impl(rctx):
     ref_deps = []
     lc_deps = []
     deps = []
@@ -292,26 +242,23 @@ def _impl(rctx):
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
             ))
 
-    pkg_json_path = paths.join(_EXTRACT_DIRNAME, "package.json")
+    pkg_json_label = Label("@{}_sources//:{}/package.json".format(rctx.name, _EXTRACT_TO_DIRNAME))
 
-    if rctx.attr.postinstall and rctx.attr.enable_lifecycle_hooks:
-        _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.postinstall)
+    pkg_json_path = paths.join(pkg_json_label)
 
     pkg_json = json.decode(rctx.read(pkg_json_path))
 
     bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
-    enable_lifecycle_hooks = rctx.attr.enable_lifecycle_hooks and _has_lifecycle_hooks(pkg_json)
-
     bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
-    if enable_lifecycle_hooks:
+    if rctx.attr.lifecycle_build_target:
         js_package_src = ":{namespace}{bazel_name}__lifecycle".format(
             namespace = pnpm_utils.js_package_target_namespace,
             bazel_name = bazel_name,
         )
     else:
-        js_package_src = "@%s//:%s" % (rctx.name, _EXTRACT_DIRNAME)
+        js_package_src = "@{}_sources//:{}".format(rctx.name, _EXTRACT_TO_DIRNAME)
 
     maybe_bins = """
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(bins, 2) if bins else ""
@@ -321,7 +268,7 @@ def _impl(rctx):
         src = \"%s\",""" % js_package_src if not transitive_closure_pattern else ""
     maybe_lifecycle_hooks = _RUN_LIFECYCLE_HOOKS_TMPL.format(
         namespace = pnpm_utils.js_package_target_namespace,
-        extract_dirname = _EXTRACT_DIRNAME,
+        extract_to_dirname = _EXTRACT_TO_DIRNAME,
         rctx_name = rctx.name,
         bazel_name = bazel_name,
         ref_deps = ref_deps,
@@ -331,11 +278,11 @@ def _impl(rctx):
         lc_deps = starlark_codegen_utils.to_list_attr(lc_deps, 2),
         maybe_bins = maybe_bins,
         maybe_indirect = maybe_indirect,
-    ) if enable_lifecycle_hooks else ""
+    ) if rctx.attr.lifecycle_build_target else ""
 
     link_js_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         namespace = pnpm_utils.js_package_target_namespace,
-        extract_dirname = _EXTRACT_DIRNAME,
+        extract_to_dirname = _EXTRACT_TO_DIRNAME,
         link_package_guard = rctx.attr.link_package_guard,
         package = rctx.attr.package,
         version = rctx.attr.version,
@@ -395,96 +342,56 @@ def _impl(rctx):
     link_js_package_bzl_header = generated_by_lines + [
         """load("@aspect_rules_js//js:%s", _link_js_package = "link_js_package")""" % _LINK_JS_PACKAGE_BZL_FILENAME,
     ]
-    if enable_lifecycle_hooks:
+    if rctx.attr.lifecycle_build_target:
         link_js_package_bzl_header.extend([
             """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
             """load("@aspect_rules_js//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")""",
         ])
 
     rctx.file(_LINK_JS_PACKAGE_BZL_FILENAME, "\n".join(link_js_package_bzl_header + link_js_package_bzl))
-    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_EXTRACT_DIRNAME, _LINK_JS_PACKAGE_BZL_FILENAME] + ([bin_bzl_file] if bin_bzl_file else [])))
+    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_EXTRACT_TO_DIRNAME, _LINK_JS_PACKAGE_BZL_FILENAME] + ([bin_bzl_file] if bin_bzl_file else [])))
 
-    # Apply patches to the extracted package
-    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_DIRNAME)
-
-_ATTRS = {
-    "deps": attr.string_dict(
-        doc = """A dict other npm packages this one depends on where the key is
-        the package name and value is the version""",
-    ),
-    "transitive_closure": attr.string_list_dict(
-        doc = """A dict all npm packages this one depends on directly or transitively where the key
-        is the package name and value is a list of version(s) depended on in the closure.""",
-    ),
-    "integrity": attr.string(
-        doc = """Expected checksum of the file downloaded, in Subresource Integrity format.
-        This must match the checksum of the file downloaded.
-
-        This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.
-
-        It is a security risk to omit the checksum as remote files can change.
-        At best omitting this field will make your build non-hermetic.
-        It is optional to make development easier but should be set before shipping.""",
-    ),
-    "package": attr.string(
-        doc = """Name of the npm package, such as `acorn` or `@types/node`""",
-        mandatory = True,
-    ),
-    "version": attr.string(
-        doc = """Version of the npm package, such as `8.4.0`""",
-        mandatory = True,
-    ),
-    "patch_args": attr.string_list(
-        doc = """Arguments to pass to the patch tool.
-        `-p1` will usually be needed for patches generated by git.""",
-        default = ["-p0"],
-    ),
-    "patches": attr.label_list(
-        doc = """Patch files to apply onto the downloaded npm package.""",
-    ),
-    "postinstall": attr.string(
-        doc = """Custom string postinstall script to run against the installed npm package. Runs after any existing lifecycle hooks.""",
-    ),
-    "indirect": attr.bool(
-        doc = """If True, this is a indirect npm dependency which will not be linked as a top-level node_module.""",
-    ),
-    "link_package_guard": attr.string(
-        doc = """When explictly set, check that the generated link_js_package() macro
-        from link_js_package.bzl is called within the specified package.
-
-        Default value of "." implies no gaurd.
-
-        This is set by automatically when using translate_pnpm_lock via npm_import
-        to guard against linking the generated node_modules into the wrong
-        location.""",
-        default = ".",
-    ),
-    "enable_lifecycle_hooks": attr.bool(
-        doc = """If true, runs lifecycle hooks declared in this package and the custom postinstall script if one exists.""",
-        default = True,
-    ),
-    "yq": attr.label(
-        doc = """The label to the yq binary to use. If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
-        default = "@yq//:yq",
-    ),
+_COMMON_ATTRS = {
+    "package": attr.string(mandatory = True),
+    "version": attr.string(mandatory = True),
 }
 
-npm_import = struct(
-    doc = _DOC,
-    implementation = _impl,
-    attrs = _ATTRS,
-)
+_ATTRS = dicts.add(_COMMON_ATTRS, {
+    "deps": attr.string_dict(),
+    "transitive_closure": attr.string_list_dict(),
+    "indirect": attr.bool(),
+    "link_package_guard": attr.string(default = "."),
+    "lifecycle_build_target": attr.bool(),
+})
+
+_ATTRS_SOURCES = dicts.add(_COMMON_ATTRS, {
+    "integrity": attr.string(),
+    "patch_args": attr.string_list(default = ["-p0"]),
+    "patches": attr.label_list(),
+    "run_lifecycle_hooks": attr.bool(),
+    "custom_postinstall": attr.string(),
+    "yq": attr.label(default = "@yq//:yq"),
+})
+
+def _inject_run_lifecycle_hooks(rctx, pkg_json_path):
+    rctx.execute([
+        yq_path(rctx),
+        "-P",
+        "-o=json",
+        "--inplace",
+        ".scripts._rules_js_run_lifecycle_hooks=\"1\"",
+        pkg_json_path,
+    ], quiet = False)
 
 def _inject_custom_postinstall(rctx, pkg_json_path, custom_postinstall):
-    rctx.execute([yq_path(rctx), "-P", "-o=json", "--inplace", ".scripts._rules_js_postinstall=\"%s\"" % custom_postinstall, pkg_json_path], quiet = False)
-
-def _has_lifecycle_hooks(pkg_json):
-    return "scripts" in pkg_json and (
-        "preinstall" in pkg_json["scripts"] or
-        "install" in pkg_json["scripts"] or
-        "postinstall" in pkg_json["scripts"] or
-        "_rules_js_postinstall" in pkg_json["scripts"]
-    )
+    rctx.execute([
+        yq_path(rctx),
+        "-P",
+        "-o=json",
+        "--inplace",
+        ".scripts._rules_js_custom_postinstall=\"%s\"" % custom_postinstall,
+        pkg_json_path,
+    ], quiet = False)
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
@@ -492,3 +399,13 @@ def _get_bin_entries(pkg_json, package):
     if type(bin) != "dict":
         bin = {paths.basename(package): bin}
     return bin
+
+npm_import = repository_rule(
+    implementation = _impl,
+    attrs = _ATTRS,
+)
+
+npm_import_sources = repository_rule(
+    implementation = _impl_sources,
+    attrs = _ATTRS_SOURCES,
+)

@@ -52,7 +52,8 @@ def npm_repositories():
             "@aspect-test/c": ["1.0.0"],
         },
         indirect = True,
-        postinstall = "echo 'moo' > cow.txt",
+        run_lifecycle_hooks = True,
+        custom_postinstall = "echo 'moo' > cow.txt",
     )
 
     npm_import(
@@ -64,7 +65,8 @@ def npm_repositories():
         transitive_closure = {
             "@aspect-test/c": ["2.0.0"],
         },
-        postinstall = "echo 'moo' > cow.txt && echo 'mooo' >> cow.txt",
+        run_lifecycle_hooks = True,
+        custom_postinstall = "echo 'moo' > cow.txt && echo 'mooo' >> cow.txt",
     )
 
     npm_import(
@@ -330,6 +332,7 @@ def npm_repositories():
             "bufferutil": ["4.0.1"],
             "node-gyp-build": ["3.7.0"],
         },
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -463,6 +466,7 @@ def npm_repositories():
             "esbuild-android-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -475,6 +479,7 @@ def npm_repositories():
             "esbuild-android-arm64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -487,6 +492,7 @@ def npm_repositories():
             "esbuild-darwin-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -499,6 +505,7 @@ def npm_repositories():
             "esbuild-darwin-arm64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -511,6 +518,7 @@ def npm_repositories():
             "esbuild-freebsd-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -523,6 +531,7 @@ def npm_repositories():
             "esbuild-freebsd-arm64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -535,6 +544,7 @@ def npm_repositories():
             "esbuild-linux-32": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -547,6 +557,7 @@ def npm_repositories():
             "esbuild-linux-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -559,6 +570,7 @@ def npm_repositories():
             "esbuild-linux-arm": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -571,6 +583,7 @@ def npm_repositories():
             "esbuild-linux-arm64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -583,6 +596,7 @@ def npm_repositories():
             "esbuild-linux-mips64le": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -595,6 +609,7 @@ def npm_repositories():
             "esbuild-linux-ppc64le": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -607,6 +622,7 @@ def npm_repositories():
             "esbuild-linux-riscv64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -619,6 +635,7 @@ def npm_repositories():
             "esbuild-linux-s390x": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -631,6 +648,7 @@ def npm_repositories():
             "esbuild-netbsd-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -643,6 +661,7 @@ def npm_repositories():
             "esbuild-openbsd-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -655,6 +674,7 @@ def npm_repositories():
             "esbuild-sunos-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -667,6 +687,7 @@ def npm_repositories():
             "esbuild-windows-32": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -679,6 +700,7 @@ def npm_repositories():
             "esbuild-windows-64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -691,6 +713,7 @@ def npm_repositories():
             "esbuild-windows-arm64": ["0.14.38"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -744,6 +767,7 @@ def npm_repositories():
             "esbuild-windows-64": ["0.14.38"],
             "esbuild-windows-arm64": ["0.14.38"],
         },
+        run_lifecycle_hooks = True,
     )
 
     npm_import(
@@ -792,6 +816,7 @@ def npm_repositories():
             "fsevents": ["2.3.2"],
         },
         indirect = True,
+        run_lifecycle_hooks = True,
     )
 
     npm_import(

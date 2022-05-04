@@ -21,111 +21,14 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 
 
-<a id="#npm_import"></a>
-
-## npm_import
-
-<pre>
-npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-enable_lifecycle_hooks">enable_lifecycle_hooks</a>, <a href="#npm_import-indirect">indirect</a>, <a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-link_package_guard">link_package_guard</a>, <a href="#npm_import-package">package</a>,
-           <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>, <a href="#npm_import-postinstall">postinstall</a>, <a href="#npm_import-repo_mapping">repo_mapping</a>, <a href="#npm_import-transitive_closure">transitive_closure</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-yq">yq</a>)
-</pre>
-
-Import a single npm package into Bazel.
-
-Normally you'd want to use `translate_pnpm_lock` to import all your packages at once.
-It generates `npm_import` rules.
-You can create these manually if you want to have exact control.
-
-Bazel will only fetch the given package from an external registry if the package is
-required for the user-requested targets to be build/tested.
-
-This is a repository rule, which should be called from your `WORKSPACE` file
-or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
-
-```starlark
-npm_import(
-    name = "npm__at_types_node_15.12.2",
-    package = "@types/node",
-    version = "15.12.2",
-    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
-)
-```
-
-> This is similar to Bazel rules in other ecosystems named "_import" like
-> `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
-> `go_repository` is also a model for this rule.
-
-The name of this repository should contain the version number, so that multiple versions of the same
-package don't collide.
-(Note that the npm ecosystem always supports multiple versions of a library depending on where
-it is required, unlike other languages like Go or Python.)
-
-To consume the downloaded package in rules, it must be "linked" into the link package in the
-package's `BUILD.bazel` file:
-
-```
-load("@npm__at_types_node_15.12.2//:link_js_package.bzl", link_types_node = "link_js_package")
-
-link_types_node()
-```
-
-This instantiates a `link_js_package` target for this package that can be referenced by the alias
-`@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
-The `npm` prefix of these alias is configurable via the `namespace` attribute.
-
-When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
-
-```
-load("@npm//:link_js_packages.bzl", "link_js_packages")
-
-link_js_packages()
-```
-
-`translate_pnpm_lock` also creates convienence aliases in the external repository that reference
-the `link_js_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
-
-To change the proxy URL we use to fetch, configure the Bazel downloader:
-
-1. Make a file containing a rewrite rule like
-
-    rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2
-
-1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
-
-1. Point bazel to the config with a line in .bazelrc like
-common --experimental_downloader_config=.bazel_downloader_config
-
-[UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
-
-
-**ATTRIBUTES**
-
-
-| Name  | Description | Type | Mandatory | Default |
-| :------------- | :------------- | :------------- | :------------- | :------------- |
-| <a id="npm_import-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| <a id="npm_import-deps"></a>deps |  A dict other npm packages this one depends on where the key is         the package name and value is the version   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
-| <a id="npm_import-enable_lifecycle_hooks"></a>enable_lifecycle_hooks |  If true, runs lifecycle hooks declared in this package and the custom postinstall script if one exists.   | Boolean | optional | True |
-| <a id="npm_import-indirect"></a>indirect |  If True, this is a indirect npm dependency which will not be linked as a top-level node_module.   | Boolean | optional | False |
-| <a id="npm_import-integrity"></a>integrity |  Expected checksum of the file downloaded, in Subresource Integrity format.         This must match the checksum of the file downloaded.<br><br>        This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.<br><br>        It is a security risk to omit the checksum as remote files can change.         At best omitting this field will make your build non-hermetic.         It is optional to make development easier but should be set before shipping.   | String | optional | "" |
-| <a id="npm_import-link_package_guard"></a>link_package_guard |  When explictly set, check that the generated link_js_package() macro         from link_js_package.bzl is called within the specified package.<br><br>        Default value of "." implies no gaurd.<br><br>        This is set by automatically when using translate_pnpm_lock via npm_import         to guard against linking the generated node_modules into the wrong         location.   | String | optional | "." |
-| <a id="npm_import-package"></a>package |  Name of the npm package, such as <code>acorn</code> or <code>@types/node</code>   | String | required |  |
-| <a id="npm_import-patch_args"></a>patch_args |  Arguments to pass to the patch tool.         <code>-p1</code> will usually be needed for patches generated by git.   | List of strings | optional | ["-p0"] |
-| <a id="npm_import-patches"></a>patches |  Patch files to apply onto the downloaded npm package.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| <a id="npm_import-postinstall"></a>postinstall |  Custom string postinstall script to run against the installed npm package. Runs after any existing lifecycle hooks.   | String | optional | "" |
-| <a id="npm_import-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
-| <a id="npm_import-transitive_closure"></a>transitive_closure |  A dict all npm packages this one depends on directly or transitively where the key         is the package name and value is a list of version(s) depended on in the closure.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
-| <a id="npm_import-version"></a>version |  Version of the npm package, such as <code>8.4.0</code>   | String | required |  |
-| <a id="npm_import-yq"></a>yq |  The label to the yq binary to use. If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | @yq//:yq |
-
-
 <a id="#translate_pnpm_lock"></a>
 
 ## translate_pnpm_lock
 
 <pre>
-translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-enable_lifecycle_hooks">enable_lifecycle_hooks</a>, <a href="#translate_pnpm_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>, <a href="#translate_pnpm_lock-node">node</a>,
-                    <a href="#translate_pnpm_lock-package">package</a>, <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-postinstall">postinstall</a>, <a href="#translate_pnpm_lock-prod">prod</a>, <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-yq">yq</a>)
+translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-custom_postinstalls">custom_postinstalls</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>, <a href="#translate_pnpm_lock-node">node</a>,
+                    <a href="#translate_pnpm_lock-package">package</a>, <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-prod">prod</a>, <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>,
+                    <a href="#translate_pnpm_lock-yq">yq</a>)
 </pre>
 
 Repository rule to generate npm_import rules from pnpm lock file.
@@ -224,8 +127,8 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="translate_pnpm_lock-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+| <a id="translate_pnpm_lock-custom_postinstalls"></a>custom_postinstalls |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a custom postinstall script to apply to the downloaded npm package after its lifecycle scripts runs.         If the version is left out of the package name, the script will run on every version of the npm package. If         a custom postinstall scripts exists for a package as well as for a specific version, the script for the versioned package         will be appended with <code>&&</code> to the non-versioned package script.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | <a id="translate_pnpm_lock-dev"></a>dev |  If true, only install devDependencies   | Boolean | optional | False |
-| <a id="translate_pnpm_lock-enable_lifecycle_hooks"></a>enable_lifecycle_hooks |  If true, runs lifecycle hooks on installed packages as well as any custom postinstall scripts   | Boolean | optional | True |
 | <a id="translate_pnpm_lock-lifecycle_hooks_exclude"></a>lifecycle_hooks_exclude |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to not run lifecycle hooks on   | List of strings | optional | [] |
 | <a id="translate_pnpm_lock-no_optional"></a>no_optional |  If true, optionalDependencies are not installed   | Boolean | optional | False |
 | <a id="translate_pnpm_lock-node"></a>node |  The label to the node binary to use.         If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | @nodejs_host//:bin/node |
@@ -233,9 +136,106 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 | <a id="translate_pnpm_lock-patch_args"></a>patch_args |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a label list arguments to pass to the patch tool. Defaults to -p0, but -p1 will         usually be needed for patches generated by git. If patch args exists for a package         as well as a package version, then the version-specific args will be appended to the args for the package.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
 | <a id="translate_pnpm_lock-patches"></a>patches |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a label list of patches to apply to the downloaded npm package. Paths in the patch         file must start with <code>extract_tmp/package</code> where <code>package</code> is the top-level folder in         the archive on npm. If the version is left out of the package name, the patch will be         applied to every version of the npm package.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
 | <a id="translate_pnpm_lock-pnpm_lock"></a>pnpm_lock |  The pnpm-lock.yaml file.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
-| <a id="translate_pnpm_lock-postinstall"></a>postinstall |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a string postinstall script to apply to the downloaded npm package after its existing postinstall script runs.         If the version is left out of the package name, the script will run on every version of the npm package. If         postinstall scripts exists for a package as well as for a specific version, the script for the versioned package         will be appended with <code>&&</code> to the non-versioned package script.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | <a id="translate_pnpm_lock-prod"></a>prod |  If true, only install dependencies   | Boolean | optional | False |
 | <a id="translate_pnpm_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
+| <a id="translate_pnpm_lock-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist   | Boolean | optional | True |
 | <a id="translate_pnpm_lock-yq"></a>yq |  The label to the yq binary to use.         If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | @yq//:yq |
+
+
+<a id="#npm_import"></a>
+
+## npm_import
+
+<pre>
+npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-transitive_closure">transitive_closure</a>, <a href="#npm_import-indirect">indirect</a>, <a href="#npm_import-link_package_guard">link_package_guard</a>,
+           <a href="#npm_import-run_lifecycle_hooks">run_lifecycle_hooks</a>, <a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>, <a href="#npm_import-custom_postinstall">custom_postinstall</a>, <a href="#npm_import-yq">yq</a>)
+</pre>
+
+Import a single npm package into Bazel.
+
+Normally you'd want to use `translate_pnpm_lock` to import all your packages at once.
+It generates `npm_import` rules.
+You can create these manually if you want to have exact control.
+
+Bazel will only fetch the given package from an external registry if the package is
+required for the user-requested targets to be build/tested.
+
+This is a repository rule, which should be called from your `WORKSPACE` file
+or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
+
+```starlark
+npm_import(
+    name = "npm__at_types_node_15.12.2",
+    package = "@types/node",
+    version = "15.12.2",
+    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
+)
+```
+
+> This is similar to Bazel rules in other ecosystems named "_import" like
+> `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
+> `go_repository` is also a model for this rule.
+
+The name of this repository should contain the version number, so that multiple versions of the same
+package don't collide.
+(Note that the npm ecosystem always supports multiple versions of a library depending on where
+it is required, unlike other languages like Go or Python.)
+
+To consume the downloaded package in rules, it must be "linked" into the link package in the
+package's `BUILD.bazel` file:
+
+```
+load("@npm__at_types_node_15.12.2//:link_js_package.bzl", link_types_node = "link_js_package")
+
+link_types_node()
+```
+
+This instantiates a `link_js_package` target for this package that can be referenced by the alias
+`@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
+The `npm` prefix of these alias is configurable via the `namespace` attribute.
+
+When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
+
+```
+load("@npm//:link_js_packages.bzl", "link_js_packages")
+
+link_js_packages()
+```
+
+`translate_pnpm_lock` also creates convienence aliases in the external repository that reference
+the `link_js_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
+
+To change the proxy URL we use to fetch, configure the Bazel downloader:
+
+1. Make a file containing a rewrite rule like
+
+    rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2
+
+1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
+
+1. Point bazel to the config with a line in .bazelrc like
+common --experimental_downloader_config=.bazel_downloader_config
+
+[UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :------------- | :------------- | :------------- |
+| <a id="npm_import-name"></a>name |  Name for this repository rule   |  none |
+| <a id="npm_import-package"></a>package |  Name of the npm package, such as <code>acorn</code> or <code>@types/node</code>   |  none |
+| <a id="npm_import-version"></a>version |  Version of the npm package, such as <code>8.4.0</code>   |  none |
+| <a id="npm_import-deps"></a>deps |  A dict other npm packages this one depends on where the key is the package name and value is the version   |  <code>{}</code> |
+| <a id="npm_import-transitive_closure"></a>transitive_closure |  A dict all npm packages this one depends on directly or transitively where the key is the package name and value is a list of version(s) depended on in the closure.   |  <code>{}</code> |
+| <a id="npm_import-indirect"></a>indirect |  If True, this is a indirect npm dependency which will not be linked as a top-level node_module.   |  <code>False</code> |
+| <a id="npm_import-link_package_guard"></a>link_package_guard |  When explictly set, check that the generated link_js_package() macro from link_js_package.bzl is called within the specified package.<br><br>Default value of "." implies no guard.<br><br>This is set by automatically when using translate_pnpm_lock via npm_import to guard against linking the generated node_modules into the wrong location.   |  <code>"."</code> |
+| <a id="npm_import-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs <code>preinstall</code>, <code>install</code> and <code>postinstall</code> lifecycle hooks declared in this package.   |  <code>False</code> |
+| <a id="npm_import-integrity"></a>integrity |  Expected checksum of the file downloaded, in Subresource Integrity format. This must match the checksum of the file downloaded.<br><br>This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.<br><br>It is a security risk to omit the checksum as remote files can change.<br><br>At best omitting this field will make your build non-hermetic.<br><br>It is optional to make development easier but should be set before shipping.   |  <code>""</code> |
+| <a id="npm_import-patch_args"></a>patch_args |  Arguments to pass to the patch tool. <code>-p1</code> will usually be needed for patches generated by git.   |  <code>["-p0"]</code> |
+| <a id="npm_import-patches"></a>patches |  Patch files to apply onto the downloaded npm package.   |  <code>[]</code> |
+| <a id="npm_import-custom_postinstall"></a>custom_postinstall |  Custom string postinstall script to run on the installed npm package. Runs after any existing lifecycle hooks if <code>run_lifecycle_hooks</code> is True.   |  <code>""</code> |
+| <a id="npm_import-yq"></a>yq |  The label to the yq binary to use. If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.   |  <code>"@yq//:yq"</code> |
 
 
