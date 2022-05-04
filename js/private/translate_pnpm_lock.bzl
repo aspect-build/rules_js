@@ -221,7 +221,7 @@ def package_dir(name):
 """
 
 _BIN_TMPL = \
-    """load("@{repo_name}//:package_json.bzl", _bin = "bin")
+    """load("@{repo_name}_sources//:package_json.bzl", _bin = "bin")
 bin = _bin
 """
 
