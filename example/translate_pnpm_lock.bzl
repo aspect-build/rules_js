@@ -15,7 +15,7 @@ def translate_pnpm_lock():
             "@gregmagolan/test-a@0.0.1": ["//example:test-a@0.0.1.patch"],
         },
         pnpm_lock = "//example:pnpm-lock.yaml",
-        postinstall = {
+        custom_postinstalls = {
             "@aspect-test/c": "echo 'moo' > cow.txt",
             "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",
         },
