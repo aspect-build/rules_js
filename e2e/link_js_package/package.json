@@ -2,7 +2,8 @@
     "name": "simple",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
-        "@aspect-test/a": "5.0.0"
+        "@aspect-test/a": "5.0.0",
+        "unused": "latest"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.0"
