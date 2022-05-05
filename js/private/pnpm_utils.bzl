@@ -6,13 +6,13 @@ def _bazel_name(name, pnpm_version = None):
     if not pnpm_version:
         return escaped_name
     pnpm_version_segments = pnpm_version.split("_")
-    escaped_version = pnpm_version_segments[0]
+    escaped_version = pnpm_version_segments[0].replace("/", "_")
     peer_version = "_".join(pnpm_version_segments[1:])
     if peer_version.startswith("@"):
         peer_version = "at_" + peer_version[1:]
     if peer_version:
         escaped_version = "%s__%s" % (escaped_version, peer_version.replace("/", "_").replace("@", "_").replace("+", "_"))
-    return "%s_%s" % (escaped_name, escaped_version)
+    return "%s__%s" % (escaped_name, escaped_version)
 
 def _strip_peer_dep_version(version):
     "Remove peer dependency syntax from version string"
@@ -46,4 +46,12 @@ pnpm_utils = struct(
     js_package_target_namespace = "jsp__",
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
+    # Postfix for npm_import links repository
+    links_postfix = "__links",
+    # Postfix for virtual store target
+    store_postfix = "__store",
+    # Postfix for package directory filegroup and alias targets
+    dir_postfix = "__dir",
+    # Output group name for the package directory of a linked package
+    package_directory_output_group = "package_directory",
 )

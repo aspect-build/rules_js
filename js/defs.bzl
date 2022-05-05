@@ -14,9 +14,10 @@ load(
 )
 load(
     "//js/private:link_js_package.bzl",
-    _link_js_package = "link_js_package",
-    _link_js_package_lib = "link_js_package_lib",
+    _link_js_package_direct = "link_js_package_direct",
+    _link_js_package_store = "link_js_package_store",
 )
+load("//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")
 
 def js_binary(**kwargs):
     _js_binary(
@@ -28,11 +29,6 @@ def js_binary(**kwargs):
     )
 
 def js_test(**kwargs):
-    """Alias of js_binary which can be used with `bazel test`
-
-    Args:
-      **kwargs: see js_binary attributes
-    """
     _js_test(
         enable_runfiles = select({
             "@aspect_rules_js//js/private:enable_runfiles": True,
@@ -45,30 +41,39 @@ js_package = _js_package
 JsPackageInfo = _JsPackageInfo
 
 def link_js_package(name, **kwargs):
-    """"Wrapper around link_js_package rule.
+    """"Public API macro around link_js_package_store and link_js_package_direct rules.
+
+    Links a package to the virtual store and directly to node_modules.
 
     Args:
-        name: name of the resulting link_js_package target
-        **kwargs: see attributes of link_js_package rule
+        name: name of the link_js_package_direct target
+        **kwargs: see attributes of link_js_package_store rule
     """
-    _link_js_package(
-        name = name,
+
+    # link the virtual store
+    _link_js_package_store(
+        name = "{}{}".format(name, _pnpm_utils.store_postfix),
         **kwargs
     )
 
-    # If not indirect, create a {name}__dir
-    # filegroup target that provides a single file which is the root
-    # node_modules directory for use in $(execpath) and $(rootpath)
-    if not kwargs.get("indirect", False):
-        native.filegroup(
-            name = "%s__dir" % name,
-            srcs = [":%s" % name],
-            output_group = "linked_js_package_dir",
-            tags = kwargs.get("tags", None),
-            visibility = kwargs.get("visibility", []),
-        )
+    # Link as a direct dependency in node_modules
+    _link_js_package_direct(
+        name = name,
+        src = ":{}{}".format(name, _pnpm_utils.store_postfix),
+        tags = kwargs.get("tags", None),
+        visibility = kwargs.get("visibility", []),
+    )
+
+    # filegroup target that provides a single file which is
+    # package directory for use in $(execpath) and $(rootpath)
+    native.filegroup(
+        name = "{}{}".format(name, _pnpm_utils.dir_postfix),
+        srcs = [":{}".format(name)],
+        output_group = _pnpm_utils.package_directory_output_group,
+        tags = kwargs.get("tags", None),
+        visibility = kwargs.get("visibility", []),
+    )
 
 # export the starlark libraries as a public API
 js_binary_lib = _js_binary_lib
 js_package_lib = _js_package_lib
-link_js_package_lib = _link_js_package_lib

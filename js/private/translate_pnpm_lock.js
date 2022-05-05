@@ -93,7 +93,7 @@ async function main(argv) {
     const dev = !!process.env.TRANSLATE_PACKAGE_LOCK_DEV
     const noOptional = !!process.env.TRANSLATE_PACKAGE_LOCK_NO_OPTIONAL
 
-    const importers = lockfile.importers
+    const lockImporters = lockfile.importers
         ? lockfile.importers
         : {
               '.': {
@@ -104,26 +104,29 @@ async function main(argv) {
               },
           }
 
-    const rootImporters = importers['.']
+    const rootImporters = lockImporters['.']
     if (!rootImporters) {
         console.error('no root importers in lockfile')
         process.exit(1)
     }
 
-    const lockDependencies = {
-        ...(!prod && rootImporters.devDependencies
-            ? rootImporters.devDependencies
-            : {}),
-        ...(!dev && rootImporters.dependencies
-            ? rootImporters.dependencies
-            : {}),
-        ...(!noOptional && rootImporters.optionalDependencies
-            ? rootImporters.optionalDependencies
-            : {}),
-    }
-    const directDependencies = []
-    for (const name of Object.keys(lockDependencies)) {
-        directDependencies.push(pnpmName(name, lockDependencies[name]))
+    const importers = {}
+    for (const importPath of Object.keys(lockImporters)) {
+        const lockImporter = lockImporters[importPath]
+        const lockDependencies = {
+            ...(!prod && lockImporter.devDependencies
+                ? lockImporter.devDependencies
+                : {}),
+            ...(!dev && lockImporter.dependencies
+                ? lockImporter.dependencies
+                : {}),
+            ...(!noOptional && lockImporter.optionalDependencies
+                ? lockImporter.optionalDependencies
+                : {}),
+        }
+        importers[importPath] = {
+            dependencies: lockDependencies,
+        }
     }
 
     packages = {}
@@ -183,7 +186,7 @@ async function main(argv) {
         packageInfo.transitiveClosure = transitiveClosure
     }
 
-    result = { dependencies: directDependencies, packages }
+    result = { importers, packages }
 
     writeFileSync(outputJson, JSON.stringify(result, null, 2))
 }

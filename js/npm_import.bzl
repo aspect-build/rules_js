@@ -19,7 +19,8 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 """
 
-load("//js/private:npm_import.bzl", _npm_import = "npm_import", _npm_import_sources = "npm_import_sources")
+load("//js/private:npm_import.bzl", _npm_import = "npm_import", _npm_import_links = "npm_import_links")
+load("//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")
 load("//js/private:translate_pnpm_lock.bzl", _translate_pnpm_lock_lib = "translate_pnpm_lock")
 
 translate_pnpm_lock = repository_rule(
@@ -34,8 +35,8 @@ def npm_import(
         version,
         deps = {},
         transitive_closure = {},
-        indirect = False,
-        link_package_guard = ".",
+        root_path = "",
+        link_paths = ["."],
         run_lifecycle_hooks = False,
         integrity = "",
         patch_args = ["-p0"],
@@ -76,7 +77,7 @@ def npm_import(
     package's `BUILD.bazel` file:
 
     ```
-    load("@npm__at_types_node_15.12.2//:link_js_package.bzl", link_types_node = "link_js_package")
+    load("@npm__at_types_node__15.12.2__links//:link_js_package.bzl", link_types_node = "link_js_package")
 
     link_types_node()
     ```
@@ -88,7 +89,7 @@ def npm_import(
     When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
 
     ```
-    load("@npm//:link_js_packages.bzl", "link_js_packages")
+    load("@npm//:defs.bzl", "link_js_packages")
 
     link_js_packages()
     ```
@@ -116,14 +117,10 @@ def npm_import(
         deps: A dict other npm packages this one depends on where the key is the package name and value is the version
         transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
             package name and value is a list of version(s) depended on in the closure.
-        indirect: If True, this is a indirect npm dependency which will not be linked as a top-level node_module.
-        link_package_guard: When explictly set, check that the generated link_js_package() macro from
-            link_js_package.bzl is called within the specified package.
-
-            Default value of "." implies no guard.
-
-            This is set by automatically when using translate_pnpm_lock via npm_import to guard against linking the
-            generated node_modules into the wrong location.
+        root_path: The root package where the node_modules virtual store is linked to.
+            Typically this is the package that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
+        link_paths: List of paths where direct links will be created at for this package.
+            These paths are relative to the root package with "." being the node_modules at the root package.
         run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
             package.
         custom_postinstall: Custom string postinstall script to run on the installed npm package. Runs after any
@@ -145,21 +142,10 @@ def npm_import(
             there is no .exe, .bat, or .cmd extension on the label.
     """
 
+    # By convention, the `{name}` repository contains the actual npm
+    # package sources downloaded from the registry and extracted
     _npm_import(
         name = name,
-        package = package,
-        version = version,
-        deps = deps,
-        transitive_closure = transitive_closure,
-        indirect = indirect,
-        link_package_guard = link_package_guard,
-        lifecycle_build_target = run_lifecycle_hooks or not (not custom_postinstall),
-    )
-
-    # By convention, the `{name}_sources` repository contains the actual npm
-    # package sources downloaded from the registry and extract
-    _npm_import_sources(
-        name = "%s_sources" % name,
         package = package,
         version = version,
         integrity = integrity,
@@ -168,4 +154,17 @@ def npm_import(
         custom_postinstall = custom_postinstall,
         run_lifecycle_hooks = run_lifecycle_hooks,
         yq = yq,
+    )
+
+    # By convention, the `{name}{pnpm_utils.links_postfix}` repository contains the generated
+    # code to link this npm package into one or more node_modules trees
+    _npm_import_links(
+        name = "{}{}".format(name, _pnpm_utils.links_postfix),
+        package = package,
+        version = version,
+        deps = deps,
+        transitive_closure = transitive_closure,
+        root_path = root_path,
+        link_paths = link_paths,
+        lifecycle_build_target = run_lifecycle_hooks or not (not custom_postinstall),
     )

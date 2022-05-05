@@ -27,13 +27,22 @@ _ATTRS = dicts.add({
         allow_single_file = True,
     ),
     "package": attr.string(
-        # TODO: validate that name matches in an action if src is set
-        doc = "Must match the `name` field in the `package.json` file for this package.",
-        mandatory = True,
+        doc = """The package name. If set, should match the `name` field in the `package.json` file for this package.
+
+If set, the package name set here will be used for linking if a link_js_package does not specify a package name. A 
+link_js_package target that specifies a package name will override the value here when linking.
+
+If unset, a link_js_package target that references this js_package must define the package name must be for linking.
+""",
     ),
     "version": attr.string(
-        # TODO: validate that version matches in an action if src is set
-        doc = "Must match the `version` field in the `package.json` file for this package.",
+        doc = """The package version. If set, should match the `version` field in the `package.json` file for this package.
+
+If set, a link_js_package may omit the package version and the package version set here will be used for linking. A 
+link_js_package target that specifies a package version will override the value here when linking.
+
+If unset, a link_js_package target that references this js_package must define the package version must be for linking.
+""",
         default = "0.0.0",
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
@@ -46,11 +55,6 @@ def _impl(ctx):
         fail("Exactly one of src or srcs must be specified")
     if not ctx.attr.src and not ctx.attr.srcs:
         fail("Exactly one of src or srcs must be specified")
-
-    if not ctx.attr.package:
-        fail("package attr must not be empty")
-    if not ctx.attr.version:
-        fail("version attr must not be empty")
 
     if ctx.attr.src:
         if ctx.file.src.is_source:

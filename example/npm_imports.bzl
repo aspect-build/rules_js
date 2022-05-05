@@ -9,9 +9,9 @@ def npm_imports():
     # Manually import a package using explicit coordinates.
     # Just a demonstration of the syntax de-sugaring.
     npm_import(
-        name = "example_npm_deps__acorn-8.4.0",
+        name = "example_npm_deps__acorn__8.4.0",
         integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
-        link_package_guard = "example",
+        root_path = "example",
         package = "acorn",
         version = "8.4.0",
     )

@@ -3,7 +3,7 @@ workspace(name = "rules_foo")
 
 local_repository(
     name = "aspect_rules_js",
-    path = "../../..",
+    path = "../..",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
