@@ -71,11 +71,14 @@ async function main(argv) {
         process.exit(1)
     }
 
-    // TODO: support a range: lockVersion >= 5.3 and lockVersion < 6.0
-    const expectedLockVersion = '5.3'
-    if (lockVersion != expectedLockVersion) {
+    // Restrict the supported lock file versions to what this code has been tested with:
+    //   5.3 - pnpm v6.x.x
+    //   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
+    const minLockVersion = 5.3
+    const maxLockVersion = 5.4
+    if (lockVersion < minLockVersion || lockVersion > maxLockVersion) {
         console.error(
-            `translate_pnpm_lock expected pnpm lockfile version ${expectedLockVersion}, found ${lockVersion}`
+            `translate_pnpm_lock supports minimum pnpm lockVersion of ${minLockVersion} and a maximum lockVersion of ${maxLockVersion}, but found ${lockVersion}`
         )
         process.exit(1)
     }
@@ -90,11 +93,32 @@ async function main(argv) {
     const dev = !!process.env.TRANSLATE_PACKAGE_LOCK_DEV
     const noOptional = !!process.env.TRANSLATE_PACKAGE_LOCK_NO_OPTIONAL
 
+    const importers = lockfile.importers
+        ? lockfile.importers
+        : {
+              '.': {
+                  specifiers: lockfile.specifiers || {},
+                  dependencies: lockfile.dependencies || {},
+                  optionalDependencies: lockfile.optionalDependencies || {},
+                  devDependencies: lockfile.devDependencies || {},
+              },
+          }
+
+    const rootImporters = importers['.']
+    if (!rootImporters) {
+        console.error('no root importers in lockfile')
+        process.exit(1)
+    }
+
     const lockDependencies = {
-        ...(!prod && lockfile.devDependencies ? lockfile.devDependencies : {}),
-        ...(!dev && lockfile.dependencies ? lockfile.dependencies : {}),
-        ...(!noOptional && lockfile.optionalDependencies
-            ? lockfile.optionalDependencies
+        ...(!prod && rootImporters.devDependencies
+            ? rootImporters.devDependencies
+            : {}),
+        ...(!dev && rootImporters.dependencies
+            ? rootImporters.dependencies
+            : {}),
+        ...(!noOptional && rootImporters.optionalDependencies
+            ? rootImporters.optionalDependencies
             : {}),
     }
     const directDependencies = []
