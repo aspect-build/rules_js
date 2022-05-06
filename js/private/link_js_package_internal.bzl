@@ -27,8 +27,6 @@ _INTERNAL_ATTRS = dicts.add(_link_js_package_lib.attrs, {
     ),
 })
 
-print(_INTERNAL_ATTRS)
-
 _link_js_package_internal = rule(
     implementation = _link_js_package_lib.implementation,
     attrs = _INTERNAL_ATTRS,
