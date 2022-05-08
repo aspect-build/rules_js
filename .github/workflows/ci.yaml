@@ -21,7 +21,8 @@ jobs:
                 folder:
                     - '.'
                     - 'e2e/link_js_package'
-                    - 'e2e/link_js_package/rules_foo'
+                    - 'e2e/pnpm_workspace'
+                    - 'e2e/rules_foo'
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:

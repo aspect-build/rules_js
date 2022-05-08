@@ -1,4 +1,4 @@
-load("@npm//:link_js_packages.bzl", "link_js_packages")
+load("@npm//:defs.bzl", "link_js_packages")
 load("@aspect_rules_js//js:defs.bzl", "link_js_package")
 
 link_js_packages()

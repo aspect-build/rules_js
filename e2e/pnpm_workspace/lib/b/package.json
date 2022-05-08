@@ -1,0 +1,7 @@
+{
+    "name": "@lib/b",
+    "private": true,
+    "dependencies": {
+        "@aspect-test/f": "1.0.0"
+    }
+}

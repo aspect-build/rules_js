@@ -30,12 +30,3 @@ translate_pnpm_lock(
 load("@npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
-
-local_repository(
-    name = "rules_foo",
-    path = "../rules_foo",
-)
-
-load("@rules_foo//:repositories.bzl", rules_foo_repositories = "repositories")
-
-rules_foo_repositories()
