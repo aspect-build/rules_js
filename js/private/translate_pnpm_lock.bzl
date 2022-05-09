@@ -3,8 +3,9 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
+load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":repo_toolchains.bzl", "node_path", "yq_path")
+load(":repo_toolchains.bzl", "yq_path")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
 
@@ -138,11 +139,6 @@ _ATTRS = {
         doc = """If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist""",
         default = True,
     ),
-    "node": attr.label(
-        doc = """The label to the node binary to use.
-        If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
-        default = "@nodejs_host//:bin/node",
-    ),
     "yq": attr.label(
         doc = """The label to the yq binary to use.
         If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
@@ -157,24 +153,8 @@ def _process_lockfile(rctx):
         fail("failed to convert pnpm lockfile to json: %s" % result.stderr)
     rctx.file(json_lockfile_path, result.stdout)
 
-    translated_json_path = rctx.path("translated.json")
-    cmd = [
-        node_path(rctx),
-        rctx.path(Label("@aspect_rules_js//js/private:translate_pnpm_lock.js")),
-        json_lockfile_path,
-        translated_json_path,
-    ]
-    env = {}
-    if rctx.attr.prod:
-        env.append("TRANSLATE_PACKAGE_LOCK_PROD")
-    if rctx.attr.dev:
-        env.append("TRANSLATE_PACKAGE_LOCK_DEV")
-    if rctx.attr.no_optional:
-        env.append("TRANSLATE_PACKAGE_LOCK_NO_OPTIONAL")
-    result = rctx.execute(cmd, environment = env, quiet = False)
-    if result.return_code:
-        fail("translate_pnpm_lock.js failed: %s" % result.stderr)
-    return json.decode(rctx.read(translated_json_path))
+    json_lockfile = json.decode(rctx.read(json_lockfile_path))
+    return translate_to_transitive_closure(json_lockfile, rctx.attr.prod, rctx.attr.dev, rctx.attr.no_optional)
 
 _NPM_IMPORT_TMPL = \
     """    npm_import(

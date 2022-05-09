@@ -27,6 +27,16 @@ def _pnpm_name(name, version):
     "Make a name/version pnpm-style name for a package name and version"
     return "%s/%s" % (name, version)
 
+def _parse_pnpm_name(pnpmName):
+    # Parse a name/version or @scope/name/version string and return
+    # a [name, version] list
+    segments = pnpmName.split("/")
+    if len(segments) not in [2, 3]:
+        fail("unexpected pnpm versioned name " + pnpmName)
+    version = segments.pop()
+    name = "/".join(segments)
+    return [name, version]
+
 def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
@@ -39,6 +49,7 @@ def _virtual_store_name(name, pnpm_version):
 pnpm_utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
+    parse_pnpm_name = _parse_pnpm_name,
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_version = _strip_peer_dep_version,
