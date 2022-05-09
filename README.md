@@ -1,8 +1,5 @@
 # Bazel rules for js
 
-**EXPERIMENTAL** this code is currently pre-release and not subject to any stability guarantee.
-It could be archived or there could be major breaking changes.
-
 This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
 accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 
@@ -31,19 +28,19 @@ and trade-offs you should be aware of.
 
 rules_js is just a part of what Aspect provides:
 
-- _Need help?_ This ruleset has support provided by https://aspect.dev.
-- Javascript
-  - __rules_js__ - Rules for running nodejs tools and building JavaScript projects
-  - [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for <https://esbuild.github.io/> JS bundler
-  - [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for <https://terser.org/> - a JavaScript minifier
-  - [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for the swc toolchain <https://swc.rs/>
-  - [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for the `tsc` compiler from <http://typescriptlang.org>
-  - [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for webpack bundler <https://webpack.js.org/>
-  - [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
-- Python
-  - [rules_py](https://github.com/aspect-build/rules_py) - Bazel rules for running Python tools and building Python projects
-- C / C++
-  - [gcc-toolchain](https://github.com/aspect-build/gcc-toolchain) - A fully-hermetic Bazel GCC toolchain for Linux
+-   _Need help?_ This ruleset has support provided by https://aspect.dev.
+-   Javascript
+    -   **rules_js** - Rules for running nodejs tools and building JavaScript projects
+    -   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for <https://esbuild.github.io/> JS bundler
+    -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for <https://terser.org/> - a JavaScript minifier
+    -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for the swc toolchain <https://swc.rs/>
+    -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for the `tsc` compiler from <http://typescriptlang.org>
+    -   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for webpack bundler <https://webpack.js.org/>
+    -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
+-   Python
+    -   [rules_py](https://github.com/aspect-build/rules_py) - Bazel rules for running Python tools and building Python projects
+-   C / C++
+    -   [gcc-toolchain](https://github.com/aspect-build/gcc-toolchain) - A fully-hermetic Bazel GCC toolchain for Linux
 
 ## Installation
 
