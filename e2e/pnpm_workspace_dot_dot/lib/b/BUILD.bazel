@@ -1,0 +1,13 @@
+load("@aspect_rules_js//js:defs.bzl", "js_package")
+load("@npm//:defs.bzl", "link_js_packages")
+
+link_js_packages()
+
+js_package(
+    name = "b",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+)

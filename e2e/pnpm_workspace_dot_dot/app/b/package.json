@@ -1,0 +1,12 @@
+{
+    "name": "@app/b",
+    "private": true,
+    "dependencies": {
+        "@aspect-test/a": "1.0.0",
+        "@aspect-test/b": "1.0.0",
+        "@aspect-test/c": "1.0.0",
+        "@aspect-test/h": "1.0.0",
+        "@lib/b": "workspace:*",
+        "@lib/b_alias": "workspace:@lib/b@*"
+    }
+}
