@@ -7,12 +7,9 @@ js_binary(
     name = "main",
     args = ["foo"],
     data = [
-        "@npm//@aspect-test/a",
-        "@npm//@aspect-test/b",
-        "@npm//@aspect-test/c",
-        "@npm//app/b/@aspect-test/h",
-        "@npm//app/b/@lib/b",
-        "@npm//app/b/@lib/b_alias",
+        "@npm//dot_dot/dot_dot/app/b/@aspect-test/h",
+        "@npm//dot_dot/dot_dot/app/b/@lib/b",
+        # "@npm//dot_dot/dot_dot/app/b/@lib/b_alias",
     ],
     entry_point = "main.js",
 )
@@ -21,13 +18,11 @@ js_test(
     name = "test",
     args = ["foo"],
     data = [
-        "@npm//@aspect-test/a",
-        "@npm//@aspect-test/b",
-        "@npm//@aspect-test/c",
-        "@npm//app/b/@aspect-test/h",
-        "@npm//app/b/@lib/b",
-        "@npm//app/b/@lib/b_alias",
+        "@npm//dot_dot/dot_dot/app/b/@aspect-test/h",
+        "@npm//dot_dot/dot_dot/app/b/@lib/b",
+        # "@npm//dot_dot/dot_dot/app/b/@lib/b_alias",
     ],
+    tags = ["no-sandbox"],
     entry_point = "main.js",
     verbose = True,
 )

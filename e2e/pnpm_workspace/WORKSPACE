@@ -24,7 +24,7 @@ load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 
 translate_pnpm_lock(
     name = "npm",
-    pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_lock = "//common/temp:pnpm-lock.yaml",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
