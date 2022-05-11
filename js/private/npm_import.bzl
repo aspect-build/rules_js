@@ -226,6 +226,16 @@ def _impl(rctx):
         msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
         fail(msg)
 
+    if not repo_utils.is_windows(rctx):
+        # Some packages have directory permissions missing executable which
+        # make the directories not listable. Fix these cases in order to be able
+        # to execute the copy action. https://stackoverflow.com/a/14634721
+        chmod_args = ["chmod", "-R", "a+X", _EXTRACT_TO_DIRNAME]
+        result = rctx.execute(chmod_args)
+        if result.return_code:
+            msg = "chmod %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
+            fail(msg)
+
     pkg_json_path = paths.join(_EXTRACT_TO_DIRNAME, "package.json")
 
     pkg_json = json.decode(rctx.read(pkg_json_path))
