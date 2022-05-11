@@ -52,16 +52,7 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
         fail("expected lockfileVersion key in lockfile")
     if "packages" not in lockfile.keys():
         fail("expected packages key in lockfile")
-
-    # Restrict the supported lock file versions to what this code has been tested with:
-    #   5.3 - pnpm v6.x.x
-    #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
-    min_lock_version = (5, 3)
-    max_lock_version = (5, 4)
-    # FIXME
-    #lock_version = versions.parse(lockfile["lockfileVersion"])
-    #if False:  #(lock_version < minLockVersion || lock_version > maxLockVersion) {
-    #    fail("translate_pnpm_lock supports minimum pnpm lock_version of {minLockVersion} and a maximum lock_version of {maxLockVersion}, but found {lockVersion}")
+    pnpm_utils.assert_lockfile_version(lockfile["lockfileVersion"])
 
     lock_importers = lockfile.get("importers", {
         ".": {
@@ -81,8 +72,11 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
     importers = {}
     for importPath in lock_importers.keys():
         lock_importer = lock_importers[importPath]
+        prod_deps = {} if dev else lock_importer.get("dependencies", {})
+        dev_deps = {} if prod else lock_importer.get("devDependencies", {})
+        opt_deps = {} if no_optional else lock_importer.get("optionalDependencies", {})
         importers[importPath] = {
-            "dependencies": dicts.add(lock_importer.get("dependencies", {}), lock_importer.get("devDependencies", {}), lock_importer.get("optionalDependencies", {})),
+            "dependencies": dicts.add(prod_deps, dev_deps, opt_deps),
         }
 
     packages = {}
