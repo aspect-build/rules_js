@@ -78,13 +78,13 @@ def link_js_package(fail_if_no_link = False):
             _run_js_binary(
                 name = "{lifecycle_target_name}",
                 srcs = [
-                    "{js_package_target}",
+                    "{js_package_target_lc}",
                     ":{namespace}{bazel_name}__pkg_lc"
                 ],
                 # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
                 args = [
                     "{package}",
-                    "../../../$(execpath {js_package_target})",
+                    "../../../$(execpath {js_package_target_lc})",
                     "../../../$(@D)",
                 ],
                 copy_srcs_to_bin = False,
@@ -186,6 +186,15 @@ def {bin_name}_binary(name, **kwargs):
 
 _JS_PACKAGE_TMPL = """
 _js_package(
+    name = "jsp_source_directory",
+    src = ":{extract_to_dirname}",
+    provide_source_directory = True,
+    package = "{package}",
+    version = "{version}",
+    visibility = ["//visibility:public"],
+)
+
+_js_package(
     name = "jsp",
     src = ":{extract_to_dirname}",
     package = "{package}",
@@ -282,7 +291,7 @@ def _impl(rctx):
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
 
     build_file = generated_by_lines + [
-        """load("@aspect_rules_js//js:defs.bzl", _js_package = "js_package")""",
+        """load("@aspect_rules_js//js/private:js_package_internal.bzl", _js_package = "js_package_internal")""",
     ]
 
     build_file.append(_JS_PACKAGE_TMPL.format(
@@ -352,7 +361,8 @@ def _impl_links(rctx):
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(pnpm_utils.links_postfix)]
 
-    js_package_target = "@{}//:jsp".format(npm_import_sources_repo_name)
+    js_package_target = "@{}//:jsp_source_directory".format(npm_import_sources_repo_name)
+    js_package_target_lc = "@{}//:jsp".format(npm_import_sources_repo_name)
 
     link_js_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         alias = pnpm_utils.bazel_name(rctx.attr.package),
@@ -361,6 +371,7 @@ def _impl_links(rctx):
         dir_postfix = pnpm_utils.dir_postfix,
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         js_package_target = js_package_target,
+        js_package_target_lc = js_package_target_lc,
         lc_deps = starlark_codegen_utils.to_list_attr(lc_deps, 1),
         lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_target_name = lifecycle_target_name,

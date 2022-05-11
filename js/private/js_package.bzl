@@ -58,9 +58,13 @@ def _impl(ctx):
 
     if ctx.attr.src:
         if ctx.file.src.is_source:
-            # copy the source directory to a TreeArtifact
-            directory = ctx.actions.declare_directory(ctx.attr.name)
-            copy_directory_action(ctx, ctx.file.src, directory, is_windows = is_windows)
+            if getattr(ctx.attr, "provide_source_directory", False):
+                # pass the source directory through; for rules_js internal use only
+                directory = ctx.file.src
+            else:
+                # copy the source directory to a TreeArtifact
+                directory = ctx.actions.declare_directory(ctx.attr.name)
+                copy_directory_action(ctx, ctx.file.src, directory, is_windows = is_windows)
         elif ctx.file.src.is_directory:
             # pass-through since src is already a TreeArtifact
             directory = ctx.file.src
