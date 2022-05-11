@@ -168,7 +168,7 @@ deps of link_js_package must be in the same package or in a parent package.""" %
                 dep_version = dep[_LinkJsPackageInfo].version
                 deps_map[pnpm_utils.pnpm_name(dep_package, dep_version)] = dep
             else:
-                # this is a ref link_js_package, a downstream terminal link_js_package # for this npm
+                # this is a ref link_js_package, a downstream terminal link_js_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
                 direct_dep_refs.append(dep)
@@ -185,17 +185,23 @@ deps of link_js_package must be in the same package or in a parent package.""" %
             for dep_ref in dep_refs:
                 dep_ref_package = dep_ref[_LinkJsPackageInfo].package
                 dep_ref_version = dep_ref[_LinkJsPackageInfo].version
-                actual_dep = deps_map[pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)]
-                dep_ref_virtual_store_directory = actual_dep[_LinkJsPackageInfo].virtual_store_directory
-                if dep_ref_virtual_store_directory:
-                    # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                    dep_symlink_path = paths.join("node_modules", pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
-                    dep_symlink = ctx.actions.declare_file(dep_symlink_path)
-                    ctx.actions.symlink(
-                        output = dep_symlink,
-                        target_file = dep_ref_virtual_store_directory,
-                    )
-                    direct_files.append(dep_symlink)
+                if dep_ref_package == package and dep_ref_version == version:
+                    pass
+                else:
+                    def_ref_pnpm_name = pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)
+                    if not def_ref_pnpm_name in deps_map:
+                        fail("Expecting {} to be in deps".format(def_ref_pnpm_name))
+                    actual_dep = deps_map[def_ref_pnpm_name]
+                    dep_ref_virtual_store_directory = actual_dep[_LinkJsPackageInfo].virtual_store_directory
+                    if dep_ref_virtual_store_directory:
+                        # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                        dep_symlink_path = paths.join("node_modules", pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
+                        dep_symlink = ctx.actions.declare_file(dep_symlink_path)
+                        ctx.actions.symlink(
+                            output = dep_symlink,
+                            target_file = dep_ref_virtual_store_directory,
+                        )
+                        direct_files.append(dep_symlink)
 
     direct_files = depset(direct = direct_files)
     files_depsets = [direct_files]
