@@ -459,6 +459,7 @@ def link_js_packages():
             fail("expected dict of dependencies in processed importer '%s'" % import_path)
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("link:"):
+                dep_importer = _fp_link_path(".", import_path, dep_version[len("link:"):])
                 dep_path = _fp_link_path(root_path, import_path, dep_version[len("link:"):])
                 dep_key = "{}+{}".format(dep_package, dep_path)
                 if dep_key in fp_links.keys():
@@ -466,11 +467,11 @@ def link_js_packages():
                 else:
                     transitive_deps = []
                     raw_deps = {}
-                    if dep_path in importers.keys():
-                        raw_deps = importers.get(dep_path).get("dependencies")
+                    if dep_importer in importers.keys():
+                        raw_deps = importers.get(dep_importer).get("dependencies")
                     for raw_package, raw_version in raw_deps.items():
                         if raw_version.startswith("link:"):
-                            raw_path = _fp_link_path(root_path, dep_path, raw_version[len("link:"):])
+                            raw_path = _fp_link_path(root_path, dep_importer, raw_version[len("link:"):])
                             raw_bazel_name = pnpm_utils.bazel_name(raw_package, raw_path)
                         else:
                             raw_bazel_name = pnpm_utils.bazel_name(raw_package, raw_version)
