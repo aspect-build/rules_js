@@ -7,6 +7,9 @@ js_binary(
     name = "main",
     args = ["foo"],
     data = [
+        "@npm//@aspect-test/a",
+        "@npm//@aspect-test/b",
+        "@npm//@aspect-test/c",
         "@npm//dot_dot/dot_dot/app/a/@aspect-test/g",
         "@npm//dot_dot/dot_dot/app/a/@lib/a",
     ],
@@ -17,6 +20,9 @@ js_test(
     name = "test",
     args = ["foo"],
     data = [
+        "@npm//@aspect-test/a",
+        "@npm//@aspect-test/b",
+        "@npm//@aspect-test/c",
         "@npm//dot_dot/dot_dot/app/a/@aspect-test/g",
         "@npm//dot_dot/dot_dot/app/a/@lib/a",
     ],
