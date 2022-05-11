@@ -1,0 +1,71 @@
+"""Unit tests for pnpm utils
+See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-starlark-utilities
+"""
+
+load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
+load("//js/private:transitive_closure.bzl", "gather_transitive_closure")
+
+TEST_PACKAGES = {
+    "@aspect-test/a/5.0.0": {
+        "name": "@aspect-test/a",
+        "pnpmVersion": "5.0.0",
+        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
+        "dependencies": {
+            "@aspect-test/b": "5.0.0",
+            "@aspect-test/c": "1.0.0",
+            "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0",
+        },
+        "optionalDependencies": {},
+    },
+    "@aspect-test/b/5.0.0": {
+        "dependencies": {},
+        "optionalDependencies": {
+            "@aspect-test/c": "2.0.0",
+        },
+    },
+    "@aspect-test/c/1.0.0": {
+        "dependencies": {},
+        "optionalDependencies": {},
+    },
+    "@aspect-test/c/2.0.0": {
+        "dependencies": {},
+        "optionalDependencies": {},
+    },
+    "@aspect-test/d/2.0.0_@aspect-test+c@1.0.0": {
+        "dependencies": {},
+        "optionalDependencies": {},
+    },
+}
+
+# buildifier: disable=function-docstring
+def test_walk_deps(ctx):
+    env = unittest.begin(ctx)
+    closure = {}
+    no_optional = True
+    not_no_optional = False
+
+    # Test empty case
+    gather_transitive_closure({}, no_optional, {}, closure)
+    asserts.equals(env, 0, len(closure))
+
+    # Walk the example tree above
+    gather_transitive_closure(TEST_PACKAGES, not_no_optional, {
+        "@aspect-test/a": "5.0.0",
+    }, closure)
+    expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["2.0.0", "1.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
+    asserts.equals(env, expected, closure)
+
+    # Run again with no_optional set, this means we shouldn't walk the dep from @aspect-test/b/5.0.0 -> @aspect-test/c/2.0.0
+    closure = {}
+    gather_transitive_closure(TEST_PACKAGES, no_optional, {
+        "@aspect-test/a": "5.0.0",
+    }, closure)
+    expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["1.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
+    asserts.equals(env, expected, closure)
+
+    return unittest.end(env)
+
+t0_test = unittest.make(test_walk_deps)
+
+def transitive_closure_tests(name):
+    unittest.suite(name, t0_test)

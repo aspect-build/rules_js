@@ -82,6 +82,7 @@ bzl_library(
         ":pnpm_utils",
         ":repo_toolchains",
         ":starlark_codegen_utils",
+        ":transitive_closure",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
     ],
@@ -91,6 +92,16 @@ bzl_library(
     name = "pnpm_utils",
     srcs = ["pnpm_utils.bzl"],
     visibility = ["//js:__subpackages__"],
+)
+
+bzl_library(
+    name = "transitive_closure",
+    srcs = ["transitive_closure.bzl"],
+    visibility = ["//js:__subpackages__"],
+    deps = [
+        "@bazel_skylib//lib:dicts",
+        "@bazel_skylib//lib:types",
+    ],
 )
 
 bzl_library(
