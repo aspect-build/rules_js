@@ -182,15 +182,6 @@ def npm_repositories():
             "sourcemap-codec": ["1.4.8"],
             "@types/estree": ["0.0.39", "0.0.51"],
             "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "wrappy": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
             "picomatch": ["2.3.1"],
         },
     )
@@ -316,12 +307,10 @@ def npm_repositories():
         version = "1.1.11",
         deps = {
             "balanced-match": "1.0.2",
-            "concat-map": "0.0.1",
         },
         transitive_closure = {
             "brace-expansion": ["1.1.11"],
             "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
         },
     )
 
@@ -351,13 +340,10 @@ def npm_repositories():
         version = "4.1.2",
         deps = {
             "ansi-styles": "4.3.0",
-            "supports-color": "7.2.0",
         },
         transitive_closure = {
             "chalk": ["4.1.2"],
             "ansi-styles": ["4.3.0"],
-            "supports-color": ["7.2.0"],
-            "has-flag": ["4.0.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
         },
@@ -848,24 +834,10 @@ def npm_repositories():
         version = "7.2.0",
         deps = {
             "fs.realpath": "1.0.0",
-            "inflight": "1.0.6",
-            "inherits": "2.0.4",
-            "minimatch": "3.1.2",
-            "once": "1.4.0",
-            "path-is-absolute": "1.0.1",
         },
         transitive_closure = {
             "glob": ["7.2.0"],
             "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "wrappy": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
         },
     )
 
@@ -922,7 +894,6 @@ def npm_repositories():
         version = "1.0.6",
         deps = {
             "once": "1.4.0",
-            "wrappy": "1.0.2",
         },
         transitive_closure = {
             "inflight": ["1.0.6"],
@@ -1058,7 +1029,6 @@ def npm_repositories():
             "minimatch": ["3.1.2"],
             "brace-expansion": ["1.1.11"],
             "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
         },
     )
 
@@ -1078,7 +1048,6 @@ def npm_repositories():
             "mobx": ["6.5.0"],
             "react": ["17.0.2"],
             "loose-envify": ["1.4.0"],
-            "object-assign": ["4.1.1"],
             "js-tokens": ["4.0.0"],
         },
     )
@@ -1101,7 +1070,6 @@ def npm_repositories():
             "mobx-react-lite": ["3.3.0_mobx@6.5.0+react@17.0.2"],
             "react": ["17.0.2"],
             "loose-envify": ["1.4.0"],
-            "object-assign": ["4.1.1"],
             "js-tokens": ["4.0.0"],
         },
     )
@@ -1239,12 +1207,10 @@ def npm_repositories():
         version = "17.0.2",
         deps = {
             "loose-envify": "1.4.0",
-            "object-assign": "4.1.1",
         },
         transitive_closure = {
             "react": ["17.0.2"],
             "loose-envify": ["1.4.0"],
-            "object-assign": ["4.1.1"],
             "js-tokens": ["4.0.0"],
         },
     )
@@ -1312,14 +1278,10 @@ def npm_repositories():
         version = "1.0.19",
         deps = {
             "@polka/url": "1.0.0-next.21",
-            "mrmime": "1.0.0",
-            "totalist": "1.1.0",
         },
         transitive_closure = {
             "sirv": ["1.0.19"],
             "@polka/url": ["1.0.0-next.21"],
-            "mrmime": ["1.0.0"],
-            "totalist": ["1.1.0"],
         },
     )
 
@@ -1430,12 +1392,8 @@ def npm_repositories():
             "bufferutil": ["4.0.1"],
             "node-gyp-build": ["3.7.0"],
             "@polka/url": ["1.0.0-next.21"],
-            "mrmime": ["1.0.0"],
-            "totalist": ["1.1.0"],
             "duplexer": ["0.1.2"],
             "ansi-styles": ["4.3.0"],
-            "supports-color": ["7.2.0"],
-            "has-flag": ["4.0.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
         },

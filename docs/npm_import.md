@@ -27,7 +27,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 
 <pre>
 translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-custom_postinstalls">custom_postinstalls</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>,
-                    <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-prod">prod</a>, <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>, <a href="#translate_pnpm_lock-yq">yq</a>)
+                    <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-prod">prod</a>, <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>)
 </pre>
 
 Repository rule to generate npm_import rules from pnpm lock file.
@@ -136,7 +136,6 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 | <a id="translate_pnpm_lock-prod"></a>prod |  If true, only install dependencies   | Boolean | optional | False |
 | <a id="translate_pnpm_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
 | <a id="translate_pnpm_lock-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist   | Boolean | optional | True |
-| <a id="translate_pnpm_lock-yq"></a>yq |  The label to the yq binary to use.         If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | @yq//:yq |
 
 
 <a id="#npm_import"></a>
