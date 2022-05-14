@@ -21,9 +21,7 @@ http_archive(
     strip_prefix = "${PREFIX}",
     url = "https://github.com/aspect-build/rules_js/archive/refs/tags/${TAG}.tar.gz",
 )
-
-load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
-
-rules_js_dependencies()
-\`\`\`
 EOF
+
+awk 'f;/--SNIP--/{f=1}' e2e/pnpm_workspace/WORKSPACE
+echo "\`\`\`" 
