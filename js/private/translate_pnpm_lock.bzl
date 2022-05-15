@@ -5,7 +5,6 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":repo_toolchains.bzl", "yq_path")
 
 _DOC = """Repository rule to generate npm_import rules from pnpm lock file.
 
@@ -139,22 +138,11 @@ _ATTRS = {
         doc = """If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist""",
         default = True,
     ),
-    "yq": attr.label(
-        doc = """The label to the yq binary to use.
-        If executing on a windows host, the .exe extension will be appended if there is no .exe, .bat, or .cmd extension on the label.""",
-        default = "@yq//:yq",
-    ),
 }
 
 def _process_lockfile(rctx):
-    json_lockfile_path = rctx.path("pnpm-lock.json")
-    result = rctx.execute([yq_path(rctx), "-o=json", ".", rctx.path(rctx.attr.pnpm_lock)])
-    if result.return_code != 0:
-        fail("failed to convert pnpm lockfile to json: %s" % result.stderr)
-    rctx.file(json_lockfile_path, result.stdout)
-
-    json_lockfile = json.decode(rctx.read(json_lockfile_path))
-    return translate_to_transitive_closure(json_lockfile, rctx.attr.prod, rctx.attr.dev, rctx.attr.no_optional)
+    lockfile = pnpm_utils.parse_pnpm_lock(rctx.read(rctx.path(rctx.attr.pnpm_lock)))
+    return translate_to_transitive_closure(lockfile, rctx.attr.prod, rctx.attr.dev, rctx.attr.no_optional)
 
 _NPM_IMPORT_TMPL = \
     """    npm_import(

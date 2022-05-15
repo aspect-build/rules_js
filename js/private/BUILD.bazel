@@ -80,7 +80,6 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
     deps = [
         ":pnpm_utils",
-        ":repo_toolchains",
         ":starlark_codegen_utils",
         ":transitive_closure",
         "@bazel_skylib//lib:dicts",
@@ -92,6 +91,7 @@ bzl_library(
     name = "pnpm_utils",
     srcs = ["pnpm_utils.bzl"],
     visibility = ["//js:__subpackages__"],
+    deps = [":yaml"],
 )
 
 bzl_library(
