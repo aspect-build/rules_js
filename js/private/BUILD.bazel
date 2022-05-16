@@ -59,17 +59,7 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
     deps = [
         ":pnpm_utils",
-        ":repo_toolchains",
         ":starlark_codegen_utils",
-        "@aspect_bazel_lib//lib:repo_utils",
-    ],
-)
-
-bzl_library(
-    name = "repo_toolchains",
-    srcs = ["repo_toolchains.bzl"],
-    visibility = ["//js:__subpackages__"],
-    deps = [
         "@aspect_bazel_lib//lib:repo_utils",
     ],
 )

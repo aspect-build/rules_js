@@ -14,12 +14,6 @@ nodejs_register_toolchains(
     node_version = "16.9.0",
 )
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "DEFAULT_YQ_VERSION", "register_yq_toolchains")
-
-register_yq_toolchains(
-    version = DEFAULT_YQ_VERSION,
-)
-
 load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
 
 translate_pnpm_lock(
