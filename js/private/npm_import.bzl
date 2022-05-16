@@ -5,7 +5,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":pnpm_utils.bzl", "pnpm_utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":repo_toolchains.bzl", "yq_path")
 
 _LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_package = "js_package")
 load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")
@@ -414,28 +413,21 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "patches": attr.label_list(),
     "run_lifecycle_hooks": attr.bool(),
     "custom_postinstall": attr.string(),
-    "yq": attr.label(default = "@yq//:yq"),
 })
 
 def _inject_run_lifecycle_hooks(rctx, pkg_json_path):
-    rctx.execute([
-        yq_path(rctx),
-        "-P",
-        "-o=json",
-        "--inplace",
-        ".scripts._rules_js_run_lifecycle_hooks=\"1\"",
-        pkg_json_path,
-    ], quiet = False)
+    package_json = json.decode(rctx.read(pkg_json_path))
+    package_json.setdefault("scripts", {})["_rules_js_run_lifecycle_hooks"] = "1"
+
+    # TODO: The order of fields in package.json is not preserved making it harder to read
+    rctx.file(pkg_json_path, json.encode_indent(package_json, indent = "  "))
 
 def _inject_custom_postinstall(rctx, pkg_json_path, custom_postinstall):
-    rctx.execute([
-        yq_path(rctx),
-        "-P",
-        "-o=json",
-        "--inplace",
-        ".scripts._rules_js_custom_postinstall=\"%s\"" % custom_postinstall,
-        pkg_json_path,
-    ], quiet = False)
+    package_json = json.decode(rctx.read(pkg_json_path))
+    package_json.setdefault("scripts", {})["_rules_js_custom_postinstall"] = custom_postinstall
+
+    # TODO: The order of fields in package.json is not preserved making it harder to read
+    rctx.file(pkg_json_path, json.encode_indent(package_json, indent = "  "))
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
