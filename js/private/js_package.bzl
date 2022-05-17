@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo")
+load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 
 JsPackageInfo = provider(
     doc = "A provider that carries the output directory (a TreeArtifact) of a js_package which contains the packages sources along with the package name and version",
@@ -90,9 +90,7 @@ def _impl(ctx):
     #       if no package.json is found in the directory then optional generate one
 
     providers.extend([
-        DeclarationInfo(
-            declarations = [directory],
-        ),
+        declaration_info(depset([directory])),
         JsPackageInfo(
             label = ctx.label,
             package = ctx.attr.package,
