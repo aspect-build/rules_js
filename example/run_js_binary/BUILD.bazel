@@ -1,0 +1,18 @@
+load("//js:defs.bzl", "js_binary")
+load("//js:run_js_binary.bzl", "run_js_binary")
+
+js_binary(
+    name = "copy",
+    entry_point = "copy.js",
+)
+
+run_js_binary(
+    name = "run_copy",
+    srcs = ["in.txt"],
+    outs = ["out.txt"],
+    args = [
+        "$(location in.txt)",
+        "$(location out.txt)",
+    ],
+    tool = ":copy",
+)
