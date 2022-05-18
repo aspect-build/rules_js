@@ -83,6 +83,27 @@ Identical to js_binary, but usable under `bazel test`.
 | <a id="js_test-verbose"></a>verbose |  Produce verbose output.   | Boolean | optional | False |
 
 
+<a id="#js_binary_lib.create_launcher"></a>
+
+## js_binary_lib.create_launcher
+
+<pre>
+js_binary_lib.create_launcher(<a href="#js_binary_lib.create_launcher-ctx">ctx</a>, <a href="#js_binary_lib.create_launcher-log_prefix_rule_set">log_prefix_rule_set</a>, <a href="#js_binary_lib.create_launcher-log_prefix_rule">log_prefix_rule</a>, <a href="#js_binary_lib.create_launcher-fixed_args">fixed_args</a>)
+</pre>
+
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :------------- | :------------- | :------------- |
+| <a id="js_binary_lib.create_launcher-ctx"></a>ctx |  <p align="center"> - </p>   |  none |
+| <a id="js_binary_lib.create_launcher-log_prefix_rule_set"></a>log_prefix_rule_set |  <p align="center"> - </p>   |  none |
+| <a id="js_binary_lib.create_launcher-log_prefix_rule"></a>log_prefix_rule |  <p align="center"> - </p>   |  none |
+| <a id="js_binary_lib.create_launcher-fixed_args"></a>fixed_args |  <p align="center"> - </p>   |  <code>[]</code> |
+
+
 <a id="#js_binary_lib.implementation"></a>
 
 ## js_binary_lib.implementation

@@ -9,12 +9,7 @@ set -o pipefail -o errexit -o nounset
 
 {{envs}}
 
-# https://docs.bazel.build/versions/main/test-encyclopedia.html#initial-conditions
-if [ "${TEST_TARGET:-}" ]; then
-    LOG_PREFIX="aspect_rules_js[js_test]"
-else
-    LOG_PREFIX="aspect_rules_js[js_binary]"
-fi
+LOG_PREFIX="{{log_prefix_rule_set}}[{{log_prefix_rule}}]"
 
 # ==============================================================================
 # Initialize RUNFILES environment variable
@@ -204,7 +199,7 @@ NODE_OPTIONS=()
 {{node_options}}
 
 ARGS=()
-ALL_ARGS=("$@")
+ALL_ARGS=({{fixed_args}} "$@")
 for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
   case "$ARG" in
     # Let users pass through arguments to node itself
