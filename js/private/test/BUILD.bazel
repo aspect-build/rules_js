@@ -49,5 +49,6 @@ write_source_files(
         "repositories_checked.bzl": "@example_npm_deps//:repositories.bzl",
         "defs_checked.bzl": "@example_npm_deps//:defs.bzl",
         "package_json_checked.bzl": "@example_npm_deps__rollup__2.70.2//:package_json.bzl",
+        "package_json_with_dashes_checked.bzl": "@example_npm_deps__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1//:package_json.bzl",
     },
 )

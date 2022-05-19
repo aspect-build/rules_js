@@ -266,19 +266,20 @@ def _impl(rctx):
             bin_bzl.append(
                 _BIN_MACRO_TMPL.format(
                     bazel_name = bazel_name,
-                    bin_name = name,
+                    bin_name = _sanitize_bin_name(name),
                     bin_path = bins[name],
                     dir_postfix = pnpm_utils.dir_postfix,
                     namespace = pnpm_utils.js_package_target_namespace,
                 ),
             )
 
-        rctx.file(bin_bzl_file, "\n".join(bin_bzl + [
-            "bin = struct(%s)\n" % ",\n".join([
-                "{name} = {name}, {name}_test = {name}_test, {name}_binary = {name}_binary".format(name = name)
-                for name in bins
-            ]),
-        ]))
+        bin_struct_fields = [
+            "{name} = {name}, {name}_test = {name}_test, {name}_binary = {name}_binary".format(name = _sanitize_bin_name(name))
+            for name in bins
+        ]
+        bin_bzl.append("bin = struct(%s)\n" % ",\n".join(bin_struct_fields))
+
+        rctx.file(bin_bzl_file, "\n".join(bin_bzl))
 
     if rctx.attr.run_lifecycle_hooks:
         _inject_run_lifecycle_hooks(rctx, pkg_json_path)
@@ -303,6 +304,10 @@ def _impl(rctx):
         build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr([bin_bzl_file]))
 
     rctx.file("BUILD.bazel", "\n".join(build_file))
+
+def _sanitize_bin_name(name):
+    """ Sanitize a package name so we can use it in starlark function names """
+    return name.replace("-", "_")
 
 def _impl_links(rctx):
     ref_deps = []
