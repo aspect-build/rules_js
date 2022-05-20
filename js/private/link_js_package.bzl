@@ -119,8 +119,12 @@ def _impl_store(ctx):
         # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
         virtual_store_directory_path = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", package)
 
+        if ctx.label.workspace_name:
+            expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, virtual_store_directory_path)
+        else:
+            expected_short_path = paths.join(ctx.label.package, virtual_store_directory_path)
         src_directory = ctx.attr.src[JsPackageInfo].directory
-        if src_directory.short_path == paths.join(ctx.label.package, virtual_store_directory_path):
+        if src_directory.short_path == expected_short_path:
             # the input is already the desired output; this is the pattern for
             # packages with lifecycle hooks
             virtual_store_directory = src_directory
