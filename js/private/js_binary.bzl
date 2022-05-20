@@ -139,7 +139,7 @@ _NODE_OPTION = """NODE_OPTIONS+=(\"{value}\")"""
 def _target_tool_short_path(path):
     return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
-def _bash_launcher(ctx, entry_point_path, args):
+def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args):
     bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
@@ -172,13 +172,18 @@ def _bash_launcher(ctx, entry_point_path, args):
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, node_option, ctx.attr.data).split(" ")]),
         ))
 
+    fixed_args_expanded = [expand_variables(ctx, fixed_arg, attribute_name = "fixed_args") for fixed_arg in fixed_args]
+
     launcher_subst = {
-        "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
-        "{{node}}": _target_tool_short_path(node_bin.target_tool_path),
         "{{entry_point_path}}": entry_point_path,
-        "{{workspace_name}}": ctx.workspace_name,
         "{{envs}}": "\n".join(envs),
+        "{{fixed_args}}": " ".join(fixed_args_expanded),
+        "{{log_prefix_rule_set}}": log_prefix_rule_set,
+        "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
+        "{{node}}": _target_tool_short_path(node_bin.target_tool_path),
+        "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
+        "{{workspace_name}}": ctx.workspace_name,
     }
 
     ctx.actions.expand_template(
@@ -190,7 +195,7 @@ def _bash_launcher(ctx, entry_point_path, args):
 
     return launcher
 
-def _create_launcher(ctx):
+def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = []):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
     if is_windows and not ctx.attr.enable_runfiles:
@@ -213,8 +218,8 @@ def _create_launcher(ctx):
 
     output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows)
 
-    bash_launcher = _bash_launcher(ctx, entry_point_path, ctx.attr.args)
-    launcher = create_windows_native_launcher_script(ctx, ctx.outputs.launcher_sh) if is_windows else bash_launcher
+    bash_launcher = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args)
+    launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
     all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(
@@ -226,19 +231,24 @@ def _create_launcher(ctx):
         for dep in ctx.attr.data
     ])
     return struct(
-        exe = launcher,
+        executable = launcher,
         runfiles = runfiles,
     )
 
 def _impl(ctx):
-    launcher = _create_launcher(ctx)
+    launcher = _create_launcher(
+        ctx,
+        log_prefix_rule_set = "aspect_rules_js",
+        log_prefix_rule = "js_test" if ctx.attr.testonly else "js_binary",
+    )
     return DefaultInfo(
-        executable = launcher.exe,
+        executable = launcher.executable,
         runfiles = launcher.runfiles,
     )
 
 js_binary_lib = struct(
     attrs = _ATTRS,
+    create_launcher = _create_launcher,
     implementation = _impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
