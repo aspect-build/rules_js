@@ -1,7 +1,9 @@
-# Bazel rules for js
+# Bazel rules for JavaScript
 
 This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
 accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
+
+It is not a complete replacement for rules_nodejs, as the foundational layer is still used:
 
 ![Block Diagram](./block_diagram.svg)
 
@@ -37,6 +39,7 @@ rules_js is just a part of what Aspect provides:
     -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for the `tsc` compiler from <http://typescriptlang.org>
     -   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for webpack bundler <https://webpack.js.org/>
     -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
+    -   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using https://jestjs.io
 -   Python
     -   [rules_py](https://github.com/aspect-build/rules_py) - Bazel rules for running Python tools and building Python projects
 -   C / C++
