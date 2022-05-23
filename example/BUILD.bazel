@@ -2,15 +2,20 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@example_npm_deps//:defs.bzl", "link_js_packages", "package", "package_dir")
-load("@example_npm_deps//uvu:package_json.bzl", uvu_bin = "bin")
-load("@example_npm_deps__acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
-load("@example_npm_deps__rollup__2.70.2//:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
+
+# Load from all packages declared in /WORKSPACE translate_pnpm_lock
+load("@npm//:defs.bzl", "link_js_packages", "package", "package_dir")
+
+# Load from the "bin" property from the package.json of the uvu package
+load("@npm//uvu:package_json.bzl", uvu_bin = "bin")
+
+# This package was fetched separately with npm_import from /WORKSPACE
+load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
+
+# Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
+load("@npm__rollup__2.70.2//:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
 load("//js:defs.bzl", "js_binary", "js_test", "link_js_package")
 load("//js:run_js_binary.bzl", "run_js_binary")
-
-# gazelle:exclude npm_imports.bzl
-# gazelle:exclude translate_pnpm_lock.bzl
 
 ###########################
 
@@ -170,7 +175,7 @@ diff_test(
 
 js_test(
     name = "test_test",
-    data = ["@example_npm_deps//@types/node"],
+    data = ["@npm//@types/node"],
     entry_point = "test.js",
 )
 
@@ -224,7 +229,7 @@ write_file(
 
 js_binary(
     name = "bin7",
-    data = ["@example_npm_deps//@gregmagolan/test-b"],
+    data = ["@npm//@gregmagolan/test-b"],
     entry_point = "case7.js",
 )
 
@@ -410,12 +415,12 @@ run_js_binary(
 js_test(
     name = "test_peer",
     data = [
-        "@example_npm_deps//@rollup/plugin-commonjs",
-        "@example_npm_deps//mobx-react",
-        "@example_npm_deps//react",
+        "@npm//@rollup/plugin-commonjs",
+        "@npm//mobx-react",
+        "@npm//react",
         # TODO: fix this test so we test a peer dependency without requiring it as a direct
         # dependency https://github.com/aspect-build/rules_js/issues/92
-        "@example_npm_deps//rollup",
+        "@npm//rollup",
     ],
     entry_point = "peer.js",
 )
@@ -621,7 +626,7 @@ uvu_test(
     ],
     data = [
         ":acorn_spec",
-        "@example_npm_deps//uvu",
+        "@npm//uvu",
         package("@mycorp/mylib"),
     ],
 )

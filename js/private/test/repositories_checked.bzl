@@ -5,7 +5,7 @@ load("@aspect_rules_js//js:npm_import.bzl", "npm_import")
 def npm_repositories():
     "Generated npm_import repository rules corresponding to npm packages in @//example:pnpm-lock.yaml"
     npm_import(
-        name = "example_npm_deps__at_aspect-test_a__5.0.0",
+        name = "npm__at_aspect-test_a__5.0.0",
         integrity = "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         root_path = "example",
         link_paths = ["."],
@@ -25,7 +25,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_aspect-test_b__5.0.0",
+        name = "npm__at_aspect-test_b__5.0.0",
         integrity = "sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==",
         root_path = "example",
         link_paths = ["."],
@@ -45,7 +45,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_aspect-test_c__1.0.0",
+        name = "npm__at_aspect-test_c__1.0.0",
         integrity = "sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==",
         root_path = "example",
         link_paths = [],
@@ -59,7 +59,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_aspect-test_c__2.0.0",
+        name = "npm__at_aspect-test_c__2.0.0",
         integrity = "sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==",
         root_path = "example",
         link_paths = ["."],
@@ -73,7 +73,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_aspect-test_d__2.0.0__at_aspect-test_c_1.0.0",
+        name = "npm__at_aspect-test_d__2.0.0__at_aspect-test_c_1.0.0",
         integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
         root_path = "example",
         link_paths = [],
@@ -89,7 +89,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.0",
+        name = "npm__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.0",
         integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
         root_path = "example",
         link_paths = [],
@@ -105,7 +105,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_gregmagolan_test-a__0.0.1",
+        name = "npm__at_gregmagolan_test-a__0.0.1",
         integrity = "sha512-nMZ3MKkXZ+uYbrm8R3dfdt3v1gOOLtf88CdDciWxMYGLr29oVjQG11y2fz4IRBR6R7hI2Gj+G9sHZ69wLTnjfA==",
         root_path = "example",
         link_paths = [],
@@ -119,7 +119,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_gregmagolan_test-b__0.0.2",
+        name = "npm__at_gregmagolan_test-b__0.0.2",
         integrity = "sha512-h+LeJUbUued9XyQwxKMUdklGiGxPYJ1RvTAK9612ctCiMS2Fn0wu/Au5kHsMHxm8l4bOfpgAWmQ0OQQy7wUBCg==",
         root_path = "example",
         link_paths = ["."],
@@ -135,7 +135,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_polka_url__1.0.0-next.21",
+        name = "npm__at_polka_url__1.0.0-next.21",
         integrity = "sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==",
         root_path = "example",
         link_paths = [],
@@ -147,7 +147,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_rollup_plugin-commonjs__21.1.0__rollup_2.70.2",
+        name = "npm__at_rollup_plugin-commonjs__21.1.0__rollup_2.70.2",
         integrity = "sha512-6ZtHx3VHIp2ReNNDxHjuUml6ur+WcQ28N1yHgCQwsbNkQg2suhxGMDQGJOn/KuDxKtd1xuZP5xSTwBA4GQ8hbA==",
         root_path = "example",
         link_paths = ["."],
@@ -196,7 +196,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_rollup_pluginutils__3.1.0__rollup_2.70.2",
+        name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.70.2",
         integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
         root_path = "example",
         link_paths = [],
@@ -219,7 +219,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_types_estree__0.0.39",
+        name = "npm__at_types_estree__0.0.39",
         integrity = "sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==",
         root_path = "example",
         link_paths = [],
@@ -231,7 +231,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_types_estree__0.0.51",
+        name = "npm__at_types_estree__0.0.51",
         integrity = "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==",
         root_path = "example",
         link_paths = [],
@@ -243,7 +243,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__at_types_node__15.14.9",
+        name = "npm__at_types_node__15.14.9",
         integrity = "sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==",
         root_path = "example",
         link_paths = ["."],
@@ -255,7 +255,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__acorn-walk__8.2.0",
+        name = "npm__acorn-walk__8.2.0",
         integrity = "sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==",
         root_path = "example",
         link_paths = [],
@@ -267,7 +267,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__acorn__8.7.1",
+        name = "npm__acorn__8.7.1",
         integrity = "sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==",
         root_path = "example",
         link_paths = [],
@@ -279,7 +279,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__ansi-styles__4.3.0",
+        name = "npm__ansi-styles__4.3.0",
         integrity = "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
         root_path = "example",
         link_paths = [],
@@ -296,7 +296,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__balanced-match__1.0.2",
+        name = "npm__balanced-match__1.0.2",
         integrity = "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         root_path = "example",
         link_paths = [],
@@ -308,7 +308,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__brace-expansion__1.1.11",
+        name = "npm__brace-expansion__1.1.11",
         integrity = "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
         root_path = "example",
         link_paths = [],
@@ -326,7 +326,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__bufferutil__4.0.1",
+        name = "npm__bufferutil__4.0.1",
         integrity = "sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==",
         root_path = "example",
         link_paths = ["."],
@@ -343,7 +343,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__chalk__4.1.2",
+        name = "npm__chalk__4.1.2",
         integrity = "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==",
         root_path = "example",
         link_paths = [],
@@ -364,7 +364,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__color-convert__2.0.1",
+        name = "npm__color-convert__2.0.1",
         integrity = "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==",
         root_path = "example",
         link_paths = [],
@@ -380,7 +380,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__color-name__1.1.4",
+        name = "npm__color-name__1.1.4",
         integrity = "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
         root_path = "example",
         link_paths = [],
@@ -392,7 +392,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__commander__7.2.0",
+        name = "npm__commander__7.2.0",
         integrity = "sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==",
         root_path = "example",
         link_paths = [],
@@ -404,7 +404,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__commondir__1.0.1",
+        name = "npm__commondir__1.0.1",
         integrity = "sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=",
         root_path = "example",
         link_paths = [],
@@ -416,7 +416,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__concat-map__0.0.1",
+        name = "npm__concat-map__0.0.1",
         integrity = "sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=",
         root_path = "example",
         link_paths = [],
@@ -428,7 +428,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__dequal__2.0.2",
+        name = "npm__dequal__2.0.2",
         integrity = "sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==",
         root_path = "example",
         link_paths = [],
@@ -440,7 +440,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__diff__5.0.0",
+        name = "npm__diff__5.0.0",
         integrity = "sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==",
         root_path = "example",
         link_paths = [],
@@ -452,7 +452,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__duplexer__0.1.2",
+        name = "npm__duplexer__0.1.2",
         integrity = "sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==",
         root_path = "example",
         link_paths = [],
@@ -464,7 +464,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-android-64__0.14.38",
+        name = "npm__esbuild-android-64__0.14.38",
         integrity = "sha512-aRFxR3scRKkbmNuGAK+Gee3+yFxkTJO/cx83Dkyzo4CnQl/2zVSurtG6+G86EQIZ+w+VYngVyK7P3HyTBKu3nw==",
         root_path = "example",
         link_paths = [],
@@ -477,7 +477,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-android-arm64__0.14.38",
+        name = "npm__esbuild-android-arm64__0.14.38",
         integrity = "sha512-L2NgQRWuHFI89IIZIlpAcINy9FvBk6xFVZ7xGdOwIm8VyhX1vNCEqUJO3DPSSy945Gzdg98cxtNt8Grv1CsyhA==",
         root_path = "example",
         link_paths = [],
@@ -490,7 +490,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-darwin-64__0.14.38",
+        name = "npm__esbuild-darwin-64__0.14.38",
         integrity = "sha512-5JJvgXkX87Pd1Og0u/NJuO7TSqAikAcQQ74gyJ87bqWRVeouky84ICoV4sN6VV53aTW+NE87qLdGY4QA2S7KNA==",
         root_path = "example",
         link_paths = [],
@@ -503,7 +503,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-darwin-arm64__0.14.38",
+        name = "npm__esbuild-darwin-arm64__0.14.38",
         integrity = "sha512-eqF+OejMI3mC5Dlo9Kdq/Ilbki9sQBw3QlHW3wjLmsLh+quNfHmGMp3Ly1eWm981iGBMdbtSS9+LRvR2T8B3eQ==",
         root_path = "example",
         link_paths = [],
@@ -516,7 +516,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-freebsd-64__0.14.38",
+        name = "npm__esbuild-freebsd-64__0.14.38",
         integrity = "sha512-epnPbhZUt93xV5cgeY36ZxPXDsQeO55DppzsIgWM8vgiG/Rz+qYDLmh5ts3e+Ln1wA9dQ+nZmVHw+RjaW3I5Ig==",
         root_path = "example",
         link_paths = [],
@@ -529,7 +529,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-freebsd-arm64__0.14.38",
+        name = "npm__esbuild-freebsd-arm64__0.14.38",
         integrity = "sha512-/9icXUYJWherhk+y5fjPI5yNUdFPtXHQlwP7/K/zg8t8lQdHVj20SqU9/udQmeUo5pDFHMYzcEFfJqgOVeKNNQ==",
         root_path = "example",
         link_paths = [],
@@ -542,7 +542,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-32__0.14.38",
+        name = "npm__esbuild-linux-32__0.14.38",
         integrity = "sha512-QfgfeNHRFvr2XeHFzP8kOZVnal3QvST3A0cgq32ZrHjSMFTdgXhMhmWdKzRXP/PKcfv3e2OW9tT9PpcjNvaq6g==",
         root_path = "example",
         link_paths = [],
@@ -555,7 +555,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-64__0.14.38",
+        name = "npm__esbuild-linux-64__0.14.38",
         integrity = "sha512-uuZHNmqcs+Bj1qiW9k/HZU3FtIHmYiuxZ/6Aa+/KHb/pFKr7R3aVqvxlAudYI9Fw3St0VCPfv7QBpUITSmBR1Q==",
         root_path = "example",
         link_paths = [],
@@ -568,7 +568,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-arm__0.14.38",
+        name = "npm__esbuild-linux-arm__0.14.38",
         integrity = "sha512-FiFvQe8J3VKTDXG01JbvoVRXQ0x6UZwyrU4IaLBZeq39Bsbatd94Fuc3F1RGqPF5RbIWW7RvkVQjn79ejzysnA==",
         root_path = "example",
         link_paths = [],
@@ -581,7 +581,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-arm64__0.14.38",
+        name = "npm__esbuild-linux-arm64__0.14.38",
         integrity = "sha512-HlMGZTEsBrXrivr64eZ/EO0NQM8H8DuSENRok9d+Jtvq8hOLzrxfsAT9U94K3KOGk2XgCmkaI2KD8hX7F97lvA==",
         root_path = "example",
         link_paths = [],
@@ -594,7 +594,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-mips64le__0.14.38",
+        name = "npm__esbuild-linux-mips64le__0.14.38",
         integrity = "sha512-qd1dLf2v7QBiI5wwfil9j0HG/5YMFBAmMVmdeokbNAMbcg49p25t6IlJFXAeLzogv1AvgaXRXvgFNhScYEUXGQ==",
         root_path = "example",
         link_paths = [],
@@ -607,7 +607,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-ppc64le__0.14.38",
+        name = "npm__esbuild-linux-ppc64le__0.14.38",
         integrity = "sha512-mnbEm7o69gTl60jSuK+nn+pRsRHGtDPfzhrqEUXyCl7CTOCLtWN2bhK8bgsdp6J/2NyS/wHBjs1x8aBWwP2X9Q==",
         root_path = "example",
         link_paths = [],
@@ -620,7 +620,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-riscv64__0.14.38",
+        name = "npm__esbuild-linux-riscv64__0.14.38",
         integrity = "sha512-+p6YKYbuV72uikChRk14FSyNJZ4WfYkffj6Af0/Tw63/6TJX6TnIKE+6D3xtEc7DeDth1fjUOEqm+ApKFXbbVQ==",
         root_path = "example",
         link_paths = [],
@@ -633,7 +633,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-linux-s390x__0.14.38",
+        name = "npm__esbuild-linux-s390x__0.14.38",
         integrity = "sha512-0zUsiDkGJiMHxBQ7JDU8jbaanUY975CdOW1YDrurjrM0vWHfjv9tLQsW9GSyEb/heSK1L5gaweRjzfUVBFoybQ==",
         root_path = "example",
         link_paths = [],
@@ -646,7 +646,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-netbsd-64__0.14.38",
+        name = "npm__esbuild-netbsd-64__0.14.38",
         integrity = "sha512-cljBAApVwkpnJZfnRVThpRBGzCi+a+V9Ofb1fVkKhtrPLDYlHLrSYGtmnoTVWDQdU516qYI8+wOgcGZ4XIZh0Q==",
         root_path = "example",
         link_paths = [],
@@ -659,7 +659,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-openbsd-64__0.14.38",
+        name = "npm__esbuild-openbsd-64__0.14.38",
         integrity = "sha512-CDswYr2PWPGEPpLDUO50mL3WO/07EMjnZDNKpmaxUPsrW+kVM3LoAqr/CE8UbzugpEiflYqJsGPLirThRB18IQ==",
         root_path = "example",
         link_paths = [],
@@ -672,7 +672,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-sunos-64__0.14.38",
+        name = "npm__esbuild-sunos-64__0.14.38",
         integrity = "sha512-2mfIoYW58gKcC3bck0j7lD3RZkqYA7MmujFYmSn9l6TiIcAMpuEvqksO+ntBgbLep/eyjpgdplF7b+4T9VJGOA==",
         root_path = "example",
         link_paths = [],
@@ -685,7 +685,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-windows-32__0.14.38",
+        name = "npm__esbuild-windows-32__0.14.38",
         integrity = "sha512-L2BmEeFZATAvU+FJzJiRLFUP+d9RHN+QXpgaOrs2klshoAm1AE6Us4X6fS9k33Uy5SzScn2TpcgecbqJza1Hjw==",
         root_path = "example",
         link_paths = [],
@@ -698,7 +698,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-windows-64__0.14.38",
+        name = "npm__esbuild-windows-64__0.14.38",
         integrity = "sha512-Khy4wVmebnzue8aeSXLC+6clo/hRYeNIm0DyikoEqX+3w3rcvrhzpoix0S+MF9vzh6JFskkIGD7Zx47ODJNyCw==",
         root_path = "example",
         link_paths = [],
@@ -711,7 +711,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild-windows-arm64__0.14.38",
+        name = "npm__esbuild-windows-arm64__0.14.38",
         integrity = "sha512-k3FGCNmHBkqdJXuJszdWciAH77PukEyDsdIryEHn9cKLQFxzhT39dSumeTuggaQcXY57UlmLGIkklWZo2qzHpw==",
         root_path = "example",
         link_paths = [],
@@ -724,7 +724,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__esbuild__0.14.38",
+        name = "npm__esbuild__0.14.38",
         integrity = "sha512-12fzJ0fsm7gVZX1YQ1InkOE5f9Tl7cgf6JPYXRJtPIoE0zkWAbHdPHVPPaLi9tYAcEBqheGzqLn/3RdTOyBfcA==",
         root_path = "example",
         link_paths = ["."],
@@ -779,7 +779,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__estree-walker__1.0.1",
+        name = "npm__estree-walker__1.0.1",
         integrity = "sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==",
         root_path = "example",
         link_paths = [],
@@ -791,7 +791,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__estree-walker__2.0.2",
+        name = "npm__estree-walker__2.0.2",
         integrity = "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==",
         root_path = "example",
         link_paths = [],
@@ -803,7 +803,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__fs.realpath__1.0.0",
+        name = "npm__fs.realpath__1.0.0",
         integrity = "sha1-FQStJSMVjKpA20onh8sBQRmU6k8=",
         root_path = "example",
         link_paths = [],
@@ -815,7 +815,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__fsevents__2.3.2",
+        name = "npm__fsevents__2.3.2",
         integrity = "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==",
         root_path = "example",
         link_paths = [],
@@ -828,7 +828,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__function-bind__1.1.1",
+        name = "npm__function-bind__1.1.1",
         integrity = "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==",
         root_path = "example",
         link_paths = [],
@@ -840,7 +840,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__glob__7.2.0",
+        name = "npm__glob__7.2.0",
         integrity = "sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==",
         root_path = "example",
         link_paths = [],
@@ -870,7 +870,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__gzip-size__6.0.0",
+        name = "npm__gzip-size__6.0.0",
         integrity = "sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==",
         root_path = "example",
         link_paths = [],
@@ -886,7 +886,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__has-flag__4.0.0",
+        name = "npm__has-flag__4.0.0",
         integrity = "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==",
         root_path = "example",
         link_paths = [],
@@ -898,7 +898,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__has__1.0.3",
+        name = "npm__has__1.0.3",
         integrity = "sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==",
         root_path = "example",
         link_paths = [],
@@ -914,7 +914,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__inflight__1.0.6",
+        name = "npm__inflight__1.0.6",
         integrity = "sha1-Sb1jMdfQLQwJvJEKEHW6gWW1bfk=",
         root_path = "example",
         link_paths = [],
@@ -932,7 +932,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__inherits__2.0.4",
+        name = "npm__inherits__2.0.4",
         integrity = "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
         root_path = "example",
         link_paths = [],
@@ -944,7 +944,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__is-core-module__2.9.0",
+        name = "npm__is-core-module__2.9.0",
         integrity = "sha512-+5FPy5PnwmO3lvfMb0AsoPaBG+5KHUI0wYFXOtYPnVVVspTFUuMZNfNaNVRt3FZadstu2c8x23vykRW/NBoU6A==",
         root_path = "example",
         link_paths = [],
@@ -961,7 +961,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__is-reference__1.2.1",
+        name = "npm__is-reference__1.2.1",
         integrity = "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
         root_path = "example",
         link_paths = [],
@@ -977,7 +977,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__js-tokens__4.0.0",
+        name = "npm__js-tokens__4.0.0",
         integrity = "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==",
         root_path = "example",
         link_paths = [],
@@ -989,7 +989,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__kleur__4.1.4",
+        name = "npm__kleur__4.1.4",
         integrity = "sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==",
         root_path = "example",
         link_paths = [],
@@ -1001,7 +1001,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__lodash__4.17.21",
+        name = "npm__lodash__4.17.21",
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         root_path = "example",
         link_paths = [],
@@ -1013,7 +1013,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__loose-envify__1.4.0",
+        name = "npm__loose-envify__1.4.0",
         integrity = "sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==",
         root_path = "example",
         link_paths = [],
@@ -1029,7 +1029,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__magic-string__0.25.9",
+        name = "npm__magic-string__0.25.9",
         integrity = "sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==",
         root_path = "example",
         link_paths = [],
@@ -1045,7 +1045,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__minimatch__3.1.2",
+        name = "npm__minimatch__3.1.2",
         integrity = "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
         root_path = "example",
         link_paths = [],
@@ -1063,7 +1063,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__mobx-react-lite__3.3.0__mobx_6.5.0_react_17.0.2",
+        name = "npm__mobx-react-lite__3.3.0__mobx_6.5.0_react_17.0.2",
         integrity = "sha512-U/kMSFtV/bNVgY01FuiGWpRkaQVHozBq5CEBZltFvPt4FcV111hEWkgwqVg9GPPZSEuEdV438PEz8mk8mKpYlA==",
         root_path = "example",
         link_paths = [],
@@ -1084,7 +1084,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__mobx-react__7.3.0__mobx_6.5.0_react_17.0.2",
+        name = "npm__mobx-react__7.3.0__mobx_6.5.0_react_17.0.2",
         integrity = "sha512-RGEcwZokopqyJE5JPwXKB9FWMSqFM9NJVO2QPI+z6laJTJeBHqvPicjnKgY5mvihxTeXB1+72TnooqUePeGV1g==",
         root_path = "example",
         link_paths = ["."],
@@ -1107,7 +1107,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__mobx__6.5.0",
+        name = "npm__mobx__6.5.0",
         integrity = "sha512-pHZ/cySF00FVENDWIDzJyoObFahK6Eg4d0papqm6d7yMkxWTZ/S/csqJX1A3PsYy4t5k3z2QnlwuCfMW5lSEwA==",
         root_path = "example",
         link_paths = ["."],
@@ -1119,7 +1119,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__mri__1.2.0",
+        name = "npm__mri__1.2.0",
         integrity = "sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==",
         root_path = "example",
         link_paths = [],
@@ -1131,7 +1131,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__mrmime__1.0.0",
+        name = "npm__mrmime__1.0.0",
         integrity = "sha512-a70zx7zFfVO7XpnQ2IX1Myh9yY4UYvfld/dikWRnsXxbyvMcfz+u6UfgNAtH+k2QqtJuzVpv6eLTx1G2+WKZbQ==",
         root_path = "example",
         link_paths = [],
@@ -1143,7 +1143,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__node-gyp-build__3.7.0",
+        name = "npm__node-gyp-build__3.7.0",
         integrity = "sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==",
         root_path = "example",
         link_paths = [],
@@ -1155,7 +1155,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__object-assign__4.1.1",
+        name = "npm__object-assign__4.1.1",
         integrity = "sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=",
         root_path = "example",
         link_paths = [],
@@ -1167,7 +1167,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__once__1.4.0",
+        name = "npm__once__1.4.0",
         integrity = "sha1-WDsap3WWHUsROsF9nFC6753Xa9E=",
         root_path = "example",
         link_paths = [],
@@ -1183,7 +1183,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__opener__1.5.2",
+        name = "npm__opener__1.5.2",
         integrity = "sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==",
         root_path = "example",
         link_paths = [],
@@ -1195,7 +1195,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__path-is-absolute__1.0.1",
+        name = "npm__path-is-absolute__1.0.1",
         integrity = "sha1-F0uSaHNVNP+8es5r9TpanhtcX18=",
         root_path = "example",
         link_paths = [],
@@ -1207,7 +1207,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__path-parse__1.0.7",
+        name = "npm__path-parse__1.0.7",
         integrity = "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==",
         root_path = "example",
         link_paths = [],
@@ -1219,7 +1219,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__picomatch__2.3.1",
+        name = "npm__picomatch__2.3.1",
         integrity = "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==",
         root_path = "example",
         link_paths = [],
@@ -1231,7 +1231,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__react__17.0.2",
+        name = "npm__react__17.0.2",
         integrity = "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==",
         root_path = "example",
         link_paths = ["."],
@@ -1250,7 +1250,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__resolve__1.22.0",
+        name = "npm__resolve__1.22.0",
         integrity = "sha512-Hhtrw0nLeSrFQ7phPp4OOcVjLPIeMnRlr5mcnVuMe7M/7eBn98A3hmFRLoFo3DLZkivSYwhRUJTyPyWAk56WLw==",
         root_path = "example",
         link_paths = [],
@@ -1272,7 +1272,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__rollup__2.70.2",
+        name = "npm__rollup__2.70.2",
         integrity = "sha512-EitogNZnfku65I1DD5Mxe8JYRUCy0hkK5X84IlDtUs+O6JRMpRciXTzyCUuX11b5L5pvjH+OmFXiQ3XjabcXgg==",
         root_path = "example",
         link_paths = ["."],
@@ -1288,7 +1288,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__sade__1.8.1",
+        name = "npm__sade__1.8.1",
         integrity = "sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==",
         root_path = "example",
         link_paths = [],
@@ -1304,7 +1304,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__sirv__1.0.19",
+        name = "npm__sirv__1.0.19",
         integrity = "sha512-JuLThK3TnZG1TAKDwNIqNq6QA2afLOCcm+iE8D1Kj3GA40pSPsxQjjJl0J8X3tsR7T+CP1GavpzLwYkgVLWrZQ==",
         root_path = "example",
         link_paths = [],
@@ -1324,7 +1324,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__sourcemap-codec__1.4.8",
+        name = "npm__sourcemap-codec__1.4.8",
         integrity = "sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==",
         root_path = "example",
         link_paths = [],
@@ -1336,7 +1336,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__supports-color__7.2.0",
+        name = "npm__supports-color__7.2.0",
         integrity = "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
         root_path = "example",
         link_paths = [],
@@ -1352,7 +1352,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__supports-preserve-symlinks-flag__1.0.0",
+        name = "npm__supports-preserve-symlinks-flag__1.0.0",
         integrity = "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==",
         root_path = "example",
         link_paths = [],
@@ -1364,7 +1364,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__totalist__1.1.0",
+        name = "npm__totalist__1.1.0",
         integrity = "sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==",
         root_path = "example",
         link_paths = [],
@@ -1376,7 +1376,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__uvu__0.5.3",
+        name = "npm__uvu__0.5.3",
         integrity = "sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==",
         root_path = "example",
         link_paths = ["."],
@@ -1399,7 +1399,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1",
+        name = "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1",
         integrity = "sha512-GUMZlM3SKwS8Z+CKeIFx7CVoHn3dXFcUAjT/dcZQQmfSZGvitPfMob2ipjai7ovFFqPvTqkEZ/leL4O0YOdAYQ==",
         root_path = "example",
         link_paths = ["."],
@@ -1442,7 +1442,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__wrappy__1.0.2",
+        name = "npm__wrappy__1.0.2",
         integrity = "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=",
         root_path = "example",
         link_paths = [],
@@ -1454,7 +1454,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "example_npm_deps__ws__7.5.7__bufferutil_4.0.1",
+        name = "npm__ws__7.5.7__bufferutil_4.0.1",
         integrity = "sha512-KMvVuFzpKBuiIXW3E4u3mySRO2/mCHSyZDJQM5NQ9Q9KHWHWh0NHgfbRMLLrceUK5qAL4ytALJbpRMjixFZh8A==",
         root_path = "example",
         link_paths = [],
