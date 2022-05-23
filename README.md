@@ -60,7 +60,7 @@ Note that the example also relies on code in the `/WORKSPACE` file in the root o
 ## Design
 
 The authors of `rules_js` spent four years writing and re-writing `build_bazel_rules_nodejs`.
-We learned a lot from that project, as well as from discussions with [Rush](https://rushjs.io/) maintainer @octogonz.
+We learned a lot from that project, as well as from discussions with [Rush](https://rushjs.io/) maintainer [@octogonz](https://github.com/octogonz).
 
 There are two core problems:
 
