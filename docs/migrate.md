@@ -3,7 +3,9 @@
 1. [Upgrade Bazel to >=5.0](#upgrade-to-bazel-50-or-greater)
 2. [Install pnpm (optional)](#install-pnpm-optional)
 3. [Translate lockfile to pnpm format](#translate-your-lockfile-to-pnpm-format)
-4. [Update usage of npm package generated rules](#update-usage-of-npm-package-generated-rules)
+4. [Update WORKSPACE](#update-workspace)
+5. [Update package.json](#update-package-json)
+6. [Update usage of npm package generated rules](#update-usage-of-npm-package-generated-rules)
 
 > There are more migration steps needed, this guide is still a work-in-progress
 
@@ -32,6 +34,50 @@ Alternatively, you can skip the install. All commands in this guide will use `np
    Run `npx pnpm import` to translate the existing file. See the [pnpm import docs](https://pnpm.io/cli/import)  
 2. If you don't care about keeping identical versions, or don't have a lockfile,
    you could just run `npx pnpm install` which generates a new lockfile.
+
+## Update WORKSPACE
+
+The `WORKSPACE` file contains Bazel module dependency fetching and installation.
+
+Remove usage of the following:
+
+- `build_bazel_rules_nodejs`
+
+Then add install steps from a release of rules_js, along with related rulesets you plan to use.
+
+You'll need to remove `build_bazel_rules_nodejs` load() statements from BUILD files as well.
+We suggest using https://docs.aspect.build/ to locate replacements for the rules you use.
+
+## Update package.json
+
+Remove usage of the following npm packages which contain Bazel rules, as they don't work with `rules_js`.
+
+- `@bazel/typescript`
+- `@bazel/rollup`
+- `@bazel/esbuild`
+- `@bazel/create`
+- `@bazel/cypress`
+- `@bazel/concatjs`
+- `@bazel/jasmine`
+- `@bazel/karma`
+- `@bazel/terser`
+
+Some `@bazel`-scoped packages are still fine, as they're tools or JS libraries rather than Bazel rules:
+
+- `@bazel/bazelisk`
+- `@bazel/buildozer`
+- `@bazel/buildifier`
+- `@bazel/ibazel` (watch mode)
+- `@bazel/runfiles`
+
+In addition, rules_js and associated rulesets can manage dependencies for tools they run. For example, rules_esbuild downloads its own esbuild packages. So you can remove these tools from package.json if you intend to run them only under Bazel.
+
+## Account for change to working directory
+
+`rules_js` spawns all Bazel actions in the bazel-bin folder.
+
+- If you use a `chdir.js` workaround for tools like react-scripts, you can just remove this.
+- If you use `$(location)`, `$(execpath)`, or `$(rootpath)` make variable expansions in an argument to a program, you may need to prefix with `../../../` to avoid duplicated `bazel-out/[arch]/bin` path segments.
 
 ## Update usage of npm package generated rules
 
