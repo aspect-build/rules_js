@@ -1,8 +1,9 @@
 # Migrating to rules_js
 
 1. [Upgrade Bazel to >=5.0](#upgrade-to-bazel-50-or-greater)
-2. [Translate lockfile to pnpm format](#translate-your-lockfile-to-pnpm-format)
-3. [Update usage of npm package generated rules](#update-usage-of-npm package-generated-rules)
+2. [Install pnpm (optional)](#install-pnpm-optional)
+3. [Translate lockfile to pnpm format](#translate-your-lockfile-to-pnpm-format)
+4. [Update usage of npm package generated rules](#update-usage-of-npm-package-generated-rules)
 
 > There are more migration steps needed, this guide is still a work-in-progress
 
@@ -12,6 +13,16 @@ We follow [Bazel's LTS policy](https://bazel.build/release/versioning).
 
 `rules_js` and the related rules depend on APIs that were introduced in Bazel 5.0.
 
+## Install pnpm (optional)
+
+`rules_js` is based on the pnpm package manager.
+Our implementation is self-contained, so it doesn't matter if users install pnpm,
+however it's typically useful to manipulate the lockfile or to install packages for use outside of Bazel.
+
+You can follow the [pnpm install docs](https://pnpm.io/installation).
+
+Alternatively, you can skip the install. All commands in this guide will use `npx` to run the pnpm tool without any installation.
+
 ## Translate your lockfile to pnpm format
 
 `rules_js` uses the `pnpm` lockfile to declare dependency versions as well as a deterministic layout for the `node_modules` tree.
@@ -20,7 +31,7 @@ We follow [Bazel's LTS policy](https://bazel.build/release/versioning).
    so we recommend taking care to keep all dependencies the same (including transitive).
    Run `npx pnpm import` to translate the existing file. See the [pnpm import docs](https://pnpm.io/cli/import)  
 2. If you don't care about keeping identical versions, or don't have a lockfile,
-   you could just run `pnpm install` which generates a new lockfile.
+   you could just run `npx pnpm install` which generates a new lockfile.
 
 ## Update usage of npm package generated rules
 
