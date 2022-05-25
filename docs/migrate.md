@@ -39,11 +39,9 @@ You'll have to avoid version skew between the two files during that time.
 
 A few packages have bugs which rely on "hoisting" behavior in yarn or npm, where undeclared dependencies can be loaded because they happen to be installed in an ancestor folder under `node_modules`.
 
-See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for more info on the sort of bugs you might find.
+In many cases, updating your dependencies will fix issues since maintainers are constantly addressing pnpm bugs.
 
-- In many cases, updating your dependencies will fix issues since maintainers are constantly addressing pnpm bugs.
-- You can use Solution 2 in that guide to mitigate broken packages.
-- Do **not** use Solution 3 "shamelessly-hoist" since rules_js doesn't have an emulation mode for this install strategy.
+See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for other mitigations.
 
 As long as you're able to run your build and test under pnpm, we expect the behavior of `rules_js` should match.
 
@@ -63,18 +61,19 @@ This macro will expand to a rule for each npm package, which creates part of the
 
 The `WORKSPACE` file contains Bazel module dependency fetching and installation.
 
-Remove usage of the following:
+Add install steps from a release of rules_js, along with related rulesets you plan to use.
+
+When you're ready to complete the migration, remove usage of the following:
 
 - `build_bazel_rules_nodejs`
-
-Then add install steps from a release of rules_js, along with related rulesets you plan to use.
 
 You'll need to remove `build_bazel_rules_nodejs` load() statements from BUILD files as well.
 We suggest using https://docs.aspect.build/ to locate replacements for the rules you use.
 
 ## Update package.json
 
-Remove usage of the following npm packages which contain Bazel rules, as they don't work with `rules_js`.
+When you're ready to complete the migration, remove usage of the following npm packages which contain Bazel rules, as they don't work with `rules_js`.
+Instead, look under https://github.com/aspect-build/ for replacement rulesets.
 
 - `@bazel/typescript`
 - `@bazel/rollup`
