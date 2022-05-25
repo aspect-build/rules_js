@@ -39,7 +39,11 @@ You'll have to avoid version skew between the two files during that time.
 
 A few packages have bugs which rely on "hoisting" behavior in yarn or npm, where undeclared dependencies can be loaded because they happen to be installed in an ancestor folder under `node_modules`.
 
-See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for more info on the sort of bugs you might find. You can use Solution 2 in that guide to mitigate broken packages. Do not use Solution 3 "shamelessly-hoist" since rules_js doesn't have an emulation mode for this install strategy.
+See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for more info on the sort of bugs you might find.
+
+- In many cases, updating your dependencies will fix issues since maintainers are constantly addressing pnpm bugs.
+- You can use Solution 2 in that guide to mitigate broken packages.
+- Do **not** use Solution 3 "shamelessly-hoist" since rules_js doesn't have an emulation mode for this install strategy.
 
 As long as you're able to run your build and test under pnpm, we expect the behavior of `rules_js` should match.
 
