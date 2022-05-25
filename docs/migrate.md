@@ -1,13 +1,6 @@
 # Migrating to rules_js
 
-1. [Upgrade Bazel to >=5.0](#upgrade-to-bazel-50-or-greater)
-2. [Install pnpm (optional)](#install-pnpm-optional)
-3. [Translate lockfile to pnpm format](#translate-your-lockfile-to-pnpm-format)
-4. [Update WORKSPACE](#update-workspace)
-5. [Update package.json](#update-package-json)
-6. [Update usage of npm package generated rules](#update-usage-of-npm-package-generated-rules)
-
-> There are more migration steps needed, this guide is still a work-in-progress
+There are more migration steps needed, this guide is still a work-in-progress.
 
 ## Upgrade to Bazel 5.0 or greater
 
@@ -34,6 +27,25 @@ Alternatively, you can skip the install. All commands in this guide will use `np
    Run `npx pnpm import` to translate the existing file. See the [pnpm import docs](https://pnpm.io/cli/import)  
 2. If you don't care about keeping identical versions, or don't have a lockfile,
    you could just run `npx pnpm install` which generates a new lockfile.
+
+The new `pnpm-lock.yaml` file needs to be updated by engineers on the team as well,
+so when you're ready to switch over to rules_js, you'll have to train them to run `pnpm` rather than `npm` or `yarn`
+when changing dependency versions.
+
+If needed, you might have both the pnpm lockfile and your legacy one checked into the repo during a migration window.
+You'll have to avoid version skew between the two files during that time.
+
+## Link the node modules
+
+Typically you just add a `link_js_packages` call to the BUILD file next to each `package.json` file:
+
+```starlark
+load("@npm//:defs.bzl", "link_js_packages")
+
+link_js_packages()
+```
+
+This macro will expand to a rule for each npm package, which creates part of the `bazel-bin/[path/to/package]/node_modules` tree.
 
 ## Update WORKSPACE
 
