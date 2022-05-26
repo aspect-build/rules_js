@@ -129,6 +129,9 @@ else
         printf "\nERROR: %s: BAZEL_BINDIR must be set in environment when not running out of runfiles so js_binary can run out of the output tree on build actions\n" "$LOG_PREFIX" >&2
         exit 1
     fi
+    if [ "${JS_BINARY__VERBOSE:-}" ]; then
+        echo "${LOG_PREFIX}: changing directory to root of bazel output tree $BAZEL_BINDIR" >&2
+    fi
     cd "$BAZEL_BINDIR"
 fi
 
@@ -146,6 +149,9 @@ if [ ! -f "$entry_point" ]; then
 fi
 
 if [ "${JS_BINARY__CHDIR:-}" ]; then
+    if [ "${JS_BINARY__VERBOSE:-}" ]; then
+        echo "${LOG_PREFIX}: changing directory to user specified package $JS_BINARY__CHDIR" >&2
+    fi
     cd "$JS_BINARY__CHDIR"
 fi
 
@@ -218,7 +224,8 @@ export PATH
 # ==============================================================================
 
 if [ "${JS_BINARY__VERBOSE:-}" ]; then
-    echo "${LOG_PREFIX}: running:" "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} >&2
+    echo "${LOG_PREFIX}: cwd $PWD" >&2
+    echo "${LOG_PREFIX}: running" "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} >&2
 fi
 
 set +e
