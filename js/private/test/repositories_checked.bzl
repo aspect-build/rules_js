@@ -269,6 +269,18 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_ungap_promise-all-settled__1.1.2",
+        integrity = "sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==",
+        root_path = "example",
+        link_paths = [],
+        package = "@ungap/promise-all-settled",
+        version = "1.1.2",
+        transitive_closure = {
+            "@ungap/promise-all-settled": ["1.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__acorn-walk__8.2.0",
         integrity = "sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==",
         root_path = "",
@@ -295,6 +307,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__ansi-colors__4.1.1",
+        integrity = "sha512-JoX0apGbHaUJBNl6yF+p6JAFYZ666/hhCGKN5t9QFjbJQKUU/g8MNbFDbvfrgKXvI1QpZplPOnwIo99lX/AAmA==",
+        root_path = "example",
+        link_paths = [],
+        package = "ansi-colors",
+        version = "4.1.1",
+        transitive_closure = {
+            "ansi-colors": ["4.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ansi-regex__5.0.1",
+        integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "ansi-regex",
+        version = "5.0.1",
+        transitive_closure = {
+            "ansi-regex": ["5.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__ansi-styles__4.3.0",
         integrity = "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
         root_path = "",
@@ -313,6 +349,36 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__anymatch__3.1.2",
+        integrity = "sha512-P43ePfOAIupkguHUycrc4qJ9kz8ZiuOUijaETwX7THt0Y/GNK7v0aa8rY816xWjZ7rJdA5XdMcpVFTKMq+RvWg==",
+        root_path = "example",
+        link_paths = [],
+        package = "anymatch",
+        version = "3.1.2",
+        deps = {
+            "normalize-path": "3.0.0",
+            "picomatch": "2.3.1",
+        },
+        transitive_closure = {
+            "anymatch": ["3.1.2"],
+            "normalize-path": ["3.0.0"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__argparse__2.0.1",
+        integrity = "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==",
+        root_path = "example",
+        link_paths = [],
+        package = "argparse",
+        version = "2.0.1",
+        transitive_closure = {
+            "argparse": ["2.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__balanced-match__1.0.2",
         integrity = "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         root_path = "",
@@ -322,6 +388,18 @@ def npm_repositories():
         version = "1.0.2",
         transitive_closure = {
             "balanced-match": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__binary-extensions__2.2.0",
+        integrity = "sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==",
+        root_path = "example",
+        link_paths = [],
+        package = "binary-extensions",
+        version = "2.2.0",
+        transitive_closure = {
+            "binary-extensions": ["2.2.0"],
         },
     )
 
@@ -345,6 +423,52 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__brace-expansion__2.0.1",
+        integrity = "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
+        root_path = "example",
+        link_paths = [],
+        package = "brace-expansion",
+        version = "2.0.1",
+        deps = {
+            "balanced-match": "1.0.2",
+        },
+        transitive_closure = {
+            "brace-expansion": ["2.0.1"],
+            "balanced-match": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__braces__3.0.2",
+        integrity = "sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==",
+        root_path = "example",
+        link_paths = [],
+        package = "braces",
+        version = "3.0.2",
+        deps = {
+            "fill-range": "7.0.1",
+        },
+        transitive_closure = {
+            "braces": ["3.0.2"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__browser-stdout__1.3.1",
+        integrity = "sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==",
+        root_path = "example",
+        link_paths = [],
+        package = "browser-stdout",
+        version = "1.3.1",
+        transitive_closure = {
+            "browser-stdout": ["1.3.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__bufferutil__4.0.1",
         integrity = "sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==",
         root_path = "",
@@ -360,6 +484,18 @@ def npm_repositories():
             "node-gyp-build": ["3.7.0"],
         },
         run_lifecycle_hooks = True,
+    )
+
+    npm_import(
+        name = "npm__camelcase__6.3.0",
+        integrity = "sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==",
+        root_path = "example",
+        link_paths = [],
+        package = "camelcase",
+        version = "6.3.0",
+        transitive_closure = {
+            "camelcase": ["6.3.0"],
+        },
     )
 
     npm_import(
@@ -381,6 +517,80 @@ def npm_repositories():
             "has-flag": ["4.0.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__charenc__0.0.2",
+        integrity = "sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==",
+        root_path = "example",
+        link_paths = [],
+        package = "charenc",
+        version = "0.0.2",
+        transitive_closure = {
+            "charenc": ["0.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__chokidar__3.5.3",
+        integrity = "sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==",
+        root_path = "example",
+        link_paths = [],
+        package = "chokidar",
+        version = "3.5.3",
+        deps = {
+            "fsevents": "2.3.2",
+            "anymatch": "3.1.2",
+            "braces": "3.0.2",
+            "glob-parent": "5.1.2",
+            "is-binary-path": "2.1.0",
+            "is-glob": "4.0.3",
+            "normalize-path": "3.0.0",
+            "readdirp": "3.6.0",
+        },
+        transitive_closure = {
+            "chokidar": ["3.5.3"],
+            "anymatch": ["3.1.2"],
+            "braces": ["3.0.2"],
+            "glob-parent": ["5.1.2"],
+            "is-binary-path": ["2.1.0"],
+            "is-glob": ["4.0.3"],
+            "normalize-path": ["3.0.0"],
+            "readdirp": ["3.6.0"],
+            "fsevents": ["2.3.2"],
+            "picomatch": ["2.3.1"],
+            "is-extglob": ["2.1.1"],
+            "binary-extensions": ["2.2.0"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__cliui__7.0.4",
+        integrity = "sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "cliui",
+        version = "7.0.4",
+        deps = {
+            "string-width": "4.2.3",
+            "strip-ansi": "6.0.1",
+            "wrap-ansi": "7.0.0",
+        },
+        transitive_closure = {
+            "cliui": ["7.0.4"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
         },
     )
 
@@ -454,6 +664,81 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__crypt__0.0.2",
+        integrity = "sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=",
+        root_path = "example",
+        link_paths = [],
+        package = "crypt",
+        version = "0.0.2",
+        transitive_closure = {
+            "crypt": ["0.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__debug__2.6.9",
+        integrity = "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==",
+        root_path = "example",
+        link_paths = [],
+        package = "debug",
+        version = "2.6.9",
+        deps = {
+            "ms": "2.0.0",
+        },
+        transitive_closure = {
+            "debug": ["2.6.9"],
+            "ms": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__debug__4.3.4",
+        integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "debug",
+        version = "4.3.4",
+        deps = {
+            "ms": "2.1.2",
+        },
+        transitive_closure = {
+            "debug": ["4.3.4"],
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__debug__4.3.4__supports-color_8.1.1",
+        integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "debug",
+        version = "4.3.4_supports-color@8.1.1",
+        deps = {
+            "ms": "2.1.2",
+            "supports-color": "8.1.1",
+        },
+        transitive_closure = {
+            "debug": ["4.3.4_supports-color@8.1.1"],
+            "ms": ["2.1.2"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__decamelize__4.0.0",
+        integrity = "sha512-9iE1PgSik9HeIIw2JO94IidnE3eBoQrFJ3w7sFuzSX4DpmZ3v5sZpUiV5Swcf6mQEF+Y0ru8Neo+p+nyh2J+hQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "decamelize",
+        version = "4.0.0",
+        transitive_closure = {
+            "decamelize": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__dequal__2.0.2",
         integrity = "sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==",
         root_path = "",
@@ -489,6 +774,18 @@ def npm_repositories():
         version = "0.1.2",
         transitive_closure = {
             "duplexer": ["0.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__emoji-regex__8.0.0",
+        integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
+        root_path = "example",
+        link_paths = [],
+        package = "emoji-regex",
+        version = "8.0.0",
+        transitive_closure = {
+            "emoji-regex": ["8.0.0"],
         },
     )
 
@@ -829,6 +1126,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__escalade__3.1.1",
+        integrity = "sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==",
+        root_path = "example",
+        link_paths = [],
+        package = "escalade",
+        version = "3.1.1",
+        transitive_closure = {
+            "escalade": ["3.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__escape-string-regexp__4.0.0",
+        integrity = "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==",
+        root_path = "example",
+        link_paths = [],
+        package = "escape-string-regexp",
+        version = "4.0.0",
+        transitive_closure = {
+            "escape-string-regexp": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__estree-walker__1.0.1",
         integrity = "sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==",
         root_path = "",
@@ -851,6 +1172,56 @@ def npm_repositories():
         version = "2.0.2",
         transitive_closure = {
             "estree-walker": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fill-range__7.0.1",
+        integrity = "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "fill-range",
+        version = "7.0.1",
+        deps = {
+            "to-regex-range": "5.0.1",
+        },
+        transitive_closure = {
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__find-up__5.0.0",
+        integrity = "sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==",
+        root_path = "example",
+        link_paths = [],
+        package = "find-up",
+        version = "5.0.0",
+        deps = {
+            "locate-path": "6.0.0",
+            "path-exists": "4.0.0",
+        },
+        transitive_closure = {
+            "find-up": ["5.0.0"],
+            "locate-path": ["6.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__flat__5.0.2",
+        integrity = "sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "flat",
+        version = "5.0.2",
+        transitive_closure = {
+            "flat": ["5.0.2"],
         },
     )
 
@@ -973,6 +1344,18 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__he__1.2.0",
+        integrity = "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==",
+        root_path = "example",
+        link_paths = [],
+        package = "he",
+        version = "1.2.0",
+        transitive_closure = {
+            "he": ["1.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__inflight__1.0.6",
         integrity = "sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==",
         root_path = "",
@@ -1005,6 +1388,34 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-binary-path__2.1.0",
+        integrity = "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-binary-path",
+        version = "2.1.0",
+        deps = {
+            "binary-extensions": "2.2.0",
+        },
+        transitive_closure = {
+            "is-binary-path": ["2.1.0"],
+            "binary-extensions": ["2.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-buffer__1.1.6",
+        integrity = "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-buffer",
+        version = "1.1.6",
+        transitive_closure = {
+            "is-buffer": ["1.1.6"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-core-module__2.9.0",
         integrity = "sha512-+5FPy5PnwmO3lvfMb0AsoPaBG+5KHUI0wYFXOtYPnVVVspTFUuMZNfNaNVRt3FZadstu2c8x23vykRW/NBoU6A==",
         root_path = "",
@@ -1028,6 +1439,70 @@ def npm_repositories():
         root_path = "",
         link_workspace = "",
         link_paths = [],
+        package = "is-extglob",
+        version = "2.1.1",
+        transitive_closure = {
+            "is-extglob": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-fullwidth-code-point__3.0.0",
+        integrity = "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-fullwidth-code-point",
+        version = "3.0.0",
+        transitive_closure = {
+            "is-fullwidth-code-point": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-glob__4.0.3",
+        integrity = "sha512-xelSayHH36ZgE7ZWhli7pW34hNbNl8Ojv5KVmkJD4hBdD3th8Tfk9vYasLM+mXWOZhFkgZfxhLSnrwRr4elSSg==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-glob",
+        version = "4.0.3",
+        deps = {
+            "is-extglob": "2.1.1",
+        },
+        transitive_closure = {
+            "is-glob": ["4.0.3"],
+            "is-extglob": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-number__7.0.0",
+        integrity = "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-number",
+        version = "7.0.0",
+        transitive_closure = {
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-plain-obj__2.1.0",
+        integrity = "sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-plain-obj",
+        version = "2.1.0",
+        transitive_closure = {
+            "is-plain-obj": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-reference__1.2.1",
+        integrity = "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
+        root_path = "example",
+        link_paths = [],
         package = "is-reference",
         version = "1.2.1",
         deps = {
@@ -1036,6 +1511,18 @@ def npm_repositories():
         transitive_closure = {
             "is-reference": ["1.2.1"],
             "@types/estree": ["0.0.51"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-unicode-supported__0.1.0",
+        integrity = "sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==",
+        root_path = "example",
+        link_paths = [],
+        package = "is-unicode-supported",
+        version = "0.1.0",
+        transitive_closure = {
+            "is-unicode-supported": ["0.1.0"],
         },
     )
 
@@ -1053,6 +1540,22 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__js-yaml__4.1.0",
+        integrity = "sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==",
+        root_path = "example",
+        link_paths = [],
+        package = "js-yaml",
+        version = "4.1.0",
+        deps = {
+            "argparse": "2.0.1",
+        },
+        transitive_closure = {
+            "js-yaml": ["4.1.0"],
+            "argparse": ["2.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__kleur__4.1.4",
         integrity = "sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==",
         root_path = "",
@@ -1066,6 +1569,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__locate-path__6.0.0",
+        integrity = "sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==",
+        root_path = "example",
+        link_paths = [],
+        package = "locate-path",
+        version = "6.0.0",
+        deps = {
+            "p-locate": "5.0.0",
+        },
+        transitive_closure = {
+            "locate-path": ["6.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__lodash__4.17.21",
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         root_path = "",
@@ -1075,6 +1596,29 @@ def npm_repositories():
         version = "4.17.21",
         transitive_closure = {
             "lodash": ["4.17.21"],
+        },
+    )
+
+    npm_import(
+        name = "npm__log-symbols__4.1.0",
+        integrity = "sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==",
+        root_path = "example",
+        link_paths = [],
+        package = "log-symbols",
+        version = "4.1.0",
+        deps = {
+            "chalk": "4.1.2",
+            "is-unicode-supported": "0.1.0",
+        },
+        transitive_closure = {
+            "log-symbols": ["4.1.0"],
+            "chalk": ["4.1.2"],
+            "is-unicode-supported": ["0.1.0"],
+            "ansi-styles": ["4.3.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
         },
     )
 
@@ -1109,6 +1653,26 @@ def npm_repositories():
         transitive_closure = {
             "magic-string": ["0.25.9"],
             "sourcemap-codec": ["1.4.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__md5__2.3.0",
+        integrity = "sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==",
+        root_path = "example",
+        link_paths = [],
+        package = "md5",
+        version = "2.3.0",
+        deps = {
+            "charenc": "0.0.2",
+            "crypt": "0.0.2",
+            "is-buffer": "1.1.6",
+        },
+        transitive_closure = {
+            "md5": ["2.3.0"],
+            "charenc": ["0.0.2"],
+            "crypt": ["0.0.2"],
+            "is-buffer": ["1.1.6"],
         },
     )
 
@@ -1191,6 +1755,311 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__mocha-junit-reporter__2.0.2__mocha_10.0.0",
+        integrity = "sha512-vYwWq5hh3v1lG0gdQCBxwNipBfvDiAM1PHroQRNp96+2l72e9wEUTw+mzoK+O0SudgfQ7WvTQZ9Nh3qkAYAjfg==",
+        root_path = "example",
+        link_paths = ["."],
+        package = "mocha-junit-reporter",
+        version = "2.0.2_mocha@10.0.0",
+        deps = {
+            "debug": "2.6.9",
+            "md5": "2.3.0",
+            "mkdirp": "0.5.6",
+            "mocha": "10.0.0",
+            "strip-ansi": "6.0.1",
+            "xml": "1.0.1",
+        },
+        transitive_closure = {
+            "mocha-junit-reporter": ["2.0.2_mocha@10.0.0"],
+            "debug": ["4.3.4_supports-color@8.1.1", "2.6.9"],
+            "md5": ["2.3.0"],
+            "mkdirp": ["0.5.6"],
+            "mocha": ["10.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "xml": ["1.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "@ungap/promise-all-settled": ["1.1.2"],
+            "ansi-colors": ["4.1.1"],
+            "browser-stdout": ["1.3.1"],
+            "chokidar": ["3.5.3"],
+            "diff": ["5.0.0"],
+            "escape-string-regexp": ["4.0.0"],
+            "find-up": ["5.0.0"],
+            "glob": ["7.2.0"],
+            "he": ["1.2.0"],
+            "js-yaml": ["4.1.0"],
+            "log-symbols": ["4.1.0"],
+            "minimatch": ["3.1.2", "5.0.1"],
+            "ms": ["2.0.0", "2.1.2", "2.1.3"],
+            "nanoid": ["3.3.3"],
+            "serialize-javascript": ["6.0.0"],
+            "strip-json-comments": ["3.1.1"],
+            "supports-color": ["7.2.0", "8.1.1"],
+            "workerpool": ["6.2.1"],
+            "yargs": ["16.2.0"],
+            "yargs-parser": ["20.2.4"],
+            "yargs-unparser": ["2.0.0"],
+            "camelcase": ["6.3.0"],
+            "decamelize": ["4.0.0"],
+            "flat": ["5.0.2"],
+            "is-plain-obj": ["2.1.0"],
+            "cliui": ["7.0.4"],
+            "escalade": ["3.1.1"],
+            "get-caller-file": ["2.0.5"],
+            "require-directory": ["2.1.1"],
+            "string-width": ["4.2.3"],
+            "y18n": ["5.0.8"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "has-flag": ["4.0.0"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "brace-expansion": ["1.1.11", "2.0.1"],
+            "balanced-match": ["1.0.2"],
+            "chalk": ["4.1.2"],
+            "is-unicode-supported": ["0.1.0"],
+            "argparse": ["2.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "locate-path": ["6.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+            "anymatch": ["3.1.2"],
+            "braces": ["3.0.2"],
+            "glob-parent": ["5.1.2"],
+            "is-binary-path": ["2.1.0"],
+            "is-glob": ["4.0.3"],
+            "normalize-path": ["3.0.0"],
+            "readdirp": ["3.6.0"],
+            "fsevents": ["2.3.2"],
+            "picomatch": ["2.3.1"],
+            "is-extglob": ["2.1.1"],
+            "binary-extensions": ["2.2.0"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+            "minimist": ["1.2.6"],
+            "charenc": ["0.0.2"],
+            "crypt": ["0.0.2"],
+            "is-buffer": ["1.1.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mocha-multi-reporters__1.5.1__mocha_10.0.0",
+        integrity = "sha512-Yb4QJOaGLIcmB0VY7Wif5AjvLMUFAdV57D2TWEva1Y0kU/3LjKpeRVmlMIfuO1SVbauve459kgtIizADqxMWPg==",
+        root_path = "example",
+        link_paths = ["."],
+        package = "mocha-multi-reporters",
+        version = "1.5.1_mocha@10.0.0",
+        deps = {
+            "debug": "4.3.4",
+            "lodash": "4.17.21",
+            "mocha": "10.0.0",
+        },
+        transitive_closure = {
+            "mocha-multi-reporters": ["1.5.1_mocha@10.0.0"],
+            "debug": ["4.3.4_supports-color@8.1.1", "4.3.4"],
+            "lodash": ["4.17.21"],
+            "mocha": ["10.0.0"],
+            "@ungap/promise-all-settled": ["1.1.2"],
+            "ansi-colors": ["4.1.1"],
+            "browser-stdout": ["1.3.1"],
+            "chokidar": ["3.5.3"],
+            "diff": ["5.0.0"],
+            "escape-string-regexp": ["4.0.0"],
+            "find-up": ["5.0.0"],
+            "glob": ["7.2.0"],
+            "he": ["1.2.0"],
+            "js-yaml": ["4.1.0"],
+            "log-symbols": ["4.1.0"],
+            "minimatch": ["3.1.2", "5.0.1"],
+            "ms": ["2.1.2", "2.1.3"],
+            "nanoid": ["3.3.3"],
+            "serialize-javascript": ["6.0.0"],
+            "strip-json-comments": ["3.1.1"],
+            "supports-color": ["7.2.0", "8.1.1"],
+            "workerpool": ["6.2.1"],
+            "yargs": ["16.2.0"],
+            "yargs-parser": ["20.2.4"],
+            "yargs-unparser": ["2.0.0"],
+            "camelcase": ["6.3.0"],
+            "decamelize": ["4.0.0"],
+            "flat": ["5.0.2"],
+            "is-plain-obj": ["2.1.0"],
+            "cliui": ["7.0.4"],
+            "escalade": ["3.1.1"],
+            "get-caller-file": ["2.0.5"],
+            "require-directory": ["2.1.1"],
+            "string-width": ["4.2.3"],
+            "y18n": ["5.0.8"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "has-flag": ["4.0.0"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "brace-expansion": ["1.1.11", "2.0.1"],
+            "balanced-match": ["1.0.2"],
+            "chalk": ["4.1.2"],
+            "is-unicode-supported": ["0.1.0"],
+            "argparse": ["2.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "locate-path": ["6.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+            "anymatch": ["3.1.2"],
+            "braces": ["3.0.2"],
+            "glob-parent": ["5.1.2"],
+            "is-binary-path": ["2.1.0"],
+            "is-glob": ["4.0.3"],
+            "normalize-path": ["3.0.0"],
+            "readdirp": ["3.6.0"],
+            "fsevents": ["2.3.2"],
+            "picomatch": ["2.3.1"],
+            "is-extglob": ["2.1.1"],
+            "binary-extensions": ["2.2.0"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mocha__10.0.0",
+        integrity = "sha512-0Wl+elVUD43Y0BqPZBzZt8Tnkw9CMUdNYnUsTfOM1vuhJVZL+kiesFYsqwBkEEuEixaiPe5ZQdqDgX2jddhmoA==",
+        root_path = "example",
+        link_paths = ["."],
+        package = "mocha",
+        version = "10.0.0",
+        deps = {
+            "@ungap/promise-all-settled": "1.1.2",
+            "ansi-colors": "4.1.1",
+            "browser-stdout": "1.3.1",
+            "chokidar": "3.5.3",
+            "debug": "4.3.4_supports-color@8.1.1",
+            "diff": "5.0.0",
+            "escape-string-regexp": "4.0.0",
+            "find-up": "5.0.0",
+            "glob": "7.2.0",
+            "he": "1.2.0",
+            "js-yaml": "4.1.0",
+            "log-symbols": "4.1.0",
+            "minimatch": "5.0.1",
+            "ms": "2.1.3",
+            "nanoid": "3.3.3",
+            "serialize-javascript": "6.0.0",
+            "strip-json-comments": "3.1.1",
+            "supports-color": "8.1.1",
+            "workerpool": "6.2.1",
+            "yargs": "16.2.0",
+            "yargs-parser": "20.2.4",
+            "yargs-unparser": "2.0.0",
+        },
+        transitive_closure = {
+            "mocha": ["10.0.0"],
+            "@ungap/promise-all-settled": ["1.1.2"],
+            "ansi-colors": ["4.1.1"],
+            "browser-stdout": ["1.3.1"],
+            "chokidar": ["3.5.3"],
+            "debug": ["4.3.4_supports-color@8.1.1"],
+            "diff": ["5.0.0"],
+            "escape-string-regexp": ["4.0.0"],
+            "find-up": ["5.0.0"],
+            "glob": ["7.2.0"],
+            "he": ["1.2.0"],
+            "js-yaml": ["4.1.0"],
+            "log-symbols": ["4.1.0"],
+            "minimatch": ["3.1.2", "5.0.1"],
+            "ms": ["2.1.2", "2.1.3"],
+            "nanoid": ["3.3.3"],
+            "serialize-javascript": ["6.0.0"],
+            "strip-json-comments": ["3.1.1"],
+            "supports-color": ["7.2.0", "8.1.1"],
+            "workerpool": ["6.2.1"],
+            "yargs": ["16.2.0"],
+            "yargs-parser": ["20.2.4"],
+            "yargs-unparser": ["2.0.0"],
+            "camelcase": ["6.3.0"],
+            "decamelize": ["4.0.0"],
+            "flat": ["5.0.2"],
+            "is-plain-obj": ["2.1.0"],
+            "cliui": ["7.0.4"],
+            "escalade": ["3.1.1"],
+            "get-caller-file": ["2.0.5"],
+            "require-directory": ["2.1.1"],
+            "string-width": ["4.2.3"],
+            "y18n": ["5.0.8"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "has-flag": ["4.0.0"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "brace-expansion": ["1.1.11", "2.0.1"],
+            "balanced-match": ["1.0.2"],
+            "chalk": ["4.1.2"],
+            "is-unicode-supported": ["0.1.0"],
+            "argparse": ["2.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "locate-path": ["6.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+            "anymatch": ["3.1.2"],
+            "braces": ["3.0.2"],
+            "glob-parent": ["5.1.2"],
+            "is-binary-path": ["2.1.0"],
+            "is-glob": ["4.0.3"],
+            "normalize-path": ["3.0.0"],
+            "readdirp": ["3.6.0"],
+            "fsevents": ["2.3.2"],
+            "picomatch": ["2.3.1"],
+            "is-extglob": ["2.1.1"],
+            "binary-extensions": ["2.2.0"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__mri__1.2.0",
         integrity = "sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==",
         root_path = "",
@@ -1217,6 +2086,54 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__ms__2.0.0",
+        integrity = "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
+        root_path = "example",
+        link_paths = [],
+        package = "ms",
+        version = "2.0.0",
+        transitive_closure = {
+            "ms": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ms__2.1.2",
+        integrity = "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
+        root_path = "example",
+        link_paths = [],
+        package = "ms",
+        version = "2.1.2",
+        transitive_closure = {
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ms__2.1.3",
+        integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
+        root_path = "example",
+        link_paths = [],
+        package = "ms",
+        version = "2.1.3",
+        transitive_closure = {
+            "ms": ["2.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__nanoid__3.3.3",
+        integrity = "sha512-p1sjXuopFs0xg+fPASzQ28agW1oHD7xDsd9Xkf3T15H3c/cifrFHVwrh74PdoklAPi+i7MdRsE47vm2r6JoB+w==",
+        root_path = "example",
+        link_paths = [],
+        package = "nanoid",
+        version = "3.3.3",
+        transitive_closure = {
+            "nanoid": ["3.3.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__node-gyp-build__3.7.0",
         integrity = "sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==",
         root_path = "",
@@ -1226,6 +2143,18 @@ def npm_repositories():
         version = "3.7.0",
         transitive_closure = {
             "node-gyp-build": ["3.7.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__normalize-path__3.0.0",
+        integrity = "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==",
+        root_path = "example",
+        link_paths = [],
+        package = "normalize-path",
+        version = "3.0.0",
+        transitive_closure = {
+            "normalize-path": ["3.0.0"],
         },
     )
 
@@ -1273,6 +2202,51 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__p-limit__3.1.0",
+        integrity = "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "p-limit",
+        version = "3.1.0",
+        deps = {
+            "yocto-queue": "0.1.0",
+        },
+        transitive_closure = {
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__p-locate__5.0.0",
+        integrity = "sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==",
+        root_path = "example",
+        link_paths = [],
+        package = "p-locate",
+        version = "5.0.0",
+        deps = {
+            "p-limit": "3.1.0",
+        },
+        transitive_closure = {
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__path-exists__4.0.0",
+        integrity = "sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==",
+        root_path = "example",
+        link_paths = [],
+        package = "path-exists",
+        version = "4.0.0",
+        transitive_closure = {
+            "path-exists": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__path-is-absolute__1.0.1",
         integrity = "sha1-F0uSaHNVNP+8es5r9TpanhtcX18=",
         root_path = "",
@@ -1312,6 +2286,22 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__randombytes__2.1.0",
+        integrity = "sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "randombytes",
+        version = "2.1.0",
+        deps = {
+            "safe-buffer": "5.2.1",
+        },
+        transitive_closure = {
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__react__17.0.2",
         integrity = "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==",
         root_path = "",
@@ -1328,6 +2318,34 @@ def npm_repositories():
             "loose-envify": ["1.4.0"],
             "object-assign": ["4.1.1"],
             "js-tokens": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__readdirp__3.6.0",
+        integrity = "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
+        root_path = "example",
+        link_paths = [],
+        package = "readdirp",
+        version = "3.6.0",
+        deps = {
+            "picomatch": "2.3.1",
+        },
+        transitive_closure = {
+            "readdirp": ["3.6.0"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__require-directory__2.1.1",
+        integrity = "sha1-jGStX9MNqxyXbiNE/+f3kqam30I=",
+        root_path = "example",
+        link_paths = [],
+        package = "require-directory",
+        version = "2.1.1",
+        transitive_closure = {
+            "require-directory": ["2.1.1"],
         },
     )
 
@@ -1389,6 +2407,35 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__safe-buffer__5.2.1",
+        integrity = "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "safe-buffer",
+        version = "5.2.1",
+        transitive_closure = {
+            "safe-buffer": ["5.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__serialize-javascript__6.0.0",
+        integrity = "sha512-Qr3TosvguFt8ePWqsvRfrKyQXIiW+nGbYpy8XK24NQHE83caxWt+mIymTT19DGFbNWNLfEwsrkSmN64lVWB9ag==",
+        root_path = "example",
+        link_paths = [],
+        package = "serialize-javascript",
+        version = "6.0.0",
+        deps = {
+            "randombytes": "2.1.0",
+        },
+        transitive_closure = {
+            "serialize-javascript": ["6.0.0"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__sirv__1.0.19",
         integrity = "sha512-JuLThK3TnZG1TAKDwNIqNq6QA2afLOCcm+iE8D1Kj3GA40pSPsxQjjJl0J8X3tsR7T+CP1GavpzLwYkgVLWrZQ==",
         root_path = "",
@@ -1423,6 +2470,55 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__string-width__4.2.3",
+        integrity = "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==",
+        root_path = "example",
+        link_paths = [],
+        package = "string-width",
+        version = "4.2.3",
+        deps = {
+            "emoji-regex": "8.0.0",
+            "is-fullwidth-code-point": "3.0.0",
+            "strip-ansi": "6.0.1",
+        },
+        transitive_closure = {
+            "string-width": ["4.2.3"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__strip-ansi__6.0.1",
+        integrity = "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
+        root_path = "example",
+        link_paths = [],
+        package = "strip-ansi",
+        version = "6.0.1",
+        deps = {
+            "ansi-regex": "5.0.1",
+        },
+        transitive_closure = {
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__strip-json-comments__3.1.1",
+        integrity = "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==",
+        root_path = "example",
+        link_paths = [],
+        package = "strip-json-comments",
+        version = "3.1.1",
+        transitive_closure = {
+            "strip-json-comments": ["3.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__supports-color__7.2.0",
         integrity = "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
         root_path = "",
@@ -1440,6 +2536,22 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__supports-color__8.1.1",
+        integrity = "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==",
+        root_path = "example",
+        link_paths = [],
+        package = "supports-color",
+        version = "8.1.1",
+        deps = {
+            "has-flag": "4.0.0",
+        },
+        transitive_closure = {
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__supports-preserve-symlinks-flag__1.0.0",
         integrity = "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==",
         root_path = "",
@@ -1449,6 +2561,22 @@ def npm_repositories():
         version = "1.0.0",
         transitive_closure = {
             "supports-preserve-symlinks-flag": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__to-regex-range__5.0.1",
+        integrity = "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==",
+        root_path = "example",
+        link_paths = [],
+        package = "to-regex-range",
+        version = "5.0.1",
+        deps = {
+            "is-number": "7.0.0",
+        },
+        transitive_closure = {
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
         },
     )
 
@@ -1547,6 +2675,43 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__workerpool__6.2.1",
+        integrity = "sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==",
+        root_path = "example",
+        link_paths = [],
+        package = "workerpool",
+        version = "6.2.1",
+        transitive_closure = {
+            "workerpool": ["6.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__wrap-ansi__7.0.0",
+        integrity = "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==",
+        root_path = "example",
+        link_paths = [],
+        package = "wrap-ansi",
+        version = "7.0.0",
+        deps = {
+            "ansi-styles": "4.3.0",
+            "string-width": "4.2.3",
+            "strip-ansi": "6.0.1",
+        },
+        transitive_closure = {
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
         name = "npm__wrappy__1.0.2",
         integrity = "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=",
         root_path = "",
@@ -1574,5 +2739,111 @@ def npm_repositories():
             "ws": ["7.5.8_bufferutil@4.0.1"],
             "bufferutil": ["4.0.1"],
             "node-gyp-build": ["3.7.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__xml__1.0.1",
+        integrity = "sha1-eLpyAgApxbyHuKgaPPzXS0ovweU=",
+        root_path = "example",
+        link_paths = [],
+        package = "xml",
+        version = "1.0.1",
+        transitive_closure = {
+            "xml": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__y18n__5.0.8",
+        integrity = "sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==",
+        root_path = "example",
+        link_paths = [],
+        package = "y18n",
+        version = "5.0.8",
+        transitive_closure = {
+            "y18n": ["5.0.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__yargs-parser__20.2.4",
+        integrity = "sha512-WOkpgNhPTlE73h4VFAFsOnomJVaovO8VqLDzy5saChRBFQFBoMYirowyW+Q9HB4HFF4Z7VZTiG3iSzJJA29yRA==",
+        root_path = "example",
+        link_paths = [],
+        package = "yargs-parser",
+        version = "20.2.4",
+        transitive_closure = {
+            "yargs-parser": ["20.2.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__yargs-unparser__2.0.0",
+        integrity = "sha512-7pRTIA9Qc1caZ0bZ6RYRGbHJthJWuakf+WmHK0rVeLkNrrGhfoabBNdue6kdINI6r4if7ocq9aD/n7xwKOdzOA==",
+        root_path = "example",
+        link_paths = [],
+        package = "yargs-unparser",
+        version = "2.0.0",
+        deps = {
+            "camelcase": "6.3.0",
+            "decamelize": "4.0.0",
+            "flat": "5.0.2",
+            "is-plain-obj": "2.1.0",
+        },
+        transitive_closure = {
+            "yargs-unparser": ["2.0.0"],
+            "camelcase": ["6.3.0"],
+            "decamelize": ["4.0.0"],
+            "flat": ["5.0.2"],
+            "is-plain-obj": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__yargs__16.2.0",
+        integrity = "sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==",
+        root_path = "example",
+        link_paths = [],
+        package = "yargs",
+        version = "16.2.0",
+        deps = {
+            "cliui": "7.0.4",
+            "escalade": "3.1.1",
+            "get-caller-file": "2.0.5",
+            "require-directory": "2.1.1",
+            "string-width": "4.2.3",
+            "y18n": "5.0.8",
+            "yargs-parser": "20.2.4",
+        },
+        transitive_closure = {
+            "yargs": ["16.2.0"],
+            "cliui": ["7.0.4"],
+            "escalade": ["3.1.1"],
+            "get-caller-file": ["2.0.5"],
+            "require-directory": ["2.1.1"],
+            "string-width": ["4.2.3"],
+            "y18n": ["5.0.8"],
+            "yargs-parser": ["20.2.4"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__yocto-queue__0.1.0",
+        integrity = "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==",
+        root_path = "example",
+        link_paths = [],
+        package = "yocto-queue",
+        version = "0.1.0",
+        transitive_closure = {
+            "yocto-queue": ["0.1.0"],
         },
     )
