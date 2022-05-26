@@ -171,6 +171,16 @@ alias(
     visibility = ["//visibility:public"],
 )"""
 
+_SCOPE_TMPL = \
+    """load("//:defs.bzl", _package = "package")
+load("@aspect_rules_js//js/private:linked_js_packages.bzl", "linked_js_packages")
+
+linked_js_packages(
+    name = "{scope}",
+    srcs = {srcs},
+    visibility = ["//visibility:public"],
+)"""
+
 _PACKAGE_TMPL = \
     """
 def package(name, import_path = "."):
@@ -326,6 +336,9 @@ def link_js_packages():
         ),
     ]
 
+    # map of @scope to [packages] for //@scope:@scope targets
+    scoped_packages = {}
+
     for (i, v) in enumerate(packages.items()):
         (package, package_info) = v
         name = package_info.get("name")
@@ -447,8 +460,17 @@ def link_js_packages():
                     ),
                 ]))
 
+            # Gather scoped packages
+            if len(name.split("/", 1)) > 1:
+                package_scope = name.split("/", 1)[0]
+                build_file_package = paths.normalize(paths.join(escaped_link_path, package_scope))
+                if build_file_package not in scoped_packages:
+                    scoped_packages[build_file_package] = []
+                scoped_packages[build_file_package].append("""_package("{}", "{}")""".format(name, link_path))
+
     fp_links = {}
 
+    # Look for first party links
     for import_path, importer in importers.items():
         dependencies = importer.get("dependencies")
         if type(dependencies) != "dict":
@@ -530,6 +552,23 @@ def link_js_packages():
                     name = fp_package,
                 ),
             ]))
+
+            # Gather scoped packages
+            if len(fp_package.split("/", 1)) > 1:
+                package_scope = fp_package.split("/", 1)[0]
+                build_file_package = paths.normalize(paths.join(escaped_link_path, package_scope))
+                if build_file_package not in scoped_packages:
+                    scoped_packages[build_file_package] = []
+                scoped_packages[build_file_package].append("""_package("{}", "{}")""".format(fp_package, link_path))
+
+    # Generate scoped @npm//@scope targets
+    for build_file_package, scope_packages in scoped_packages.items():
+        rctx.file(paths.join(build_file_package, "BUILD.bazel"), "\n".join(generated_by_lines + [
+            _SCOPE_TMPL.format(
+                scope = paths.basename(build_file_package),
+                srcs = starlark_codegen_utils.to_list_attr(scope_packages, 1, quote_value = False),
+            ),
+        ]))
 
     defs_bzl_body.append(_PACKAGE_TMPL.format(
         dir_postfix = pnpm_utils.dir_postfix,
