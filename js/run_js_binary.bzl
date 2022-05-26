@@ -22,6 +22,7 @@ def run_js_binary(
         exit_code_out = None,
         silent_on_success = True,
         copy_srcs_to_bin = True,
+        verbose = False,
         **kwargs):
     """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
 
@@ -87,6 +88,8 @@ def run_js_binary(
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
+        verbose: Produce verbose output.
+
         **kwargs: Additional arguments
     """
 
@@ -140,6 +143,10 @@ def run_js_binary(
     # Configure silent on success
     if silent_on_success:
         extra_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
+
+    # Configure verbose
+    if verbose:
+        extra_env["JS_BINARY__VERBOSE"] = "1"
 
     _run_binary(
         name = name,

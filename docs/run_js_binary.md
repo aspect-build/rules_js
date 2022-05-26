@@ -12,7 +12,7 @@ and adds attributes and features specific to rules_js's js_binary.
 
 <pre>
 run_js_binary(<a href="#run_js_binary-name">name</a>, <a href="#run_js_binary-tool">tool</a>, <a href="#run_js_binary-env">env</a>, <a href="#run_js_binary-srcs">srcs</a>, <a href="#run_js_binary-output_dir">output_dir</a>, <a href="#run_js_binary-outs">outs</a>, <a href="#run_js_binary-args">args</a>, <a href="#run_js_binary-chdir">chdir</a>, <a href="#run_js_binary-stdout">stdout</a>, <a href="#run_js_binary-stderr">stderr</a>, <a href="#run_js_binary-exit_code_out">exit_code_out</a>,
-              <a href="#run_js_binary-silent_on_success">silent_on_success</a>, <a href="#run_js_binary-copy_srcs_to_bin">copy_srcs_to_bin</a>, <a href="#run_js_binary-kwargs">kwargs</a>)
+              <a href="#run_js_binary-silent_on_success">silent_on_success</a>, <a href="#run_js_binary-copy_srcs_to_bin">copy_srcs_to_bin</a>, <a href="#run_js_binary-verbose">verbose</a>, <a href="#run_js_binary-kwargs">kwargs</a>)
 </pre>
 
 Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
@@ -38,6 +38,7 @@ This rule does not require Bash `native.genrule`.
 | <a id="run_js_binary-exit_code_out"></a>exit_code_out |  set to capture the exit code of the binary to a file, which can later be used as an input to another target subject to the same semantics as <code>outs</code>. Note that setting this will force the binary to exit 0. If the binary creates outputs and these are declared, they must still be created   |  <code>None</code> |
 | <a id="run_js_binary-silent_on_success"></a>silent_on_success |  produce no output on stdout nor stderr when program exits with status code 0. This makes node binaries match the expected bazel paradigm.   |  <code>True</code> |
 | <a id="run_js_binary-copy_srcs_to_bin"></a>copy_srcs_to_bin |  When True, all srcs files are copied to the output tree that are not already there.   |  <code>True</code> |
+| <a id="run_js_binary-verbose"></a>verbose |  Produce verbose output.   |  <code>False</code> |
 | <a id="run_js_binary-kwargs"></a>kwargs |  Additional arguments   |  none |
 
 
