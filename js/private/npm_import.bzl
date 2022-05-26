@@ -151,6 +151,7 @@ def {bin_name}(name, **kwargs):
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
+        data = kwargs.pop("data", []) + [":{namespace}{bazel_name}"],
     )
     _run_js_binary(
         name = name,
@@ -167,6 +168,7 @@ def {bin_name}_test(name, **kwargs):
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
+        data = kwargs.pop("data", []) + [":{namespace}{bazel_name}"],
         **kwargs
     )
 
@@ -179,6 +181,7 @@ def {bin_name}_binary(name, **kwargs):
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
+        data = kwargs.pop("data", []) + [":{namespace}{bazel_name}"],
         **kwargs
     )
 """

@@ -13,6 +13,7 @@ def rollup(name, **kwargs):
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
+        data = kwargs.pop("data", []) + [":jsp__rollup__2.70.2"],
     )
     _run_js_binary(
         name = name,
@@ -29,6 +30,7 @@ def rollup_test(name, **kwargs):
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
+        data = kwargs.pop("data", []) + [":jsp__rollup__2.70.2"],
         **kwargs
     )
 
@@ -41,6 +43,7 @@ def rollup_binary(name, **kwargs):
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
+        data = kwargs.pop("data", []) + [":jsp__rollup__2.70.2"],
         **kwargs
     )
 
