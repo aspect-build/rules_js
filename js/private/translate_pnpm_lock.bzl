@@ -149,6 +149,7 @@ _NPM_IMPORT_TMPL = \
         name = "{name}",
         integrity = "{integrity}",
         root_path = "{root_path}",
+        link_workspace = "{link_workspace}",
         link_paths = {link_paths},
         package = "{package}",
         version = "{pnpm_version}",{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}
@@ -396,6 +397,7 @@ def link_js_packages():
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             integrity = integrity,
             link_paths = link_paths,
+            link_workspace = rctx.attr.pnpm_lock.workspace_name,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
             maybe_patch_args = maybe_patch_args,

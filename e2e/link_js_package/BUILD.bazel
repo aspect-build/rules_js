@@ -1,5 +1,6 @@
 load("@npm//:defs.bzl", "link_js_packages")
 load("@aspect_rules_js//js:defs.bzl", "link_js_package")
+load("@rules_foo_npm//@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 
 link_js_packages()
 
@@ -7,4 +8,8 @@ link_js_package(
     name = "linked_e2e_lib",
     src = "//lib",
     visibility = ["//visibility:public"],
+)
+
+aspect_test_a_bin.bin_a_test(
+    name = "aspect_test_a_bin_test",
 )

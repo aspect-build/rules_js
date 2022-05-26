@@ -61,7 +61,7 @@ translate_pnpm_lock(
 
 load("@npm//:repositories.bzl", "npm_repositories")
 
-# Declares npm_import rules from the pnpm-lock.json file
+# Declares npm_import rules from the pnpm-lock.yaml file
 npm_repositories()
 
 # As an example, manually import a package using explicit coordinates.

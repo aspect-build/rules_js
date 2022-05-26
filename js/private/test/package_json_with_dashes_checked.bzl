@@ -7,13 +7,13 @@ load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")
 def webpack_bundle_analyzer(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1__dir",
+        directory = "@//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1__dir",
         path = "lib/bin/analyzer.js",
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1"],
+        data = kwargs.pop("data", []) + ["@//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1"],
     )
     _run_js_binary(
         name = name,
@@ -24,26 +24,26 @@ def webpack_bundle_analyzer(name, **kwargs):
 def webpack_bundle_analyzer_test(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1__dir",
+        directory = "@//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1__dir",
         path = "lib/bin/analyzer.js",
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1"],
+        data = kwargs.pop("data", []) + ["@//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1"],
         **kwargs
     )
 
 def webpack_bundle_analyzer_binary(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1__dir",
+        directory = "@//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1__dir",
         path = "lib/bin/analyzer.js",
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1"],
+        data = kwargs.pop("data", []) + ["@//example:jsp__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1"],
         **kwargs
     )
 
