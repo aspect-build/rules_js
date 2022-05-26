@@ -7,13 +7,13 @@ load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")
 def rollup(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = ":jsp__rollup__2.70.2__dir",
+        directory = "//example:jsp__rollup__2.70.2__dir",
         path = "dist/bin/rollup",
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [":jsp__rollup__2.70.2"],
+        data = kwargs.pop("data", []) + ["//example:jsp__rollup__2.70.2"],
     )
     _run_js_binary(
         name = name,
@@ -24,26 +24,26 @@ def rollup(name, **kwargs):
 def rollup_test(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = ":jsp__rollup__2.70.2__dir",
+        directory = "//example:jsp__rollup__2.70.2__dir",
         path = "dist/bin/rollup",
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [":jsp__rollup__2.70.2"],
+        data = kwargs.pop("data", []) + ["//example:jsp__rollup__2.70.2"],
         **kwargs
     )
 
 def rollup_binary(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = ":jsp__rollup__2.70.2__dir",
+        directory = "//example:jsp__rollup__2.70.2__dir",
         path = "dist/bin/rollup",
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [":jsp__rollup__2.70.2"],
+        data = kwargs.pop("data", []) + ["//example:jsp__rollup__2.70.2"],
         **kwargs
     )
 

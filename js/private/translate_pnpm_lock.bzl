@@ -192,7 +192,7 @@ def package_dir(name, import_path = "."):
 """
 
 _BIN_TMPL = \
-    """load("@{repo_name}//:package_json.bzl", _bin = "bin")
+    """load("@{repo_name}//{repo_package_json_bzl}", _bin = "bin")
 bin = _bin
 """
 
@@ -417,15 +417,6 @@ def link_js_packages():
         )
         defs_bzl_body.append("    link_{i}(False)".format(i = i))
 
-        if len(link_paths) and has_bin:
-            # Generate a package_json.bzl file if there are bin entries
-            rctx.file("%s/package_json.bzl" % name, "\n".join([
-                _BIN_TMPL.format(
-                    name = name,
-                    repo_name = repo_name,
-                ),
-            ]))
-
         # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
         # @repo_name//name:dir and @repo_name//@scope/name:dir
         for link_path in link_paths:
@@ -438,6 +429,21 @@ def link_js_packages():
                     name = name,
                 ),
             ]))
+
+            # Generate a package_json.bzl file if there are bin entries
+            if has_bin:
+                package_json_bzl_file_path = paths.normalize(paths.join(escaped_link_path, name, "package_json.bzl"))
+                repo_package_json_bzl = paths.normalize(paths.join(escaped_link_path, "package_json.bzl")).rsplit("/", 1)
+                if len(repo_package_json_bzl) == 1:
+                    repo_package_json_bzl = [""] + repo_package_json_bzl
+                repo_package_json_bzl = ":".join(repo_package_json_bzl)
+                rctx.file(package_json_bzl_file_path, "\n".join([
+                    _BIN_TMPL.format(
+                        repo_package_json_bzl = repo_package_json_bzl,
+                        name = name,
+                        repo_name = repo_name,
+                    ),
+                ]))
 
     fp_links = {}
 

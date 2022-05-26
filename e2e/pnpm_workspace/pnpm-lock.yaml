@@ -16,9 +16,11 @@ importers:
 
   app/a:
     specifiers:
+      '@aspect-test/a': 5.0.0
       '@aspect-test/g': 1.0.0
       '@lib/a': workspace:*
     dependencies:
+      '@aspect-test/a': 5.0.0
       '@aspect-test/g': 1.0.0
       '@lib/a': link:../../lib/a
 

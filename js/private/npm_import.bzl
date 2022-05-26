@@ -145,13 +145,13 @@ _BIN_MACRO_TMPL = """
 def {bin_name}(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = ":{namespace}{bazel_name}{dir_postfix}",
+        directory = "//{link_package}:{namespace}{bazel_name}{dir_postfix}",
         path = "{bin_path}",
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [":{namespace}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["//{link_package}:{namespace}{bazel_name}"],
     )
     _run_js_binary(
         name = name,
@@ -162,26 +162,26 @@ def {bin_name}(name, **kwargs):
 def {bin_name}_test(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = ":{namespace}{bazel_name}{dir_postfix}",
+        directory = "//{link_package}:{namespace}{bazel_name}{dir_postfix}",
         path = "{bin_path}",
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [":{namespace}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["//{link_package}:{namespace}{bazel_name}"],
         **kwargs
     )
 
 def {bin_name}_binary(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = ":{namespace}{bazel_name}{dir_postfix}",
+        directory = "//{link_package}:{namespace}{bazel_name}{dir_postfix}",
         path = "{bin_path}",
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [":{namespace}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["//{link_package}:{namespace}{bazel_name}"],
         **kwargs
     )
 """
@@ -264,32 +264,44 @@ def _impl(rctx):
 
     bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
-    bin_bzl_file = None
+    root_package_json_bzl = False
+
     if bins:
-        bin_bzl_file = "package_json.bzl"
-        bin_bzl = generated_by_lines + [
-            """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
-            """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test")""",
-            """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
-        ]
-        for name in bins:
-            bin_bzl.append(
-                _BIN_MACRO_TMPL.format(
-                    bazel_name = bazel_name,
-                    bin_name = _sanitize_bin_name(name),
-                    bin_path = bins[name],
-                    dir_postfix = pnpm_utils.dir_postfix,
-                    namespace = pnpm_utils.js_package_target_namespace,
-                ),
-            )
+        for link_path in rctx.attr.link_paths:
+            escaped_link_path = link_path.replace("../", "dot_dot/")
+            bin_bzl = generated_by_lines + [
+                """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
+                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test")""",
+                """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
+            ]
+            link_package = paths.normalize(paths.join(rctx.attr.root_path, link_path))
+            if link_package == ".":
+                link_package = ""
+            for name in bins:
+                bin_bzl.append(
+                    _BIN_MACRO_TMPL.format(
+                        bazel_name = bazel_name,
+                        bin_name = _sanitize_bin_name(name),
+                        bin_path = bins[name],
+                        dir_postfix = pnpm_utils.dir_postfix,
+                        link_package = link_package,
+                        namespace = pnpm_utils.js_package_target_namespace,
+                    ),
+                )
 
-        bin_struct_fields = [
-            "{name} = {name}, {name}_test = {name}_test, {name}_binary = {name}_binary".format(name = _sanitize_bin_name(name))
-            for name in bins
-        ]
-        bin_bzl.append("bin = struct(%s)\n" % ",\n".join(bin_struct_fields))
+            bin_struct_fields = [
+                "{name} = {name}, {name}_test = {name}_test, {name}_binary = {name}_binary".format(name = _sanitize_bin_name(name))
+                for name in bins
+            ]
+            bin_bzl.append("bin = struct(%s)\n" % ",\n".join(bin_struct_fields))
 
-        rctx.file(bin_bzl_file, "\n".join(bin_bzl))
+            if escaped_link_path == ".":
+                root_package_json_bzl = True
+            else:
+                rctx.file(paths.normalize(paths.join(escaped_link_path, "BUILD.bazel")), "\n".join(generated_by_lines + [
+                    "exports_files(%s)" % starlark_codegen_utils.to_list_attr(["package_json.bzl"]),
+                ]))
+            rctx.file(paths.normalize(paths.join(escaped_link_path, "package_json.bzl")), "\n".join(bin_bzl))
 
     if rctx.attr.run_lifecycle_hooks:
         _inject_run_lifecycle_hooks(rctx, pkg_json_path)
@@ -310,8 +322,8 @@ def _impl(rctx):
         version = rctx.attr.version,
     ))
 
-    if bin_bzl_file:
-        build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr([bin_bzl_file]))
+    if root_package_json_bzl:
+        build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr(["package_json.bzl"]))
 
     rctx.file("BUILD.bazel", "\n".join(build_file))
 
@@ -412,13 +424,13 @@ def _impl_links(rctx):
 _COMMON_ATTRS = {
     "package": attr.string(mandatory = True),
     "version": attr.string(mandatory = True),
+    "root_path": attr.string(),
+    "link_paths": attr.string_list(),
 }
 
 _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "deps": attr.string_dict(),
     "transitive_closure": attr.string_list_dict(),
-    "root_path": attr.string(),
-    "link_paths": attr.string_list(),
     "lifecycle_build_target": attr.bool(),
 })
 

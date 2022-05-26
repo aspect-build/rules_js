@@ -2,7 +2,7 @@
     "name": "@app/a",
     "private": true,
     "dependencies": {
-        "@aspect-test/a": "1.0.0",
+        "@aspect-test/a": "5.0.0",
         "@aspect-test/b": "1.0.0",
         "@aspect-test/c": "1.0.0",
         "@aspect-test/g": "1.0.0",

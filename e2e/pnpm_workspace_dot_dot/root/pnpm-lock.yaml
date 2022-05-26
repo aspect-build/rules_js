@@ -1,173 +1,139 @@
 lockfileVersion: 5.4
 
 importers:
-    .:
-        specifiers:
-            '@aspect-test/a': 5.0.0
-            '@aspect-test/b': 5.0.0
-            '@aspect-test/c': 2.0.0
-        dependencies:
-            '@aspect-test/a': 5.0.0
-        optionalDependencies:
-            '@aspect-test/c': 2.0.0
-        devDependencies:
-            '@aspect-test/b': 5.0.0
 
-    ../app/a:
-        specifiers:
-            '@aspect-test/a': 1.0.0
-            '@aspect-test/b': 1.0.0
-            '@aspect-test/c': 1.0.0
-            '@aspect-test/g': 1.0.0
-            '@lib/a': workspace:*
-        dependencies:
-            '@aspect-test/a': 1.0.0
-            '@aspect-test/b': 1.0.0
-            '@aspect-test/c': 1.0.0
-            '@aspect-test/g': 1.0.0
-            '@lib/a': link:../../lib/a
+  .:
+    specifiers:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/b': 5.0.0
+      '@aspect-test/c': 2.0.0
+    dependencies:
+      '@aspect-test/a': 5.0.0
+    optionalDependencies:
+      '@aspect-test/c': 2.0.0
+    devDependencies:
+      '@aspect-test/b': 5.0.0
 
-    ../app/b:
-        specifiers:
-            '@aspect-test/a': 1.0.0
-            '@aspect-test/b': 1.0.0
-            '@aspect-test/c': 1.0.0
-            '@aspect-test/h': 1.0.0
-            '@lib/b': workspace:*
-            '@lib/b_alias': workspace:@lib/b@*
-        dependencies:
-            '@aspect-test/a': 1.0.0
-            '@aspect-test/b': 1.0.0
-            '@aspect-test/c': 1.0.0
-            '@aspect-test/h': 1.0.0
-            '@lib/b': link:../../lib/b
-            '@lib/b_alias': link:../../lib/b
+  ../app/a:
+    specifiers:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/b': 1.0.0
+      '@aspect-test/c': 1.0.0
+      '@aspect-test/g': 1.0.0
+      '@lib/a': workspace:*
+    dependencies:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/b': 1.0.0
+      '@aspect-test/c': 1.0.0
+      '@aspect-test/g': 1.0.0
+      '@lib/a': link:../../lib/a
 
-    ../lib/a:
-        specifiers:
-            '@aspect-test/e': 1.0.0
-            '@lib/b': workspace:*
-        dependencies:
-            '@aspect-test/e': 1.0.0
-            '@lib/b': link:../b
+  ../app/b:
+    specifiers:
+      '@aspect-test/a': 1.0.0
+      '@aspect-test/b': 1.0.0
+      '@aspect-test/c': 1.0.0
+      '@aspect-test/h': 1.0.0
+      '@lib/b': workspace:*
+      '@lib/b_alias': workspace:@lib/b@*
+    dependencies:
+      '@aspect-test/a': 1.0.0
+      '@aspect-test/b': 1.0.0
+      '@aspect-test/c': 1.0.0
+      '@aspect-test/h': 1.0.0
+      '@lib/b': link:../../lib/b
+      '@lib/b_alias': link:../../lib/b
 
-    ../lib/b:
-        specifiers:
-            '@aspect-test/f': 1.0.0
-        dependencies:
-            '@aspect-test/f': 1.0.0
+  ../lib/a:
+    specifiers:
+      '@aspect-test/e': 1.0.0
+      '@lib/b': workspace:*
+    dependencies:
+      '@aspect-test/e': 1.0.0
+      '@lib/b': link:../b
+
+  ../lib/b:
+    specifiers:
+      '@aspect-test/f': 1.0.0
+    dependencies:
+      '@aspect-test/f': 1.0.0
 
 packages:
-    /@aspect-test/a/1.0.0:
-        resolution:
-            {
-                integrity: sha512-MYeL/yqAPYJXOnnSEOAdtQSu/8tiifFtKN6Jg/rgpKRqxKL8NVsQXrX9H2dlJ4mS23pu7VS0+i9mZNiRoCUYwg==,
-            }
-        hasBin: true
-        dependencies:
-            '@aspect-test/b': 1.0.0
-            '@aspect-test/c': 1.0.0
-        dev: false
 
-    /@aspect-test/a/5.0.0:
-        resolution:
-            {
-                integrity: sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==,
-            }
-        hasBin: true
-        dependencies:
-            '@aspect-test/b': 5.0.0
-            '@aspect-test/c': 1.0.0
-            '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
+  /@aspect-test/a/1.0.0:
+    resolution: {integrity: sha512-MYeL/yqAPYJXOnnSEOAdtQSu/8tiifFtKN6Jg/rgpKRqxKL8NVsQXrX9H2dlJ4mS23pu7VS0+i9mZNiRoCUYwg==}
+    hasBin: true
+    dependencies:
+      '@aspect-test/b': 1.0.0
+      '@aspect-test/c': 1.0.0
+    dev: false
 
-    /@aspect-test/b/1.0.0:
-        resolution:
-            {
-                integrity: sha512-IlLB5ZYT2Guryz+hQrgl/IgRMutfJfa78TuznRhaM5o+aLbmeHx0hvC83sc6dACLC1h/Bix0fimZBf/vz9j3Cw==,
-            }
-        hasBin: true
-        dependencies:
-            '@aspect-test/a': 1.0.0
-            '@aspect-test/c': 2.0.0
-        dev: false
+  /@aspect-test/a/5.0.0:
+    resolution: {integrity: sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==}
+    hasBin: true
+    dependencies:
+      '@aspect-test/b': 5.0.0
+      '@aspect-test/c': 1.0.0
+      '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
 
-    /@aspect-test/b/5.0.0:
-        resolution:
-            {
-                integrity: sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==,
-            }
-        hasBin: true
-        dependencies:
-            '@aspect-test/a': 5.0.0
-            '@aspect-test/c': 2.0.0
-            '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
+  /@aspect-test/b/1.0.0:
+    resolution: {integrity: sha512-IlLB5ZYT2Guryz+hQrgl/IgRMutfJfa78TuznRhaM5o+aLbmeHx0hvC83sc6dACLC1h/Bix0fimZBf/vz9j3Cw==}
+    hasBin: true
+    dependencies:
+      '@aspect-test/a': 1.0.0
+      '@aspect-test/c': 2.0.0
+    dev: false
 
-    /@aspect-test/c/1.0.0:
-        resolution:
-            {
-                integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==,
-            }
-        hasBin: true
-        requiresBuild: true
+  /@aspect-test/b/5.0.0:
+    resolution: {integrity: sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==}
+    hasBin: true
+    dependencies:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/c': 2.0.0
+      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
 
-    /@aspect-test/c/2.0.0:
-        resolution:
-            {
-                integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==,
-            }
-        hasBin: true
-        requiresBuild: true
+  /@aspect-test/c/1.0.0:
+    resolution: {integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==}
+    hasBin: true
+    requiresBuild: true
 
-    /@aspect-test/d/2.0.0_@aspect-test+c@1.0.0:
-        resolution:
-            {
-                integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==,
-            }
-        hasBin: true
-        peerDependencies:
-            '@aspect-test/c': x.x.x
-        dependencies:
-            '@aspect-test/c': 1.0.0
+  /@aspect-test/c/2.0.0:
+    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
+    hasBin: true
+    requiresBuild: true
 
-    /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
-        resolution:
-            {
-                integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==,
-            }
-        hasBin: true
-        peerDependencies:
-            '@aspect-test/c': x.x.x
-        dependencies:
-            '@aspect-test/c': 2.0.0
+  /@aspect-test/d/2.0.0_@aspect-test+c@1.0.0:
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+    dependencies:
+      '@aspect-test/c': 1.0.0
 
-    /@aspect-test/e/1.0.0:
-        resolution:
-            {
-                integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==,
-            }
-        hasBin: true
-        dev: false
+  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+    dependencies:
+      '@aspect-test/c': 2.0.0
 
-    /@aspect-test/f/1.0.0:
-        resolution:
-            {
-                integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==,
-            }
-        hasBin: true
-        dev: false
+  /@aspect-test/e/1.0.0:
+    resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
+    hasBin: true
+    dev: false
 
-    /@aspect-test/g/1.0.0:
-        resolution:
-            {
-                integrity: sha512-nYxZCTIw+sHZfuKsqBBL7CW3KOliEoQh0D/ynWyUoB2Vi+DT2+nuvghXqL70/eNegjQ/8hUNTRBDBN2CPgoY8A==,
-            }
-        hasBin: true
-        dev: false
+  /@aspect-test/f/1.0.0:
+    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
+    hasBin: true
+    dev: false
 
-    /@aspect-test/h/1.0.0:
-        resolution:
-            {
-                integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==,
-            }
-        hasBin: true
-        dev: false
+  /@aspect-test/g/1.0.0:
+    resolution: {integrity: sha512-nYxZCTIw+sHZfuKsqBBL7CW3KOliEoQh0D/ynWyUoB2Vi+DT2+nuvghXqL70/eNegjQ/8hUNTRBDBN2CPgoY8A==}
+    hasBin: true
+    dev: false
+
+  /@aspect-test/h/1.0.0:
+    resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
+    hasBin: true
+    dev: false
