@@ -41,12 +41,14 @@ fi
 LOG_PREFIX="aspect_rules_js[js_binary]"
 
 function logf_stderr {
-    local format_string="$1"
+    local format_string="$1\n"
     shift
     if [ "${STDERR_CAPTURE:-}" ]; then
-        printf "$format_string\n" "$@" >>"$STDERR_CAPTURE"
+        # shellcheck disable=SC2059
+        printf "$format_string" "$@" >>"$STDERR_CAPTURE"
     else
-        printf "$format_string\n" "$@" >&2
+        # shellcheck disable=SC2059
+        printf "$format_string" "$@" >&2
     fi
 }
 
@@ -251,11 +253,20 @@ fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     # We in runfiles
+    bazel_out="/bazel-out/"
+    rest="${PWD#*"$bazel_out"}"
+    index=$(( ${#PWD} - ${#rest} - ${#bazel_out} ))
+    if [ ${index} -lt 0 ]; then
+        printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$LOG_PREFIX" >&2
+        exit 1
+    fi
+    execroot="${PWD:0:$index}"
     node="$PWD/../nodejs_linux_amd64/bin/nodejs/bin/node"
     entry_point="$PWD/js/private/test/shellcheck.js"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
+    execroot="$PWD"
     node="$RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
     entry_point="$RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
@@ -285,11 +296,13 @@ if [ ! -f "$entry_point" ]; then
     exit 1
 fi
 
+# Change directory to user specified package if set
 if [ "${JS_BINARY__CHDIR:-}" ]; then
     logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
     cd "$JS_BINARY__CHDIR"
 fi
 
+# Gather node options
 NODE_OPTIONS=()
 
 
@@ -303,6 +316,13 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
         *) ARGS+=( "$ARG" )
     esac
 done
+
+# Run node patches if needed
+export JS_BINARY__FS_PATH_ROOTS="$execroot:$RUNFILES"
+if [ -z "${JS_BINARY__DISABLE_NODE_PATCHES:-}" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
+    logf_debug "adding node fs patches with roots: %s" "$JS_BINARY__FS_PATH_ROOTS"
+    NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register" )
+fi
 
 # Put bazel managed node on the path
 PATH="$(dirname "$node"):$PATH"

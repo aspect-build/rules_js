@@ -1,3 +1,4 @@
 docs/
 min/
 **/pnpm-lock.yaml
+js/private/node-patches/fs.js

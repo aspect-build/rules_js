@@ -166,6 +166,14 @@ _ATTRS = {
     ),
     "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
+    "_node_patches_files": attr.label_list(
+        allow_files = True,
+        default = ["@aspect_rules_js//js/private/node-patches:fs.js"],
+    ),
+    "_node_patches_entry": attr.label(
+        allow_single_file = True,
+        default = "@aspect_rules_js//js/private/node-patches:register.js",
+    ),
 }
 
 _ENV_SET = """export {var}=\"{value}\""""
@@ -278,7 +286,15 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
     bash_launcher = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point, bash_launcher] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
+    all_files = []
+    all_files.extend(output_data_files)
+    all_files.extend(ctx.files._runfiles_lib)
+    all_files.append(ctx.file._node_patches_entry)
+    all_files.extend(ctx.files._node_patches_files)
+    all_files.append(output_entry_point)
+    all_files.append(bash_launcher)
+    all_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+
     runfiles = ctx.runfiles(
         files = all_files,
         transitive_files = depset(all_files),
