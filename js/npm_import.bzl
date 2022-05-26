@@ -36,6 +36,7 @@ def npm_import(
         deps = {},
         transitive_closure = {},
         root_path = "",
+        link_workspace = "",
         link_paths = ["."],
         run_lifecycle_hooks = False,
         integrity = "",
@@ -118,6 +119,9 @@ def npm_import(
             package name and value is a list of version(s) depended on in the closure.
         root_path: The root package where the node_modules virtual store is linked to.
             Typically this is the package that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
+        link_workspace: The workspace name where links will be created for this package.
+            Typically this is the workspace that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
+            Can be left unspecified if the link workspace is the user workspace.
         link_paths: List of paths where direct links will be created at for this package.
             These paths are relative to the root package with "." being the node_modules at the root package.
         run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
@@ -146,6 +150,7 @@ def npm_import(
         package = package,
         version = version,
         root_path = root_path,
+        link_workspace = link_workspace,
         link_paths = link_paths,
         integrity = integrity,
         patch_args = patch_args,
