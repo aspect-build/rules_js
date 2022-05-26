@@ -48,7 +48,7 @@ write_source_files(
     files = {
         "repositories_checked.bzl": "@npm//:repositories.bzl",
         "defs_checked.bzl": "@npm//:defs.bzl",
-        "package_json_checked.bzl": "@npm__rollup__2.70.2//:package_json.bzl",
-        "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1//:package_json.bzl",
+        "package_json_checked.bzl": "@npm__rollup__2.70.2//example:package_json.bzl",
+        "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1//example:package_json.bzl",
     },
 )

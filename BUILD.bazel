@@ -1,4 +1,10 @@
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@npm//:defs.bzl", "link_js_packages")
+
+# Link all packages from the /WORKSPACE translate_pnpm_lock in the package.json to
+# bazel-bin/example/node_modules as well as the virtual store since this package.json
+# is the root of the pnpm workspace
+link_js_packages()
 
 gazelle_binary(
     name = "gazelle_bin",
