@@ -29,5 +29,5 @@ js_test(
         "@npm//dot_dot/app/b/@lib/b_alias",
     ],
     entry_point = "main.js",
-    verbose = True,
+    log_level = "info",
 )

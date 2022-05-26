@@ -157,8 +157,8 @@ diff_test(
 write_file(
     name = "write10",
     out = "case10.js",
-    content = ["""process.stdout.write("to stdout")
-process.stderr.write("to stderr")
+    content = ["""process.stdout.write("to stdout\\n")
+process.stderr.write("to stderr\\n")
 require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)
 process.exit(42)
 """],
@@ -198,13 +198,13 @@ write_file(
 write_file(
     name = "expected10_stdout",
     out = "expected10_stdout.txt",
-    content = ["to stdout"],
+    content = ["to stdout\n"],
 )
 
 write_file(
     name = "expected10_stderr",
     out = "expected10_stderr.txt",
-    content = ["to stderr"],
+    content = ["to stderr\n"],
 )
 
 write_file(
@@ -229,7 +229,7 @@ js_test(
         "FOO": "BAR",
     },
     expected_exit_code = 42,
-    verbose = True,
+    log_level = "debug",
 )
 
 # bazel run //examples:test10_binary
@@ -241,7 +241,7 @@ js_binary(
         "FOO": "BAR",
     },
     expected_exit_code = 42,
-    verbose = True,
+    log_level = "debug",
 )
 
 run_js_binary(

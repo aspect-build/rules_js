@@ -35,6 +35,40 @@ This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
 """
 
+_LOG_LEVELS = {
+    "fatal": 1,
+    "error": 2,
+    "warn": 3,
+    "info": 4,
+    "debug": 5,
+}
+
+def envs_for_log_level(log_level):
+    """Returns a list environment variables to set for a given log level
+
+    Args:
+        log_level: The log level string value
+
+    Returns:
+        A list of environment variables to set to turn on the js_binary runtime
+        logs for the given log level. Typically, they are each set to "1".
+    """
+    if log_level not in _LOG_LEVELS.keys():
+        fail("log_level must be one of {} but got {}".format(_LOG_LEVELS.keys(), log_level))
+    envs = []
+    log_level_numeric = _LOG_LEVELS[log_level]
+    if log_level_numeric >= _LOG_LEVELS["fatal"]:
+        envs.append("JS_BINARY__LOG_FATAL")
+    if log_level_numeric >= _LOG_LEVELS["error"]:
+        envs.append("JS_BINARY__LOG_ERROR")
+    if log_level_numeric >= _LOG_LEVELS["warn"]:
+        envs.append("JS_BINARY__LOG_WARN")
+    if log_level_numeric >= _LOG_LEVELS["info"]:
+        envs.append("JS_BINARY__LOG_INFO")
+    if log_level_numeric >= _LOG_LEVELS["debug"]:
+        envs.append("JS_BINARY__LOG_DEBUG")
+    return envs
+
 _ATTRS = {
     "chdir": attr.string(
         doc = """Working directory to run the binary or test in, relative to the workspace.
@@ -117,8 +151,14 @@ _ATTRS = {
         Can be used to write tests that are expected to fail.""",
         default = 0,
     ),
-    "verbose": attr.bool(
-        doc = """Produce verbose output.""",
+    "log_level": attr.string(
+        doc = """Set the logging level.
+
+        Log from are written to stderr. They will be supressed on success when running as the tool
+        of a run_js_binary when silent_on_success is True. In that case, they will be shown
+        only on a build failure along with the stdout & stderr of the node tool being run.""",
+        values = _LOG_LEVELS.keys(),
+        default = "error",
     ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
@@ -150,21 +190,38 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             var = key,
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
         ))
-    if ctx.attr.chdir:
-        envs.append(_ENV_SET_IFF_NOT_SET.format(
-            var = "JS_BINARY__CHDIR",
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
+
+    # Automatically add common and useful make variables to the environment
+    builtin_envs = {
+        "JS_BINARY__BINDIR": "$(BINDIR)",
+        "JS_BINARY__BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
+        "JS_BINARY__COMPILATION_MODE": "$(COMPILATION_MODE)",
+        "JS_BINARY__TARGET_CPU": "$(TARGET_CPU)",
+        "JS_BINARY__TARGET": "$(TARGET)",
+        "JS_BINARY__WORKSPACE": "$(WORKSPACE)",
+    }
+    for (key, value) in builtin_envs.items():
+        envs.append(_ENV_SET.format(
+            var = key,
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
         ))
+
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
             var = "JS_BINARY__EXPECTED_EXIT_CODE",
             value = str(ctx.attr.expected_exit_code),
         ))
-    if ctx.attr.verbose:
-        envs.append(_ENV_SET.format(
-            var = "JS_BINARY__VERBOSE",
-            value = "1",
+
+    if ctx.attr.chdir:
+        # Set chdir env if not already set to allow run_js_binary to override
+        envs.append(_ENV_SET_IFF_NOT_SET.format(
+            var = "JS_BINARY__CHDIR",
+            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
         ))
+
+    # Set log envs iff not already set to allow run_js_binary to override
+    for env in envs_for_log_level(ctx.attr.log_level):
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, value = "1"))
 
     node_options = []
     for node_option in ctx.attr.node_options:

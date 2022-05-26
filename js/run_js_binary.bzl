@@ -7,6 +7,7 @@ and adds attributes and features specific to rules_js's js_binary.
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("//js/private:js_binary.bzl", _js_binary_envs_for_log_level = "envs_for_log_level")
 
 def run_js_binary(
         name,
@@ -22,6 +23,7 @@ def run_js_binary(
         exit_code_out = None,
         silent_on_success = True,
         copy_srcs_to_bin = True,
+        log_level = None,
         **kwargs):
     """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
 
@@ -59,6 +61,8 @@ def run_js_binary(
 
         chdir: Working directory to run the binary or test in, relative to the workspace.
 
+            This overrides the chdir value if set on the js_binary tool target.
+
             By default, Bazel always runs in the workspace root.
 
             To run in the directory containing the run_js_binary under the source tree, use
@@ -73,19 +77,25 @@ def run_js_binary(
             You may need `../../` segments to re-relativize such paths to the new working directory.
 
         stderr: set to capture the stderr of the binary to a file, which can later be used as an input to another target
-                subject to the same semantics as `outs`
+            subject to the same semantics as `outs`
 
         stdout: set to capture the stdout of the binary to a file, which can later be used as an input to another target
-                subject to the same semantics as `outs`
+            subject to the same semantics as `outs`
 
         exit_code_out: set to capture the exit code of the binary to a file, which can later be used as an input to another target
-                subject to the same semantics as `outs`. Note that setting this will force the binary to exit 0.
-                If the binary creates outputs and these are declared, they must still be created
+            subject to the same semantics as `outs`. Note that setting this will force the binary to exit 0.
+
+            If the binary creates outputs and these are declared, they must still be created
 
         silent_on_success: produce no output on stdout nor stderr when program exits with status code 0.
-                This makes node binaries match the expected bazel paradigm.
+
+            This makes node binaries match the expected bazel paradigm.
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
+
+        log_level: Set the logging level of the js_binary tool.
+
+            This overrides the log level set on the js_binary tool target.
 
         **kwargs: Additional arguments
     """
@@ -106,40 +116,42 @@ def run_js_binary(
         )
         extra_srcs = [":%s" % copy_to_bin_name]
 
-    # Automatically add common and useful make variables to the environment for js_binary targets
-    # under rules_js
+    # Automatically add common and useful make variables to the environment for run_js_binary build targets
     extra_env = {
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
-        "BAZEL_VERSION_FILE": "$(VERSION_FILE)",
-        "BAZEL_INFO_FILE": "$(INFO_FILE)",
-        "BAZEL_TARGET": "$(TARGET)",
-        "BAZEL_WORKSPACE": "$(WORKSPACE)",
-        "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
         "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
+        "BAZEL_INFO_FILE": "$(INFO_FILE)",
+        "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
+        "BAZEL_TARGET": "$(TARGET)",
+        "BAZEL_VERSION_FILE": "$(VERSION_FILE)",
+        "BAZEL_WORKSPACE": "$(WORKSPACE)",
     }
 
     # Configure working directory to `chdir` is set
-    chdir_prefix = ""
     if chdir:
         extra_env["JS_BINARY__CHDIR"] = chdir
-        chdir_prefix = "/".join([".."] * len(chdir.split("/"))) + "/"
 
     # Configure capturing stdout, stderr and/or the exit code
     extra_outs = []
     if stdout:
-        extra_env["JS_BINARY__CAPTURE_STDOUT"] = "%s$(rootpath %s)" % (chdir_prefix, stdout)
+        extra_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = "$(execpath {})".format(stdout)
         extra_outs.append(stdout)
     if stderr:
-        extra_env["JS_BINARY__CAPTURE_STDERR"] = "%s$(rootpath %s)" % (chdir_prefix, stderr)
+        extra_env["JS_BINARY__STDERR_OUTPUT_FILE"] = "$(execpath {})".format(stderr)
         extra_outs.append(stderr)
     if exit_code_out:
-        extra_env["JS_BINARY__CAPTURE_EXIT_CODE"] = "%s$(rootpath %s)" % (chdir_prefix, exit_code_out)
+        extra_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = "$(execpath {})".format(exit_code_out)
         extra_outs.append(exit_code_out)
 
     # Configure silent on success
     if silent_on_success:
         extra_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
+
+    # Configure log_level if specified
+    if log_level:
+        for env in _js_binary_envs_for_log_level(log_level):
+            extra_env[env] = "1"
 
     _run_binary(
         name = name,

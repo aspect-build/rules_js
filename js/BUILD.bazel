@@ -44,6 +44,7 @@ bzl_library(
     srcs = ["run_js_binary.bzl"],
     visibility = ["//visibility:public"],
     deps = [
+        "//js/private:js_binary",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:run_binary",
         "@bazel_skylib//lib:dicts",
