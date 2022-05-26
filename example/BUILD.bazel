@@ -626,7 +626,6 @@ uvu_test(
     ],
     data = [
         ":acorn_spec",
-        "@npm//uvu",
         package("@mycorp/mylib"),
     ],
 )
