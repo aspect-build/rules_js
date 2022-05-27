@@ -2,31 +2,32 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-
-# Load from all packages declared in /WORKSPACE translate_pnpm_lock
 load("@npm//:defs.bzl", "link_js_packages", "package", "package_dir")
-
-# Load from the "bin" property from the package.json of the uvu package
-load("@npm//uvu:package_json.bzl", uvu_bin = "bin")
-
-# This package was fetched separately with npm_import from /WORKSPACE
 load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
 
+# Load from the "bin" property from the package.json of the uvu package
+load("@npm//example/uvu:package_json.bzl", uvu_bin = "bin")
+
 # Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
-load("@npm__rollup__2.70.2//:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
+load("@npm__rollup__2.70.2//example:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
 load("//js:defs.bzl", "js_binary", "js_test", "link_js_package")
 load("//js:run_js_binary.bzl", "run_js_binary")
 
 ###########################
 
-link_acorn()
-
+# Link all packages from the /WORKSPACE translate_pnpm_lock in the example/package.json to
+# bazel-bin/example/node_modules
 link_js_packages()
 
+# Link the acorn package, was fetched separately with npm_import from /WORKSPACE, to
+# bazel-bin/example/node_modules
+link_acorn()
+
+# Example of manually linking a first party dependency to bazel-bin/example/node_modules
 link_js_package(
     name = package("@mycorp/mylib").name,
     src = "//example/lib",
-    deps = [package("acorn")],
+    deps = [package("acorn", "example")],
 )
 
 ###########################
@@ -92,8 +93,8 @@ genrule(
     name = "call_acorn",
     srcs = [
         "one.js",
-        package("acorn"),
-        package_dir("acorn"),
+        package("acorn", "example"),
+        package_dir("acorn", "example"),
     ],
     outs = ["actual2"],
     cmd = """
@@ -101,7 +102,7 @@ genrule(
         ./$(execpath %s)/bin/acorn \\
         --compact \\
         $(execpath one.js) \\
-        > $@""" % package_dir("acorn"),
+        > $@""" % package_dir("acorn", "example"),
     toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
     tools = ["@nodejs_toolchains//:resolved_toolchain"],
 )
@@ -126,7 +127,7 @@ genrule(
     name = "require_acorn",
     srcs = [
         ":require_acorn_js",
-        package("acorn"),
+        package("acorn", "example"),
     ],
     outs = ["actual3"],
     cmd = """
@@ -150,7 +151,7 @@ diff_test(
 
 js_binary(
     name = "bin",
-    data = [package("acorn")],
+    data = [package("acorn", "example")],
     entry_point = "require_acorn.js",
 )
 
@@ -193,7 +194,7 @@ write_file(
 
 js_binary(
     name = "bin6",
-    data = [package("@mycorp/mylib")],
+    data = [package("@mycorp/mylib", "example")],
     entry_point = "case6.js",
 )
 
@@ -229,7 +230,7 @@ write_file(
 
 js_binary(
     name = "bin7",
-    data = ["@npm//@gregmagolan/test-b"],
+    data = ["@npm//example/@gregmagolan/test-b"],
     entry_point = "case7.js",
 )
 
@@ -415,12 +416,12 @@ run_js_binary(
 js_test(
     name = "test_peer",
     data = [
-        "@npm//@rollup/plugin-commonjs",
-        "@npm//mobx-react",
-        "@npm//react",
+        "@npm//example/@rollup/plugin-commonjs",
+        "@npm//example/mobx-react",
+        "@npm//example/react",
         # TODO: fix this test so we test a peer dependency without requiring it as a direct
         # dependency https://github.com/aspect-build/rules_js/issues/92
-        "@npm//rollup",
+        "@npm//example/rollup",
     ],
     entry_point = "peer.js",
 )
@@ -470,7 +471,7 @@ if (content.answer !== '42*') {
 js_test(
     name = "test11",
     data = [
-        package("@aspect-test/c"),
+        package("@aspect-test/c", "example"),
     ],
     entry_point = "case11.js",
 )
@@ -497,9 +498,9 @@ if (!/^moo\\s+mooo\\s*$/.test(content)) {
 
 js_test(
     name = "test12",
-    args = ["$(rootpath %s)" % package_dir("@aspect-test/c")],
+    args = ["$(rootpath %s)" % package_dir("@aspect-test/c", "example")],
     data = [
-        package_dir("@aspect-test/c"),
+        package_dir("@aspect-test/c", "example"),
     ],
     entry_point = "case12.js",
 )
@@ -510,7 +511,7 @@ js_test(
 
 directory_path(
     name = "acorn_entry_point",
-    directory = package_dir("acorn"),
+    directory = package_dir("acorn", "example"),
     path = "bin/acorn",
 )
 
@@ -626,6 +627,6 @@ uvu_test(
     ],
     data = [
         ":acorn_spec",
-        package("@mycorp/mylib"),
+        package("@mycorp/mylib", "example"),
     ],
 )

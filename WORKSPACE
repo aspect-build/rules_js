@@ -56,7 +56,7 @@ translate_pnpm_lock(
         "@gregmagolan/test-a": ["//example:test-a.patch"],
         "@gregmagolan/test-a@0.0.1": ["//example:test-a@0.0.1.patch"],
     },
-    pnpm_lock = "//example:pnpm-lock.yaml",
+    pnpm_lock = "//:pnpm-lock.yaml",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")

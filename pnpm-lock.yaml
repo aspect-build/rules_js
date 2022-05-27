@@ -1,36 +1,44 @@
 lockfileVersion: 5.4
 
-specifiers:
-  '@aspect-test/a': 5.0.0
-  '@aspect-test/b': 5.0.0
-  '@aspect-test/c': 2.0.0
-  '@gregmagolan/test-b': ^0.0.2
-  '@rollup/plugin-commonjs': ^21.1.0
-  '@types/node': ^15.12.2
-  bufferutil: 4.0.1
-  esbuild: 0.14.38
-  mobx: ^6.1.0
-  mobx-react: ^7.3.0
-  react: ^17
-  rollup: ^2.70.2
-  uvu: ^0.5.3
-  webpack-bundle-analyzer: 4.5.0
+importers:
 
-devDependencies:
-  '@aspect-test/a': 5.0.0
-  '@aspect-test/b': 5.0.0
-  '@aspect-test/c': 2.0.0
-  '@gregmagolan/test-b': 0.0.2
-  '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
-  '@types/node': 15.14.9
-  bufferutil: 4.0.1
-  esbuild: 0.14.38
-  mobx: 6.5.0
-  mobx-react: 7.3.0_mobx@6.5.0+react@17.0.2
-  react: 17.0.2
-  rollup: 2.70.2
-  uvu: 0.5.3
-  webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
+  .:
+    specifiers:
+      '@types/node': 16.11.36
+      typescript: 4.7.2
+    devDependencies:
+      '@types/node': 16.11.36
+      typescript: 4.7.2
+
+  example:
+    specifiers:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/b': 5.0.0
+      '@aspect-test/c': 2.0.0
+      '@gregmagolan/test-b': 0.0.2
+      '@rollup/plugin-commonjs': 21.1.0
+      bufferutil: 4.0.1
+      esbuild: 0.14.38
+      mobx: 6.3.0
+      mobx-react: 7.3.0
+      react: 17.0.2
+      rollup: 2.70.2
+      uvu: 0.5.3
+      webpack-bundle-analyzer: 4.5.0
+    devDependencies:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/b': 5.0.0
+      '@aspect-test/c': 2.0.0
+      '@gregmagolan/test-b': 0.0.2
+      '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
+      bufferutil: 4.0.1
+      esbuild: 0.14.38
+      mobx: 6.3.0
+      mobx-react: 7.3.0_mobx@6.3.0+react@17.0.2
+      react: 17.0.2
+      rollup: 2.70.2
+      uvu: 0.5.3
+      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
 packages:
 
@@ -105,7 +113,7 @@ packages:
       '@rollup/pluginutils': 3.1.0_rollup@2.70.2
       commondir: 1.0.1
       estree-walker: 2.0.2
-      glob: 7.2.0
+      glob: 7.2.3
       is-reference: 1.2.1
       magic-string: 0.25.9
       resolve: 1.22.0
@@ -132,8 +140,8 @@ packages:
     resolution: {integrity: sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==}
     dev: true
 
-  /@types/node/15.14.9:
-    resolution: {integrity: sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==}
+  /@types/node/16.11.36:
+    resolution: {integrity: sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==}
     dev: true
 
   /acorn-walk/8.2.0:
@@ -197,7 +205,7 @@ packages:
     dev: true
 
   /commondir/1.0.1:
-    resolution: {integrity: sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=}
+    resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
     dev: true
 
   /concat-map/0.0.1:
@@ -209,8 +217,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /diff/5.0.0:
-    resolution: {integrity: sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==}
+  /diff/5.1.0:
+    resolution: {integrity: sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==}
     engines: {node: '>=0.3.1'}
     dev: true
 
@@ -450,8 +458,8 @@ packages:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
     dev: true
 
-  /glob/7.2.0:
-    resolution: {integrity: sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==}
+  /glob/7.2.3:
+    resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -535,11 +543,11 @@ packages:
       brace-expansion: 1.1.11
     dev: true
 
-  /mobx-react-lite/3.3.0_mobx@6.5.0+react@17.0.2:
-    resolution: {integrity: sha512-U/kMSFtV/bNVgY01FuiGWpRkaQVHozBq5CEBZltFvPt4FcV111hEWkgwqVg9GPPZSEuEdV438PEz8mk8mKpYlA==}
+  /mobx-react-lite/3.4.0_mobx@6.3.0+react@17.0.2:
+    resolution: {integrity: sha512-bRuZp3C0itgLKHu/VNxi66DN/XVkQG7xtoBVWxpvC5FhAqbOCP21+nPhULjnzEqd7xBMybp6KwytdUpZKEgpIQ==}
     peerDependencies:
       mobx: ^6.1.0
-      react: ^16.8.0 || ^17
+      react: ^16.8.0 || ^17 || ^18
       react-dom: '*'
       react-native: '*'
     peerDependenciesMeta:
@@ -548,11 +556,11 @@ packages:
       react-native:
         optional: true
     dependencies:
-      mobx: 6.5.0
+      mobx: 6.3.0
       react: 17.0.2
     dev: true
 
-  /mobx-react/7.3.0_mobx@6.5.0+react@17.0.2:
+  /mobx-react/7.3.0_mobx@6.3.0+react@17.0.2:
     resolution: {integrity: sha512-RGEcwZokopqyJE5JPwXKB9FWMSqFM9NJVO2QPI+z6laJTJeBHqvPicjnKgY5mvihxTeXB1+72TnooqUePeGV1g==}
     peerDependencies:
       mobx: ^6.1.0
@@ -565,13 +573,13 @@ packages:
       react-native:
         optional: true
     dependencies:
-      mobx: 6.5.0
-      mobx-react-lite: 3.3.0_mobx@6.5.0+react@17.0.2
+      mobx: 6.3.0
+      mobx-react-lite: 3.4.0_mobx@6.3.0+react@17.0.2
       react: 17.0.2
     dev: true
 
-  /mobx/6.5.0:
-    resolution: {integrity: sha512-pHZ/cySF00FVENDWIDzJyoObFahK6Eg4d0papqm6d7yMkxWTZ/S/csqJX1A3PsYy4t5k3z2QnlwuCfMW5lSEwA==}
+  /mobx/6.3.0:
+    resolution: {integrity: sha512-Aa1+VXsg4WxqJMTQfWoYuJi5UD10VZhiobSmcs5kcmI3BIT0aVtn7DysvCeDADCzl7dnbX+0BTHUj/v7gLlZpQ==}
     dev: true
 
   /mri/1.2.0:
@@ -681,13 +689,19 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /typescript/4.7.2:
+    resolution: {integrity: sha512-Mamb1iX2FDUpcTRzltPxgWMKy3fhg0TN378ylbktPGPK/99KbDtMQ4W1hwgsbPAsG3a0xKa1vmw4VKZQbkvz5A==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
   /uvu/0.5.3:
     resolution: {integrity: sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==}
     engines: {node: '>=8'}
     hasBin: true
     dependencies:
       dequal: 2.0.2
-      diff: 5.0.0
+      diff: 5.1.0
       kleur: 4.1.4
       sade: 1.8.1
     dev: true
@@ -705,7 +719,7 @@ packages:
       lodash: 4.17.21
       opener: 1.5.2
       sirv: 1.0.19
-      ws: 7.5.7_bufferutil@4.0.1
+      ws: 7.5.8_bufferutil@4.0.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -715,8 +729,8 @@ packages:
     resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
     dev: true
 
-  /ws/7.5.7_bufferutil@4.0.1:
-    resolution: {integrity: sha512-KMvVuFzpKBuiIXW3E4u3mySRO2/mCHSyZDJQM5NQ9Q9KHWHWh0NHgfbRMLLrceUK5qAL4ytALJbpRMjixFZh8A==}
+  /ws/7.5.8_bufferutil@4.0.1:
+    resolution: {integrity: sha512-ri1Id1WinAX5Jqn9HejiGb8crfRio0Qgu8+MtL36rlTA6RLsMdWt1Az/19A2Qij6uSHUMphEFaTKa4WG+UNHNw==}
     engines: {node: '>=8.3.0'}
     peerDependencies:
       bufferutil: ^4.0.1
