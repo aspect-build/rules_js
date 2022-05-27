@@ -89,6 +89,13 @@ def run_js_binary(
 
         **kwargs: Additional arguments
     """
+
+    # Friendly fail if user has specified data instead of srcs
+    data = kwargs.pop("data", None)
+    if data != None:
+        fail("Use srcs instead of data in run_js_binary: https://github.com/aspect-build/rules_js/blob/main/docs/run_js_binary.md#run_js_binary-srcs.")
+
+    # Copy srcs to bin
     extra_srcs = []
     if copy_srcs_to_bin:
         copy_to_bin_name = "%s_copy_srcs_to_bin" % name
