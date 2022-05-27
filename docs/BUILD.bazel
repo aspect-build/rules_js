@@ -20,4 +20,9 @@ stardoc_with_diff_test(
     bzl_library_target = "//js:npm_import",
 )
 
+stardoc_with_diff_test(
+    name = "run_js_binary",
+    bzl_library_target = "//js:run_js_binary",
+)
+
 update_docs(name = "update")

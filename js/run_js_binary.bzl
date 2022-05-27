@@ -1,6 +1,7 @@
-"""Runs a binary as a build action. This rule does not require Bash (unlike native.genrule()).
+"""Runs a js_binary as a build action.
 
-This fork of bazel-skylib's run_binary adds directory output support and better makevar expansions.
+This macro wraps Aspect bazel-lib's run_binary (https://github.com/aspect-build/bazel-lib/blob/main/lib/run_binary.bzl)
+and adds attributes and features specific to rules_js's js_binary.
 """
 
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
@@ -30,10 +31,9 @@ def run_js_binary(
         name: Target name
         tool: The tool to run in the action.
 
-            Must be the label of a *_binary rule, of a rule that generates an executable file, or of a file
-            that can be executed as a subprocess (e.g. an .exe or .bat file on Windows or a binary with
-            executable permission on Linux). This label is available for `$(location)` expansion in `args` and
-            `env`.
+            Should be a js_binary rule. Use Aspect bazel-lib's run_binary
+            (https://github.com/aspect-build/bazel-lib/blob/main/lib/run_binary.bzl)
+            for other *_binary rule types.
 
         env: Environment variables of the action.
 
