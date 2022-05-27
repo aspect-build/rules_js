@@ -151,7 +151,7 @@ def {bin_name}(name, **kwargs):
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{namespace}{bazel_name}"],
+        data = ["@{link_workspace}//{link_package}:{namespace}{bazel_name}"],
     )
     _run_js_binary(
         name = name,
