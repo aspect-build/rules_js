@@ -1,0 +1,88 @@
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@npm//:defs.bzl", "package", "package_dir")
+load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
+
+# Link the acorn package, was fetched separately with npm_import from /WORKSPACE, to
+# bazel-bin/examples/node_modules
+link_acorn()
+
+#############################
+# Test case 1
+# Show that you can use the node toolchain together with a genrule().
+# This gives you complete control over starting the interpreter, but you also have to
+# manually handle module resolution.
+genrule(
+    name = "use_node_toolchain",
+    srcs = ["//examples:some.js"],
+    outs = ["actual1"],
+    cmd = "$(NODE_PATH) $(execpath //examples:some.js) $@",
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    tools = ["@nodejs_toolchains//:resolved_toolchain"],
+)
+
+diff_test(
+    name = "test_genrule",
+    file1 = "//examples:expected",
+    file2 = "actual1",
+)
+
+##########################################################
+# Test case 2
+# Directly invoke a bin from a package from npm to transform inputs to bazel-out
+# Similar to build_bazel_rules_nodejs generated npm_package_bin targets
+
+genrule(
+    name = "call_acorn",
+    srcs = [
+        "//examples:one.js",
+        package("acorn", "examples"),
+        package_dir("acorn", "examples"),
+    ],
+    outs = ["actual2"],
+    cmd = """
+        $(NODE_PATH) \\
+        ./$(execpath %s)/bin/acorn \\
+        --compact \\
+        $(execpath //examples:one.js) \\
+        > $@""" % package_dir("acorn", "examples"),
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    tools = ["@nodejs_toolchains//:resolved_toolchain"],
+)
+
+diff_test(
+    name = "test_acorn",
+    file1 = "actual2",
+    file2 = "//examples:expected_ast.json",
+)
+
+################################################
+# Test case 3
+# Run a first-party program that requires a package from npm
+# Use a genrule to prove that works
+
+copy_to_bin(
+    name = "require_acorn_js",
+    srcs = ["require_acorn.js"],
+)
+
+genrule(
+    name = "require_acorn",
+    srcs = [
+        ":require_acorn_js",
+        package("acorn", "examples"),
+    ],
+    outs = ["actual3"],
+    cmd = """
+        $(NODE_PATH) \\
+        ./$(execpath :require_acorn_js) \\
+        $@""",
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    tools = ["@nodejs_toolchains//:resolved_toolchain"],
+)
+
+diff_test(
+    name = "test_require_acorn",
+    file1 = "actual3",
+    file2 = "//examples:expected_ast.json",
+)

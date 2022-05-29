@@ -10,7 +10,7 @@ importers:
       '@types/node': 16.11.36
       typescript: 4.7.2
 
-  example:
+  examples:
     specifiers:
       '@aspect-test/a': 5.0.0
       '@aspect-test/b': 5.0.0

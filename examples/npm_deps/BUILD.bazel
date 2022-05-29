@@ -1,0 +1,204 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@npm//:defs.bzl", "package", "package_dir")
+load("//js:defs.bzl", "js_binary", "js_test")
+load("//js:run_js_binary.bzl", "run_js_binary")
+
+# Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
+load("@npm__rollup__2.70.2//examples:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
+
+# Load from the "bin" property from the package.json of the uvu package
+load("@npm//examples/uvu:package_json.bzl", uvu_bin = "bin")
+
+#######################################
+# Test case 7
+# transitive npm dependencies
+
+write_file(
+    name = "write7",
+    out = "case7.js",
+    content = ["require('fs').writeFileSync(process.argv[2], require('@gregmagolan/test-b'))"],
+)
+
+write_file(
+    name = "expected7",
+    out = "expected7.txt",
+    content = ["test-b-0.0.2/test-a-0.0.1"],
+)
+
+js_binary(
+    name = "bin7",
+    data = ["@npm//examples/@gregmagolan/test-b"],
+    entry_point = "case7.js",
+)
+
+run_js_binary(
+    name = "run7",
+    srcs = [],
+    outs = ["actual7"],
+    args = ["examples/npm_deps/actual7"],
+    tool = ":bin7",
+)
+
+diff_test(
+    name = "test7",
+    file1 = "expected7",
+    file2 = "actual7",
+)
+
+#######################################
+# Test case 10
+# peer deps
+js_test(
+    name = "test_peer",
+    data = [
+        "@npm//examples/@rollup/plugin-commonjs",
+        "@npm//examples/mobx-react",
+        "@npm//examples/react",
+        # TODO: fix this test so we test a peer dependency without requiring it as a direct
+        # dependency https://github.com/aspect-build/rules_js/issues/92
+        "@npm//examples/rollup",
+    ],
+    entry_point = "peer.js",
+)
+
+#######################################
+# Test case 11
+# postinstall creates a file
+# The @aspect-test/c package's postinstall creates a data.json file
+
+write_file(
+    name = "write11",
+    out = "case11.js",
+    content = ["""
+const content = require('@aspect-test/c/data.json')
+if (content.answer !== '42*') {
+    console.error(`expected answer to be '42*', but got '${content.answer}'`)
+    process.exit(1);
+}
+"""],
+)
+
+js_test(
+    name = "test11",
+    data = [
+        package("@aspect-test/c", "examples"),
+    ],
+    entry_point = "case11.js",
+)
+
+#######################################
+# Test case 12
+# custom postinstall creates a file
+# See postinstall on @aspect-test/c in WORKSPACE
+
+write_file(
+    name = "write12",
+    out = "case12.js",
+    content = ["""
+const fs = require('fs')
+const path = require('path')
+const content = fs.readFileSync(path.join(process.argv[2], 'cow.txt'), 'utf-8')
+console.log(content)
+if (!/^moo\\s+mooo\\s*$/.test(content)) {
+    console.error("expected file to contain cow sounds")
+    process.exit(1);
+}
+"""],
+)
+
+js_test(
+    name = "test12",
+    args = ["$(rootpath %s)" % package_dir("@aspect-test/c", "examples")],
+    data = [
+        package_dir("@aspect-test/c", "examples"),
+    ],
+    entry_point = "case12.js",
+)
+
+####################################################
+# Test case 14
+# Use a generated rollup and rollup_binary targets from an npm_import
+
+rollup(
+    name = "actual14",
+    args = ["--version"],
+    stdout = "actual14.txt",
+)
+
+rollup_binary(
+    name = "rollup_bin",
+    args = ["--version"],
+)
+
+rollup_test(
+    name = "rollup_version_test",
+    args = ["--version"],
+)
+
+write_file(
+    name = "expected14",
+    out = "expected14.txt",
+    content = [
+        "rollup v2.70.2",
+        "",
+    ],
+)
+
+diff_test(
+    name = "test14",
+    file1 = ":expected14",
+    file2 = ":actual14",
+)
+
+run_js_binary(
+    name = "actual14_alt",
+    args = ["--version"],
+    stdout = "actual14_alt.txt",
+    tool = ":rollup_bin",
+)
+
+diff_test(
+    name = "test14_alt",
+    file1 = ":expected14",
+    file2 = ":actual14_alt",
+)
+
+####################################################
+# Test case 15
+# Use a generated bin.uvo_test target from an translate_pnpm_lock
+
+# Generated bin test as a test target
+write_file(
+    name = "acorn_spec",
+    out = "acorn.spec.js",
+    content = [
+        "const { test } = require('uvu');",
+        "const assert = require('uvu/assert');",
+        "const mylib = require('@mycorp/mylib');",
+        "test('version', () => {",
+        "  assert.is(mylib.getAcornVersion(), '8.4.0');",
+        "})",
+        "test.run()",
+    ],
+)
+
+# @unused
+uvu = uvu_bin.uvu
+
+# @unused
+uvu_binary = uvu_bin.uvu_binary
+
+uvu_test = uvu_bin.uvu_test
+
+uvu_test(
+    name = "test_acorn_version",
+    args = [
+        "--color",
+        "false",
+    ],
+    data = [
+        ":acorn_spec",
+        package("@mycorp/mylib", "examples"),
+    ],
+)

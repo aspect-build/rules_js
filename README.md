@@ -54,8 +54,8 @@ copy the WORKSPACE snippet into your `WORKSPACE` file.
 
 ## Usage
 
-See the API documentation in the [docs](docs/) folder and the example usage in the [example](example/) folder.
-Note that the example also relies on code in the `/WORKSPACE` file in the root of this repo.
+See the API documentation in the [docs](docs/) folder and the example usage in the [examples](examples/) folder.
+Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
 
 ## Design
 
