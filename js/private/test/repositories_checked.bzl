@@ -271,7 +271,8 @@ def npm_repositories():
     npm_import(
         name = "npm__at_ungap_promise-all-settled__1.1.2",
         integrity = "sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "@ungap/promise-all-settled",
         version = "1.1.2",
@@ -309,7 +310,8 @@ def npm_repositories():
     npm_import(
         name = "npm__ansi-colors__4.1.1",
         integrity = "sha512-JoX0apGbHaUJBNl6yF+p6JAFYZ666/hhCGKN5t9QFjbJQKUU/g8MNbFDbvfrgKXvI1QpZplPOnwIo99lX/AAmA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "ansi-colors",
         version = "4.1.1",
@@ -321,7 +323,8 @@ def npm_repositories():
     npm_import(
         name = "npm__ansi-regex__5.0.1",
         integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "ansi-regex",
         version = "5.0.1",
@@ -351,7 +354,8 @@ def npm_repositories():
     npm_import(
         name = "npm__anymatch__3.1.2",
         integrity = "sha512-P43ePfOAIupkguHUycrc4qJ9kz8ZiuOUijaETwX7THt0Y/GNK7v0aa8rY816xWjZ7rJdA5XdMcpVFTKMq+RvWg==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "anymatch",
         version = "3.1.2",
@@ -369,7 +373,8 @@ def npm_repositories():
     npm_import(
         name = "npm__argparse__2.0.1",
         integrity = "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "argparse",
         version = "2.0.1",
@@ -394,7 +399,8 @@ def npm_repositories():
     npm_import(
         name = "npm__binary-extensions__2.2.0",
         integrity = "sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "binary-extensions",
         version = "2.2.0",
@@ -425,7 +431,8 @@ def npm_repositories():
     npm_import(
         name = "npm__brace-expansion__2.0.1",
         integrity = "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "brace-expansion",
         version = "2.0.1",
@@ -441,7 +448,8 @@ def npm_repositories():
     npm_import(
         name = "npm__braces__3.0.2",
         integrity = "sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "braces",
         version = "3.0.2",
@@ -459,7 +467,8 @@ def npm_repositories():
     npm_import(
         name = "npm__browser-stdout__1.3.1",
         integrity = "sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "browser-stdout",
         version = "1.3.1",
@@ -489,7 +498,8 @@ def npm_repositories():
     npm_import(
         name = "npm__camelcase__6.3.0",
         integrity = "sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "camelcase",
         version = "6.3.0",
@@ -523,7 +533,8 @@ def npm_repositories():
     npm_import(
         name = "npm__charenc__0.0.2",
         integrity = "sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "charenc",
         version = "0.0.2",
@@ -535,7 +546,8 @@ def npm_repositories():
     npm_import(
         name = "npm__chokidar__3.5.3",
         integrity = "sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "chokidar",
         version = "3.5.3",
@@ -571,7 +583,8 @@ def npm_repositories():
     npm_import(
         name = "npm__cliui__7.0.4",
         integrity = "sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "cliui",
         version = "7.0.4",
@@ -665,8 +678,9 @@ def npm_repositories():
 
     npm_import(
         name = "npm__crypt__0.0.2",
-        integrity = "sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=",
-        root_path = "example",
+        integrity = "sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "crypt",
         version = "0.0.2",
@@ -678,7 +692,8 @@ def npm_repositories():
     npm_import(
         name = "npm__debug__2.6.9",
         integrity = "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "debug",
         version = "2.6.9",
@@ -694,7 +709,8 @@ def npm_repositories():
     npm_import(
         name = "npm__debug__4.3.4",
         integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "debug",
         version = "4.3.4",
@@ -710,7 +726,8 @@ def npm_repositories():
     npm_import(
         name = "npm__debug__4.3.4__supports-color_8.1.1",
         integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "debug",
         version = "4.3.4_supports-color@8.1.1",
@@ -729,7 +746,8 @@ def npm_repositories():
     npm_import(
         name = "npm__decamelize__4.0.0",
         integrity = "sha512-9iE1PgSik9HeIIw2JO94IidnE3eBoQrFJ3w7sFuzSX4DpmZ3v5sZpUiV5Swcf6mQEF+Y0ru8Neo+p+nyh2J+hQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "decamelize",
         version = "4.0.0",
@@ -748,6 +766,19 @@ def npm_repositories():
         version = "2.0.2",
         transitive_closure = {
             "dequal": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__diff__5.0.0",
+        integrity = "sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "diff",
+        version = "5.0.0",
+        transitive_closure = {
+            "diff": ["5.0.0"],
         },
     )
 
@@ -780,7 +811,8 @@ def npm_repositories():
     npm_import(
         name = "npm__emoji-regex__8.0.0",
         integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "emoji-regex",
         version = "8.0.0",
@@ -1128,7 +1160,8 @@ def npm_repositories():
     npm_import(
         name = "npm__escalade__3.1.1",
         integrity = "sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "escalade",
         version = "3.1.1",
@@ -1140,7 +1173,8 @@ def npm_repositories():
     npm_import(
         name = "npm__escape-string-regexp__4.0.0",
         integrity = "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "escape-string-regexp",
         version = "4.0.0",
@@ -1178,7 +1212,8 @@ def npm_repositories():
     npm_import(
         name = "npm__fill-range__7.0.1",
         integrity = "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "fill-range",
         version = "7.0.1",
@@ -1195,7 +1230,8 @@ def npm_repositories():
     npm_import(
         name = "npm__find-up__5.0.0",
         integrity = "sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "find-up",
         version = "5.0.0",
@@ -1216,7 +1252,8 @@ def npm_repositories():
     npm_import(
         name = "npm__flat__5.0.2",
         integrity = "sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "flat",
         version = "5.0.2",
@@ -1262,6 +1299,68 @@ def npm_repositories():
         version = "1.1.1",
         transitive_closure = {
             "function-bind": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__get-caller-file__2.0.5",
+        integrity = "sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "get-caller-file",
+        version = "2.0.5",
+        transitive_closure = {
+            "get-caller-file": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glob-parent__5.1.2",
+        integrity = "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "glob-parent",
+        version = "5.1.2",
+        deps = {
+            "is-glob": "4.0.3",
+        },
+        transitive_closure = {
+            "glob-parent": ["5.1.2"],
+            "is-glob": ["4.0.3"],
+            "is-extglob": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glob__7.2.0",
+        integrity = "sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "glob",
+        version = "7.2.0",
+        deps = {
+            "fs.realpath": "1.0.0",
+            "inflight": "1.0.6",
+            "inherits": "2.0.4",
+            "minimatch": "3.1.2",
+            "once": "1.4.0",
+            "path-is-absolute": "1.0.1",
+        },
+        transitive_closure = {
+            "glob": ["7.2.0"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
         },
     )
 
@@ -1346,7 +1445,8 @@ def npm_repositories():
     npm_import(
         name = "npm__he__1.2.0",
         integrity = "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "he",
         version = "1.2.0",
@@ -1390,7 +1490,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-binary-path__2.1.0",
         integrity = "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-binary-path",
         version = "2.1.0",
@@ -1406,7 +1507,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-buffer__1.1.6",
         integrity = "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-buffer",
         version = "1.1.6",
@@ -1434,8 +1536,8 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__is-reference__1.2.1",
-        integrity = "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
+        name = "npm__is-extglob__2.1.1",
+        integrity = "sha1-qIwCU1eR8C7TfHahueqXc8gz+MI=",
         root_path = "",
         link_workspace = "",
         link_paths = [],
@@ -1449,7 +1551,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-fullwidth-code-point__3.0.0",
         integrity = "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-fullwidth-code-point",
         version = "3.0.0",
@@ -1461,7 +1564,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-glob__4.0.3",
         integrity = "sha512-xelSayHH36ZgE7ZWhli7pW34hNbNl8Ojv5KVmkJD4hBdD3th8Tfk9vYasLM+mXWOZhFkgZfxhLSnrwRr4elSSg==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-glob",
         version = "4.0.3",
@@ -1477,7 +1581,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-number__7.0.0",
         integrity = "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-number",
         version = "7.0.0",
@@ -1489,7 +1594,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-plain-obj__2.1.0",
         integrity = "sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-plain-obj",
         version = "2.1.0",
@@ -1501,7 +1607,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-reference__1.2.1",
         integrity = "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-reference",
         version = "1.2.1",
@@ -1517,7 +1624,8 @@ def npm_repositories():
     npm_import(
         name = "npm__is-unicode-supported__0.1.0",
         integrity = "sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "is-unicode-supported",
         version = "0.1.0",
@@ -1542,7 +1650,8 @@ def npm_repositories():
     npm_import(
         name = "npm__js-yaml__4.1.0",
         integrity = "sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "js-yaml",
         version = "4.1.0",
@@ -1571,7 +1680,8 @@ def npm_repositories():
     npm_import(
         name = "npm__locate-path__6.0.0",
         integrity = "sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "locate-path",
         version = "6.0.0",
@@ -1602,7 +1712,8 @@ def npm_repositories():
     npm_import(
         name = "npm__log-symbols__4.1.0",
         integrity = "sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "log-symbols",
         version = "4.1.0",
@@ -1659,7 +1770,8 @@ def npm_repositories():
     npm_import(
         name = "npm__md5__2.3.0",
         integrity = "sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "md5",
         version = "2.3.0",
@@ -1692,6 +1804,54 @@ def npm_repositories():
             "brace-expansion": ["1.1.11"],
             "balanced-match": ["1.0.2"],
             "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minimatch__5.0.1",
+        integrity = "sha512-nLDxIFRyhDblz3qMuq+SoRZED4+miJ/G+tdDrjkkkRnjAsBexeGpgjLEQ0blJy7rHhR2b93rhQY4SvyWu9v03g==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "minimatch",
+        version = "5.0.1",
+        deps = {
+            "brace-expansion": "2.0.1",
+        },
+        transitive_closure = {
+            "minimatch": ["5.0.1"],
+            "brace-expansion": ["2.0.1"],
+            "balanced-match": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minimist__1.2.6",
+        integrity = "sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "minimist",
+        version = "1.2.6",
+        transitive_closure = {
+            "minimist": ["1.2.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mkdirp__0.5.6",
+        integrity = "sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==",
+        root_path = "",
+        link_workspace = "",
+        link_paths = [],
+        package = "mkdirp",
+        version = "0.5.6",
+        deps = {
+            "minimist": "1.2.6",
+        },
+        transitive_closure = {
+            "mkdirp": ["0.5.6"],
+            "minimist": ["1.2.6"],
         },
     )
 
@@ -1757,8 +1917,9 @@ def npm_repositories():
     npm_import(
         name = "npm__mocha-junit-reporter__2.0.2__mocha_10.0.0",
         integrity = "sha512-vYwWq5hh3v1lG0gdQCBxwNipBfvDiAM1PHroQRNp96+2l72e9wEUTw+mzoK+O0SudgfQ7WvTQZ9Nh3qkAYAjfg==",
-        root_path = "example",
-        link_paths = ["."],
+        root_path = "",
+        link_workspace = "",
+        link_paths = ["example"],
         package = "mocha-junit-reporter",
         version = "2.0.2_mocha@10.0.0",
         deps = {
@@ -1859,8 +2020,9 @@ def npm_repositories():
     npm_import(
         name = "npm__mocha-multi-reporters__1.5.1__mocha_10.0.0",
         integrity = "sha512-Yb4QJOaGLIcmB0VY7Wif5AjvLMUFAdV57D2TWEva1Y0kU/3LjKpeRVmlMIfuO1SVbauve459kgtIizADqxMWPg==",
-        root_path = "example",
-        link_paths = ["."],
+        root_path = "",
+        link_workspace = "",
+        link_paths = ["example"],
         package = "mocha-multi-reporters",
         version = "1.5.1_mocha@10.0.0",
         deps = {
@@ -1952,8 +2114,9 @@ def npm_repositories():
     npm_import(
         name = "npm__mocha__10.0.0",
         integrity = "sha512-0Wl+elVUD43Y0BqPZBzZt8Tnkw9CMUdNYnUsTfOM1vuhJVZL+kiesFYsqwBkEEuEixaiPe5ZQdqDgX2jddhmoA==",
-        root_path = "example",
-        link_paths = ["."],
+        root_path = "",
+        link_workspace = "",
+        link_paths = ["example"],
         package = "mocha",
         version = "10.0.0",
         deps = {
@@ -2088,7 +2251,8 @@ def npm_repositories():
     npm_import(
         name = "npm__ms__2.0.0",
         integrity = "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "ms",
         version = "2.0.0",
@@ -2100,7 +2264,8 @@ def npm_repositories():
     npm_import(
         name = "npm__ms__2.1.2",
         integrity = "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "ms",
         version = "2.1.2",
@@ -2112,7 +2277,8 @@ def npm_repositories():
     npm_import(
         name = "npm__ms__2.1.3",
         integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "ms",
         version = "2.1.3",
@@ -2124,7 +2290,8 @@ def npm_repositories():
     npm_import(
         name = "npm__nanoid__3.3.3",
         integrity = "sha512-p1sjXuopFs0xg+fPASzQ28agW1oHD7xDsd9Xkf3T15H3c/cifrFHVwrh74PdoklAPi+i7MdRsE47vm2r6JoB+w==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "nanoid",
         version = "3.3.3",
@@ -2149,7 +2316,8 @@ def npm_repositories():
     npm_import(
         name = "npm__normalize-path__3.0.0",
         integrity = "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "normalize-path",
         version = "3.0.0",
@@ -2204,7 +2372,8 @@ def npm_repositories():
     npm_import(
         name = "npm__p-limit__3.1.0",
         integrity = "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "p-limit",
         version = "3.1.0",
@@ -2220,7 +2389,8 @@ def npm_repositories():
     npm_import(
         name = "npm__p-locate__5.0.0",
         integrity = "sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "p-locate",
         version = "5.0.0",
@@ -2237,7 +2407,8 @@ def npm_repositories():
     npm_import(
         name = "npm__path-exists__4.0.0",
         integrity = "sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "path-exists",
         version = "4.0.0",
@@ -2288,7 +2459,8 @@ def npm_repositories():
     npm_import(
         name = "npm__randombytes__2.1.0",
         integrity = "sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "randombytes",
         version = "2.1.0",
@@ -2324,7 +2496,8 @@ def npm_repositories():
     npm_import(
         name = "npm__readdirp__3.6.0",
         integrity = "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "readdirp",
         version = "3.6.0",
@@ -2340,7 +2513,8 @@ def npm_repositories():
     npm_import(
         name = "npm__require-directory__2.1.1",
         integrity = "sha1-jGStX9MNqxyXbiNE/+f3kqam30I=",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "require-directory",
         version = "2.1.1",
@@ -2409,7 +2583,8 @@ def npm_repositories():
     npm_import(
         name = "npm__safe-buffer__5.2.1",
         integrity = "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "safe-buffer",
         version = "5.2.1",
@@ -2421,7 +2596,8 @@ def npm_repositories():
     npm_import(
         name = "npm__serialize-javascript__6.0.0",
         integrity = "sha512-Qr3TosvguFt8ePWqsvRfrKyQXIiW+nGbYpy8XK24NQHE83caxWt+mIymTT19DGFbNWNLfEwsrkSmN64lVWB9ag==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "serialize-javascript",
         version = "6.0.0",
@@ -2472,7 +2648,8 @@ def npm_repositories():
     npm_import(
         name = "npm__string-width__4.2.3",
         integrity = "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "string-width",
         version = "4.2.3",
@@ -2493,7 +2670,8 @@ def npm_repositories():
     npm_import(
         name = "npm__strip-ansi__6.0.1",
         integrity = "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "strip-ansi",
         version = "6.0.1",
@@ -2509,7 +2687,8 @@ def npm_repositories():
     npm_import(
         name = "npm__strip-json-comments__3.1.1",
         integrity = "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "strip-json-comments",
         version = "3.1.1",
@@ -2538,7 +2717,8 @@ def npm_repositories():
     npm_import(
         name = "npm__supports-color__8.1.1",
         integrity = "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "supports-color",
         version = "8.1.1",
@@ -2567,7 +2747,8 @@ def npm_repositories():
     npm_import(
         name = "npm__to-regex-range__5.0.1",
         integrity = "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "to-regex-range",
         version = "5.0.1",
@@ -2677,7 +2858,8 @@ def npm_repositories():
     npm_import(
         name = "npm__workerpool__6.2.1",
         integrity = "sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "workerpool",
         version = "6.2.1",
@@ -2689,7 +2871,8 @@ def npm_repositories():
     npm_import(
         name = "npm__wrap-ansi__7.0.0",
         integrity = "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "wrap-ansi",
         version = "7.0.0",
@@ -2745,7 +2928,8 @@ def npm_repositories():
     npm_import(
         name = "npm__xml__1.0.1",
         integrity = "sha1-eLpyAgApxbyHuKgaPPzXS0ovweU=",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "xml",
         version = "1.0.1",
@@ -2757,7 +2941,8 @@ def npm_repositories():
     npm_import(
         name = "npm__y18n__5.0.8",
         integrity = "sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "y18n",
         version = "5.0.8",
@@ -2769,7 +2954,8 @@ def npm_repositories():
     npm_import(
         name = "npm__yargs-parser__20.2.4",
         integrity = "sha512-WOkpgNhPTlE73h4VFAFsOnomJVaovO8VqLDzy5saChRBFQFBoMYirowyW+Q9HB4HFF4Z7VZTiG3iSzJJA29yRA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "yargs-parser",
         version = "20.2.4",
@@ -2781,7 +2967,8 @@ def npm_repositories():
     npm_import(
         name = "npm__yargs-unparser__2.0.0",
         integrity = "sha512-7pRTIA9Qc1caZ0bZ6RYRGbHJthJWuakf+WmHK0rVeLkNrrGhfoabBNdue6kdINI6r4if7ocq9aD/n7xwKOdzOA==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "yargs-unparser",
         version = "2.0.0",
@@ -2803,7 +2990,8 @@ def npm_repositories():
     npm_import(
         name = "npm__yargs__16.2.0",
         integrity = "sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "yargs",
         version = "16.2.0",
@@ -2839,7 +3027,8 @@ def npm_repositories():
     npm_import(
         name = "npm__yocto-queue__0.1.0",
         integrity = "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==",
-        root_path = "example",
+        root_path = "",
+        link_workspace = "",
         link_paths = [],
         package = "yocto-queue",
         version = "0.1.0",

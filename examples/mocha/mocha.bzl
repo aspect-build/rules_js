@@ -1,7 +1,7 @@
 "Example macro wrapping the mocha CLI"
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@npm//mocha:package_json.bzl", "bin")
+load("@npm//example/mocha:package_json.bzl", "bin")
 
 def mocha_test(name, args = [], data = [], env = {}, **kwargs):
     srcs = kwargs.pop("srcs", native.glob(["test*.js"]))
@@ -21,8 +21,8 @@ def mocha_test(name, args = [], data = [], env = {}, **kwargs):
         data = data + [
             "_%s_srcs" % name,
             "//example/mocha:mocha_reporters.json",
-            "@npm//mocha-multi-reporters",
-            "@npm//mocha-junit-reporter",
+            "@npm//example/mocha-multi-reporters",
+            "@npm//example/mocha-junit-reporter",
         ],
         env = dict(env, **{
             "MOCHA_FILE": "$$XML_OUTPUT_FILE",
