@@ -85,7 +85,7 @@ if (content.answer !== '42*') {
 js_test(
     name = "test3",
     data = [
-        package("@aspect-test/c", "examples"),
+        package("@aspect-test/c", "examples/npm_deps"),
     ],
     entry_point = "case3.js",
 )
@@ -111,9 +111,9 @@ if (!/^moo\\s+mooo\\s*$/.test(content)) {
 
 js_test(
     name = "test4",
-    args = ["$(rootpath %s)" % package_dir("@aspect-test/c", "examples")],
+    args = ["$(rootpath %s)" % package_dir("@aspect-test/c", "examples/npm_deps")],
     data = [
-        package_dir("@aspect-test/c", "examples"),
+        package_dir("@aspect-test/c", "examples/npm_deps"),
     ],
     entry_point = "case4.js",
 )

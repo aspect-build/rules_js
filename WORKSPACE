@@ -53,8 +53,8 @@ translate_pnpm_lock(
         "@gregmagolan/test-a": ["-p1"],
     },
     patches = {
-        "@gregmagolan/test-a": ["//examples:patches/test-a.patch"],
-        "@gregmagolan/test-a@0.0.1": ["//examples:patches/test-a@0.0.1.patch"],
+        "@gregmagolan/test-a": ["//examples/npm_deps:patches/test-a.patch"],
+        "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
 )

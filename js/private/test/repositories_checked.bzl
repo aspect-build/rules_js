@@ -9,7 +9,7 @@ def npm_repositories():
         integrity = "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "@aspect-test/a",
         version = "5.0.0",
         deps = {
@@ -30,7 +30,7 @@ def npm_repositories():
         integrity = "sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = [],
         package = "@aspect-test/b",
         version = "5.0.0",
         deps = {
@@ -66,7 +66,7 @@ def npm_repositories():
         integrity = "sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "@aspect-test/c",
         version = "2.0.0",
         transitive_closure = {
@@ -121,7 +121,7 @@ def npm_repositories():
         transitive_closure = {
             "@gregmagolan/test-a": ["0.0.1"],
         },
-        patches = ["//examples:patches/test-a.patch", "//examples:patches/test-a@0.0.1.patch"],
+        patches = ["//examples/npm_deps:patches/test-a.patch", "//examples/npm_deps:patches/test-a@0.0.1.patch"],
         patch_args = ["-p1"],
     )
 
@@ -349,7 +349,7 @@ def npm_repositories():
         integrity = "sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["js/private/test"],
         package = "bufferutil",
         version = "4.0.1",
         deps = {
@@ -777,7 +777,7 @@ def npm_repositories():
         integrity = "sha512-12fzJ0fsm7gVZX1YQ1InkOE5f9Tl7cgf6JPYXRJtPIoE0zkWAbHdPHVPPaLi9tYAcEBqheGzqLn/3RdTOyBfcA==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["js/private/test"],
         package = "esbuild",
         version = "0.14.38",
         deps = {
@@ -1507,7 +1507,7 @@ def npm_repositories():
         integrity = "sha512-GUMZlM3SKwS8Z+CKeIFx7CVoHn3dXFcUAjT/dcZQQmfSZGvitPfMob2ipjai7ovFFqPvTqkEZ/leL4O0YOdAYQ==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["js/private/test"],
         package = "webpack-bundle-analyzer",
         version = "4.5.0_bufferutil@4.0.1",
         deps = {

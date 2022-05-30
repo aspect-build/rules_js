@@ -1,13 +1,9 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//:defs.bzl", "link_js_packages", "package")
+load("@npm//:defs.bzl", "package")
 load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
 load("//js:defs.bzl", "link_js_package")
 
 ###########################
-
-# Link all packages from the /WORKSPACE translate_pnpm_lock in the examples/package.json to
-# bazel-bin/examples/node_modules
-link_js_packages()
 
 # Link the acorn package, was fetched separately with npm_import from /WORKSPACE, to
 # bazel-bin/examples/node_modules

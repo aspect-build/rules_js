@@ -2,6 +2,7 @@ load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//:defs.bzl", "package", "package_dir")
+load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 load("//js:defs.bzl", "js_binary", "js_test")
 load("//js:run_js_binary.bzl", "run_js_binary")
 
@@ -297,4 +298,13 @@ diff_test(
     name = "test13",
     file1 = ":expected13",
     file2 = ":actual13",
+)
+
+####################################################
+# Test case 14
+# Show that we can run a generated bin from a package where the npm package
+# is not linked. In this case @aspect-test/a is linked to the //examples:__pkg__
+
+aspect_test_a_bin.bin_a_test(
+    name = "aspect_bin_a_test",
 )
