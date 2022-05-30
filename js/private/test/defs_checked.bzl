@@ -102,7 +102,7 @@ load("@npm__ws__7.5.8__bufferutil_4.0.1__links//:link_js_package.bzl", link_94 =
 def link_js_packages():
     "Generated list of link_js_package() target generators and first party linked packages corresponding to the packages in @//:pnpm-lock.yaml"
     root_path = ""
-    importer_paths = [".", "examples"]
+    importer_paths = [".", "examples", "examples/npm_deps"]
     is_root = native.package_name() == root_path
     is_direct = False
     for import_path in importer_paths:
@@ -112,7 +112,7 @@ def link_js_packages():
         if importer_package_path == native.package_name():
             is_direct = True
     if not is_root and not is_direct:
-        msg = "The link_js_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages corresponding to importer paths ['.', 'examples']" % native.package_name()
+        msg = "The link_js_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages corresponding to importer paths ['.', 'examples', 'examples/npm_deps']" % native.package_name()
         fail(msg)
 
     link_0(False)
