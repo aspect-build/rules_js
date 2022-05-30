@@ -17,9 +17,119 @@ source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/
 
 set -o pipefail -o errexit -o nounset
 
+export JS_BINARY__BINDIR="bazel-out/k8-fastbuild/bin"
+export JS_BINARY__BUILD_FILE_PATH="js/private/test/BUILD.bazel"
+export JS_BINARY__COMPILATION_MODE="fastbuild"
+export JS_BINARY__TARGET_CPU="k8"
+export JS_BINARY__TARGET="@//js/private/test:shellcheck_launcher"
+export JS_BINARY__WORKSPACE="aspect_rules_js"
+if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; fi
+if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
 
+# ==============================================================================
+# Prepare stdout capture, stderr capture && logging
+# ==============================================================================
+
+if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
+    STDOUT_CAPTURE=$(mktemp)
+fi
+
+if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
+    STDERR_CAPTURE=$(mktemp)
+fi
 
 LOG_PREFIX="aspect_rules_js[js_binary]"
+
+function logf_stderr {
+    if [ "${STDERR_CAPTURE:-}" ]; then
+        printf "%s\n" "$*" >>"$STDERR_CAPTURE"
+    else
+        printf "%s\n" "$*" >&2
+    fi
+}
+
+function logf_fatal {
+    if [ "${JS_BINARY__LOG_FATAL:-}" ]; then
+        if [ "${STDERR_CAPTURE:-}" ]; then
+            printf "FATAL: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+        else
+            printf "FATAL: %s: " "$LOG_PREFIX" >&2
+        fi
+        logf_stderr "$@"
+    fi
+}
+
+function logf_error {
+    if [ "${JS_BINARY__LOG_ERROR:-}" ]; then
+        if [ "${STDERR_CAPTURE:-}" ]; then
+            printf "ERROR: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+        else
+            printf "ERROR: %s: " "$LOG_PREFIX" >&2
+        fi
+        logf_stderr "$@"
+    fi
+}
+
+function logf_warn {
+    if [ "${JS_BINARY__LOG_WARN:-}" ]; then
+        if [ "${STDERR_CAPTURE:-}" ]; then
+            printf "WARN: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+        else
+            printf "WARN: %s: " "$LOG_PREFIX" >&2
+        fi
+        logf_stderr "$@"
+    fi
+}
+
+function logf_info {
+    if [ "${JS_BINARY__LOG_INFO:-}" ]; then
+        if [ "${STDERR_CAPTURE:-}" ]; then
+            printf "INFO: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+        else
+            printf "INFO: %s: " "$LOG_PREFIX" >&2
+        fi
+        logf_stderr "$@"
+    fi
+}
+
+function logf_debug {
+    if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
+        if [ "${STDERR_CAPTURE:-}" ]; then
+            printf "DEBUG: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+        else
+            printf "DEBUG: %s: " "$LOG_PREFIX" >&2
+        fi
+        logf_stderr "$@"
+    fi
+}
+
+_exit() {
+    EXIT_CODE=$?
+
+    if [ "${STDERR_CAPTURE:-}" ]; then
+        if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
+            cp -f "$STDERR_CAPTURE" "$JS_BINARY__STDERR_OUTPUT_FILE"
+        fi
+        if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
+            cat "$STDERR_CAPTURE" >&2
+        fi
+        rm "$STDERR_CAPTURE"
+    fi
+
+    if [ "${STDOUT_CAPTURE:-}" ]; then
+        if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
+            cp -f "$STDOUT_CAPTURE" "$JS_BINARY__STDOUT_OUTPUT_FILE"
+        fi
+        if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
+            cat "$STDOUT_CAPTURE"
+        fi
+        rm "$STDOUT_CAPTURE"
+    fi
+
+    exit $EXIT_CODE
+}
+
+trap _exit EXIT
 
 # ==============================================================================
 # Initialize RUNFILES environment variable
@@ -116,7 +226,7 @@ else
     done
 
     if [ -z "$RUNFILES" ]; then
-        printf "\nERROR: %s: RUNFILES environment variable is not set\n" "$LOG_PREFIX" >&2
+        logf_fatal "RUNFILES environment variable is not set"
         exit 1
     fi
 fi
@@ -125,6 +235,17 @@ export RUNFILES
 # ==============================================================================
 # Prepare to run main program
 # ==============================================================================
+
+# Convert stdout, stderr and exit_code capture outputs paths to absolute paths
+if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__STDOUT_OUTPUT_FILE="$PWD/$JS_BINARY__STDOUT_OUTPUT_FILE"
+fi
+if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__STDERR_OUTPUT_FILE="$PWD/$JS_BINARY__STDERR_OUTPUT_FILE"
+fi
+if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$PWD/$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
+fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     # We in runfiles
@@ -136,80 +257,36 @@ else
     node="$RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
     entry_point="$RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
-        printf "\nERROR: %s: BAZEL_BINDIR must be set in environment when not running out of runfiles so js_binary can run out of the output tree on build actions\n" "$LOG_PREFIX" >&2
+        logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
+run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
+tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set \
+by 'run_js_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/run_js_binary.md) which is the recommended \
+rule to use for using a js_binary as the tool of a build action. If this is not a build action you can set the \
+BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the \
+aspect_rules_js README https://github.com/aspect-build/rules_js#running-nodejs-programs."
         exit 1
     fi
-    if [ "${JS_BINARY__VERBOSE:-}" ]; then
-        echo "${LOG_PREFIX}: changing directory to root of bazel output tree $BAZEL_BINDIR" >&2
-    fi
+    logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
     cd "$BAZEL_BINDIR"
 fi
 
 if [ ! -f "$node" ]; then
-    printf "\nERROR: %s: the node binary '%s' not found in runfiles\n" "$LOG_PREFIX" "$node" >&2
+    logf_fatal "the node binary '%s' not found in runfiles" "$node"
     exit 1
 fi
 if [ ! -x "$node" ]; then
-    printf "\nERROR: %s: the node binary '%s' is not executable\n" "$LOG_PREFIX" "$node" >&2
+    logf_fatal "the node binary '%s' is not executable" "$node"
     exit 1
 fi
 if [ ! -f "$entry_point" ]; then
-    printf "\nERROR: %s: the entry_point '%s' not found in runfiles\n" "$LOG_PREFIX" "$entry_point" >&2
+    logf_fatal "the entry_point '%s' not found in runfiles" "$entry_point"
     exit 1
 fi
 
 if [ "${JS_BINARY__CHDIR:-}" ]; then
-    if [ "${JS_BINARY__VERBOSE:-}" ]; then
-        echo "${LOG_PREFIX}: changing directory to user specified package $JS_BINARY__CHDIR" >&2
-    fi
+    logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
     cd "$JS_BINARY__CHDIR"
 fi
-
-if [ "${JS_BINARY__CAPTURE_STDOUT:-}" ]; then
-    STDOUT_CAPTURE="$JS_BINARY__CAPTURE_STDOUT"
-fi
-
-if [ "${JS_BINARY__CAPTURE_STDERR:-}" ]; then
-    STDERR_CAPTURE="$JS_BINARY__CAPTURE_STDERR"
-fi
-
-if [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-  if [ -z "${STDOUT_CAPTURE:-}" ]; then
-    STDOUT_CAPTURE_IS_NOT_AN_OUTPUT=true
-    STDOUT_CAPTURE=$(mktemp)
-  fi
-  if [ -z "${STDERR_CAPTURE:-}" ]; then
-    STDERR_CAPTURE_IS_NOT_AN_OUTPUT=true
-    STDERR_CAPTURE=$(mktemp)
-  fi
-fi
-
-# Bash does not forward termination signals to any child process when
-# running in docker so need to manually trap and forward the signals
-_term() {
-  kill -TERM "${child}" 2>/dev/null
-}
-
-_int() {
-  kill -INT "${child}" 2>/dev/null
-}
-
-_exit() {
-  EXIT_CODE=$?
-
-  if [ "$EXIT_CODE" != 0 ]; then
-    if [[ ${STDOUT_CAPTURE_IS_NOT_AN_OUTPUT:-} == true ]]; then
-      cat "$STDOUT_CAPTURE"
-      rm "$STDOUT_CAPTURE"
-    fi
-    if [[ ${STDERR_CAPTURE_IS_NOT_AN_OUTPUT:-} == true ]]; then
-      cat "$STDERR_CAPTURE"
-      rm "$STDERR_CAPTURE"
-    fi
-  fi
-
-  exit $EXIT_CODE
-}
 
 NODE_OPTIONS=()
 
@@ -217,35 +294,73 @@ NODE_OPTIONS=()
 ARGS=()
 ALL_ARGS=( "$@")
 for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
-  case "$ARG" in
-    # Let users pass through arguments to node itself
-    --node_options=*) NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
-    # Remaining argv is collected to pass to the program
-    *) ARGS+=( "$ARG" )
-  esac
+    case "$ARG" in
+        # Let users pass through arguments to node itself
+        --node_options=*) NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
+        # Remaining argv is collected to pass to the program
+        *) ARGS+=( "$ARG" )
+    esac
 done
 
 # Put bazel managed node on the path
 PATH="$(dirname "$node"):$PATH"
 export PATH
 
+# Debug logs
+if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
+    if [ "${BAZEL_BINDIR:-}" ]; then
+        logf_debug "BAZEL_BINDIR %s" "${BAZEL_BINDIR:-}"
+    fi
+    if [ "${BAZEL_TARGET_CPU:-}" ]; then
+        logf_debug "BAZEL_TARGET_CPU %s" "${BAZEL_TARGET_CPU:-}"
+    fi
+    if [ "${BAZEL_COMPILATION_MODE:-}" ]; then
+        logf_debug "BAZEL_COMPILATION_MODE %s" "${BAZEL_COMPILATION_MODE:-}"
+    fi
+    if [ "${BAZEL_WORKSPACE:-}" ]; then
+        logf_debug "BAZEL_WORKSPACE %s" "${BAZEL_WORKSPACE:-}"
+    fi
+    if [ "${BAZEL_BUILD_FILE_PATH:-}" ]; then
+        logf_debug "BAZEL_BUILD_FILE_PATH %s" "${BAZEL_BUILD_FILE_PATH:-}"
+    fi
+    if [ "${BAZEL_INFO_FILE:-}" ]; then
+        logf_debug "BAZEL_INFO_FILE %s" "${BAZEL_INFO_FILE:-}"
+    fi
+    if [ "${BAZEL_VERSION_FILE:-}" ]; then
+        logf_debug "BAZEL_VERSION_FILE %s" "${BAZEL_VERSION_FILE:-}"
+    fi
+    logf_debug "binary target BINDIR %s" "${JS_BINARY__BINDIR:-}"
+    logf_debug "binary target TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
+    logf_debug "binary target COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
+    logf_debug "binary target WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
+    logf_debug "binary target BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
+fi
+
+# Info logs
+if [ "${JS_BINARY__LOG_INFO:-}" ]; then
+    if [ "${BAZEL_TARGET:-}" ]; then
+        logf_info "BAZEL_TARGET %s" "${BAZEL_TARGET:-}"
+    fi
+    logf_info "binary target %s" "${JS_BINARY__TARGET:-}"
+    logf_info "PWD %s" "$PWD"
+fi
+
 # ==============================================================================
 # Run the main program
 # ==============================================================================
 
-if [ "${JS_BINARY__VERBOSE:-}" ]; then
-    echo "${LOG_PREFIX}: cwd $PWD" >&2
-    echo "${LOG_PREFIX}: running" "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} >&2
+if [ "${JS_BINARY__LOG_INFO:-}" ]; then
+    logf_info "$(echo -n "running" "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
 set +e
 
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >"$STDOUT_CAPTURE" 2>"$STDERR_CAPTURE" &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
 elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >"$STDOUT_CAPTURE" &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
 elif [ "${STDERR_CAPTURE:-}" ]; then
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>"$STDERR_CAPTURE" &
+    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
 else
     "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 fi
@@ -255,9 +370,12 @@ fi
 # ==============================================================================
 
 readonly child=$!
+# Bash does not forward termination signals to any child process when
+# running in docker so need to manually trap and forward the signals
+_term() { kill -TERM "${child}" 2>/dev/null; }
+_int() { kill -INT "${child}" 2>/dev/null; }
 trap _term SIGTERM
 trap _int SIGINT
-trap _exit EXIT
 wait "$child"
 # Remove trap after first signal has been receieved and wait for child to exit
 # (first wait returns immediatel if SIGTERM is received while waiting). Second
@@ -274,7 +392,7 @@ set -e
 
 if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
     if [ "$RESULT" != "$JS_BINARY__EXPECTED_EXIT_CODE" ]; then
-        printf "\nERROR: %s: expected exit code to be '%s', but got '%s'\n" "$LOG_PREFIX" "$JS_BINARY__EXPECTED_EXIT_CODE" "$RESULT" >&2
+        logf_error "expected exit code to be '%s', but got '%s'" "$JS_BINARY__EXPECTED_EXIT_CODE" "$RESULT"
         if [ $RESULT -eq 0 ]; then
             # This exit code is handled specially by Bazel:
             # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
@@ -292,9 +410,9 @@ if [ $RESULT -eq 0 ]; then
     echo -n
 fi
 
-if [ "${JS_BINARY__CAPTURE_EXIT_CODE:-}" ]; then
+if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
     # Exit zero if the exit code was captured
-    echo -n "$RESULT" > "$JS_BINARY__CAPTURE_EXIT_CODE"
+    echo -n "$RESULT" > "$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
     exit 0
 else
     exit $RESULT

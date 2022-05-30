@@ -17,5 +17,5 @@ js_test(
         "@rules_foo_npm//@aspect-test/a",
     ],
     entry_point = "main.js",
-    verbose = True,
+    log_level = "info",
 )

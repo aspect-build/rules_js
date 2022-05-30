@@ -24,7 +24,7 @@ js_test(
         "@npm//dot_dot/app/a/@lib",
     ],
     entry_point = "main.js",
-    verbose = True,
+    log_level = "info",
 )
 
 aspect_test_a_bin.bin_a_test(
