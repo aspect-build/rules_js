@@ -27,24 +27,12 @@ Then, there's how a nodejs tool can be executed:
 There are trade-offs involved here, but we think the `rules_js` approach is superior for all users,
 especially those at large scale. Read below for more in-depth discussion of the design differences
 and trade-offs you should be aware of.
+Also see the [slides for our Bazel eXchange talk](https://hackmd.io/@aspect/rules_js)
 
 rules_js is just a part of what Aspect provides:
 
--   _Need help?_ This ruleset has support provided by https://aspect.dev.
--   Javascript
-    -   **rules_js** - Rules for running nodejs tools and building JavaScript projects
-    -   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for <https://esbuild.github.io/> JS bundler
-    -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for <https://terser.org/> - a JavaScript minifier
-    -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for the swc toolchain <https://swc.rs/>
-    -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for the `tsc` compiler from <http://typescriptlang.org>
-    -   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for webpack bundler <https://webpack.js.org/>
-    -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
-    -   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using https://jestjs.io
-    -   [rules_deno](https://github.com/aspect-build/rules_deno) - Bazel rules for Deno http://deno.land
--   Python
-    -   [rules_py](https://github.com/aspect-build/rules_py) - Bazel rules for running Python tools and building Python projects
--   C / C++
-    -   [gcc-toolchain](https://github.com/aspect-build/gcc-toolchain) - A fully-hermetic Bazel GCC toolchain for Linux
+-  _Need help?_ This ruleset has support provided by https://aspect.dev.
+-  See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
 
 ## Installation
 
@@ -84,13 +72,14 @@ See the [design doc](https://hackmd.io/gu2Nj0TKS068LKAf8KanuA)
 Fundamentally, Bazel operates out of a different filesystem layout than Node.
 Bazel keeps outputs in a distinct tree outside of the sources.
 
-Our first attempt was based on what Google does: monkey-patch the implementation of `require` in
-NodeJS itself, so that every resolution can be aware of the source/output tree difference.
+Our first attempt was based on what Yarn PnP and Google-internal nodejs rules do:
+monkey-patch the implementation of `require` in NodeJS itself,
+so that every resolution can be aware of the source/output tree difference.
 The main downside to this is compatibility: many packages on npm make their own assumptions about
 how to resolve dependencies without asking the `require` implementation, and you can't patch them all.
 Unlike Google, most of us don't want to re-write all the npm packages we use to be compatible.
 
-Our second attempt was essentially to run `npm link` before running a program, using a "linker".
+Our second attempt was essentially to run `npm link` before running a program, using a runtime linker.
 This was largely successful at papering over the filesystem layout differences without disrupting
 execution of programs. However, it required a lot of workarounds anytime a JS tool wanted to be
 aware of the input and output locations on disk. For example, many tools like react-scripts (the
@@ -98,7 +87,7 @@ build system used by Create React App aka. CRA) insist on writing their outputs 
 working directory. Such programs were forced to be run with Bazel's output folder as the working
 directory, and their sources copied to that location.
 
-Our third attempt is here in `rules_js`, where we take that react-scripts-prompted workaround to the
+`rules_js` takes a better approach, where we follow that react-scripts-prompted workaround to the
 extreme. We _always_ run JS tools with the working directory in Bazel's output tree.
 We can use a `pnpm`-style layout tool to create a `node_modules` under `bazel-out`, and all resolutions
 naturally work.
@@ -113,3 +102,5 @@ This third approach has trade-offs.
 -   The downside is that Bazel rules/macro authors (even `genrule` authors) must re-path
     inputs and outputs to account for the working directory under `bazel-out`,
     and must ensure that sources are copied there first.
+    This forces users to pass a `BAZEL_BINDIR` in the environment of every node action.
+    https://github.com/bazelbuild/bazel/issues/15470 suggests a way to improve that, avoiding that imposition on users.
