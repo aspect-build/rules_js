@@ -130,7 +130,7 @@ def npm_repositories():
         integrity = "sha512-h+LeJUbUued9XyQwxKMUdklGiGxPYJ1RvTAK9612ctCiMS2Fn0wu/Au5kHsMHxm8l4bOfpgAWmQ0OQQy7wUBCg==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "@gregmagolan/test-b",
         version = "0.0.2",
         deps = {
@@ -160,7 +160,7 @@ def npm_repositories():
         integrity = "sha512-6ZtHx3VHIp2ReNNDxHjuUml6ur+WcQ28N1yHgCQwsbNkQg2suhxGMDQGJOn/KuDxKtd1xuZP5xSTwBA4GQ8hbA==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "@rollup/plugin-commonjs",
         version = "21.1.0_rollup@2.70.2",
         deps = {
@@ -856,7 +856,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__fs.realpath__1.0.0",
-        integrity = "sha1-FQStJSMVjKpA20onh8sBQRmU6k8=",
+        integrity = "sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==",
         root_path = "",
         link_workspace = "",
         link_paths = [],
@@ -974,7 +974,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__inflight__1.0.6",
-        integrity = "sha1-Sb1jMdfQLQwJvJEKEHW6gWW1bfk=",
+        integrity = "sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==",
         root_path = "",
         link_workspace = "",
         link_paths = [],
@@ -1158,7 +1158,7 @@ def npm_repositories():
         integrity = "sha512-RGEcwZokopqyJE5JPwXKB9FWMSqFM9NJVO2QPI+z6laJTJeBHqvPicjnKgY5mvihxTeXB1+72TnooqUePeGV1g==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "mobx-react",
         version = "7.3.0_mobx@6.3.0+react@17.0.2",
         deps = {
@@ -1182,7 +1182,7 @@ def npm_repositories():
         integrity = "sha512-Aa1+VXsg4WxqJMTQfWoYuJi5UD10VZhiobSmcs5kcmI3BIT0aVtn7DysvCeDADCzl7dnbX+0BTHUj/v7gLlZpQ==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "mobx",
         version = "6.3.0",
         transitive_closure = {
@@ -1316,7 +1316,7 @@ def npm_repositories():
         integrity = "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "react",
         version = "17.0.2",
         deps = {
@@ -1359,7 +1359,7 @@ def npm_repositories():
         integrity = "sha512-EitogNZnfku65I1DD5Mxe8JYRUCy0hkK5X84IlDtUs+O6JRMpRciXTzyCUuX11b5L5pvjH+OmFXiQ3XjabcXgg==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "rollup",
         version = "2.70.2",
         deps = {
@@ -1483,7 +1483,7 @@ def npm_repositories():
         integrity = "sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["examples"],
+        link_paths = ["examples/npm_deps"],
         package = "uvu",
         version = "0.5.3",
         deps = {

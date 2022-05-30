@@ -1,4 +1,4 @@
-lockfileVersion: 5.4
+lockfileVersion: 5.3
 
 importers:
 
@@ -15,30 +15,34 @@ importers:
       '@aspect-test/a': 5.0.0
       '@aspect-test/b': 5.0.0
       '@aspect-test/c': 2.0.0
-      '@gregmagolan/test-b': 0.0.2
-      '@rollup/plugin-commonjs': 21.1.0
       bufferutil: 4.0.1
       esbuild: 0.14.38
-      mobx: 6.3.0
-      mobx-react: 7.3.0
-      react: 17.0.2
-      rollup: 2.70.2
-      uvu: 0.5.3
       webpack-bundle-analyzer: 4.5.0
     devDependencies:
       '@aspect-test/a': 5.0.0
       '@aspect-test/b': 5.0.0
       '@aspect-test/c': 2.0.0
-      '@gregmagolan/test-b': 0.0.2
-      '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       bufferutil: 4.0.1
       esbuild: 0.14.38
+      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
+
+  examples/npm_deps:
+    specifiers:
+      '@gregmagolan/test-b': 0.0.2
+      '@rollup/plugin-commonjs': 21.1.0
+      mobx: 6.3.0
+      mobx-react: 7.3.0
+      react: 17.0.2
+      rollup: 2.70.2
+      uvu: 0.5.3
+    devDependencies:
+      '@gregmagolan/test-b': 0.0.2
+      '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       mobx: 6.3.0
       mobx-react: 7.3.0_mobx@6.3.0+react@17.0.2
       react: 17.0.2
       rollup: 2.70.2
       uvu: 0.5.3
-      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
 packages:
 
@@ -443,7 +447,7 @@ packages:
     dev: true
 
   /fs.realpath/1.0.0:
-    resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
+    resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
     dev: true
 
   /fsevents/2.3.2:
@@ -489,7 +493,7 @@ packages:
     dev: true
 
   /inflight/1.0.6:
-    resolution: {integrity: sha1-Sb1jMdfQLQwJvJEKEHW6gWW1bfk=}
+    resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2

@@ -4,13 +4,6 @@
         "@aspect-test/a": "5.0.0",
         "@aspect-test/b": "5.0.0",
         "@aspect-test/c": "2.0.0",
-        "@gregmagolan/test-b": "0.0.2",
-        "rollup": "2.70.2",
-        "@rollup/plugin-commonjs": "21.1.0",
-        "mobx-react": "7.3.0",
-        "uvu": "0.5.3",
-        "mobx": "6.3.0",
-        "react": "17.0.2",
         "bufferutil": "4.0.1",
         "esbuild": "0.14.38",
         "webpack-bundle-analyzer": "4.5.0"

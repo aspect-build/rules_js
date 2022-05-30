@@ -1,4 +1,4 @@
-load("//js:defs.bzl", "js_package")
+load("@aspect_rules_js//js:defs.bzl", "js_package")
 load("@npm//examples/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 
 js_package(
