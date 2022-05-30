@@ -101,6 +101,9 @@ In addition, rules_js and associated rulesets can manage dependencies for tools 
 
 - If you use a `chdir.js` workaround for tools like react-scripts, you can just remove this.
 - If you use `$(location)`, `$(execpath)`, or `$(rootpath)` make variable expansions in an argument to a program, you may need to prefix with `../../../` to avoid duplicated `bazel-out/[arch]/bin` path segments.
+- If you spawn node programs, you'll need to pass the `BAZEL_BINDIR` environment variable.
+    - In a `genrule` add `BAZEL_BINDIR=$(BINDIR)`
+    - ctx.actions.run add `env = { "BAZEL_BINDIR": ctx.bin_dir.path}`
 
 ## Update usage of npm package generated rules
 
