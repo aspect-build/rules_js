@@ -1,0 +1,300 @@
+load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@npm//:defs.bzl", "package", "package_dir")
+load("//js:defs.bzl", "js_binary", "js_test")
+load("//js:run_js_binary.bzl", "run_js_binary")
+
+####################################################
+# Test case 4
+# Show that a js_binary can be used with run_js_binary
+# because everything it needs to run is in the runfiles
+
+js_binary(
+    name = "bin",
+    data = [package("acorn", "examples")],
+    entry_point = "require_acorn.js",
+)
+
+run_js_binary(
+    name = "run4",
+    srcs = [],
+    outs = ["actual4"],
+    args = ["actual4"],
+    chdir = package_name(),
+    tool = ":bin",
+)
+
+diff_test(
+    name = "test_js_binary_under_run_js_binary",
+    file1 = "//examples:expected_ast.json",
+    file2 = "actual4",
+)
+
+################################
+# Test case 5
+# js_test is just a js_binary
+
+js_test(
+    name = "test_test",
+    data = ["@npm//@types/node"],
+    entry_point = "test.js",
+)
+
+###############################
+# Test case 6
+# a first-party library which we want to run as a program
+
+write_file(
+    name = "write6",
+    out = "case6.js",
+    content = [
+        """require('fs').writeFileSync(process.argv[2], require("@mycorp/mylib").toAst("1"))""",
+    ],
+)
+
+js_binary(
+    name = "bin6",
+    data = [package("@mycorp/mylib", "examples")],
+    entry_point = "case6.js",
+)
+
+run_js_binary(
+    name = "run6",
+    outs = ["actual6"],
+    args = ["actual6"],
+    chdir = package_name(),
+    tool = ":bin6",
+)
+
+diff_test(
+    name = "test6",
+    file1 = "//examples:expected_ast.json",
+    file2 = "actual6",
+)
+
+#######################################
+# Test case 8
+# run_js_binary
+write_file(
+    name = "write8",
+    out = "case8.js",
+    content = ["""
+require('fs').writeFileSync(process.argv[2], JSON.stringify(require(require('path').join(process.cwd(), "case8.json"))))"""],
+)
+
+write_file(
+    name = "expected8",
+    out = "expected8.txt",
+    content = ["{\"case7\":42}"],
+)
+
+js_binary(
+    name = "bin8",
+    entry_point = "case8.js",
+)
+
+run_js_binary(
+    name = "run8",
+    srcs = ["case8.json"],
+    outs = ["actual8"],
+    args = ["actual8"],
+    chdir = package_name(),
+    tool = ":bin8",
+)
+
+diff_test(
+    name = "test8",
+    file1 = "expected8",
+    file2 = "actual8",
+)
+
+#######################################
+# Test case 9
+# set env variable and node_options
+
+write_file(
+    name = "write9",
+    out = "case9.js",
+    content = ["require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)"],
+)
+
+write_file(
+    name = "expected9",
+    out = "expected9.txt",
+    content = ["BARbin9"],
+)
+
+js_binary(
+    name = "bin9",
+    entry_point = "case9.js",
+    env = {
+        "FOO": "BAR",
+    },
+    node_options = [
+        "--title=bin9",
+        "--throw-deprecation",
+    ],
+)
+
+run_js_binary(
+    name = "run9",
+    outs = ["actual9"],
+    args = ["../../../$@"],
+    tool = ":bin9",
+)
+
+diff_test(
+    name = "test9",
+    file1 = "expected9",
+    file2 = "actual9",
+)
+
+#######################################
+# Test case 10
+# capture stdout, stderr & exit code and --node_options
+
+write_file(
+    name = "write10",
+    out = "case10.js",
+    content = ["""process.stdout.write("to stdout")
+process.stderr.write("to stderr")
+require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)
+process.exit(42)
+"""],
+)
+
+## Diff tests
+diff_test(
+    name = "test10",
+    file1 = "expected10",
+    file2 = "actual10",
+)
+
+diff_test(
+    name = "test10_stdout",
+    file1 = "expected10_stdout",
+    file2 = "actual10_stdout",
+)
+
+diff_test(
+    name = "test10_stderr",
+    file1 = "expected10_stderr",
+    file2 = "actual10_stderr",
+)
+
+diff_test(
+    name = "test10_result",
+    file1 = "expected10_result",
+    file2 = "actual10_result",
+)
+
+write_file(
+    name = "expected10",
+    out = "expected10.txt",
+    content = ["BARbin10"],
+)
+
+write_file(
+    name = "expected10_stdout",
+    out = "expected10_stdout.txt",
+    content = ["to stdout"],
+)
+
+write_file(
+    name = "expected10_stderr",
+    out = "expected10_stderr.txt",
+    content = ["to stderr"],
+)
+
+write_file(
+    name = "expected10_result",
+    out = "expected10_result.txt",
+    content = ["42"],
+)
+
+js_binary(
+    name = "bin10",
+    entry_point = "case10.js",
+    env = {
+        "FOO": "BAR",
+    },
+)
+
+js_test(
+    name = "test10_test",
+    args = ["dummy"],
+    entry_point = "case10.js",
+    env = {
+        "FOO": "BAR",
+    },
+    expected_exit_code = 42,
+    verbose = True,
+)
+
+# bazel run //examples:test10_binary
+js_binary(
+    name = "test10_binary",
+    args = ["dummy"],
+    entry_point = "case10.js",
+    env = {
+        "FOO": "BAR",
+    },
+    expected_exit_code = 42,
+    verbose = True,
+)
+
+run_js_binary(
+    name = "run10",
+    outs = [
+        "actual10",
+    ],
+    args = [
+        "--node_options=--title=bin10",
+        "actual10",
+    ],
+    chdir = package_name(),
+    exit_code_out = "actual10_result",
+    stderr = "actual10_stderr",
+    stdout = "actual10_stdout",
+    tool = ":bin10",
+)
+
+####################################################
+# Test case 13
+# Show that a js_binary can use a DirectoryPathInfo entry point
+
+directory_path(
+    name = "acorn_entry_point",
+    directory = package_dir("acorn", "examples"),
+    path = "bin/acorn",
+)
+
+js_binary(
+    name = "acorn_bin",
+    args = ["--help"],
+    entry_point = ":acorn_entry_point",
+)
+
+run_js_binary(
+    name = "run13",
+    args = ["--help"],
+    stdout = "actual13",
+    tool = ":acorn_bin",
+)
+
+write_file(
+    name = "expected13",
+    out = "expected13.txt",
+    content = [
+        "usage: acorn [--ecma3|--ecma5|--ecma6|--ecma7|--ecma8|--ecma9|...|--ecma2015|--ecma2016|--ecma2017|--ecma2018|...]",
+        "        [--tokenize] [--locations] [---allow-hash-bang] [--allow-await-outside-function] [--compact] [--silent] [--module] [--help] [--] [infile]",
+        "",
+    ],
+)
+
+diff_test(
+    name = "test13",
+    file1 = ":expected13",
+    file2 = ":actual13",
+)
