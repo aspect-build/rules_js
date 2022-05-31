@@ -20,10 +20,10 @@ load("@npm//examples/npm_deps/uvu:package_json.bzl", uvu_bin = "bin")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
 # a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_acorn(name = "acorn_link")
+link_acorn(name = "link_acorn")
 
 # Link @mycorp/mylib as a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_js_package(name = "mycorp_mylib_link")
+link_js_package(name = "link_mycorp_mylib")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
@@ -213,7 +213,7 @@ uvu_test(
         "false",
     ],
     data = [
-        ":mycorp_mylib_link",
+        ":link_mycorp_mylib",
         ":uvu_spec",
     ],
 )

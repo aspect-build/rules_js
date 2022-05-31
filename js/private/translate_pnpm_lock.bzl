@@ -279,33 +279,30 @@ def _impl(rctx):
 
     importer_paths = importers.keys()
 
+    link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
+
     defs_bzl_file = "defs.bzl"
-    defs_bzl_header = generated_by_lines + [
-        """load("@bazel_skylib//lib:paths.bzl", _paths = "paths")""",
-    ]
+    defs_bzl_header = generated_by_lines
     defs_bzl_body = [
         """# buildifier: disable=unnamed-macro
 def link_js_packages():
     "Generated list of link_js_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}"
     root_package = "{root_package}"
-    importer_paths = {importer_paths}
+    link_packages = {link_packages}
     is_root = native.package_name() == root_package
     is_direct = False
-    for import_path in importer_paths:
-        importer_package_path = _paths.normalize(_paths.join(root_package, import_path))
-        if importer_package_path == ".":
-            importer_package_path = ""
-        if importer_package_path == native.package_name():
+    for link_package in link_packages:
+        if link_package == native.package_name():
             is_direct = True
     if not is_root and not is_direct:
-        msg = "The link_js_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages corresponding to importer paths [{importer_paths_comma_separated}]" % native.package_name()
+        msg = "The link_js_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
         fail(msg)
 """.format(
             pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
             pnpm_lock = str(rctx.attr.pnpm_lock),
             root_package = root_package,
-            importer_paths = str(importer_paths),
-            importer_paths_comma_separated = "'" + "', '".join(importer_paths) + "'" if len(importer_paths) else "",
+            link_packages = str(link_packages),
+            link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
             defs_bzl_file = "@{}//:{}".format(rctx.name, defs_bzl_file),
         ),
     ]
