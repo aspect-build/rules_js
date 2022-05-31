@@ -94,9 +94,9 @@ pnpm_utils = struct(
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
     # Prefix namespace to use for js_package direct links
-    direct_link_target_namespace = "direct__",
+    direct_link_target_namespace = "direct_link__",
     # Prefix namespace to use for js_package store links
-    store_link_target_namespace = "store__",
+    store_link_target_namespace = "store_link__",
     # Postfix for npm_import links repository
     links_postfix = "__links",
     # Postfix for package directory filegroup and alias targets

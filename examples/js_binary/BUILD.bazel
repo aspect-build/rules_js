@@ -1,4 +1,4 @@
-load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
+load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_js_package")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")

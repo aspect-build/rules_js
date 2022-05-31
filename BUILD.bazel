@@ -1,6 +1,6 @@
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@npm//:defs.bzl", "link_js_packages")
-load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
+load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_js_package")
 load("//js:defs.bzl", "link_js_package", "link_js_package_dep")
 
 # Link all packages from the /WORKSPACE translate_pnpm_lock in /package.json to

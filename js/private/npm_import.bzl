@@ -215,7 +215,8 @@ _js_package(
 
 _TARBALL_FILENAME = "package.tgz"
 _EXTRACT_TO_DIRNAME = "package"
-_LINK_JS_PACKAGE_BZL_FILENAME = "link_js_package.bzl"
+_DEFS_BZL_FILENAME = "defs.bzl"
+_PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _impl(rctx):
     numeric_version = pnpm_utils.strip_peer_dep_version(rctx.attr.version)
@@ -304,9 +305,9 @@ def _impl(rctx):
                 root_package_json_bzl = True
             else:
                 rctx.file(paths.normalize(paths.join(link_package, "BUILD.bazel")), "\n".join(generated_by_lines + [
-                    "exports_files(%s)" % starlark_codegen_utils.to_list_attr(["package_json.bzl"]),
+                    "exports_files({})".format(starlark_codegen_utils.to_list_attr([_PACKAGE_JSON_BZL_FILENAME])),
                 ]))
-            rctx.file(paths.normalize(paths.join(link_package, "package_json.bzl")), "\n".join(bin_bzl))
+            rctx.file(paths.normalize(paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)), "\n".join(bin_bzl))
 
     if rctx.attr.run_lifecycle_hooks:
         _inject_run_lifecycle_hooks(rctx, pkg_json_path)
@@ -328,7 +329,7 @@ def _impl(rctx):
     ))
 
     if root_package_json_bzl:
-        build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr(["package_json.bzl"]))
+        build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr([_PACKAGE_JSON_BZL_FILENAME]))
 
     rctx.file("BUILD.bazel", "\n".join(build_file))
 
@@ -405,7 +406,7 @@ def _impl_links(rctx):
         lc_deps = starlark_codegen_utils.to_list_attr(lc_deps, 1),
         lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_target_name = lifecycle_target_name,
-        link_js_package_bzl = "@%s//:%s" % (rctx.name, _LINK_JS_PACKAGE_BZL_FILENAME),
+        link_js_package_bzl = "@%s//:%s" % (rctx.name, _DEFS_BZL_FILENAME),
         link_packages = rctx.attr.link_packages,
         package = rctx.attr.package,
         package_directory_output_group = pnpm_utils.package_directory_output_group,
@@ -420,9 +421,9 @@ def _impl_links(rctx):
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
 
-    rctx.file(_LINK_JS_PACKAGE_BZL_FILENAME, "\n".join(generated_by_lines + link_js_package_bzl))
+    rctx.file(_DEFS_BZL_FILENAME, "\n".join(generated_by_lines + link_js_package_bzl))
 
-    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_LINK_JS_PACKAGE_BZL_FILENAME]))
+    rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_DEFS_BZL_FILENAME]))
 
 _COMMON_ATTRS = {
     "package": attr.string(mandatory = True),
