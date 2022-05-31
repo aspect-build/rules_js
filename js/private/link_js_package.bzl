@@ -34,8 +34,8 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 
 _DOC_DIRECT = """Defines a node package that is linked into a node_modules tree as a direct dependency.
 
-This is used in co-ordination with link_js_package that links into the virtual store in
-with a pnpm style symlinked node_modules output tree.
+This is used in co-ordination with the link_js_package_store rule that links into the
+node_modules/.apsect_rules_js virtual store with a pnpm style symlinked node_modules output tree.
 
 The term "package" is defined at
 <https://nodejs.org/docs/latest-v16.x/api/packages.html>
@@ -82,8 +82,8 @@ If set, takes precendance over the package name in the JsPackageInfo src.
     "version": attr.string(
         doc = """The package version being linked.
 
-If unset, the package name in the JsPackageInfo src must be set.
-If set, takes precendance over the package name in the JsPackageInfo src.
+If unset, the package version in the JsPackageInfo src must be set.
+If set, takes precendance over the package version in the JsPackageInfo src.
 """,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
@@ -137,7 +137,7 @@ def _impl_store(ctx):
             # symlink the package's direct deps to its virtual store location
             dep_link_package = dep[_LinkJsPackageInfo].link_package
             if dep_link_package != ctx.label.package:
-                if not ctx.label.package.startwith(dep_link_package + "/"):
+                if not ctx.label.package.startswith(dep_link_package + "/"):
                     msg = """link_js_package in %s package cannot depend on link_js_package in %s package.
 deps of link_js_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
                     fail(msg)
@@ -295,3 +295,177 @@ link_js_package_direct = rule(
     attrs = link_js_package_direct_lib.attrs,
     provides = link_js_package_direct_lib.provides,
 )
+
+def link_js_package_dep(
+        name,
+        version = None,
+        root_package = ""):
+    """Returns the label to the link_js_package store for a package.
+
+    This can be used to generate virtual store target names for the deps list
+    of a link_js_package.
+
+    Example root BUILD.file where the virtual store is linked by default,
+
+    ```
+    load("@npm//:defs.bzl", "link_js_packages")
+    load("@aspect_rules_js//:defs.bzl", "link_js_package")
+
+    # Links all packages from the `translate_pnpm_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
+    # repository rule.
+    link_js_packages()
+
+    # Link a first party `@lib/foo` defined by the `js_package` `//lib/foo:foo` target.
+    link_js_package(
+        name = "lib_foo_link",
+        src = "//lib/foo",
+    )
+
+    # Link a first party `@lib/bar` defined by the `js_package` `//lib/bar:bar` target
+    # that depends on `@lib/foo` and on `acorn` specified in `package.json` and fetched
+    # with `translate_pnpm_lock`
+    link_js_package(
+        name = "lib_bar_link",
+        src = "//lib/bar",
+        deps = [
+            link_js_package_dep("lib_foo_link"),
+            link_js_package_dep("acorn", version = "8.4.0"),
+        ],
+    )
+    ```
+
+    Args:
+        name: The name of the link target.
+            For first-party packages, this must match the `name` passed to link_js_package
+            for the package in the root package when not linking at the root package.
+
+            For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+            the name must match the `package` attribute of the corresponding `npm_import`. This is typically
+            the npm package name.
+        version: The version of the package
+            This should be left unset for first-party packages linked manually with link_js_package.
+
+            For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+            the package version is required to qualify the dependency. It must the `version` attribute
+            of the corresponding `npm_import`.
+        root_package: The bazel package of the virtual store.
+            Defaults to the current package
+
+    Returns:
+        The label of the direct link for the given package at the given link package,
+    """
+    return Label("//{root_package}:{store_namespace}{bazel_name}".format(
+        bazel_name = pnpm_utils.bazel_name(name, version),
+        root_package = root_package,
+        store_namespace = pnpm_utils.store_link_target_namespace,
+    ))
+
+def link_js_package(
+        name,
+        root_package = "",
+        direct = True,
+        src = None,
+        deps = [],
+        fail_if_no_link = True,
+        visibility = ["//visibility:public"],
+        **kwargs):
+    """"Links a package to the virtual store if in the root package and directly to node_modules if direct is True.
+
+    When called at the root_package, a virtual store target is generated named "link__{bazelified_name}__store".
+
+    When linking direct, a "{name}" alias is generated which consists of the direct node_modules link and transitively
+    its virtual store link and the virtual store links of the transitive closure of deps.
+
+    When linking direct, "{name}__dir" alias is also generated that refers to a directory artifact can be used to access
+    the package directory for creating entry points or accessing files in the package.
+
+    Args:
+        name: The name of the package.
+            This should generally by the same as
+        root_package: the root package where the node_modules virtual store is linked to
+        direct: whether or not to link a direct dependency in this package
+            For 3rd party deps fetched with an npm_import, direct may not be specified if
+            link_packages is set on the npm_import.
+        src: the js_package target to link; may only to be specified when linking in the root package
+        deps: list of link_js_package_store; may only to be specified when linking in the root package
+        fail_if_no_link: whether or not to fail if this is called in a package that is not the root package and with direct false
+        visibility: the visibility of the generated targets
+        **kwargs: see attributes of link_js_package_store rule
+    """
+    is_root = native.package_name() == root_package
+    is_direct = direct
+
+    if fail_if_no_link and not is_root and not is_direct:
+        msg = "Nothing to link in bazel package '{bazel_package}' for {name}. This is neither the root package nor a direct link.".format(
+            bazel_package = native.package_name(),
+            name = name,
+        )
+        fail(msg)
+
+    if deps and not is_root:
+        msg = "deps may only be specified when linking in the root package '{}'".format(root_package)
+        fail(msg)
+
+    if src and not is_root:
+        msg = "src may only be specified when linking in the root package '{}'".format(root_package)
+        fail(msg)
+
+    link_target_name = "{direct_namespace}{bazel_name}".format(
+        bazel_name = pnpm_utils.bazel_name(name),
+        direct_namespace = pnpm_utils.direct_link_target_namespace,
+    )
+
+    dir_target_name = "{direct_namespace}{bazel_name}{dir_postfix}".format(
+        bazel_name = pnpm_utils.bazel_name(name),
+        dir_postfix = pnpm_utils.dir_postfix,
+        direct_namespace = pnpm_utils.direct_link_target_namespace,
+    )
+
+    store_target_name = "{store_namespace}{bazel_name}".format(
+        bazel_name = pnpm_utils.bazel_name(name),
+        store_namespace = pnpm_utils.store_link_target_namespace,
+    )
+
+    if is_root:
+        # link the virtual store when linking at the root
+        link_js_package_store(
+            name = store_target_name,
+            src = src,
+            deps = deps,
+            visibility = visibility,
+            **kwargs
+        )
+
+    if direct:
+        # link as a direct dependency in node_modules of this package
+        link_js_package_direct(
+            name = link_target_name,
+            src = "//{root_package}:{store_target}".format(
+                root_package = root_package,
+                store_target = store_target_name,
+            ),
+            tags = kwargs.get("tags", None),
+            visibility = visibility,
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = dir_target_name,
+            srcs = [":{}".format(link_target_name)],
+            output_group = pnpm_utils.package_directory_output_group,
+            tags = kwargs.get("tags", None),
+            visibility = visibility,
+        )
+
+        native.alias(
+            name = name,
+            actual = ":{}".format(link_target_name),
+            visibility = visibility,
+        )
+
+        native.alias(
+            name = "{}{}".format(name, pnpm_utils.dir_postfix),
+            actual = ":{}".format(dir_target_name),
+            visibility = visibility,
+        )

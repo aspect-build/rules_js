@@ -53,8 +53,8 @@ translate_pnpm_lock(
         "@gregmagolan/test-a": ["-p1"],
     },
     patches = {
-        "@gregmagolan/test-a": ["//examples:patches/test-a.patch"],
-        "@gregmagolan/test-a@0.0.1": ["//examples:patches/test-a@0.0.1.patch"],
+        "@gregmagolan/test-a": ["//examples/npm_deps:patches/test-a.patch"],
+        "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
 )
@@ -70,6 +70,7 @@ npm_import(
     name = "acorn__8.4.0",
     integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     package = "acorn",
-    root_path = "examples",
+    # Root package where to link the virtual store
+    root_package = "",
     version = "8.4.0",
 )

@@ -1,10 +1,41 @@
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@npm//:defs.bzl", "link_js_packages")
+load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
+load("//js:defs.bzl", "link_js_package", "link_js_package_dep")
 
-# Link all packages from the /WORKSPACE translate_pnpm_lock in the package.json to
-# bazel-bin/examples/node_modules as well as the virtual store since this package.json
-# is the root of the pnpm workspace
+# Link all packages from the /WORKSPACE translate_pnpm_lock in /package.json to
+# bazel-bin/node_modules as well as the virtual store bazel-bin/node_modules/.aspect_rules_js
+# since /package.json is the root of the pnpm workspace
 link_js_packages()
+
+# Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, to the
+# virtual store in bazel-bin/node_modules/.aspect_rules_js
+link_acorn(
+    name = "acorn_link",
+    # `direct` set to False as an example of *not* also linking this 3rd dependency as a
+    # direct dependency in the package at bazel-bin/node_modules/@mycorp/mylib. Alternately,
+    # you may specify link_packages in the npm_import of this package and direct is then
+    # automatically set to True when this is called in the packages listed.
+    direct = False,
+)
+
+# Linking a first-party dependency to the virtual store in bazel-bin/node_modules/.aspect_rules_js
+link_js_package(
+    name = "mycorp_mylib_link",
+    src = "//examples/lib",
+    # `direct` set to False as an example of *not* also linking this first-party dependency as a
+    # direct dependency in the package at bazel-bin/node_modules/@mycorp/mylib.
+    direct = False,
+    deps = [
+        # For a 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+        # you must specify both the name and version to qualify the dependency. These should match the
+        # `package` and `version` attributes of the corresponding `npm_import`.
+        link_js_package_dep(
+            "acorn",
+            version = "8.4.0",
+        ),
+    ],
+)
 
 gazelle_binary(
     name = "gazelle_bin",

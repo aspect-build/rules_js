@@ -1,8 +1,12 @@
+load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//:defs.bzl", "link_js_packages", "package", "package_dir")
+load("@npm//:defs.bzl", "link_js_packages")
+load("//js:defs.bzl", "link_js_package")
+
+###########################
 
 # Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
 # Just to show what the syntax de-sugaring looks like, and to test that
@@ -12,7 +16,16 @@ load("@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl", "rollup", "roll
 # Load from the "bin" property from the package.json of the uvu package
 load("@npm//examples/npm_deps/uvu:package_json.bzl", uvu_bin = "bin")
 
-# Link all packages in our package.json to
+###########################
+
+# Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
+# a direct dependency in bazel-bin/examples/npm_deps/node_modules
+link_acorn(name = "acorn_link")
+
+# Link @mycorp/mylib as a direct dependency in bazel-bin/examples/npm_deps/node_modules
+link_js_package(name = "mycorp_mylib_link")
+
+# Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
 link_js_packages()
 
@@ -85,7 +98,7 @@ if (content.answer !== '42*') {
 js_test(
     name = "test3",
     data = [
-        package("@aspect-test/c", "examples"),
+        "@npm//examples/npm_deps/@aspect-test/c",
     ],
     entry_point = "case3.js",
 )
@@ -111,9 +124,9 @@ if (!/^moo\\s+mooo\\s*$/.test(content)) {
 
 js_test(
     name = "test4",
-    args = ["$(rootpath %s)" % package_dir("@aspect-test/c", "examples")],
+    args = ["$(rootpath @npm//examples/npm_deps/@aspect-test/c:dir)"],
     data = [
-        package_dir("@aspect-test/c", "examples"),
+        "@npm//examples/npm_deps/@aspect-test/c:dir",
     ],
     entry_point = "case4.js",
 )
@@ -200,7 +213,7 @@ uvu_test(
         "false",
     ],
     data = [
+        ":mycorp_mylib_link",
         ":uvu_spec",
-        package("@mycorp/mylib", "examples"),
     ],
 )

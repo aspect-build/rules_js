@@ -8,7 +8,7 @@ js_binary(
         "@npm//@aspect-test/a",
         "@npm//@aspect-test/b",
         "@npm//@aspect-test/c",
-        "@rules_foo_npm//@aspect-test/a",
+        "@rules_foo_npm//foo/@aspect-test/a",
     ],
     entry_point = "main.js",
 )
@@ -21,7 +21,7 @@ js_test(
         "@npm//@aspect-test/a",
         "@npm//@aspect-test/b",
         "@npm//@aspect-test/c",
-        "@rules_foo_npm//@aspect-test/a",
+        "@rules_foo_npm//foo/@aspect-test/a",
     ],
     entry_point = "main.js",
     log_level = "info",

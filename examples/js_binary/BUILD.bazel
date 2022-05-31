@@ -1,9 +1,17 @@
+load("@acorn__8.4.0__links//:link_js_package.bzl", link_acorn = "link_js_package")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//:defs.bzl", "package", "package_dir")
-load("//js:defs.bzl", "js_binary", "js_test")
+load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
+load("//js:defs.bzl", "js_binary", "js_test", "link_js_package")
 load("//js:run_js_binary.bzl", "run_js_binary")
+
+# Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
+# a direct dependency in bazel-bin/examples/js_binary/node_modules
+link_acorn(name = "acorn_link")
+
+# Link @mycorp/mylib as a direct dependency in bazel-bin/examples/js_binary/node_modules
+link_js_package(name = "mycorp_mylib_link")
 
 ####################################################
 # Test case 4
@@ -12,7 +20,7 @@ load("//js:run_js_binary.bzl", "run_js_binary")
 
 js_binary(
     name = "bin",
-    data = [package("acorn", "examples")],
+    data = [":acorn_link"],
     entry_point = "require_acorn.js",
 )
 
@@ -27,7 +35,7 @@ run_js_binary(
 
 diff_test(
     name = "test_js_binary_under_run_js_binary",
-    file1 = "//examples:expected_ast.json",
+    file1 = "//examples:expected_one_ast.json",
     file2 = "actual4",
 )
 
@@ -55,7 +63,7 @@ write_file(
 
 js_binary(
     name = "bin6",
-    data = [package("@mycorp/mylib", "examples")],
+    data = [":mycorp_mylib_link"],
     entry_point = "case6.js",
 )
 
@@ -69,7 +77,7 @@ run_js_binary(
 
 diff_test(
     name = "test6",
-    file1 = "//examples:expected_ast.json",
+    file1 = "//examples:expected_one_ast.json",
     file2 = "actual6",
 )
 
@@ -266,7 +274,7 @@ run_js_binary(
 
 directory_path(
     name = "acorn_entry_point",
-    directory = package_dir("acorn", "examples"),
+    directory = ":acorn_link__dir",
     path = "bin/acorn",
 )
 
@@ -297,4 +305,13 @@ diff_test(
     name = "test13",
     file1 = ":expected13",
     file2 = ":actual13",
+)
+
+####################################################
+# Test case 14
+# Show that we can run a generated bin from a package where the npm package
+# is not linked. In this case @aspect-test/a is linked to the //examples/npm_deps:__pkg__
+
+aspect_test_a_bin.bin_a_test(
+    name = "aspect_bin_a_test",
 )

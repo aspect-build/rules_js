@@ -91,14 +91,14 @@ pnpm_utils = struct(
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_version = _strip_peer_dep_version,
-    # Prefix namespace to use for generated js_binary targets and aliases
-    js_package_target_namespace = "jsp__",
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
+    # Prefix namespace to use for js_package direct links
+    direct_link_target_namespace = "direct__",
+    # Prefix namespace to use for js_package store links
+    store_link_target_namespace = "store__",
     # Postfix for npm_import links repository
     links_postfix = "__links",
-    # Postfix for virtual store target
-    store_postfix = "__store",
     # Postfix for package directory filegroup and alias targets
     dir_postfix = "__dir",
     # Output group name for the package directory of a linked package
