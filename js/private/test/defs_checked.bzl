@@ -120,7 +120,7 @@ load("@npm__mobx-react__7.3.0__mobx_6.3.0_react_17.0.2__links//:link_js_package.
 load("@npm__mobx__6.3.0__links//:link_js_package.bzl", link_115 = "link_js_package")
 load("@npm__mocha-junit-reporter__2.0.2__mocha_10.0.0__links//:link_js_package.bzl", link_116 = "link_js_package")
 load("@npm__mocha-multi-reporters__1.5.1__mocha_10.0.0__links//:link_js_package.bzl", link_117 = "link_js_package")
-load("@npm__mocha__10.0.0__th2rfume6p4m5jxelm27wrhnly__links//:link_js_package.bzl", link_118 = "link_js_package")
+load("@npm__mocha__10.0.0__mocha-multi-reporters_1.5.1__links//:link_js_package.bzl", link_118 = "link_js_package")
 load("@npm__mri__1.2.0__links//:link_js_package.bzl", link_119 = "link_js_package")
 load("@npm__mrmime__1.0.0__links//:link_js_package.bzl", link_120 = "link_js_package")
 load("@npm__ms__2.0.0__links//:link_js_package.bzl", link_121 = "link_js_package")
@@ -175,7 +175,7 @@ load("@npm__yocto-queue__0.1.0__links//:link_js_package.bzl", link_167 = "link_j
 def link_js_packages():
     "Generated list of link_js_package() target generators and first party linked packages corresponding to the packages in @//:pnpm-lock.yaml"
     root_path = ""
-    importer_paths = [".", "examples", "examples/npm_deps"]
+    importer_paths = [".", "examples", "examples/lib", "examples/macro", "examples/npm_deps"]
     is_root = native.package_name() == root_path
     is_direct = False
     for import_path in importer_paths:
@@ -185,7 +185,7 @@ def link_js_packages():
         if importer_package_path == native.package_name():
             is_direct = True
     if not is_root and not is_direct:
-        msg = "The link_js_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages corresponding to importer paths ['.', 'examples', 'examples/npm_deps']" % native.package_name()
+        msg = "The link_js_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages corresponding to importer paths ['.', 'examples', 'examples/lib', 'examples/macro', 'examples/npm_deps']" % native.package_name()
         fail(msg)
 
     link_0(False)

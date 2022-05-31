@@ -1,1 +1,0 @@
-This example shows how to create `mocha_test` targets to test JavaScript with [mocha](https://mochajs.org/). It integrates with Bazel's JUnit XML consumer so that [`--test_summary=detailed`](https://bazel.build/docs/user-manual#test-summary) works.

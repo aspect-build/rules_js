@@ -1,5 +1,0 @@
-load("//example/mocha:mocha.bzl", "mocha_test")
-
-mocha_test(
-    name = "test",
-)
