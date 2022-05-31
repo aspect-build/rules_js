@@ -385,6 +385,8 @@ def _impl_links(rctx):
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(pnpm_utils.links_suffix)]
+    if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
+        npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
     js_package_target = "@{}//:jsp_source_directory".format(npm_import_sources_repo_name)
     js_package_target_lc = "@{}//:jsp".format(npm_import_sources_repo_name)
