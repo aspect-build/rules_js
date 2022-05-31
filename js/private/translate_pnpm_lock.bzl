@@ -306,6 +306,8 @@ def _gen_npm_imports(lockfile, attr):
             custom_postinstall = "%s && %s" % (custom_postinstall, attr.custom_postinstalls.get(friendly_name))
 
         repo_name = "%s__%s" % (attr.name, pnpm_utils.bazel_name(name, pnpm_version))
+        if repo_name.startswith("aspect_rules_js.npm."):
+            repo_name = repo_name[len("aspect_rules_js.npm."):]
 
         link_packages = []
 
@@ -613,6 +615,7 @@ translate_pnpm_lock = struct(
     doc = _DOC,
     implementation = _impl,
     attrs = _ATTRS,
+    gen_npm_imports = _gen_npm_imports,
 )
 
 translate_pnpm_lock_testonly = struct(

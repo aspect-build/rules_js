@@ -1,0 +1,14 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "link_js_packages")
+
+link_js_packages()
+
+js_test(
+    name = "test",
+    data = [
+        "//:direct_link__chalk",
+        # these don't work yet:
+        # "@npm//chalk",
+    ],
+    entry_point = "main.mjs",
+)
