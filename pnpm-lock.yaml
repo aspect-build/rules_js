@@ -26,15 +26,25 @@ importers:
       esbuild: 0.14.38
       webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
+  examples/lib:
+    specifiers: {}
+
+  examples/macro:
+    specifiers:
+      mocha: ^10.0.0
+      mocha-junit-reporter: ^2.0.2
+      mocha-multi-reporters: ^1.5.1
+    devDependencies:
+      mocha: 10.0.0_mocha-multi-reporters@1.5.1
+      mocha-junit-reporter: 2.0.2_mocha@10.0.0
+      mocha-multi-reporters: 1.5.1_mocha@10.0.0
+
   examples/npm_deps:
     specifiers:
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0
       mobx: 6.3.0
       mobx-react: 7.3.0
-      mocha: ^10.0.0
-      mocha-junit-reporter: ^2.0.2
-      mocha-multi-reporters: ^1.5.1
       react: 17.0.2
       rollup: 2.70.2
       uvu: 0.5.3
@@ -43,9 +53,6 @@ importers:
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       mobx: 6.3.0
       mobx-react: 7.3.0_mobx@6.3.0+react@17.0.2
-      mocha: 10.0.0_th2rfume6p4m5jxelm27wrhnly
-      mocha-junit-reporter: 2.0.2_mocha@10.0.0
-      mocha-multi-reporters: 1.5.1_mocha@10.0.0
       react: 17.0.2
       rollup: 2.70.2
       uvu: 0.5.3
@@ -719,7 +726,7 @@ packages:
     dev: true
 
   /is-extglob/2.1.1:
-    resolution: {integrity: sha1-qIwCU1eR8C7TfHahueqXc8gz+MI=}
+    resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -883,7 +890,7 @@ packages:
       debug: 2.6.9
       md5: 2.3.0
       mkdirp: 0.5.6
-      mocha: 10.0.0_th2rfume6p4m5jxelm27wrhnly
+      mocha: 10.0.0_mocha-multi-reporters@1.5.1
       strip-ansi: 6.0.1
       xml: 1.0.1
     transitivePeerDependencies:
@@ -898,12 +905,12 @@ packages:
     dependencies:
       debug: 4.3.4
       lodash: 4.17.21
-      mocha: 10.0.0_th2rfume6p4m5jxelm27wrhnly
+      mocha: 10.0.0_mocha-multi-reporters@1.5.1
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /mocha/10.0.0_th2rfume6p4m5jxelm27wrhnly:
+  /mocha/10.0.0_mocha-multi-reporters@1.5.1:
     resolution: {integrity: sha512-0Wl+elVUD43Y0BqPZBzZt8Tnkw9CMUdNYnUsTfOM1vuhJVZL+kiesFYsqwBkEEuEixaiPe5ZQdqDgX2jddhmoA==}
     engines: {node: '>= 14.0.0'}
     hasBin: true

@@ -1537,7 +1537,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__is-extglob__2.1.1",
-        integrity = "sha1-qIwCU1eR8C7TfHahueqXc8gz+MI=",
+        integrity = "sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==",
         root_path = "",
         link_workspace = "",
         link_paths = [],
@@ -1919,14 +1919,14 @@ def npm_repositories():
         integrity = "sha512-vYwWq5hh3v1lG0gdQCBxwNipBfvDiAM1PHroQRNp96+2l72e9wEUTw+mzoK+O0SudgfQ7WvTQZ9Nh3qkAYAjfg==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["example"],
+        link_paths = ["examples/macro"],
         package = "mocha-junit-reporter",
         version = "2.0.2_mocha@10.0.0",
         deps = {
             "debug": "2.6.9",
             "md5": "2.3.0",
             "mkdirp": "0.5.6",
-            "mocha": "10.0.0_th2rfume6p4m5jxelm27wrhnly",
+            "mocha": "10.0.0_mocha-multi-reporters@1.5.1",
             "strip-ansi": "6.0.1",
             "xml": "1.0.1",
         },
@@ -1935,7 +1935,7 @@ def npm_repositories():
             "debug": ["4.3.4", "4.3.4_supports-color@8.1.1", "2.6.9"],
             "md5": ["2.3.0"],
             "mkdirp": ["0.5.6"],
-            "mocha": ["10.0.0_th2rfume6p4m5jxelm27wrhnly"],
+            "mocha": ["10.0.0_mocha-multi-reporters@1.5.1"],
             "strip-ansi": ["6.0.1"],
             "xml": ["1.0.1"],
             "ansi-regex": ["5.0.1"],
@@ -2024,19 +2024,19 @@ def npm_repositories():
         integrity = "sha512-Yb4QJOaGLIcmB0VY7Wif5AjvLMUFAdV57D2TWEva1Y0kU/3LjKpeRVmlMIfuO1SVbauve459kgtIizADqxMWPg==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["example"],
+        link_paths = ["examples/macro"],
         package = "mocha-multi-reporters",
         version = "1.5.1_mocha@10.0.0",
         deps = {
             "debug": "4.3.4",
             "lodash": "4.17.21",
-            "mocha": "10.0.0_th2rfume6p4m5jxelm27wrhnly",
+            "mocha": "10.0.0_mocha-multi-reporters@1.5.1",
         },
         transitive_closure = {
             "mocha-multi-reporters": ["1.5.1_mocha@10.0.0"],
             "debug": ["4.3.4_supports-color@8.1.1", "4.3.4"],
             "lodash": ["4.17.21"],
-            "mocha": ["10.0.0_th2rfume6p4m5jxelm27wrhnly"],
+            "mocha": ["10.0.0_mocha-multi-reporters@1.5.1"],
             "@ungap/promise-all-settled": ["1.1.2"],
             "ansi-colors": ["4.1.1"],
             "browser-stdout": ["1.3.1"],
@@ -2114,13 +2114,13 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mocha__10.0.0__th2rfume6p4m5jxelm27wrhnly",
+        name = "npm__mocha__10.0.0__mocha-multi-reporters_1.5.1",
         integrity = "sha512-0Wl+elVUD43Y0BqPZBzZt8Tnkw9CMUdNYnUsTfOM1vuhJVZL+kiesFYsqwBkEEuEixaiPe5ZQdqDgX2jddhmoA==",
         root_path = "",
         link_workspace = "",
-        link_paths = ["example"],
+        link_paths = ["examples/macro"],
         package = "mocha",
-        version = "10.0.0_th2rfume6p4m5jxelm27wrhnly",
+        version = "10.0.0_mocha-multi-reporters@1.5.1",
         deps = {
             "@ungap/promise-all-settled": "1.1.2",
             "ansi-colors": "4.1.1",
@@ -2147,7 +2147,7 @@ def npm_repositories():
             "yargs-unparser": "2.0.0",
         },
         transitive_closure = {
-            "mocha": ["10.0.0_th2rfume6p4m5jxelm27wrhnly"],
+            "mocha": ["10.0.0_mocha-multi-reporters@1.5.1"],
             "@ungap/promise-all-settled": ["1.1.2"],
             "ansi-colors": ["4.1.1"],
             "browser-stdout": ["1.3.1"],
