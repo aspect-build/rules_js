@@ -1,5 +1,4 @@
 load("@aspect_rules_js//js:defs.bzl", "js_package")
-load("@npm//examples/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 
 js_package(
     name = "lib",
@@ -9,13 +8,4 @@ js_package(
     ],
     package = "@mycorp/mylib",
     visibility = ["//visibility:public"],
-)
-
-####################################################
-# Sub-package test case 1
-# Show that we can run a generated bin from a package where the npm package
-# is not linked. In this case @aspect-test/a is linked to the //examples:__pkg__
-
-aspect_test_a_bin.bin_a_test(
-    name = "aspect_bin_a_test",
 )

@@ -1,9 +1,7 @@
 {
     "private": true,
+    "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
     "devDependencies": {
-        "@aspect-test/a": "5.0.0",
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "2.0.0",
         "bufferutil": "4.0.1",
         "esbuild": "0.14.38",
         "webpack-bundle-analyzer": "4.5.0"

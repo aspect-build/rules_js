@@ -35,9 +35,9 @@ def npm_import(
         version,
         deps = {},
         transitive_closure = {},
-        root_path = "",
+        root_package = "",
         link_workspace = "",
-        link_paths = ["."],
+        link_packages = [],
         run_lifecycle_hooks = False,
         integrity = "",
         patch_args = ["-p0"],
@@ -117,12 +117,14 @@ def npm_import(
         deps: A dict other npm packages this one depends on where the key is the package name and value is the version
         transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
             package name and value is a list of version(s) depended on in the closure.
-        root_path: The root package where the node_modules virtual store is linked to.
+        root_package: The root package where the node_modules virtual store is linked to.
             Typically this is the package that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
         link_workspace: The workspace name where links will be created for this package.
             Typically this is the workspace that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
             Can be left unspecified if the link workspace is the user workspace.
-        link_paths: List of paths where direct links will be created at for this package.
+        link_packages: List of paths where direct links may be created at for this package.
+            Defaults to [] which indicates that direct links may be created in any package as specified by
+            the `direct` attribute of the generated link_js_package.
             These paths are relative to the root package with "." being the node_modules at the root package.
         run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
             package.
@@ -149,9 +151,9 @@ def npm_import(
         name = name,
         package = package,
         version = version,
-        root_path = root_path,
+        root_package = root_package,
         link_workspace = link_workspace,
-        link_paths = link_paths,
+        link_packages = link_packages,
         integrity = integrity,
         patch_args = patch_args,
         patches = patches,
@@ -165,8 +167,8 @@ def npm_import(
         name = "{}{}".format(name, _pnpm_utils.links_postfix),
         package = package,
         version = version,
-        root_path = root_path,
-        link_paths = link_paths,
+        root_package = root_package,
+        link_packages = link_packages,
         deps = deps,
         transitive_closure = transitive_closure,
         lifecycle_build_target = run_lifecycle_hooks or not (not custom_postinstall),

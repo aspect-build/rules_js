@@ -10,14 +10,24 @@ _LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_package = "
 load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")
 load("@aspect_rules_js//js/private:link_js_package_store_internal.bzl", _link_js_package_store = "link_js_package_store_internal")
 load("@aspect_rules_js//js/private:link_js_package.bzl", _link_js_package_direct = "link_js_package_direct")
-load("@aspect_rules_js//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")
 load("@bazel_skylib//lib:paths.bzl", _paths = "paths")
 
 # buildifier: disable=unnamed-macro
-def link_js_package(fail_if_no_link = False):
+def link_js_package(
+    name,
+    direct = {direct_default},
+    fail_if_no_link = True,
+    visibility = ["//visibility:public"]):
     "Generated link_js_package_store and link_js_package_direct targets for npm package {package}@{version}"
 
-    is_root = native.package_name() == "{root_path}"
+    root_package = "{root_package}"
+
+    is_root = native.package_name() == root_package
+
+    link_packages = {link_packages}
+
+    if link_packages and direct != None:
+        fail("direct attribute cannot be specified when link_packages are set")
 
     if is_root:
         # link the virtual store if we are linking in the root package
@@ -32,15 +42,15 @@ def link_js_package(fail_if_no_link = False):
 
         # reference target used to avoid circular deps
         _link_js_package_store(
-            name = "{namespace}{bazel_name}__ref",
+            name = "{store_namespace}{bazel_name}__ref",
             package = "{package}",
             version = "{version}",
         )
 
         # post-lifecycle target with reference deps for use in terminal target with transitive closure
         _link_js_package_store(
-            name = "{namespace}{bazel_name}__pkg",
-            src = "{namespace}{bazel_name}__jsp" if lifecycle_build_target else "{js_package_target}",
+            name = "{store_namespace}{bazel_name}__pkg",
+            src = "{store_namespace}{bazel_name}__jsp" if lifecycle_build_target else "{js_package_target}",
             package = "{package}",
             version = "{version}",
             deps = ref_deps,
@@ -48,18 +58,18 @@ def link_js_package(fail_if_no_link = False):
 
         # virtual store target with transitive closure of all node package dependencies
         _link_js_package_store(
-            name = "{namespace}{bazel_name}{store_postfix}",
+            name = "{store_namespace}{bazel_name}",
             src = None if {transitive_closure_pattern} else "{js_package_target}",
             package = "{package}",
             version = "{version}",
             deps = deps,
-            visibility = ["//visibility:public"],
+            visibility = visibility,
         )
 
         if lifecycle_build_target:
             # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
             _link_js_package_store(
-                name = "{namespace}{bazel_name}__pkg_lite",
+                name = "{store_namespace}{bazel_name}__pkg_lite",
                 package = "{package}",
                 version = "{version}",
                 deps = ref_deps,
@@ -67,7 +77,7 @@ def link_js_package(fail_if_no_link = False):
 
             # terminal pre-lifecycle target for use in lifecycle build target below
             _link_js_package_store(
-                name = "{namespace}{bazel_name}__pkg_lc",
+                name = "{store_namespace}{bazel_name}__pkg_lc",
                 package = "{package}",
                 version = "{version}",
                 deps = lc_deps,
@@ -78,7 +88,7 @@ def link_js_package(fail_if_no_link = False):
                 name = "{lifecycle_target_name}",
                 srcs = [
                     "{js_package_target_lc}",
-                    ":{namespace}{bazel_name}__pkg_lc"
+                    ":{store_namespace}{bazel_name}__pkg_lc"
                 ],
                 # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
                 args = [
@@ -93,51 +103,49 @@ def link_js_package(fail_if_no_link = False):
 
             # post-lifecycle js_package
             _js_package(
-                name = "{namespace}{bazel_name}__jsp",
+                name = "{store_namespace}{bazel_name}__jsp",
                 src = ":{lifecycle_target_name}",
                 package = "{package}",
                 version = "{version}",
             )
 
     # link direct deps
-    is_direct = False
-    for link_path in {link_paths}:
-        link_package_path = _paths.normalize(_paths.join("{root_path}", link_path))
-        if link_package_path == ".":
-            link_package_path = ""
-        if link_package_path == native.package_name():
+    is_direct = not (not direct)
+    for link_package in link_packages:
+        if direct == None and link_package == native.package_name():
             is_direct = True
 
-            # terminal target for direct dependencies
-            _link_js_package_direct(
-                name = "{namespace}{bazel_name}",
-                src = "//{root_path}:{namespace}{bazel_name}{store_postfix}",
-                visibility = ["//visibility:public"],
-            )
+    if is_direct:
+        # terminal target for direct dependencies
+        _link_js_package_direct(
+            name = "{direct_namespace}{bazel_name}",
+            src = "//{root_package}:{store_namespace}{bazel_name}",
+            visibility = visibility,
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{namespace}{bazel_name}{dir_postfix}",
-                srcs = [":{namespace}{bazel_name}"],
-                output_group = "{package_directory_output_group}",
-                visibility = ["//visibility:public"],
-            )
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{direct_namespace}{bazel_name}{dir_postfix}",
+            srcs = [":{direct_namespace}{bazel_name}"],
+            output_group = "{package_directory_output_group}",
+            visibility = visibility,
+        )
 
-            native.alias(
-                name = "{namespace}{alias}",
-                actual = ":{namespace}{bazel_name}",
-                visibility = ["//visibility:public"],
-            )
+        native.alias(
+            name = name,
+            actual = ":{direct_namespace}{bazel_name}",
+            visibility = visibility,
+        )
 
-            native.alias(
-                name = "{namespace}{alias}{dir_postfix}",
-                actual = ":{namespace}{bazel_name}{dir_postfix}",
-                visibility = ["//visibility:public"],
-            )
+        native.alias(
+            name = "{{}}{dir_postfix}".format(name),
+            actual = ":{direct_namespace}{bazel_name}{dir_postfix}",
+            visibility = visibility,
+        )
 
     if fail_if_no_link and not is_root and not is_direct:
-        msg = "Nothing to link in bazel package '%s' for npm package npm package {package}@{version}. This is neither the root_path of this workspace nor a link_path of this package." % native.package_name()
+        msg = "Nothing to link in bazel package '%s' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package." % native.package_name()
         fail(msg)
 """
 
@@ -145,13 +153,13 @@ _BIN_MACRO_TMPL = """
 def {bin_name}(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{namespace}{bazel_name}{dir_postfix}",
+        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
         path = "{bin_path}",
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = ["@{link_workspace}//{link_package}:{namespace}{bazel_name}"],
+        data = ["@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}"],
     )
     _run_js_binary(
         name = name,
@@ -162,26 +170,26 @@ def {bin_name}(name, **kwargs):
 def {bin_name}_test(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{namespace}{bazel_name}{dir_postfix}",
+        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
         path = "{bin_path}",
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{namespace}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}"],
         **kwargs
     )
 
 def {bin_name}_binary(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{namespace}{bazel_name}{dir_postfix}",
+        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
         path = "{bin_path}",
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{namespace}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}"],
         **kwargs
     )
 """
@@ -267,16 +275,12 @@ def _impl(rctx):
     root_package_json_bzl = False
 
     if bins:
-        for link_path in rctx.attr.link_paths:
-            escaped_link_path = link_path.replace("../", "dot_dot/")
+        for link_package in rctx.attr.link_packages:
             bin_bzl = generated_by_lines + [
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
                 """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test")""",
                 """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
             ]
-            link_package = paths.normalize(paths.join(rctx.attr.root_path, link_path))
-            if link_package == ".":
-                link_package = ""
             for name in bins:
                 bin_bzl.append(
                     _BIN_MACRO_TMPL.format(
@@ -284,9 +288,9 @@ def _impl(rctx):
                         bin_name = _sanitize_bin_name(name),
                         bin_path = bins[name],
                         dir_postfix = pnpm_utils.dir_postfix,
-                        link_workspace = rctx.attr.link_workspace,
+                        direct_namespace = pnpm_utils.direct_link_target_namespace,
                         link_package = link_package,
-                        namespace = pnpm_utils.js_package_target_namespace,
+                        link_workspace = rctx.attr.link_workspace,
                     ),
                 )
 
@@ -296,13 +300,13 @@ def _impl(rctx):
             ]
             bin_bzl.append("bin = struct(%s)\n" % ",\n".join(bin_struct_fields))
 
-            if escaped_link_path == ".":
+            if link_package == "":
                 root_package_json_bzl = True
             else:
-                rctx.file(paths.normalize(paths.join(escaped_link_path, "BUILD.bazel")), "\n".join(generated_by_lines + [
+                rctx.file(paths.normalize(paths.join(link_package, "BUILD.bazel")), "\n".join(generated_by_lines + [
                     "exports_files(%s)" % starlark_codegen_utils.to_list_attr(["package_json.bzl"]),
                 ]))
-            rctx.file(paths.normalize(paths.join(escaped_link_path, "package_json.bzl")), "\n".join(bin_bzl))
+            rctx.file(paths.normalize(paths.join(link_package, "package_json.bzl")), "\n".join(bin_bzl))
 
     if rctx.attr.run_lifecycle_hooks:
         _inject_run_lifecycle_hooks(rctx, pkg_json_path)
@@ -338,9 +342,9 @@ def _impl_links(rctx):
     deps = []
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        ref_deps.append("{namespace}{bazel_name}__ref".format(
-            namespace = pnpm_utils.js_package_target_namespace,
+        ref_deps.append("{store_namespace}{bazel_name}__ref".format(
             bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+            store_namespace = pnpm_utils.store_link_target_namespace,
         ))
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
@@ -354,30 +358,28 @@ def _impl_links(rctx):
                     # special case for lifecycle transitive closure deps; do not depend on
                     # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
-                    lc_deps.append("{namespace}{bazel_name}__pkg_lite".format(
-                        namespace = pnpm_utils.js_package_target_namespace,
+                    lc_deps.append("{store_namespace}{bazel_name}__pkg_lite".format(
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                        store_namespace = pnpm_utils.store_link_target_namespace,
                     ))
                 else:
-                    lc_deps.append("{namespace}{bazel_name}__pkg".format(
-                        namespace = pnpm_utils.js_package_target_namespace,
+                    lc_deps.append("{store_namespace}{bazel_name}__pkg".format(
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                        store_namespace = pnpm_utils.store_link_target_namespace,
                     ))
-                deps.append("{namespace}{bazel_name}__pkg".format(
-                    namespace = pnpm_utils.js_package_target_namespace,
+                deps.append("{store_namespace}{bazel_name}__pkg".format(
                     bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
+                    store_namespace = pnpm_utils.store_link_target_namespace,
                 ))
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
-            lc_deps.append("{namespace}{bazel_name}{store_postfix}".format(
-                namespace = pnpm_utils.js_package_target_namespace,
+            lc_deps.append("{store_namespace}{bazel_name}".format(
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                store_postfix = pnpm_utils.store_postfix,
+                store_namespace = pnpm_utils.store_link_target_namespace,
             ))
-            deps.append("{namespace}{bazel_name}{store_postfix}".format(
-                namespace = pnpm_utils.js_package_target_namespace,
+            deps.append("{store_namespace}{bazel_name}".format(
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                store_postfix = pnpm_utils.store_postfix,
+                store_namespace = pnpm_utils.store_link_target_namespace,
             ))
 
     virtual_store_name = pnpm_utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
@@ -392,10 +394,11 @@ def _impl_links(rctx):
     js_package_target_lc = "@{}//:jsp".format(npm_import_sources_repo_name)
 
     link_js_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
-        alias = pnpm_utils.bazel_name(rctx.attr.package),
         bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version),
         deps = starlark_codegen_utils.to_list_attr(deps, 1),
         dir_postfix = pnpm_utils.dir_postfix,
+        direct_namespace = pnpm_utils.direct_link_target_namespace,
+        direct_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         js_package_target = js_package_target,
         js_package_target_lc = js_package_target_lc,
@@ -403,14 +406,13 @@ def _impl_links(rctx):
         lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_target_name = lifecycle_target_name,
         link_js_package_bzl = "@%s//:%s" % (rctx.name, _LINK_JS_PACKAGE_BZL_FILENAME),
-        link_paths = rctx.attr.link_paths,
-        namespace = pnpm_utils.js_package_target_namespace,
+        link_packages = rctx.attr.link_packages,
         package = rctx.attr.package,
         package_directory_output_group = pnpm_utils.package_directory_output_group,
         rctx_name = rctx.name,
         ref_deps = starlark_codegen_utils.to_list_attr(ref_deps, 1),
-        root_path = rctx.attr.root_path,
-        store_postfix = pnpm_utils.store_postfix,
+        root_package = rctx.attr.root_package,
+        store_namespace = pnpm_utils.store_link_target_namespace,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
         virtual_store_root = pnpm_utils.virtual_store_root,
@@ -425,8 +427,8 @@ def _impl_links(rctx):
 _COMMON_ATTRS = {
     "package": attr.string(mandatory = True),
     "version": attr.string(mandatory = True),
-    "root_path": attr.string(),
-    "link_paths": attr.string_list(),
+    "root_package": attr.string(),
+    "link_packages": attr.string_list(),
 }
 
 _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {

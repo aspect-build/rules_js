@@ -148,59 +148,35 @@ _NPM_IMPORT_TMPL = \
     """    npm_import(
         name = "{name}",
         integrity = "{integrity}",
-        root_path = "{root_path}",
+        root_package = "{root_package}",
         link_workspace = "{link_workspace}",
-        link_paths = {link_paths},
+        link_packages = {link_packages},
         package = "{package}",
         version = "{pnpm_version}",{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}
     )
 """
 
 _ALIAS_TMPL = \
-    """load("//:defs.bzl", _package = "package", _package_dir = "package_dir")
-
-alias(
+    """alias(
     name = "{basename}",
-    actual = _package("{name}", "{import_path}"),
+    actual = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}",
     visibility = ["//visibility:public"],
 )
 
 alias(
     name = "dir",
-    actual = _package_dir("{name}", "{import_path}"),
+    actual = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
     visibility = ["//visibility:public"],
 )"""
 
 _SCOPE_TMPL = \
-    """load("//:defs.bzl", _package = "package")
-load("@aspect_rules_js//js/private:linked_js_packages.bzl", "linked_js_packages")
+    """load("@aspect_rules_js//js/private:linked_js_packages.bzl", "linked_js_packages")
 
 linked_js_packages(
     name = "{scope}",
     srcs = {srcs},
     visibility = ["//visibility:public"],
 )"""
-
-_PACKAGE_TMPL = \
-    """
-def package(name, import_path = "."):
-    package_path = _paths.normalize(_paths.join("{root_path}", import_path))
-    if package_path == ".":
-        package_path = ""
-    return Label("@{workspace}//{{package_path}}:{namespace}{{bazel_name}}".format(
-        package_path = package_path,
-        bazel_name = _pnpm_utils.bazel_name(name),
-    ))
-
-def package_dir(name, import_path = "."):
-    package_path = _paths.normalize(_paths.join("{root_path}", import_path))
-    if package_path == ".":
-        package_path = ""
-    return Label("@{workspace}//{{package_path}}:{namespace}{{bazel_name}}{dir_postfix}".format(
-        package_path = package_path,
-        bazel_name = _pnpm_utils.bazel_name(name),
-    ))
-"""
 
 _BIN_TMPL = \
     """load("@{repo_name}//{repo_package_json_bzl}", _bin = "bin")
@@ -211,7 +187,7 @@ _FP_STORE_TMPL = \
     """
     if is_root:
          _link_js_package_store(
-            name = "{namespace}{bazel_name}{store_postfix}",
+            name = "{store_namespace}{bazel_name}",
             src = "{js_package_target}",
             package = "{package}",
             version = "0.0.0",
@@ -221,36 +197,33 @@ _FP_STORE_TMPL = \
 
 _FP_DIRECT_TMPL = \
     """
-    for link_path in {link_paths}:
-        link_package_path = _paths.normalize(_paths.join("{root_path}", link_path))
-        if link_package_path == ".":
-            link_package_path = ""
-        if link_package_path == native.package_name():
+    for link_package in {link_packages}:
+        if link_package == native.package_name():
             # terminal target for direct dependencies
             _link_js_package_direct(
-                name = "{namespace}{bazel_name}",
-                src = "//{root_path}:{namespace}{bazel_name}{store_postfix}",
+                name = "{direct_namespace}{bazel_name}",
+                src = "//{root_package}:{store_namespace}{bazel_name}",
                 visibility = ["//visibility:public"],
             )
 
             # filegroup target that provides a single file which is
             # package directory for use in $(execpath) and $(rootpath)
             native.filegroup(
-                name = "{namespace}{bazel_name}{dir_postfix}",
-                srcs = [":{namespace}{bazel_name}"],
+                name = "{direct_namespace}{bazel_name}{dir_postfix}",
+                srcs = [":{direct_namespace}{bazel_name}"],
                 output_group = "{package_directory_output_group}",
                 visibility = ["//visibility:public"],
             )
 
             native.alias(
-                name = "{namespace}{alias}",
-                actual = ":{namespace}{bazel_name}",
+                name = "{direct_namespace}{alias}",
+                actual = ":{direct_namespace}{bazel_name}",
                 visibility = ["//visibility:public"],
             )
 
             native.alias(
-                name = "{namespace}{alias}{dir_postfix}",
-                actual = ":{namespace}{bazel_name}{dir_postfix}",
+                name = "{direct_namespace}{alias}{dir_postfix}",
+                actual = ":{direct_namespace}{bazel_name}{dir_postfix}",
                 visibility = ["//visibility:public"],
             )"""
 
@@ -263,11 +236,13 @@ def _generated_by_lines(pnpm_lock_wksp, pnpm_lock):
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-def _fp_link_path(root_path, import_path, rel_path):
-    fp_link_path = paths.normalize(paths.join(root_path, import_path, rel_path))
-    if fp_link_path == ".":
-        fail("root bazel package first party dep not supported")
-    return fp_link_path
+def _link_package(root_package, import_path, rel_path = "."):
+    link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
+    if link_package.startswith("../"):
+        fail("Invalid link_package outside of the WORKSPACE: {}".format(link_package))
+    if link_package == ".":
+        link_package = ""
+    return link_package
 
 def _impl(rctx):
     if rctx.attr.prod and rctx.attr.dev:
@@ -276,7 +251,7 @@ def _impl(rctx):
     lockfile = _process_lockfile(rctx)
 
     # root path is the directory of the pnpm_lock file
-    root_path = rctx.attr.pnpm_lock.package
+    root_package = rctx.attr.pnpm_lock.package
 
     # don't allow a pnpm lock file that isn't in the root directory of a bazel package
     if paths.dirname(rctx.attr.pnpm_lock.name):
@@ -306,30 +281,29 @@ def _impl(rctx):
 
     defs_bzl_file = "defs.bzl"
     defs_bzl_header = generated_by_lines + [
-        """load("@aspect_rules_js//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")""",
         """load("@bazel_skylib//lib:paths.bzl", _paths = "paths")""",
     ]
     defs_bzl_body = [
         """# buildifier: disable=unnamed-macro
 def link_js_packages():
-    "Generated list of link_js_package() target generators and first party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}"
-    root_path = "{root_path}"
+    "Generated list of link_js_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}"
+    root_package = "{root_package}"
     importer_paths = {importer_paths}
-    is_root = native.package_name() == root_path
+    is_root = native.package_name() == root_package
     is_direct = False
     for import_path in importer_paths:
-        importer_package_path = _paths.normalize(_paths.join(root_path, import_path))
+        importer_package_path = _paths.normalize(_paths.join(root_package, import_path))
         if importer_package_path == ".":
             importer_package_path = ""
         if importer_package_path == native.package_name():
             is_direct = True
     if not is_root and not is_direct:
-        msg = "The link_js_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_path}' and packages corresponding to importer paths [{importer_paths_comma_separated}]" % native.package_name()
+        msg = "The link_js_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages corresponding to importer paths [{importer_paths_comma_separated}]" % native.package_name()
         fail(msg)
 """.format(
             pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
             pnpm_lock = str(rctx.attr.pnpm_lock),
-            root_path = root_path,
+            root_package = root_package,
             importer_paths = str(importer_paths),
             importer_paths_comma_separated = "'" + "', '".join(importer_paths) + "'" if len(importer_paths) else "",
             defs_bzl_file = "@{}//:{}".format(rctx.name, defs_bzl_file),
@@ -381,16 +355,17 @@ def link_js_packages():
 
         repo_name = "%s__%s" % (rctx.name, pnpm_utils.bazel_name(name, pnpm_version))
 
-        link_paths = []
+        link_packages = []
 
         for import_path, importer in importers.items():
             dependencies = importer.get("dependencies")
             if type(dependencies) != "dict":
                 fail("expected dict of dependencies in processed importer '%s'" % import_path)
+            link_package = _link_package(root_package, import_path)
             for dep_package, dep_version in dependencies.items():
                 if not dep_version.startswith("link:") and package == pnpm_utils.pnpm_name(dep_package, dep_version):
                     # this package is a direct dependency at this import path
-                    link_paths.append(import_path)
+                    link_packages.append(link_package)
 
         run_lifecycle_hooks = requires_build and rctx.attr.run_lifecycle_hooks and name not in rctx.attr.lifecycle_hooks_exclude and friendly_name not in rctx.attr.lifecycle_hooks_exclude
 
@@ -409,7 +384,7 @@ def link_js_packages():
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             integrity = integrity,
-            link_paths = link_paths,
+            link_packages = link_packages,
             link_workspace = rctx.attr.pnpm_lock.workspace_name,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
@@ -420,7 +395,7 @@ def link_js_packages():
             name = repo_name,
             package = name,
             pnpm_version = pnpm_version,
-            root_path = root_path,
+            root_package = root_package,
         ))
 
         defs_bzl_header.append(
@@ -430,25 +405,31 @@ def link_js_packages():
                 links_postfix = pnpm_utils.links_postfix,
             ),
         )
-        defs_bzl_body.append("    link_{i}(False)".format(i = i))
+        defs_bzl_body.append("""    link_{i}(name = "{direct_namespace}{bazel_name}", direct = None, fail_if_no_link = False)""".format(
+            i = i,
+            direct_namespace = pnpm_utils.direct_link_target_namespace,
+            bazel_name = pnpm_utils.bazel_name(name),
+        ))
 
         # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
         # @repo_name//name:dir and @repo_name//@scope/name:dir
-        for link_path in link_paths:
-            escaped_link_path = link_path.replace("../", "dot_dot/")
-            build_file_path = paths.normalize(paths.join(escaped_link_path, name, "BUILD.bazel"))
+        for link_package in link_packages:
+            build_file_path = paths.normalize(paths.join(link_package, name, "BUILD.bazel"))
             rctx.file(build_file_path, "\n".join(generated_by_lines + [
                 _ALIAS_TMPL.format(
                     basename = paths.basename(name),
-                    import_path = link_path,
-                    name = name,
+                    bazel_name = pnpm_utils.bazel_name(name),
+                    dir_postfix = pnpm_utils.dir_postfix,
+                    direct_namespace = pnpm_utils.direct_link_target_namespace,
+                    link_package = link_package,
+                    link_workspace = rctx.attr.pnpm_lock.workspace_name,
                 ),
             ]))
 
             # Generate a package_json.bzl file if there are bin entries
             if has_bin:
-                package_json_bzl_file_path = paths.normalize(paths.join(escaped_link_path, name, "package_json.bzl"))
-                repo_package_json_bzl = paths.normalize(paths.join(escaped_link_path, "package_json.bzl")).rsplit("/", 1)
+                package_json_bzl_file_path = paths.normalize(paths.join(link_package, name, "package_json.bzl"))
+                repo_package_json_bzl = paths.normalize(paths.join(link_package, "package_json.bzl")).rsplit("/", 1)
                 if len(repo_package_json_bzl) == 1:
                     repo_package_json_bzl = [""] + repo_package_json_bzl
                 repo_package_json_bzl = ":".join(repo_package_json_bzl)
@@ -463,25 +444,33 @@ def link_js_packages():
             # Gather scoped packages
             if len(name.split("/", 1)) > 1:
                 package_scope = name.split("/", 1)[0]
-                build_file_package = paths.normalize(paths.join(escaped_link_path, package_scope))
+                build_file_package = paths.normalize(paths.join(link_package, package_scope))
                 if build_file_package not in scoped_packages:
                     scoped_packages[build_file_package] = []
-                scoped_packages[build_file_package].append("""_package("{}", "{}")""".format(name, link_path))
+                scoped_packages[build_file_package].append(
+                    "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}".format(
+                        bazel_name = pnpm_utils.bazel_name(name),
+                        direct_namespace = pnpm_utils.direct_link_target_namespace,
+                        link_package = link_package,
+                        link_workspace = rctx.attr.pnpm_lock.workspace_name,
+                    ),
+                )
 
     fp_links = {}
 
-    # Look for first party links
+    # Look for first-party links
     for import_path, importer in importers.items():
         dependencies = importer.get("dependencies")
         if type(dependencies) != "dict":
             fail("expected dict of dependencies in processed importer '%s'" % import_path)
+        link_package = _link_package(root_package, import_path)
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("link:"):
-                dep_importer = _fp_link_path(".", import_path, dep_version[len("link:"):])
-                dep_path = _fp_link_path(root_path, import_path, dep_version[len("link:"):])
+                dep_importer = paths.normalize(paths.join(import_path, dep_version[len("link:"):]))
+                dep_path = _link_package(root_package, import_path, dep_version[len("link:"):])
                 dep_key = "{}+{}".format(dep_package, dep_path)
                 if dep_key in fp_links.keys():
-                    fp_links[dep_key]["link_paths"].append(import_path)
+                    fp_links[dep_key]["link_packages"].append(link_package)
                 else:
                     transitive_deps = []
                     raw_deps = {}
@@ -489,20 +478,19 @@ def link_js_packages():
                         raw_deps = importers.get(dep_importer).get("dependencies")
                     for raw_package, raw_version in raw_deps.items():
                         if raw_version.startswith("link:"):
-                            raw_path = _fp_link_path(root_path, dep_importer, raw_version[len("link:"):])
+                            raw_path = _link_package(root_package, dep_importer, raw_version[len("link:"):])
                             raw_bazel_name = pnpm_utils.bazel_name(raw_package, raw_path)
                         else:
                             raw_bazel_name = pnpm_utils.bazel_name(raw_package, raw_version)
-                        transitive_deps.append("//{root_path}:{namespace}{bazel_name}{store_postfix}".format(
-                            root_path = root_path,
-                            namespace = pnpm_utils.js_package_target_namespace,
+                        transitive_deps.append("//{root_package}:{store_namespace}{bazel_name}".format(
                             bazel_name = raw_bazel_name,
-                            store_postfix = pnpm_utils.store_postfix,
+                            root_package = root_package,
+                            store_namespace = pnpm_utils.store_link_target_namespace,
                         ))
                     fp_links[dep_key] = {
                         "package": dep_package,
                         "path": dep_path,
-                        "link_paths": [import_path],
+                        "link_packages": [link_package],
                         "deps": transitive_deps,
                     }
 
@@ -514,7 +502,7 @@ def link_js_packages():
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
         fp_path = fp_link.get("path")
-        fp_link_paths = fp_link.get("link_paths")
+        fp_link_packages = fp_link.get("link_packages")
         fp_deps = fp_link.get("deps")
         fp_bazel_name = pnpm_utils.bazel_name(fp_package, fp_path)
         fp_target = "//{}:{}".format(fp_path, paths.basename(fp_path))
@@ -522,62 +510,65 @@ def link_js_packages():
         defs_bzl_body.append(_FP_STORE_TMPL.format(
             bazel_name = fp_bazel_name,
             deps = starlark_codegen_utils.to_list_attr(fp_deps, 3),
+            direct_namespace = pnpm_utils.direct_link_target_namespace,
             js_package_target = fp_target,
-            namespace = pnpm_utils.js_package_target_namespace,
             package = fp_package,
-            store_postfix = pnpm_utils.store_postfix,
+            store_namespace = pnpm_utils.store_link_target_namespace,
         ))
 
         defs_bzl_body.append(_FP_DIRECT_TMPL.format(
             alias = pnpm_utils.bazel_name(fp_package),
             bazel_name = fp_bazel_name,
             dir_postfix = pnpm_utils.dir_postfix,
-            link_paths = fp_link_paths,
-            namespace = pnpm_utils.js_package_target_namespace,
+            direct_namespace = pnpm_utils.direct_link_target_namespace,
+            link_packages = fp_link_packages,
             package = fp_package,
             package_directory_output_group = pnpm_utils.package_directory_output_group,
-            root_path = root_path,
-            store_postfix = pnpm_utils.store_postfix,
+            root_package = root_package,
+            store_namespace = pnpm_utils.store_link_target_namespace,
         ))
 
         # Create alias targets @repo_name//name, @repo_name//@scope/name,
         # @repo_name//name:dir and @repo_name//@scope/name:dir
-        for link_path in fp_link_paths:
-            escaped_link_path = link_path.replace("../", "dot_dot/")
-            build_file_path = paths.normalize(paths.join(escaped_link_path, fp_package, "BUILD.bazel"))
+        for link_package in fp_link_packages:
+            build_file_path = paths.normalize(paths.join(link_package, fp_package, "BUILD.bazel"))
             rctx.file(build_file_path, "\n".join(generated_by_lines + [
                 _ALIAS_TMPL.format(
                     basename = paths.basename(fp_package),
-                    import_path = link_path,
-                    name = fp_package,
+                    bazel_name = pnpm_utils.bazel_name(fp_package),
+                    dir_postfix = pnpm_utils.dir_postfix,
+                    direct_namespace = pnpm_utils.direct_link_target_namespace,
+                    link_package = link_package,
+                    link_workspace = rctx.attr.pnpm_lock.workspace_name,
                 ),
             ]))
 
             # Gather scoped packages
             if len(fp_package.split("/", 1)) > 1:
                 package_scope = fp_package.split("/", 1)[0]
-                build_file_package = paths.normalize(paths.join(escaped_link_path, package_scope))
+                build_file_package = paths.normalize(paths.join(link_package, package_scope))
                 if build_file_package not in scoped_packages:
                     scoped_packages[build_file_package] = []
-                scoped_packages[build_file_package].append("""_package("{}", "{}")""".format(fp_package, link_path))
+                scoped_packages[build_file_package].append(
+                    "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}".format(
+                        bazel_name = pnpm_utils.bazel_name(fp_package),
+                        direct_namespace = pnpm_utils.direct_link_target_namespace,
+                        link_package = link_package,
+                        link_workspace = rctx.attr.pnpm_lock.workspace_name,
+                    ),
+                )
 
     # Generate scoped @npm//@scope targets
     for build_file_package, scope_packages in scoped_packages.items():
         rctx.file(paths.join(build_file_package, "BUILD.bazel"), "\n".join(generated_by_lines + [
             _SCOPE_TMPL.format(
                 scope = paths.basename(build_file_package),
-                srcs = starlark_codegen_utils.to_list_attr(scope_packages, 1, quote_value = False),
+                srcs = starlark_codegen_utils.to_list_attr(scope_packages, 1),
+                package_path = build_file_package,
             ),
         ]))
 
-    defs_bzl_body.append(_PACKAGE_TMPL.format(
-        dir_postfix = pnpm_utils.dir_postfix,
-        namespace = pnpm_utils.js_package_target_namespace,
-        root_path = root_path,
-        workspace = rctx.attr.pnpm_lock.workspace_name,
-    ))
-
-    rctx.file(defs_bzl_file, "\n".join(defs_bzl_header + [""] + defs_bzl_body))
+    rctx.file(defs_bzl_file, "\n".join(defs_bzl_header + [""] + defs_bzl_body + [""]))
     rctx.file("repositories.bzl", "\n".join(repositories_bzl))
     rctx.file("BUILD.bazel", """exports_files(["defs.bzl", "repositories.bzl"])""")
 

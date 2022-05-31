@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 importers:
 
@@ -10,21 +10,21 @@ importers:
       '@types/node': 16.11.36
       typescript: 4.7.2
 
-  examples:
+  examples/lib:
+    specifiers: {}
+
+  examples/lib:
+    specifiers: {}
+
+  examples/macro:
     specifiers:
-      '@aspect-test/a': 5.0.0
-      '@aspect-test/b': 5.0.0
-      '@aspect-test/c': 2.0.0
-      bufferutil: 4.0.1
-      esbuild: 0.14.38
-      webpack-bundle-analyzer: 4.5.0
+      mocha: ^10.0.0
+      mocha-junit-reporter: ^2.0.2
+      mocha-multi-reporters: ^1.5.1
     devDependencies:
-      '@aspect-test/a': 5.0.0
-      '@aspect-test/b': 5.0.0
-      '@aspect-test/c': 2.0.0
-      bufferutil: 4.0.1
-      esbuild: 0.14.38
-      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
+      mocha: 10.0.0_mocha-multi-reporters@1.5.1
+      mocha-junit-reporter: 2.0.2_mocha@10.0.0
+      mocha-multi-reporters: 1.5.1_mocha@10.0.0
 
   examples/lib:
     specifiers: {}
@@ -41,6 +41,8 @@ importers:
 
   examples/npm_deps:
     specifiers:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/c': 2.0.0
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0
       mobx: 6.3.0
@@ -49,6 +51,8 @@ importers:
       rollup: 2.70.2
       uvu: 0.5.3
     devDependencies:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/c': 2.0.0
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       mobx: 6.3.0
@@ -56,6 +60,16 @@ importers:
       react: 17.0.2
       rollup: 2.70.2
       uvu: 0.5.3
+
+  js/private/test:
+    specifiers:
+      bufferutil: 4.0.1
+      esbuild: 0.14.38
+      webpack-bundle-analyzer: 4.5.0
+    devDependencies:
+      bufferutil: 4.0.1
+      esbuild: 0.14.38
+      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
 packages:
 
