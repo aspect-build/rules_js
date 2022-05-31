@@ -8,10 +8,10 @@ load("//js:run_js_binary.bzl", "run_js_binary")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
 # a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_acorn(name = "acorn_link")
+link_acorn(name = "link_acorn")
 
 # Link @mycorp/mylib as a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_js_package(name = "mycorp_mylib_link")
+link_js_package(name = "link_mycorp_mylib")
 
 ####################################################
 # Test case 4
@@ -20,7 +20,7 @@ link_js_package(name = "mycorp_mylib_link")
 
 js_binary(
     name = "bin",
-    data = [":acorn_link"],
+    data = [":link_acorn"],
     entry_point = "require_acorn.js",
 )
 
@@ -63,7 +63,7 @@ write_file(
 
 js_binary(
     name = "bin6",
-    data = [":mycorp_mylib_link"],
+    data = [":link_mycorp_mylib"],
     entry_point = "case6.js",
 )
 
@@ -274,7 +274,7 @@ run_js_binary(
 
 directory_path(
     name = "acorn_entry_point",
-    directory = ":acorn_link__dir",
+    directory = ":link_acorn__dir",
     path = "bin/acorn",
 )
 

@@ -317,7 +317,7 @@ def link_js_package_dep(
 
     # Link a first party `@lib/foo` defined by the `js_package` `//lib/foo:foo` target.
     link_js_package(
-        name = "lib_foo_link",
+        name = "link_lib_foo",
         src = "//lib/foo",
     )
 
@@ -325,10 +325,10 @@ def link_js_package_dep(
     # that depends on `@lib/foo` and on `acorn` specified in `package.json` and fetched
     # with `translate_pnpm_lock`
     link_js_package(
-        name = "lib_bar_link",
+        name = "link_lib_bar",
         src = "//lib/bar",
         deps = [
-            link_js_package_dep("lib_foo_link"),
+            link_js_package_dep("link_lib_foo"),
             link_js_package_dep("acorn", version = "8.4.0"),
         ],
     )
