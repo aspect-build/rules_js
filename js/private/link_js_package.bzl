@@ -354,10 +354,10 @@ def link_js_package_dep(
     Returns:
         The label of the direct link for the given package at the given link package,
     """
-    return Label("//{root_package}:{store_namespace}{bazel_name}".format(
+    return Label("//{root_package}:{store_link_prefix}{bazel_name}".format(
         bazel_name = pnpm_utils.bazel_name(name, version),
         root_package = root_package,
-        store_namespace = pnpm_utils.store_link_prefix,
+        store_link_prefix = pnpm_utils.store_link_prefix,
     ))
 
 def link_js_package(
@@ -410,20 +410,20 @@ def link_js_package(
         msg = "src may only be specified when linking in the root package '{}'".format(root_package)
         fail(msg)
 
-    link_target_name = "{direct_namespace}{bazel_name}".format(
+    link_target_name = "{direct_link_prefix}{bazel_name}".format(
         bazel_name = pnpm_utils.bazel_name(name),
-        direct_namespace = pnpm_utils.direct_link_prefix,
+        direct_link_prefix = pnpm_utils.direct_link_prefix,
     )
 
-    dir_target_name = "{direct_namespace}{bazel_name}{dir_suffix}".format(
+    dir_target_name = "{direct_link_prefix}{bazel_name}{dir_suffix}".format(
         bazel_name = pnpm_utils.bazel_name(name),
         dir_suffix = pnpm_utils.dir_suffix,
-        direct_namespace = pnpm_utils.direct_link_prefix,
+        direct_link_prefix = pnpm_utils.direct_link_prefix,
     )
 
-    store_target_name = "{store_namespace}{bazel_name}".format(
+    store_target_name = "{store_link_prefix}{bazel_name}".format(
         bazel_name = pnpm_utils.bazel_name(name),
-        store_namespace = pnpm_utils.store_link_prefix,
+        store_link_prefix = pnpm_utils.store_link_prefix,
     )
 
     if is_root:
