@@ -357,7 +357,7 @@ def link_js_package_dep(
     return Label("//{root_package}:{store_namespace}{bazel_name}".format(
         bazel_name = pnpm_utils.bazel_name(name, version),
         root_package = root_package,
-        store_namespace = pnpm_utils.store_link_target_namespace,
+        store_namespace = pnpm_utils.store_link_prefix,
     ))
 
 def link_js_package(
@@ -412,18 +412,18 @@ def link_js_package(
 
     link_target_name = "{direct_namespace}{bazel_name}".format(
         bazel_name = pnpm_utils.bazel_name(name),
-        direct_namespace = pnpm_utils.direct_link_target_namespace,
+        direct_namespace = pnpm_utils.direct_link_prefix,
     )
 
-    dir_target_name = "{direct_namespace}{bazel_name}{dir_postfix}".format(
+    dir_target_name = "{direct_namespace}{bazel_name}{dir_suffix}".format(
         bazel_name = pnpm_utils.bazel_name(name),
-        dir_postfix = pnpm_utils.dir_postfix,
-        direct_namespace = pnpm_utils.direct_link_target_namespace,
+        dir_suffix = pnpm_utils.dir_suffix,
+        direct_namespace = pnpm_utils.direct_link_prefix,
     )
 
     store_target_name = "{store_namespace}{bazel_name}".format(
         bazel_name = pnpm_utils.bazel_name(name),
-        store_namespace = pnpm_utils.store_link_target_namespace,
+        store_namespace = pnpm_utils.store_link_prefix,
     )
 
     if is_root:
@@ -465,7 +465,7 @@ def link_js_package(
         )
 
         native.alias(
-            name = "{}{}".format(name, pnpm_utils.dir_postfix),
+            name = "{}{}".format(name, pnpm_utils.dir_suffix),
             actual = ":{}".format(dir_target_name),
             visibility = visibility,
         )

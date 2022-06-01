@@ -3,8 +3,8 @@ load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
-load("//js:defs.bzl", "js_binary", "js_test", "link_js_package")
-load("//js:run_js_binary.bzl", "run_js_binary")
+load("@aspect_rules_js//js:defs.bzl", "constants", "js_binary", "js_test", "link_js_package")
+load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
 # a direct dependency in bazel-bin/examples/js_binary/node_modules
@@ -274,7 +274,7 @@ run_js_binary(
 
 directory_path(
     name = "acorn_entry_point",
-    directory = ":link_acorn__dir",
+    directory = ":link_acorn{}".format(constants.dir_suffix),
     path = "bin/acorn",
 )
 

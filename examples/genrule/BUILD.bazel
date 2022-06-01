@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_rules_js//js:defs.bzl", "constants")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_js_package")
@@ -62,15 +63,17 @@ genrule(
     srcs = [
         ":one.js",
         ":link_acorn",
-        ":link_acorn__dir",
+        ":link_acorn{}".format(constants.dir_suffix),
     ],
     outs = ["actual2"],
-    cmd = """
-        $(NODE_PATH) \\
-        ./$(execpath :link_acorn__dir)/bin/acorn \\
-        --compact \\
-        $(execpath :one.js) \\
-        > $@""",
+    cmd = " ".join([
+        "$(NODE_PATH)",
+        "./$(execpath :link_acorn{})/bin/acorn".format(constants.dir_suffix),
+        "--compact",
+        "$(execpath :one.js)",
+        # $@ is bazel shorthand for the path of the output file
+        ">$@",
+    ]),
     toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
     tools = ["@nodejs_toolchains//:resolved_toolchain"],
 )

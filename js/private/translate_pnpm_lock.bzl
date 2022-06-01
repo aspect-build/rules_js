@@ -165,7 +165,7 @@ _ALIAS_TMPL = \
 
 alias(
     name = "dir",
-    actual = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
+    actual = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_suffix}",
     visibility = ["//visibility:public"],
 )"""
 
@@ -209,7 +209,7 @@ _FP_DIRECT_TMPL = \
             # filegroup target that provides a single file which is
             # package directory for use in $(execpath) and $(rootpath)
             native.filegroup(
-                name = "{direct_namespace}{bazel_name}{dir_postfix}",
+                name = "{direct_namespace}{bazel_name}{dir_suffix}",
                 srcs = [":{direct_namespace}{bazel_name}"],
                 output_group = "{package_directory_output_group}",
                 visibility = ["//visibility:public"],
@@ -222,8 +222,8 @@ _FP_DIRECT_TMPL = \
             )
 
             native.alias(
-                name = "{direct_namespace}{alias}{dir_postfix}",
-                actual = ":{direct_namespace}{bazel_name}{dir_postfix}",
+                name = "{direct_namespace}{alias}{dir_suffix}",
+                actual = ":{direct_namespace}{bazel_name}{dir_suffix}",
                 visibility = ["//visibility:public"],
             )"""
 
@@ -399,15 +399,15 @@ def link_js_packages():
         ))
 
         defs_bzl_header.append(
-            """load("@{repo_name}{links_postfix}//:defs.bzl", link_{i} = "link_js_package")""".format(
+            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_js_package")""".format(
                 i = i,
                 repo_name = repo_name,
-                links_postfix = pnpm_utils.links_postfix,
+                links_suffix = pnpm_utils.links_suffix,
             ),
         )
         defs_bzl_body.append("""    link_{i}(name = "{direct_namespace}{bazel_name}", direct = None, fail_if_no_link = False)""".format(
             i = i,
-            direct_namespace = pnpm_utils.direct_link_target_namespace,
+            direct_namespace = pnpm_utils.direct_link_prefix,
             bazel_name = pnpm_utils.bazel_name(name),
         ))
 
@@ -419,8 +419,8 @@ def link_js_packages():
                 _ALIAS_TMPL.format(
                     basename = paths.basename(name),
                     bazel_name = pnpm_utils.bazel_name(name),
-                    dir_postfix = pnpm_utils.dir_postfix,
-                    direct_namespace = pnpm_utils.direct_link_target_namespace,
+                    dir_suffix = pnpm_utils.dir_suffix,
+                    direct_namespace = pnpm_utils.direct_link_prefix,
                     link_package = link_package,
                     link_workspace = rctx.attr.pnpm_lock.workspace_name,
                 ),
@@ -450,7 +450,7 @@ def link_js_packages():
                 scoped_packages[build_file_package].append(
                     "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}".format(
                         bazel_name = pnpm_utils.bazel_name(name),
-                        direct_namespace = pnpm_utils.direct_link_target_namespace,
+                        direct_namespace = pnpm_utils.direct_link_prefix,
                         link_package = link_package,
                         link_workspace = rctx.attr.pnpm_lock.workspace_name,
                     ),
@@ -485,7 +485,7 @@ def link_js_packages():
                         transitive_deps.append("//{root_package}:{store_namespace}{bazel_name}".format(
                             bazel_name = raw_bazel_name,
                             root_package = root_package,
-                            store_namespace = pnpm_utils.store_link_target_namespace,
+                            store_namespace = pnpm_utils.store_link_prefix,
                         ))
                     fp_links[dep_key] = {
                         "package": dep_package,
@@ -510,22 +510,22 @@ def link_js_packages():
         defs_bzl_body.append(_FP_STORE_TMPL.format(
             bazel_name = fp_bazel_name,
             deps = starlark_codegen_utils.to_list_attr(fp_deps, 3),
-            direct_namespace = pnpm_utils.direct_link_target_namespace,
+            direct_namespace = pnpm_utils.direct_link_prefix,
             js_package_target = fp_target,
             package = fp_package,
-            store_namespace = pnpm_utils.store_link_target_namespace,
+            store_namespace = pnpm_utils.store_link_prefix,
         ))
 
         defs_bzl_body.append(_FP_DIRECT_TMPL.format(
             alias = pnpm_utils.bazel_name(fp_package),
             bazel_name = fp_bazel_name,
-            dir_postfix = pnpm_utils.dir_postfix,
-            direct_namespace = pnpm_utils.direct_link_target_namespace,
+            dir_suffix = pnpm_utils.dir_suffix,
+            direct_namespace = pnpm_utils.direct_link_prefix,
             link_packages = fp_link_packages,
             package = fp_package,
             package_directory_output_group = pnpm_utils.package_directory_output_group,
             root_package = root_package,
-            store_namespace = pnpm_utils.store_link_target_namespace,
+            store_namespace = pnpm_utils.store_link_prefix,
         ))
 
         # Create alias targets @repo_name//name, @repo_name//@scope/name,
@@ -536,8 +536,8 @@ def link_js_packages():
                 _ALIAS_TMPL.format(
                     basename = paths.basename(fp_package),
                     bazel_name = pnpm_utils.bazel_name(fp_package),
-                    dir_postfix = pnpm_utils.dir_postfix,
-                    direct_namespace = pnpm_utils.direct_link_target_namespace,
+                    dir_suffix = pnpm_utils.dir_suffix,
+                    direct_namespace = pnpm_utils.direct_link_prefix,
                     link_package = link_package,
                     link_workspace = rctx.attr.pnpm_lock.workspace_name,
                 ),
@@ -552,7 +552,7 @@ def link_js_packages():
                 scoped_packages[build_file_package].append(
                     "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}".format(
                         bazel_name = pnpm_utils.bazel_name(fp_package),
-                        direct_namespace = pnpm_utils.direct_link_target_namespace,
+                        direct_namespace = pnpm_utils.direct_link_prefix,
                         link_package = link_package,
                         link_workspace = rctx.attr.pnpm_lock.workspace_name,
                     ),
