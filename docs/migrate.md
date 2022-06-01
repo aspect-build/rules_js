@@ -8,6 +8,13 @@ We follow [Bazel's LTS policy](https://bazel.build/release/versioning).
 
 `rules_js` and the related rules depend on APIs that were introduced in Bazel 5.0.
 
+## Upgrade to rules_nodejs 5.0 or greater
+
+As explained in the [README](/README.md), rules_js depends on rules_nodejs.
+We need at least version 5.0.
+
+This also requires you upgrade `build_bazel_rules_nodejs` to 5.0, along with `@bazel`-scoped npm packages like `@bazel/typescript`.
+
 ## Install pnpm (optional)
 
 `rules_js` is based on the pnpm package manager.
@@ -68,38 +75,6 @@ This macro will expand to a rule for each npm package, which creates part of the
 The `WORKSPACE` file contains Bazel module dependency fetching and installation.
 
 Add install steps from a release of rules_js, along with related rulesets you plan to use.
-
-When you're ready to complete the migration, remove usage of the following:
-
-- `build_bazel_rules_nodejs`
-
-You'll need to remove `build_bazel_rules_nodejs` load() statements from BUILD files as well.
-We suggest using https://docs.aspect.build/ to locate replacements for the rules you use.
-
-## Update package.json
-
-When you're ready to complete the migration, remove usage of the following npm packages which contain Bazel rules, as they don't work with `rules_js`.
-Instead, look under https://github.com/aspect-build/ for replacement rulesets.
-
-- `@bazel/typescript`
-- `@bazel/rollup`
-- `@bazel/esbuild`
-- `@bazel/create`
-- `@bazel/cypress`
-- `@bazel/concatjs`
-- `@bazel/jasmine`
-- `@bazel/karma`
-- `@bazel/terser`
-
-Some `@bazel`-scoped packages are still fine, as they're tools or JS libraries rather than Bazel rules:
-
-- `@bazel/bazelisk`
-- `@bazel/buildozer`
-- `@bazel/buildifier`
-- `@bazel/ibazel` (watch mode)
-- `@bazel/runfiles`
-
-In addition, rules_js and associated rulesets can manage dependencies for tools they run. For example, rules_esbuild downloads its own esbuild packages. So you can remove these tools from package.json if you intend to run them only under Bazel.
 
 ## Account for change to working directory
 
@@ -163,3 +138,37 @@ bin.npm_check(
 )
 
 ```
+
+## Completing the migration
+
+Once everything is migrated, we can remove the legacy rules.
+
+In `package.json` you can remove usage of the following npm packages which contain Bazel rules, as they don't work with `rules_js`.
+Instead, look under https://github.com/aspect-build/ for replacement rulesets.
+
+- `@bazel/typescript`
+- `@bazel/rollup`
+- `@bazel/esbuild`
+- `@bazel/create`
+- `@bazel/cypress`
+- `@bazel/concatjs`
+- `@bazel/jasmine`
+- `@bazel/karma`
+- `@bazel/terser`
+
+Some `@bazel`-scoped packages are still fine, as they're tools or JS libraries rather than Bazel rules:
+
+- `@bazel/bazelisk`
+- `@bazel/buildozer`
+- `@bazel/buildifier`
+- `@bazel/ibazel` (watch mode)
+- `@bazel/runfiles`
+
+In addition, rules_js and associated rulesets can manage dependencies for tools they run. For example, rules_esbuild downloads its own esbuild packages. So you can remove these tools from package.json if you intend to run them only under Bazel.
+
+In `WORKSPACE` you can remove declaration of the following bazel modules:
+
+- `build_bazel_rules_nodejs`
+
+You'll need to remove `build_bazel_rules_nodejs` load() statements from BUILD files as well.
+We suggest using https://docs.aspect.build/ to locate replacements for the rules you use.
