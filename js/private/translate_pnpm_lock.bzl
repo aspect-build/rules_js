@@ -248,26 +248,105 @@ def _link_package(root_package, import_path, rel_path = "."):
         link_package = ""
     return link_package
 
-def _impl(rctx):
-    if rctx.attr.prod and rctx.attr.dev:
+def _gen_npm_imports(lockfile, attr):
+    "Converts packages from the lockfile to a struct of attributes for npm_import"
+
+    if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
 
-    lockfile = _process_lockfile(rctx)
-
-    # root path is the directory of the pnpm_lock file
-    root_package = rctx.attr.pnpm_lock.package
+    # root package is the directory of the pnpm_lock file
+    root_package = attr.pnpm_lock.package
 
     # don't allow a pnpm lock file that isn't in the root directory of a bazel package
-    if paths.dirname(rctx.attr.pnpm_lock.name):
+    if paths.dirname(attr.pnpm_lock.name):
         fail("pnpm-lock.yaml file must be at the root of a bazel package")
-
-    importers = lockfile.get("importers")
-    if not importers:
-        fail("expected importers in processed lockfile")
 
     packages = lockfile.get("packages")
     if not packages:
         fail("expected packages in processed lockfile")
+
+    result = []
+    for (i, v) in enumerate(packages.items()):
+        (package, package_info) = v
+        name = package_info.get("name")
+        pnpm_version = package_info.get("pnpmVersion")
+        deps = package_info.get("dependencies")
+        optional_deps = package_info.get("optionalDependencies")
+        dev = package_info.get("dev")
+        optional = package_info.get("optional")
+        requires_build = package_info.get("requiresBuild")
+        integrity = package_info.get("integrity")
+        transitive_closure = package_info.get("transitiveClosure")
+
+        if attr.prod and dev:
+            # when prod attribute is set, skip devDependencies
+            continue
+        if attr.dev and not dev:
+            # when dev attribute is set, skip (non-dev) dependencies
+            continue
+        if attr.no_optional and optional:
+            # when no_optional attribute is set, skip optionalDependencies
+            continue
+
+        if not attr.no_optional:
+            deps = dicts.add(optional_deps, deps)
+
+        friendly_name = pnpm_utils.friendly_name(name, pnpm_utils.strip_peer_dep_version(pnpm_version))
+
+        patches = attr.patches.get(name, [])[:]
+        patches.extend(attr.patches.get(friendly_name, []))
+
+        patch_args = attr.patch_args.get(name, [])[:]
+        patch_args.extend(attr.patch_args.get(friendly_name, []))
+
+        custom_postinstall = attr.custom_postinstalls.get(name)
+        if not custom_postinstall:
+            custom_postinstall = attr.custom_postinstalls.get(friendly_name)
+        elif attr.custom_postinstalls.get(friendly_name):
+            custom_postinstall = "%s && %s" % (custom_postinstall, attr.custom_postinstalls.get(friendly_name))
+
+        repo_name = "%s__%s" % (attr.name, pnpm_utils.bazel_name(name, pnpm_version))
+
+        link_packages = []
+
+        for import_path, importer in lockfile.get("importers").items():
+            dependencies = importer.get("dependencies")
+            if type(dependencies) != "dict":
+                fail("expected dict of dependencies in processed importer '%s'" % import_path)
+            link_package = _link_package(root_package, import_path)
+            for dep_package, dep_version in dependencies.items():
+                if not dep_version.startswith("link:") and package == pnpm_utils.pnpm_name(dep_package, dep_version):
+                    # this package is a direct dependency at this import path
+                    link_packages.append(link_package)
+
+        run_lifecycle_hooks = (
+            requires_build and
+            attr.run_lifecycle_hooks and
+            name not in attr.lifecycle_hooks_exclude and
+            friendly_name not in attr.lifecycle_hooks_exclude
+        )
+
+        result.append(struct(
+            custom_postinstall = custom_postinstall,
+            deps = deps,
+            integrity = integrity,
+            link_packages = link_packages,
+            name = repo_name,
+            package = name,
+            patch_args = patch_args,
+            patches = patches,
+            pnpm_version = pnpm_version,
+            root_package = root_package,
+            run_lifecycle_hooks = run_lifecycle_hooks,
+            transitive_closure = transitive_closure,
+        ))
+    return result
+
+def _impl(rctx):
+    lockfile = _process_lockfile(rctx)
+
+    # root package is the directory of the pnpm_lock file
+    root_package = rctx.attr.pnpm_lock.package
 
     generated_by_lines = _generated_by_lines(rctx.attr.pnpm_lock.workspace_name, rctx.attr.pnpm_lock)
 
@@ -280,6 +359,10 @@ def _impl(rctx):
             pnpm_lock = str(rctx.attr.pnpm_lock),
         ),
     ]
+
+    importers = lockfile.get("importers")
+    if not importers:
+        fail("expected importers in processed lockfile")
 
     importer_paths = importers.keys()
 
@@ -313,78 +396,23 @@ def link_js_packages():
     # map of @scope to [packages] for //@scope:@scope targets
     scoped_packages = {}
 
-    for (i, v) in enumerate(packages.items()):
-        (package, package_info) = v
-        name = package_info.get("name")
-        pnpm_version = package_info.get("pnpmVersion")
-        deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optionalDependencies")
-        dev = package_info.get("dev")
-        optional = package_info.get("optional")
-        has_bin = package_info.get("hasBin")
-        requires_build = package_info.get("requiresBuild")
-        integrity = package_info.get("integrity")
-        transitive_closure = package_info.get("transitiveClosure")
-
-        if rctx.attr.prod and dev:
-            # when prod attribute is set, skip devDependencies
-            continue
-        if rctx.attr.dev and not dev:
-            # when dev attribute is set, skip (non-dev) dependencies
-            continue
-        if rctx.attr.no_optional and optional:
-            # when no_optional attribute is set, skip optionalDependencies
-            continue
-
-        if not rctx.attr.no_optional:
-            deps = dicts.add(optional_deps, deps)
-
-        friendly_name = pnpm_utils.friendly_name(name, pnpm_utils.strip_peer_dep_version(pnpm_version))
-
-        patches = rctx.attr.patches.get(name, [])[:]
-        patches.extend(rctx.attr.patches.get(friendly_name, []))
-
-        patch_args = rctx.attr.patch_args.get(name, [])[:]
-        patch_args.extend(rctx.attr.patch_args.get(friendly_name, []))
-
-        custom_postinstall = rctx.attr.custom_postinstalls.get(name)
-        if not custom_postinstall:
-            custom_postinstall = rctx.attr.custom_postinstalls.get(friendly_name)
-        elif rctx.attr.custom_postinstalls.get(friendly_name):
-            custom_postinstall = "%s && %s" % (custom_postinstall, rctx.attr.custom_postinstalls.get(friendly_name))
-
-        repo_name = "%s__%s" % (rctx.name, pnpm_utils.bazel_name(name, pnpm_version))
-
-        link_packages = []
-
-        for import_path, importer in importers.items():
-            dependencies = importer.get("dependencies")
-            if type(dependencies) != "dict":
-                fail("expected dict of dependencies in processed importer '%s'" % import_path)
-            link_package = _link_package(root_package, import_path)
-            for dep_package, dep_version in dependencies.items():
-                if not dep_version.startswith("link:") and package == pnpm_utils.pnpm_name(dep_package, dep_version):
-                    # this package is a direct dependency at this import path
-                    link_packages.append(link_package)
-
-        run_lifecycle_hooks = requires_build and rctx.attr.run_lifecycle_hooks and name not in rctx.attr.lifecycle_hooks_exclude and friendly_name not in rctx.attr.lifecycle_hooks_exclude
-
+    for (i, _import) in enumerate(_gen_npm_imports(lockfile, rctx.attr)):
         maybe_deps = ("""
-        deps = %s,""" % starlark_codegen_utils.to_dict_attr(deps, 2)) if len(deps) > 0 else ""
+        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
         maybe_transitive_closure = ("""
-        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(transitive_closure, 2)) if len(transitive_closure) > 0 else ""
+        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
         maybe_patches = ("""
-        patches = %s,""" % patches) if len(patches) > 0 else ""
+        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
         maybe_patch_args = ("""
-        patch_args = %s,""" % patch_args) if len(patches) > 0 and len(patch_args) > 0 else ""
+        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
         maybe_custom_postinstall = ("""
-        custom_postinstall = \"%s\",""" % custom_postinstall) if custom_postinstall else ""
+        custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
         maybe_run_lifecycle_hooks = ("""
-        run_lifecycle_hooks = True,""") if run_lifecycle_hooks else ""
+        run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
-            integrity = integrity,
-            link_packages = link_packages,
+            integrity = _import.integrity,
+            link_packages = _import.link_packages,
             link_workspace = rctx.attr.pnpm_lock.workspace_name,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
@@ -392,33 +420,33 @@ def link_js_packages():
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
             maybe_transitive_closure = maybe_transitive_closure,
-            name = repo_name,
-            package = name,
-            pnpm_version = pnpm_version,
-            root_package = root_package,
+            name = _import.name,
+            package = _import.package,
+            pnpm_version = _import.pnpm_version,
+            root_package = _import.root_package,
         ))
 
         defs_bzl_header.append(
             """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_js_package")""".format(
                 i = i,
-                repo_name = repo_name,
+                repo_name = _import.name,
                 links_suffix = pnpm_utils.links_suffix,
             ),
         )
         defs_bzl_body.append("""    link_{i}(name = "{direct_namespace}{bazel_name}", direct = None, fail_if_no_link = False)""".format(
             i = i,
             direct_namespace = pnpm_utils.direct_link_prefix,
-            bazel_name = pnpm_utils.bazel_name(name),
+            bazel_name = pnpm_utils.bazel_name(_import.package),
         ))
 
         # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
         # @repo_name//name:dir and @repo_name//@scope/name:dir
-        for link_package in link_packages:
-            build_file_path = paths.normalize(paths.join(link_package, name, "BUILD.bazel"))
+        for link_package in _import.link_packages:
+            build_file_path = paths.normalize(paths.join(link_package, _import.package, "BUILD.bazel"))
             rctx.file(build_file_path, "\n".join(generated_by_lines + [
                 _ALIAS_TMPL.format(
-                    basename = paths.basename(name),
-                    bazel_name = pnpm_utils.bazel_name(name),
+                    basename = paths.basename(_import.package),
+                    bazel_name = pnpm_utils.bazel_name(_import.package),
                     dir_suffix = pnpm_utils.dir_suffix,
                     direct_namespace = pnpm_utils.direct_link_prefix,
                     link_package = link_package,
@@ -426,9 +454,13 @@ def link_js_packages():
                 ),
             ]))
 
-            # Generate a package_json.bzl file if there are bin entries
-            if has_bin:
-                package_json_bzl_file_path = paths.normalize(paths.join(link_package, name, _PACKAGE_JSON_BZL_FILENAME))
+            # Generate a package_json.bzl file for the bin entries (even if there are none)
+            # Note, there's no has_bin attribute on npm_import so we can't get the boolean
+            # value from the _import struct.
+            # If this is a problem, we could lookup into the packages again like
+            # if lockfile.get("packages").values()[i].get("hasBin"):
+            if True:
+                package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
                 repo_package_json_bzl = paths.normalize(paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)).rsplit("/", 1)
                 if len(repo_package_json_bzl) == 1:
                     repo_package_json_bzl = [""] + repo_package_json_bzl
@@ -436,20 +468,20 @@ def link_js_packages():
                 rctx.file(package_json_bzl_file_path, "\n".join([
                     _BIN_TMPL.format(
                         repo_package_json_bzl = repo_package_json_bzl,
-                        name = name,
-                        repo_name = repo_name,
+                        name = _import.package,
+                        repo_name = _import.name,
                     ),
                 ]))
 
             # Gather scoped packages
-            if len(name.split("/", 1)) > 1:
-                package_scope = name.split("/", 1)[0]
+            if len(_import.package.split("/", 1)) > 1:
+                package_scope = _import.package.split("/", 1)[0]
                 build_file_package = paths.normalize(paths.join(link_package, package_scope))
                 if build_file_package not in scoped_packages:
                     scoped_packages[build_file_package] = []
                 scoped_packages[build_file_package].append(
                     "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}".format(
-                        bazel_name = pnpm_utils.bazel_name(name),
+                        bazel_name = pnpm_utils.bazel_name(_import.package),
                         direct_namespace = pnpm_utils.direct_link_prefix,
                         link_package = link_package,
                         link_workspace = rctx.attr.pnpm_lock.workspace_name,
