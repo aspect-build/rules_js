@@ -175,10 +175,7 @@ def link_js_packages():
     root_package = ""
     link_packages = ["", "examples/lib", "examples/macro", "examples/npm_deps", "js/private/test"]
     is_root = native.package_name() == root_package
-    is_direct = False
-    for link_package in link_packages:
-        if link_package == native.package_name():
-            is_direct = True
+    is_direct = native.package_name() in link_packages
     if not is_root and not is_direct:
         msg = "The link_js_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages ['', 'examples/lib', 'examples/macro', 'examples/npm_deps', 'js/private/test']" % native.package_name()
         fail(msg)
