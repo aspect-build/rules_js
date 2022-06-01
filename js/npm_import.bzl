@@ -161,10 +161,10 @@ def npm_import(
         run_lifecycle_hooks = run_lifecycle_hooks,
     )
 
-    # By convention, the `{name}{pnpm_utils.links_postfix}` repository contains the generated
+    # By convention, the `{name}{pnpm_utils.links_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
     _npm_import_links(
-        name = "{}{}".format(name, _pnpm_utils.links_postfix),
+        name = "{}{}".format(name, _pnpm_utils.links_suffix),
         package = package,
         version = version,
         root_package = root_package,

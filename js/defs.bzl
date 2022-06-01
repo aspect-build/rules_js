@@ -17,6 +17,10 @@ load(
     _link_js_package = "link_js_package",
     _link_js_package_dep = "link_js_package_dep",
 )
+load(
+    "//js/private:pnpm_utils.bzl",
+    _pnpm_utils = "pnpm_utils",
+)
 
 def js_binary(**kwargs):
     _js_binary(
@@ -45,3 +49,19 @@ link_js_package_dep = _link_js_package_dep
 # export the starlark libraries as a public API
 js_binary_lib = _js_binary_lib
 js_package_lib = _js_package_lib
+
+# export constants since users might not always have syntax sugar
+constants = struct(
+    # Prefix for link_js_package_direct links
+    direct_link_prefix = _pnpm_utils.direct_link_prefix,
+    # Prefix for link_js_package_store links
+    store_link_prefix = _pnpm_utils.store_link_prefix,
+    # Suffix for package directory filegroup and alias targets
+    dir_suffix = _pnpm_utils.dir_suffix,
+)
+
+# export utils since users might not always have syntax sugar
+utils = struct(
+    # Prefix for link_js_package_direct links
+    bazel_name = _pnpm_utils.bazel_name,
+)

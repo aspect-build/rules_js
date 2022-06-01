@@ -126,7 +126,7 @@ def link_js_package(
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
         native.filegroup(
-            name = "{direct_namespace}{bazel_name}{dir_postfix}",
+            name = "{direct_namespace}{bazel_name}{dir_suffix}",
             srcs = [":{direct_namespace}{bazel_name}"],
             output_group = "{package_directory_output_group}",
             visibility = visibility,
@@ -139,8 +139,8 @@ def link_js_package(
         )
 
         native.alias(
-            name = "{{}}{dir_postfix}".format(name),
-            actual = ":{direct_namespace}{bazel_name}{dir_postfix}",
+            name = "{{}}{dir_suffix}".format(name),
+            actual = ":{direct_namespace}{bazel_name}{dir_suffix}",
             visibility = visibility,
         )
 
@@ -153,7 +153,7 @@ _BIN_MACRO_TMPL = """
 def {bin_name}(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
+        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_suffix}",
         path = "{bin_path}",
     )
     _js_binary(
@@ -170,7 +170,7 @@ def {bin_name}(name, **kwargs):
 def {bin_name}_test(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
+        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_suffix}",
         path = "{bin_path}",
     )
     _js_test(
@@ -183,7 +183,7 @@ def {bin_name}_test(name, **kwargs):
 def {bin_name}_binary(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_postfix}",
+        directory = "@{link_workspace}//{link_package}:{direct_namespace}{bazel_name}{dir_suffix}",
         path = "{bin_path}",
     )
     _js_binary(
@@ -288,8 +288,8 @@ def _impl(rctx):
                         bazel_name = bazel_name,
                         bin_name = _sanitize_bin_name(name),
                         bin_path = bins[name],
-                        dir_postfix = pnpm_utils.dir_postfix,
-                        direct_namespace = pnpm_utils.direct_link_target_namespace,
+                        dir_suffix = pnpm_utils.dir_suffix,
+                        direct_namespace = pnpm_utils.direct_link_prefix,
                         link_package = link_package,
                         link_workspace = rctx.attr.link_workspace,
                     ),
@@ -345,7 +345,7 @@ def _impl_links(rctx):
     for (dep_name, dep_version) in rctx.attr.deps.items():
         ref_deps.append("{store_namespace}{bazel_name}__ref".format(
             bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-            store_namespace = pnpm_utils.store_link_target_namespace,
+            store_namespace = pnpm_utils.store_link_prefix,
         ))
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
@@ -361,26 +361,26 @@ def _impl_links(rctx):
                     # of the lifecycle action
                     lc_deps.append("{store_namespace}{bazel_name}__pkg_lite".format(
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                        store_namespace = pnpm_utils.store_link_target_namespace,
+                        store_namespace = pnpm_utils.store_link_prefix,
                     ))
                 else:
                     lc_deps.append("{store_namespace}{bazel_name}__pkg".format(
                         bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                        store_namespace = pnpm_utils.store_link_target_namespace,
+                        store_namespace = pnpm_utils.store_link_prefix,
                     ))
                 deps.append("{store_namespace}{bazel_name}__pkg".format(
                     bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                    store_namespace = pnpm_utils.store_link_target_namespace,
+                    store_namespace = pnpm_utils.store_link_prefix,
                 ))
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
             lc_deps.append("{store_namespace}{bazel_name}".format(
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                store_namespace = pnpm_utils.store_link_target_namespace,
+                store_namespace = pnpm_utils.store_link_prefix,
             ))
             deps.append("{store_namespace}{bazel_name}".format(
                 bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                store_namespace = pnpm_utils.store_link_target_namespace,
+                store_namespace = pnpm_utils.store_link_prefix,
             ))
 
     virtual_store_name = pnpm_utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
@@ -389,7 +389,7 @@ def _impl_links(rctx):
     lifecycle_target_name = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
 
     # strip _links post-fix to get the repository name of the npm sources
-    npm_import_sources_repo_name = rctx.name[:-len(pnpm_utils.links_postfix)]
+    npm_import_sources_repo_name = rctx.name[:-len(pnpm_utils.links_suffix)]
 
     js_package_target = "@{}//:jsp_source_directory".format(npm_import_sources_repo_name)
     js_package_target_lc = "@{}//:jsp".format(npm_import_sources_repo_name)
@@ -397,8 +397,8 @@ def _impl_links(rctx):
     link_js_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version),
         deps = starlark_codegen_utils.to_list_attr(deps, 1),
-        dir_postfix = pnpm_utils.dir_postfix,
-        direct_namespace = pnpm_utils.direct_link_target_namespace,
+        dir_suffix = pnpm_utils.dir_suffix,
+        direct_namespace = pnpm_utils.direct_link_prefix,
         direct_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         js_package_target = js_package_target,
@@ -413,7 +413,7 @@ def _impl_links(rctx):
         rctx_name = rctx.name,
         ref_deps = starlark_codegen_utils.to_list_attr(ref_deps, 1),
         root_package = rctx.attr.root_package,
-        store_namespace = pnpm_utils.store_link_target_namespace,
+        store_namespace = pnpm_utils.store_link_prefix,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
         virtual_store_root = pnpm_utils.virtual_store_root,
