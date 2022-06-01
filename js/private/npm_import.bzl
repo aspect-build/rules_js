@@ -22,15 +22,20 @@ def link_js_package(
 
     root_package = "{root_package}"
 
-    is_root = native.package_name() == root_package
-
     link_packages = {link_packages}
 
     if link_packages and direct != None:
         fail("direct attribute cannot be specified when link_packages are set")
 
+    is_root = native.package_name() == root_package
+    is_direct = (direct == True) or (direct == None and native.package_name() in link_packages)
+
+    if fail_if_no_link and not is_root and not is_direct:
+        msg = "Nothing to link in bazel package '%s' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package." % native.package_name()
+        fail(msg)
+
     if is_root:
-        # link the virtual store if we are linking in the root package
+        # link the virtual store when linking at the root
 
         lifecycle_build_target = {lifecycle_build_target}
 
@@ -109,12 +114,6 @@ def link_js_package(
                 version = "{version}",
             )
 
-    # link direct deps
-    is_direct = not (not direct)
-    for link_package in link_packages:
-        if direct == None and link_package == native.package_name():
-            is_direct = True
-
     if is_direct:
         # terminal target for direct dependencies
         _link_js_package_direct(
@@ -143,10 +142,6 @@ def link_js_package(
             actual = ":{direct_namespace}{bazel_name}{dir_suffix}",
             visibility = visibility,
         )
-
-    if fail_if_no_link and not is_root and not is_direct:
-        msg = "Nothing to link in bazel package '%s' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package." % native.package_name()
-        fail(msg)
 """
 
 _BIN_MACRO_TMPL = """
