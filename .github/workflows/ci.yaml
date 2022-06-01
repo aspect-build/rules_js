@@ -44,4 +44,4 @@ jobs:
               working-directory: ${{ matrix.folder }}
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
-                  ls $(bazel info output_base)/external | grep -vz unused
+                  ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
