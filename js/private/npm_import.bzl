@@ -45,6 +45,7 @@ def link_js_package(
             name = "{store_namespace}{bazel_name}__ref",
             package = "{package}",
             version = "{version}",
+            tags = ["manual"],
         )
 
         # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -54,6 +55,7 @@ def link_js_package(
             package = "{package}",
             version = "{version}",
             deps = ref_deps,
+            tags = ["manual"],
         )
 
         # virtual store target with transitive closure of all node package dependencies
@@ -64,6 +66,7 @@ def link_js_package(
             version = "{version}",
             deps = deps,
             visibility = visibility,
+            tags = ["manual"],
         )
 
         if lifecycle_build_target:
@@ -73,6 +76,7 @@ def link_js_package(
                 package = "{package}",
                 version = "{version}",
                 deps = ref_deps,
+                tags = ["manual"],
             )
 
             # terminal pre-lifecycle target for use in lifecycle build target below
@@ -81,6 +85,7 @@ def link_js_package(
                 package = "{package}",
                 version = "{version}",
                 deps = lc_deps,
+                tags = ["manual"],
             )
 
             # lifecycle build action
@@ -99,6 +104,7 @@ def link_js_package(
                 copy_srcs_to_bin = False,
                 tool = "@aspect_rules_js//js/private/lifecycle:lifecycle-hooks",
                 output_dir = True,
+                tags = ["manual"],
             )
 
             # post-lifecycle js_package
@@ -107,6 +113,7 @@ def link_js_package(
                 src = ":{lifecycle_target_name}",
                 package = "{package}",
                 version = "{version}",
+                tags = ["manual"],
             )
 
     # link direct deps
@@ -121,6 +128,7 @@ def link_js_package(
             name = "{direct_namespace}{bazel_name}",
             src = "//{root_package}:{store_namespace}{bazel_name}",
             visibility = visibility,
+            tags = ["manual"],
         )
 
         # filegroup target that provides a single file which is
@@ -130,18 +138,21 @@ def link_js_package(
             srcs = [":{direct_namespace}{bazel_name}"],
             output_group = "{package_directory_output_group}",
             visibility = visibility,
+            tags = ["manual"],
         )
 
         native.alias(
             name = name,
             actual = ":{direct_namespace}{bazel_name}",
             visibility = visibility,
+            tags = ["manual"],
         )
 
         native.alias(
             name = "{{}}{dir_suffix}".format(name),
             actual = ":{direct_namespace}{bazel_name}{dir_suffix}",
             visibility = visibility,
+            tags = ["manual"],
         )
 
     if fail_if_no_link and not is_root and not is_direct:

@@ -193,6 +193,7 @@ _FP_STORE_TMPL = \
             version = "0.0.0",
             deps = {deps},
             visibility = ["//visibility:public"],
+            tags = ["manual"],
         )"""
 
 _FP_DIRECT_TMPL = \
@@ -204,6 +205,7 @@ _FP_DIRECT_TMPL = \
                 name = "{direct_namespace}{bazel_name}",
                 src = "//{root_package}:{store_namespace}{bazel_name}",
                 visibility = ["//visibility:public"],
+                tags = ["manual"],
             )
 
             # filegroup target that provides a single file which is
@@ -213,18 +215,21 @@ _FP_DIRECT_TMPL = \
                 srcs = [":{direct_namespace}{bazel_name}"],
                 output_group = "{package_directory_output_group}",
                 visibility = ["//visibility:public"],
+                tags = ["manual"],
             )
 
             native.alias(
                 name = "{direct_namespace}{alias}",
                 actual = ":{direct_namespace}{bazel_name}",
                 visibility = ["//visibility:public"],
+                tags = ["manual"],
             )
 
             native.alias(
                 name = "{direct_namespace}{alias}{dir_suffix}",
                 actual = ":{direct_namespace}{bazel_name}{dir_suffix}",
                 visibility = ["//visibility:public"],
+                tags = ["manual"],
             )"""
 
 _DEFS_BZL_FILENAME = "defs.bzl"

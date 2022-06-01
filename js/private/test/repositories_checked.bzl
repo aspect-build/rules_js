@@ -532,7 +532,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__charenc__0.0.2",
-        integrity = "sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==",
+        integrity = "sha1-wKHS86cJLgN3S/qD8UwPxXkKhmc=",
         root_package = "",
         link_workspace = "",
         link_packages = [],
@@ -678,7 +678,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__crypt__0.0.2",
-        integrity = "sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==",
+        integrity = "sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=",
         root_package = "",
         link_workspace = "",
         link_packages = [],
@@ -1180,6 +1180,19 @@ def npm_repositories():
         version = "4.0.0",
         transitive_closure = {
             "escape-string-regexp": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__esprima__1.0.0",
+        integrity = "sha512-k344tuMul8eif80+WDaTCcS5g4xDSO6FRHmCkvlF6t/QSBYQDrvph2VqP23ry9y9oMVEJ/sdJEh8JXT0smlcQQ==",
+        root_package = "",
+        link_workspace = "",
+        link_packages = [],
+        package = "esprima",
+        version = "1.0.0",
+        transitive_closure = {
+            "esprima": ["1.0.0"],
         },
     )
 
@@ -1826,6 +1839,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__minimist__0.0.10",
+        integrity = "sha512-iotkTvxc+TwOm5Ieim8VnSNvCDjCK9S8G3scJ50ZthspSxa7jx50jkhYduuAtAjvfDUwSgOwf8+If99AlOEhyw==",
+        root_package = "",
+        link_workspace = "",
+        link_packages = [],
+        package = "minimist",
+        version = "0.0.10",
+        transitive_closure = {
+            "minimist": ["0.0.10"],
+        },
+    )
+
+    npm_import(
         name = "npm__minimist__1.2.6",
         integrity = "sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==",
         root_package = "",
@@ -1926,7 +1952,7 @@ def npm_repositories():
             "debug": "2.6.9",
             "md5": "2.3.0",
             "mkdirp": "0.5.6",
-            "mocha": "10.0.0_mocha-multi-reporters@1.5.1",
+            "mocha": "10.0.0_th2rfume6p4m5jxelm27wrhnly",
             "strip-ansi": "6.0.1",
             "xml": "1.0.1",
         },
@@ -1935,7 +1961,7 @@ def npm_repositories():
             "debug": ["4.3.4", "4.3.4_supports-color@8.1.1", "2.6.9"],
             "md5": ["2.3.0"],
             "mkdirp": ["0.5.6"],
-            "mocha": ["10.0.0_mocha-multi-reporters@1.5.1"],
+            "mocha": ["10.0.0_th2rfume6p4m5jxelm27wrhnly"],
             "strip-ansi": ["6.0.1"],
             "xml": ["1.0.1"],
             "ansi-regex": ["5.0.1"],
@@ -2030,13 +2056,13 @@ def npm_repositories():
         deps = {
             "debug": "4.3.4",
             "lodash": "4.17.21",
-            "mocha": "10.0.0_mocha-multi-reporters@1.5.1",
+            "mocha": "10.0.0_th2rfume6p4m5jxelm27wrhnly",
         },
         transitive_closure = {
             "mocha-multi-reporters": ["1.5.1_mocha@10.0.0"],
             "debug": ["4.3.4_supports-color@8.1.1", "4.3.4"],
             "lodash": ["4.17.21"],
-            "mocha": ["10.0.0_mocha-multi-reporters@1.5.1"],
+            "mocha": ["10.0.0_th2rfume6p4m5jxelm27wrhnly"],
             "@ungap/promise-all-settled": ["1.1.2"],
             "ansi-colors": ["4.1.1"],
             "browser-stdout": ["1.3.1"],
@@ -2114,13 +2140,13 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mocha__10.0.0__mocha-multi-reporters_1.5.1",
+        name = "npm__mocha__10.0.0__th2rfume6p4m5jxelm27wrhnly",
         integrity = "sha512-0Wl+elVUD43Y0BqPZBzZt8Tnkw9CMUdNYnUsTfOM1vuhJVZL+kiesFYsqwBkEEuEixaiPe5ZQdqDgX2jddhmoA==",
         root_package = "",
         link_workspace = "",
         link_packages = ["examples/macro"],
         package = "mocha",
-        version = "10.0.0_mocha-multi-reporters@1.5.1",
+        version = "10.0.0_th2rfume6p4m5jxelm27wrhnly",
         deps = {
             "@ungap/promise-all-settled": "1.1.2",
             "ansi-colors": "4.1.1",
@@ -2147,7 +2173,7 @@ def npm_repositories():
             "yargs-unparser": "2.0.0",
         },
         transitive_closure = {
-            "mocha": ["10.0.0_mocha-multi-reporters@1.5.1"],
+            "mocha": ["10.0.0_th2rfume6p4m5jxelm27wrhnly"],
             "@ungap/promise-all-settled": ["1.1.2"],
             "ansi-colors": ["4.1.1"],
             "browser-stdout": ["1.3.1"],
@@ -2333,7 +2359,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__object-assign__4.1.1",
-        integrity = "sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=",
+        integrity = "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==",
         root_package = "",
         link_workspace = "",
         link_packages = [],
@@ -2346,7 +2372,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__once__1.4.0",
-        integrity = "sha1-WDsap3WWHUsROsF9nFC6753Xa9E=",
+        integrity = "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==",
         root_package = "",
         link_workspace = "",
         link_packages = [],
@@ -2371,6 +2397,25 @@ def npm_repositories():
         version = "1.5.2",
         transitive_closure = {
             "opener": ["1.5.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__optimist__0.6.0",
+        integrity = "sha512-ubrZPyOU0AHpXkmwqfWolap+eHMwQ484AKivkf0ZGyysd6fUJZl7ow9iu5UNV1vCZv46HQ7EM83IC3NGJ820hg==",
+        root_package = "",
+        link_workspace = "",
+        link_packages = [],
+        package = "optimist",
+        version = "0.6.0",
+        deps = {
+            "minimist": "0.0.10",
+            "wordwrap": "0.0.3",
+        },
+        transitive_closure = {
+            "optimist": ["0.6.0"],
+            "minimist": ["0.0.10"],
+            "wordwrap": ["0.0.3"],
         },
     )
 
@@ -2424,7 +2469,7 @@ def npm_repositories():
 
     npm_import(
         name = "npm__path-is-absolute__1.0.1",
-        integrity = "sha1-F0uSaHNVNP+8es5r9TpanhtcX18=",
+        integrity = "sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==",
         root_package = "",
         link_workspace = "",
         link_packages = [],
@@ -2793,6 +2838,27 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__unused__0.2.2",
+        integrity = "sha1-zhJIBInz3ZPRDxt6yDzA1YQj6qA=",
+        root_package = "",
+        link_workspace = "",
+        link_packages = ["js/private/test"],
+        package = "unused",
+        version = "0.2.2",
+        deps = {
+            "esprima": "1.0.0",
+            "optimist": "0.6.0",
+        },
+        transitive_closure = {
+            "unused": ["0.2.2"],
+            "esprima": ["1.0.0"],
+            "optimist": ["0.6.0"],
+            "minimist": ["0.0.10"],
+            "wordwrap": ["0.0.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__uvu__0.5.3",
         integrity = "sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==",
         root_package = "",
@@ -2857,6 +2923,19 @@ def npm_repositories():
             "has-flag": ["4.0.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__wordwrap__0.0.3",
+        integrity = "sha1-o9XabNXAvAAI03I0u68b7WMFkQc=",
+        root_package = "",
+        link_workspace = "",
+        link_packages = [],
+        package = "wordwrap",
+        version = "0.0.3",
+        transitive_closure = {
+            "wordwrap": ["0.0.3"],
         },
     )
 
