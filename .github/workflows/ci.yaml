@@ -29,7 +29,6 @@ jobs:
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
-            - uses: bazelbuild/setup-bazelisk@v1
             - name: Mount bazel caches
               uses: actions/cache@v2
               with:
@@ -43,4 +42,6 @@ jobs:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
               working-directory: ${{ matrix.folder }}
-              run: bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
+              run: |
+                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
+                  ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
