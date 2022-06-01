@@ -43,7 +43,11 @@ In many cases, updating your dependencies will fix issues since maintainers are 
 
 Another pattern which may break is when a configuration file references an npm package, then a library reads that configuration and tries to require that package. For example, this [mocha json config file](https://github.com/aspect-build/rules_js/blob/main/examples/macro/mocha_reporters.json) references the `mocha-junit-reporter` package, so mocha will try to load that package despite not having a declared dependency on it.
 
-See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for how to resolve these issues. In our mocha example, the solution is to declare the missing dependency: <https://github.com/aspect-build/rules_js/blob/main/.pnpmfile.cjs>. The next time you `pnpm install`, this additional dependency will be added to the pnpm-lock.yaml file.
+See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for how to resolve these issues. In our mocha example, the solution is to declare the missing dependency: <https://github.com/aspect-build/rules_js/blob/main/.pnpmfile.cjs> using [`hooks.readPackage`](https://pnpm.io/pnpmfile#hooksreadpackagepkg-context-pkg--promisepkg).
+
+> Note that if pnpm has already resolved the dependency you want to modify, then running `pnpm install` won't apply the changes from `hooks.readPackage`.
+> For rules_js to see the added dependency edge, you must ensure it appears in the `pnpm-lock.yaml` file, either by re-creating it
+> (though this loses your transitive dependency version pinning) or by hand-modifying it.
 
 As long as you're able to run your build and test under pnpm, we expect the behavior of `rules_js` should match.
 
