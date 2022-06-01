@@ -367,6 +367,7 @@ def link_js_package(
         src = None,
         deps = [],
         fail_if_no_link = True,
+        auto_manual = True,
         visibility = ["//visibility:public"],
         **kwargs):
     """"Links a package to the virtual store if in the root package and directly to node_modules if direct is True.
@@ -389,6 +390,10 @@ def link_js_package(
         src: the js_package target to link; may only to be specified when linking in the root package
         deps: list of link_js_package_store; may only to be specified when linking in the root package
         fail_if_no_link: whether or not to fail if this is called in a package that is not the root package and with direct false
+        auto_manual: whether or not to automatically add a manual tag to the generated targets
+            Links tagged "manual" dy default is desirable so that they are not built by `bazel build ...` if they
+            are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are
+            not fetched at all unless they are used.
         visibility: the visibility of the generated targets
         **kwargs: see attributes of link_js_package_store rule
     """
@@ -426,6 +431,10 @@ def link_js_package(
         store_link_prefix = pnpm_utils.store_link_prefix,
     )
 
+    tags = kwargs.pop("tags", [])
+    if auto_manual and "manual" not in tags:
+        tags.append("manual")
+
     if is_root:
         # link the virtual store when linking at the root
         link_js_package_store(
@@ -433,6 +442,7 @@ def link_js_package(
             src = src,
             deps = deps,
             visibility = visibility,
+            tags = tags,
             **kwargs
         )
 
@@ -444,7 +454,7 @@ def link_js_package(
                 root_package = root_package,
                 store_target = store_target_name,
             ),
-            tags = kwargs.get("tags", None),
+            tags = tags,
             visibility = visibility,
         )
 
@@ -454,18 +464,20 @@ def link_js_package(
             name = dir_target_name,
             srcs = [":{}".format(link_target_name)],
             output_group = pnpm_utils.package_directory_output_group,
-            tags = kwargs.get("tags", None),
+            tags = tags,
             visibility = visibility,
         )
 
         native.alias(
             name = name,
             actual = ":{}".format(link_target_name),
+            tags = tags,
             visibility = visibility,
         )
 
         native.alias(
             name = "{}{}".format(name, pnpm_utils.dir_suffix),
             actual = ":{}".format(dir_target_name),
+            tags = tags,
             visibility = visibility,
         )

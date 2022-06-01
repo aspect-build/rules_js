@@ -73,7 +73,8 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 ## link_js_package
 
 <pre>
-link_js_package(<a href="#link_js_package-name">name</a>, <a href="#link_js_package-root_package">root_package</a>, <a href="#link_js_package-direct">direct</a>, <a href="#link_js_package-src">src</a>, <a href="#link_js_package-deps">deps</a>, <a href="#link_js_package-fail_if_no_link">fail_if_no_link</a>, <a href="#link_js_package-visibility">visibility</a>, <a href="#link_js_package-kwargs">kwargs</a>)
+link_js_package(<a href="#link_js_package-name">name</a>, <a href="#link_js_package-root_package">root_package</a>, <a href="#link_js_package-direct">direct</a>, <a href="#link_js_package-src">src</a>, <a href="#link_js_package-deps">deps</a>, <a href="#link_js_package-fail_if_no_link">fail_if_no_link</a>, <a href="#link_js_package-auto_manual">auto_manual</a>, <a href="#link_js_package-visibility">visibility</a>,
+                <a href="#link_js_package-kwargs">kwargs</a>)
 </pre>
 
 "Links a package to the virtual store if in the root package and directly to node_modules if direct is True.
@@ -98,6 +99,7 @@ the package directory for creating entry points or accessing files in the packag
 | <a id="link_js_package-src"></a>src |  the js_package target to link; may only to be specified when linking in the root package   |  <code>None</code> |
 | <a id="link_js_package-deps"></a>deps |  list of link_js_package_store; may only to be specified when linking in the root package   |  <code>[]</code> |
 | <a id="link_js_package-fail_if_no_link"></a>fail_if_no_link |  whether or not to fail if this is called in a package that is not the root package and with direct false   |  <code>True</code> |
+| <a id="link_js_package-auto_manual"></a>auto_manual |  whether or not to automatically add a manual tag to the generated targets Links tagged "manual" dy default is desirable so that they are not built by <code>bazel build ...</code> if they are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are not fetched at all unless they are used.   |  <code>True</code> |
 | <a id="link_js_package-visibility"></a>visibility |  the visibility of the generated targets   |  <code>["//visibility:public"]</code> |
 | <a id="link_js_package-kwargs"></a>kwargs |  see attributes of link_js_package_store rule   |  none |
 
