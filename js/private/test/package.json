@@ -4,6 +4,7 @@
     "devDependencies": {
         "bufferutil": "4.0.1",
         "esbuild": "0.14.38",
+        "unused": "latest",
         "webpack-bundle-analyzer": "4.5.0"
     }
 }
