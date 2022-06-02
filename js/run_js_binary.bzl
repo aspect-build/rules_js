@@ -150,8 +150,8 @@ def run_js_binary(
 
     # Configure log_level if specified
     if log_level:
-        for env in _js_binary_envs_for_log_level(log_level):
-            extra_env[env] = "1"
+        for log_level_env in _js_binary_envs_for_log_level(log_level):
+            extra_env[log_level_env] = "1"
 
     _run_binary(
         name = name,
