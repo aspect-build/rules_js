@@ -31,6 +31,10 @@ run_js_binary(
     args = ["actual4"],
     chdir = package_name(),
     tool = ":bin",
+    log_level = "debug",
+    # Uncomment the setting below to see debug output even on a
+    # successful run of the build action.
+    # silent_on_success = False,
 )
 
 diff_test(
