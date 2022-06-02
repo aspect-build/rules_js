@@ -269,6 +269,10 @@ def _impl(rctx):
             msg = "chmod %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
             fail(msg)
 
+    # apply patches to the extracted package before reading the package.json incase
+    # the patch targets the package.json itself
+    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
+
     pkg_json_path = paths.join(_EXTRACT_TO_DIRNAME, "package.json")
 
     pkg_json = json.decode(rctx.read(pkg_json_path))
@@ -320,9 +324,6 @@ def _impl(rctx):
 
     if rctx.attr.custom_postinstall:
         _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.custom_postinstall)
-
-    # Apply patches to the extracted package
-    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
 
     build_file = generated_by_lines + [
         """load("@aspect_rules_js//js/private:js_package_internal.bzl", _js_package = "js_package_internal")""",
