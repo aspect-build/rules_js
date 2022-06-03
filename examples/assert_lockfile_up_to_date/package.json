@@ -1,0 +1,7 @@
+{
+    "private": true,
+    "devDependencies": {
+        "@types/node": "16.11.36",
+        "typescript": "4.7.2"
+    }
+}

@@ -74,3 +74,11 @@ npm_import(
     root_package = "",
     version = "8.4.0",
 )
+
+npm_import(
+    name = "pnpm",
+    version = "6.32.19",
+    integrity = "sha512-IY+62k/caP5GsMQm5YcOJ03XDkze68aBiiXrlwqMUAYFhSstLETlenIC73AukJyUd7o4Y18HcV2gfQYCKb0PEA==",
+    package = "pnpm",
+    root_package = "",
+)
