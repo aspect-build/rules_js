@@ -164,7 +164,7 @@ bin = _bin
 _FP_STORE_TMPL = \
     """
     if is_root:
-         _link_npm_package_store(
+         _npm_link_package_store(
             name = "{store_link_prefix}{bazel_name}",
             src = "{npm_package_target}",
             package = "{package}",
@@ -179,7 +179,7 @@ _FP_DIRECT_TMPL = \
     for link_package in {link_packages}:
         if link_package == native.package_name():
             # terminal target for direct dependencies
-            _link_npm_package_direct(
+            _npm_link_package_direct(
                 name = "{{}}/{name}".format(name),
                 src = "//{root_package}:{store_link_prefix}{bazel_name}",
                 visibility = ["//visibility:public"],
@@ -342,7 +342,7 @@ def _impl(rctx):
     link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packages")"""]
+load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packages")"""]
 
     npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
@@ -385,13 +385,13 @@ load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packag
                     }
 
     if fp_links:
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:link_npm_package.bzl",
-    _link_npm_package_store = "link_npm_package_store",
-    _link_npm_package_direct = "link_npm_package_direct")""")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package.bzl",
+    _npm_link_package_store = "npm_link_package_store",
+    _npm_link_package_direct = "npm_link_package_direct")""")
 
     defs_bzl_body = [
-        """def link_all_npm_packages(name = "node_modules"):
-    \"\"\"Generated list of link_npm_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}
+        """def npm_link_all_packages(name = "node_modules"):
+    \"\"\"Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}
 
     Args:
         name: name of catch all target to generate for all packages linked
@@ -401,7 +401,7 @@ load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packag
     is_root = native.package_name() == root_package
     is_direct = native.package_name() in link_packages
     if not is_root and not is_direct:
-        msg = "The link_all_npm_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
+        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
         fail(msg)
     direct_targets = []
     scoped_direct_targets = {{}}
@@ -462,7 +462,7 @@ load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packag
         ))
 
         defs_bzl_header.append(
-            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_npm_package")""".format(
+            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "npm_link_package")""".format(
                 i = i,
                 repo_name = _import.name,
                 links_suffix = utils.links_suffix,
@@ -533,17 +533,17 @@ load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packag
                 package_scope = package_scope,
             ))
 
-    # Generate catch all & scoped linked_npm_packages target
+    # Generate catch all & scoped npm_linked_packages target
     defs_bzl_body.append("""
     for scope, scoped_targets in scoped_direct_targets.items():
-        linked_npm_packages(
+        npm_linked_packages(
             name = "{}/{}".format(name, scope),
             srcs = [t for t in scoped_targets if t],
             tags = ["manual"],
             visibility = ["//visibility:public"],
         )
 
-    linked_npm_packages(
+    npm_linked_packages(
         name = name,
         srcs = [t for t in direct_targets if t],
         tags = ["manual"],

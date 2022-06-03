@@ -25,7 +25,7 @@ NpmPackageInfo = provider(
 
 _DOC = """A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a NpmPackageInfo.
 
-This target can be used as the src attribute to link_npm_package.
+This target can be used as the src attribute to npm_link_package.
 
 A DeclarationInfo is also provided so that the target can be used as an input to rules that expect one such as ts_project."""
 
@@ -37,19 +37,19 @@ _ATTRS = dicts.add({
     "package": attr.string(
         doc = """The package name. If set, should match the `name` field in the `package.json` file for this package.
 
-If set, the package name set here will be used for linking if a link_npm_package does not specify a package name. A 
-link_npm_package target that specifies a package name will override the value here when linking.
+If set, the package name set here will be used for linking if a npm_link_package does not specify a package name. A 
+npm_link_package target that specifies a package name will override the value here when linking.
 
-If unset, a link_npm_package target that references this npm_package must define the package name must be for linking.
+If unset, a npm_link_package target that references this npm_package must define the package name must be for linking.
 """,
     ),
     "version": attr.string(
         doc = """The package version. If set, should match the `version` field in the `package.json` file for this package.
 
-If set, a link_npm_package may omit the package version and the package version set here will be used for linking. A 
-link_npm_package target that specifies a package version will override the value here when linking.
+If set, a npm_link_package may omit the package version and the package version set here will be used for linking. A 
+npm_link_package target that specifies a package version will override the value here when linking.
 
-If unset, a link_npm_package target that references this npm_package must define the package version must be for linking.
+If unset, a npm_link_package target that references this npm_package must define the package version must be for linking.
 """,
         default = "0.0.0",
     ),

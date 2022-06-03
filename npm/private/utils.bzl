@@ -93,7 +93,7 @@ utils = struct(
     strip_peer_dep_version = _strip_peer_dep_version,
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
-    # Prefix for link_npm_package_store links
+    # Prefix for npm_link_package_store links
     store_link_prefix = "store_link__",
     # Suffix for package directory filegroup
     dir_suffix = "__dir",
