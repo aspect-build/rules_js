@@ -1,0 +1,26 @@
+load("@npm//typescript:package_json.bzl", typescript_bin = "bin")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+typescript_bin.tsc(
+    name = "two",
+    srcs = [
+        "tsconfig.json",
+        "two.ts",
+        "//:node_modules/@types/node",
+        "//examples/js_library/one",
+    ],
+    outs = [
+        "two.js",
+    ],
+    chdir = package_name(),
+    args = [
+        "-p",
+        "tsconfig.json",
+    ],
+)
+
+js_test(
+    name = "two_test",
+    data = ["//examples/js_library/one"],
+    entry_point = "two.js",
+)

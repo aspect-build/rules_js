@@ -7,6 +7,11 @@ load(
     _js_test = "js_test",
 )
 load(
+    "//js/private:js_library.bzl",
+    _js_library = "js_library",
+    _js_library_lib = "js_library_lib",
+)
+load(
     "//js/private:run_js_binary.bzl",
     _run_js_binary = "run_js_binary",
 )
@@ -29,7 +34,9 @@ def js_test(**kwargs):
         **kwargs
     )
 
+js_library = _js_library
+run_js_binary = _run_js_binary
+
 # export the starlark libraries as a public API
 js_binary_lib = _js_binary_lib
-
-run_js_binary = _run_js_binary
+js_library_lib = _js_library_lib
