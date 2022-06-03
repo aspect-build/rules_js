@@ -341,7 +341,8 @@ def _impl(rctx):
 
     link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
-    defs_bzl_header = generated_by_lines + ["""load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packages")"""]
+    defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packages")"""]
 
     npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
