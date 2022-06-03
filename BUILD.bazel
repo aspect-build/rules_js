@@ -1,12 +1,12 @@
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
-load("@npm//:defs.bzl", "link_npm_packages")
+load("@npm//:defs.bzl", "link_all_npm_packages")
 load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
 load("//js:defs.bzl", "link_npm_package", "link_npm_package_dep")
 
 # Link all packages from the /WORKSPACE translate_pnpm_lock in /package.json to
 # bazel-bin/node_modules as well as the virtual store bazel-bin/node_modules/.aspect_rules_js
 # since /package.json is the root of the pnpm workspace
-link_npm_packages()
+link_all_npm_packages(name = "node_modules")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, to the
 # virtual store in bazel-bin/node_modules/.aspect_rules_js

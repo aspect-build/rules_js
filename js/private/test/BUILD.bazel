@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@aspect_bazel_lib_host//:defs.bzl", "host")
-load("@npm//:defs.bzl", "link_npm_packages")
+load("@npm//:defs.bzl", "link_all_npm_packages")
 load("//js:defs.bzl", "js_binary")
 load(":pnpm_utils_tests.bzl", "pnpm_utils_tests")
 load(":transitive_closure_tests.bzl", "transitive_closure_tests")
@@ -9,7 +9,7 @@ load(":yaml_tests.bzl", "yaml_tests")
 
 # gazelle:exclude *_checked.bzl
 
-link_npm_packages()
+link_all_npm_packages(name = "node_modules")
 
 # Unit tests
 pnpm_utils_tests(name = "test_pnpm_utils")

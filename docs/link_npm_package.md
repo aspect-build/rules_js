@@ -77,7 +77,7 @@ link_npm_package(<a href="#link_npm_package-name">name</a>, <a href="#link_npm_p
                  <a href="#link_npm_package-kwargs">kwargs</a>)
 </pre>
 
-"Links a package to the virtual store if in the root package and directly to node_modules if direct is True.
+"Links an npm package to the virtual store if in the root package and directly to node_modules if direct is True.
 
 When called at the root_package, a virtual store target is generated named "link__{bazelified_name}__store".
 
@@ -93,7 +93,7 @@ the package directory for creating entry points or accessing files in the packag
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="link_npm_package-name"></a>name |  The name of the package. This should generally by the same as   |  none |
+| <a id="link_npm_package-name"></a>name |  The name of the direct alias target to create if linked directly.   |  none |
 | <a id="link_npm_package-root_package"></a>root_package |  the root package where the node_modules virtual store is linked to   |  <code>""</code> |
 | <a id="link_npm_package-direct"></a>direct |  whether or not to link a direct dependency in this package For 3rd party deps fetched with an npm_import, direct may not be specified if link_packages is set on the npm_import.   |  <code>True</code> |
 | <a id="link_npm_package-src"></a>src |  the npm_package target to link; may only to be specified when linking in the root package   |  <code>None</code> |
@@ -102,6 +102,10 @@ the package directory for creating entry points or accessing files in the packag
 | <a id="link_npm_package-auto_manual"></a>auto_manual |  whether or not to automatically add a manual tag to the generated targets Links tagged "manual" dy default is desirable so that they are not built by <code>bazel build ...</code> if they are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are not fetched at all unless they are used.   |  <code>True</code> |
 | <a id="link_npm_package-visibility"></a>visibility |  the visibility of the generated targets   |  <code>["//visibility:public"]</code> |
 | <a id="link_npm_package-kwargs"></a>kwargs |  see attributes of link_npm_package_store rule   |  none |
+
+**RETURNS**
+
+Label of the link_npm_package_direct if created, else None
 
 
 <a id="#link_npm_package_dep"></a>
@@ -120,12 +124,12 @@ of a link_npm_package.
 Example root BUILD.file where the virtual store is linked by default,
 
 ```
-load("@npm//:defs.bzl", "link_npm_packages")
+load("@npm//:defs.bzl", "link_all_npm_packages")
 load("@aspect_rules_js//:defs.bzl", "link_npm_package")
 
 # Links all packages from the `translate_pnpm_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
 # repository rule.
-link_npm_packages()
+link_all_npm_packages(name = "node_modules")
 
 # Link a first party `@lib/foo` defined by the `npm_package` `//lib/foo:foo` target.
 link_npm_package(

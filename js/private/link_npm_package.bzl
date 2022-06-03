@@ -308,12 +308,12 @@ def link_npm_package_dep(
     Example root BUILD.file where the virtual store is linked by default,
 
     ```
-    load("@npm//:defs.bzl", "link_npm_packages")
+    load("@npm//:defs.bzl", "link_all_npm_packages")
     load("@aspect_rules_js//:defs.bzl", "link_npm_package")
 
     # Links all packages from the `translate_pnpm_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
     # repository rule.
-    link_npm_packages()
+    link_all_npm_packages(name = "node_modules")
 
     # Link a first party `@lib/foo` defined by the `npm_package` `//lib/foo:foo` target.
     link_npm_package(
@@ -370,7 +370,7 @@ def link_npm_package(
         auto_manual = True,
         visibility = ["//visibility:public"],
         **kwargs):
-    """"Links a package to the virtual store if in the root package and directly to node_modules if direct is True.
+    """"Links an npm package to the virtual store if in the root package and directly to node_modules if direct is True.
 
     When called at the root_package, a virtual store target is generated named "link__{bazelified_name}__store".
 
@@ -381,8 +381,7 @@ def link_npm_package(
     the package directory for creating entry points or accessing files in the package.
 
     Args:
-        name: The name of the package.
-            This should generally by the same as
+        name: The name of the direct alias target to create if linked directly.
         root_package: the root package where the node_modules virtual store is linked to
         direct: whether or not to link a direct dependency in this package
             For 3rd party deps fetched with an npm_import, direct may not be specified if
@@ -396,6 +395,9 @@ def link_npm_package(
             not fetched at all unless they are used.
         visibility: the visibility of the generated targets
         **kwargs: see attributes of link_npm_package_store rule
+
+    Returns:
+        Label of the link_npm_package_direct if created, else None
     """
     is_root = native.package_name() == root_package
     is_direct = direct
@@ -446,6 +448,7 @@ def link_npm_package(
             **kwargs
         )
 
+    direct_target = None
     if direct:
         # link as a direct dependency in node_modules of this package
         link_npm_package_direct(
@@ -457,6 +460,7 @@ def link_npm_package(
             tags = tags,
             visibility = visibility,
         )
+        direct_target = ":{}".format(link_target_name)
 
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
@@ -481,3 +485,5 @@ def link_npm_package(
             tags = tags,
             visibility = visibility,
         )
+
+    return direct_target

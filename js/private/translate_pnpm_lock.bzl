@@ -207,6 +207,7 @@ _FP_DIRECT_TMPL = \
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
             )
+            direct_targets.append(":{direct_link_prefix}{bazel_name}")
 
             # filegroup target that provides a single file which is
             # package directory for use in $(execpath) and $(rootpath)
@@ -376,17 +377,22 @@ def _impl(rctx):
     link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
     defs_bzl_header = generated_by_lines
+    defs_bzl_header.append("""load("@aspect_rules_js//js/private:linked_npm_packages.bzl", "linked_npm_packages")""")
     defs_bzl_body = [
-        """# buildifier: disable=unnamed-macro
-def link_npm_packages():
-    "Generated list of link_npm_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}"
+        """def link_all_npm_packages(name = "node_modules"):
+    \"\"\"Generated list of link_npm_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}
+
+    Args:
+        name: name of catch all target to generate for all packages linked
+    \"\"\"
     root_package = "{root_package}"
     link_packages = {link_packages}
     is_root = native.package_name() == root_package
     is_direct = native.package_name() in link_packages
     if not is_root and not is_direct:
-        msg = "The link_npm_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
+        msg = "The link_all_npm_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
         fail(msg)
+    direct_targets = []
 """.format(
             pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
             pnpm_lock = str(rctx.attr.pnpm_lock),
@@ -437,7 +443,7 @@ def link_npm_packages():
                 links_suffix = pnpm_utils.links_suffix,
             ),
         )
-        defs_bzl_body.append("""    link_{i}(name = "{direct_link_prefix}{bazel_name}", direct = None, fail_if_no_link = False)""".format(
+        defs_bzl_body.append("""    direct_targets.append(link_{i}(name = "{direct_link_prefix}{bazel_name}", direct = None, fail_if_no_link = False))""".format(
             i = i,
             direct_link_prefix = pnpm_utils.direct_link_prefix,
             bazel_name = pnpm_utils.bazel_name(_import.package),
@@ -593,6 +599,15 @@ def link_npm_packages():
                         link_workspace = rctx.attr.pnpm_lock.workspace_name,
                     ),
                 )
+
+    # Generate linked_npm_packages target
+    defs_bzl_body.append("""
+    linked_npm_packages(
+        name = name,
+        srcs = [t for t in direct_targets if t],
+        tags = ["manual"],
+        visibility = ["//visibility:public"],
+    )""")
 
     # Generate scoped @npm//@scope targets
     for build_file_package, scope_packages in scoped_packages.items():
