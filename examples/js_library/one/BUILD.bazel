@@ -1,0 +1,13 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+js_library(
+    name = "one",
+    srcs = [
+        "one.d.ts",
+        "one.js",
+        # package.json needed here so that the "typings" field appears in the
+        # downstream typecheck and so "main" field is seen at runtime
+        "package.json",
+    ],
+    visibility = ["//examples/js_library:__subpackages__"],
+)

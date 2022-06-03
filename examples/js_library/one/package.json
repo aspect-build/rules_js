@@ -1,0 +1,5 @@
+{
+    "private": true,
+    "main": "one.js",
+    "typings": "one.d.ts"
+}
