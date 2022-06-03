@@ -32,7 +32,7 @@ See the API documentation in the [docs](docs/) folder and the example usage in t
 
 > Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
 
-Read our [migration guide](docs/migration.md) to adopt rules_js in an existing project.
+Read our [migration guide](docs/migrate.md) to adopt rules_js in an existing project.
 
 ## Relationship to rules_nodejs
 
