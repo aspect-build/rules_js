@@ -24,10 +24,12 @@ fi
 LOG_PREFIX="{{log_prefix_rule_set}}[{{log_prefix_rule}}]"
 
 function logf_stderr {
+    local format_string="$1"
+    shift
     if [ "${STDERR_CAPTURE:-}" ]; then
-        printf "%s\n" "$*" >>"$STDERR_CAPTURE"
+        printf "$format_string\n" "$@" >>"$STDERR_CAPTURE"
     else
-        printf "%s\n" "$*" >&2
+        printf "$format_string\n" "$@" >&2
     fi
 }
 
