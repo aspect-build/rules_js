@@ -14,7 +14,7 @@ bzl_library(
     deps = [
         "//js/private:js_binary",
         "//js/private:js_library",
-        "//js/private:run_js_binary",
+        "//js/private:js_run_binary",
     ],
 )
 

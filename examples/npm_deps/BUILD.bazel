@@ -1,5 +1,5 @@
 load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_package")
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test", "run_js_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
@@ -49,7 +49,7 @@ js_binary(
     entry_point = "case1.js",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run1",
     srcs = [],
     outs = ["actual1"],
@@ -165,7 +165,7 @@ diff_test(
     file2 = ":actual5",
 )
 
-run_js_binary(
+js_run_binary(
     name = "actual5_alt",
     args = ["--version"],
     stdout = "actual5_alt.txt",

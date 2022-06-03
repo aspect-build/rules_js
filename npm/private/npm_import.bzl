@@ -7,7 +7,7 @@ load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 _LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
-load("@aspect_rules_js//js:defs.bzl", _run_js_binary = "run_js_binary")
+load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
 load("@aspect_rules_js//npm/private:npm_link_package_store_internal.bzl", _npm_link_package_store = "npm_link_package_store_internal")
 load("@aspect_rules_js//npm/private:npm_link_package.bzl", _npm_link_package_direct = "npm_link_package_direct")
 load("@bazel_skylib//lib:paths.bzl", _paths = "paths")
@@ -104,13 +104,13 @@ def npm_link_package(
             )
 
             # lifecycle build action
-            _run_js_binary(
+            _js_run_binary(
                 name = "{lifecycle_target_name}",
                 srcs = [
                     "{npm_package_target_lc}",
                     ":{store_link_prefix}{bazel_name}__pkg_lc"
                 ],
-                # run_js_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
+                # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
                 args = [
                     "{package}",
                     "../../../$(execpath {npm_package_target_lc})",
@@ -167,7 +167,7 @@ def {bin_name}(name, **kwargs):
         entry_point = ":%s__entry_point" % name,
         data = ["@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}"],
     )
-    _run_js_binary(
+    _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
         **kwargs
@@ -289,7 +289,7 @@ def _impl(rctx):
         for link_package in rctx.attr.link_packages:
             bin_bzl = generated_by_lines + [
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
-                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test", _run_js_binary = "run_js_binary")""",
+                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test", _js_run_binary = "js_run_binary")""",
             ]
             for name in bins:
                 bin_bzl.append(
