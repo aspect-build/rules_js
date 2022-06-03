@@ -11,7 +11,7 @@ local_path_override(
     path = "../..",
 )
 
-npm = use_extension("@aspect_rules_js//js:extensions.bzl", "npm", dev_dependency = True)
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 
 npm.translate_pnpm_lock(
     name = "npm",

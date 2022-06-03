@@ -1,6 +1,14 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-npm_package rule
+
+Rules for linking npm dependencies and packaging and linking first-party deps.
+
+Load these with,
+
+```starlark
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+```
+
 
 <a id="#npm_package"></a>
 

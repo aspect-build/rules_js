@@ -1,0 +1,26 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@npm//:defs.bzl", "link_all_npm_packages")
+load(":transitive_closure_tests.bzl", "transitive_closure_tests")
+load(":yaml_tests.bzl", "yaml_tests")
+load(":utils_tests.bzl", "utils_tests")
+
+# gazelle:exclude *_checked.bzl
+
+link_all_npm_packages(name = "node_modules")
+
+# Unit tests
+utils_tests(name = "test_utils")
+
+transitive_closure_tests(name = "test_transitive_closure")
+
+yaml_tests(name = "test_yaml")
+
+write_source_files(
+    name = "write_translate_pnpm_lock",
+    files = {
+        "repositories_checked.bzl": "@npm//:repositories.bzl",
+        "defs_checked.bzl": "@npm//:defs.bzl",
+        "package_json_checked.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
+        "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1//npm/private/test:package_json.bzl",
+    },
+)

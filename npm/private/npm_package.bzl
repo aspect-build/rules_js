@@ -1,4 +1,12 @@
-"npm_package rule"
+"""
+Rules for linking npm dependencies and packaging and linking first-party deps.
+
+Load these with,
+
+```starlark
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+```
+"""
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")

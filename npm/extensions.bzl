@@ -2,15 +2,15 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
-load("//js/private:pnpm_utils.bzl", "pnpm_utils")
-load("//js/private:translate_pnpm_lock.bzl", translate_pnpm_lock_lib = "translate_pnpm_lock")
-load("//js:npm_import.bzl", "npm_import", "translate_pnpm_lock")
-load("//js/private:transitive_closure.bzl", "translate_to_transitive_closure")
+load("//npm/private:utils.bzl", "utils")
+load("//npm/private:translate_pnpm_lock.bzl", translate_pnpm_lock_lib = "translate_pnpm_lock")
+load("//npm:npm_import.bzl", "npm_import", "translate_pnpm_lock")
+load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 
 def _extension_impl(module_ctx):
     for mod in module_ctx.modules:
         for attr in mod.tags.translate_pnpm_lock:
-            lockfile = pnpm_utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
+            lockfile = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             trans = translate_to_transitive_closure(lockfile, attr.prod, attr.dev, attr.no_optional)
             imports = translate_pnpm_lock_lib.gen_npm_imports(trans, attr)
             for i in imports:

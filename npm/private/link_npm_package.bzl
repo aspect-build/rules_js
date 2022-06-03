@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
-load(":pnpm_utils.bzl", "pnpm_utils")
+load(":utils.bzl", "utils")
 load(":npm_package.bzl", "NpmPackageInfo")
 
 _LinkNpmPackageInfo = provider(
@@ -108,7 +108,7 @@ def _impl_store(ctx):
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via `version` attribute or come from the `src` `NpmPackageInfo`, typically a `npm_package` target")
 
-    virtual_store_name = pnpm_utils.virtual_store_name(package, version)
+    virtual_store_name = utils.virtual_store_name(package, version)
 
     virtual_store_directory = None
     direct_files = []
@@ -117,7 +117,7 @@ def _impl_store(ctx):
     if ctx.attr.src:
         # output the package as a TreeArtifact to its virtual store location
         # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-        virtual_store_directory_path = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", package)
+        virtual_store_directory_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", package)
 
         if ctx.label.workspace_name:
             expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, virtual_store_directory_path)
@@ -146,7 +146,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
             dep_virtual_store_directory = dep[_LinkNpmPackageInfo].virtual_store_directory
             if dep_virtual_store_directory:
                 # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                dep_symlink_path = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
+                dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
                 dep_symlink = ctx.actions.declare_file(dep_symlink_path)
                 ctx.actions.symlink(
                     output = dep_symlink,
@@ -170,7 +170,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
             if dep[_LinkNpmPackageInfo].virtual_store_directory:
                 dep_package = dep[_LinkNpmPackageInfo].package
                 dep_version = dep[_LinkNpmPackageInfo].version
-                deps_map[pnpm_utils.pnpm_name(dep_package, dep_version)] = dep
+                deps_map[utils.pnpm_name(dep_package, dep_version)] = dep
             else:
                 # this is a ref link_npm_package, a downstream terminal link_npm_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
@@ -179,7 +179,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
         for dep in ctx.attr.deps:
             dep_package = dep[_LinkNpmPackageInfo].package
             dep_version = dep[_LinkNpmPackageInfo].version
-            dep_virtual_store_name = pnpm_utils.virtual_store_name(dep_package, dep_version)
+            dep_virtual_store_name = utils.virtual_store_name(dep_package, dep_version)
             dep_refs = dep[_LinkNpmPackageInfo].dep_refs
             if dep_package == package and dep_version == version:
                 # provide the node_modules directory for this package if found in the transitive_closure
@@ -192,14 +192,14 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
                 if dep_ref_package == package and dep_ref_version == version:
                     pass
                 else:
-                    def_ref_pnpm_name = pnpm_utils.pnpm_name(dep_ref_package, dep_ref_version)
+                    def_ref_pnpm_name = utils.pnpm_name(dep_ref_package, dep_ref_version)
                     if not def_ref_pnpm_name in deps_map:
                         fail("Expecting {} to be in deps".format(def_ref_pnpm_name))
                     actual_dep = deps_map[def_ref_pnpm_name]
                     dep_ref_virtual_store_directory = actual_dep[_LinkNpmPackageInfo].virtual_store_directory
                     if dep_ref_virtual_store_directory:
                         # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                        dep_symlink_path = paths.join("node_modules", pnpm_utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
+                        dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
                         dep_symlink = ctx.actions.declare_file(dep_symlink_path)
                         ctx.actions.symlink(
                             output = dep_symlink,
@@ -234,7 +234,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
     if virtual_store_directory:
         # Provide an output group that provides a single file which is the
         # package directory for use in $(execpath) and $(rootpath).
-        # Output group name must match pnpm_utils.package_directory_output_group
+        # Output group name must match utils.package_directory_output_group
         result.append(OutputGroupInfo(package_directory = depset([virtual_store_directory])))
 
     return result
@@ -355,9 +355,9 @@ def link_npm_package_dep(
         The label of the direct link for the given package at the given link package,
     """
     return Label("//{root_package}:{store_link_prefix}{bazel_name}".format(
-        bazel_name = pnpm_utils.bazel_name(name, version),
+        bazel_name = utils.bazel_name(name, version),
         root_package = root_package,
-        store_link_prefix = pnpm_utils.store_link_prefix,
+        store_link_prefix = utils.store_link_prefix,
     ))
 
 def link_npm_package(
@@ -418,19 +418,19 @@ def link_npm_package(
         fail(msg)
 
     link_target_name = "{direct_link_prefix}{bazel_name}".format(
-        bazel_name = pnpm_utils.bazel_name(name),
-        direct_link_prefix = pnpm_utils.direct_link_prefix,
+        bazel_name = utils.bazel_name(name),
+        direct_link_prefix = utils.direct_link_prefix,
     )
 
     dir_target_name = "{direct_link_prefix}{bazel_name}{dir_suffix}".format(
-        bazel_name = pnpm_utils.bazel_name(name),
-        dir_suffix = pnpm_utils.dir_suffix,
-        direct_link_prefix = pnpm_utils.direct_link_prefix,
+        bazel_name = utils.bazel_name(name),
+        dir_suffix = utils.dir_suffix,
+        direct_link_prefix = utils.direct_link_prefix,
     )
 
     store_target_name = "{store_link_prefix}{bazel_name}".format(
-        bazel_name = pnpm_utils.bazel_name(name),
-        store_link_prefix = pnpm_utils.store_link_prefix,
+        bazel_name = utils.bazel_name(name),
+        store_link_prefix = utils.store_link_prefix,
     )
 
     tags = kwargs.pop("tags", [])
@@ -467,7 +467,7 @@ def link_npm_package(
         native.filegroup(
             name = dir_target_name,
             srcs = [":{}".format(link_target_name)],
-            output_group = pnpm_utils.package_directory_output_group,
+            output_group = utils.package_directory_output_group,
             tags = tags,
             visibility = visibility,
         )
@@ -480,7 +480,7 @@ def link_npm_package(
         )
 
         native.alias(
-            name = "{}{}".format(name, pnpm_utils.dir_suffix),
+            name = "{}{}".format(name, utils.dir_suffix),
             actual = ":{}".format(dir_target_name),
             tags = tags,
             visibility = visibility,

@@ -1,5 +1,11 @@
 """Repository rules to fetch third-party npm packages
 
+Load these with,
+
+```starlark
+load("@aspect_rules_js//npm:npm_import.bzl", "translate_pnpm_lock", "npm_import")
+```
+
 These use Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
 
@@ -19,9 +25,9 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 """
 
-load("//js/private:npm_import.bzl", _npm_import = "npm_import", _npm_import_links = "npm_import_links")
-load("//js/private:pnpm_utils.bzl", _pnpm_utils = "pnpm_utils")
-load("//js/private:translate_pnpm_lock.bzl", _translate_pnpm_lock_lib = "translate_pnpm_lock")
+load("//npm/private:npm_import.bzl", _npm_import = "npm_import", _npm_import_links = "npm_import_links")
+load("//npm/private:utils.bzl", _utils = "utils")
+load("//npm/private:translate_pnpm_lock.bzl", _translate_pnpm_lock_lib = "translate_pnpm_lock")
 
 translate_pnpm_lock = repository_rule(
     doc = _translate_pnpm_lock_lib.doc,
@@ -161,10 +167,10 @@ def npm_import(
         run_lifecycle_hooks = run_lifecycle_hooks,
     )
 
-    # By convention, the `{name}{pnpm_utils.links_suffix}` repository contains the generated
+    # By convention, the `{name}{utils.links_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
     _npm_import_links(
-        name = "{}{}".format(name, _pnpm_utils.links_suffix),
+        name = "{}{}".format(name, _utils.links_suffix),
         package = package,
         version = version,
         root_package = root_package,
