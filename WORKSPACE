@@ -41,9 +41,9 @@ gazelle_dependencies()
 ############################################
 # Example npm dependencies
 
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_import", "translate_pnpm_lock")
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 
-translate_pnpm_lock(
+npm_translate_lock(
     name = "npm",
     custom_postinstalls = {
         "@aspect-test/c": "echo 'moo' > cow.txt",

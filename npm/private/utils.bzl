@@ -60,12 +60,12 @@ def _assert_lockfile_version(version, testonly = False):
     msg = None
 
     if version < min_lock_version:
-        msg = "translate_pnpm_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v6 or greater.".format(
+        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v6 or greater.".format(
             min = min_lock_version,
             actual = version,
         )
     if version > max_lock_version:
-        msg = "translate_pnpm_lock currently supports a maximum lock_version of {max}, but found {actual}. Please file an issue on rules_js".format(
+        msg = "npm_translate_lock currently supports a maximum lock_version of {max}, but found {actual}. Please file an issue on rules_js".format(
             max = max_lock_version,
             actual = version,
         )

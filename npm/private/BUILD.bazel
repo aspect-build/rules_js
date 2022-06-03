@@ -50,8 +50,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "translate_pnpm_lock",
-    srcs = ["translate_pnpm_lock.bzl"],
+    name = "npm_translate_lock",
+    srcs = ["npm_translate_lock.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
         ":starlark_codegen_utils",
