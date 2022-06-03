@@ -19,8 +19,7 @@ js_test(
     name = "test",
     args = ["foo"],
     data = [
-        "@npm//app/a/@aspect-test",
-        "@npm//app/a/@lib",
+        ":node_modules",
         "@npm//root/@aspect-test",
     ],
     entry_point = "main.js",
