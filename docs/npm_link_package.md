@@ -93,7 +93,7 @@ the package directory for creating entry points or accessing files in the packag
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_package-name"></a>name |  The name of the direct alias target to create if linked directly.   |  none |
+| <a id="npm_link_package-name"></a>name |  The name of the direct alias target to create if linked directly. For first-party deps linked across a workspace, the name must match in all packages being linked as it is used to derive the virtual store link target name.   |  none |
 | <a id="npm_link_package-root_package"></a>root_package |  the root package where the node_modules virtual store is linked to   |  <code>""</code> |
 | <a id="npm_link_package-direct"></a>direct |  whether or not to link a direct dependency in this package For 3rd party deps fetched with an npm_import, direct may not be specified if link_packages is set on the npm_import.   |  <code>True</code> |
 | <a id="npm_link_package-src"></a>src |  the npm_package target to link; may only to be specified when linking in the root package   |  <code>None</code> |

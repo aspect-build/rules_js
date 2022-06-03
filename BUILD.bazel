@@ -9,23 +9,15 @@ load("//npm:defs.bzl", "npm_link_package", "npm_link_package_dep")
 npm_link_all_packages(name = "node_modules")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, to the
-# virtual store in bazel-bin/node_modules/.aspect_rules_js
-npm_link_acorn(
-    name = "node_modules/acorn",
-    # `direct` set to False as an example of *not* also linking this 3rd dependency as a
-    # direct dependency in the package at bazel-bin/node_modules/@mycorp/mylib. Alternately,
-    # you may specify link_packages in the npm_import of this package and direct is then
-    # automatically set to True when this is called in the packages listed.
-    direct = False,
-)
+# virtual store in bazel-bin/node_modules/.aspect_rules_js and as a direct link to
+# bazel-bin/node_modules/acorn
+npm_link_acorn(name = "node_modules/acorn")
 
-# Linking a first-party dependency to the virtual store in bazel-bin/node_modules/.aspect_rules_js
+# Linking a first-party dependency to the virtual store in bazel-bin/node_modules/.aspect_rules_js and
+# as a direct link to bazel-bin/node_modules/@mycorp/mylib
 npm_link_package(
     name = "node_modules/@mycorp/mylib",
     src = "//examples/lib",
-    # `direct` set to False as an example of *not* also linking this first-party dependency as a
-    # direct dependency in the package at bazel-bin/node_modules/@mycorp/mylib.
-    direct = False,
     deps = [
         # For a 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule,
         # you must specify both the name and version to qualify the dependency. These should match the
