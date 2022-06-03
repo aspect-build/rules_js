@@ -1,10 +1,9 @@
 load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
-load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test", "run_js_binary")
+load("@aspect_rules_js//npm:defs.bzl", "link_npm_package")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//:defs.bzl", "link_all_npm_packages")
-load("//js:defs.bzl", "link_npm_package")
 
 ###########################
 

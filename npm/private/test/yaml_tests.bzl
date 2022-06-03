@@ -1,7 +1,7 @@
 "Unit tests for yaml.bzl"
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//js/private:yaml.bzl", "parse")
+load("//npm/private:yaml.bzl", "parse")
 
 def _parse_basic_test_impl(ctx):
     env = unittest.begin(ctx)

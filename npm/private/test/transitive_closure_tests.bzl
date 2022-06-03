@@ -3,7 +3,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//js/private:transitive_closure.bzl", "gather_transitive_closure")
+load("//npm/private:transitive_closure.bzl", "gather_transitive_closure")
 
 TEST_PACKAGES = {
     "@aspect-test/a/5.0.0": {

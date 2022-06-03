@@ -1,5 +1,5 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@aspect_rules_js//js:defs.bzl", "constants")
+load("@aspect_rules_js//npm:defs.bzl", "constants")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")

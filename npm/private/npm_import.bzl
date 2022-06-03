@@ -3,13 +3,13 @@
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":pnpm_utils.bzl", "pnpm_utils")
+load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-_LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _npm_package = "npm_package")
-load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")
-load("@aspect_rules_js//js/private:link_npm_package_store_internal.bzl", _link_npm_package_store = "link_npm_package_store_internal")
-load("@aspect_rules_js//js/private:link_npm_package.bzl", _link_npm_package_direct = "link_npm_package_direct")
+_LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
+load("@aspect_rules_js//js:defs.bzl", _run_js_binary = "run_js_binary")
+load("@aspect_rules_js//npm/private:link_npm_package_store_internal.bzl", _link_npm_package_store = "link_npm_package_store_internal")
+load("@aspect_rules_js//npm/private:link_npm_package.bzl", _link_npm_package_direct = "link_npm_package_direct")
 load("@bazel_skylib//lib:paths.bzl", _paths = "paths")
 
 # buildifier: disable=unnamed-macro
@@ -107,7 +107,7 @@ def link_npm_package(
                     "../../../$(@D)",
                 ],
                 copy_srcs_to_bin = False,
-                tool = "@aspect_rules_js//js/private/lifecycle:lifecycle-hooks",
+                tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
                 output_dir = True,
                 tags = ["manual"],
             )
@@ -229,7 +229,7 @@ _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _impl(rctx):
-    numeric_version = pnpm_utils.strip_peer_dep_version(rctx.attr.version)
+    numeric_version = utils.strip_peer_dep_version(rctx.attr.version)
 
     rctx.download(
         output = _TARBALL_FILENAME,
@@ -285,7 +285,7 @@ def _impl(rctx):
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
 
-    bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version)
+    bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
     root_package_json_bzl = False
 
@@ -293,8 +293,7 @@ def _impl(rctx):
         for link_package in rctx.attr.link_packages:
             bin_bzl = generated_by_lines + [
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
-                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test")""",
-                """load("@aspect_rules_js//js:run_js_binary.bzl", _run_js_binary = "run_js_binary")""",
+                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test", _run_js_binary = "run_js_binary")""",
             ]
             for name in bins:
                 bin_bzl.append(
@@ -302,8 +301,8 @@ def _impl(rctx):
                         bazel_name = bazel_name,
                         bin_name = _sanitize_bin_name(name),
                         bin_path = bins[name],
-                        dir_suffix = pnpm_utils.dir_suffix,
-                        direct_link_prefix = pnpm_utils.direct_link_prefix,
+                        dir_suffix = utils.dir_suffix,
+                        direct_link_prefix = utils.direct_link_prefix,
                         link_package = link_package,
                         link_workspace = rctx.attr.link_workspace,
                     ),
@@ -330,7 +329,7 @@ def _impl(rctx):
         _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.custom_postinstall)
 
     build_file = generated_by_lines + [
-        """load("@aspect_rules_js//js/private:npm_package_internal.bzl", _npm_package = "npm_package_internal")""",
+        """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package = "npm_package_internal")""",
     ]
 
     build_file.append(_JS_PACKAGE_TMPL.format(
@@ -355,8 +354,8 @@ def _impl_links(rctx):
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
         ref_deps.append("{store_link_prefix}{bazel_name}__ref".format(
-            bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-            store_link_prefix = pnpm_utils.store_link_prefix,
+            bazel_name = utils.bazel_name(dep_name, dep_version),
+            store_link_prefix = utils.store_link_prefix,
         ))
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
@@ -371,36 +370,36 @@ def _impl_links(rctx):
                     # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
                     lc_deps.append("{store_link_prefix}{bazel_name}__pkg_lite".format(
-                        bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                        store_link_prefix = pnpm_utils.store_link_prefix,
+                        bazel_name = utils.bazel_name(dep_name, dep_version),
+                        store_link_prefix = utils.store_link_prefix,
                     ))
                 else:
                     lc_deps.append("{store_link_prefix}{bazel_name}__pkg".format(
-                        bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                        store_link_prefix = pnpm_utils.store_link_prefix,
+                        bazel_name = utils.bazel_name(dep_name, dep_version),
+                        store_link_prefix = utils.store_link_prefix,
                     ))
                 deps.append("{store_link_prefix}{bazel_name}__pkg".format(
-                    bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                    store_link_prefix = pnpm_utils.store_link_prefix,
+                    bazel_name = utils.bazel_name(dep_name, dep_version),
+                    store_link_prefix = utils.store_link_prefix,
                 ))
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
             lc_deps.append("{store_link_prefix}{bazel_name}".format(
-                bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                store_link_prefix = pnpm_utils.store_link_prefix,
+                bazel_name = utils.bazel_name(dep_name, dep_version),
+                store_link_prefix = utils.store_link_prefix,
             ))
             deps.append("{store_link_prefix}{bazel_name}".format(
-                bazel_name = pnpm_utils.bazel_name(dep_name, dep_version),
-                store_link_prefix = pnpm_utils.store_link_prefix,
+                bazel_name = utils.bazel_name(dep_name, dep_version),
+                store_link_prefix = utils.store_link_prefix,
             ))
 
-    virtual_store_name = pnpm_utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+    virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
 
     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-    lifecycle_target_name = paths.join("node_modules", pnpm_utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
+    lifecycle_target_name = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
 
     # strip _links post-fix to get the repository name of the npm sources
-    npm_import_sources_repo_name = rctx.name[:-len(pnpm_utils.links_suffix)]
+    npm_import_sources_repo_name = rctx.name[:-len(utils.links_suffix)]
     if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
         npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
@@ -408,10 +407,10 @@ def _impl_links(rctx):
     npm_package_target_lc = "@{}//:jsp".format(npm_import_sources_repo_name)
 
     link_npm_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
-        bazel_name = pnpm_utils.bazel_name(rctx.attr.package, rctx.attr.version),
+        bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version),
         deps = starlark_codegen_utils.to_list_attr(deps, 1),
-        dir_suffix = pnpm_utils.dir_suffix,
-        direct_link_prefix = pnpm_utils.direct_link_prefix,
+        dir_suffix = utils.dir_suffix,
+        direct_link_prefix = utils.direct_link_prefix,
         direct_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
@@ -422,14 +421,14 @@ def _impl_links(rctx):
         link_npm_package_bzl = "@%s//:%s" % (rctx.name, _DEFS_BZL_FILENAME),
         link_packages = rctx.attr.link_packages,
         package = rctx.attr.package,
-        package_directory_output_group = pnpm_utils.package_directory_output_group,
+        package_directory_output_group = utils.package_directory_output_group,
         rctx_name = rctx.name,
         ref_deps = starlark_codegen_utils.to_list_attr(ref_deps, 1),
         root_package = rctx.attr.root_package,
-        store_link_prefix = pnpm_utils.store_link_prefix,
+        store_link_prefix = utils.store_link_prefix,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
-        virtual_store_root = pnpm_utils.virtual_store_root,
+        virtual_store_root = utils.virtual_store_root,
     )]
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
@@ -483,7 +482,7 @@ def _get_bin_entries(pkg_json, package):
 
 def _make_generated_by_lines(package, version):
     return [
-        "\"@generated by @aspect_rules_js//js/private:npm_import.bzl for npm package {package}@{version}\"".format(
+        "\"@generated by @aspect_rules_js//npm/private:npm_import.bzl for npm package {package}@{version}\"".format(
             package = package,
             version = version,
         ),

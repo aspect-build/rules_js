@@ -2,6 +2,12 @@
 
 Repository rules to fetch third-party npm packages
 
+Load these with,
+
+```starlark
+load("@aspect_rules_js//npm:npm_import.bzl", "translate_pnpm_lock", "npm_import")
+```
+
 These use Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
 
@@ -54,7 +60,7 @@ users needing to fetch many unnecessary packages.
 In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
 
 ```starlark
-load("@aspect_rules_js//js:npm_import.bzl", "translate_pnpm_lock")
+load("@aspect_rules_js//npm:npm_import.bzl", "translate_pnpm_lock")
 
 # Read the pnpm-lock.yaml file to automate creation of remaining npm_import rules
 translate_pnpm_lock(

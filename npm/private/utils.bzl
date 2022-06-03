@@ -82,7 +82,7 @@ def _virtual_store_name(name, pnpm_version):
     escaped = name.replace("/", "+")
     return "%s@%s" % (escaped, pnpm_version)
 
-pnpm_utils = struct(
+utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
     assert_lockfile_version = _assert_lockfile_version,

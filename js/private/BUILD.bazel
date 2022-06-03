@@ -17,7 +17,10 @@ config_setting(
 bzl_library(
     name = "js_binary",
     srcs = ["js_binary.bzl"],
-    visibility = ["//:__subpackages__"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
     deps = [
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:directory_path",
@@ -29,79 +32,16 @@ bzl_library(
 )
 
 bzl_library(
-    name = "npm_package",
-    srcs = ["npm_package.bzl"],
-    visibility = ["//:__subpackages__"],
+    name = "run_js_binary",
+    srcs = ["run_js_binary.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
     deps = [
-        "@aspect_bazel_lib//lib:copy_directory",
-        "@aspect_bazel_lib//lib:copy_to_directory",
+        ":js_binary",
+        "@aspect_bazel_lib//lib:copy_to_bin",
+        "@aspect_bazel_lib//lib:run_binary",
         "@bazel_skylib//lib:dicts",
-        "@rules_nodejs//nodejs:bzl",
     ],
-)
-
-bzl_library(
-    name = "link_npm_package",
-    srcs = ["link_npm_package.bzl"],
-    visibility = ["//:__subpackages__"],
-    deps = [
-        ":npm_package",
-        ":pnpm_utils",
-        "@aspect_bazel_lib//lib:copy_directory",
-        "@bazel_skylib//lib:paths",
-        "@rules_nodejs//nodejs:bzl",
-    ],
-)
-
-bzl_library(
-    name = "npm_import",
-    srcs = ["npm_import.bzl"],
-    visibility = ["//js:__subpackages__"],
-    deps = [
-        ":pnpm_utils",
-        ":starlark_codegen_utils",
-        "@aspect_bazel_lib//lib:repo_utils",
-    ],
-)
-
-bzl_library(
-    name = "translate_pnpm_lock",
-    srcs = ["translate_pnpm_lock.bzl"],
-    visibility = ["//js:__subpackages__"],
-    deps = [
-        ":pnpm_utils",
-        ":starlark_codegen_utils",
-        ":transitive_closure",
-        "@bazel_skylib//lib:dicts",
-        "@bazel_skylib//lib:paths",
-    ],
-)
-
-bzl_library(
-    name = "pnpm_utils",
-    srcs = ["pnpm_utils.bzl"],
-    visibility = ["//js:__subpackages__"],
-    deps = [":yaml"],
-)
-
-bzl_library(
-    name = "transitive_closure",
-    srcs = ["transitive_closure.bzl"],
-    visibility = ["//js:__subpackages__"],
-    deps = [
-        "@bazel_skylib//lib:dicts",
-        "@bazel_skylib//lib:types",
-    ],
-)
-
-bzl_library(
-    name = "starlark_codegen_utils",
-    srcs = ["starlark_codegen_utils.bzl"],
-    visibility = ["//js:__subpackages__"],
-)
-
-bzl_library(
-    name = "yaml",
-    srcs = ["yaml.bzl"],
-    visibility = ["//js:__subpackages__"],
 )

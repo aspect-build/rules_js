@@ -45,7 +45,7 @@ importers:
       rollup: 2.70.2
       uvu: 0.5.3
 
-  js/private/test:
+  npm/private/test:
     specifiers:
       bufferutil: 4.0.1
       esbuild: 0.14.38

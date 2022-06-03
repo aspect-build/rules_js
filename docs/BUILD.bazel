@@ -6,23 +6,23 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
+    name = "run_js_binary",
+    bzl_library_target = "//js/private:run_js_binary",
+)
+
+stardoc_with_diff_test(
     name = "npm_package",
-    bzl_library_target = "//js/private:npm_package",
+    bzl_library_target = "//npm/private:npm_package",
 )
 
 stardoc_with_diff_test(
     name = "link_npm_package",
-    bzl_library_target = "//js/private:link_npm_package",
+    bzl_library_target = "//npm/private:link_npm_package",
 )
 
 stardoc_with_diff_test(
     name = "npm_import",
-    bzl_library_target = "//js:npm_import",
-)
-
-stardoc_with_diff_test(
-    name = "run_js_binary",
-    bzl_library_target = "//js:run_js_binary",
+    bzl_library_target = "//npm:npm_import",
 )
 
 update_docs(name = "update")

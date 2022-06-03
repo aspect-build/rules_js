@@ -13,8 +13,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/private:js_binary",
-        "//js/private:link_npm_package",
-        "//js/private:npm_package",
+        "//js/private:run_js_binary",
     ],
 )
 
@@ -25,29 +24,6 @@ bzl_library(
     deps = [
         "@bazel_tools//tools/build_defs/repo:http.bzl",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",
-    ],
-)
-
-bzl_library(
-    name = "npm_import",
-    srcs = ["npm_import.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//js/private:npm_import",
-        "//js/private:pnpm_utils",
-        "//js/private:translate_pnpm_lock",
-    ],
-)
-
-bzl_library(
-    name = "run_js_binary",
-    srcs = ["run_js_binary.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//js/private:js_binary",
-        "@aspect_bazel_lib//lib:copy_to_bin",
-        "@aspect_bazel_lib//lib:run_binary",
-        "@bazel_skylib//lib:dicts",
     ],
 )
 

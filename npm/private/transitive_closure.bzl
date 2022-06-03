@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:types.bzl", "types")
-load("//js/private:pnpm_utils.bzl", "pnpm_utils")
+load(":utils.bzl", "utils")
 
 def gather_transitive_closure(packages, no_optional, direct_deps, transitive_closure):
     """Walk the dependency tree, collecting the transitive closure of dependencies and their versions.
@@ -31,7 +31,7 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
             if version in transitive_closure[name]:
                 continue
             transitive_closure[name].insert(0, version)
-            package_info = packages[pnpm_utils.pnpm_name(name, version)]
+            package_info = packages[utils.pnpm_name(name, version)]
             stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"]))
 
 def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_optional = False):
@@ -52,7 +52,7 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
         fail("expected lockfileVersion key in lockfile")
     if "packages" not in lockfile.keys():
         fail("expected packages key in lockfile")
-    pnpm_utils.assert_lockfile_version(lockfile["lockfileVersion"])
+    utils.assert_lockfile_version(lockfile["lockfileVersion"])
 
     lock_importers = lockfile.get("importers", {
         ".": {
@@ -85,7 +85,7 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
         if not package_path.startswith("/"):
             fail("unsupported package path " + package_path)
         package = package_path[1:]
-        [name, pnpmVersion] = pnpm_utils.parse_pnpm_name(package)
+        [name, pnpmVersion] = utils.parse_pnpm_name(package)
 
         if "resolution" not in package_snapshot.keys():
             fail("package %s has no resolution field" % package_path)
