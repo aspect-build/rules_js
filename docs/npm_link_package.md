@@ -127,7 +127,7 @@ Example root BUILD.file where the virtual store is linked by default,
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//:defs.bzl", "npm_link_package")
 
-# Links all packages from the `translate_pnpm_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
+# Links all packages from the `npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
 # repository rule.
 npm_link_all_packages(name = "node_modules")
 
@@ -139,7 +139,7 @@ npm_link_package(
 
 # Link a first party `@lib/bar` defined by the `npm_package` `//lib/bar:bar` target
 # that depends on `@lib/foo` and on `acorn` specified in `package.json` and fetched
-# with `translate_pnpm_lock`
+# with `npm_translate_lock`
 npm_link_package(
     name = "link_lib_bar",
     src = "//lib/bar",
@@ -156,8 +156,8 @@ npm_link_package(
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_package_dep-name"></a>name |  The name of the link target. For first-party packages, this must match the <code>name</code> passed to npm_link_package for the package in the root package when not linking at the root package.<br><br>For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule, the name must match the <code>package</code> attribute of the corresponding <code>npm_import</code>. This is typically the npm package name.   |  none |
-| <a id="npm_link_package_dep-version"></a>version |  The version of the package This should be left unset for first-party packages linked manually with npm_link_package.<br><br>For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule, the package version is required to qualify the dependency. It must the <code>version</code> attribute of the corresponding <code>npm_import</code>.   |  <code>None</code> |
+| <a id="npm_link_package_dep-name"></a>name |  The name of the link target. For first-party packages, this must match the <code>name</code> passed to npm_link_package for the package in the root package when not linking at the root package.<br><br>For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule, the name must match the <code>package</code> attribute of the corresponding <code>npm_import</code>. This is typically the npm package name.   |  none |
+| <a id="npm_link_package_dep-version"></a>version |  The version of the package This should be left unset for first-party packages linked manually with npm_link_package.<br><br>For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule, the package version is required to qualify the dependency. It must the <code>version</code> attribute of the corresponding <code>npm_import</code>.   |  <code>None</code> |
 | <a id="npm_link_package_dep-root_package"></a>root_package |  The bazel package of the virtual store. Defaults to the current package   |  <code>""</code> |
 
 **RETURNS**

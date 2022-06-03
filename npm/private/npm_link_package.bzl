@@ -318,7 +318,7 @@ def npm_link_package_dep(
     load("@npm//:defs.bzl", "npm_link_all_packages")
     load("@aspect_rules_js//:defs.bzl", "npm_link_package")
 
-    # Links all packages from the `translate_pnpm_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
+    # Links all packages from the `npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
     # repository rule.
     npm_link_all_packages(name = "node_modules")
 
@@ -330,7 +330,7 @@ def npm_link_package_dep(
 
     # Link a first party `@lib/bar` defined by the `npm_package` `//lib/bar:bar` target
     # that depends on `@lib/foo` and on `acorn` specified in `package.json` and fetched
-    # with `translate_pnpm_lock`
+    # with `npm_translate_lock`
     npm_link_package(
         name = "link_lib_bar",
         src = "//lib/bar",
@@ -346,13 +346,13 @@ def npm_link_package_dep(
             For first-party packages, this must match the `name` passed to npm_link_package
             for the package in the root package when not linking at the root package.
 
-            For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+            For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule,
             the name must match the `package` attribute of the corresponding `npm_import`. This is typically
             the npm package name.
         version: The version of the package
             This should be left unset for first-party packages linked manually with npm_link_package.
 
-            For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+            For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule,
             the package version is required to qualify the dependency. It must the `version` attribute
             of the corresponding `npm_import`.
         root_package: The bazel package of the virtual store.

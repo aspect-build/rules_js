@@ -179,7 +179,7 @@ diff_test(
 )
 
 ####################################################
-# Use case 6: bin from translate_pnpm_lock
+# Use case 6: bin from npm_translate_lock
 # Use a generated bin.uvo_test target
 
 # Generated bin test as a test target

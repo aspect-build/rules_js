@@ -289,7 +289,7 @@ def _impl(rctx):
         for link_package in rctx.attr.link_packages:
             bin_bzl = generated_by_lines + [
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
-                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_test = "js_test", _js_run_binary = "js_run_binary")""",
+                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
             ]
             for name in bins:
                 bin_bzl.append(

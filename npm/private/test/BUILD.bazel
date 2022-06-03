@@ -16,7 +16,7 @@ transitive_closure_tests(name = "test_transitive_closure")
 yaml_tests(name = "test_yaml")
 
 write_source_files(
-    name = "write_translate_pnpm_lock",
+    name = "write_npm_translate_lock",
     files = {
         "repositories_checked.bzl": "@npm//:repositories.bzl",
         "defs_checked.bzl": "@npm//:defs.bzl",

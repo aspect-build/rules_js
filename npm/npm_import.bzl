@@ -3,7 +3,7 @@
 Load these with,
 
 ```starlark
-load("@aspect_rules_js//npm:npm_import.bzl", "translate_pnpm_lock", "npm_import")
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock", "npm_import")
 ```
 
 These use Bazel's downloader to fetch the packages.
@@ -12,7 +12,7 @@ You can use this to redirect all fetches through a store like Artifactory.
 See <https://blog.aspect.dev/configuring-bazels-downloader> for more info about how it works
 and how to configure it.
 
-[`translate_pnpm_lock`](#translate_pnpm_lock) is the primary user-facing API.
+[`npm_translate_lock`](#npm_translate_lock) is the primary user-facing API.
 It uses the lockfile format from [pnpm](https://pnpm.io/motivation) because it gives us reliable
 semantics for how to dynamically lay out `node_modules` trees on disk in bazel-out.
 
@@ -27,12 +27,12 @@ Advanced users may want to directly fetch a package from npm rather than start f
 
 load("//npm/private:npm_import.bzl", _npm_import = "npm_import", _npm_import_links = "npm_import_links")
 load("//npm/private:utils.bzl", _utils = "utils")
-load("//npm/private:translate_pnpm_lock.bzl", _translate_pnpm_lock_lib = "translate_pnpm_lock")
+load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock_lib = "npm_translate_lock")
 
-translate_pnpm_lock = repository_rule(
-    doc = _translate_pnpm_lock_lib.doc,
-    implementation = _translate_pnpm_lock_lib.implementation,
-    attrs = _translate_pnpm_lock_lib.attrs,
+npm_translate_lock = repository_rule(
+    doc = _npm_translate_lock_lib.doc,
+    implementation = _npm_translate_lock_lib.implementation,
+    attrs = _npm_translate_lock_lib.attrs,
 )
 
 def npm_import(
@@ -51,7 +51,7 @@ def npm_import(
         custom_postinstall = ""):
     """Import a single npm package into Bazel.
 
-    Normally you'd want to use `translate_pnpm_lock` to import all your packages at once.
+    Normally you'd want to use `npm_translate_lock` to import all your packages at once.
     It generates `npm_import` rules.
     You can create these manually if you want to have exact control.
 
@@ -96,7 +96,7 @@ def npm_import(
     NB: You can choose any target name for the link target but we recommend using the `node_modules/@scope/name` and
     `node_modules/name` convention for readability.
 
-    When using `translate_pnpm_lock`, you can link all the npm dependencies in the lock file for a package:
+    When using `npm_translate_lock`, you can link all the npm dependencies in the lock file for a package:
 
     ```
     load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -132,9 +132,9 @@ def npm_import(
         transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
             package name and value is a list of version(s) depended on in the closure.
         root_package: The root package where the node_modules virtual store is linked to.
-            Typically this is the package that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
+            Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
         link_workspace: The workspace name where links will be created for this package.
-            Typically this is the workspace that the pnpm-lock.yaml file is located when using `translate_pnpm_lock`.
+            Typically this is the workspace that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
             Can be left unspecified if the link workspace is the user workspace.
         link_packages: List of paths where direct links may be created at for this package.
             Defaults to [] which indicates that direct links may be created in any package as specified by
