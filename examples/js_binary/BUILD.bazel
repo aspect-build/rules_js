@@ -4,14 +4,14 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test", "run_js_binary")
-load("@aspect_rules_js//npm:defs.bzl", "constants", "link_npm_package")
+load("@aspect_rules_js//npm:defs.bzl", "link_npm_package")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
 # a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_acorn(name = "link_acorn")
+link_acorn(name = "node_modules/acorn")
 
 # Link @mycorp/mylib as a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_npm_package(name = "link_mycorp_mylib")
+link_npm_package(name = "node_modules/@mycorp/mylib")
 
 ####################################################
 # Test case 4
@@ -20,7 +20,7 @@ link_npm_package(name = "link_mycorp_mylib")
 
 js_binary(
     name = "bin",
-    data = [":link_acorn"],
+    data = [":node_modules/acorn"],
     entry_point = "require_acorn.js",
 )
 
@@ -49,7 +49,7 @@ diff_test(
 
 js_test(
     name = "test_test",
-    data = ["@npm//@types/node"],
+    data = ["//:node_modules/@types/node"],
     entry_point = "test.js",
 )
 
@@ -67,7 +67,7 @@ write_file(
 
 js_binary(
     name = "bin6",
-    data = [":link_mycorp_mylib"],
+    data = [":node_modules/@mycorp/mylib"],
     entry_point = "case6.js",
 )
 
@@ -278,7 +278,7 @@ run_js_binary(
 
 directory_path(
     name = "acorn_entry_point",
-    directory = ":link_acorn{}".format(constants.dir_suffix),
+    directory = ":node_modules/acorn/dir",
     path = "bin/acorn",
 )
 

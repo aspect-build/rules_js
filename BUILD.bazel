@@ -11,7 +11,7 @@ link_all_npm_packages(name = "node_modules")
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, to the
 # virtual store in bazel-bin/node_modules/.aspect_rules_js
 link_acorn(
-    name = "link_acorn",
+    name = "node_modules/acorn",
     # `direct` set to False as an example of *not* also linking this 3rd dependency as a
     # direct dependency in the package at bazel-bin/node_modules/@mycorp/mylib. Alternately,
     # you may specify link_packages in the npm_import of this package and direct is then
@@ -21,7 +21,7 @@ link_acorn(
 
 # Linking a first-party dependency to the virtual store in bazel-bin/node_modules/.aspect_rules_js
 link_npm_package(
-    name = "link_mycorp_mylib",
+    name = "node_modules/@mycorp/mylib",
     src = "//examples/lib",
     # `direct` set to False as an example of *not* also linking this first-party dependency as a
     # direct dependency in the package at bazel-bin/node_modules/@mycorp/mylib.

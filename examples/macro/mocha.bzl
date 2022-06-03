@@ -20,8 +20,8 @@ def mocha_test(name, srcs, args = [], data = [], env = {}, **kwargs):
         data = data + [
             "_%s_srcs" % name,
             "//examples/macro:mocha_reporters.json",
-            "@npm//examples/macro/mocha-multi-reporters",
-            "@npm//examples/macro/mocha-junit-reporter",
+            "//examples/macro:node_modules/mocha-multi-reporters",
+            "//examples/macro:node_modules/mocha-junit-reporter",
         ],
         env = dict(env, **{
             # Add environment variable so that mocha writes its test xml
