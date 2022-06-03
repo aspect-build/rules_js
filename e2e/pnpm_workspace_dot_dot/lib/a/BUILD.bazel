@@ -1,9 +1,9 @@
-load("@aspect_rules_js//js:defs.bzl", "js_package")
-load("@npm//:defs.bzl", "link_js_packages")
+load("@aspect_rules_js//js:defs.bzl", "npm_package")
+load("@npm//:defs.bzl", "link_npm_packages")
 
-link_js_packages()
+link_npm_packages()
 
-js_package(
+npm_package(
     name = "a",
     srcs = [
         "index.js",

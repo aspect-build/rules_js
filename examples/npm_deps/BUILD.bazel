@@ -1,10 +1,10 @@
-load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_js_package")
+load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//:defs.bzl", "link_js_packages")
-load("//js:defs.bzl", "link_js_package")
+load("@npm//:defs.bzl", "link_npm_packages")
+load("//js:defs.bzl", "link_npm_package")
 
 ###########################
 
@@ -23,11 +23,11 @@ load("@npm//examples/npm_deps/uvu:package_json.bzl", uvu_bin = "bin")
 link_acorn(name = "link_acorn")
 
 # Link @mycorp/mylib as a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_js_package(name = "link_mycorp_mylib")
+link_npm_package(name = "link_mycorp_mylib")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
-link_js_packages()
+link_npm_packages()
 
 #######################################
 # Use case 1: transitive npm dependencies

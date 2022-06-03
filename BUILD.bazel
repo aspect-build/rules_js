@@ -1,12 +1,12 @@
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
-load("@npm//:defs.bzl", "link_js_packages")
-load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_js_package")
-load("//js:defs.bzl", "link_js_package", "link_js_package_dep")
+load("@npm//:defs.bzl", "link_npm_packages")
+load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
+load("//js:defs.bzl", "link_npm_package", "link_npm_package_dep")
 
 # Link all packages from the /WORKSPACE translate_pnpm_lock in /package.json to
 # bazel-bin/node_modules as well as the virtual store bazel-bin/node_modules/.aspect_rules_js
 # since /package.json is the root of the pnpm workspace
-link_js_packages()
+link_npm_packages()
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, to the
 # virtual store in bazel-bin/node_modules/.aspect_rules_js
@@ -20,7 +20,7 @@ link_acorn(
 )
 
 # Linking a first-party dependency to the virtual store in bazel-bin/node_modules/.aspect_rules_js
-link_js_package(
+link_npm_package(
     name = "link_mycorp_mylib",
     src = "//examples/lib",
     # `direct` set to False as an example of *not* also linking this first-party dependency as a
@@ -30,7 +30,7 @@ link_js_package(
         # For a 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
         # you must specify both the name and version to qualify the dependency. These should match the
         # `package` and `version` attributes of the corresponding `npm_import`.
-        link_js_package_dep(
+        link_npm_package_dep(
             "acorn",
             version = "8.4.0",
         ),

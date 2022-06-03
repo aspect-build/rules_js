@@ -77,25 +77,25 @@ def npm_import(
     package's `BUILD.bazel` file:
 
     ```
-    load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "link_js_package")
+    load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "link_npm_package")
 
     link_types_node()
     ```
 
-    This instantiates a `link_js_package` target for this package that can be referenced by the alias
+    This instantiates a `link_npm_package` target for this package that can be referenced by the alias
     `@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
     The `npm` prefix of these alias is configurable via the `namespace` attribute.
 
     When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
 
     ```
-    load("@npm//:defs.bzl", "link_js_packages")
+    load("@npm//:defs.bzl", "link_npm_packages")
 
-    link_js_packages()
+    link_npm_packages()
     ```
 
     `translate_pnpm_lock` also creates convienence aliases in the external repository that reference
-    the `link_js_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
+    the `link_npm_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
 
     To change the proxy URL we use to fetch, configure the Bazel downloader:
 
@@ -124,7 +124,7 @@ def npm_import(
             Can be left unspecified if the link workspace is the user workspace.
         link_packages: List of paths where direct links may be created at for this package.
             Defaults to [] which indicates that direct links may be created in any package as specified by
-            the `direct` attribute of the generated link_js_package.
+            the `direct` attribute of the generated link_npm_package.
             These paths are relative to the root package with "." being the node_modules at the root package.
         run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
             package.

@@ -1,7 +1,7 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
-load("@npm//:defs.bzl", "link_js_packages")
+load("@npm//:defs.bzl", "link_npm_packages")
 
-link_js_packages()
+link_npm_packages()
 
 js_binary(
     name = "main",

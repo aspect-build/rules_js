@@ -170,9 +170,9 @@ alias(
 )"""
 
 _SCOPE_TMPL = \
-    """load("@aspect_rules_js//js/private:linked_js_packages.bzl", "linked_js_packages")
+    """load("@aspect_rules_js//js/private:linked_npm_packages.bzl", "linked_npm_packages")
 
-linked_js_packages(
+linked_npm_packages(
     name = "{scope}",
     srcs = {srcs},
     visibility = ["//visibility:public"],
@@ -186,9 +186,9 @@ bin = _bin
 _FP_STORE_TMPL = \
     """
     if is_root:
-         _link_js_package_store(
+         _link_npm_package_store(
             name = "{store_link_prefix}{bazel_name}",
-            src = "{js_package_target}",
+            src = "{npm_package_target}",
             package = "{package}",
             version = "0.0.0",
             deps = {deps},
@@ -201,7 +201,7 @@ _FP_DIRECT_TMPL = \
     for link_package in {link_packages}:
         if link_package == native.package_name():
             # terminal target for direct dependencies
-            _link_js_package_direct(
+            _link_npm_package_direct(
                 name = "{direct_link_prefix}{bazel_name}",
                 src = "//{root_package}:{store_link_prefix}{bazel_name}",
                 visibility = ["//visibility:public"],
@@ -378,14 +378,14 @@ def _impl(rctx):
     defs_bzl_header = generated_by_lines
     defs_bzl_body = [
         """# buildifier: disable=unnamed-macro
-def link_js_packages():
-    "Generated list of link_js_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}"
+def link_npm_packages():
+    "Generated list of link_npm_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}"
     root_package = "{root_package}"
     link_packages = {link_packages}
     is_root = native.package_name() == root_package
     is_direct = native.package_name() in link_packages
     if not is_root and not is_direct:
-        msg = "The link_js_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
+        msg = "The link_npm_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
         fail(msg)
 """.format(
             pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
@@ -431,7 +431,7 @@ def link_js_packages():
         ))
 
         defs_bzl_header.append(
-            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_js_package")""".format(
+            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_npm_package")""".format(
                 i = i,
                 repo_name = _import.name,
                 links_suffix = pnpm_utils.links_suffix,
@@ -531,9 +531,9 @@ def link_js_packages():
                     }
 
     if fp_links:
-        defs_bzl_header.append("""load("@aspect_rules_js//js/private:link_js_package.bzl",
-    _link_js_package_store = "link_js_package_store",
-    _link_js_package_direct = "link_js_package_direct")""")
+        defs_bzl_header.append("""load("@aspect_rules_js//js/private:link_npm_package.bzl",
+    _link_npm_package_store = "link_npm_package_store",
+    _link_npm_package_direct = "link_npm_package_direct")""")
 
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
@@ -547,7 +547,7 @@ def link_js_packages():
             bazel_name = fp_bazel_name,
             deps = starlark_codegen_utils.to_list_attr(fp_deps, 3),
             direct_link_prefix = pnpm_utils.direct_link_prefix,
-            js_package_target = fp_target,
+            npm_package_target = fp_target,
             package = fp_package,
             store_link_prefix = pnpm_utils.store_link_prefix,
         ))

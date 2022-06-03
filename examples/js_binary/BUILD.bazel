@@ -1,9 +1,9 @@
-load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_js_package")
+load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
-load("@aspect_rules_js//js:defs.bzl", "constants", "js_binary", "js_test", "link_js_package")
+load("@aspect_rules_js//js:defs.bzl", "constants", "js_binary", "js_test", "link_npm_package")
 load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
@@ -11,7 +11,7 @@ load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
 link_acorn(name = "link_acorn")
 
 # Link @mycorp/mylib as a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_js_package(name = "link_mycorp_mylib")
+link_npm_package(name = "link_mycorp_mylib")
 
 ####################################################
 # Test case 4
@@ -30,8 +30,8 @@ run_js_binary(
     outs = ["actual4"],
     args = ["actual4"],
     chdir = package_name(),
-    tool = ":bin",
     log_level = "debug",
+    tool = ":bin",
     # Uncomment the setting below to see debug output even on a
     # successful run of the build action.
     # silent_on_success = False,

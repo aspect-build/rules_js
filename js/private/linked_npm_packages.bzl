@@ -1,9 +1,9 @@
-"linked_js_packages rule"
+"linked_npm_packages rule"
 
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
-load(":link_js_package.bzl", _link_js_package_direct_lib = "link_js_package_direct_lib")
+load(":link_npm_package.bzl", _link_npm_package_direct_lib = "link_npm_package_direct_lib")
 
-_DOC = """Combines multiple link_js_package_direct targets into a single target.
+_DOC = """Combines multiple link_npm_package_direct targets into a single target.
 
 New target provides DefaultInfo and DeclarationInfo but does not forward the
 _LinkJsPackageInfo of srcs.
@@ -13,8 +13,8 @@ For internal use only. Used for create `@npm//@scope` targets.
 
 _ATTRS = {
     "srcs": attr.label_list(
-        doc = """The link_js_package targets to forward.""",
-        providers = _link_js_package_direct_lib.provides,
+        doc = """The link_npm_package targets to forward.""",
+        providers = _link_npm_package_direct_lib.provides,
         mandatory = True,
     ),
 }
@@ -37,7 +37,7 @@ def _impl(ctx):
 
     return result
 
-linked_js_packages = rule(
+linked_npm_packages = rule(
     doc = _DOC,
     implementation = _impl,
     attrs = _ATTRS,
