@@ -56,6 +56,9 @@ See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for how to r
 > For rules_js to see the added dependency edge, you must ensure it appears in the `pnpm-lock.yaml` file, either by re-creating it
 > (though this loses your transitive dependency version pinning) or by hand-modifying it.
 
+Another approach is to just give up on pnpm's stricter visibility for npm modules, and use the `--shamefully-hoist` option.
+This will write a `pnpm-lock.yaml` file which provides a hoisted node_modules structure, which rules_js will naturally translate into the bazel-out folder.
+
 As long as you're able to run your build and test under pnpm, we expect the behavior of `rules_js` should match.
 
 ## Link the node modules
