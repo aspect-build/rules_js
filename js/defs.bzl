@@ -8,7 +8,7 @@ load(
 )
 load(
     "//js/private:npm_package.bzl",
-    _JsPackageInfo = "JsPackageInfo",
+    _NpmPackageInfo = "NpmPackageInfo",
     _npm_package = "npm_package",
     _npm_package_lib = "npm_package_lib",
 )
@@ -41,7 +41,7 @@ def js_test(**kwargs):
     )
 
 npm_package = _npm_package
-JsPackageInfo = _JsPackageInfo
+NpmPackageInfo = _NpmPackageInfo
 
 link_npm_package = _link_npm_package
 link_npm_package_dep = _link_npm_package_dep

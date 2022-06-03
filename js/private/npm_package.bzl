@@ -5,8 +5,8 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 
-JsPackageInfo = provider(
-    doc = "A provider that carries the output directory (a TreeArtifact) of a npm_package which contains the packages sources along with the package name and version",
+NpmPackageInfo = provider(
+    doc = "A provider that carries the output directory (a TreeArtifact) of an npm package which contains the packages sources along with the package name and version",
     fields = {
         "label": "the label of the target the created this provider",
         "package": "name of this node package",
@@ -15,7 +15,7 @@ JsPackageInfo = provider(
     },
 )
 
-_DOC = """A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a JsPackageInfo.
+_DOC = """A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a NpmPackageInfo.
 
 This target can be used as the src attribute to link_npm_package.
 
@@ -91,7 +91,7 @@ def _impl(ctx):
 
     providers.extend([
         declaration_info(depset([directory])),
-        JsPackageInfo(
+        NpmPackageInfo(
             label = ctx.label,
             package = ctx.attr.package,
             version = ctx.attr.version,
@@ -103,7 +103,7 @@ def _impl(ctx):
 npm_package_lib = struct(
     attrs = _ATTRS,
     implementation = _impl,
-    provides = [DefaultInfo, DeclarationInfo, JsPackageInfo],
+    provides = [DefaultInfo, DeclarationInfo, NpmPackageInfo],
 )
 
 npm_package = rule(

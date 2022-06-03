@@ -11,7 +11,7 @@ npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-exclude_
             <a href="#npm_package-root_paths">root_paths</a>, <a href="#npm_package-src">src</a>, <a href="#npm_package-srcs">srcs</a>, <a href="#npm_package-version">version</a>)
 </pre>
 
-A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a JsPackageInfo.
+A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a NpmPackageInfo.
 
 This target can be used as the src attribute to link_npm_package.
 
@@ -33,25 +33,25 @@ A DeclarationInfo is also provided so that the target can be used as an input to
 | <a id="npm_package-version"></a>version |  The package version. If set, should match the <code>version</code> field in the <code>package.json</code> file for this package.<br><br>If set, a link_npm_package may omit the package version and the package version set here will be used for linking. A  link_npm_package target that specifies a package version will override the value here when linking.<br><br>If unset, a link_npm_package target that references this npm_package must define the package version must be for linking.   | String | optional | "0.0.0" |
 
 
-<a id="#JsPackageInfo"></a>
+<a id="#NpmPackageInfo"></a>
 
-## JsPackageInfo
+## NpmPackageInfo
 
 <pre>
-JsPackageInfo(<a href="#JsPackageInfo-label">label</a>, <a href="#JsPackageInfo-package">package</a>, <a href="#JsPackageInfo-version">version</a>, <a href="#JsPackageInfo-directory">directory</a>)
+NpmPackageInfo(<a href="#NpmPackageInfo-label">label</a>, <a href="#NpmPackageInfo-package">package</a>, <a href="#NpmPackageInfo-version">version</a>, <a href="#NpmPackageInfo-directory">directory</a>)
 </pre>
 
-A provider that carries the output directory (a TreeArtifact) of a npm_package which contains the packages sources along with the package name and version
+A provider that carries the output directory (a TreeArtifact) of an npm package which contains the packages sources along with the package name and version
 
 **FIELDS**
 
 
 | Name  | Description |
 | :------------- | :------------- |
-| <a id="JsPackageInfo-label"></a>label |  the label of the target the created this provider    |
-| <a id="JsPackageInfo-package"></a>package |  name of this node package    |
-| <a id="JsPackageInfo-version"></a>version |  version of this node package    |
-| <a id="JsPackageInfo-directory"></a>directory |  the output directory (a TreeArtifact) that contains the package sources    |
+| <a id="NpmPackageInfo-label"></a>label |  the label of the target the created this provider    |
+| <a id="NpmPackageInfo-package"></a>package |  name of this node package    |
+| <a id="NpmPackageInfo-version"></a>version |  version of this node package    |
+| <a id="NpmPackageInfo-directory"></a>directory |  the output directory (a TreeArtifact) that contains the package sources    |
 
 
 <a id="#npm_package_lib.implementation"></a>
