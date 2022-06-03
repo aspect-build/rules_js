@@ -74,6 +74,16 @@ def link_npm_package(
             tags = ["manual"],
         )
 
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{store_link_prefix}{bazel_name}{dir_suffix}",
+            srcs = [":{store_link_prefix}{bazel_name}"],
+            output_group = "{package_directory_output_group}",
+            visibility = visibility,
+            tags = ["manual"],
+        )
+
         if lifecycle_build_target:
             # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
             _link_npm_package_store(
@@ -125,33 +135,19 @@ def link_npm_package(
     if is_direct:
         # terminal target for direct dependencies
         _link_npm_package_direct(
-            name = "{direct_link_prefix}{bazel_name}",
+            name = name,
             src = "//{root_package}:{store_link_prefix}{bazel_name}",
             visibility = visibility,
             tags = ["manual"],
         )
-        direct_target = ":{direct_link_prefix}{bazel_name}"
+        direct_target = ":{{}}".format(name)
 
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
         native.filegroup(
-            name = "{direct_link_prefix}{bazel_name}{dir_suffix}",
-            srcs = [":{direct_link_prefix}{bazel_name}"],
+            name = "{{}}/dir".format(name),
+            srcs = [direct_target],
             output_group = "{package_directory_output_group}",
-            visibility = visibility,
-            tags = ["manual"],
-        )
-
-        native.alias(
-            name = name,
-            actual = ":{direct_link_prefix}{bazel_name}",
-            visibility = visibility,
-            tags = ["manual"],
-        )
-
-        native.alias(
-            name = "{{}}{dir_suffix}".format(name),
-            actual = ":{direct_link_prefix}{bazel_name}{dir_suffix}",
             visibility = visibility,
             tags = ["manual"],
         )
@@ -163,13 +159,13 @@ _BIN_MACRO_TMPL = """
 def {bin_name}(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}{dir_suffix}",
+        directory = "@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}{dir_suffix}",
         path = "{bin_path}",
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = ["@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}"],
+        data = ["@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}"],
     )
     _run_js_binary(
         name = name,
@@ -180,26 +176,26 @@ def {bin_name}(name, **kwargs):
 def {bin_name}_test(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}{dir_suffix}",
+        directory = "@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}{dir_suffix}",
         path = "{bin_path}",
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}"],
         **kwargs
     )
 
 def {bin_name}_binary(name, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}{dir_suffix}",
+        directory = "@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}{dir_suffix}",
         path = "{bin_path}",
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}"],
+        data = kwargs.pop("data", []) + ["@{link_workspace}//{root_package}:{store_link_prefix}{bazel_name}"],
         **kwargs
     )
 """
@@ -302,9 +298,9 @@ def _impl(rctx):
                         bin_name = _sanitize_bin_name(name),
                         bin_path = bins[name],
                         dir_suffix = utils.dir_suffix,
-                        direct_link_prefix = utils.direct_link_prefix,
-                        link_package = link_package,
+                        root_package = rctx.attr.root_package,
                         link_workspace = rctx.attr.link_workspace,
+                        store_link_prefix = utils.store_link_prefix,
                     ),
                 )
 
@@ -410,7 +406,6 @@ def _impl_links(rctx):
         bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version),
         deps = starlark_codegen_utils.to_list_attr(deps, 1),
         dir_suffix = utils.dir_suffix,
-        direct_link_prefix = utils.direct_link_prefix,
         direct_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,

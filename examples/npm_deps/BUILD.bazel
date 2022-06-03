@@ -19,10 +19,10 @@ load("@npm//examples/npm_deps/uvu:package_json.bzl", uvu_bin = "bin")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
 # a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_acorn(name = "link_acorn")
+link_acorn(name = "node_modules/acorn")
 
 # Link @mycorp/mylib as a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_npm_package(name = "link_mycorp_mylib")
+link_npm_package(name = "node_modules/@mycorp/mylib")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
@@ -45,7 +45,7 @@ write_file(
 
 js_binary(
     name = "bin1",
-    data = ["@npm//examples/npm_deps/@gregmagolan/test-b"],
+    data = [":node_modules/@gregmagolan/test-b"],
     entry_point = "case1.js",
 )
 
@@ -68,12 +68,12 @@ diff_test(
 js_test(
     name = "test_peer",
     data = [
-        "@npm//examples/npm_deps/@rollup/plugin-commonjs",
-        "@npm//examples/npm_deps/mobx-react",
-        "@npm//examples/npm_deps/react",
+        ":node_modules/@rollup/plugin-commonjs",
+        ":node_modules/mobx-react",
+        ":node_modules/react",
         # TODO: fix this test so we test a peer dependency without requiring it as a direct
         # dependency https://github.com/aspect-build/rules_js/issues/92
-        "@npm//examples/npm_deps/rollup",
+        ":node_modules/rollup",
     ],
     entry_point = "peer_test.js",
 )
@@ -97,7 +97,7 @@ if (content.answer !== '42*') {
 js_test(
     name = "test3",
     data = [
-        "@npm//examples/npm_deps/@aspect-test/c",
+        ":node_modules/@aspect-test/c",
     ],
     entry_point = "case3.js",
 )
@@ -123,9 +123,9 @@ if (!/^moo\\s+mooo\\s*$/.test(content)) {
 
 js_test(
     name = "test4",
-    args = ["$(rootpath @npm//examples/npm_deps/@aspect-test/c:dir)"],
+    args = ["$(rootpath :node_modules/@aspect-test/c/dir)"],
     data = [
-        "@npm//examples/npm_deps/@aspect-test/c:dir",
+        ":node_modules/@aspect-test/c/dir",
     ],
     entry_point = "case4.js",
 )
@@ -212,7 +212,9 @@ uvu_test(
         "false",
     ],
     data = [
-        ":link_mycorp_mylib",
+        ":node_modules/@mycorp/mylib",
+        # ":node_modules/uvu" dep required because our spec calls require('uvu')
+        ":node_modules/uvu",
         ":uvu_spec",
     ],
 )

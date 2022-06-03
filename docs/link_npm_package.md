@@ -81,10 +81,10 @@ link_npm_package(<a href="#link_npm_package-name">name</a>, <a href="#link_npm_p
 
 When called at the root_package, a virtual store target is generated named "link__{bazelified_name}__store".
 
-When linking direct, a "{name}" alias is generated which consists of the direct node_modules link and transitively
+When linking direct, a "{name}" target is generated which consists of the direct node_modules link and transitively
 its virtual store link and the virtual store links of the transitive closure of deps.
 
-When linking direct, "{name}__dir" alias is also generated that refers to a directory artifact can be used to access
+When linking direct, "{name}/dir" filegroup is also generated that refers to a directory artifact can be used to access
 the package directory for creating entry points or accessing files in the package.
 
 
@@ -133,7 +133,7 @@ link_all_npm_packages(name = "node_modules")
 
 # Link a first party `@lib/foo` defined by the `npm_package` `//lib/foo:foo` target.
 link_npm_package(
-    name = "link_lib_foo",
+    name = "node_modules/@lib/foo",
     src = "//lib/foo",
 )
 
@@ -144,7 +144,7 @@ link_npm_package(
     name = "link_lib_bar",
     src = "//lib/bar",
     deps = [
-        link_npm_package_dep("link_lib_foo"),
+        link_npm_package_dep("node_modules/@lib/foo"),
         link_npm_package_dep("acorn", version = "8.4.0"),
     ],
 )

@@ -296,6 +296,13 @@ link_npm_package_direct = rule(
     provides = link_npm_package_direct_lib.provides,
 )
 
+def _name_for_store(name):
+    """Strip the standard node_modules/ naming convention prefix off of the name used for the store"""
+    if name.startswith("node_modules/"):
+        return name[len("node_modules/"):]
+    else:
+        return name
+
 def link_npm_package_dep(
         name,
         version = None,
@@ -317,7 +324,7 @@ def link_npm_package_dep(
 
     # Link a first party `@lib/foo` defined by the `npm_package` `//lib/foo:foo` target.
     link_npm_package(
-        name = "link_lib_foo",
+        name = "node_modules/@lib/foo",
         src = "//lib/foo",
     )
 
@@ -328,7 +335,7 @@ def link_npm_package_dep(
         name = "link_lib_bar",
         src = "//lib/bar",
         deps = [
-            link_npm_package_dep("link_lib_foo"),
+            link_npm_package_dep("node_modules/@lib/foo"),
             link_npm_package_dep("acorn", version = "8.4.0"),
         ],
     )
@@ -355,7 +362,7 @@ def link_npm_package_dep(
         The label of the direct link for the given package at the given link package,
     """
     return Label("//{root_package}:{store_link_prefix}{bazel_name}".format(
-        bazel_name = utils.bazel_name(name, version),
+        bazel_name = utils.bazel_name(_name_for_store(name), version),
         root_package = root_package,
         store_link_prefix = utils.store_link_prefix,
     ))
@@ -374,10 +381,10 @@ def link_npm_package(
 
     When called at the root_package, a virtual store target is generated named "link__{bazelified_name}__store".
 
-    When linking direct, a "{name}" alias is generated which consists of the direct node_modules link and transitively
+    When linking direct, a "{name}" target is generated which consists of the direct node_modules link and transitively
     its virtual store link and the virtual store links of the transitive closure of deps.
 
-    When linking direct, "{name}__dir" alias is also generated that refers to a directory artifact can be used to access
+    When linking direct, "{name}/dir" filegroup is also generated that refers to a directory artifact can be used to access
     the package directory for creating entry points or accessing files in the package.
 
     Args:
@@ -417,19 +424,8 @@ def link_npm_package(
         msg = "src may only be specified when linking in the root package '{}'".format(root_package)
         fail(msg)
 
-    link_target_name = "{direct_link_prefix}{bazel_name}".format(
-        bazel_name = utils.bazel_name(name),
-        direct_link_prefix = utils.direct_link_prefix,
-    )
-
-    dir_target_name = "{direct_link_prefix}{bazel_name}{dir_suffix}".format(
-        bazel_name = utils.bazel_name(name),
-        dir_suffix = utils.dir_suffix,
-        direct_link_prefix = utils.direct_link_prefix,
-    )
-
     store_target_name = "{store_link_prefix}{bazel_name}".format(
-        bazel_name = utils.bazel_name(name),
+        bazel_name = utils.bazel_name(_name_for_store(name)),
         store_link_prefix = utils.store_link_prefix,
     )
 
@@ -452,7 +448,7 @@ def link_npm_package(
     if direct:
         # link as a direct dependency in node_modules of this package
         link_npm_package_direct(
-            name = link_target_name,
+            name = name,
             src = "//{root_package}:{store_target}".format(
                 root_package = root_package,
                 store_target = store_target_name,
@@ -460,28 +456,14 @@ def link_npm_package(
             tags = tags,
             visibility = visibility,
         )
-        direct_target = ":{}".format(link_target_name)
+        direct_target = ":{}".format(name)
 
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
         native.filegroup(
-            name = dir_target_name,
-            srcs = [":{}".format(link_target_name)],
+            name = "{}/dir".format(name),
+            srcs = [direct_target],
             output_group = utils.package_directory_output_group,
-            tags = tags,
-            visibility = visibility,
-        )
-
-        native.alias(
-            name = name,
-            actual = ":{}".format(link_target_name),
-            tags = tags,
-            visibility = visibility,
-        )
-
-        native.alias(
-            name = "{}{}".format(name, utils.dir_suffix),
-            actual = ":{}".format(dir_target_name),
             tags = tags,
             visibility = visibility,
         )

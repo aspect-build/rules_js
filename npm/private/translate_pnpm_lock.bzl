@@ -156,28 +156,6 @@ _NPM_IMPORT_TMPL = \
     )
 """
 
-_ALIAS_TMPL = \
-    """alias(
-    name = "{basename}",
-    actual = "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}",
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "dir",
-    actual = "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}{dir_suffix}",
-    visibility = ["//visibility:public"],
-)"""
-
-_SCOPE_TMPL = \
-    """load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packages")
-
-linked_npm_packages(
-    name = "{scope}",
-    srcs = {srcs},
-    visibility = ["//visibility:public"],
-)"""
-
 _BIN_TMPL = \
     """load("@{repo_name}//{repo_package_json_bzl}", _bin = "bin")
 bin = _bin
@@ -202,36 +180,23 @@ _FP_DIRECT_TMPL = \
         if link_package == native.package_name():
             # terminal target for direct dependencies
             _link_npm_package_direct(
-                name = "{direct_link_prefix}{bazel_name}",
+                name = "{{}}/{name}".format(name),
                 src = "//{root_package}:{store_link_prefix}{bazel_name}",
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
             )
-            direct_targets.append(":{direct_link_prefix}{bazel_name}")
+            direct_targets.append(":{{}}/{name}".format(name))
 
             # filegroup target that provides a single file which is
             # package directory for use in $(execpath) and $(rootpath)
             native.filegroup(
-                name = "{direct_link_prefix}{bazel_name}{dir_suffix}",
-                srcs = [":{direct_link_prefix}{bazel_name}"],
+                name = "{{}}/{name}/dir".format(name),
+                srcs = [":{{}}/{name}".format(name)],
                 output_group = "{package_directory_output_group}",
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
             )
-
-            native.alias(
-                name = "{direct_link_prefix}{alias}",
-                actual = ":{direct_link_prefix}{bazel_name}",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-
-            native.alias(
-                name = "{direct_link_prefix}{alias}{dir_suffix}",
-                actual = ":{direct_link_prefix}{bazel_name}{dir_suffix}",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )"""
+            """
 
 _DEFS_BZL_FILENAME = "defs.bzl"
 _REPOSITORIES_BZL_FILENAME = "repositories.bzl"
@@ -376,127 +341,9 @@ def _impl(rctx):
 
     link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
-    defs_bzl_header = generated_by_lines
-    defs_bzl_header.append("""load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packages")""")
-    defs_bzl_body = [
-        """def link_all_npm_packages(name = "node_modules"):
-    \"\"\"Generated list of link_npm_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}
+    defs_bzl_header = generated_by_lines + ["""load("@aspect_rules_js//npm/private:linked_npm_packages.bzl", "linked_npm_packages")"""]
 
-    Args:
-        name: name of catch all target to generate for all packages linked
-    \"\"\"
-    root_package = "{root_package}"
-    link_packages = {link_packages}
-    is_root = native.package_name() == root_package
-    is_direct = native.package_name() in link_packages
-    if not is_root and not is_direct:
-        msg = "The link_all_npm_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
-        fail(msg)
-    direct_targets = []
-""".format(
-            pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
-            pnpm_lock = str(rctx.attr.pnpm_lock),
-            root_package = root_package,
-            link_packages = str(link_packages),
-            link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
-            defs_bzl_file = "@{}//:{}".format(rctx.name, _DEFS_BZL_FILENAME),
-        ),
-    ]
-
-    # map of @scope to [packages] for //@scope:@scope targets
-    scoped_packages = {}
-
-    for (i, _import) in enumerate(_gen_npm_imports(lockfile, rctx.attr)):
-        maybe_deps = ("""
-        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
-        maybe_transitive_closure = ("""
-        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
-        maybe_patches = ("""
-        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
-        maybe_patch_args = ("""
-        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
-        maybe_custom_postinstall = ("""
-        custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
-        maybe_run_lifecycle_hooks = ("""
-        run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
-
-        repositories_bzl.append(_NPM_IMPORT_TMPL.format(
-            integrity = _import.integrity,
-            link_packages = _import.link_packages,
-            link_workspace = rctx.attr.pnpm_lock.workspace_name,
-            maybe_custom_postinstall = maybe_custom_postinstall,
-            maybe_deps = maybe_deps,
-            maybe_patch_args = maybe_patch_args,
-            maybe_patches = maybe_patches,
-            maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
-            maybe_transitive_closure = maybe_transitive_closure,
-            name = _import.name,
-            package = _import.package,
-            pnpm_version = _import.pnpm_version,
-            root_package = _import.root_package,
-        ))
-
-        defs_bzl_header.append(
-            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_npm_package")""".format(
-                i = i,
-                repo_name = _import.name,
-                links_suffix = utils.links_suffix,
-            ),
-        )
-        defs_bzl_body.append("""    direct_targets.append(link_{i}(name = "{direct_link_prefix}{bazel_name}", direct = None, fail_if_no_link = False))""".format(
-            i = i,
-            direct_link_prefix = utils.direct_link_prefix,
-            bazel_name = utils.bazel_name(_import.package),
-        ))
-
-        # For direct dependencies create alias targets @repo_name//name, @repo_name//@scope/name,
-        # @repo_name//name:dir and @repo_name//@scope/name:dir
-        for link_package in _import.link_packages:
-            build_file_path = paths.normalize(paths.join(link_package, _import.package, "BUILD.bazel"))
-            rctx.file(build_file_path, "\n".join(generated_by_lines + [
-                _ALIAS_TMPL.format(
-                    basename = paths.basename(_import.package),
-                    bazel_name = utils.bazel_name(_import.package),
-                    dir_suffix = utils.dir_suffix,
-                    direct_link_prefix = utils.direct_link_prefix,
-                    link_package = link_package,
-                    link_workspace = rctx.attr.pnpm_lock.workspace_name,
-                ),
-            ]))
-
-            # Generate a package_json.bzl file for the bin entries (even if there are none)
-            # Note, there's no has_bin attribute on npm_import so we can't get the boolean
-            # value from the _import struct.
-            # If this is a problem, we could lookup into the packages again like
-            # if lockfile.get("packages").values()[i].get("hasBin"):
-            if True:
-                package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
-                repo_package_json_bzl = paths.normalize(paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)).rsplit("/", 1)
-                if len(repo_package_json_bzl) == 1:
-                    repo_package_json_bzl = [""] + repo_package_json_bzl
-                repo_package_json_bzl = ":".join(repo_package_json_bzl)
-                rctx.file(package_json_bzl_file_path, "\n".join([
-                    _BIN_TMPL.format(
-                        repo_package_json_bzl = repo_package_json_bzl,
-                        name = _import.package,
-                        repo_name = _import.name,
-                    ),
-                ]))
-
-            # Gather scoped packages
-            if len(_import.package.split("/", 1)) > 1:
-                package_scope = _import.package.split("/", 1)[0]
-                build_file_package = paths.normalize(paths.join(link_package, package_scope))
-                if build_file_package not in scoped_packages:
-                    scoped_packages[build_file_package] = []
-                scoped_packages[build_file_package].append(
-                    "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}".format(
-                        bazel_name = utils.bazel_name(_import.package),
-                        direct_link_prefix = utils.direct_link_prefix,
-                        link_package = link_package,
-                        link_workspace = rctx.attr.pnpm_lock.workspace_name,
-                    ),
-                )
+    npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
     fp_links = {}
 
@@ -541,6 +388,117 @@ def _impl(rctx):
     _link_npm_package_store = "link_npm_package_store",
     _link_npm_package_direct = "link_npm_package_direct")""")
 
+    defs_bzl_body = [
+        """def link_all_npm_packages(name = "node_modules"):
+    \"\"\"Generated list of link_npm_package() target generators and first-party linked packages corresponding to the packages in @{pnpm_lock_wksp}{pnpm_lock}
+
+    Args:
+        name: name of catch all target to generate for all packages linked
+    \"\"\"
+    root_package = "{root_package}"
+    link_packages = {link_packages}
+    is_root = native.package_name() == root_package
+    is_direct = native.package_name() in link_packages
+    if not is_root and not is_direct:
+        msg = "The link_all_npm_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
+        fail(msg)
+    direct_targets = []
+    scoped_direct_targets = {{}}
+""".format(
+            pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
+            pnpm_lock = str(rctx.attr.pnpm_lock),
+            root_package = root_package,
+            link_packages = str(link_packages),
+            link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
+            defs_bzl_file = "@{}//:{}".format(rctx.name, _DEFS_BZL_FILENAME),
+        ),
+    ]
+
+    # Gather list of all scopes across third-party and first-party deps
+    package_scopes = []
+    for _import in npm_imports:
+        if len(_import.package.split("/", 1)) > 1:
+            package_scope = _import.package.split("/", 1)[0]
+            if package_scope not in package_scopes:
+                package_scopes.append(package_scope)
+    for fp_link in fp_links.values():
+        fp_package = fp_link.get("package")
+        if len(fp_package.split("/", 1)) > 1:
+            package_scope = fp_package.split("/", 1)[0]
+            if package_scope not in package_scopes:
+                package_scopes.append(package_scope)
+    for package_scope in package_scopes:
+        defs_bzl_body.append("""    scoped_direct_targets["{}"] = []""".format(package_scope))
+
+    for (i, _import) in enumerate(npm_imports):
+        maybe_deps = ("""
+        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
+        maybe_transitive_closure = ("""
+        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
+        maybe_patches = ("""
+        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
+        maybe_patch_args = ("""
+        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
+        maybe_custom_postinstall = ("""
+        custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
+        maybe_run_lifecycle_hooks = ("""
+        run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
+
+        repositories_bzl.append(_NPM_IMPORT_TMPL.format(
+            integrity = _import.integrity,
+            link_packages = _import.link_packages,
+            link_workspace = rctx.attr.pnpm_lock.workspace_name,
+            maybe_custom_postinstall = maybe_custom_postinstall,
+            maybe_deps = maybe_deps,
+            maybe_patch_args = maybe_patch_args,
+            maybe_patches = maybe_patches,
+            maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
+            maybe_transitive_closure = maybe_transitive_closure,
+            name = _import.name,
+            package = _import.package,
+            pnpm_version = _import.pnpm_version,
+            root_package = _import.root_package,
+        ))
+
+        defs_bzl_header.append(
+            """load("@{repo_name}{links_suffix}//:defs.bzl", link_{i} = "link_npm_package")""".format(
+                i = i,
+                repo_name = _import.name,
+                links_suffix = utils.links_suffix,
+            ),
+        )
+        defs_bzl_body.append("""    direct_targets.append(link_{i}(name = "{{}}/{name}".format(name), direct = None, fail_if_no_link = False))""".format(
+            i = i,
+            name = _import.package,
+        ))
+        if len(_import.package.split("/", 1)) > 1:
+            package_scope = _import.package.split("/", 1)[0]
+            defs_bzl_body.append("""    scoped_direct_targets["{package_scope}"].append(direct_targets[-1])""".format(
+                package_scope = package_scope,
+            ))
+
+        for link_package in _import.link_packages:
+            # Generate a package_json.bzl file for the bin entries (even if there are none)
+            # Note, there's no has_bin attribute on npm_import so we can't get the boolean
+            # value from the _import struct.
+            # If this is a problem, we could lookup into the packages again like
+            # if lockfile.get("packages").values()[i].get("hasBin"):
+            if True:
+                build_file_path = paths.normalize(paths.join(link_package, _import.package, "BUILD.bazel"))
+                rctx.file(build_file_path, "\n".join(generated_by_lines))
+                package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
+                repo_package_json_bzl = paths.normalize(paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)).rsplit("/", 1)
+                if len(repo_package_json_bzl) == 1:
+                    repo_package_json_bzl = [""] + repo_package_json_bzl
+                repo_package_json_bzl = ":".join(repo_package_json_bzl)
+                rctx.file(package_json_bzl_file_path, "\n".join([
+                    _BIN_TMPL.format(
+                        repo_package_json_bzl = repo_package_json_bzl,
+                        name = _import.package,
+                        repo_name = _import.name,
+                    ),
+                ]))
+
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
         fp_path = fp_link.get("path")
@@ -552,17 +510,15 @@ def _impl(rctx):
         defs_bzl_body.append(_FP_STORE_TMPL.format(
             bazel_name = fp_bazel_name,
             deps = starlark_codegen_utils.to_list_attr(fp_deps, 3),
-            direct_link_prefix = utils.direct_link_prefix,
             npm_package_target = fp_target,
             package = fp_package,
             store_link_prefix = utils.store_link_prefix,
         ))
 
         defs_bzl_body.append(_FP_DIRECT_TMPL.format(
-            alias = utils.bazel_name(fp_package),
             bazel_name = fp_bazel_name,
+            name = fp_package,
             dir_suffix = utils.dir_suffix,
-            direct_link_prefix = utils.direct_link_prefix,
             link_packages = fp_link_packages,
             package = fp_package,
             package_directory_output_group = utils.package_directory_output_group,
@@ -570,54 +526,28 @@ def _impl(rctx):
             store_link_prefix = utils.store_link_prefix,
         ))
 
-        # Create alias targets @repo_name//name, @repo_name//@scope/name,
-        # @repo_name//name:dir and @repo_name//@scope/name:dir
-        for link_package in fp_link_packages:
-            build_file_path = paths.normalize(paths.join(link_package, fp_package, "BUILD.bazel"))
-            rctx.file(build_file_path, "\n".join(generated_by_lines + [
-                _ALIAS_TMPL.format(
-                    basename = paths.basename(fp_package),
-                    bazel_name = utils.bazel_name(fp_package),
-                    dir_suffix = utils.dir_suffix,
-                    direct_link_prefix = utils.direct_link_prefix,
-                    link_package = link_package,
-                    link_workspace = rctx.attr.pnpm_lock.workspace_name,
-                ),
-            ]))
+        if len(fp_package.split("/", 1)) > 1:
+            package_scope = fp_package.split("/", 1)[0]
+            defs_bzl_body.append("""            scoped_direct_targets["{package_scope}"].append(direct_targets[-1])""".format(
+                package_scope = package_scope,
+            ))
 
-            # Gather scoped packages
-            if len(fp_package.split("/", 1)) > 1:
-                package_scope = fp_package.split("/", 1)[0]
-                build_file_package = paths.normalize(paths.join(link_package, package_scope))
-                if build_file_package not in scoped_packages:
-                    scoped_packages[build_file_package] = []
-                scoped_packages[build_file_package].append(
-                    "@{link_workspace}//{link_package}:{direct_link_prefix}{bazel_name}".format(
-                        bazel_name = utils.bazel_name(fp_package),
-                        direct_link_prefix = utils.direct_link_prefix,
-                        link_package = link_package,
-                        link_workspace = rctx.attr.pnpm_lock.workspace_name,
-                    ),
-                )
-
-    # Generate linked_npm_packages target
+    # Generate catch all & scoped linked_npm_packages target
     defs_bzl_body.append("""
+    for scope, scoped_targets in scoped_direct_targets.items():
+        linked_npm_packages(
+            name = "{}/{}".format(name, scope),
+            srcs = [t for t in scoped_targets if t],
+            tags = ["manual"],
+            visibility = ["//visibility:public"],
+        )
+
     linked_npm_packages(
         name = name,
         srcs = [t for t in direct_targets if t],
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )""")
-
-    # Generate scoped @npm//@scope targets
-    for build_file_package, scope_packages in scoped_packages.items():
-        rctx.file(paths.join(build_file_package, "BUILD.bazel"), "\n".join(generated_by_lines + [
-            _SCOPE_TMPL.format(
-                scope = paths.basename(build_file_package),
-                srcs = starlark_codegen_utils.to_list_attr(scope_packages, 1),
-                package_path = build_file_package,
-            ),
-        ]))
 
     rctx.file(_DEFS_BZL_FILENAME, "\n".join(defs_bzl_header + [""] + defs_bzl_body + [""]))
     rctx.file(_REPOSITORIES_BZL_FILENAME, "\n".join(repositories_bzl))

@@ -8,9 +8,9 @@ js_binary(
     name = "main",
     args = ["foo"],
     data = [
-        "@npm//app/a/@aspect-test",
-        "@npm//app/a/@lib",
-        "@npm//root/@aspect-test",
+        ":node_modules/@aspect-test",
+        ":node_modules/@lib",
+        "//root:node_modules/@aspect-test",
     ],
     entry_point = "main.js",
 )
@@ -20,7 +20,7 @@ js_test(
     args = ["foo"],
     data = [
         ":node_modules",
-        "@npm//root/@aspect-test",
+        "//root:node_modules/@aspect-test",
     ],
     entry_point = "main.js",
     log_level = "info",

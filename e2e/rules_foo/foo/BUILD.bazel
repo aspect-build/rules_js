@@ -6,7 +6,7 @@ link_all_npm_packages(name = "node_modules")
 js_binary(
     name = "main",
     data = [
-        "@rules_foo_npm//foo/@aspect-test/a",
+        "@rules_foo//foo:node_modules/@aspect-test/a",
     ],
     entry_point = "main.js",
 )
@@ -14,7 +14,7 @@ js_binary(
 js_test(
     name = "test",
     data = [
-        "@rules_foo_npm//foo/@aspect-test/a",
+        "@rules_foo//foo:node_modules/@aspect-test/a",
     ],
     entry_point = "main.js",
     log_level = "info",

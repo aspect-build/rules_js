@@ -6,9 +6,7 @@ link_all_npm_packages(name = "node_modules")
 js_test(
     name = "test",
     data = [
-        "//:direct_link__chalk",
-        # these don't work yet:
-        # "@npm//chalk",
+        ":node_modules/chalk",
     ],
     entry_point = "main.mjs",
 )

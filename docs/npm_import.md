@@ -189,14 +189,18 @@ package's `BUILD.bazel` file:
 ```
 load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "link_npm_package")
 
-link_types_node()
+link_types_node(name = "node_modules/@types/node")
 ```
 
-This instantiates a `link_npm_package` target for this package that can be referenced by the alias
-`@//link/package:npm__name` and `@//link/package:npm__@scope+name` for scoped packages.
-The `npm` prefix of these alias is configurable via the `namespace` attribute.
+This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
 
-When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
+A `:node_modules/@types/node/dir` filegroup target is also created that provides the the directory artifact of the npm package.
+This target can be used to create entry points for binary target or to access files within the npm package.
+
+NB: You can choose any target name for the link target but we recommend using the `node_modules/@scope/name` and
+`node_modules/name` convention for readability.
+
+When using `translate_pnpm_lock`, you can link all the npm dependencies in the lock file for a package:
 
 ```
 load("@npm//:defs.bzl", "link_all_npm_packages")
@@ -204,8 +208,12 @@ load("@npm//:defs.bzl", "link_all_npm_packages")
 link_all_npm_packages(name = "node_modules")
 ```
 
-`translate_pnpm_lock` also creates convienence aliases in the external repository that reference
-the `link_npm_package` targets. For example, `@npm//name` and `@npm//@scope/name`.
+This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
+It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
+These target can be used to create entry points for binary target or to access files within the npm package.
+
+NB: You can pass an name to link_all_npm_packages and this will change the targets generated to "{name}/@scope/name" and
+"{name}/name". We recommend using "node_modules" as the convention for readability.
 
 To change the proxy URL we use to fetch, configure the Bazel downloader:
 

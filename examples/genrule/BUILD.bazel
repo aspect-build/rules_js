@@ -1,12 +1,11 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@aspect_rules_js//npm:defs.bzl", "constants")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
 
 # Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
 # a direct dependency in bazel-bin/examples/genrule/node_modules
-link_acorn(name = "link_acorn")
+link_acorn(name = "node_modules/acorn")
 
 #############################
 # Test case 1
@@ -62,13 +61,13 @@ genrule(
     name = "call_acorn",
     srcs = [
         ":one.js",
-        ":link_acorn",
-        ":link_acorn{}".format(constants.dir_suffix),
+        ":node_modules/acorn",
+        ":node_modules/acorn/dir",
     ],
     outs = ["actual2"],
     cmd = " ".join([
         "$(NODE_PATH)",
-        "./$(execpath :link_acorn{})/bin/acorn".format(constants.dir_suffix),
+        "./$(execpath :node_modules/acorn/dir)/bin/acorn",
         "--compact",
         "$(execpath :one.js)",
         # $@ is bazel shorthand for the path of the output file
@@ -98,7 +97,7 @@ genrule(
     name = "require_acorn",
     srcs = [
         ":require_acorn_js",
-        ":link_acorn",
+        ":node_modules/acorn",
     ],
     outs = ["actual3"],
     cmd = """
