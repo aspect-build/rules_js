@@ -56,7 +56,7 @@ def npm_link_package(
         # post-lifecycle target with reference deps for use in terminal target with transitive closure
         _npm_link_package_store(
             name = "{store_link_prefix}{bazel_name}__pkg",
-            src = "{store_link_prefix}{bazel_name}__jsp" if lifecycle_build_target else "{npm_package_target}",
+            src = "{store_link_prefix}{bazel_name}__pkg_lc" if lifecycle_build_target else "{npm_package_target}",
             package = "{package}",
             version = "{version}",
             deps = ref_deps,
@@ -87,7 +87,7 @@ def npm_link_package(
         if lifecycle_build_target:
             # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
             _npm_link_package_store(
-                name = "{store_link_prefix}{bazel_name}__pkg_lite",
+                name = "{store_link_prefix}{bazel_name}__pkg_pre_lc_lite",
                 package = "{package}",
                 version = "{version}",
                 deps = ref_deps,
@@ -96,7 +96,7 @@ def npm_link_package(
 
             # terminal pre-lifecycle target for use in lifecycle build target below
             _npm_link_package_store(
-                name = "{store_link_prefix}{bazel_name}__pkg_lc",
+                name = "{store_link_prefix}{bazel_name}__pkg_pre_lc",
                 package = "{package}",
                 version = "{version}",
                 deps = lc_deps,
@@ -108,7 +108,7 @@ def npm_link_package(
                 name = "{lifecycle_target_name}",
                 srcs = [
                     "{npm_package_target_lc}",
-                    ":{store_link_prefix}{bazel_name}__pkg_lc"
+                    ":{store_link_prefix}{bazel_name}__pkg_pre_lc"
                 ],
                 # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
                 args = [
@@ -124,7 +124,7 @@ def npm_link_package(
 
             # post-lifecycle npm_package
             _npm_package(
-                name = "{store_link_prefix}{bazel_name}__jsp",
+                name = "{store_link_prefix}{bazel_name}__pkg_lc",
                 src = ":{lifecycle_target_name}",
                 package = "{package}",
                 version = "{version}",
@@ -202,7 +202,7 @@ def {bin_name}_binary(name, **kwargs):
 
 _JS_PACKAGE_TMPL = """
 _npm_package(
-    name = "jsp_source_directory",
+    name = "source_directory",
     src = ":{extract_to_dirname}",
     provide_source_directory = True,
     package = "{package}",
@@ -211,7 +211,7 @@ _npm_package(
 )
 
 _npm_package(
-    name = "jsp",
+    name = "pkg",
     src = ":{extract_to_dirname}",
     package = "{package}",
     version = "{version}",
@@ -365,7 +365,7 @@ def _impl_links(rctx):
                     # special case for lifecycle transitive closure deps; do not depend on
                     # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
-                    lc_deps.append("{store_link_prefix}{bazel_name}__pkg_lite".format(
+                    lc_deps.append("{store_link_prefix}{bazel_name}__pkg_pre_lc_lite".format(
                         bazel_name = utils.bazel_name(dep_name, dep_version),
                         store_link_prefix = utils.store_link_prefix,
                     ))
@@ -399,8 +399,8 @@ def _impl_links(rctx):
     if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
         npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
-    npm_package_target = "@{}//:jsp_source_directory".format(npm_import_sources_repo_name)
-    npm_package_target_lc = "@{}//:jsp".format(npm_import_sources_repo_name)
+    npm_package_target = "@{}//:source_directory".format(npm_import_sources_repo_name)
+    npm_package_target_lc = "@{}//:pkg".format(npm_import_sources_repo_name)
 
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version),
