@@ -536,12 +536,14 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
     # Generate catch all & scoped npm_linked_packages target
     defs_bzl_body.append("""
     for scope, scoped_targets in scoped_direct_targets.items():
-        npm_linked_packages(
-            name = "{}/{}".format(name, scope),
-            srcs = [t for t in scoped_targets if t],
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+        direct_scoped_targets = [t for t in scoped_targets if t]
+        if direct_scoped_targets:
+            npm_linked_packages(
+                name = "{}/{}".format(name, scope),
+                srcs = direct_scoped_targets,
+                tags = ["manual"],
+                visibility = ["//visibility:public"],
+            )
 
     npm_linked_packages(
         name = name,

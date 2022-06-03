@@ -388,12 +388,14 @@ def npm_link_all_packages(name = "node_modules"):
     direct_targets.append(link_172(name = "{}/yocto-queue".format(name), direct = None, fail_if_no_link = False))
 
     for scope, scoped_targets in scoped_direct_targets.items():
-        npm_linked_packages(
-            name = "{}/{}".format(name, scope),
-            srcs = [t for t in scoped_targets if t],
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+        direct_scoped_targets = [t for t in scoped_targets if t]
+        if direct_scoped_targets:
+            npm_linked_packages(
+                name = "{}/{}".format(name, scope),
+                srcs = direct_scoped_targets,
+                tags = ["manual"],
+                visibility = ["//visibility:public"],
+            )
 
     npm_linked_packages(
         name = name,
