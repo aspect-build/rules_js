@@ -3,7 +3,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 load("@aspect_rules_js//js:run_js_binary.bzl", "run_js_binary")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//:defs.bzl", "link_npm_packages")
+load("@npm//:defs.bzl", "link_all_npm_packages")
 load("//js:defs.bzl", "link_npm_package")
 
 ###########################
@@ -27,7 +27,7 @@ link_npm_package(name = "link_mycorp_mylib")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
-link_npm_packages()
+link_all_npm_packages(name = "node_modules")
 
 #######################################
 # Use case 1: transitive npm dependencies

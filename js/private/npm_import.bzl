@@ -121,6 +121,7 @@ def link_npm_package(
                 tags = ["manual"],
             )
 
+    direct_target = None
     if is_direct:
         # terminal target for direct dependencies
         _link_npm_package_direct(
@@ -129,6 +130,7 @@ def link_npm_package(
             visibility = visibility,
             tags = ["manual"],
         )
+        direct_target = ":{direct_link_prefix}{bazel_name}"
 
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
@@ -153,6 +155,8 @@ def link_npm_package(
             visibility = visibility,
             tags = ["manual"],
         )
+
+    return direct_target
 """
 
 _BIN_MACRO_TMPL = """

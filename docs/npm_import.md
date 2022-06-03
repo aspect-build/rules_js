@@ -193,9 +193,9 @@ The `npm` prefix of these alias is configurable via the `namespace` attribute.
 When using `translate_pnpm_lock`, you can `link` all the npm dependencies in the lock file with:
 
 ```
-load("@npm//:defs.bzl", "link_npm_packages")
+load("@npm//:defs.bzl", "link_all_npm_packages")
 
-link_npm_packages()
+link_all_npm_packages(name = "node_modules")
 ```
 
 `translate_pnpm_lock` also creates convienence aliases in the external repository that reference
