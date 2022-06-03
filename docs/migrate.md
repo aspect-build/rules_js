@@ -63,12 +63,12 @@ As long as you're able to run your build and test under pnpm, we expect the beha
 
 ## Link the node modules
 
-Typically you just add a `link_all_npm_packages(name = "node_modules")` call to the BUILD file next to each `package.json` file:
+Typically you just add a `npm_link_all_packages(name = "node_modules")` call to the BUILD file next to each `package.json` file:
 
 ```starlark
-load("@npm//:defs.bzl", "link_all_npm_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
-link_all_npm_packages(name = "node_modules")
+npm_link_all_packages(name = "node_modules")
 ```
 
 This macro will expand to a rule for each npm package, which creates part of the `bazel-bin/[path/to/package]/node_modules` tree.

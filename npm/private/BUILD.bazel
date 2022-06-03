@@ -23,8 +23,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "link_npm_package",
-    srcs = ["link_npm_package.bzl"],
+    name = "npm_link_package",
+    srcs = ["npm_link_package.bzl"],
     visibility = [
         "//docs:__subpackages__",
         "//npm:__subpackages__",

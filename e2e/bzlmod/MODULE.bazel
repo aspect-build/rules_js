@@ -21,7 +21,7 @@ npm.translate_pnpm_lock(
 # FIXME: this isn't very usable yet due to the new "repository strict visibility" in bzlmod.
 # You must list all repositories that you load() from or reference their targets,
 # and ALSO any repositories that get brought into your repository scope via macro expansion.
-# rules_js macros like link_all_npm_packages(name = "node_modules") will cause references to these repositories.
+# rules_js macros like npm_link_all_packages(name = "node_modules") will cause references to these repositories.
 # We don't recommend bzlmod for rules_js users quite yet.
 use_repo(npm, "npm")
 use_repo(npm, "npm__chalk__5.0.1")

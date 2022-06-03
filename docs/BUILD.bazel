@@ -21,8 +21,8 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
-    name = "link_npm_package",
-    bzl_library_target = "//npm/private:link_npm_package",
+    name = "npm_link_package",
+    bzl_library_target = "//npm/private:npm_link_package",
 )
 
 stardoc_with_diff_test(
