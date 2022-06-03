@@ -389,6 +389,8 @@ def npm_link_package(
 
     Args:
         name: The name of the direct alias target to create if linked directly.
+            For first-party deps linked across a workspace, the name must match in all packages
+            being linked as it is used to derive the virtual store link target name.
         root_package: the root package where the node_modules virtual store is linked to
         direct: whether or not to link a direct dependency in this package
             For 3rd party deps fetched with an npm_import, direct may not be specified if
