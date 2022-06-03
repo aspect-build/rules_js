@@ -23,6 +23,7 @@ jobs:
                     - 'e2e/bzlmod'
                     - 'e2e/link_npm_package'
                     - 'e2e/pnpm_workspace'
+                    - 'e2e/pnpm_workspace_dot_dot'
                     - 'e2e/rules_foo'
 
         # Steps represent a sequence of tasks that will be executed as part of the job
