@@ -1,9 +1,9 @@
 load("//examples/macro:mocha.bzl", "mocha_test")
-load("@npm//:defs.bzl", "link_js_packages")
+load("@npm//:defs.bzl", "link_npm_packages")
 
 # Link all direct dependencies in /examples/macro/package.json to
 # bazel-bin/examples/macro/node_modules
-link_js_packages()
+link_npm_packages()
 
 mocha_test(
     name = "test",

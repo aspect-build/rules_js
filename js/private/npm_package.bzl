@@ -1,4 +1,4 @@
-"js_package rule"
+"npm_package rule"
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
@@ -6,7 +6,7 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 
 JsPackageInfo = provider(
-    doc = "A provider that carries the output directory (a TreeArtifact) of a js_package which contains the packages sources along with the package name and version",
+    doc = "A provider that carries the output directory (a TreeArtifact) of a npm_package which contains the packages sources along with the package name and version",
     fields = {
         "label": "the label of the target the created this provider",
         "package": "name of this node package",
@@ -17,7 +17,7 @@ JsPackageInfo = provider(
 
 _DOC = """A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a JsPackageInfo.
 
-This target can be used as the src attribute to link_js_package.
+This target can be used as the src attribute to link_npm_package.
 
 A DeclarationInfo is also provided so that the target can be used as an input to rules that expect one such as ts_project."""
 
@@ -29,19 +29,19 @@ _ATTRS = dicts.add({
     "package": attr.string(
         doc = """The package name. If set, should match the `name` field in the `package.json` file for this package.
 
-If set, the package name set here will be used for linking if a link_js_package does not specify a package name. A 
-link_js_package target that specifies a package name will override the value here when linking.
+If set, the package name set here will be used for linking if a link_npm_package does not specify a package name. A 
+link_npm_package target that specifies a package name will override the value here when linking.
 
-If unset, a link_js_package target that references this js_package must define the package name must be for linking.
+If unset, a link_npm_package target that references this npm_package must define the package name must be for linking.
 """,
     ),
     "version": attr.string(
         doc = """The package version. If set, should match the `version` field in the `package.json` file for this package.
 
-If set, a link_js_package may omit the package version and the package version set here will be used for linking. A 
-link_js_package target that specifies a package version will override the value here when linking.
+If set, a link_npm_package may omit the package version and the package version set here will be used for linking. A 
+link_npm_package target that specifies a package version will override the value here when linking.
 
-If unset, a link_js_package target that references this js_package must define the package version must be for linking.
+If unset, a link_npm_package target that references this npm_package must define the package version must be for linking.
 """,
         default = "0.0.0",
     ),
@@ -100,15 +100,15 @@ def _impl(ctx):
     ])
     return providers
 
-js_package_lib = struct(
+npm_package_lib = struct(
     attrs = _ATTRS,
     implementation = _impl,
     provides = [DefaultInfo, DeclarationInfo, JsPackageInfo],
 )
 
-js_package = rule(
+npm_package = rule(
     doc = _DOC,
-    implementation = js_package_lib.implementation,
-    attrs = js_package_lib.attrs,
-    provides = js_package_lib.provides,
+    implementation = npm_package_lib.implementation,
+    attrs = npm_package_lib.attrs,
+    provides = npm_package_lib.provides,
 )
