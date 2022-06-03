@@ -90,7 +90,7 @@ Add install steps from a release of rules_js, along with related rulesets you pl
 
 - the load point is now a `bin` symbol from `package_json.bzl`
 - this now produces different rules, which are explicitly referenced from `bin`
-- to run as a tool under `bazel build` you use [package] which is a `run_js_binary`
+- to run as a tool under `bazel build` you use [package] which is a `js_run_binary`
   - rename `data` to `srcs`
   - rename `templated_args` to `args`
 - as a program under `bazel run` you need to add a `_binary` suffix, you get a `js_binary`

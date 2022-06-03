@@ -6,7 +6,7 @@ and adds attributes and features specific to rules_js's js_binary.
 Load this with,
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "run_js_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 ```
 """
 
@@ -15,7 +15,7 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js/private:js_binary.bzl", _js_binary_envs_for_log_level = "envs_for_log_level")
 
-def run_js_binary(
+def js_run_binary(
         name,
         tool,
         env = {},
@@ -71,10 +71,10 @@ def run_js_binary(
 
             By default, Bazel always runs in the workspace root.
 
-            To run in the directory containing the run_js_binary under the source tree, use
+            To run in the directory containing the js_run_binary under the source tree, use
             `chdir = package_name()` (or if you're in a macro, use `native.package_name()`).
 
-            To run in the output directory where the run_js_binary writes outputs, use
+            To run in the output directory where the js_run_binary writes outputs, use
             `chdir = "$(RULEDIR)"`
 
             WARNING: this will affect other paths passed to the program, either as arguments or in configuration files,
@@ -109,7 +109,7 @@ def run_js_binary(
     # Friendly fail if user has specified data instead of srcs
     data = kwargs.pop("data", None)
     if data != None:
-        fail("Use srcs instead of data in run_js_binary: https://github.com/aspect-build/rules_js/blob/main/docs/run_js_binary.md#run_js_binary-srcs.")
+        fail("Use srcs instead of data in js_run_binary: https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md#js_run_binary-srcs.")
 
     # Copy srcs to bin
     extra_srcs = []
@@ -122,7 +122,7 @@ def run_js_binary(
         )
         extra_srcs = [":%s" % copy_to_bin_name]
 
-    # Automatically add common and useful make variables to the environment for run_js_binary build targets
+    # Automatically add common and useful make variables to the environment for js_run_binary build targets
     extra_env = {
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",

@@ -11,8 +11,8 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
-    name = "run_js_binary",
-    bzl_library_target = "//js/private:run_js_binary",
+    name = "js_run_binary",
+    bzl_library_target = "//js/private:js_run_binary",
 )
 
 stardoc_with_diff_test(

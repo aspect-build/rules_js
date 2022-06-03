@@ -243,7 +243,7 @@ else
         logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
 run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
 tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set \
-by 'run_js_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/run_js_binary.md) which is the recommended \
+by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended \
 rule to use for using a js_binary as the tool of a build action. If this is not a build action you can set the \
 BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the \
 aspect_rules_js README https://github.com/aspect-build/rules_js#running-nodejs-programs."
