@@ -10,6 +10,7 @@ const OUTDATED_LOCKFILE_ERR_CODE = "ERR_PNPM_OUTDATED_LOCKFILE"
 
 // pnpm does not offer a no-install method to assert that a lockfile
 // is up-to-date, so we need to trick it a bit.
+// See: https://github.com/pnpm/pnpm/issues/4861
 //
 // When using --frozen-lockfile, pnpm will perform the lockfile check before
 // attempting to download any packages. We use that flag and force it offline,
