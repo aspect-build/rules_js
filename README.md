@@ -8,6 +8,32 @@ accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 - Supports npm workspaces (nested npm packages in a monorepo).
 - Fast: Bazel's sandbox only sees packages as directories, not individual files.
 
+Known issues:
+- Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
+- Doesn't work with rules_docker due to https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1137465914.
+- Actions may follow symlinks out of the sandbox, leading to non-hermeticity. Fix planned for 1.0: https://github.com/aspect-build/rules_js/issues/114.
+- No examples yet for proto/gRPC, though this may "just work".
+- No examples yet for publishing npm packages.
+
+rules_js is just a part of what Aspect provides:
+
+-  _Need help?_ This ruleset has support provided by https://aspect.dev.
+-  See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
+
+## Installation
+
+From the release you wish to use:
+<https://github.com/aspect-build/rules_js/releases>
+copy the WORKSPACE snippet into your `WORKSPACE` file.
+
+## Usage
+
+See the API documentation in the [docs](docs/) folder and the example usage in the [examples](examples/) folder.
+
+> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
+
+Read our [migration guide](docs/migrate.md) to adopt rules_js in an existing project.
+
 ## Relationship to rules_nodejs
 
 It is not a complete replacement for rules_nodejs, as the foundational layer is still used:
@@ -35,22 +61,6 @@ There are trade-offs involved here, but we think the `rules_js` approach is supe
 especially those at large scale. Read below for more in-depth discussion of the design differences
 and trade-offs you should be aware of.
 Also see the [slides for our Bazel eXchange talk](https://hackmd.io/@aspect/rules_js)
-
-rules_js is just a part of what Aspect provides:
-
--  _Need help?_ This ruleset has support provided by https://aspect.dev.
--  See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
-
-## Installation
-
-From the release you wish to use:
-<https://github.com/aspect-build/rules_js/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
-
-## Usage
-
-See the API documentation in the [docs](docs/) folder and the example usage in the [examples](examples/) folder.
-Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
 
 ## Design
 

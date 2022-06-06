@@ -45,8 +45,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "run_js_binary",
-    srcs = ["run_js_binary.bzl"],
+    name = "js_run_binary",
+    srcs = ["js_run_binary.bzl"],
     visibility = [
         "//docs:__subpackages__",
         "//js:__subpackages__",

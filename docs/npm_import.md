@@ -5,7 +5,7 @@ Repository rules to fetch third-party npm packages
 Load these with,
 
 ```starlark
-load("@aspect_rules_js//npm:npm_import.bzl", "translate_pnpm_lock", "npm_import")
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock", "npm_import")
 ```
 
 These use Bazel's downloader to fetch the packages.
@@ -14,7 +14,7 @@ You can use this to redirect all fetches through a store like Artifactory.
 See <https://blog.aspect.dev/configuring-bazels-downloader> for more info about how it works
 and how to configure it.
 
-[`translate_pnpm_lock`](#translate_pnpm_lock) is the primary user-facing API.
+[`npm_translate_lock`](#npm_translate_lock) is the primary user-facing API.
 It uses the lockfile format from [pnpm](https://pnpm.io/motivation) because it gives us reliable
 semantics for how to dynamically lay out `node_modules` trees on disk in bazel-out.
 
@@ -27,13 +27,13 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 
 
-<a id="#translate_pnpm_lock"></a>
+<a id="#npm_translate_lock"></a>
 
-## translate_pnpm_lock
+## npm_translate_lock
 
 <pre>
-translate_pnpm_lock(<a href="#translate_pnpm_lock-name">name</a>, <a href="#translate_pnpm_lock-custom_postinstalls">custom_postinstalls</a>, <a href="#translate_pnpm_lock-dev">dev</a>, <a href="#translate_pnpm_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#translate_pnpm_lock-no_optional">no_optional</a>,
-                    <a href="#translate_pnpm_lock-patch_args">patch_args</a>, <a href="#translate_pnpm_lock-patches">patches</a>, <a href="#translate_pnpm_lock-pnpm_lock">pnpm_lock</a>, <a href="#translate_pnpm_lock-prod">prod</a>, <a href="#translate_pnpm_lock-repo_mapping">repo_mapping</a>, <a href="#translate_pnpm_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>)
+npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_translate_lock-custom_postinstalls">custom_postinstalls</a>, <a href="#npm_translate_lock-dev">dev</a>, <a href="#npm_translate_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#npm_translate_lock-no_optional">no_optional</a>, <a href="#npm_translate_lock-patch_args">patch_args</a>,
+                   <a href="#npm_translate_lock-patches">patches</a>, <a href="#npm_translate_lock-pnpm_lock">pnpm_lock</a>, <a href="#npm_translate_lock-prod">prod</a>, <a href="#npm_translate_lock-repo_mapping">repo_mapping</a>, <a href="#npm_translate_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>)
 </pre>
 
 Repository rule to generate npm_import rules from pnpm lock file.
@@ -60,10 +60,10 @@ users needing to fetch many unnecessary packages.
 In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
 
 ```starlark
-load("@aspect_rules_js//npm:npm_import.bzl", "translate_pnpm_lock")
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
 # Read the pnpm-lock.yaml file to automate creation of remaining npm_import rules
-translate_pnpm_lock(
+npm_translate_lock(
     # Creates a new repository named "@npm_deps"
     name = "npm_deps",
     pnpm_lock = "//:pnpm-lock.yaml",
@@ -80,7 +80,7 @@ This is similar to the
 rule in rules_python for example.
 It has the advantage of also creating aliases for simpler dependencies that don't require
 spelling out the version of the packages.
-However it causes Bazel to eagerly evaluate the `translate_pnpm_lock` rule for every build,
+However it causes Bazel to eagerly evaluate the `npm_translate_lock` rule for every build,
 even if the user didn't ask for anything JavaScript-related.
 
 ```starlark
@@ -103,7 +103,7 @@ js_test(
 
 2. Check in the `repositories.bzl` file to version control, and load that instead.
 This makes it easier to ship a ruleset that has its own npm dependencies, as users don't
-have to install those dependencies. It also avoids eager-evaluation of `translate_pnpm_lock`
+have to install those dependencies. It also avoids eager-evaluation of `npm_translate_lock`
 for builds that don't need it.
 This is similar to the [`update-repos`](https://github.com/bazelbuild/bazel-gazelle#update-repos)
 approach from bazel-gazelle.
@@ -131,17 +131,17 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
-| <a id="translate_pnpm_lock-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| <a id="translate_pnpm_lock-custom_postinstalls"></a>custom_postinstalls |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a custom postinstall script to apply to the downloaded npm package after its lifecycle scripts runs.         If the version is left out of the package name, the script will run on every version of the npm package. If         a custom postinstall scripts exists for a package as well as for a specific version, the script for the versioned package         will be appended with <code>&&</code> to the non-versioned package script.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
-| <a id="translate_pnpm_lock-dev"></a>dev |  If true, only install devDependencies   | Boolean | optional | False |
-| <a id="translate_pnpm_lock-lifecycle_hooks_exclude"></a>lifecycle_hooks_exclude |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to not run lifecycle hooks on   | List of strings | optional | [] |
-| <a id="translate_pnpm_lock-no_optional"></a>no_optional |  If true, optionalDependencies are not installed   | Boolean | optional | False |
-| <a id="translate_pnpm_lock-patch_args"></a>patch_args |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a label list arguments to pass to the patch tool. Defaults to -p0, but -p1 will         usually be needed for patches generated by git. If patch args exists for a package         as well as a package version, then the version-specific args will be appended to the args for the package.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
-| <a id="translate_pnpm_lock-patches"></a>patches |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a label list of patches to apply to the downloaded npm package. Paths in the patch         file must start with <code>extract_tmp/package</code> where <code>package</code> is the top-level folder in         the archive on npm. If the version is left out of the package name, the patch will be         applied to every version of the npm package.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
-| <a id="translate_pnpm_lock-pnpm_lock"></a>pnpm_lock |  The pnpm-lock.yaml file.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
-| <a id="translate_pnpm_lock-prod"></a>prod |  If true, only install dependencies   | Boolean | optional | False |
-| <a id="translate_pnpm_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
-| <a id="translate_pnpm_lock-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist   | Boolean | optional | True |
+| <a id="npm_translate_lock-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+| <a id="npm_translate_lock-custom_postinstalls"></a>custom_postinstalls |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a custom postinstall script to apply to the downloaded npm package after its lifecycle scripts runs.         If the version is left out of the package name, the script will run on every version of the npm package. If         a custom postinstall scripts exists for a package as well as for a specific version, the script for the versioned package         will be appended with <code>&&</code> to the non-versioned package script.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
+| <a id="npm_translate_lock-dev"></a>dev |  If true, only install devDependencies   | Boolean | optional | False |
+| <a id="npm_translate_lock-lifecycle_hooks_exclude"></a>lifecycle_hooks_exclude |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to not run lifecycle hooks on   | List of strings | optional | [] |
+| <a id="npm_translate_lock-no_optional"></a>no_optional |  If true, optionalDependencies are not installed   | Boolean | optional | False |
+| <a id="npm_translate_lock-patch_args"></a>patch_args |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a label list arguments to pass to the patch tool. Defaults to -p0, but -p1 will         usually be needed for patches generated by git. If patch args exists for a package         as well as a package version, then the version-specific args will be appended to the args for the package.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
+| <a id="npm_translate_lock-patches"></a>patches |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")         to a label list of patches to apply to the downloaded npm package. Paths in the patch         file must start with <code>extract_tmp/package</code> where <code>package</code> is the top-level folder in         the archive on npm. If the version is left out of the package name, the patch will be         applied to every version of the npm package.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> List of strings</a> | optional | {} |
+| <a id="npm_translate_lock-pnpm_lock"></a>pnpm_lock |  The pnpm-lock.yaml file.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
+| <a id="npm_translate_lock-prod"></a>prod |  If true, only install dependencies   | Boolean | optional | False |
+| <a id="npm_translate_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
+| <a id="npm_translate_lock-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist   | Boolean | optional | True |
 
 
 <a id="#npm_import"></a>
@@ -155,7 +155,7 @@ npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-package">pa
 
 Import a single npm package into Bazel.
 
-Normally you'd want to use `translate_pnpm_lock` to import all your packages at once.
+Normally you'd want to use `npm_translate_lock` to import all your packages at once.
 It generates `npm_import` rules.
 You can create these manually if you want to have exact control.
 
@@ -187,7 +187,7 @@ To consume the downloaded package in rules, it must be "linked" into the link pa
 package's `BUILD.bazel` file:
 
 ```
-load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "link_npm_package")
+load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "npm_link_package")
 
 link_types_node(name = "node_modules/@types/node")
 ```
@@ -200,19 +200,19 @@ This target can be used to create entry points for binary target or to access fi
 NB: You can choose any target name for the link target but we recommend using the `node_modules/@scope/name` and
 `node_modules/name` convention for readability.
 
-When using `translate_pnpm_lock`, you can link all the npm dependencies in the lock file for a package:
+When using `npm_translate_lock`, you can link all the npm dependencies in the lock file for a package:
 
 ```
-load("@npm//:defs.bzl", "link_all_npm_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
-link_all_npm_packages(name = "node_modules")
+npm_link_all_packages(name = "node_modules")
 ```
 
 This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
 It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
 These target can be used to create entry points for binary target or to access files within the npm package.
 
-NB: You can pass an name to link_all_npm_packages and this will change the targets generated to "{name}/@scope/name" and
+NB: You can pass an name to npm_link_all_packages and this will change the targets generated to "{name}/@scope/name" and
 "{name}/name". We recommend using "node_modules" as the convention for readability.
 
 To change the proxy URL we use to fetch, configure the Bazel downloader:
@@ -239,9 +239,9 @@ common --experimental_downloader_config=.bazel_downloader_config
 | <a id="npm_import-version"></a>version |  Version of the npm package, such as <code>8.4.0</code>   |  none |
 | <a id="npm_import-deps"></a>deps |  A dict other npm packages this one depends on where the key is the package name and value is the version   |  <code>{}</code> |
 | <a id="npm_import-transitive_closure"></a>transitive_closure |  A dict all npm packages this one depends on directly or transitively where the key is the package name and value is a list of version(s) depended on in the closure.   |  <code>{}</code> |
-| <a id="npm_import-root_package"></a>root_package |  The root package where the node_modules virtual store is linked to. Typically this is the package that the pnpm-lock.yaml file is located when using <code>translate_pnpm_lock</code>.   |  <code>""</code> |
-| <a id="npm_import-link_workspace"></a>link_workspace |  The workspace name where links will be created for this package. Typically this is the workspace that the pnpm-lock.yaml file is located when using <code>translate_pnpm_lock</code>. Can be left unspecified if the link workspace is the user workspace.   |  <code>""</code> |
-| <a id="npm_import-link_packages"></a>link_packages |  List of paths where direct links may be created at for this package. Defaults to [] which indicates that direct links may be created in any package as specified by the <code>direct</code> attribute of the generated link_npm_package. These paths are relative to the root package with "." being the node_modules at the root package.   |  <code>[]</code> |
+| <a id="npm_import-root_package"></a>root_package |  The root package where the node_modules virtual store is linked to. Typically this is the package that the pnpm-lock.yaml file is located when using <code>npm_translate_lock</code>.   |  <code>""</code> |
+| <a id="npm_import-link_workspace"></a>link_workspace |  The workspace name where links will be created for this package. Typically this is the workspace that the pnpm-lock.yaml file is located when using <code>npm_translate_lock</code>. Can be left unspecified if the link workspace is the user workspace.   |  <code>""</code> |
+| <a id="npm_import-link_packages"></a>link_packages |  List of paths where direct links may be created at for this package. Defaults to [] which indicates that direct links may be created in any package as specified by the <code>direct</code> attribute of the generated npm_link_package. These paths are relative to the root package with "." being the node_modules at the root package.   |  <code>[]</code> |
 | <a id="npm_import-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs <code>preinstall</code>, <code>install</code> and <code>postinstall</code> lifecycle hooks declared in this package.   |  <code>False</code> |
 | <a id="npm_import-integrity"></a>integrity |  Expected checksum of the file downloaded, in Subresource Integrity format. This must match the checksum of the file downloaded.<br><br>This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.<br><br>It is a security risk to omit the checksum as remote files can change.<br><br>At best omitting this field will make your build non-hermetic.<br><br>It is optional to make development easier but should be set before shipping.   |  <code>""</code> |
 | <a id="npm_import-patch_args"></a>patch_args |  Arguments to pass to the patch tool. <code>-p1</code> will usually be needed for patches generated by git.   |  <code>["-p0"]</code> |

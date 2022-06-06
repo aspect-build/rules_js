@@ -21,7 +21,7 @@ jobs:
                 folder:
                     - '.'
                     - 'e2e/bzlmod'
-                    - 'e2e/link_npm_package'
+                    - 'e2e/npm_link_package'
                     - 'e2e/pnpm_workspace'
                     - 'e2e/pnpm_workspace_dot_dot'
                     - 'e2e/rules_foo'

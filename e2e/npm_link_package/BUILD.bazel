@@ -1,10 +1,10 @@
-load("@npm//:defs.bzl", "link_all_npm_packages")
-load("@aspect_rules_js//npm:defs.bzl", "link_npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
 load("@rules_foo_npm//foo/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 
-link_all_npm_packages(name = "node_modules")
+npm_link_all_packages(name = "node_modules")
 
-link_npm_package(
+npm_link_package(
     name = "node_modules/@e2e/lib",
     src = "//lib",
     visibility = ["//visibility:public"],

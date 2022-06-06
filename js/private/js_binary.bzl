@@ -155,7 +155,7 @@ _ATTRS = {
         doc = """Set the logging level.
 
         Log from are written to stderr. They will be supressed on success when running as the tool
-        of a run_js_binary when silent_on_success is True. In that case, they will be shown
+        of a js_run_binary when silent_on_success is True. In that case, they will be shown
         only on a build failure along with the stdout & stderr of the node tool being run.""",
         values = _LOG_LEVELS.keys(),
         default = "error",
@@ -213,13 +213,13 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         ))
 
     if ctx.attr.chdir:
-        # Set chdir env if not already set to allow run_js_binary to override
+        # Set chdir env if not already set to allow js_run_binary to override
         envs.append(_ENV_SET_IFF_NOT_SET.format(
             var = "JS_BINARY__CHDIR",
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
         ))
 
-    # Set log envs iff not already set to allow run_js_binary to override
+    # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
         envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, value = "1"))
 

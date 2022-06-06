@@ -12,7 +12,7 @@ bzl_library(
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//npm/private:link_npm_package",
+        "//npm/private:npm_link_package",
         "//npm/private:npm_package",
     ],
 )
@@ -23,7 +23,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//npm/private:npm_import",
-        "//npm/private:translate_pnpm_lock",
+        "//npm/private:npm_translate_lock",
         "//npm/private:utils",
     ],
 )

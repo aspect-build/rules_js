@@ -1,4 +1,4 @@
-"link_npm_package rule"
+"npm_link_package rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -34,7 +34,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 
 _DOC_DIRECT = """Defines a node package that is linked into a node_modules tree as a direct dependency.
 
-This is used in co-ordination with the link_npm_package_store rule that links into the
+This is used in co-ordination with the npm_link_package_store rule that links into the
 node_modules/.apsect_rules_js virtual store with a pnpm style symlinked node_modules output tree.
 
 The term "package" is defined at
@@ -91,7 +91,7 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
 
 _ATTRS_DIRECT = {
     "src": attr.label(
-        doc = """The link_npm_package target to link as a direct dependency.""",
+        doc = """The npm_link_package target to link as a direct dependency.""",
         providers = [_LinkNpmPackageInfo],
         mandatory = True,
     ),
@@ -138,8 +138,8 @@ def _impl_store(ctx):
             dep_link_package = dep[_LinkNpmPackageInfo].link_package
             if dep_link_package != ctx.label.package:
                 if not ctx.label.package.startswith(dep_link_package + "/"):
-                    msg = """link_npm_package in %s package cannot depend on link_npm_package in %s package.
-deps of link_npm_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
+                    msg = """npm_link_package in %s package cannot depend on npm_link_package in %s package.
+deps of npm_link_package must be in the same package or in a parent package.""" % (ctx.label.package, dep_link_package)
                     fail(msg)
             dep_package = dep[_LinkNpmPackageInfo].package
             dep_version = dep[_LinkNpmPackageInfo].version
@@ -154,7 +154,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
                 )
                 direct_files.append(dep_symlink)
             else:
-                # this is a ref link_npm_package, a downstream terminal link_npm_package
+                # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm depedency will create the dep symlinks for this dep;
                 # this pattern is used to break circular dependencies between 3rd
                 # party npm deps; it is not recommended for 1st party deps
@@ -172,7 +172,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
                 dep_version = dep[_LinkNpmPackageInfo].version
                 deps_map[utils.pnpm_name(dep_package, dep_version)] = dep
             else:
-                # this is a ref link_npm_package, a downstream terminal link_npm_package for this npm
+                # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
                 direct_dep_refs.append(dep)
@@ -242,7 +242,7 @@ deps of link_npm_package must be in the same package or in a parent package.""" 
 def _impl_direct(ctx):
     virtual_store_directory = ctx.attr.src[_LinkNpmPackageInfo].virtual_store_directory
     if not virtual_store_directory:
-        fail("src must be a link_npm_package that provides a virtual_store_directory")
+        fail("src must be a npm_link_package that provides a virtual_store_directory")
 
     # symlink the package's path in the virtual store to the root of the node_modules
     # as a direct dependency
@@ -270,30 +270,30 @@ def _impl_direct(ctx):
 
     return result
 
-link_npm_package_store_lib = struct(
+npm_link_package_store_lib = struct(
     attrs = _ATTRS_STORE,
     implementation = _impl_store,
     provides = [DefaultInfo, DeclarationInfo, _LinkNpmPackageInfo],
 )
 
-link_npm_package_store = rule(
+npm_link_package_store = rule(
     doc = _DOC_STORE,
-    implementation = link_npm_package_store_lib.implementation,
-    attrs = link_npm_package_store_lib.attrs,
-    provides = link_npm_package_store_lib.provides,
+    implementation = npm_link_package_store_lib.implementation,
+    attrs = npm_link_package_store_lib.attrs,
+    provides = npm_link_package_store_lib.provides,
 )
 
-link_npm_package_direct_lib = struct(
+npm_link_package_direct_lib = struct(
     attrs = _ATTRS_DIRECT,
     implementation = _impl_direct,
     provides = [DefaultInfo, DeclarationInfo, _LinkNpmPackageInfo],
 )
 
-link_npm_package_direct = rule(
+npm_link_package_direct = rule(
     doc = _DOC_DIRECT,
-    implementation = link_npm_package_direct_lib.implementation,
-    attrs = link_npm_package_direct_lib.attrs,
-    provides = link_npm_package_direct_lib.provides,
+    implementation = npm_link_package_direct_lib.implementation,
+    attrs = npm_link_package_direct_lib.attrs,
+    provides = npm_link_package_direct_lib.provides,
 )
 
 def _name_for_store(name):
@@ -303,56 +303,56 @@ def _name_for_store(name):
     else:
         return name
 
-def link_npm_package_dep(
+def npm_link_package_dep(
         name,
         version = None,
         root_package = ""):
-    """Returns the label to the link_npm_package store for a package.
+    """Returns the label to the npm_link_package store for a package.
 
     This can be used to generate virtual store target names for the deps list
-    of a link_npm_package.
+    of a npm_link_package.
 
     Example root BUILD.file where the virtual store is linked by default,
 
     ```
-    load("@npm//:defs.bzl", "link_all_npm_packages")
-    load("@aspect_rules_js//:defs.bzl", "link_npm_package")
+    load("@npm//:defs.bzl", "npm_link_all_packages")
+    load("@aspect_rules_js//:defs.bzl", "npm_link_package")
 
-    # Links all packages from the `translate_pnpm_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
+    # Links all packages from the `npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
     # repository rule.
-    link_all_npm_packages(name = "node_modules")
+    npm_link_all_packages(name = "node_modules")
 
     # Link a first party `@lib/foo` defined by the `npm_package` `//lib/foo:foo` target.
-    link_npm_package(
+    npm_link_package(
         name = "node_modules/@lib/foo",
         src = "//lib/foo",
     )
 
     # Link a first party `@lib/bar` defined by the `npm_package` `//lib/bar:bar` target
     # that depends on `@lib/foo` and on `acorn` specified in `package.json` and fetched
-    # with `translate_pnpm_lock`
-    link_npm_package(
+    # with `npm_translate_lock`
+    npm_link_package(
         name = "link_lib_bar",
         src = "//lib/bar",
         deps = [
-            link_npm_package_dep("node_modules/@lib/foo"),
-            link_npm_package_dep("acorn", version = "8.4.0"),
+            npm_link_package_dep("node_modules/@lib/foo"),
+            npm_link_package_dep("acorn", version = "8.4.0"),
         ],
     )
     ```
 
     Args:
         name: The name of the link target.
-            For first-party packages, this must match the `name` passed to link_npm_package
+            For first-party packages, this must match the `name` passed to npm_link_package
             for the package in the root package when not linking at the root package.
 
-            For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+            For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule,
             the name must match the `package` attribute of the corresponding `npm_import`. This is typically
             the npm package name.
         version: The version of the package
-            This should be left unset for first-party packages linked manually with link_npm_package.
+            This should be left unset for first-party packages linked manually with npm_link_package.
 
-            For 3rd party deps fetched with an npm_import or via a translate_pnpm_lock repository rule,
+            For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule,
             the package version is required to qualify the dependency. It must the `version` attribute
             of the corresponding `npm_import`.
         root_package: The bazel package of the virtual store.
@@ -367,7 +367,7 @@ def link_npm_package_dep(
         store_link_prefix = utils.store_link_prefix,
     ))
 
-def link_npm_package(
+def npm_link_package(
         name,
         root_package = "",
         direct = True,
@@ -389,22 +389,24 @@ def link_npm_package(
 
     Args:
         name: The name of the direct alias target to create if linked directly.
+            For first-party deps linked across a workspace, the name must match in all packages
+            being linked as it is used to derive the virtual store link target name.
         root_package: the root package where the node_modules virtual store is linked to
         direct: whether or not to link a direct dependency in this package
             For 3rd party deps fetched with an npm_import, direct may not be specified if
             link_packages is set on the npm_import.
         src: the npm_package target to link; may only to be specified when linking in the root package
-        deps: list of link_npm_package_store; may only to be specified when linking in the root package
+        deps: list of npm_link_package_store; may only to be specified when linking in the root package
         fail_if_no_link: whether or not to fail if this is called in a package that is not the root package and with direct false
         auto_manual: whether or not to automatically add a manual tag to the generated targets
             Links tagged "manual" dy default is desirable so that they are not built by `bazel build ...` if they
             are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are
             not fetched at all unless they are used.
         visibility: the visibility of the generated targets
-        **kwargs: see attributes of link_npm_package_store rule
+        **kwargs: see attributes of npm_link_package_store rule
 
     Returns:
-        Label of the link_npm_package_direct if created, else None
+        Label of the npm_link_package_direct if created, else None
     """
     is_root = native.package_name() == root_package
     is_direct = direct
@@ -435,7 +437,7 @@ def link_npm_package(
 
     if is_root:
         # link the virtual store when linking at the root
-        link_npm_package_store(
+        npm_link_package_store(
             name = store_target_name,
             src = src,
             deps = deps,
@@ -447,7 +449,7 @@ def link_npm_package(
     direct_target = None
     if direct:
         # link as a direct dependency in node_modules of this package
-        link_npm_package_direct(
+        npm_link_package_direct(
             name = name,
             src = "//{root_package}:{store_target}".format(
                 root_package = root_package,

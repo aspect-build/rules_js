@@ -51,9 +51,9 @@ def test_version_supported(ctx):
     utils.assert_lockfile_version(5.3)
     utils.assert_lockfile_version(5.4)
     msg = utils.assert_lockfile_version(1.2, testonly = True)
-    asserts.equals(env, "translate_pnpm_lock requires lock_version at least 5.3, but found 1.2. Please upgrade to pnpm v6 or greater.", msg)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 5.3, but found 1.2. Please upgrade to pnpm v6 or greater.", msg)
     msg = utils.assert_lockfile_version(99.99, testonly = True)
-    asserts.equals(env, "translate_pnpm_lock currently supports a maximum lock_version of 5.4, but found 99.99. Please file an issue on rules_js", msg)
+    asserts.equals(env, "npm_translate_lock currently supports a maximum lock_version of 5.4, but found 99.99. Please file an issue on rules_js", msg)
     return unittest.end(env)
 
 t0_test = unittest.make(test_strip_peer_dep_version)

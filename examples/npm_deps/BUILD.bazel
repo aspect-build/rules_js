@@ -1,9 +1,7 @@
-load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test", "run_js_binary")
-load("@aspect_rules_js//npm:defs.bzl", "link_npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//:defs.bzl", "link_all_npm_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
 ###########################
 
@@ -17,16 +15,9 @@ load("@npm//examples/npm_deps/uvu:package_json.bzl", uvu_bin = "bin")
 
 ###########################
 
-# Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
-# a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_acorn(name = "node_modules/acorn")
-
-# Link @mycorp/mylib as a direct dependency in bazel-bin/examples/npm_deps/node_modules
-link_npm_package(name = "node_modules/@mycorp/mylib")
-
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
-link_all_npm_packages(name = "node_modules")
+npm_link_all_packages(name = "node_modules")
 
 #######################################
 # Use case 1: transitive npm dependencies
@@ -49,7 +40,7 @@ js_binary(
     entry_point = "case1.js",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run1",
     srcs = [],
     outs = ["actual1"],
@@ -165,7 +156,7 @@ diff_test(
     file2 = ":actual5",
 )
 
-run_js_binary(
+js_run_binary(
     name = "actual5_alt",
     args = ["--version"],
     stdout = "actual5_alt.txt",
@@ -179,7 +170,7 @@ diff_test(
 )
 
 ####################################################
-# Use case 6: bin from translate_pnpm_lock
+# Use case 6: bin from npm_translate_lock
 # Use a generated bin.uvo_test target
 
 # Generated bin test as a test target
@@ -212,7 +203,7 @@ uvu_test(
         "false",
     ],
     data = [
-        ":node_modules/@mycorp/mylib",
+        "//:node_modules/@mycorp/mylib",
         # ":node_modules/uvu" dep required because our spec calls require('uvu')
         ":node_modules/uvu",
         ":uvu_spec",

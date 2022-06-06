@@ -1,8 +1,7 @@
-load("@aspect_rules_js//js:defs.bzl", "run_js_binary", "js_binary", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_binary", "js_test")
 
-load("@pnpm__links//:defs.bzl", link_pnpm = "link_npm_package")
-
-link_pnpm(name = "link_pnpm")
+load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_package")
+npm_link_pnpm(name = "node_modules/pnpm")
 
 js_test(
     name = "assert_lockfile_up_to_date",
@@ -10,18 +9,18 @@ js_test(
     data = [
         ":pnpm-lock.yaml",
         ":package.json",
-        ":link_pnpm",
+        ":node_modules/pnpm",
     ],
     chdir = package_name(),
 )
 
 js_binary(
     name = "update_lockfile_js",
-    data = [":link_pnpm"],
+    data = [":node_modules/pnpm"],
     entry_point = ":update_lockfile.js",
 )
 
-run_js_binary(
+js_run_binary(
     name = "generate_lockfile",
     srcs = [
         ":pnpm-lock.yaml",
@@ -58,7 +57,7 @@ js_test(
     data = [
         ":testdata/pnpm-lock.yaml",
         ":testdata/package.json",
-        ":link_pnpm",
+        ":node_modules/pnpm",
     ],
     chdir = package_name() + "/testdata",
     expected_exit_code = 1,

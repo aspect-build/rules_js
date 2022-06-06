@@ -1,30 +1,21 @@
-load("@acorn__8.4.0__links//:defs.bzl", link_acorn = "link_npm_package")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test", "run_js_binary")
-load("@aspect_rules_js//npm:defs.bzl", "link_npm_package")
-
-# Link the acorn package, which was fetched separately with npm_import from /WORKSPACE, as
-# a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_acorn(name = "node_modules/acorn")
-
-# Link @mycorp/mylib as a direct dependency in bazel-bin/examples/js_binary/node_modules
-link_npm_package(name = "node_modules/@mycorp/mylib")
 
 ####################################################
 # Test case 4
-# Show that a js_binary can be used with run_js_binary
+# Show that a js_binary can be used with js_run_binary
 # because everything it needs to run is in the runfiles
 
 js_binary(
     name = "bin",
-    data = [":node_modules/acorn"],
+    data = ["//:node_modules/acorn"],
     entry_point = "require_acorn.js",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run4",
     srcs = [],
     outs = ["actual4"],
@@ -38,7 +29,7 @@ run_js_binary(
 )
 
 diff_test(
-    name = "test_js_binary_under_run_js_binary",
+    name = "test_js_binary_under_js_run_binary",
     file1 = "//examples:expected_one_ast.json",
     file2 = "actual4",
 )
@@ -67,11 +58,11 @@ write_file(
 
 js_binary(
     name = "bin6",
-    data = [":node_modules/@mycorp/mylib"],
+    data = ["//:node_modules/@mycorp/mylib"],
     entry_point = "case6.js",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run6",
     outs = ["actual6"],
     args = ["actual6"],
@@ -87,7 +78,7 @@ diff_test(
 
 #######################################
 # Test case 8
-# run_js_binary
+# js_run_binary
 write_file(
     name = "write8",
     out = "case8.js",
@@ -106,7 +97,7 @@ js_binary(
     entry_point = "case8.js",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run8",
     srcs = ["case8.json"],
     outs = ["actual8"],
@@ -149,7 +140,7 @@ js_binary(
     ],
 )
 
-run_js_binary(
+js_run_binary(
     name = "run9",
     outs = ["actual9"],
     args = ["../../../$@"],
@@ -256,7 +247,7 @@ js_binary(
     log_level = "debug",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run10",
     outs = [
         "actual10",
@@ -278,7 +269,7 @@ run_js_binary(
 
 directory_path(
     name = "acorn_entry_point",
-    directory = ":node_modules/acorn/dir",
+    directory = "//:node_modules/acorn/dir",
     path = "bin/acorn",
 )
 
@@ -288,7 +279,7 @@ js_binary(
     entry_point = ":acorn_entry_point",
 )
 
-run_js_binary(
+js_run_binary(
     name = "run13",
     args = ["--help"],
     stdout = "actual13",

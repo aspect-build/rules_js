@@ -60,12 +60,12 @@ def _assert_lockfile_version(version, testonly = False):
     msg = None
 
     if version < min_lock_version:
-        msg = "translate_pnpm_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v6 or greater.".format(
+        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v6 or greater.".format(
             min = min_lock_version,
             actual = version,
         )
     if version > max_lock_version:
-        msg = "translate_pnpm_lock currently supports a maximum lock_version of {max}, but found {actual}. Please file an issue on rules_js".format(
+        msg = "npm_translate_lock currently supports a maximum lock_version of {max}, but found {actual}. Please file an issue on rules_js".format(
             max = max_lock_version,
             actual = version,
         )
@@ -93,7 +93,7 @@ utils = struct(
     strip_peer_dep_version = _strip_peer_dep_version,
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
-    # Prefix for link_npm_package_store links
+    # Prefix for npm_link_package_store links
     store_link_prefix = "store_link__",
     # Suffix for package directory filegroup
     dir_suffix = "__dir",

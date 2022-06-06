@@ -56,16 +56,19 @@ See <https://pnpm.io/faq#pnpm-does-not-work-with-your-project-here> for how to r
 > For rules_js to see the added dependency edge, you must ensure it appears in the `pnpm-lock.yaml` file, either by re-creating it
 > (though this loses your transitive dependency version pinning) or by hand-modifying it.
 
+Another approach is to just give up on pnpm's stricter visibility for npm modules, and use the `--shamefully-hoist` option.
+This will write a `pnpm-lock.yaml` file which provides a hoisted node_modules structure, which rules_js will naturally translate into the bazel-out folder.
+
 As long as you're able to run your build and test under pnpm, we expect the behavior of `rules_js` should match.
 
 ## Link the node modules
 
-Typically you just add a `link_all_npm_packages(name = "node_modules")` call to the BUILD file next to each `package.json` file:
+Typically you just add a `npm_link_all_packages(name = "node_modules")` call to the BUILD file next to each `package.json` file:
 
 ```starlark
-load("@npm//:defs.bzl", "link_all_npm_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
-link_all_npm_packages(name = "node_modules")
+npm_link_all_packages(name = "node_modules")
 ```
 
 This macro will expand to a rule for each npm package, which creates part of the `bazel-bin/[path/to/package]/node_modules` tree.
@@ -90,7 +93,7 @@ Add install steps from a release of rules_js, along with related rulesets you pl
 
 - the load point is now a `bin` symbol from `package_json.bzl`
 - this now produces different rules, which are explicitly referenced from `bin`
-- to run as a tool under `bazel build` you use [package] which is a `run_js_binary`
+- to run as a tool under `bazel build` you use [package] which is a `js_run_binary`
   - rename `data` to `srcs`
   - rename `templated_args` to `args`
 - as a program under `bazel run` you need to add a `_binary` suffix, you get a `js_binary`
