@@ -1,47 +1,22 @@
+"""Examples of using rules_js-managed npm dependencies from a genrule.
+
+Most users should *not* follow this pattern.
+Instead use the js_binary rule to create a program that knows how to resolve dependencies from npm.
+
+See /examples/js_binary.
+
+Also for trivial nodejs programs without npm dependencies, rules_js is not needed;
+see examples at
+https://github.com/bazelbuild/rules_nodejs/tree/stable/examples/toolchain
+"""
+
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
-#############################
-# Test case 1
-# Show that you can use the node toolchain together with a genrule().
-# This gives you complete control over starting the interpreter, but you also have to
-# manually handle module resolution.
-
-# Trivial test fixture: a nodejs program that writes to a file
-write_file(
-    name = "js",
-    out = "some1.js",
-    content = ["require('fs').writeFileSync(process.argv[2], 'stuff')"],
-    visibility = ["//examples:__subpackages__"],
-)
-
-# The output produced by that program, for assertions
-write_file(
-    name = "write_expected",
-    out = "expected1",
-    content = ["stuff"],
-    visibility = ["//examples:__subpackages__"],
-)
-
-genrule(
-    name = "use_node_toolchain",
-    srcs = [":some1.js"],
-    outs = ["actual1"],
-    cmd = "$(NODE_PATH) $(execpath :some1.js) $@",
-    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
-    tools = ["@nodejs_toolchains//:resolved_toolchain"],
-)
-
-diff_test(
-    name = "test_genrule",
-    file1 = "expected1",
-    file2 = "actual1",
-)
-
 ##########################################################
-# Test case 2
-# Directly invoke a bin from a package from npm to transform inputs to bazel-out
+# Use case 1
+# Directly invoke a bin from an npm package to transform inputs to bazel-out
 # Similar to build_bazel_rules_nodejs generated npm_package_bin targets
 
 # Trivial test fixture: the shortest legal JS program
@@ -56,10 +31,11 @@ genrule(
     name = "call_acorn",
     srcs = [
         ":one.js",
+        # reference the location where the "acorn" npm package was linked in our root Bazel package.
         "//:node_modules/acorn",
         "//:node_modules/acorn/dir",
     ],
-    outs = ["actual2"],
+    outs = ["out1"],
     cmd = " ".join([
         "$(NODE_PATH)",
         "./$(execpath //:node_modules/acorn/dir)/bin/acorn",
@@ -74,14 +50,13 @@ genrule(
 
 diff_test(
     name = "test_acorn",
-    file1 = "actual2",
+    file1 = "out1",
     file2 = "//examples:expected_one_ast.json",
 )
 
 ################################################
-# Test case 3
-# Run a first-party program that requires a package from npm
-# Use a genrule to prove that works
+# Use case 2
+# Run a first-party program that requires a package from npm.
 
 copy_to_bin(
     name = "require_acorn_js",
@@ -94,7 +69,7 @@ genrule(
         ":require_acorn_js",
         "//:node_modules/acorn",
     ],
-    outs = ["actual3"],
+    outs = ["out2"],
     cmd = """
         $(NODE_PATH) \\
         ./$(execpath :require_acorn_js) \\
@@ -105,6 +80,6 @@ genrule(
 
 diff_test(
     name = "test_require_acorn",
-    file1 = "actual3",
+    file1 = "out2",
     file2 = "//examples:expected_one_ast.json",
 )

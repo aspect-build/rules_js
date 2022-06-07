@@ -1,26 +1,49 @@
+"""
+js_binary examples
+
+Simple examples of running JS programs in node with js_binary, js_run_binary, and js_test.
+"""
+
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
 
-####################################################
-# Test case 4
-# Show that a js_binary can be used with js_run_binary
-# because everything it needs to run is in the runfiles
-
+# A simple program that runs the Acorn JS parser to produce an AST
 js_binary(
     name = "bin",
+    # Reference the location where the acorn npm module was linked in the root Bazel package
     data = ["//:node_modules/acorn"],
     entry_point = "require_acorn.js",
 )
 
-js_run_binary(
-    name = "run4",
+####################################################
+# Use case 1
+# js_binary can be used with genrule
+# because everything it needs to run is in the runfiles
+genrule(
+    name = "run1",
     srcs = [],
-    outs = ["actual4"],
-    args = ["actual4"],
+    outs = ["out1"],
+    # All js_binary rules need a BAZEL_BINDIR environment variable set so they can
+    # run from that directory as the working directory.
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(location :bin) {}/out1".format(package_name()),
+    tools = [":bin"],
+)
+
+####################################################
+# Use case 2
+# Using js_run_binary has some nice syntax sugar vs.
+# a genrule() or the run_binary rule from bazel-skylib.
+
+js_run_binary(
+    name = "run2",
+    srcs = [],
+    outs = ["out2"],
+    args = ["out2"],
     chdir = package_name(),
+    # Request that the rules_js launcher prints extra information
     log_level = "debug",
     tool = ":bin",
     # Uncomment the setting below to see debug output even on a
@@ -31,240 +54,223 @@ js_run_binary(
 diff_test(
     name = "test_js_binary_under_js_run_binary",
     file1 = "//examples:expected_one_ast.json",
-    file2 = "actual4",
+    file2 = "out2",
 )
 
 ################################
-# Test case 5
+# Use case 3
 # js_test is just a js_binary
+# Bazel will check the exit code: a zero means the test passes, anything else means it fails.
 
 js_test(
     name = "test_test",
-    data = ["//:node_modules/@types/node"],
     entry_point = "test.js",
 )
 
 ###############################
-# Test case 6
-# a first-party library which we want to run as a program
+# Use case 4
+# A first-party library which we want to run as a program.
+# This relies on a `require("@mycorp/mylib")` which is a package within this monorepo.
 
 write_file(
-    name = "write6",
-    out = "case6.js",
+    name = "write4",
+    out = "case4.js",
     content = [
-        """require('fs').writeFileSync(process.argv[2], require("@mycorp/mylib").toAst("1"))""",
+        """require('fs').writeFileSync(
+            process.argv[2],
+            require("@mycorp/mylib").toAst("1")
+        )""",
     ],
 )
 
 js_binary(
-    name = "bin6",
+    name = "bin4",
+    # To resolve the require() statement, we supply the location where our local monorepo
+    # npm package was linked into the node_modules in the root Bazel package.
     data = ["//:node_modules/@mycorp/mylib"],
-    entry_point = "case6.js",
+    entry_point = "case4.js",
 )
 
 js_run_binary(
-    name = "run6",
-    outs = ["actual6"],
-    args = ["actual6"],
+    name = "run4",
+    outs = ["out4"],
+    args = ["out4"],
     chdir = package_name(),
-    tool = ":bin6",
+    tool = ":bin4",
 )
 
 diff_test(
-    name = "test6",
+    name = "test4",
     file1 = "//examples:expected_one_ast.json",
-    file2 = "actual6",
+    file2 = "out4",
 )
 
 #######################################
-# Test case 8
-# js_run_binary
+# Use case 5
+# js_run_binary that reads a data file at runtime.
+
 write_file(
-    name = "write8",
-    out = "case8.js",
-    content = ["""
-require('fs').writeFileSync(process.argv[2], JSON.stringify(require(require('path').join(process.cwd(), "case8.json"))))"""],
+    name = "write5",
+    out = "case5.js",
+    content = ["""\
+require('fs').writeFileSync(
+    process.argv[2],
+    JSON.stringify(require(require('path').join(process.cwd(), "data.json")))
+)"""],
 )
 
 write_file(
-    name = "expected8",
-    out = "expected8.txt",
-    content = ["{\"case7\":42}"],
+    name = "expected5",
+    out = "expected5.txt",
+    content = ["{\"answer\":42}"],
 )
 
 js_binary(
-    name = "bin8",
-    entry_point = "case8.js",
+    name = "bin5",
+    entry_point = "case5.js",
 )
 
 js_run_binary(
-    name = "run8",
-    srcs = ["case8.json"],
-    outs = ["actual8"],
-    args = ["actual8"],
+    name = "run5",
+    srcs = ["data.json"],
+    outs = ["out5"],
+    args = ["out5"],
     chdir = package_name(),
-    tool = ":bin8",
+    tool = ":bin5",
 )
 
 diff_test(
-    name = "test8",
-    file1 = "expected8",
-    file2 = "actual8",
+    name = "test5",
+    file1 = "expected5",
+    file2 = "out5",
 )
 
 #######################################
-# Test case 9
-# set env variable and node_options
+# Use case 6
+# A program that relies on environment variables and node_options
 
 write_file(
-    name = "write9",
-    out = "case9.js",
-    content = ["require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)"],
+    name = "write6",
+    out = "case6.js",
+    content = ["require('fs').writeFileSync(process.argv[2], process.env.NODE_ENV + ' ' + process.title)"],
 )
 
 write_file(
-    name = "expected9",
-    out = "expected9.txt",
-    content = ["BARbin9"],
+    name = "expected6",
+    out = "expected6.txt",
+    content = ["production myapp"],
 )
 
 js_binary(
-    name = "bin9",
-    entry_point = "case9.js",
+    name = "bin6",
+    entry_point = "case6.js",
     env = {
-        "FOO": "BAR",
+        "NODE_ENV": "production",
     },
     node_options = [
-        "--title=bin9",
+        "--title=myapp",
         "--throw-deprecation",
     ],
 )
 
 js_run_binary(
-    name = "run9",
-    outs = ["actual9"],
+    name = "run6",
+    outs = ["out6"],
     args = ["../../../$@"],
-    tool = ":bin9",
+    tool = ":bin6",
 )
 
 diff_test(
-    name = "test9",
-    file1 = "expected9",
-    file2 = "actual9",
+    name = "test6",
+    file1 = "expected6",
+    file2 = "out6",
 )
 
 #######################################
-# Test case 10
-# capture stdout, stderr & exit code and --node_options
+# Use case 7
+# capture stdout, stderr & exit code
 
 write_file(
-    name = "write10",
-    out = "case10.js",
-    content = ["""process.stdout.write("to stdout\\n")
+    name = "write7",
+    out = "case7.js",
+    content = ["""\
+process.stdout.write("to stdout\\n")
 process.stderr.write("to stderr\\n")
-require('fs').writeFileSync(process.argv[2], process.env.FOO + process.title)
 process.exit(42)
 """],
 )
 
-## Diff tests
-diff_test(
-    name = "test10",
-    file1 = "expected10",
-    file2 = "actual10",
+js_binary(
+    name = "bin7",
+    entry_point = "case7.js",
 )
 
-diff_test(
-    name = "test10_stdout",
-    file1 = "expected10_stdout",
-    file2 = "actual10_stdout",
-)
-
-diff_test(
-    name = "test10_stderr",
-    file1 = "expected10_stderr",
-    file2 = "actual10_stderr",
-)
-
-diff_test(
-    name = "test10_result",
-    file1 = "expected10_result",
-    file2 = "actual10_result",
+js_run_binary(
+    name = "run7",
+    outs = [],
+    chdir = package_name(),
+    exit_code_out = "actual_exitcode",
+    stderr = "actual_stderr",
+    stdout = "actual_stdout",
+    tool = ":bin7",
 )
 
 write_file(
-    name = "expected10",
-    out = "expected10.txt",
-    content = ["BARbin10"],
-)
-
-write_file(
-    name = "expected10_stdout",
-    out = "expected10_stdout.txt",
+    name = "expected_stdout",
+    out = "expected_stdout.txt",
     content = ["to stdout\n"],
 )
 
 write_file(
-    name = "expected10_stderr",
-    out = "expected10_stderr.txt",
+    name = "expected_stderr",
+    out = "expected_stderr.txt",
     content = ["to stderr\n"],
 )
 
 write_file(
-    name = "expected10_result",
-    out = "expected10_result.txt",
+    name = "expected_exitcode",
+    out = "expected_exitcode.txt",
     content = ["42"],
 )
 
-js_binary(
-    name = "bin10",
-    entry_point = "case10.js",
-    env = {
-        "FOO": "BAR",
-    },
+diff_test(
+    name = "test_stdout",
+    file1 = "expected_stdout",
+    file2 = "actual_stdout",
+)
+
+diff_test(
+    name = "test_stderr",
+    file1 = "expected_stderr",
+    file2 = "actual_stderr",
+)
+
+diff_test(
+    name = "test_exitcode",
+    file1 = "expected_exitcode",
+    file2 = "actual_exitcode",
 )
 
 js_test(
-    name = "test10_test",
+    name = "case7_test",
     args = ["dummy"],
-    entry_point = "case10.js",
-    env = {
-        "FOO": "BAR",
-    },
+    entry_point = "case7.js",
     expected_exit_code = 42,
     log_level = "debug",
 )
 
 # bazel run //examples:test10_binary
 js_binary(
-    name = "test10_binary",
+    name = "case7_binary",
     args = ["dummy"],
-    entry_point = "case10.js",
-    env = {
-        "FOO": "BAR",
-    },
+    entry_point = "case7.js",
+    # Prevent bazel failing when a build step exits non-zero
     expected_exit_code = 42,
     log_level = "debug",
 )
 
-js_run_binary(
-    name = "run10",
-    outs = [
-        "actual10",
-    ],
-    args = [
-        "--node_options=--title=bin10",
-        "actual10",
-    ],
-    chdir = package_name(),
-    exit_code_out = "actual10_result",
-    stderr = "actual10_stderr",
-    stdout = "actual10_stdout",
-    tool = ":bin10",
-)
-
 ####################################################
-# Test case 13
+# Use case 8
 # Show that a js_binary can use a DirectoryPathInfo entry point
 
 directory_path(
@@ -280,15 +286,15 @@ js_binary(
 )
 
 js_run_binary(
-    name = "run13",
+    name = "run8",
     args = ["--help"],
-    stdout = "actual13",
+    stdout = "out8",
     tool = ":acorn_bin",
 )
 
 write_file(
-    name = "expected13",
-    out = "expected13.txt",
+    name = "expected8",
+    out = "expected8.txt",
     content = [
         "usage: acorn [--ecma3|--ecma5|--ecma6|--ecma7|--ecma8|--ecma9|...|--ecma2015|--ecma2016|--ecma2017|--ecma2018|...]",
         "        [--tokenize] [--locations] [---allow-hash-bang] [--allow-await-outside-function] [--compact] [--silent] [--module] [--help] [--] [infile]",
@@ -297,13 +303,13 @@ write_file(
 )
 
 diff_test(
-    name = "test13",
-    file1 = ":expected13",
-    file2 = ":actual13",
+    name = "test8",
+    file1 = ":expected8",
+    file2 = ":out8",
 )
 
 ####################################################
-# Test case 14
+# Use case 9
 # Show that we can run a generated bin from a package where the npm package
 # is not linked. In this case @aspect-test/a is linked to the //examples/npm_deps:__pkg__
 
