@@ -3,10 +3,10 @@
 This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
 accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 
-- Only fetches/installs npm packages needed for the requested build/test targets.
-- Works correctly with node resolution. For example there are no pathMapping issues with TypeScript `rootDirs`.
-- Supports npm workspaces (nested npm packages in a monorepo).
-- Fast: Bazel's sandbox only sees packages as directories, not individual files.
+- Lazy: only fetches/installs npm packages needed for the requested build/test targets.
+- Correct: works seamlessly with node.js module resolution. For example there are no pathMapping issues with TypeScript `rootDirs`.
+- Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
+- Supports npm "workspaces": nested npm packages in a monorepo.
 
 Known issues:
 - Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
