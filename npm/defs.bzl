@@ -10,14 +10,12 @@ load(
 load(
     "//npm/private:npm_link_package.bzl",
     _npm_link_package = "npm_link_package",
-    _npm_link_package_dep = "npm_link_package_dep",
 )
 
 npm_package = _npm_package
 NpmPackageInfo = _NpmPackageInfo
 
 npm_link_package = _npm_link_package
-npm_link_package_dep = _npm_link_package_dep
 
 # export the starlark libraries as a public API
 npm_package_lib = _npm_package_lib

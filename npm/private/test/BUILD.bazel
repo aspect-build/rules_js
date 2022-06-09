@@ -28,9 +28,11 @@ write_source_files(
 filegroup(
     name = "build_some_node_modules",
     srcs = [
+        "node_modules/@plotly/regl",
         "node_modules/bufferutil",
         "node_modules/debug",
         "node_modules/esbuild",
+        "node_modules/regl",
         "node_modules/webpack-bundle-analyzer",
         # intentionally don't include node_modules/unused
     ],

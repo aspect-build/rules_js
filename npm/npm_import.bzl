@@ -53,7 +53,7 @@ def npm_import(
         transitive_closure = {},
         root_package = "",
         link_workspace = "",
-        link_packages = [],
+        link_packages = {},
         run_lifecycle_hooks = False,
         integrity = "",
         url = "",
@@ -94,9 +94,9 @@ def npm_import(
     package's `BUILD.bazel` file:
 
     ```
-    load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "npm_link_package")
+    load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 
-    link_types_node(name = "node_modules/@types/node")
+    npm_link_types_node(name = "node_modules")
     ```
 
     This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
@@ -118,6 +118,25 @@ def npm_import(
     This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
     It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
     These target can be used to create entry points for binary target or to access files within the npm package.
+
+    If you have a mix of `npm_link_all_packages` and `npm_link_imported_package` functions to call you can pass the
+    `npm_link_imported_package` link functions to the `imported_links` attribute of `npm_link_all_packages` to link
+    them all in one call. For example,
+
+    ```
+    load("@npm//:defs.bzl", "npm_link_all_packages")
+    load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
+
+    npm_link_all_packages(
+        name = "node_modules",
+        imported_links = [
+            npm_link_types_node,
+        ]
+    )
+    ```
+
+    This has the added benefit of adding the `imported_links` to the convienence `:node_modules` target which
+    includes all direct dependencies in that package.
 
     NB: You can pass an name to npm_link_all_packages and this will change the targets generated to "{name}/@scope/name" and
     "{name}/name". We recommend using "node_modules" as the convention for readability.
@@ -147,10 +166,12 @@ def npm_import(
         link_workspace: The workspace name where links will be created for this package.
             Typically this is the workspace that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
             Can be left unspecified if the link workspace is the user workspace.
-        link_packages: List of paths where direct links may be created at for this package.
-            Defaults to [] which indicates that direct links may be created in any package as specified by
+        link_packages: Dict of paths where direct links may be created at for this package to
+            a list of link aliases to link as in each package. If aliases are an
+            empty list this indicates to link as the package name.
+
+            Defaults to {} which indicates that direct links may be created in any package as specified by
             the `direct` attribute of the generated npm_link_package.
-            These paths are relative to the root package with "." being the node_modules at the root package.
         run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
             package.
         integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
@@ -189,10 +210,10 @@ def npm_import(
         run_lifecycle_hooks = run_lifecycle_hooks,
     )
 
-    # By convention, the `{name}{utils.links_suffix}` repository contains the generated
+    # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
     _npm_import_links(
-        name = "{}{}".format(name, _utils.links_suffix),
+        name = "{}{}".format(name, _utils.links_repo_suffix),
         package = package,
         version = version,
         root_package = root_package,

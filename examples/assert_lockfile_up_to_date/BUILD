@@ -1,17 +1,17 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_binary", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_imported_package")
 
-load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_package")
-npm_link_pnpm(name = "node_modules/pnpm")
+npm_link_pnpm(name = "node_modules")
 
 js_test(
     name = "assert_lockfile_up_to_date",
-    entry_point = "assert_lockfile_frozen.js",
-    data = [
-        ":pnpm-lock.yaml",
-        ":package.json",
-        ":node_modules/pnpm",
-    ],
     chdir = package_name(),
+    data = [
+        ":node_modules/pnpm",
+        ":package.json",
+        ":pnpm-lock.yaml",
+    ],
+    entry_point = "assert_lockfile_frozen.js",
 )
 
 js_binary(
@@ -23,8 +23,8 @@ js_binary(
 js_run_binary(
     name = "generate_lockfile",
     srcs = [
-        ":pnpm-lock.yaml",
         ":package.json",
+        ":pnpm-lock.yaml",
     ],
     outs = [
         "output-pnpm-lock.yaml",
@@ -53,13 +53,12 @@ sh_binary(
 # This ensures that future updates to pnpm don't break our detection logic.
 js_test(
     name = "test_assert_lockfile_frozen",
-    entry_point = "assert_lockfile_frozen.js",
-    data = [
-        ":testdata/pnpm-lock.yaml",
-        ":testdata/package.json",
-        ":node_modules/pnpm",
-    ],
     chdir = package_name() + "/testdata",
+    data = [
+        ":node_modules/pnpm",
+        ":testdata/package.json",
+        ":testdata/pnpm-lock.yaml",
+    ],
+    entry_point = "assert_lockfile_frozen.js",
     expected_exit_code = 1,
 )
-

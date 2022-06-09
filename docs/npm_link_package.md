@@ -7,7 +7,7 @@ npm_link_package rule
 ## npm_link_package_direct
 
 <pre>
-npm_link_package_direct(<a href="#npm_link_package_direct-name">name</a>, <a href="#npm_link_package_direct-src">src</a>)
+npm_link_package_direct(<a href="#npm_link_package_direct-name">name</a>, <a href="#npm_link_package_direct-package">package</a>, <a href="#npm_link_package_direct-src">src</a>)
 </pre>
 
 Defines a node package that is linked into a node_modules tree as a direct dependency.
@@ -31,6 +31,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="npm_link_package_direct-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
+| <a id="npm_link_package_direct-package"></a>package |  The package name to link to.<br><br>If unset, the package name of the src npm_link_package_store is used. If set, takes precendance over the package name in the src npm_link_package_store.   | String | optional | "" |
 | <a id="npm_link_package_direct-src"></a>src |  The npm_link_package target to link as a direct dependency.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
 
 
@@ -62,7 +63,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="npm_link_package_store-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| <a id="npm_link_package_store-deps"></a>deps |  Other node packages this one depends on.<br><br>        This should include *all* modules the program may need at runtime.<br><br>        &gt; In typical usage, a node.js program sometimes requires modules which were         &gt; never declared as dependencies.         &gt; This pattern is typically used when the program has conditional behavior         &gt; that is enabled when the module is found (like a plugin) but the program         &gt; also runs without the dependency.         &gt;          &gt; This is possible because node.js doesn't enforce the dependencies are sound.         &gt; All files under <code>node_modules</code> are available to any program.         &gt; In contrast, Bazel makes it possible to make builds hermetic, which means that         &gt; all dependencies of a program must be declared when running in Bazel's sandbox.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| <a id="npm_link_package_store-deps"></a>deps |  Other node packages store link targets one depends on mapped to the name to link them under in this packages deps.<br><br>        This should include *all* modules the program may need at runtime.<br><br>        You can find all the package store link targets in your repository with<br><br>        <pre><code>         bazel query ... | grep /store/ | grep -v /dir | grep -v /pkg | grep -v /ref         </code></pre><br><br>        1st party deps will typically be versioned 0.0.0 (unless set to another version explicitly in         npm_link_package). For example,<br><br>        <pre><code>         //:node_modules/@mycorp/mylib/store/0.0.0         </code></pre><br><br>        3rd party package store link targets will include the version. For example,<br><br>        <pre><code>         //:node_modules/cliui/store/7.0.4         </code></pre><br><br>        If imported via npm_translate_lock, the version may include peer dep(s),<br><br>        <pre><code>         //:node_modules/debug/store/4.3.4_supports-color@8.1.1         </code></pre><br><br>        It could be also be a <code>github.com</code> url based version,<br><br>        <pre><code>         //:node_modules/debug/store/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53         </code></pre><br><br>        In general, package store link targets names for 3rd party packages that come from         <code>npm_translate_lock</code> start with the name passed to the <code>npm_link_all_packages</code> macro         (typically 'node_modules') followed by <code>/&lt;package&gt;/store/&lt;version&gt;</code> where <code>package</code> is the         package name (including @scope segment if any) and <code>version</code> is the specific version of         the package that comes from the pnpm-lock.yaml file.<br><br>        Package store link targets names for 3rd party package that come directly from an         <code>npm_import</code> start with the name passed to the <code>npm_import</code>'s <code>npm_link_imported_package</code>         macro (typically 'node_modules') followed by <code>/&lt;package&gt;/store/&lt;version&gt;</code> where <code>package</code>         matches the <code>package</code> attribute in the npm_import of the package and <code>version</code> matches the         <code>version</code> attribute.<br><br>        &gt; In typical usage, a node.js program sometimes requires modules which were         &gt; never declared as dependencies.         &gt; This pattern is typically used when the program has conditional behavior         &gt; that is enabled when the module is found (like a plugin) but the program         &gt; also runs without the dependency.         &gt;          &gt; This is possible because node.js doesn't enforce the dependencies are sound.         &gt; All files under <code>node_modules</code> are available to any program.         &gt; In contrast, Bazel makes it possible to make builds hermetic, which means that         &gt; all dependencies of a program must be declared when running in Bazel's sandbox.   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: Label -> String</a> | optional | {} |
 | <a id="npm_link_package_store-package"></a>package |  The package name to link to.<br><br>If unset, the package name in the NpmPackageInfo src must be set. If set, takes precendance over the package name in the NpmPackageInfo src.   | String | optional | "" |
 | <a id="npm_link_package_store-src"></a>src |  A npm_package target or or any other target that provides a NpmPackageInfo.   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | required |  |
 | <a id="npm_link_package_store-version"></a>version |  The package version being linked.<br><br>If unset, the package version in the NpmPackageInfo src must be set. If set, takes precendance over the package version in the NpmPackageInfo src.   | String | optional | "" |
@@ -73,8 +74,8 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 ## npm_link_package
 
 <pre>
-npm_link_package(<a href="#npm_link_package-name">name</a>, <a href="#npm_link_package-root_package">root_package</a>, <a href="#npm_link_package-direct">direct</a>, <a href="#npm_link_package-src">src</a>, <a href="#npm_link_package-deps">deps</a>, <a href="#npm_link_package-fail_if_no_link">fail_if_no_link</a>, <a href="#npm_link_package-auto_manual">auto_manual</a>, <a href="#npm_link_package-visibility">visibility</a>,
-                 <a href="#npm_link_package-kwargs">kwargs</a>)
+npm_link_package(<a href="#npm_link_package-name">name</a>, <a href="#npm_link_package-version">version</a>, <a href="#npm_link_package-root_package">root_package</a>, <a href="#npm_link_package-direct">direct</a>, <a href="#npm_link_package-src">src</a>, <a href="#npm_link_package-deps">deps</a>, <a href="#npm_link_package-fail_if_no_link">fail_if_no_link</a>, <a href="#npm_link_package-auto_manual">auto_manual</a>,
+                 <a href="#npm_link_package-visibility">visibility</a>, <a href="#npm_link_package-kwargs">kwargs</a>)
 </pre>
 
 "Links an npm package to the virtual store if in the root package and directly to node_modules if direct is True.
@@ -93,11 +94,12 @@ the package directory for creating entry points or accessing files in the packag
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_package-name"></a>name |  The name of the direct alias target to create if linked directly. For first-party deps linked across a workspace, the name must match in all packages being linked as it is used to derive the virtual store link target name.   |  none |
+| <a id="npm_link_package-name"></a>name |  The name of the direct link target to create (if linked directly). For first-party deps linked across a workspace, the name must match in all packages being linked as it is used to derive the virtual store link target name.   |  none |
+| <a id="npm_link_package-version"></a>version |  version used to identify the package in the virtual store   |  <code>"0.0.0"</code> |
 | <a id="npm_link_package-root_package"></a>root_package |  the root package where the node_modules virtual store is linked to   |  <code>""</code> |
 | <a id="npm_link_package-direct"></a>direct |  whether or not to link a direct dependency in this package For 3rd party deps fetched with an npm_import, direct may not be specified if link_packages is set on the npm_import.   |  <code>True</code> |
 | <a id="npm_link_package-src"></a>src |  the npm_package target to link; may only to be specified when linking in the root package   |  <code>None</code> |
-| <a id="npm_link_package-deps"></a>deps |  list of npm_link_package_store; may only to be specified when linking in the root package   |  <code>[]</code> |
+| <a id="npm_link_package-deps"></a>deps |  list of npm_link_package_store; may only to be specified when linking in the root package   |  <code>{}</code> |
 | <a id="npm_link_package-fail_if_no_link"></a>fail_if_no_link |  whether or not to fail if this is called in a package that is not the root package and with direct false   |  <code>True</code> |
 | <a id="npm_link_package-auto_manual"></a>auto_manual |  whether or not to automatically add a manual tag to the generated targets Links tagged "manual" dy default is desirable so that they are not built by <code>bazel build ...</code> if they are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are not fetched at all unless they are used.   |  <code>True</code> |
 | <a id="npm_link_package-visibility"></a>visibility |  the visibility of the generated targets   |  <code>["//visibility:public"]</code> |
@@ -106,63 +108,6 @@ the package directory for creating entry points or accessing files in the packag
 **RETURNS**
 
 Label of the npm_link_package_direct if created, else None
-
-
-<a id="#npm_link_package_dep"></a>
-
-## npm_link_package_dep
-
-<pre>
-npm_link_package_dep(<a href="#npm_link_package_dep-name">name</a>, <a href="#npm_link_package_dep-version">version</a>, <a href="#npm_link_package_dep-root_package">root_package</a>)
-</pre>
-
-Returns the label to the npm_link_package store for a package.
-
-This can be used to generate virtual store target names for the deps list
-of a npm_link_package.
-
-Example root BUILD.file where the virtual store is linked by default,
-
-```
-load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@aspect_rules_js//:defs.bzl", "npm_link_package")
-
-# Links all packages from the `npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")`
-# repository rule.
-npm_link_all_packages(name = "node_modules")
-
-# Link a first party `@lib/foo` defined by the `npm_package` `//lib/foo:foo` target.
-npm_link_package(
-    name = "node_modules/@lib/foo",
-    src = "//lib/foo",
-)
-
-# Link a first party `@lib/bar` defined by the `npm_package` `//lib/bar:bar` target
-# that depends on `@lib/foo` and on `acorn` specified in `package.json` and fetched
-# with `npm_translate_lock`
-npm_link_package(
-    name = "link_lib_bar",
-    src = "//lib/bar",
-    deps = [
-        npm_link_package_dep("node_modules/@lib/foo"),
-        npm_link_package_dep("acorn", version = "8.4.0"),
-    ],
-)
-```
-
-
-**PARAMETERS**
-
-
-| Name  | Description | Default Value |
-| :------------- | :------------- | :------------- |
-| <a id="npm_link_package_dep-name"></a>name |  The name of the link target. For first-party packages, this must match the <code>name</code> passed to npm_link_package for the package in the root package when not linking at the root package.<br><br>For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule, the name must match the <code>package</code> attribute of the corresponding <code>npm_import</code>. This is typically the npm package name.   |  none |
-| <a id="npm_link_package_dep-version"></a>version |  The version of the package This should be left unset for first-party packages linked manually with npm_link_package.<br><br>For 3rd party deps fetched with an npm_import or via a npm_translate_lock repository rule, the package version is required to qualify the dependency. It must the <code>version</code> attribute of the corresponding <code>npm_import</code>.   |  <code>None</code> |
-| <a id="npm_link_package_dep-root_package"></a>root_package |  The bazel package of the virtual store. Defaults to the current package   |  <code>""</code> |
-
-**RETURNS**
-
-The label of the direct link for the given package at the given link package,
 
 
 <a id="#npm_link_package_direct_lib.implementation"></a>
