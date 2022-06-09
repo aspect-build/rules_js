@@ -188,9 +188,9 @@ To consume the downloaded package in rules, it must be "linked" into the link pa
 package's `BUILD.bazel` file:
 
 ```
-load("@npm__at_types_node__15.12.2__links//:defs.bzl", link_types_node = "npm_link_package")
+load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 
-link_types_node(name = "node_modules/@types/node")
+npm_link_types_node(name = "node_modules")
 ```
 
 This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
@@ -212,6 +212,25 @@ npm_link_all_packages(name = "node_modules")
 This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
 It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
 These target can be used to create entry points for binary target or to access files within the npm package.
+
+If you have a mix of `npm_link_all_packages` and `npm_link_imported_package` functions to call you can pass the
+`npm_link_imported_package` link functions to the `imported_links` attribute of `npm_link_all_packages` to link
+them all in one call. For example,
+
+```
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
+
+npm_link_all_packages(
+    name = "node_modules",
+    imported_links = [
+        npm_link_types_node,
+    ]
+)
+```
+
+This has the added benefit of adding the `imported_links` to the convienence `:node_modules` target which
+includes all direct dependencies in that package.
 
 NB: You can pass an name to npm_link_all_packages and this will change the targets generated to "{name}/@scope/name" and
 "{name}/name". We recommend using "node_modules" as the convention for readability.
@@ -242,7 +261,7 @@ common --experimental_downloader_config=.bazel_downloader_config
 | <a id="npm_import-transitive_closure"></a>transitive_closure |  A dict all npm packages this one depends on directly or transitively where the key is the package name and value is a list of version(s) depended on in the closure.   |  <code>{}</code> |
 | <a id="npm_import-root_package"></a>root_package |  The root package where the node_modules virtual store is linked to. Typically this is the package that the pnpm-lock.yaml file is located when using <code>npm_translate_lock</code>.   |  <code>""</code> |
 | <a id="npm_import-link_workspace"></a>link_workspace |  The workspace name where links will be created for this package. Typically this is the workspace that the pnpm-lock.yaml file is located when using <code>npm_translate_lock</code>. Can be left unspecified if the link workspace is the user workspace.   |  <code>""</code> |
-| <a id="npm_import-link_packages"></a>link_packages |  List of paths where direct links may be created at for this package. Defaults to [] which indicates that direct links may be created in any package as specified by the <code>direct</code> attribute of the generated npm_link_package. These paths are relative to the root package with "." being the node_modules at the root package.   |  <code>[]</code> |
+| <a id="npm_import-link_packages"></a>link_packages |  Dict of paths where direct links may be created at for this package to a list of link aliases to link as in each package. If aliases are an empty list this indicates to link as the package name.<br><br>Defaults to {} which indicates that direct links may be created in any package as specified by the <code>direct</code> attribute of the generated npm_link_package.   |  <code>{}</code> |
 | <a id="npm_import-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs <code>preinstall</code>, <code>install</code> and <code>postinstall</code> lifecycle hooks declared in this package.   |  <code>False</code> |
 | <a id="npm_import-integrity"></a>integrity |  Expected checksum of the file downloaded, in Subresource Integrity format. This must match the checksum of the file downloaded.<br><br>This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.<br><br>It is a security risk to omit the checksum as remote files can change.<br><br>At best omitting this field will make your build non-hermetic.<br><br>It is optional to make development easier but should be set before shipping.   |  <code>""</code> |
 | <a id="npm_import-url"></a>url |  Optional url for this package. If unset, a default npm registry url is generated from the package name and version.   |  <code>""</code> |

@@ -1,5 +1,5 @@
 packages:
+    - 'examples/lib'
     - 'examples/macro'
     - 'examples/npm_deps'
-    - 'examples/macro'
     - 'npm/private/test'

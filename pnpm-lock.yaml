@@ -10,6 +10,15 @@ importers:
       '@types/node': 16.11.36
       typescript: 4.7.2
 
+  examples/lib:
+    specifiers:
+      acorn: '*'
+      uuid: 8.3.2
+    dependencies:
+      uuid: 8.3.2
+    optionalDependencies:
+      acorn: 8.7.1
+
   examples/macro:
     specifiers:
       mocha: ^10.0.0
@@ -44,15 +53,19 @@ importers:
 
   npm/private/test:
     specifiers:
+      '@plotly/regl': 2.1.2
       bufferutil: 4.0.1
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
+      regl: npm:@plotly/regl@2.1.2
       unused: latest
       webpack-bundle-analyzer: 4.5.0
     devDependencies:
+      '@plotly/regl': 2.1.2
       bufferutil: 4.0.1
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
+      regl: /@plotly/regl/2.1.2
       unused: 0.2.2
       webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
@@ -116,6 +129,10 @@ packages:
       '@gregmagolan/test-a': 0.0.1
     dev: true
 
+  /@plotly/regl/2.1.2:
+    resolution: {integrity: sha512-Mdk+vUACbQvjd0m/1JJjOOafmkp/EpmHjISsopEz5Av44CBq7rPC05HHNbYGKVyNUF2zmEoBS/TT0pd0SPFFyw==}
+    dev: true
+
   /@polka/url/1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
@@ -173,7 +190,6 @@ packages:
     resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-    dev: true
 
   /ansi-colors/4.1.1:
     resolution: {integrity: sha512-JoX0apGbHaUJBNl6yF+p6JAFYZ666/hhCGKN5t9QFjbJQKUU/g8MNbFDbvfrgKXvI1QpZplPOnwIo99lX/AAmA==}
@@ -1188,6 +1204,11 @@ packages:
       esprima: 1.0.0
       optimist: 0.6.0
     dev: true
+
+  /uuid/8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+    dev: false
 
   /uvu/0.5.3:
     resolution: {integrity: sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==}
