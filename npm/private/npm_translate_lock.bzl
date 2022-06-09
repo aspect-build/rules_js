@@ -147,12 +147,11 @@ def _process_lockfile(rctx):
 _NPM_IMPORT_TMPL = \
     """    npm_import(
         name = "{name}",
-        integrity = "{integrity}",
         root_package = "{root_package}",
         link_workspace = "{link_workspace}",
         link_packages = {link_packages},
         package = "{package}",
-        version = "{pnpm_version}",{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}
+        version = "{version}",{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}
     )
 """
 
@@ -240,13 +239,15 @@ def _gen_npm_imports(lockfile, attr):
     for (i, v) in enumerate(packages.items()):
         (package, package_info) = v
         name = package_info.get("name")
-        pnpm_version = package_info.get("pnpmVersion")
+        version = package_info.get("version")
+        friendly_version = package_info.get("friendly_version")
         deps = package_info.get("dependencies")
         optional_deps = package_info.get("optionalDependencies")
         dev = package_info.get("dev")
         optional = package_info.get("optional")
         requires_build = package_info.get("requiresBuild")
         integrity = package_info.get("integrity")
+        tarball = package_info.get("tarball")
         transitive_closure = package_info.get("transitiveClosure")
 
         if attr.prod and dev:
@@ -262,21 +263,33 @@ def _gen_npm_imports(lockfile, attr):
         if not attr.no_optional:
             deps = dicts.add(optional_deps, deps)
 
-        friendly_name = utils.friendly_name(name, utils.strip_peer_dep_version(pnpm_version))
+        friendly_name = utils.friendly_name(name, friendly_version)
+        unfriendly_name = utils.friendly_name(name, version)
+        if unfriendly_name == friendly_name:
+            # there is no unfriendly name for this package
+            unfriendly_name = None
 
+        # gather patches by name, friendly_name and unfriendly_name (if any)
         patches = attr.patches.get(name, [])[:]
         patches.extend(attr.patches.get(friendly_name, []))
-
+        if unfriendly_name:
+            patches.extend(attr.patches.get(unfriendly_name, []))
         patch_args = attr.patch_args.get(name, [])[:]
         patch_args.extend(attr.patch_args.get(friendly_name, []))
+        if unfriendly_name:
+            patch_args.extend(attr.patch_args.get(unfriendly_name, []))
 
-        custom_postinstall = attr.custom_postinstalls.get(name)
-        if not custom_postinstall:
-            custom_postinstall = attr.custom_postinstalls.get(friendly_name)
-        elif attr.custom_postinstalls.get(friendly_name):
-            custom_postinstall = "%s && %s" % (custom_postinstall, attr.custom_postinstalls.get(friendly_name))
+        # gather custom postinstalls by name, friendly_name and unfriendly_name (if any)
+        custom_postinstalls = []
+        if name in attr.custom_postinstalls:
+            custom_postinstalls.append(attr.custom_postinstalls.get(name))
+        if friendly_name in attr.custom_postinstalls:
+            custom_postinstalls.append(attr.custom_postinstalls.get(friendly_name))
+        if unfriendly_name and unfriendly_name in attr.custom_postinstalls:
+            custom_postinstalls.append(attr.custom_postinstalls.get(unfriendly_name))
+        custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
-        repo_name = "%s__%s" % (attr.name, utils.bazel_name(name, pnpm_version))
+        repo_name = "%s__%s" % (attr.name, utils.bazel_name(name, version))
         if repo_name.startswith("aspect_rules_js.npm."):
             repo_name = repo_name[len("aspect_rules_js.npm."):]
 
@@ -308,10 +321,11 @@ def _gen_npm_imports(lockfile, attr):
             package = name,
             patch_args = patch_args,
             patches = patches,
-            pnpm_version = pnpm_version,
             root_package = root_package,
             run_lifecycle_hooks = run_lifecycle_hooks,
             transitive_closure = transitive_closure,
+            url = tarball,
+            version = version,
         ))
     return result
 
@@ -432,6 +446,10 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
         defs_bzl_body.append("""    scoped_direct_targets["{}"] = []""".format(package_scope))
 
     for (i, _import) in enumerate(npm_imports):
+        maybe_integrity = """
+        integrity = "%s",""" % _import.integrity if _import.integrity else ""
+        maybe_url = """
+        url = "%s",""" % _import.url if _import.url else ""
         maybe_deps = ("""
         deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
         maybe_transitive_closure = ("""
@@ -446,19 +464,20 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
         run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
-            integrity = _import.integrity,
             link_packages = _import.link_packages,
             link_workspace = rctx.attr.pnpm_lock.workspace_name,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
+            maybe_integrity = maybe_integrity,
             maybe_patch_args = maybe_patch_args,
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
             maybe_transitive_closure = maybe_transitive_closure,
+            maybe_url = maybe_url,
             name = _import.name,
             package = _import.package,
-            pnpm_version = _import.pnpm_version,
             root_package = _import.root_package,
+            version = _import.version,
         ))
 
         defs_bzl_header.append(

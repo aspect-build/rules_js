@@ -18,7 +18,7 @@ def _extension_impl(module_ctx):
                 npm_import(
                     name = i.name,
                     package = i.package,
-                    version = i.pnpm_version,
+                    version = i.version,
                     link_packages = i.link_packages,
                 )
             npm_translate_lock(

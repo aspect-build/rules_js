@@ -24,3 +24,14 @@ write_source_files(
         "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1//npm/private/test:package_json.bzl",
     },
 )
+
+filegroup(
+    name = "build_some_node_modules",
+    srcs = [
+        "node_modules/bufferutil",
+        "node_modules/debug",
+        "node_modules/esbuild",
+        "node_modules/webpack-bundle-analyzer",
+        # intentionally don't include node_modules/unused
+    ],
+)

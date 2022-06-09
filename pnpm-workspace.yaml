@@ -1,3 +1,5 @@
 packages:
-    - 'examples/*'
+    - 'examples/macro'
+    - 'examples/npm_deps'
+    - 'examples/macro'
     - 'npm/private/test'
