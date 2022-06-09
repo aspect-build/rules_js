@@ -13,7 +13,7 @@ _StoreInfo = provider(
         "root_package": "package that this node package store is linked at",
         "package": "name of this node package",
         "version": "version of this node package",
-        "dep_refs": "list of dependency ref targets",
+        "ref_deps": "list of dependency ref targets",
         "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
     },
 )
@@ -112,7 +112,7 @@ def _impl_store(ctx):
 
     virtual_store_directory = None
     direct_files = []
-    direct_dep_refs = []
+    direct_ref_deps = []
 
     if ctx.attr.src:
         # output the package as a TreeArtifact to its virtual store location
@@ -156,7 +156,7 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                 # for this npm depedency will create the dep symlinks for this dep;
                 # this pattern is used to break circular dependencies between 3rd
                 # party npm deps; it is not recommended for 1st party deps
-                direct_dep_refs.append(dep)
+                direct_ref_deps.append(dep)
     else:
         # if ctx.attr.src is _not_ set and ctx.attr.deps is, this is a terminal
         # package with deps being the transitive closure of deps;
@@ -173,37 +173,37 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
-                direct_dep_refs.append(dep)
+                direct_ref_deps.append(dep)
         for dep in ctx.attr.deps:
             dep_package = dep[_StoreInfo].package
             dep_version = dep[_StoreInfo].version
             dep_virtual_store_name = utils.virtual_store_name(dep_package, dep_version)
-            dep_refs = dep[_StoreInfo].dep_refs
+            dep_ref_deps = dep[_StoreInfo].ref_deps
             if dep_package == package and dep_version == version:
                 # provide the node_modules directory for this package if found in the transitive_closure
                 virtual_store_directory = dep[_StoreInfo].virtual_store_directory
                 if virtual_store_directory:
                     direct_files.append(virtual_store_directory)
-            for dep_ref in dep_refs:
-                dep_ref_package = dep_ref[_StoreInfo].package
-                dep_ref_version = dep_ref[_StoreInfo].version
-                if dep_ref_package == package and dep_ref_version == version:
+            for dep_ref_dep in dep_ref_deps:
+                dep_ref_dep_package = dep_ref_dep[_StoreInfo].package
+                dep_ref_dep_version = dep_ref_dep[_StoreInfo].version
+                if dep_ref_dep_package == package and dep_ref_dep_version == version:
                     pass
                 else:
-                    def_ref_pnpm_name = utils.pnpm_name(dep_ref_package, dep_ref_version)
-                    if not def_ref_pnpm_name in deps_map:
-                        fail("Expecting {} to be in deps".format(def_ref_pnpm_name))
-                    actual_dep = deps_map[def_ref_pnpm_name]
-                    dep_ref_virtual_store_directory = actual_dep[_StoreInfo].virtual_store_directory
-                    if dep_ref_virtual_store_directory:
+                    dep_ref_dep_pnpm_name = utils.pnpm_name(dep_ref_dep_package, dep_ref_dep_version)
+                    if not dep_ref_dep_pnpm_name in deps_map:
+                        fail("Expecting {} to be in deps".format(dep_ref_dep_pnpm_name))
+                    actual_dep = deps_map[dep_ref_dep_pnpm_name]
+                    dep_ref_def_virtual_store_directory = actual_dep[_StoreInfo].virtual_store_directory
+                    if dep_ref_def_virtual_store_directory:
                         # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                        dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_package)
-                        dep_symlink = ctx.actions.declare_file(dep_symlink_path)
+                        dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_package)
+                        dep_ref_dep_symlink = ctx.actions.declare_file(dep_ref_dep_symlink_path)
                         ctx.actions.symlink(
-                            output = dep_symlink,
-                            target_file = dep_ref_virtual_store_directory,
+                            output = dep_ref_dep_symlink,
+                            target_file = dep_ref_def_virtual_store_directory,
                         )
-                        direct_files.append(dep_symlink)
+                        direct_files.append(dep_ref_dep_symlink)
 
     direct_files = depset(direct = direct_files)
     files_depsets = [direct_files]
@@ -225,7 +225,7 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
             root_package = ctx.label.package,
             package = package,
             version = version,
-            dep_refs = direct_dep_refs,
+            ref_deps = direct_ref_deps,
             virtual_store_directory = virtual_store_directory,
         ),
     ]
