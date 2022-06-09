@@ -5,8 +5,7 @@ load(":npm_link_package.bzl", _npm_link_package_direct_lib = "npm_link_package_d
 
 _DOC = """Combines multiple npm_link_package_direct targets into a single target.
 
-New target provides DefaultInfo and DeclarationInfo but does not forward the
-_LinkNpmPackageInfo of srcs.
+New target provides DefaultInfo and DeclarationInfo.
 
 For internal use only. Used for create `@npm//@scope` targets.
 """
