@@ -1,4 +1,5 @@
 packages:
+    - 'examples/js_binary'
     - 'examples/lib'
     - 'examples/macro'
     - 'examples/npm_deps'

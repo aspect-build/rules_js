@@ -14,14 +14,19 @@ importers:
       inline-fixtures: 1.1.0
       typescript: 4.7.2
 
+  examples/js_binary:
+    specifiers:
+      '@mycorp/mylib': workspace:*
+    devDependencies:
+      '@mycorp/mylib': link:../lib
+
   examples/lib:
     specifiers:
-      acorn: '*'
+      acorn: 8.7.1
       uuid: 8.3.2
     dependencies:
-      uuid: 8.3.2
-    optionalDependencies:
       acorn: 8.7.1
+      uuid: 8.3.2
 
   examples/macro:
     specifiers:
@@ -38,6 +43,7 @@ importers:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
+      '@mycorp/mylib': workspace:*
       '@rollup/plugin-commonjs': 21.1.0
       debug: 3.2.7
       mobx: 6.3.0
@@ -49,6 +55,7 @@ importers:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
+      '@mycorp/mylib': link:../lib
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       debug: 3.2.7
       mobx: 6.3.0

@@ -9,6 +9,11 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps/@aspect-test/a:package_json.bzl", aspect_test_a_bin = "bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+# Link all direct dependencies in /examples/npm_deps/package.json to
+# bazel-bin/examples/npm_deps/node_modules
+npm_link_all_packages(name = "node_modules")
 
 # A simple program that runs the Acorn JS parser to produce an AST
 js_binary(
@@ -86,9 +91,7 @@ write_file(
 
 js_binary(
     name = "bin4",
-    # To resolve the require() statement, we supply the location where our local monorepo
-    # npm package was linked into the node_modules in the root Bazel package.
-    data = ["//:node_modules/@mycorp/mylib"],
+    data = [":node_modules/@mycorp/mylib"],
     entry_point = "case4.js",
 )
 

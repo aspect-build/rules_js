@@ -2,6 +2,9 @@
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packages")
+load("@aspect_rules_js//npm/private:npm_link_package.bzl",
+    _npm_link_package_store = "npm_link_package_store",
+    _npm_link_package_direct = "npm_link_package_direct")
 load("@npm__at_aspect-test_a__5.0.2__links//:defs.bzl", link_0_direct = "npm_link_imported_package_direct", link_0_store = "npm_link_imported_package_store")
 load("@npm__at_aspect-test_b__5.0.2__links//:defs.bzl", link_1_store = "npm_link_imported_package_store")
 load("@npm__at_aspect-test_c__2.0.2__links//:defs.bzl", link_2_direct = "npm_link_imported_package_direct", link_2_store = "npm_link_imported_package_store")
@@ -469,11 +472,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     """
 
     root_package = ""
-    direct_packages = ["", "examples/lib", "examples/macro", "examples/npm_deps", "npm/private/test"]
+    direct_packages = ["", "examples/js_binary", "examples/lib", "examples/macro", "examples/npm_deps", "npm/private/test"]
     is_root = native.package_name() == root_package
     is_direct = native.package_name() in direct_packages
     if not is_root and not is_direct:
-        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages ['', 'examples/lib', 'examples/macro', 'examples/npm_deps', 'npm/private/test']" % native.package_name()
+        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages ['', 'examples/js_binary', 'examples/lib', 'examples/macro', 'examples/npm_deps', 'npm/private/test']" % native.package_name()
         fail(msg)
     direct_targets = []
     scoped_direct_targets = {}
@@ -967,6 +970,43 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             direct_targets.append(link_272_direct(name = "{}/mocha-junit-reporter".format(name)))
             direct_targets.append(link_273_direct(name = "{}/mocha-multi-reporters".format(name)))
             direct_targets.append(link_274_direct(name = "{}/mocha".format(name)))
+
+    if is_root:
+         _npm_link_package_store(
+            name = ".aspect_rules_js/{}/@mycorp/mylib/0.0.0".format(name),
+            src = "//examples/lib:lib",
+            package = "@mycorp/mylib",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/acorn/8.7.1".format(name): "acorn",
+                "//:.aspect_rules_js/{}/uuid/8.3.2".format(name): "uuid",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["examples/js_binary", "examples/npm_deps"]:
+        if link_package == native.package_name():
+            # terminal target for direct dependencies
+            _npm_link_package_direct(
+                name = "{}/@mycorp/mylib".format(name),
+                src = "//:.aspect_rules_js/{}/@mycorp/mylib/0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            direct_targets.append(":{}/@mycorp/mylib".format(name))
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/@mycorp/mylib/dir".format(name),
+                srcs = [":{}/@mycorp/mylib".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            
+            scoped_direct_targets["@mycorp"] = scoped_direct_targets["@mycorp"] + [direct_targets[-1]] if "@mycorp" in scoped_direct_targets else [direct_targets[-1]]
 
     for scope, scoped_targets in scoped_direct_targets.items():
         npm_linked_packages(
