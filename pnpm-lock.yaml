@@ -10,9 +10,6 @@ importers:
       '@types/node': 16.11.36
       typescript: 4.7.2
 
-  examples/lib:
-    specifiers: {}
-
   examples/macro:
     specifiers:
       mocha: ^10.0.0
@@ -48,11 +45,13 @@ importers:
   npm/private/test:
     specifiers:
       bufferutil: 4.0.1
+      debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
       unused: latest
       webpack-bundle-analyzer: 4.5.0
     devDependencies:
       bufferutil: 4.0.1
+      debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
       unused: 0.2.2
       webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
@@ -962,6 +961,10 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /ms/0.7.3:
+    resolution: {integrity: sha512-lrKNzMWqQZgwJahtrtrM+9NgOoDUveDrVmm5aGXrf3BdtL0mq7X6IVzoZaw+TfNti29eHd1/8GI+h45K5cQ6/w==}
+    dev: true
+
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
     dev: true
@@ -1293,4 +1296,17 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53:
+    resolution: {tarball: https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53}
+    name: debug
+    version: 2.6.3
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 0.7.3
     dev: true

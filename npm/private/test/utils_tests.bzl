@@ -32,7 +32,7 @@ def test_bazel_name(ctx):
 def test_pnpm_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope/y/1.1.1", utils.pnpm_name("@scope/y", "1.1.1"))
-    asserts.equals(env, ["@scope/y", "1.1.1"], utils.parse_pnpm_name("@scope/y/1.1.1"))
+    asserts.equals(env, ("@scope/y", "1.1.1"), utils.parse_pnpm_name("@scope/y/1.1.1"))
     return unittest.end(env)
 
 def test_friendly_name(ctx):

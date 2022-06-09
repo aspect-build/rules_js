@@ -225,16 +225,16 @@ _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _impl(rctx):
-    numeric_version = utils.strip_peer_dep_version(rctx.attr.version)
+    download_url = rctx.attr.url if rctx.attr.url else "https://registry.npmjs.org/{0}/-/{1}-{2}.tgz".format(
+        rctx.attr.package,
+        # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
+        rctx.attr.package.rsplit("/", 1)[-1],
+        utils.strip_peer_dep_version(rctx.attr.version),
+    )
 
     rctx.download(
         output = _TARBALL_FILENAME,
-        url = "https://registry.npmjs.org/{0}/-/{1}-{2}.tgz".format(
-            rctx.attr.package,
-            # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
-            rctx.attr.package.split("/")[-1],
-            numeric_version,
-        ),
+        url = download_url,
         integrity = rctx.attr.integrity,
     )
 
@@ -452,6 +452,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "run_lifecycle_hooks": attr.bool(),
     "custom_postinstall": attr.string(),
     "link_workspace": attr.string(),
+    "url": attr.string(),
 })
 
 def _inject_run_lifecycle_hooks(rctx, pkg_json_path):

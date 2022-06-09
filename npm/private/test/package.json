@@ -3,6 +3,7 @@
     "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
     "devDependencies": {
         "bufferutil": "4.0.1",
+        "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
         "esbuild": "0.14.38",
         "unused": "latest",
         "webpack-bundle-analyzer": "4.5.0"

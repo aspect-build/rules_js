@@ -34,6 +34,45 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
             package_info = packages[utils.pnpm_name(name, version)]
             stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"]))
 
+def _gather_package_info(package_path, package_snapshot):
+    if package_path.startswith("/"):
+        package = package_path[1:]
+        name, version = utils.parse_pnpm_name(package)
+        friendly_version = utils.strip_peer_dep_version(version)
+    elif package_path.startswith("github.com/"):
+        package = package_path
+        if "name" not in package_snapshot:
+            fail("expected package %s to have a name field" % package_path)
+        if "version" not in package_snapshot:
+            fail("expected package %s to have a version field" % package_path)
+        name = package_snapshot["name"]
+        version = package_path
+        friendly_version = package_snapshot["version"]
+    else:
+        fail("unsupported package path " + package_path)
+
+    if "resolution" not in package_snapshot:
+        fail("package %s has no resolution field" % package_path)
+    resolution = package_snapshot["resolution"]
+    integrity = resolution["integrity"] if "integrity" in resolution else None
+    tarball = resolution["tarball"] if "tarball" in resolution else None
+    if not integrity and not tarball:
+        fail("expected package %s to have an integrity and/or tarball fields but found neither" % package_path)
+
+    return utils.pnpm_name(name, version), {
+        "name": name,
+        "version": version,
+        "friendly_version": friendly_version,
+        "integrity": integrity,
+        "tarball": tarball,
+        "dependencies": package_snapshot.get("dependencies", {}),
+        "optionalDependencies": package_snapshot.get("optionalDependencies", {}),
+        "dev": "dev" in package_snapshot.keys(),
+        "optional": "optional" in package_snapshot.keys(),
+        "hasBin": "hasBin" in package_snapshot.keys(),
+        "requiresBuild": "requiresBuild" in package_snapshot.keys(),
+    }
+
 def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_optional = False):
     """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
 
@@ -80,35 +119,14 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
         }
 
     packages = {}
-    for package_path in lock_packages.keys():
-        package_snapshot = lock_packages[package_path]
-        if not package_path.startswith("/"):
-            fail("unsupported package path " + package_path)
-        package = package_path[1:]
-        [name, pnpmVersion] = utils.parse_pnpm_name(package)
-
-        if "resolution" not in package_snapshot.keys():
-            fail("package %s has no resolution field" % package_path)
-        resolution = package_snapshot["resolution"]
-        if "integrity" not in resolution.keys():
-            fail("package %s has no integrity field" % package_path)
-
-        packages[package] = {
-            "name": name,
-            "pnpmVersion": pnpmVersion,
-            "integrity": resolution["integrity"],
-            "dependencies": package_snapshot.get("dependencies", {}),
-            "optionalDependencies": package_snapshot.get("optionalDependencies", {}),
-            "dev": "dev" in package_snapshot.keys(),
-            "optional": "optional" in package_snapshot.keys(),
-            "hasBin": "hasBin" in package_snapshot.keys(),
-            "requiresBuild": "requiresBuild" in package_snapshot.keys(),
-        }
+    for package_path, package_snapshot in lock_packages.items():
+        package, package_info = _gather_package_info(package_path, package_snapshot)
+        packages[package] = package_info
 
     for package in packages.keys():
         package_info = packages[package]
         transitive_closure = {}
-        transitive_closure[package_info["name"]] = [package_info["pnpmVersion"]]
+        transitive_closure[package_info["name"]] = [package_info["version"]]
         dependencies = package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"])
 
         gather_transitive_closure(

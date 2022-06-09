@@ -2,14 +2,14 @@
 
 load(":yaml.bzl", _parse_yaml = "parse")
 
-def _bazel_name(name, pnpm_version = None):
+def _bazel_name(name, version = None):
     "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
     escaped_name = name.replace("@", "at_").replace("/", "_")
-    if not pnpm_version:
+    if not version:
         return escaped_name
-    pnpm_version_segments = pnpm_version.split("_")
-    escaped_version = pnpm_version_segments[0].replace("/", "_")
-    peer_version = "_".join(pnpm_version_segments[1:])
+    version_segments = version.split("_")
+    escaped_version = version_segments[0].replace("/", "_")
+    peer_version = "_".join(version_segments[1:])
     if peer_version.startswith("@"):
         peer_version = "at_" + peer_version[1:]
     if peer_version:
@@ -35,7 +35,7 @@ def _parse_pnpm_name(pnpmName):
     segments = pnpmName.rsplit("/", 1)
     if len(segments) != 2:
         fail("unexpected pnpm versioned name " + pnpmName)
-    return segments
+    return (segments[0], segments[1])
 
 def _parse_pnpm_lock(lockfile_content):
     """Parse a pnpm lock file.
@@ -77,10 +77,11 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _virtual_store_name(name, pnpm_version):
+def _virtual_store_name(name, version):
     "Make a virtual store name for a given package and version"
-    escaped = name.replace("/", "+")
-    return "%s@%s" % (escaped, pnpm_version)
+    escaped_name = name.replace("/", "+")
+    escaped_version = version.replace("/", "+")
+    return "%s@%s" % (escaped_name, escaped_version)
 
 utils = struct(
     bazel_name = _bazel_name,

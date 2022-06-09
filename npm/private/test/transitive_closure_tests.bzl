@@ -8,7 +8,7 @@ load("//npm/private:transitive_closure.bzl", "gather_transitive_closure")
 TEST_PACKAGES = {
     "@aspect-test/a/5.0.0": {
         "name": "@aspect-test/a",
-        "pnpmVersion": "5.0.0",
+        "version": "5.0.0",
         "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         "dependencies": {
             "@aspect-test/b": "5.0.0",
