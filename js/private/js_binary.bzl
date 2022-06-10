@@ -182,7 +182,7 @@ def _target_tool_short_path(path):
 def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args):
     bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
-    launcher = ctx.actions.declare_file("_%s_launcher.sh" % ctx.label.name)
+    launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
 
     envs = []
     for (key, value) in ctx.attr.env.items():
