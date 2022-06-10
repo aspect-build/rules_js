@@ -15,12 +15,20 @@ def _extension_impl(module_ctx):
             trans = translate_to_transitive_closure(lockfile, attr.prod, attr.dev, attr.no_optional)
             imports = npm_translate_lock_lib.gen_npm_imports(trans, attr)
             for i in imports:
-                # fixme: pass the rest of the kwargs from i
                 npm_import(
                     name = i.name,
                     package = i.package,
                     version = i.version,
                     link_packages = i.link_packages,
+                    custom_postinstall = i.custom_postinstall,
+                    deps = i.deps,
+                    integrity = i.integrity,
+                    patch_args = i.patch_args,
+                    patches = i.patches,
+                    root_package = i.root_package,
+                    run_lifecycle_hooks = i.run_lifecycle_hooks,
+                    transitive_closure = i.transitive_closure,
+                    url = i.url,
                 )
             npm_translate_lock(
                 name = "npm",
