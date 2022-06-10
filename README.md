@@ -8,6 +8,8 @@ accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 - Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
 - Supports npm "workspaces": nested npm packages in a monorepo.
 
+<https://hackmd.io/@aspect/npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
+
 Known issues:
 - Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
 - Doesn't work with rules_docker due to https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1137465914.
