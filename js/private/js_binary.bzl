@@ -278,7 +278,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
     bash_launcher = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
+    all_files = output_data_files + ctx.files._runfiles_lib + [output_entry_point, bash_launcher] + ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files
     runfiles = ctx.runfiles(
         files = all_files,
         transitive_files = depset(all_files),
