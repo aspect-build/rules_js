@@ -31,7 +31,7 @@ jobs:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
             - name: Mount bazel caches
-              uses: actions/cache@v2
+              uses: actions/cache@v3
               with:
                   path: |
                       "~/.cache/bazel"
