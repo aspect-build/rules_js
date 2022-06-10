@@ -2,7 +2,6 @@
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packages")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
 load("@npm__at_aspect-test_a__5.0.0__links//:defs.bzl", link_0_direct = "npm_link_imported_package_direct", link_0_store = "npm_link_imported_package_store")
 load("@npm__at_aspect-test_b__5.0.0__links//:defs.bzl", link_1_store = "npm_link_imported_package_store")
 load("@npm__at_aspect-test_c__1.0.0__links//:defs.bzl", link_2_store = "npm_link_imported_package_store")
@@ -203,8 +202,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             )```
     """
 
-    # @unused
-    utils = _utils
     root_package = ""
     direct_packages = ["", "examples/lib", "examples/macro", "examples/npm_deps", "npm/private/test"]
     is_root = native.package_name() == root_package

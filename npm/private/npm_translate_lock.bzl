@@ -192,7 +192,7 @@ _FP_DIRECT_TMPL = \
             native.filegroup(
                 name = "{{}}/{name}/dir".format(name),
                 srcs = [":{{}}/{name}".format(name)],
-                output_group = utils.package_directory_output_group,
+                output_group = "{package_directory_output_group}",
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
             )
@@ -366,8 +366,7 @@ def _impl(rctx):
     direct_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packages")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")"""]
+load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packages")"""]
 
     npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
@@ -454,8 +453,6 @@ load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")"""]
             )```
     \"\"\"
 
-    # @unused
-    utils = _utils
     root_package = "{root_package}"
     direct_packages = {direct_packages}
     is_root = native.package_name() == root_package
@@ -600,9 +597,10 @@ load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")"""]
 
         defs_bzl_body.append(_FP_DIRECT_TMPL.format(
             bazel_name = fp_bazel_name,
-            name = fp_package,
             link_packages = fp_link_packages.keys(),
+            name = fp_package,
             package = fp_package,
+            package_directory_output_group = utils.package_directory_output_group,
             root_package = root_package,
         ))
 
