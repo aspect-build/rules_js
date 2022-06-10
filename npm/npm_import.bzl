@@ -25,7 +25,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 """
 
-load("//npm/private:npm_import.bzl", _npm_import = "npm_import", _npm_import_links = "npm_import_links")
+load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import_links_lib = "npm_import_links")
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock_lib = "npm_translate_lock")
 
@@ -33,6 +33,16 @@ npm_translate_lock = repository_rule(
     doc = _npm_translate_lock_lib.doc,
     implementation = _npm_translate_lock_lib.implementation,
     attrs = _npm_translate_lock_lib.attrs,
+)
+
+_npm_import_links = repository_rule(
+    implementation = _npm_import_links_lib.implementation,
+    attrs = _npm_import_links_lib.attrs,
+)
+
+_npm_import = repository_rule(
+    implementation = _npm_import_lib.implementation,
+    attrs = _npm_import_lib.attrs,
 )
 
 def npm_import(

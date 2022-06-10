@@ -18,6 +18,12 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
 )
 
+npm.npm_package(
+    name = "npm_meaning-of-life",
+    package = "meaning-of-life",
+    version = "1.0.0",
+)
+
 # FIXME: this isn't very usable yet due to the new "repository strict visibility" in bzlmod.
 # You must list all repositories that you load() from or reference their targets,
 # and ALSO any repositories that get brought into your repository scope via macro expansion.
@@ -26,3 +32,6 @@ npm.npm_translate_lock(
 use_repo(npm, "npm")
 use_repo(npm, "npm__chalk__5.0.1")
 use_repo(npm, "npm__chalk__5.0.1__links")
+
+use_repo(npm, "npm_meaning-of-life")
+use_repo(npm, "npm_meaning-of-life__links")

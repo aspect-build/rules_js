@@ -485,12 +485,12 @@ def _make_generated_by_lines(package, version):
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-npm_import_links = repository_rule(
+npm_import_links = struct(
     implementation = _impl_links,
     attrs = _ATTRS_LINKS,
 )
 
-npm_import = repository_rule(
+npm_import = struct(
     implementation = _impl,
     attrs = _ATTRS,
 )
