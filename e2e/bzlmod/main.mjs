@@ -1,2 +1,5 @@
 import chalk from 'chalk'
-console.log(chalk.blue('Hello world!'))
+import meaningOfLife from 'meaning-of-life'
+console.log(
+    chalk.blue(`Hello world! The meaning of life is... ${meaningOfLife}`)
+)
