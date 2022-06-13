@@ -138,6 +138,15 @@ _ATTRS = {
         doc = """If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist""",
         default = True,
     ),
+    "verify_node_modules_ignored": attr.label(
+        doc = """node_modules folders in the source tree should be ignored by Bazel.
+
+        This points to a `.bazelignore` file to verify that all nested node_modules directories
+        pnpm will create are listed.
+        
+        See https://github.com/bazelbuild/bazel/issues/8106
+        """,
+    ),
 }
 
 def _process_lockfile(rctx):
@@ -339,6 +348,41 @@ def _gen_npm_imports(lockfile, attr):
         ))
     return result
 
+def _join(*elements):
+    return "/".join([f for f in elements if f])
+
+def _normalize_bazelignore(lines):
+    """Make bazelignore lines predictable
+
+    - strip trailing slash so that users can have either of equivalent
+        foo/node_modules or foo/node_modules/
+    - strip leading ./ so users can have node_modules or ./node_modules
+    """
+    result = []
+    for line in lines:
+        if line.startswith("./"):
+            result.append(line[2:].rstrip("/"))
+        else:
+            result.append(line.rstrip("/"))
+    return result
+
+def _verify_node_modules_ignored(rctx, importer_paths, bazelignore):
+    bazelignore = _normalize_bazelignore(bazelignore.split("\n"))
+    missing_ignores = []
+
+    # The pnpm-lock.yaml file package needs to be prefixed on paths
+    root = rctx.attr.pnpm_lock.package
+    for i in importer_paths:
+        if i == ".":
+            expected = root
+        else:
+            expected = paths.normalize(_join(root, i))
+
+        expected = _join(expected, "node_modules")
+        if expected not in bazelignore:
+            missing_ignores.append(expected)
+    return missing_ignores
+
 def _impl(rctx):
     lockfile = _process_lockfile(rctx)
 
@@ -362,6 +406,27 @@ def _impl(rctx):
         fail("expected importers in processed lockfile")
 
     importer_paths = importers.keys()
+
+    if rctx.attr.verify_node_modules_ignored != None:
+        missing_ignores = _verify_node_modules_ignored(rctx, importer_paths, rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
+        if missing_ignores:
+            fail("""\
+
+ERROR: in verify_node_modules_ignored:                
+pnpm install will create nested node_modules, but not all of them are ignored by Bazel.
+We recommend that all node_modules folders in the source tree be ignored,
+to avoid Bazel printing confusing error messages.
+
+Either add line(s) to {bazelignore}:
+
+{fixes}
+
+or disable this check by setting 'verify_node_modules_ignored = None' in `npm_translate_lock(name = "{repo}")`
+                """.format(
+                fixes = "\n".join(missing_ignores),
+                bazelignore = rctx.attr.verify_node_modules_ignored,
+                repo = rctx.name,
+            ))
 
     direct_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
@@ -645,4 +710,5 @@ npm_translate_lock = struct(
 
 npm_translate_lock_testonly = struct(
     testonly_process_lockfile = _process_lockfile,
+    verify_node_modules_ignored = _verify_node_modules_ignored,
 )
