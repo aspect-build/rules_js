@@ -57,6 +57,7 @@ npm_translate_lock(
         "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
@@ -77,8 +78,8 @@ npm_import(
 
 npm_import(
     name = "pnpm",
-    version = "6.32.19",
     integrity = "sha512-IY+62k/caP5GsMQm5YcOJ03XDkze68aBiiXrlwqMUAYFhSstLETlenIC73AukJyUd7o4Y18HcV2gfQYCKb0PEA==",
     package = "pnpm",
     root_package = "",
+    version = "6.32.19",
 )

@@ -33,7 +33,8 @@ Advanced users may want to directly fetch a package from npm rather than start f
 
 <pre>
 npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_translate_lock-custom_postinstalls">custom_postinstalls</a>, <a href="#npm_translate_lock-dev">dev</a>, <a href="#npm_translate_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>, <a href="#npm_translate_lock-no_optional">no_optional</a>, <a href="#npm_translate_lock-patch_args">patch_args</a>,
-                   <a href="#npm_translate_lock-patches">patches</a>, <a href="#npm_translate_lock-pnpm_lock">pnpm_lock</a>, <a href="#npm_translate_lock-prod">prod</a>, <a href="#npm_translate_lock-repo_mapping">repo_mapping</a>, <a href="#npm_translate_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>)
+                   <a href="#npm_translate_lock-patches">patches</a>, <a href="#npm_translate_lock-pnpm_lock">pnpm_lock</a>, <a href="#npm_translate_lock-prod">prod</a>, <a href="#npm_translate_lock-repo_mapping">repo_mapping</a>, <a href="#npm_translate_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>,
+                   <a href="#npm_translate_lock-verify_node_modules_ignored">verify_node_modules_ignored</a>)
 </pre>
 
 Repository rule to generate npm_import rules from pnpm lock file.
@@ -142,6 +143,7 @@ and must depend on packages with their versioned label like `@npm__types_node-15
 | <a id="npm_translate_lock-prod"></a>prod |  If true, only install dependencies   | Boolean | optional | False |
 | <a id="npm_translate_lock-repo_mapping"></a>repo_mapping |  A dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.&lt;p&gt;For example, an entry <code>"@foo": "@bar"</code> declares that, for any time this repository depends on <code>@foo</code> (such as a dependency on <code>@foo//some:target</code>, it should actually resolve that dependency within globally-declared <code>@bar</code> (<code>@bar//some:target</code>).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | required |  |
 | <a id="npm_translate_lock-run_lifecycle_hooks"></a>run_lifecycle_hooks |  If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist   | Boolean | optional | True |
+| <a id="npm_translate_lock-verify_node_modules_ignored"></a>verify_node_modules_ignored |  node_modules folders in the source tree should be ignored by Bazel.<br><br>        This points to a <code>.bazelignore</code> file to verify that all nested node_modules directories         pnpm will create are listed.<br><br>        See https://github.com/bazelbuild/bazel/issues/8106   | <a href="https://bazel.build/docs/build-ref.html#labels">Label</a> | optional | None |
 
 
 <a id="#npm_import"></a>
