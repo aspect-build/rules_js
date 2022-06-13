@@ -27,6 +27,10 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
         deps = stack.pop()
         for name in deps.keys():
             version = deps[name]
+            if version.startswith("/"):
+                # an aliased dependency
+                version = version[1:]
+                name, version = utils.parse_pnpm_name(version)
             transitive_closure[name] = transitive_closure.get(name, [])
             if version in transitive_closure[name]:
                 continue
@@ -36,6 +40,7 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
 
 def _gather_package_info(package_path, package_snapshot):
     if package_path.startswith("/"):
+        # an aliased dependency
         package = package_path[1:]
         name, version = utils.parse_pnpm_name(package)
         friendly_version = utils.strip_peer_dep_version(version)

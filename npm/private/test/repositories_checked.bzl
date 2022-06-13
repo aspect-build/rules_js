@@ -115,6 +115,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_choojs_findup__0.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@choojs/findup",
+        version = "0.2.1",
+        integrity = "sha512-YstAqNb0MCN8PjdLCDfRsBcGVRN41f3vgLvaI0IrIcBp4AqILRSS0DeWNGkicC+f/zRIPJLc+9RURVSepwvfBw==",
+        deps = {
+            "commander": "2.20.3",
+        },
+        transitive_closure = {
+            "@choojs/findup": ["0.2.1"],
+            "commander": ["2.20.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_gregmagolan_test-a__0.0.1",
         root_package = "",
         link_workspace = "",
@@ -145,6 +162,259 @@ def npm_repositories():
         transitive_closure = {
             "@gregmagolan/test-b": ["0.0.2"],
             "@gregmagolan/test-a": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_geojson-rewind__0.5.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/geojson-rewind",
+        version = "0.5.2",
+        integrity = "sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==",
+        deps = {
+            "get-stream": "6.0.1",
+            "minimist": "1.2.6",
+        },
+        transitive_closure = {
+            "@mapbox/geojson-rewind": ["0.5.2"],
+            "get-stream": ["6.0.1"],
+            "minimist": ["1.2.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_geojson-types__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/geojson-types",
+        version = "1.0.2",
+        integrity = "sha512-e9EBqHHv3EORHrSfbR9DqecPNn+AmuAoQxV6aL8Xu30bJMJR1o8PZLZzpk1Wq7/NfCbuhmakHTPYRhoqLsXRnw==",
+        transitive_closure = {
+            "@mapbox/geojson-types": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_jsonlint-lines-primitives__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/jsonlint-lines-primitives",
+        version = "2.0.2",
+        integrity = "sha512-rY0o9A5ECsTQRVhv7tL/OyDpGAoUB4tTvLiW1DSzQGq4bvTPhNw1VpSNjDJc5GFZ2XuyOtSWSVN05qOtcD71qQ==",
+        transitive_closure = {
+            "@mapbox/jsonlint-lines-primitives": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_mapbox-gl-supported__1.5.0__mapbox-gl_1.10.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/mapbox-gl-supported",
+        version = "1.5.0_mapbox-gl@1.10.1",
+        integrity = "sha512-/PT1P6DNf7vjEEiPkVIRJkvibbqWtqnyGaBz3nfRdcxclNSnSdaLU5tfAgcD7I8Yt5i+L19s406YLl1koLnLbg==",
+        deps = {
+            "mapbox-gl": "1.10.1",
+        },
+        transitive_closure = {
+            "@mapbox/mapbox-gl-supported": ["1.5.0_mapbox-gl@1.10.1"],
+            "mapbox-gl": ["1.10.1"],
+            "@mapbox/geojson-rewind": ["0.5.2"],
+            "@mapbox/geojson-types": ["1.0.2"],
+            "@mapbox/jsonlint-lines-primitives": ["2.0.2"],
+            "@mapbox/point-geometry": ["0.1.0"],
+            "@mapbox/tiny-sdf": ["1.2.5"],
+            "@mapbox/unitbezier": ["0.0.0"],
+            "@mapbox/vector-tile": ["1.3.1"],
+            "@mapbox/whoots-js": ["3.1.0"],
+            "csscolorparser": ["1.0.3"],
+            "earcut": ["2.2.3"],
+            "geojson-vt": ["3.2.1"],
+            "gl-matrix": ["3.4.3"],
+            "grid-index": ["1.1.0"],
+            "minimist": ["1.2.6"],
+            "murmurhash-js": ["1.0.0"],
+            "pbf": ["3.2.1"],
+            "potpack": ["1.0.2"],
+            "quickselect": ["2.0.0"],
+            "rw": ["1.3.3"],
+            "supercluster": ["7.1.5"],
+            "tinyqueue": ["2.0.3"],
+            "vt-pbf": ["3.1.3"],
+            "kdbush": ["3.0.0"],
+            "ieee754": ["1.2.1"],
+            "resolve-protobuf-schema": ["2.1.0"],
+            "protocol-buffers-schema": ["3.6.0"],
+            "get-stream": ["6.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_point-geometry__0.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/point-geometry",
+        version = "0.1.0",
+        integrity = "sha512-6j56HdLTwWGO0fJPlrZtdU/B13q8Uwmo18Ck2GnGgN9PCFyKTZ3UbXeEdRFh18i9XQ92eH2VdtpJHpBD3aripQ==",
+        transitive_closure = {
+            "@mapbox/point-geometry": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_tiny-sdf__1.2.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/tiny-sdf",
+        version = "1.2.5",
+        integrity = "sha512-cD8A/zJlm6fdJOk6DqPUV8mcpyJkRz2x2R+/fYcWDYG3oWbG7/L7Yl/WqQ1VZCjnL9OTIMAn6c+BC5Eru4sQEw==",
+        transitive_closure = {
+            "@mapbox/tiny-sdf": ["1.2.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_unitbezier__0.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/unitbezier",
+        version = "0.0.0",
+        integrity = "sha512-HPnRdYO0WjFjRTSwO3frz1wKaU649OBFPX3Zo/2WZvuRi6zMiRGui8SnPQiQABgqCf8YikDe5t3HViTVw1WUzA==",
+        transitive_closure = {
+            "@mapbox/unitbezier": ["0.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_vector-tile__1.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/vector-tile",
+        version = "1.3.1",
+        integrity = "sha512-MCEddb8u44/xfQ3oD+Srl/tNcQoqTw3goGk2oLsrFxOTc3dUp+kAnby3PvAeeBYSMSjSPD1nd1AJA6W49WnoUw==",
+        deps = {
+            "@mapbox/point-geometry": "0.1.0",
+        },
+        transitive_closure = {
+            "@mapbox/vector-tile": ["1.3.1"],
+            "@mapbox/point-geometry": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_mapbox_whoots-js__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@mapbox/whoots-js",
+        version = "3.1.0",
+        integrity = "sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==",
+        transitive_closure = {
+            "@mapbox/whoots-js": ["3.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_plotly_d3-sankey-circular__0.33.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@plotly/d3-sankey-circular",
+        version = "0.33.1",
+        integrity = "sha512-FgBV1HEvCr3DV7RHhDsPXyryknucxtfnLwPtCKKxdolKyTFYoLX/ibEfX39iFYIL7DYbVeRtP43dbFcrHNE+KQ==",
+        deps = {
+            "d3-array": "1.2.4",
+            "d3-collection": "1.0.7",
+            "d3-shape": "1.3.7",
+            "elementary-circuits-directed-graph": "1.3.1",
+        },
+        transitive_closure = {
+            "@plotly/d3-sankey-circular": ["0.33.1"],
+            "d3-array": ["1.2.4"],
+            "d3-collection": ["1.0.7"],
+            "d3-shape": ["1.3.7"],
+            "elementary-circuits-directed-graph": ["1.3.1"],
+            "strongly-connected-components": ["1.0.1"],
+            "d3-path": ["1.0.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_plotly_d3-sankey__0.7.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@plotly/d3-sankey",
+        version = "0.7.2",
+        integrity = "sha512-2jdVos1N3mMp3QW0k2q1ph7Gd6j5PY1YihBrwpkFnKqO+cqtZq3AdEYUeSGXMeLsBDQYiqTVcihYfk8vr5tqhw==",
+        deps = {
+            "d3-array": "1.2.4",
+            "d3-collection": "1.0.7",
+            "d3-shape": "1.3.7",
+        },
+        transitive_closure = {
+            "@plotly/d3-sankey": ["0.7.2"],
+            "d3-array": ["1.2.4"],
+            "d3-collection": ["1.0.7"],
+            "d3-shape": ["1.3.7"],
+            "d3-path": ["1.0.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_plotly_d3__3.8.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@plotly/d3",
+        version = "3.8.0",
+        integrity = "sha512-L10iHgzvw3uSic/nQpYehlNzxUQvImwms5U7S95pJAEhrllzkrdQNy1Mc5DW9ab881Yr4fh300gJztKXWZDfkQ==",
+        transitive_closure = {
+            "@plotly/d3": ["3.8.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_plotly_point-cluster__3.1.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@plotly/point-cluster",
+        version = "3.1.9",
+        integrity = "sha512-MwaI6g9scKf68Orpr1pHZ597pYx9uP8UEFXLPbsCmuw3a84obwz6pnMXGc90VhgDNeNiLEdlmuK7CPo+5PIxXw==",
+        deps = {
+            "array-bounds": "1.0.1",
+            "binary-search-bounds": "2.0.5",
+            "clamp": "1.0.1",
+            "defined": "1.0.0",
+            "dtype": "2.0.0",
+            "flatten-vertex-data": "1.0.2",
+            "is-obj": "1.0.1",
+            "math-log2": "1.0.1",
+            "parse-rect": "1.2.0",
+            "pick-by-alias": "1.2.0",
+        },
+        transitive_closure = {
+            "@plotly/point-cluster": ["3.1.9"],
+            "array-bounds": ["1.0.1"],
+            "binary-search-bounds": ["2.0.5"],
+            "clamp": ["1.0.1"],
+            "defined": ["1.0.0"],
+            "dtype": ["2.0.0"],
+            "flatten-vertex-data": ["1.0.2"],
+            "is-obj": ["1.0.1"],
+            "math-log2": ["1.0.1"],
+            "parse-rect": ["1.2.0"],
+            "pick-by-alias": ["1.2.0"],
         },
     )
 
@@ -253,6 +523,93 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_turf_area__6.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@turf/area",
+        version = "6.5.0",
+        integrity = "sha512-xCZdiuojokLbQ+29qR6qoMD89hv+JAgWjLrwSEWL+3JV8IXKeNFl6XkEJz9HGkVpnXvQKJoRz4/liT+8ZZ5Jyg==",
+        deps = {
+            "@turf/helpers": "6.5.0",
+            "@turf/meta": "6.5.0",
+        },
+        transitive_closure = {
+            "@turf/area": ["6.5.0"],
+            "@turf/helpers": ["6.5.0"],
+            "@turf/meta": ["6.5.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_turf_bbox__6.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@turf/bbox",
+        version = "6.5.0",
+        integrity = "sha512-RBbLaao5hXTYyyg577iuMtDB8ehxMlUqHEJiMs8jT1GHkFhr6sYre3lmLsPeYEi/ZKj5TP5tt7fkzNdJ4GIVyw==",
+        deps = {
+            "@turf/helpers": "6.5.0",
+            "@turf/meta": "6.5.0",
+        },
+        transitive_closure = {
+            "@turf/bbox": ["6.5.0"],
+            "@turf/helpers": ["6.5.0"],
+            "@turf/meta": ["6.5.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_turf_centroid__6.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@turf/centroid",
+        version = "6.5.0",
+        integrity = "sha512-MwE1oq5E3isewPprEClbfU5pXljIK/GUOMbn22UM3IFPDJX0KeoyLNwghszkdmFp/qMGL/M13MMWvU+GNLXP/A==",
+        deps = {
+            "@turf/helpers": "6.5.0",
+            "@turf/meta": "6.5.0",
+        },
+        transitive_closure = {
+            "@turf/centroid": ["6.5.0"],
+            "@turf/helpers": ["6.5.0"],
+            "@turf/meta": ["6.5.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_turf_helpers__6.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@turf/helpers",
+        version = "6.5.0",
+        integrity = "sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==",
+        transitive_closure = {
+            "@turf/helpers": ["6.5.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_turf_meta__6.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@turf/meta",
+        version = "6.5.0",
+        integrity = "sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==",
+        deps = {
+            "@turf/helpers": "6.5.0",
+        },
+        transitive_closure = {
+            "@turf/meta": ["6.5.0"],
+            "@turf/helpers": ["6.5.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_estree__0.0.39",
         root_package = "",
         link_workspace = "",
@@ -307,6 +664,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__abs-svg-path__0.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "abs-svg-path",
+        version = "0.1.1",
+        integrity = "sha512-d8XPSGjfyzlXC3Xx891DJRyZfqk5JU0BJrDQcsWomFIV1/BIzPW5HDH5iDdWpqWaav0YVIEzT1RHTwWr0FFshA==",
+        transitive_closure = {
+            "abs-svg-path": ["0.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__acorn-walk__8.2.0",
         root_package = "",
         link_workspace = "",
@@ -316,6 +686,19 @@ def npm_repositories():
         integrity = "sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==",
         transitive_closure = {
             "acorn-walk": ["8.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__acorn__7.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "acorn",
+        version = "7.4.1",
+        integrity = "sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==",
+        transitive_closure = {
+            "acorn": ["7.4.1"],
         },
     )
 
@@ -331,6 +714,19 @@ def npm_repositories():
         integrity = "sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==",
         transitive_closure = {
             "acorn": ["8.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__almost-equal__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "almost-equal",
+        version = "1.1.0",
+        integrity = "sha512-0V/PkoculFl5+0Lp47JoxUcO0xSxhIBvm+BxHdD/OgXNmdRpRHCFnKVuUoWyS9EzQP+otSGv0m9Lb4yVkQBn2A==",
+        transitive_closure = {
+            "almost-equal": ["1.1.0"],
         },
     )
 
@@ -411,6 +807,101 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__arr-flatten__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "arr-flatten",
+        version = "1.1.0",
+        integrity = "sha512-L3hKV5R/p5o81R7O02IGnwpDmkp6E982XhtbuwSe3O4qOtMMMtodicASA1Cny2U+aCXcNpml+m4dPsvsJ3jatg==",
+        transitive_closure = {
+            "arr-flatten": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__array-bounds__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "array-bounds",
+        version = "1.0.1",
+        integrity = "sha512-8wdW3ZGk6UjMPJx/glyEt0sLzzwAE1bhToPsO1W2pbpR2gULyxe3BjSiuJFheP50T/GgODVPz2fuMUmIywt8cQ==",
+        transitive_closure = {
+            "array-bounds": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__array-find-index__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "array-find-index",
+        version = "1.0.2",
+        integrity = "sha512-M1HQyIXcBGtVywBt8WVdim+lrNaK7VHp99Qt5pSNziXznKHViIBbXWtfRTpEFpF/c4FdfxNAsCCwPp5phBYJtw==",
+        transitive_closure = {
+            "array-find-index": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__array-normalize__1.1.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "array-normalize",
+        version = "1.1.4",
+        integrity = "sha512-fCp0wKFLjvSPmCn4F5Tiw4M3lpMZoHlCjfcs7nNzuj3vqQQ1/a8cgB9DXcpDSn18c+coLnaW7rqfcYCvKbyJXg==",
+        deps = {
+            "array-bounds": "1.0.1",
+        },
+        transitive_closure = {
+            "array-normalize": ["1.1.4"],
+            "array-bounds": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__array-range__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "array-range",
+        version = "1.0.1",
+        integrity = "sha512-shdaI1zT3CVNL2hnx9c0JMc0ZogGaxDs5e85akgHWKYa0yVbIyp06Ind3dVkTj/uuFrzaHBOyqFzo+VV6aXgtA==",
+        transitive_closure = {
+            "array-range": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__array-rearrange__2.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "array-rearrange",
+        version = "2.2.2",
+        integrity = "sha512-UfobP5N12Qm4Qu4fwLDIi2v6+wZsSf6snYSxAMeKhrh37YGnNWZPRmVEKc/2wfms53TLQnzfpG8wCx2Y/6NG1w==",
+        transitive_closure = {
+            "array-rearrange": ["2.2.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__atob-lite__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "atob-lite",
+        version = "2.0.0",
+        integrity = "sha512-LEeSAWeh2Gfa2FtlQE1shxQ8zi5F9GHarrGKz08TMdODD5T4eH6BMsvtnhbWZ+XQn+Gb6om/917ucvRu7l7ukw==",
+        transitive_closure = {
+            "atob-lite": ["2.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__balanced-match__1.0.2",
         root_package = "",
         link_workspace = "",
@@ -433,6 +924,70 @@ def npm_repositories():
         integrity = "sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==",
         transitive_closure = {
             "binary-extensions": ["2.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__binary-search-bounds__2.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "binary-search-bounds",
+        version = "2.0.5",
+        integrity = "sha512-H0ea4Fd3lS1+sTEB2TgcLoK21lLhwEJzlQv3IN47pJS976Gx4zoWe0ak3q+uYh60ppQxg9F16Ri4tS1sfD4+jA==",
+        transitive_closure = {
+            "binary-search-bounds": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__bit-twiddle__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "bit-twiddle",
+        version = "1.0.2",
+        integrity = "sha512-B9UhK0DKFZhoTFcfvAzhqsjStvGJp9vYWf3+6SNTtdSQnvIgfkHbgHrg/e4+TH71N2GDu8tpmCVoyfrL1d7ntA==",
+        transitive_closure = {
+            "bit-twiddle": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__bitmap-sdf__1.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "bitmap-sdf",
+        version = "1.0.4",
+        integrity = "sha512-1G3U4n5JE6RAiALMxu0p1XmeZkTeCwGKykzsLTCqVzfSDaN6S7fKnkIkfejogz+iwqBWc0UYAIKnKHNN7pSfDg==",
+        transitive_closure = {
+            "bitmap-sdf": ["1.0.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__bl__2.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "bl",
+        version = "2.2.1",
+        integrity = "sha512-6Pesp1w0DEX1N550i/uGV/TqucVL4AM/pgThFSN/Qq9si1/DF9aIHs1BxD8V/QU0HoeHO6cQRTAuYnLPKq1e4g==",
+        deps = {
+            "readable-stream": "2.3.7",
+            "safe-buffer": "5.2.1",
+        },
+        transitive_closure = {
+            "bl": ["2.2.1"],
+            "readable-stream": ["2.3.7"],
+            "safe-buffer": ["5.1.2", "5.2.1"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
         },
     )
 
@@ -505,6 +1060,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__buffer-from__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "buffer-from",
+        version = "1.1.2",
+        integrity = "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==",
+        transitive_closure = {
+            "buffer-from": ["1.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__bufferutil__4.0.1",
         root_package = "",
         link_workspace = "",
@@ -534,6 +1102,23 @@ def npm_repositories():
         integrity = "sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==",
         transitive_closure = {
             "camelcase": ["6.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__canvas-fit__1.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "canvas-fit",
+        version = "1.5.0",
+        integrity = "sha512-onIcjRpz69/Hx5bB5HGbYKUF2uC6QT6Gp+pfpGm3A7mPfcluSLV5v4Zu+oflDUwLdUw0rLIBhUbi0v8hM4FJQQ==",
+        deps = {
+            "element-size": "1.1.1",
+        },
+        transitive_closure = {
+            "canvas-fit": ["1.5.0"],
+            "element-size": ["1.1.1"],
         },
     )
 
@@ -610,6 +1195,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__clamp__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "clamp",
+        version = "1.0.1",
+        integrity = "sha512-kgMuFyE78OC6Dyu3Dy7vcx4uy97EIbVxJB/B0eJ3bUNAkwdNcxYzgKltnyADiYwsR7SEqkkUPsEUT//OVS6XMA==",
+        transitive_closure = {
+            "clamp": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__cliui__7.0.4",
         root_package = "",
         link_workspace = "",
@@ -637,6 +1235,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__color-alpha__1.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-alpha",
+        version = "1.0.4",
+        integrity = "sha512-lr8/t5NPozTSqli+duAN+x+no/2WaKTeWvxhHGN+aXT6AJ8vPlzLa7UriyjWak0pSC2jHol9JgjBYnnHsGha9A==",
+        deps = {
+            "color-parse": "1.3.8",
+        },
+        transitive_closure = {
+            "color-alpha": ["1.0.4"],
+            "color-parse": ["1.3.8"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__color-convert__2.0.1",
         root_package = "",
         link_workspace = "",
@@ -654,6 +1272,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__color-id__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-id",
+        version = "1.1.0",
+        integrity = "sha512-2iRtAn6dC/6/G7bBIo0uupVrIne1NsQJvJxZOBCzQOfk7jRq97feaDZ3RdzuHakRXXnHGNwglto3pqtRx1sX0g==",
+        deps = {
+            "clamp": "1.0.1",
+        },
+        transitive_closure = {
+            "color-id": ["1.1.0"],
+            "clamp": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__color-name__1.1.4",
         root_package = "",
         link_workspace = "",
@@ -663,6 +1298,116 @@ def npm_repositories():
         integrity = "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
         transitive_closure = {
             "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__color-normalize__1.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-normalize",
+        version = "1.5.0",
+        integrity = "sha512-rUT/HDXMr6RFffrR53oX3HGWkDOP9goSAQGBkUaAYKjOE2JxozccdGyufageWDlInRAjm/jYPrf/Y38oa+7obw==",
+        deps = {
+            "clamp": "1.0.1",
+            "color-rgba": "2.1.1",
+            "dtype": "2.0.0",
+        },
+        transitive_closure = {
+            "color-normalize": ["1.5.0"],
+            "clamp": ["1.0.1"],
+            "color-rgba": ["2.1.1"],
+            "dtype": ["2.0.0"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__color-parse__1.3.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-parse",
+        version = "1.3.8",
+        integrity = "sha512-1Y79qFv0n1xair3lNMTNeoFvmc3nirMVBij24zbs1f13+7fPpQClMg5b4AuKXLt3szj7BRlHMCXHplkce6XlmA==",
+        deps = {
+            "color-name": "1.1.4",
+            "defined": "1.0.0",
+            "is-plain-obj": "1.1.0",
+        },
+        transitive_closure = {
+            "color-parse": ["1.3.8"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__color-rgba__2.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-rgba",
+        version = "2.1.1",
+        integrity = "sha512-VaX97wsqrMwLSOR6H7rU1Doa2zyVdmShabKrPEIFywLlHoibgD3QW9Dw6fSqM4+H/LfjprDNAUUW31qEQcGzNw==",
+        deps = {
+            "clamp": "1.0.1",
+            "color-parse": "1.3.8",
+            "color-space": "1.16.0",
+        },
+        transitive_closure = {
+            "color-rgba": ["2.1.1"],
+            "clamp": ["1.0.1"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__color-space__1.16.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-space",
+        version = "1.16.0",
+        integrity = "sha512-A6WMiFzunQ8KEPFmj02OnnoUnqhmSaHaZ/0LVFcPTdlvm8+3aMJ5x1HRHy3bDHPkovkf4sS0f4wsVvwk71fKkg==",
+        deps = {
+            "hsluv": "0.0.3",
+            "mumath": "3.3.4",
+        },
+        transitive_closure = {
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__commander__2.20.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "commander",
+        version = "2.20.3",
+        integrity = "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
+        transitive_closure = {
+            "commander": ["2.20.3"],
         },
     )
 
@@ -693,6 +1438,47 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__compute-dims__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "compute-dims",
+        version = "1.1.0",
+        integrity = "sha512-YHMiIKjH/8Eom8zATk3g8/lH3HxGCZcVQyEfEoVrfWI7od/WRpTgRGShnei3jArYSx77mQqPxZNokjGHCdLfxg==",
+        deps = {
+            "utils-copy": "1.1.1",
+            "validate.io-array": "1.0.6",
+            "validate.io-matrix-like": "1.0.2",
+            "validate.io-ndarray-like": "1.0.0",
+            "validate.io-positive-integer": "1.0.0",
+        },
+        transitive_closure = {
+            "compute-dims": ["1.1.0"],
+            "utils-copy": ["1.1.1"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-matrix-like": ["1.0.2"],
+            "validate.io-ndarray-like": ["1.0.0"],
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__concat-map__0.0.1",
         root_package = "",
         link_workspace = "",
@@ -702,6 +1488,87 @@ def npm_repositories():
         integrity = "sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=",
         transitive_closure = {
             "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__concat-stream__1.6.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "concat-stream",
+        version = "1.6.2",
+        integrity = "sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==",
+        deps = {
+            "buffer-from": "1.1.2",
+            "inherits": "2.0.4",
+            "readable-stream": "2.3.7",
+            "typedarray": "0.0.6",
+        },
+        transitive_closure = {
+            "concat-stream": ["1.6.2"],
+            "buffer-from": ["1.1.2"],
+            "inherits": ["2.0.4"],
+            "readable-stream": ["2.3.7"],
+            "typedarray": ["0.0.6"],
+            "core-util-is": ["1.0.3"],
+            "isarray": ["1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.1.2"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__const-max-uint32__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "const-max-uint32",
+        version = "1.0.2",
+        integrity = "sha512-T8/9bffg5RThuejasJWrwqxs3Q0fsJvyl7/33IB6svroD8JC93E7X60AuuOnDE8RlP6Jlb5FxmlrVDpl9KiU2Q==",
+        transitive_closure = {
+            "const-max-uint32": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__const-pinf-float64__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "const-pinf-float64",
+        version = "1.0.0",
+        integrity = "sha512-wfs+V4HdSN7C3CWJWR7hVa24yTPn3mDJthwhRIObZBh6UjTjkUMUrCP3UrNGozB/HjTpcScnGXtQUNa+yjsIJQ==",
+        transitive_closure = {
+            "const-pinf-float64": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__core-util-is__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "core-util-is",
+        version = "1.0.3",
+        integrity = "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==",
+        transitive_closure = {
+            "core-util-is": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__country-regex__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "country-regex",
+        version = "1.1.0",
+        integrity = "sha512-iSPlClZP8vX7MC3/u6s3lrDuoQyhQukh5LyABJ3hvfzbQ3Yyayd4fp04zjLnfi267B/B2FkumcWWgrbban7sSA==",
+        transitive_closure = {
+            "country-regex": ["1.1.0"],
         },
     )
 
@@ -719,6 +1586,403 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__css-font-size-keywords__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-font-size-keywords",
+        version = "1.0.0",
+        integrity = "sha512-Q+svMDbMlelgCfH/RVDKtTDaf5021O486ZThQPIpahnIjUkMUslC+WuOQSWTgGSrNCH08Y7tYNEmmy0hkfMI8Q==",
+        transitive_closure = {
+            "css-font-size-keywords": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__css-font-stretch-keywords__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-font-stretch-keywords",
+        version = "1.0.1",
+        integrity = "sha512-KmugPO2BNqoyp9zmBIUGwt58UQSfyk1X5DbOlkb2pckDXFSAfjsD5wenb88fNrD6fvS+vu90a/tsPpb9vb0SLg==",
+        transitive_closure = {
+            "css-font-stretch-keywords": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__css-font-style-keywords__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-font-style-keywords",
+        version = "1.0.1",
+        integrity = "sha512-0Fn0aTpcDktnR1RzaBYorIxQily85M2KXRpzmxQPgh8pxUN9Fcn00I8u9I3grNr1QXVgCl9T5Imx0ZwKU973Vg==",
+        transitive_closure = {
+            "css-font-style-keywords": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__css-font-weight-keywords__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-font-weight-keywords",
+        version = "1.0.0",
+        integrity = "sha512-5So8/NH+oDD+EzsnF4iaG4ZFHQ3vaViePkL1ZbZ5iC/KrsCY+WHq/lvOgrtmuOQ9pBBZ1ADGpaf+A4lj1Z9eYA==",
+        transitive_closure = {
+            "css-font-weight-keywords": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__css-font__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-font",
+        version = "1.2.0",
+        integrity = "sha512-V4U4Wps4dPDACJ4WpgofJ2RT5Yqwe1lEH6wlOOaIxMi0gTjdIijsc5FmxQlZ7ZZyKQkkutqqvULOp07l9c7ssA==",
+        deps = {
+            "css-font-size-keywords": "1.0.0",
+            "css-font-stretch-keywords": "1.0.1",
+            "css-font-style-keywords": "1.0.1",
+            "css-font-weight-keywords": "1.0.0",
+            "css-global-keywords": "1.0.1",
+            "css-system-font-keywords": "1.0.0",
+            "pick-by-alias": "1.2.0",
+            "string-split-by": "1.0.0",
+            "unquote": "1.1.1",
+        },
+        transitive_closure = {
+            "css-font": ["1.2.0"],
+            "css-font-size-keywords": ["1.0.0"],
+            "css-font-stretch-keywords": ["1.0.1"],
+            "css-font-style-keywords": ["1.0.1"],
+            "css-font-weight-keywords": ["1.0.0"],
+            "css-global-keywords": ["1.0.1"],
+            "css-system-font-keywords": ["1.0.0"],
+            "pick-by-alias": ["1.2.0"],
+            "string-split-by": ["1.0.0"],
+            "unquote": ["1.1.1"],
+            "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__css-global-keywords__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-global-keywords",
+        version = "1.0.1",
+        integrity = "sha512-X1xgQhkZ9n94WDwntqst5D/FKkmiU0GlJSFZSV3kLvyJ1WC5VeyoXDOuleUD+SIuH9C7W05is++0Woh0CGfKjQ==",
+        transitive_closure = {
+            "css-global-keywords": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__css-system-font-keywords__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "css-system-font-keywords",
+        version = "1.0.0",
+        integrity = "sha512-1umTtVd/fXS25ftfjB71eASCrYhilmEsvDEI6wG/QplnmlfmVM5HkZ/ZX46DT5K3eblFPgLUHt5BRCb0YXkSFA==",
+        transitive_closure = {
+            "css-system-font-keywords": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__csscolorparser__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "csscolorparser",
+        version = "1.0.3",
+        integrity = "sha512-umPSgYwZkdFoUrH5hIq5kf0wPSXiro51nPw0j2K/c83KflkPSTBGMz6NJvMB+07VlL0y7VPo6QJcDjcgKTTm3w==",
+        transitive_closure = {
+            "csscolorparser": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d",
+        version = "1.0.1",
+        integrity = "sha512-m62ShEObQ39CfralilEQRjH6oAMtNCV1xJyEx5LpRYUVN+EviphDgUc/F3hnYbADmkiNs67Y+3ylmlG7Lnu+FA==",
+        deps = {
+            "es5-ext": "0.10.61",
+            "type": "1.2.0",
+        },
+        transitive_closure = {
+            "d": ["1.0.1"],
+            "es5-ext": ["0.10.61"],
+            "type": ["2.6.0", "1.2.0"],
+            "es6-iterator": ["2.0.3"],
+            "es6-symbol": ["3.1.3"],
+            "next-tick": ["1.1.0"],
+            "ext": ["1.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-array__1.2.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-array",
+        version = "1.2.4",
+        integrity = "sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==",
+        transitive_closure = {
+            "d3-array": ["1.2.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-collection__1.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-collection",
+        version = "1.0.7",
+        integrity = "sha512-ii0/r5f4sjKNTfh84Di+DpztYwqKhEyUlKoPrzUFfeSkWxjW49xU2QzO9qrPrNkpdI0XJkfzvmTu8V2Zylln6A==",
+        transitive_closure = {
+            "d3-collection": ["1.0.7"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-color__1.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-color",
+        version = "1.4.1",
+        integrity = "sha512-p2sTHSLCJI2QKunbGb7ocOh7DgTAn8IrLx21QRc/BSnodXM4sv6aLQlnfpvehFMLZEfBc6g9pH9SWQccFYfJ9Q==",
+        transitive_closure = {
+            "d3-color": ["1.4.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-dispatch__1.0.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-dispatch",
+        version = "1.0.6",
+        integrity = "sha512-fVjoElzjhCEy+Hbn8KygnmMS7Or0a9sI2UzGwoB7cCtvI1XpVN9GpoYlnb3xt2YV66oXYb1fLJ8GMvP4hdU1RA==",
+        transitive_closure = {
+            "d3-dispatch": ["1.0.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-force__1.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-force",
+        version = "1.2.1",
+        integrity = "sha512-HHvehyaiUlVo5CxBJ0yF/xny4xoaxFxDnBXNvNcfW9adORGZfyNF1dj6DGLKyk4Yh3brP/1h3rnDzdIAwL08zg==",
+        deps = {
+            "d3-collection": "1.0.7",
+            "d3-dispatch": "1.0.6",
+            "d3-quadtree": "1.0.7",
+            "d3-timer": "1.0.10",
+        },
+        transitive_closure = {
+            "d3-force": ["1.2.1"],
+            "d3-collection": ["1.0.7"],
+            "d3-dispatch": ["1.0.6"],
+            "d3-quadtree": ["1.0.7"],
+            "d3-timer": ["1.0.10"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-format__1.4.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-format",
+        version = "1.4.5",
+        integrity = "sha512-J0piedu6Z8iB6TbIGfZgDzfXxUFN3qQRMofy2oPdXzQibYGqPB/9iMcxr/TGalU+2RsyDO+U4f33id8tbnSRMQ==",
+        transitive_closure = {
+            "d3-format": ["1.4.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-geo-projection__2.9.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-geo-projection",
+        version = "2.9.0",
+        integrity = "sha512-ZULvK/zBn87of5rWAfFMc9mJOipeSo57O+BBitsKIXmU4rTVAnX1kSsJkE0R+TxY8pGNoM1nbyRRE7GYHhdOEQ==",
+        deps = {
+            "commander": "2.20.3",
+            "d3-array": "1.2.4",
+            "d3-geo": "1.12.1",
+            "resolve": "1.22.0",
+        },
+        transitive_closure = {
+            "d3-geo-projection": ["2.9.0"],
+            "commander": ["2.20.3"],
+            "d3-array": ["1.2.4"],
+            "d3-geo": ["1.12.1"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-geo__1.12.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-geo",
+        version = "1.12.1",
+        integrity = "sha512-XG4d1c/UJSEX9NfU02KwBL6BYPj8YKHxgBEw5om2ZnTRSbIcego6dhHwcxuSR3clxh0EpE38os1DVPOmnYtTPg==",
+        deps = {
+            "d3-array": "1.2.4",
+        },
+        transitive_closure = {
+            "d3-geo": ["1.12.1"],
+            "d3-array": ["1.2.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-hierarchy__1.1.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-hierarchy",
+        version = "1.1.9",
+        integrity = "sha512-j8tPxlqh1srJHAtxfvOUwKNYJkQuBFdM1+JAUfq6xqH5eAqf93L7oG1NVqDa4CpFZNvnNKtCYEUC8KY9yEn9lQ==",
+        transitive_closure = {
+            "d3-hierarchy": ["1.1.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-interpolate__1.4.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-interpolate",
+        version = "1.4.0",
+        integrity = "sha512-V9znK0zc3jOPV4VD2zZn0sDhZU3WAE2bmlxdIwwQPPzPjvyLkd8B3JUVdS1IDUFDkWZ72c9qnv1GK2ZagTZ8EA==",
+        deps = {
+            "d3-color": "1.4.1",
+        },
+        transitive_closure = {
+            "d3-interpolate": ["1.4.0"],
+            "d3-color": ["1.4.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-path__1.0.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-path",
+        version = "1.0.9",
+        integrity = "sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==",
+        transitive_closure = {
+            "d3-path": ["1.0.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-quadtree__1.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-quadtree",
+        version = "1.0.7",
+        integrity = "sha512-RKPAeXnkC59IDGD0Wu5mANy0Q2V28L+fNe65pOCXVdVuTJS3WPKaJlFHer32Rbh9gIo9qMuJXio8ra4+YmIymA==",
+        transitive_closure = {
+            "d3-quadtree": ["1.0.7"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-shape__1.3.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-shape",
+        version = "1.3.7",
+        integrity = "sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw==",
+        deps = {
+            "d3-path": "1.0.9",
+        },
+        transitive_closure = {
+            "d3-shape": ["1.3.7"],
+            "d3-path": ["1.0.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-time-format__2.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-time-format",
+        version = "2.3.0",
+        integrity = "sha512-guv6b2H37s2Uq/GefleCDtbe0XZAuy7Wa49VGkPVPMfLL9qObgBST3lEHJBMUp8S7NdLQAGIvr2KXk8Hc98iKQ==",
+        deps = {
+            "d3-time": "1.1.0",
+        },
+        transitive_closure = {
+            "d3-time-format": ["2.3.0"],
+            "d3-time": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-time__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-time",
+        version = "1.1.0",
+        integrity = "sha512-Xh0isrZ5rPYYdqhAVk8VLnMEidhz5aP7htAADH6MfzgmmicPkTo8LhkLxci61/lCB7n7UmE3bN0leRt+qvkLxA==",
+        transitive_closure = {
+            "d3-time": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__d3-timer__1.0.10",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "d3-timer",
+        version = "1.0.10",
+        integrity = "sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==",
+        transitive_closure = {
+            "d3-timer": ["1.0.10"],
+        },
+    )
+
+    npm_import(
         name = "npm__debug__2.6.9",
         root_package = "",
         link_workspace = "",
@@ -732,6 +1996,23 @@ def npm_repositories():
         transitive_closure = {
             "debug": ["2.6.9"],
             "ms": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__debug__3.2.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "debug",
+        version = "3.2.7",
+        integrity = "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==",
+        deps = {
+            "ms": "2.1.3",
+        },
+        transitive_closure = {
+            "debug": ["3.2.7"],
+            "ms": ["2.1.3"],
         },
     )
 
@@ -786,6 +2067,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__deep-is__0.1.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "deep-is",
+        version = "0.1.4",
+        integrity = "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==",
+        transitive_closure = {
+            "deep-is": ["0.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__defined__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "defined",
+        version = "1.0.0",
+        integrity = "sha512-Y2caI5+ZwS5c3RiNDJ6u53VhQHv+hHKwhkI1iHvceKUHw9Df6EK2zRLfjejRgMuCuxK7PfSWIMwWecceVvThjQ==",
+        transitive_closure = {
+            "defined": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__dequal__2.0.2",
         root_package = "",
         link_workspace = "",
@@ -795,6 +2102,19 @@ def npm_repositories():
         integrity = "sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==",
         transitive_closure = {
             "dequal": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__detect-kerning__2.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "detect-kerning",
+        version = "2.1.2",
+        integrity = "sha512-I3JIbrnKPAntNLl1I6TpSQQdQ4AutYzv/sKMFKbepawV/hlH0GmYKhUoOEMd4xqaUHT+Bm0f4127lh5qs1m1tw==",
+        transitive_closure = {
+            "detect-kerning": ["2.1.2"],
         },
     )
 
@@ -825,6 +2145,51 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__draw-svg-path__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "draw-svg-path",
+        version = "1.0.0",
+        integrity = "sha512-P8j3IHxcgRMcY6sDzr0QvJDLzBnJJqpTG33UZ2Pvp8rw0apCHhJCWqYprqrXjrgHnJ6tuhP1iTJSAodPDHxwkg==",
+        deps = {
+            "abs-svg-path": "0.1.1",
+            "normalize-svg-path": "0.1.0",
+        },
+        transitive_closure = {
+            "draw-svg-path": ["1.0.0"],
+            "abs-svg-path": ["0.1.1"],
+            "normalize-svg-path": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__dtype__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "dtype",
+        version = "2.0.0",
+        integrity = "sha512-s2YVcLKdFGS0hpFqJaTwscsyt0E8nNFdmo73Ocd81xNPj4URI4rj6D60A+vFMIw7BXWlb4yRkEwfBqcZzPGiZg==",
+        transitive_closure = {
+            "dtype": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__dup__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "dup",
+        version = "1.0.0",
+        integrity = "sha512-Bz5jxMMC0wgp23Zm15ip1x8IhYRqJvF3nFC0UInJUDkN1z4uNPk9jTnfCUJXbOGiQ1JbXLQsiV41Fb+HXcj5BA==",
+        transitive_closure = {
+            "dup": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__duplexer__0.1.2",
         root_package = "",
         link_workspace = "",
@@ -838,6 +2203,80 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__duplexify__3.7.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "duplexify",
+        version = "3.7.1",
+        integrity = "sha512-07z8uv2wMyS51kKhD1KsdXJg5WQ6t93RneqRxUHnskXVtlYYkLqM0gqStQZ3pj073g687jPCHrqNfCzawLYh5g==",
+        deps = {
+            "end-of-stream": "1.4.4",
+            "inherits": "2.0.4",
+            "readable-stream": "2.3.7",
+            "stream-shift": "1.0.1",
+        },
+        transitive_closure = {
+            "duplexify": ["3.7.1"],
+            "end-of-stream": ["1.4.4"],
+            "inherits": ["2.0.4"],
+            "readable-stream": ["2.3.7"],
+            "stream-shift": ["1.0.1"],
+            "core-util-is": ["1.0.3"],
+            "isarray": ["1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.1.2"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "once": ["1.4.0"],
+            "wrappy": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__earcut__2.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "earcut",
+        version = "2.2.3",
+        integrity = "sha512-iRDI1QeCQIhMCZk48DRDMVgQSSBDmbzzNhnxIo+pwx3swkfjMh6vh0nWLq1NdvGHLKH6wIrAM3vQWeTj6qeoug==",
+        transitive_closure = {
+            "earcut": ["2.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__element-size__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "element-size",
+        version = "1.1.1",
+        integrity = "sha512-eaN+GMOq/Q+BIWy0ybsgpcYImjGIdNLyjLFJU4XsLHXYQao5jCNb36GyN6C2qwmDDYSfIBmKpPpr4VnBdLCsPQ==",
+        transitive_closure = {
+            "element-size": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__elementary-circuits-directed-graph__1.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "elementary-circuits-directed-graph",
+        version = "1.3.1",
+        integrity = "sha512-ZEiB5qkn2adYmpXGnJKkxT8uJHlW/mxmBpmeqawEHzPxh9HkLD4/1mFYX5l0On+f6rcPIt8/EWlRU2Vo3fX6dQ==",
+        deps = {
+            "strongly-connected-components": "1.0.1",
+        },
+        transitive_closure = {
+            "elementary-circuits-directed-graph": ["1.3.1"],
+            "strongly-connected-components": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__emoji-regex__8.0.0",
         root_package = "",
         link_workspace = "",
@@ -847,6 +2286,122 @@ def npm_repositories():
         integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
         transitive_closure = {
             "emoji-regex": ["8.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__end-of-stream__1.4.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "end-of-stream",
+        version = "1.4.4",
+        integrity = "sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==",
+        deps = {
+            "once": "1.4.0",
+        },
+        transitive_closure = {
+            "end-of-stream": ["1.4.4"],
+            "once": ["1.4.0"],
+            "wrappy": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__es5-ext__0.10.61",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "es5-ext",
+        version = "0.10.61",
+        integrity = "sha512-yFhIqQAzu2Ca2I4SE2Au3rxVfmohU9Y7wqGR+s7+H7krk26NXhIRAZDgqd6xqjCEFUomDEA3/Bo/7fKmIkW1kA==",
+        deps = {
+            "es6-iterator": "2.0.3",
+            "es6-symbol": "3.1.3",
+            "next-tick": "1.1.0",
+        },
+        transitive_closure = {
+            "es5-ext": ["0.10.61"],
+            "es6-iterator": ["2.0.3"],
+            "es6-symbol": ["3.1.3"],
+            "next-tick": ["1.1.0"],
+            "d": ["1.0.1"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+        },
+        run_lifecycle_hooks = True,
+    )
+
+    npm_import(
+        name = "npm__es6-iterator__2.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "es6-iterator",
+        version = "2.0.3",
+        integrity = "sha512-zw4SRzoUkd+cl+ZoE15A9o1oQd920Bb0iOJMQkQhl3jNc03YqVjAhG7scf9C5KWRU/R13Orf588uCC6525o02g==",
+        deps = {
+            "d": "1.0.1",
+            "es5-ext": "0.10.61",
+            "es6-symbol": "3.1.3",
+        },
+        transitive_closure = {
+            "es6-iterator": ["2.0.3"],
+            "d": ["1.0.1"],
+            "es5-ext": ["0.10.61"],
+            "es6-symbol": ["3.1.3"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+            "next-tick": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__es6-symbol__3.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "es6-symbol",
+        version = "3.1.3",
+        integrity = "sha512-NJ6Yn3FuDinBaBRWl/q5X/s4koRHBrgKAu+yGI6JCBeiu3qrcbJhwT2GeR/EXVfylRk8dpQVJoLEFhK+Mu31NA==",
+        deps = {
+            "d": "1.0.1",
+            "ext": "1.6.0",
+        },
+        transitive_closure = {
+            "es6-symbol": ["3.1.3"],
+            "d": ["1.0.1"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+            "es5-ext": ["0.10.61"],
+            "es6-iterator": ["2.0.3"],
+            "next-tick": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__es6-weak-map__2.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "es6-weak-map",
+        version = "2.0.3",
+        integrity = "sha512-p5um32HOTO1kP+w7PRnB+5lQ43Z6muuMuIMffvDN8ZB4GcnjLBV6zGStpbASIMk4DCAvEaamhe2zhyCb/QXXsA==",
+        deps = {
+            "d": "1.0.1",
+            "es5-ext": "0.10.61",
+            "es6-iterator": "2.0.3",
+            "es6-symbol": "3.1.3",
+        },
+        transitive_closure = {
+            "es6-weak-map": ["2.0.3"],
+            "d": ["1.0.1"],
+            "es5-ext": ["0.10.61"],
+            "es6-iterator": ["2.0.3"],
+            "es6-symbol": ["3.1.3"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+            "next-tick": ["1.1.0"],
         },
     )
 
@@ -1215,6 +2770,37 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__escodegen__1.14.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "escodegen",
+        version = "1.14.3",
+        integrity = "sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==",
+        deps = {
+            "source-map": "0.6.1",
+            "esprima": "4.0.1",
+            "estraverse": "4.3.0",
+            "esutils": "2.0.3",
+            "optionator": "0.8.3",
+        },
+        transitive_closure = {
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__esprima__1.0.0",
         root_package = "",
         link_workspace = "",
@@ -1224,6 +2810,32 @@ def npm_repositories():
         integrity = "sha512-k344tuMul8eif80+WDaTCcS5g4xDSO6FRHmCkvlF6t/QSBYQDrvph2VqP23ry9y9oMVEJ/sdJEh8JXT0smlcQQ==",
         transitive_closure = {
             "esprima": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__esprima__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "esprima",
+        version = "4.0.1",
+        integrity = "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==",
+        transitive_closure = {
+            "esprima": ["4.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__estraverse__4.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "estraverse",
+        version = "4.3.0",
+        integrity = "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==",
+        transitive_closure = {
+            "estraverse": ["4.3.0"],
         },
     )
 
@@ -1250,6 +2862,98 @@ def npm_repositories():
         integrity = "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==",
         transitive_closure = {
             "estree-walker": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__esutils__2.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "esutils",
+        version = "2.0.3",
+        integrity = "sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==",
+        transitive_closure = {
+            "esutils": ["2.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__events__3.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "events",
+        version = "3.3.0",
+        integrity = "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==",
+        transitive_closure = {
+            "events": ["3.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ext__1.6.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ext",
+        version = "1.6.0",
+        integrity = "sha512-sdBImtzkq2HpkdRLtlLWDa6w4DX22ijZLKx8BMPUuKe1c5lbN6xwQDQCxSfxBQnHZ13ls/FH0MQZx/q/gr6FQg==",
+        deps = {
+            "type": "2.6.0",
+        },
+        transitive_closure = {
+            "ext": ["1.6.0"],
+            "type": ["2.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__falafel__2.2.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "falafel",
+        version = "2.2.5",
+        integrity = "sha512-HuC1qF9iTnHDnML9YZAdCDQwT0yKl/U55K4XSUXqGAA2GLoafFgWRqdAbhWJxXaYD4pyoVxAJ8wH670jMpI9DQ==",
+        deps = {
+            "acorn": "7.4.1",
+            "isarray": "2.0.5",
+        },
+        transitive_closure = {
+            "falafel": ["2.2.5"],
+            "acorn": ["7.4.1"],
+            "isarray": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fast-isnumeric__1.1.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-isnumeric",
+        version = "1.1.4",
+        integrity = "sha512-1mM8qOr2LYz8zGaUdmiqRDiuue00Dxjgcb1NQR7TnhLVh6sQyngP9xvLo7Sl7LZpP/sk5eb+bcyWXw530NTBZw==",
+        deps = {
+            "is-string-blank": "1.0.1",
+        },
+        transitive_closure = {
+            "fast-isnumeric": ["1.1.4"],
+            "is-string-blank": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fast-levenshtein__2.0.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-levenshtein",
+        version = "2.0.6",
+        integrity = "sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==",
+        transitive_closure = {
+            "fast-levenshtein": ["2.0.6"],
         },
     )
 
@@ -1307,6 +3011,115 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__flatten-vertex-data__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "flatten-vertex-data",
+        version = "1.0.2",
+        integrity = "sha512-BvCBFK2NZqerFTdMDgqfHBwxYWnxeCkwONsw6PvBMcUXqo8U/KDWwmXhqx1x2kLIg7DqIsJfOaJFOmlua3Lxuw==",
+        deps = {
+            "dtype": "2.0.0",
+        },
+        transitive_closure = {
+            "flatten-vertex-data": ["1.0.2"],
+            "dtype": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__flip-pixels__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "flip-pixels",
+        version = "1.0.2",
+        integrity = "sha512-oXbJGbjDnfJRWPC7Va38EFhd+A8JWE5/hCiKcK8qjCdbLj9DTpsq6MEudwpRTH+V4qq+Jw7d3pUgQdSr3x3mTA==",
+        transitive_closure = {
+            "flip-pixels": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__font-atlas__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "font-atlas",
+        version = "2.1.0",
+        integrity = "sha512-kP3AmvX+HJpW4w3d+PiPR2X6E1yvsBXt2yhuCw+yReO9F1WYhvZwx3c95DGZGwg9xYzDGrgJYa885xmVA+28Cg==",
+        deps = {
+            "css-font": "1.2.0",
+        },
+        transitive_closure = {
+            "font-atlas": ["2.1.0"],
+            "css-font": ["1.2.0"],
+            "css-font-size-keywords": ["1.0.0"],
+            "css-font-stretch-keywords": ["1.0.1"],
+            "css-font-style-keywords": ["1.0.1"],
+            "css-font-weight-keywords": ["1.0.0"],
+            "css-global-keywords": ["1.0.1"],
+            "css-system-font-keywords": ["1.0.0"],
+            "pick-by-alias": ["1.2.0"],
+            "string-split-by": ["1.0.0"],
+            "unquote": ["1.1.1"],
+            "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__font-measure__1.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "font-measure",
+        version = "1.2.2",
+        integrity = "sha512-mRLEpdrWzKe9hbfaF3Qpr06TAjquuBVP5cHy4b3hyeNdjc9i0PO6HniGsX5vjL5OWv7+Bd++NiooNpT/s8BvIA==",
+        deps = {
+            "css-font": "1.2.0",
+        },
+        transitive_closure = {
+            "font-measure": ["1.2.2"],
+            "css-font": ["1.2.0"],
+            "css-font-size-keywords": ["1.0.0"],
+            "css-font-stretch-keywords": ["1.0.1"],
+            "css-font-style-keywords": ["1.0.1"],
+            "css-font-weight-keywords": ["1.0.0"],
+            "css-global-keywords": ["1.0.1"],
+            "css-system-font-keywords": ["1.0.0"],
+            "pick-by-alias": ["1.2.0"],
+            "string-split-by": ["1.0.0"],
+            "unquote": ["1.1.1"],
+            "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__from2__2.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "from2",
+        version = "2.3.0",
+        integrity = "sha512-OMcX/4IC/uqEPVgGeyfN22LJk6AZrMkRZHxcHBMBvHScDGgwTm2GT2Wkgtocyd3JfZffjj2kYUDXXII0Fk9W0g==",
+        deps = {
+            "inherits": "2.0.4",
+            "readable-stream": "2.3.7",
+        },
+        transitive_closure = {
+            "from2": ["2.3.0"],
+            "inherits": ["2.0.4"],
+            "readable-stream": ["2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "isarray": ["1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.1.2"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__fs.realpath__1.0.0",
         root_package = "",
         link_workspace = "",
@@ -1347,6 +3160,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__geojson-vt__3.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "geojson-vt",
+        version = "3.2.1",
+        integrity = "sha512-EvGQQi/zPrDA6zr6BnJD/YhwAkBP8nnJ9emh3EnHQKVMfg/MRVtPbMYdgVy/IaEmn4UfagD2a6fafPDL5hbtwg==",
+        transitive_closure = {
+            "geojson-vt": ["3.2.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__get-caller-file__2.0.5",
         root_package = "",
         link_workspace = "",
@@ -1356,6 +3182,169 @@ def npm_repositories():
         integrity = "sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==",
         transitive_closure = {
             "get-caller-file": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__get-canvas-context__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "get-canvas-context",
+        version = "1.0.2",
+        integrity = "sha512-LnpfLf/TNzr9zVOGiIY6aKCz8EKuXmlYNV7CM2pUjBa/B+c2I15tS7KLySep75+FuerJdmArvJLcsAXWEy2H0A==",
+        transitive_closure = {
+            "get-canvas-context": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__get-stream__6.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "get-stream",
+        version = "6.0.1",
+        integrity = "sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==",
+        transitive_closure = {
+            "get-stream": ["6.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__gl-mat4__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "gl-mat4",
+        version = "1.2.0",
+        integrity = "sha512-sT5C0pwB1/e9G9AvAoLsoaJtbMGjfd/jfxo8jMCKqYYEnjZuFvqV5rehqar0538EmssjdDeiEWnKyBSTw7quoA==",
+        transitive_closure = {
+            "gl-mat4": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__gl-matrix__3.4.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "gl-matrix",
+        version = "3.4.3",
+        integrity = "sha512-wcCp8vu8FT22BnvKVPjXa/ICBWRq/zjFfdofZy1WSpQZpphblv12/bOQLBC1rMM7SGOFS9ltVmKOHil5+Ml7gA==",
+        transitive_closure = {
+            "gl-matrix": ["3.4.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__gl-text__1.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "gl-text",
+        version = "1.3.1",
+        integrity = "sha512-/f5gcEMiZd+UTBJLTl3D+CkCB/0UFGTx3nflH8ZmyWcLkZhsZ1+Xx5YYkw2rgWAzgPeE35xCqBuHSoMKQVsR+w==",
+        deps = {
+            "bit-twiddle": "1.0.2",
+            "color-normalize": "1.5.0",
+            "css-font": "1.2.0",
+            "detect-kerning": "2.1.2",
+            "es6-weak-map": "2.0.3",
+            "flatten-vertex-data": "1.0.2",
+            "font-atlas": "2.1.0",
+            "font-measure": "1.2.2",
+            "gl-util": "3.1.3",
+            "is-plain-obj": "1.1.0",
+            "object-assign": "4.1.1",
+            "parse-rect": "1.2.0",
+            "parse-unit": "1.0.1",
+            "pick-by-alias": "1.2.0",
+            "regl": "2.1.0",
+            "to-px": "1.0.1",
+            "typedarray-pool": "1.2.0",
+        },
+        transitive_closure = {
+            "gl-text": ["1.3.1"],
+            "bit-twiddle": ["1.0.2"],
+            "color-normalize": ["1.5.0"],
+            "css-font": ["1.2.0"],
+            "detect-kerning": ["2.1.2"],
+            "es6-weak-map": ["2.0.3"],
+            "flatten-vertex-data": ["1.0.2"],
+            "font-atlas": ["2.1.0"],
+            "font-measure": ["1.2.2"],
+            "gl-util": ["3.1.3"],
+            "is-plain-obj": ["1.1.0"],
+            "object-assign": ["4.1.1"],
+            "parse-rect": ["1.2.0"],
+            "parse-unit": ["1.0.1"],
+            "pick-by-alias": ["1.2.0"],
+            "regl": ["2.1.0"],
+            "to-px": ["1.0.1"],
+            "typedarray-pool": ["1.2.0"],
+            "dup": ["1.0.0"],
+            "is-browser": ["2.1.0"],
+            "is-firefox": ["1.0.3"],
+            "number-is-integer": ["1.0.1"],
+            "weak-map": ["1.0.8"],
+            "is-finite": ["1.1.0"],
+            "dtype": ["2.0.0"],
+            "d": ["1.0.1"],
+            "es5-ext": ["0.10.61"],
+            "es6-iterator": ["2.0.3"],
+            "es6-symbol": ["3.1.3"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+            "next-tick": ["1.1.0"],
+            "css-font-size-keywords": ["1.0.0"],
+            "css-font-stretch-keywords": ["1.0.1"],
+            "css-font-style-keywords": ["1.0.1"],
+            "css-font-weight-keywords": ["1.0.0"],
+            "css-global-keywords": ["1.0.1"],
+            "css-system-font-keywords": ["1.0.0"],
+            "string-split-by": ["1.0.0"],
+            "unquote": ["1.1.1"],
+            "parenthesis": ["3.1.8"],
+            "clamp": ["1.0.1"],
+            "color-rgba": ["2.1.1"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__gl-util__3.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "gl-util",
+        version = "3.1.3",
+        integrity = "sha512-dvRTggw5MSkJnCbh74jZzSoTOGnVYK+Bt+Ckqm39CVcl6+zSsxqWk4lr5NKhkqXHL6qvZAU9h17ZF8mIskY9mA==",
+        deps = {
+            "is-browser": "2.1.0",
+            "is-firefox": "1.0.3",
+            "is-plain-obj": "1.1.0",
+            "number-is-integer": "1.0.1",
+            "object-assign": "4.1.1",
+            "pick-by-alias": "1.2.0",
+            "weak-map": "1.0.8",
+        },
+        transitive_closure = {
+            "gl-util": ["3.1.3"],
+            "is-browser": ["2.1.0"],
+            "is-firefox": ["1.0.3"],
+            "is-plain-obj": ["1.1.0"],
+            "number-is-integer": ["1.0.1"],
+            "object-assign": ["4.1.1"],
+            "pick-by-alias": ["1.2.0"],
+            "weak-map": ["1.0.8"],
+            "is-finite": ["1.1.0"],
         },
     )
 
@@ -1440,6 +3429,424 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__glsl-inject-defines__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-inject-defines",
+        version = "1.0.3",
+        integrity = "sha512-W49jIhuDtF6w+7wCMcClk27a2hq8znvHtlGnrYkSWEr8tHe9eA2dcnohlcAmxLYBSpSSdzOkRdyPTrx9fw49+A==",
+        deps = {
+            "glsl-token-inject-block": "1.1.0",
+            "glsl-token-string": "1.0.1",
+            "glsl-tokenizer": "2.1.5",
+        },
+        transitive_closure = {
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-inject-block": ["1.1.0"],
+            "glsl-token-string": ["1.0.1"],
+            "glsl-tokenizer": ["2.1.5"],
+            "through2": ["0.6.5"],
+            "readable-stream": ["1.0.34"],
+            "xtend": ["4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-resolve__0.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-resolve",
+        version = "0.0.1",
+        integrity = "sha512-xxFNsfnhZTK9NBhzJjSBGX6IOqYpvBHxxmo+4vapiljyGNCY0Bekzn0firQkQrazK59c1hYxMDxYS8MDlhw4gA==",
+        deps = {
+            "resolve": "0.6.3",
+            "xtend": "2.2.0",
+        },
+        transitive_closure = {
+            "glsl-resolve": ["0.0.1"],
+            "resolve": ["0.6.3"],
+            "xtend": ["2.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-assignments__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-assignments",
+        version = "2.0.2",
+        integrity = "sha512-OwXrxixCyHzzA0U2g4btSNAyB2Dx8XrztY5aVUCjRSh4/D0WoJn8Qdps7Xub3sz6zE73W3szLrmWtQ7QMpeHEQ==",
+        transitive_closure = {
+            "glsl-token-assignments": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-defines__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-defines",
+        version = "1.0.0",
+        integrity = "sha512-Vb5QMVeLjmOwvvOJuPNg3vnRlffscq2/qvIuTpMzuO/7s5kT+63iL6Dfo2FYLWbzuiycWpbC0/KV0biqFwHxaQ==",
+        deps = {
+            "glsl-tokenizer": "2.1.5",
+        },
+        transitive_closure = {
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "through2": ["0.6.5"],
+            "readable-stream": ["1.0.34"],
+            "xtend": ["4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-depth__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-depth",
+        version = "1.1.2",
+        integrity = "sha512-eQnIBLc7vFf8axF9aoi/xW37LSWd2hCQr/3sZui8aBJnksq9C7zMeUYHVJWMhFzXrBU7fgIqni4EhXVW4/krpg==",
+        transitive_closure = {
+            "glsl-token-depth": ["1.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-descope__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-descope",
+        version = "1.0.2",
+        integrity = "sha512-kS2PTWkvi/YOeicVjXGgX5j7+8N7e56srNDEHDTVZ1dcESmbmpmgrnpjPcjxJjMxh56mSXYoFdZqb90gXkGjQw==",
+        deps = {
+            "glsl-token-assignments": "2.0.2",
+            "glsl-token-depth": "1.1.2",
+            "glsl-token-properties": "1.0.1",
+            "glsl-token-scope": "1.1.2",
+        },
+        transitive_closure = {
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-scope": ["1.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-inject-block__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-inject-block",
+        version = "1.1.0",
+        integrity = "sha512-q/m+ukdUBuHCOtLhSr0uFb/qYQr4/oKrPSdIK2C4TD+qLaJvqM9wfXIF/OOBjuSA3pUoYHurVRNao6LTVVUPWA==",
+        transitive_closure = {
+            "glsl-token-inject-block": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-properties__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-properties",
+        version = "1.0.1",
+        integrity = "sha512-dSeW1cOIzbuUoYH0y+nxzwK9S9O3wsjttkq5ij9ZGw0OS41BirKJzzH48VLm8qLg+au6b0sINxGC0IrGwtQUcA==",
+        transitive_closure = {
+            "glsl-token-properties": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-scope__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-scope",
+        version = "1.1.2",
+        integrity = "sha512-YKyOMk1B/tz9BwYUdfDoHvMIYTGtVv2vbDSLh94PT4+f87z21FVdou1KNKgF+nECBTo0fJ20dpm0B1vZB1Q03A==",
+        transitive_closure = {
+            "glsl-token-scope": ["1.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-string__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-string",
+        version = "1.0.1",
+        integrity = "sha512-1mtQ47Uxd47wrovl+T6RshKGkRRCYWhnELmkEcUAPALWGTFe2XZpH3r45XAwL2B6v+l0KNsCnoaZCSnhzKEksg==",
+        transitive_closure = {
+            "glsl-token-string": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-token-whitespace-trim__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-token-whitespace-trim",
+        version = "1.0.0",
+        integrity = "sha512-ZJtsPut/aDaUdLUNtmBYhaCmhIjpKNg7IgZSfX5wFReMc2vnj8zok+gB/3Quqs0TsBSX/fGnqUUYZDqyuc2xLQ==",
+        transitive_closure = {
+            "glsl-token-whitespace-trim": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glsl-tokenizer__2.1.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glsl-tokenizer",
+        version = "2.1.5",
+        integrity = "sha512-XSZEJ/i4dmz3Pmbnpsy3cKh7cotvFlBiZnDOwnj/05EwNp2XrhQ4XKJxT7/pDt4kp4YcpRSKz8eTV7S+mwV6MA==",
+        deps = {
+            "through2": "0.6.5",
+        },
+        transitive_closure = {
+            "glsl-tokenizer": ["2.1.5"],
+            "through2": ["0.6.5"],
+            "readable-stream": ["1.0.34"],
+            "xtend": ["4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glslify-bundle__5.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glslify-bundle",
+        version = "5.1.1",
+        integrity = "sha512-plaAOQPv62M1r3OsWf2UbjN0hUYAB7Aph5bfH58VxJZJhloRNbxOL9tl/7H71K7OLJoSJ2ZqWOKk3ttQ6wy24A==",
+        deps = {
+            "glsl-inject-defines": "1.0.3",
+            "glsl-token-defines": "1.0.0",
+            "glsl-token-depth": "1.1.2",
+            "glsl-token-descope": "1.0.2",
+            "glsl-token-scope": "1.1.2",
+            "glsl-token-string": "1.0.1",
+            "glsl-token-whitespace-trim": "1.0.0",
+            "glsl-tokenizer": "2.1.5",
+            "murmurhash-js": "1.0.0",
+            "shallow-copy": "0.0.1",
+        },
+        transitive_closure = {
+            "glslify-bundle": ["5.1.1"],
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-scope": ["1.1.2"],
+            "glsl-token-string": ["1.0.1"],
+            "glsl-token-whitespace-trim": ["1.0.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "murmurhash-js": ["1.0.0"],
+            "shallow-copy": ["0.0.1"],
+            "through2": ["0.6.5"],
+            "readable-stream": ["1.0.34"],
+            "xtend": ["4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-inject-block": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glslify-deps__1.3.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glslify-deps",
+        version = "1.3.2",
+        integrity = "sha512-7S7IkHWygJRjcawveXQjRXLO2FTjijPDYC7QfZyAQanY+yGLCFHYnPtsGT9bdyHiwPTw/5a1m1M9hamT2aBpag==",
+        deps = {
+            "@choojs/findup": "0.2.1",
+            "events": "3.3.0",
+            "glsl-resolve": "0.0.1",
+            "glsl-tokenizer": "2.1.5",
+            "graceful-fs": "4.2.10",
+            "inherits": "2.0.4",
+            "map-limit": "0.0.1",
+            "resolve": "1.22.0",
+        },
+        transitive_closure = {
+            "glslify-deps": ["1.3.2"],
+            "@choojs/findup": ["0.2.1"],
+            "events": ["3.3.0"],
+            "glsl-resolve": ["0.0.1"],
+            "glsl-tokenizer": ["2.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "inherits": ["2.0.4"],
+            "map-limit": ["0.0.1"],
+            "resolve": ["0.6.3", "1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "once": ["1.3.3"],
+            "wrappy": ["1.0.2"],
+            "through2": ["0.6.5"],
+            "readable-stream": ["1.0.34"],
+            "xtend": ["2.2.0", "4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+            "commander": ["2.20.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glslify__7.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glslify",
+        version = "7.1.1",
+        integrity = "sha512-bud98CJ6kGZcP9Yxcsi7Iz647wuDz3oN+IZsjCRi5X1PI7t/xPKeL0mOwXJjo+CRZMqvq0CkSJiywCcY7kVYog==",
+        deps = {
+            "bl": "2.2.1",
+            "concat-stream": "1.6.2",
+            "duplexify": "3.7.1",
+            "falafel": "2.2.5",
+            "from2": "2.3.0",
+            "glsl-resolve": "0.0.1",
+            "glsl-token-whitespace-trim": "1.0.0",
+            "glslify-bundle": "5.1.1",
+            "glslify-deps": "1.3.2",
+            "minimist": "1.2.6",
+            "resolve": "1.22.0",
+            "stack-trace": "0.0.9",
+            "static-eval": "2.1.0",
+            "through2": "2.0.5",
+            "xtend": "4.0.2",
+        },
+        transitive_closure = {
+            "glslify": ["7.1.1"],
+            "bl": ["2.2.1"],
+            "concat-stream": ["1.6.2"],
+            "duplexify": ["3.7.1"],
+            "falafel": ["2.2.5"],
+            "from2": ["2.3.0"],
+            "glsl-resolve": ["0.0.1"],
+            "glsl-token-whitespace-trim": ["1.0.0"],
+            "glslify-bundle": ["5.1.1"],
+            "glslify-deps": ["1.3.2"],
+            "minimist": ["1.2.6"],
+            "resolve": ["0.6.3", "1.22.0"],
+            "stack-trace": ["0.0.9"],
+            "static-eval": ["2.1.0"],
+            "through2": ["0.6.5", "2.0.5"],
+            "xtend": ["2.2.0", "4.0.2"],
+            "readable-stream": ["1.0.34", "2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["2.0.5", "0.0.1", "1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.2.1", "5.1.2"],
+            "string_decoder": ["0.10.31", "1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "@choojs/findup": ["0.2.1"],
+            "events": ["3.3.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "map-limit": ["0.0.1"],
+            "once": ["1.4.0", "1.3.3"],
+            "wrappy": ["1.0.2"],
+            "commander": ["2.20.3"],
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-scope": ["1.1.2"],
+            "glsl-token-string": ["1.0.1"],
+            "murmurhash-js": ["1.0.0"],
+            "shallow-copy": ["0.0.1"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-inject-block": ["1.1.0"],
+            "acorn": ["7.4.1"],
+            "end-of-stream": ["1.4.4"],
+            "stream-shift": ["1.0.1"],
+            "buffer-from": ["1.1.2"],
+            "typedarray": ["0.0.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__graceful-fs__4.2.10",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "graceful-fs",
+        version = "4.2.10",
+        integrity = "sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==",
+        transitive_closure = {
+            "graceful-fs": ["4.2.10"],
+        },
+    )
+
+    npm_import(
+        name = "npm__grid-index__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "grid-index",
+        version = "1.1.0",
+        integrity = "sha512-HZRwumpOGUrHyxO5bqKZL0B0GlUpwtCAzZ42sgxUPniu33R1LSFH5yrIcBCHjkctCAh3mtWKcKd9J4vDDdeVHA==",
+        transitive_closure = {
+            "grid-index": ["1.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__gzip-size__6.0.0",
         root_package = "",
         link_workspace = "",
@@ -1470,6 +3877,40 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__has-hover__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "has-hover",
+        version = "1.0.1",
+        integrity = "sha512-0G6w7LnlcpyDzpeGUTuT0CEw05+QlMuGVk1IHNAlHrGJITGodjZu3x8BNDUMfKJSZXNB2ZAclqc1bvrd+uUpfg==",
+        deps = {
+            "is-browser": "2.1.0",
+        },
+        transitive_closure = {
+            "has-hover": ["1.0.1"],
+            "is-browser": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__has-passive-events__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "has-passive-events",
+        version = "1.0.0",
+        integrity = "sha512-2vSj6IeIsgvsRMyeQ0JaCX5Q3lX4zMn5HpoVc7MEhQ6pv8Iq9rsXjsp+E5ZwaT7T0xhMT0KmU8gtt1EFVdbJiw==",
+        deps = {
+            "is-browser": "2.1.0",
+        },
+        transitive_closure = {
+            "has-passive-events": ["1.0.0"],
+            "is-browser": ["2.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__has__1.0.3",
         root_package = "",
         link_workspace = "",
@@ -1496,6 +3937,106 @@ def npm_repositories():
         integrity = "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==",
         transitive_closure = {
             "he": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__hsluv__0.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "hsluv",
+        version = "0.0.3",
+        integrity = "sha512-08iL2VyCRbkQKBySkSh6m8zMUa3sADAxGVWs3Z1aPcUkTJeK0ETG4Fc27tEmQBGUAXZjIsXOZqBvacuVNSC/fQ==",
+        transitive_closure = {
+            "hsluv": ["0.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__iconv-lite__0.4.24",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "iconv-lite",
+        version = "0.4.24",
+        integrity = "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==",
+        deps = {
+            "safer-buffer": "2.1.2",
+        },
+        transitive_closure = {
+            "iconv-lite": ["0.4.24"],
+            "safer-buffer": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ieee754__1.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ieee754",
+        version = "1.2.1",
+        integrity = "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==",
+        transitive_closure = {
+            "ieee754": ["1.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__image-palette__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "image-palette",
+        version = "2.1.0",
+        integrity = "sha512-3ImSEWD26+xuQFdP0RWR4WSXadZwvgrFhjGNpMEapTG1tf2XrBFS2dlKK5hNgH4UIaSQlSUFRn1NeA+zULIWbQ==",
+        deps = {
+            "color-id": "1.1.0",
+            "pxls": "2.3.2",
+            "quantize": "1.0.2",
+        },
+        transitive_closure = {
+            "image-palette": ["2.1.0"],
+            "color-id": ["1.1.0"],
+            "pxls": ["2.3.2"],
+            "quantize": ["1.0.2"],
+            "arr-flatten": ["1.1.0"],
+            "compute-dims": ["1.1.0"],
+            "flip-pixels": ["1.0.2"],
+            "is-browser": ["2.1.0"],
+            "is-buffer": ["2.0.5"],
+            "to-uint8": ["1.4.1"],
+            "clamp": ["1.0.1"],
+            "is-base64": ["0.1.0"],
+            "is-float-array": ["1.0.0"],
+            "to-array-buffer": ["3.2.0"],
+            "flatten-vertex-data": ["1.0.2"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "dtype": ["2.0.0"],
+            "utils-copy": ["1.1.1"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-matrix-like": ["1.0.2"],
+            "validate.io-ndarray-like": ["1.0.0"],
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
         },
     )
 
@@ -1532,6 +4073,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-base64__0.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-base64",
+        version = "0.1.0",
+        integrity = "sha512-WRRyllsGXJM7ZN7gPTCCQ/6wNPTRDwiWdPK66l5sJzcU/oOzcIcRRf0Rux8bkpox/1yjt0F6VJRsQOIG2qz5sg==",
+        transitive_closure = {
+            "is-base64": ["0.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-binary-path__2.1.0",
         root_package = "",
         link_workspace = "",
@@ -1549,6 +4103,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-blob__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-blob",
+        version = "2.1.0",
+        integrity = "sha512-SZ/fTft5eUhQM6oF/ZaASFDEdbFVe89Imltn9uZr03wdKMcWNVYSMjQPFtg05QuNkt5l5c135ElvXEQG0rk4tw==",
+        transitive_closure = {
+            "is-blob": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-browser__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-browser",
+        version = "2.1.0",
+        integrity = "sha512-F5rTJxDQ2sW81fcfOR1GnCXT6sVJC104fCyfj+mjpwNEwaPYSn5fte5jiHmBg3DHsIoL/l8Kvw5VN5SsTRcRFQ==",
+        transitive_closure = {
+            "is-browser": ["2.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-buffer__1.1.6",
         root_package = "",
         link_workspace = "",
@@ -1558,6 +4138,19 @@ def npm_repositories():
         integrity = "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==",
         transitive_closure = {
             "is-buffer": ["1.1.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-buffer__2.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-buffer",
+        version = "2.0.5",
+        integrity = "sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==",
+        transitive_closure = {
+            "is-buffer": ["2.0.5"],
         },
     )
 
@@ -1593,6 +4186,45 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-finite__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-finite",
+        version = "1.1.0",
+        integrity = "sha512-cdyMtqX/BOqqNBBiKlIVkytNHm49MtMlYyn1zxzvJKWmFMlGzm+ry5BBfYyeY9YmNKbRSo/o7OX9w9ale0wg3w==",
+        transitive_closure = {
+            "is-finite": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-firefox__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-firefox",
+        version = "1.0.3",
+        integrity = "sha512-6Q9ITjvWIm0Xdqv+5U12wgOKEM2KoBw4Y926m0OFkvlCxnbG94HKAsVz8w3fWcfAS5YA2fJORXX1dLrkprCCxA==",
+        transitive_closure = {
+            "is-firefox": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-float-array__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-float-array",
+        version = "1.0.0",
+        integrity = "sha512-4ew1Sx6B6kEAl3T3NOM0yB94J3NZnBdNt4paw0e8nY73yHHTeTEhyQ3Lj7EQEnv5LD+GxNTaT4L46jcKjjpLiQ==",
+        transitive_closure = {
+            "is-float-array": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-fullwidth-code-point__3.0.0",
         root_package = "",
         link_workspace = "",
@@ -1623,6 +4255,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-iexplorer__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-iexplorer",
+        version = "1.0.0",
+        integrity = "sha512-YeLzceuwg3K6O0MLM3UyUUjKAlyULetwryFp1mHy1I5PfArK0AEqlfa+MR4gkJjcbuJXoDJCvXbyqZVf5CR2Sg==",
+        transitive_closure = {
+            "is-iexplorer": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-mobile__2.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-mobile",
+        version = "2.2.2",
+        integrity = "sha512-wW/SXnYJkTjs++tVK5b6kVITZpAZPtUrt9SF80vvxGiF/Oywal+COk1jlRkiVq15RFNEQKQY31TkV24/1T5cVg==",
+        transitive_closure = {
+            "is-mobile": ["2.2.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-number__7.0.0",
         root_package = "",
         link_workspace = "",
@@ -1632,6 +4290,32 @@ def npm_repositories():
         integrity = "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
         transitive_closure = {
             "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-obj__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-obj",
+        version = "1.0.1",
+        integrity = "sha512-l4RyHgRqGN4Y3+9JHVrNqO+tN0rV5My76uW5/nuO4K1b6vw5G8d/cmFjP9tRfEsdhZNt0IFdZuK/c2Vr4Nb+Qg==",
+        transitive_closure = {
+            "is-obj": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-plain-obj__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-plain-obj",
+        version = "1.1.0",
+        integrity = "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
+        transitive_closure = {
+            "is-plain-obj": ["1.1.0"],
         },
     )
 
@@ -1666,6 +4350,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-string-blank__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-string-blank",
+        version = "1.0.1",
+        integrity = "sha512-9H+ZBCVs3L9OYqv8nuUAzpcT9OTgMD1yAWrG7ihlnibdkbtB850heAmYWxHuXc4CHy4lKeK69tN+ny1K7gBIrw==",
+        transitive_closure = {
+            "is-string-blank": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-svg-path__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-svg-path",
+        version = "1.0.2",
+        integrity = "sha512-Lj4vePmqpPR1ZnRctHv8ltSh1OrSxHkhUkd7wi+VQdcdP15/KvQFyk7LhNuM7ZW0EVbJz8kZLVmL9quLrfq4Kg==",
+        transitive_closure = {
+            "is-svg-path": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-unicode-supported__0.1.0",
         root_package = "",
         link_workspace = "",
@@ -1675,6 +4385,45 @@ def npm_repositories():
         integrity = "sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==",
         transitive_closure = {
             "is-unicode-supported": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__isarray__0.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "isarray",
+        version = "0.0.1",
+        integrity = "sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ==",
+        transitive_closure = {
+            "isarray": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__isarray__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "isarray",
+        version = "1.0.0",
+        integrity = "sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==",
+        transitive_closure = {
+            "isarray": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__isarray__2.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "isarray",
+        version = "2.0.5",
+        integrity = "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==",
+        transitive_closure = {
+            "isarray": ["2.0.5"],
         },
     )
 
@@ -1709,6 +4458,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__kdbush__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "kdbush",
+        version = "3.0.0",
+        integrity = "sha512-hRkd6/XW4HTsA9vjVpY9tuXJYLSlelnkTmVFu4M9/7MIYQtFcHpbugAU7UbOfjOiVSVYl2fqgBuJ32JUmRo5Ew==",
+        transitive_closure = {
+            "kdbush": ["3.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__kleur__4.1.4",
         root_package = "",
         link_workspace = "",
@@ -1718,6 +4480,25 @@ def npm_repositories():
         integrity = "sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==",
         transitive_closure = {
             "kleur": ["4.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__levn__0.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "levn",
+        version = "0.3.0",
+        integrity = "sha512-0OO4y2iOHix2W6ujICbKIaEQXvFQHue65vUG3pb5EUomzPI90z9hsA1VsO/dbIIpC53J8gxM9Q4Oho0jrCM/yA==",
+        deps = {
+            "prelude-ls": "1.1.2",
+            "type-check": "0.3.2",
+        },
+        transitive_closure = {
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
         },
     )
 
@@ -1737,6 +4518,19 @@ def npm_repositories():
             "p-locate": ["5.0.0"],
             "p-limit": ["3.1.0"],
             "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__lodash.merge__4.6.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "lodash.merge",
+        version = "4.6.2",
+        integrity = "sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==",
+        transitive_closure = {
+            "lodash.merge": ["4.6.2"],
         },
     )
 
@@ -1808,6 +4602,103 @@ def npm_repositories():
         transitive_closure = {
             "magic-string": ["0.25.9"],
             "sourcemap-codec": ["1.4.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__map-limit__0.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "map-limit",
+        version = "0.0.1",
+        integrity = "sha512-pJpcfLPnIF/Sk3taPW21G/RQsEEirGaFpCW3oXRwH9dnFHPHNGjNyvh++rdmC2fNqEaTw2MhYJraoJWAHx8kEg==",
+        deps = {
+            "once": "1.3.3",
+        },
+        transitive_closure = {
+            "map-limit": ["0.0.1"],
+            "once": ["1.3.3"],
+            "wrappy": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mapbox-gl__1.10.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mapbox-gl",
+        version = "1.10.1",
+        integrity = "sha512-0aHt+lFUpYfvh0kMIqXqNXqoYMuhuAsMlw87TbhWrw78Tx2zfuPI0Lx31/YPUgJ+Ire0tzQ4JnuBL7acDNXmMg==",
+        deps = {
+            "@mapbox/geojson-rewind": "0.5.2",
+            "@mapbox/geojson-types": "1.0.2",
+            "@mapbox/jsonlint-lines-primitives": "2.0.2",
+            "@mapbox/mapbox-gl-supported": "1.5.0_mapbox-gl@1.10.1",
+            "@mapbox/point-geometry": "0.1.0",
+            "@mapbox/tiny-sdf": "1.2.5",
+            "@mapbox/unitbezier": "0.0.0",
+            "@mapbox/vector-tile": "1.3.1",
+            "@mapbox/whoots-js": "3.1.0",
+            "csscolorparser": "1.0.3",
+            "earcut": "2.2.3",
+            "geojson-vt": "3.2.1",
+            "gl-matrix": "3.4.3",
+            "grid-index": "1.1.0",
+            "minimist": "1.2.6",
+            "murmurhash-js": "1.0.0",
+            "pbf": "3.2.1",
+            "potpack": "1.0.2",
+            "quickselect": "2.0.0",
+            "rw": "1.3.3",
+            "supercluster": "7.1.5",
+            "tinyqueue": "2.0.3",
+            "vt-pbf": "3.1.3",
+        },
+        transitive_closure = {
+            "mapbox-gl": ["1.10.1"],
+            "@mapbox/geojson-rewind": ["0.5.2"],
+            "@mapbox/geojson-types": ["1.0.2"],
+            "@mapbox/jsonlint-lines-primitives": ["2.0.2"],
+            "@mapbox/mapbox-gl-supported": ["1.5.0_mapbox-gl@1.10.1"],
+            "@mapbox/point-geometry": ["0.1.0"],
+            "@mapbox/tiny-sdf": ["1.2.5"],
+            "@mapbox/unitbezier": ["0.0.0"],
+            "@mapbox/vector-tile": ["1.3.1"],
+            "@mapbox/whoots-js": ["3.1.0"],
+            "csscolorparser": ["1.0.3"],
+            "earcut": ["2.2.3"],
+            "geojson-vt": ["3.2.1"],
+            "gl-matrix": ["3.4.3"],
+            "grid-index": ["1.1.0"],
+            "minimist": ["1.2.6"],
+            "murmurhash-js": ["1.0.0"],
+            "pbf": ["3.2.1"],
+            "potpack": ["1.0.2"],
+            "quickselect": ["2.0.0"],
+            "rw": ["1.3.3"],
+            "supercluster": ["7.1.5"],
+            "tinyqueue": ["2.0.3"],
+            "vt-pbf": ["3.1.3"],
+            "kdbush": ["3.0.0"],
+            "ieee754": ["1.2.1"],
+            "resolve-protobuf-schema": ["2.1.0"],
+            "protocol-buffers-schema": ["3.6.0"],
+            "get-stream": ["6.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__math-log2__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "math-log2",
+        version = "1.0.1",
+        integrity = "sha512-9W0yGtkaMAkf74XGYVy4Dqw3YUMnTNB2eeiw9aQbUl4A3KmuCEHTt2DgAB07ENzOYAjsYSAYufkAq0Zd+jU7zA==",
+        transitive_closure = {
+            "math-log2": ["1.0.1"],
         },
     )
 
@@ -2295,6 +5186,71 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__mouse-change__1.4.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mouse-change",
+        version = "1.4.0",
+        integrity = "sha512-vpN0s+zLL2ykyyUDh+fayu9Xkor5v/zRD9jhSqjRS1cJTGS0+oakVZzNm5n19JvvEj0you+MXlYTpNxUDQUjkQ==",
+        deps = {
+            "mouse-event": "1.0.5",
+        },
+        transitive_closure = {
+            "mouse-change": ["1.4.0"],
+            "mouse-event": ["1.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mouse-event-offset__3.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mouse-event-offset",
+        version = "3.0.2",
+        integrity = "sha512-s9sqOs5B1Ykox3Xo8b3Ss2IQju4UwlW6LSR+Q5FXWpprJ5fzMLefIIItr3PH8RwzfGy6gxs/4GAmiNuZScE25w==",
+        transitive_closure = {
+            "mouse-event-offset": ["3.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mouse-event__1.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mouse-event",
+        version = "1.0.5",
+        integrity = "sha512-ItUxtL2IkeSKSp9cyaX2JLUuKk2uMoxBg4bbOWVd29+CskYJR9BGsUqtXenNzKbnDshvupjUewDIYVrOB6NmGw==",
+        transitive_closure = {
+            "mouse-event": ["1.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mouse-wheel__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mouse-wheel",
+        version = "1.2.0",
+        integrity = "sha512-+OfYBiUOCTWcTECES49neZwL5AoGkXE+lFjIvzwNCnYRlso+EnfvovcBxGoyQ0yQt806eSPjS675K0EwWknXmw==",
+        deps = {
+            "right-now": "1.0.0",
+            "signum": "1.0.0",
+            "to-px": "1.0.1",
+        },
+        transitive_closure = {
+            "mouse-wheel": ["1.2.0"],
+            "right-now": ["1.0.0"],
+            "signum": ["1.0.0"],
+            "to-px": ["1.0.1"],
+            "parse-unit": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__mri__1.2.0",
         root_package = "",
         link_workspace = "",
@@ -2340,7 +5296,7 @@ def npm_repositories():
         link_packages = {},
         package = "ms",
         version = "2.0.0",
-        integrity = "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
+        integrity = "sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==",
         transitive_closure = {
             "ms": ["2.0.0"],
         },
@@ -2373,6 +5329,36 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__mumath__3.3.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mumath",
+        version = "3.3.4",
+        integrity = "sha512-VAFIOG6rsxoc7q/IaY3jdjmrsuX9f15KlRLYTHmixASBZkZEKC1IFqE2BC5CdhXmK6WLM1Re33z//AGmeRI6FA==",
+        deps = {
+            "almost-equal": "1.1.0",
+        },
+        transitive_closure = {
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__murmurhash-js__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "murmurhash-js",
+        version = "1.0.0",
+        integrity = "sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==",
+        transitive_closure = {
+            "murmurhash-js": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__nanoid__3.3.3",
         root_package = "",
         link_workspace = "",
@@ -2382,6 +5368,55 @@ def npm_repositories():
         integrity = "sha512-p1sjXuopFs0xg+fPASzQ28agW1oHD7xDsd9Xkf3T15H3c/cifrFHVwrh74PdoklAPi+i7MdRsE47vm2r6JoB+w==",
         transitive_closure = {
             "nanoid": ["3.3.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__native-promise-only__0.8.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "native-promise-only",
+        version = "0.8.1",
+        integrity = "sha512-zkVhZUA3y8mbz652WrL5x0fB0ehrBkulWT3TomAQ9iDtyXZvzKeEA6GPxAItBYeNYl5yngKRX612qHOhvMkDeg==",
+        transitive_closure = {
+            "native-promise-only": ["0.8.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__needle__2.9.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "needle",
+        version = "2.9.1",
+        integrity = "sha512-6R9fqJ5Zcmf+uYaFgdIHmLwNldn5HbK8L5ybn7Uz+ylX/rnOsSp1AHcvQSrCaFN+qNM1wpymHqD7mVasEOlHGQ==",
+        deps = {
+            "debug": "3.2.7",
+            "iconv-lite": "0.4.24",
+            "sax": "1.2.4",
+        },
+        transitive_closure = {
+            "needle": ["2.9.1"],
+            "debug": ["3.2.7"],
+            "iconv-lite": ["0.4.24"],
+            "sax": ["1.2.4"],
+            "safer-buffer": ["2.1.2"],
+            "ms": ["2.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__next-tick__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "next-tick",
+        version = "1.1.0",
+        integrity = "sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==",
+        transitive_closure = {
+            "next-tick": ["1.1.0"],
         },
     )
 
@@ -2412,6 +5447,53 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__normalize-svg-path__0.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "normalize-svg-path",
+        version = "0.1.0",
+        integrity = "sha512-1/kmYej2iedi5+ROxkRESL/pI02pkg0OBnaR4hJkSIX6+ORzepwbuUXfrdZaPjysTsJInj0Rj5NuX027+dMBvA==",
+        transitive_closure = {
+            "normalize-svg-path": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__normalize-svg-path__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "normalize-svg-path",
+        version = "1.1.0",
+        integrity = "sha512-r9KHKG2UUeB5LoTouwDzBy2VxXlHsiM6fyLQvnJa0S5hrhzqElH/CH7TUGhT1fVvIYBIKf3OpY4YJ4CK+iaqHg==",
+        deps = {
+            "svg-arc-to-cubic-bezier": "3.2.0",
+        },
+        transitive_closure = {
+            "normalize-svg-path": ["1.1.0"],
+            "svg-arc-to-cubic-bezier": ["3.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__number-is-integer__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "number-is-integer",
+        version = "1.0.1",
+        integrity = "sha512-Dq3iuiFBkrbmuQjGFFF3zckXNCQoSD37/SdSbgcBailUx6knDvDwb5CympBgcoWHy36sfS12u74MHYkXyHq6bg==",
+        deps = {
+            "is-finite": "1.1.0",
+        },
+        transitive_closure = {
+            "number-is-integer": ["1.0.1"],
+            "is-finite": ["1.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__object-assign__4.1.1",
         root_package = "",
         link_workspace = "",
@@ -2421,6 +5503,36 @@ def npm_repositories():
         integrity = "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==",
         transitive_closure = {
             "object-assign": ["4.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__object-keys__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "object-keys",
+        version = "1.1.1",
+        integrity = "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==",
+        transitive_closure = {
+            "object-keys": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__once__1.3.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "once",
+        version = "1.3.3",
+        integrity = "sha512-6vaNInhu+CHxtONf3zw3vq4SP2DOQhjBvIa3rNcG0+P7eKWlYH6Peu7rHizSloRU2EwMz6GraLieis9Ac9+p1w==",
+        deps = {
+            "wrappy": "1.0.2",
+        },
+        transitive_closure = {
+            "once": ["1.3.3"],
+            "wrappy": ["1.0.2"],
         },
     )
 
@@ -2474,6 +5586,33 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__optionator__0.8.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "optionator",
+        version = "0.8.3",
+        integrity = "sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA==",
+        deps = {
+            "deep-is": "0.1.4",
+            "fast-levenshtein": "2.0.6",
+            "levn": "0.3.0",
+            "prelude-ls": "1.1.2",
+            "type-check": "0.3.2",
+            "word-wrap": "1.2.3",
+        },
+        transitive_closure = {
+            "optionator": ["0.8.3"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__p-limit__3.1.0",
         root_package = "",
         link_workspace = "",
@@ -2505,6 +5644,62 @@ def npm_repositories():
             "p-locate": ["5.0.0"],
             "p-limit": ["3.1.0"],
             "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__parenthesis__3.1.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "parenthesis",
+        version = "3.1.8",
+        integrity = "sha512-KF/U8tk54BgQewkJPvB4s/US3VQY68BRDpH638+7O/n58TpnwiwnOtGIOsT2/i+M78s61BBpeC83STB88d8sqw==",
+        transitive_closure = {
+            "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__parse-rect__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "parse-rect",
+        version = "1.2.0",
+        integrity = "sha512-4QZ6KYbnE6RTwg9E0HpLchUM9EZt6DnDxajFZZDSV4p/12ZJEvPO702DZpGvRYEPo00yKDys7jASi+/w7aO8LA==",
+        deps = {
+            "pick-by-alias": "1.2.0",
+        },
+        transitive_closure = {
+            "parse-rect": ["1.2.0"],
+            "pick-by-alias": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__parse-svg-path__0.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "parse-svg-path",
+        version = "0.1.2",
+        integrity = "sha512-JyPSBnkTJ0AI8GGJLfMXvKq42cj5c006fnLz6fXy6zfoVjJizi8BNTpu8on8ziI1cKy9d9DGNuY17Ce7wuejpQ==",
+        transitive_closure = {
+            "parse-svg-path": ["0.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__parse-unit__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "parse-unit",
+        version = "1.0.1",
+        integrity = "sha512-hrqldJHokR3Qj88EIlV/kAyAi/G5R2+R56TBANxNMy0uPlYcttx0jnMW6Yx5KsKPSbC3KddM/7qQm3+0wEXKxg==",
+        transitive_closure = {
+            "parse-unit": ["1.0.1"],
         },
     )
 
@@ -2548,6 +5743,52 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__pbf__3.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "pbf",
+        version = "3.2.1",
+        integrity = "sha512-ClrV7pNOn7rtmoQVF4TS1vyU0WhYRnP92fzbfF75jAIwpnzdJXf8iTd4CMEqO4yUenH6NDqLiwjqlh6QgZzgLQ==",
+        deps = {
+            "ieee754": "1.2.1",
+            "resolve-protobuf-schema": "2.1.0",
+        },
+        transitive_closure = {
+            "pbf": ["3.2.1"],
+            "ieee754": ["1.2.1"],
+            "resolve-protobuf-schema": ["2.1.0"],
+            "protocol-buffers-schema": ["3.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__performance-now__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "performance-now",
+        version = "2.1.0",
+        integrity = "sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==",
+        transitive_closure = {
+            "performance-now": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__pick-by-alias__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "pick-by-alias",
+        version = "1.2.0",
+        integrity = "sha512-ESj2+eBxhGrcA1azgHs7lARG5+5iLakc/6nlfbpjcLl00HuuUOIuORhYXN4D1HfvMSKuVtFQjAlnwi1JHEeDIw==",
+        transitive_closure = {
+            "pick-by-alias": ["1.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__picomatch__2.3.1",
         root_package = "",
         link_workspace = "",
@@ -2557,6 +5798,527 @@ def npm_repositories():
         integrity = "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==",
         transitive_closure = {
             "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__plotly.js__2.12.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["plotly.js"],
+        },
+        package = "plotly.js",
+        version = "2.12.1",
+        integrity = "sha512-XbZ3w3jSl+ihZPMXWwblmjinqbzdd+vT+3XKZpyffxmlMmTp/3vY1ewpQDuNyufUoiT0o0ekCqa80Qlzi7jwlA==",
+        deps = {
+            "@plotly/d3": "3.8.0",
+            "@plotly/d3-sankey": "0.7.2",
+            "@plotly/d3-sankey-circular": "0.33.1",
+            "@turf/area": "6.5.0",
+            "@turf/bbox": "6.5.0",
+            "@turf/centroid": "6.5.0",
+            "canvas-fit": "1.5.0",
+            "color-alpha": "1.0.4",
+            "color-normalize": "1.5.0",
+            "color-parse": "1.3.8",
+            "color-rgba": "2.1.1",
+            "country-regex": "1.1.0",
+            "d3-force": "1.2.1",
+            "d3-format": "1.4.5",
+            "d3-geo": "1.12.1",
+            "d3-geo-projection": "2.9.0",
+            "d3-hierarchy": "1.1.9",
+            "d3-interpolate": "1.4.0",
+            "d3-time": "1.1.0",
+            "d3-time-format": "2.3.0",
+            "fast-isnumeric": "1.1.4",
+            "gl-mat4": "1.2.0",
+            "gl-text": "1.3.1",
+            "glslify": "7.1.1",
+            "has-hover": "1.0.1",
+            "has-passive-events": "1.0.0",
+            "is-mobile": "2.2.2",
+            "mapbox-gl": "1.10.1",
+            "mouse-change": "1.4.0",
+            "mouse-event-offset": "3.0.2",
+            "mouse-wheel": "1.2.0",
+            "native-promise-only": "0.8.1",
+            "parse-svg-path": "0.1.2",
+            "polybooljs": "1.2.0",
+            "probe-image-size": "7.2.3",
+            "regl": "/@plotly/regl/2.1.2",
+            "regl-error2d": "2.0.12",
+            "regl-line2d": "3.1.2",
+            "regl-scatter2d": "3.2.8",
+            "regl-splom": "1.0.14",
+            "strongly-connected-components": "1.0.1",
+            "superscript-text": "1.0.0",
+            "svg-path-sdf": "1.1.3",
+            "tinycolor2": "1.4.2",
+            "to-px": "1.0.1",
+            "topojson-client": "3.1.0",
+            "webgl-context": "2.2.0",
+            "world-calendars": "1.0.3",
+        },
+        transitive_closure = {
+            "plotly.js": ["2.12.1"],
+            "@plotly/d3": ["3.8.0"],
+            "@plotly/d3-sankey": ["0.7.2"],
+            "@plotly/d3-sankey-circular": ["0.33.1"],
+            "@turf/area": ["6.5.0"],
+            "@turf/bbox": ["6.5.0"],
+            "@turf/centroid": ["6.5.0"],
+            "canvas-fit": ["1.5.0"],
+            "color-alpha": ["1.0.4"],
+            "color-normalize": ["1.5.0"],
+            "color-parse": ["1.3.8"],
+            "color-rgba": ["2.1.1"],
+            "country-regex": ["1.1.0"],
+            "d3-force": ["1.2.1"],
+            "d3-format": ["1.4.5"],
+            "d3-geo": ["1.12.1"],
+            "d3-geo-projection": ["2.9.0"],
+            "d3-hierarchy": ["1.1.9"],
+            "d3-interpolate": ["1.4.0"],
+            "d3-time": ["1.1.0"],
+            "d3-time-format": ["2.3.0"],
+            "fast-isnumeric": ["1.1.4"],
+            "gl-mat4": ["1.2.0"],
+            "gl-text": ["1.3.1"],
+            "glslify": ["7.1.1"],
+            "has-hover": ["1.0.1"],
+            "has-passive-events": ["1.0.0"],
+            "is-mobile": ["2.2.2"],
+            "mapbox-gl": ["1.10.1"],
+            "mouse-change": ["1.4.0"],
+            "mouse-event-offset": ["3.0.2"],
+            "mouse-wheel": ["1.2.0"],
+            "native-promise-only": ["0.8.1"],
+            "parse-svg-path": ["0.1.2"],
+            "polybooljs": ["1.2.0"],
+            "probe-image-size": ["7.2.3"],
+            "@plotly/regl": ["2.1.2"],
+            "regl-error2d": ["2.0.12"],
+            "regl-line2d": ["3.1.2"],
+            "regl-scatter2d": ["3.2.8"],
+            "regl-splom": ["1.0.14"],
+            "strongly-connected-components": ["1.0.1"],
+            "superscript-text": ["1.0.0"],
+            "svg-path-sdf": ["1.1.3"],
+            "tinycolor2": ["1.4.2"],
+            "to-px": ["1.0.1"],
+            "topojson-client": ["3.1.0"],
+            "webgl-context": ["2.2.0"],
+            "world-calendars": ["1.0.3"],
+            "object-assign": ["4.1.1"],
+            "get-canvas-context": ["1.0.2"],
+            "commander": ["2.20.3"],
+            "parse-unit": ["1.0.1"],
+            "bitmap-sdf": ["1.0.4"],
+            "draw-svg-path": ["1.0.0"],
+            "is-svg-path": ["1.0.2"],
+            "svg-path-bounds": ["1.0.2"],
+            "abs-svg-path": ["0.1.1"],
+            "normalize-svg-path": ["0.1.0", "1.1.0"],
+            "svg-arc-to-cubic-bezier": ["3.2.0"],
+            "array-bounds": ["1.0.1"],
+            "array-range": ["1.0.1"],
+            "flatten-vertex-data": ["1.0.2"],
+            "parse-rect": ["1.2.0"],
+            "pick-by-alias": ["1.2.0"],
+            "raf": ["3.4.1"],
+            "performance-now": ["2.1.0"],
+            "dtype": ["2.0.0"],
+            "@plotly/point-cluster": ["3.1.9"],
+            "array-rearrange": ["2.2.2"],
+            "clamp": ["1.0.1"],
+            "color-id": ["1.1.0"],
+            "image-palette": ["2.1.0"],
+            "is-iexplorer": ["1.0.0"],
+            "to-float32": ["1.1.0"],
+            "update-diff": ["1.1.0"],
+            "pxls": ["2.3.2"],
+            "quantize": ["1.0.2"],
+            "arr-flatten": ["1.1.0"],
+            "compute-dims": ["1.1.0"],
+            "flip-pixels": ["1.0.2"],
+            "is-browser": ["2.1.0"],
+            "is-buffer": ["2.0.5"],
+            "to-uint8": ["1.4.1"],
+            "is-base64": ["0.1.0"],
+            "is-float-array": ["1.0.0"],
+            "to-array-buffer": ["3.2.0"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "utils-copy": ["1.1.1"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-matrix-like": ["1.0.2"],
+            "validate.io-ndarray-like": ["1.0.0"],
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+            "binary-search-bounds": ["2.0.5"],
+            "defined": ["1.0.0"],
+            "is-obj": ["1.0.1"],
+            "math-log2": ["1.0.1"],
+            "array-find-index": ["1.0.2"],
+            "array-normalize": ["1.1.4"],
+            "earcut": ["2.2.3"],
+            "es6-weak-map": ["2.0.3"],
+            "d": ["1.0.1"],
+            "es5-ext": ["0.10.61"],
+            "es6-iterator": ["2.0.3"],
+            "es6-symbol": ["3.1.3"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+            "next-tick": ["1.1.0"],
+            "lodash.merge": ["4.6.2"],
+            "needle": ["2.9.1"],
+            "stream-parser": ["0.3.1"],
+            "debug": ["3.2.7", "2.6.9"],
+            "ms": ["2.1.3", "2.0.0"],
+            "iconv-lite": ["0.4.24"],
+            "sax": ["1.2.4"],
+            "safer-buffer": ["2.1.2"],
+            "right-now": ["1.0.0"],
+            "signum": ["1.0.0"],
+            "mouse-event": ["1.0.5"],
+            "@mapbox/geojson-rewind": ["0.5.2"],
+            "@mapbox/geojson-types": ["1.0.2"],
+            "@mapbox/jsonlint-lines-primitives": ["2.0.2"],
+            "@mapbox/mapbox-gl-supported": ["1.5.0_mapbox-gl@1.10.1"],
+            "@mapbox/point-geometry": ["0.1.0"],
+            "@mapbox/tiny-sdf": ["1.2.5"],
+            "@mapbox/unitbezier": ["0.0.0"],
+            "@mapbox/vector-tile": ["1.3.1"],
+            "@mapbox/whoots-js": ["3.1.0"],
+            "csscolorparser": ["1.0.3"],
+            "geojson-vt": ["3.2.1"],
+            "gl-matrix": ["3.4.3"],
+            "grid-index": ["1.1.0"],
+            "minimist": ["1.2.6"],
+            "murmurhash-js": ["1.0.0"],
+            "pbf": ["3.2.1"],
+            "potpack": ["1.0.2"],
+            "quickselect": ["2.0.0"],
+            "rw": ["1.3.3"],
+            "supercluster": ["7.1.5"],
+            "tinyqueue": ["2.0.3"],
+            "vt-pbf": ["3.1.3"],
+            "kdbush": ["3.0.0"],
+            "ieee754": ["1.2.1"],
+            "resolve-protobuf-schema": ["2.1.0"],
+            "protocol-buffers-schema": ["3.6.0"],
+            "get-stream": ["6.0.1"],
+            "bl": ["2.2.1"],
+            "concat-stream": ["1.6.2"],
+            "duplexify": ["3.7.1"],
+            "falafel": ["2.2.5"],
+            "from2": ["2.3.0"],
+            "glsl-resolve": ["0.0.1"],
+            "glsl-token-whitespace-trim": ["1.0.0"],
+            "glslify-bundle": ["5.1.1"],
+            "glslify-deps": ["1.3.2"],
+            "resolve": ["0.6.3", "1.22.0"],
+            "stack-trace": ["0.0.9"],
+            "static-eval": ["2.1.0"],
+            "through2": ["0.6.5", "2.0.5"],
+            "xtend": ["2.2.0", "4.0.2"],
+            "readable-stream": ["1.0.34", "2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["2.0.5", "0.0.1", "1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.2.1", "5.1.2"],
+            "string_decoder": ["0.10.31", "1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "@choojs/findup": ["0.2.1"],
+            "events": ["3.3.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "map-limit": ["0.0.1"],
+            "once": ["1.4.0", "1.3.3"],
+            "wrappy": ["1.0.2"],
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-scope": ["1.1.2"],
+            "glsl-token-string": ["1.0.1"],
+            "shallow-copy": ["0.0.1"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-inject-block": ["1.1.0"],
+            "acorn": ["7.4.1"],
+            "end-of-stream": ["1.4.4"],
+            "stream-shift": ["1.0.1"],
+            "buffer-from": ["1.1.2"],
+            "typedarray": ["0.0.6"],
+            "bit-twiddle": ["1.0.2"],
+            "css-font": ["1.2.0"],
+            "detect-kerning": ["2.1.2"],
+            "font-atlas": ["2.1.0"],
+            "font-measure": ["1.2.2"],
+            "gl-util": ["3.1.3"],
+            "is-plain-obj": ["1.1.0"],
+            "regl": ["2.1.0"],
+            "typedarray-pool": ["1.2.0"],
+            "dup": ["1.0.0"],
+            "is-firefox": ["1.0.3"],
+            "number-is-integer": ["1.0.1"],
+            "weak-map": ["1.0.8"],
+            "is-finite": ["1.1.0"],
+            "css-font-size-keywords": ["1.0.0"],
+            "css-font-stretch-keywords": ["1.0.1"],
+            "css-font-style-keywords": ["1.0.1"],
+            "css-font-weight-keywords": ["1.0.0"],
+            "css-global-keywords": ["1.0.1"],
+            "css-system-font-keywords": ["1.0.0"],
+            "string-split-by": ["1.0.0"],
+            "unquote": ["1.1.1"],
+            "parenthesis": ["3.1.8"],
+            "is-string-blank": ["1.0.1"],
+            "d3-color": ["1.4.1"],
+            "d3-array": ["1.2.4"],
+            "d3-collection": ["1.0.7"],
+            "d3-dispatch": ["1.0.6"],
+            "d3-quadtree": ["1.0.7"],
+            "d3-timer": ["1.0.10"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "element-size": ["1.1.1"],
+            "@turf/helpers": ["6.5.0"],
+            "@turf/meta": ["6.5.0"],
+            "d3-shape": ["1.3.7"],
+            "elementary-circuits-directed-graph": ["1.3.1"],
+            "d3-path": ["1.0.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__polybooljs__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "polybooljs",
+        version = "1.2.0",
+        integrity = "sha512-mKjR5nolISvF+q2BtC1fi/llpxBPTQ3wLWN8+ldzdw2Hocpc8C72ZqnamCM4Z6z+68GVVjkeM01WJegQmZ8MEQ==",
+        transitive_closure = {
+            "polybooljs": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__potpack__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "potpack",
+        version = "1.0.2",
+        integrity = "sha512-choctRBIV9EMT9WGAZHn3V7t0Z2pMQyl0EZE6pFc/6ml3ssw7Dlf/oAOvFwjm1HVsqfQN8GfeFyJ+d8tRzqueQ==",
+        transitive_closure = {
+            "potpack": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__prelude-ls__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "prelude-ls",
+        version = "1.1.2",
+        integrity = "sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==",
+        transitive_closure = {
+            "prelude-ls": ["1.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__probe-image-size__7.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "probe-image-size",
+        version = "7.2.3",
+        integrity = "sha512-HubhG4Rb2UH8YtV4ba0Vp5bQ7L78RTONYu/ujmCu5nBI8wGv24s4E9xSKBi0N1MowRpxk76pFCpJtW0KPzOK0w==",
+        deps = {
+            "lodash.merge": "4.6.2",
+            "needle": "2.9.1",
+            "stream-parser": "0.3.1",
+        },
+        transitive_closure = {
+            "probe-image-size": ["7.2.3"],
+            "lodash.merge": ["4.6.2"],
+            "needle": ["2.9.1"],
+            "stream-parser": ["0.3.1"],
+            "debug": ["3.2.7", "2.6.9"],
+            "ms": ["2.1.3", "2.0.0"],
+            "iconv-lite": ["0.4.24"],
+            "sax": ["1.2.4"],
+            "safer-buffer": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__process-nextick-args__2.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "process-nextick-args",
+        version = "2.0.1",
+        integrity = "sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==",
+        transitive_closure = {
+            "process-nextick-args": ["2.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__protocol-buffers-schema__3.6.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "protocol-buffers-schema",
+        version = "3.6.0",
+        integrity = "sha512-TdDRD+/QNdrCGCE7v8340QyuXd4kIWIgapsE2+n/SaGiSSbomYl4TjHlvIoCWRpE7wFt02EpB35VVA2ImcBVqw==",
+        transitive_closure = {
+            "protocol-buffers-schema": ["3.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__pxls__2.3.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "pxls",
+        version = "2.3.2",
+        integrity = "sha512-pQkwgbLqWPcuES5iEmGa10OlCf5xG0blkIF3dg7PpRZShbTYcvAdfFfGL03SMrkaSUaa/V0UpN9HWg40O2AIIw==",
+        deps = {
+            "arr-flatten": "1.1.0",
+            "compute-dims": "1.1.0",
+            "flip-pixels": "1.0.2",
+            "is-browser": "2.1.0",
+            "is-buffer": "2.0.5",
+            "to-uint8": "1.4.1",
+        },
+        transitive_closure = {
+            "pxls": ["2.3.2"],
+            "arr-flatten": ["1.1.0"],
+            "compute-dims": ["1.1.0"],
+            "flip-pixels": ["1.0.2"],
+            "is-browser": ["2.1.0"],
+            "is-buffer": ["2.0.5"],
+            "to-uint8": ["1.4.1"],
+            "clamp": ["1.0.1"],
+            "is-base64": ["0.1.0"],
+            "is-float-array": ["1.0.0"],
+            "to-array-buffer": ["3.2.0"],
+            "flatten-vertex-data": ["1.0.2"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "dtype": ["2.0.0"],
+            "utils-copy": ["1.1.1"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-matrix-like": ["1.0.2"],
+            "validate.io-ndarray-like": ["1.0.0"],
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__quantize__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "quantize",
+        version = "1.0.2",
+        integrity = "sha512-25P7wI2UoDbIQsQp50ARkt+5pwPsOq7G/BqvT5xAbapnRoNWMN8/p55H9TXd5MuENiJnm5XICB2H2aDZGwts7w==",
+        transitive_closure = {
+            "quantize": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__quickselect__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "quickselect",
+        version = "2.0.0",
+        integrity = "sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==",
+        transitive_closure = {
+            "quickselect": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__raf__3.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "raf",
+        version = "3.4.1",
+        integrity = "sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==",
+        deps = {
+            "performance-now": "2.1.0",
+        },
+        transitive_closure = {
+            "raf": ["3.4.1"],
+            "performance-now": ["2.1.0"],
         },
     )
 
@@ -2600,6 +6362,58 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__readable-stream__1.0.34",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "readable-stream",
+        version = "1.0.34",
+        integrity = "sha512-ok1qVCJuRkNmvebYikljxJA/UEsKwLl2nI1OmaqAu4/UE+h0wKCHok4XkL/gvi39OacXvw59RJUOFUkDib2rHg==",
+        deps = {
+            "core-util-is": "1.0.3",
+            "inherits": "2.0.4",
+            "isarray": "0.0.1",
+            "string_decoder": "0.10.31",
+        },
+        transitive_closure = {
+            "readable-stream": ["1.0.34"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+        },
+    )
+
+    npm_import(
+        name = "npm__readable-stream__2.3.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "readable-stream",
+        version = "2.3.7",
+        integrity = "sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==",
+        deps = {
+            "core-util-is": "1.0.3",
+            "inherits": "2.0.4",
+            "isarray": "1.0.0",
+            "process-nextick-args": "2.0.1",
+            "safe-buffer": "5.1.2",
+            "string_decoder": "1.1.1",
+            "util-deprecate": "1.0.2",
+        },
+        transitive_closure = {
+            "readable-stream": ["2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.1.2"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__readdirp__3.6.0",
         root_package = "",
         link_workspace = "",
@@ -2617,6 +6431,507 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__regex-regex__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regex-regex",
+        version = "1.0.0",
+        integrity = "sha512-FPbEhFTLpxKNgHKay3zMfkHzFK2ebViAlyvsz5euO4kwekH0T6fAL4Sdo2CgQ7Y1tGB5HqQm8SBq7pW5GegvVA==",
+        transitive_closure = {
+            "regex-regex": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__regl-error2d__2.0.12",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regl-error2d",
+        version = "2.0.12",
+        integrity = "sha512-r7BUprZoPO9AbyqM5qlJesrSRkl+hZnVKWKsVp7YhOl/3RIpi4UDGASGJY0puQ96u5fBYw/OlqV24IGcgJ0McA==",
+        deps = {
+            "array-bounds": "1.0.1",
+            "color-normalize": "1.5.0",
+            "flatten-vertex-data": "1.0.2",
+            "object-assign": "4.1.1",
+            "pick-by-alias": "1.2.0",
+            "to-float32": "1.1.0",
+            "update-diff": "1.1.0",
+        },
+        transitive_closure = {
+            "regl-error2d": ["2.0.12"],
+            "array-bounds": ["1.0.1"],
+            "color-normalize": ["1.5.0"],
+            "flatten-vertex-data": ["1.0.2"],
+            "object-assign": ["4.1.1"],
+            "pick-by-alias": ["1.2.0"],
+            "to-float32": ["1.1.0"],
+            "update-diff": ["1.1.0"],
+            "dtype": ["2.0.0"],
+            "clamp": ["1.0.1"],
+            "color-rgba": ["2.1.1"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__regl-line2d__3.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regl-line2d",
+        version = "3.1.2",
+        integrity = "sha512-nmT7WWS/WxmXAQMkgaMKWXaVmwJ65KCrjbqHGOUjjqQi6shfT96YbBOvelXwO9hG7/hjvbzjtQ2UO0L3e7YaXQ==",
+        deps = {
+            "array-bounds": "1.0.1",
+            "array-find-index": "1.0.2",
+            "array-normalize": "1.1.4",
+            "color-normalize": "1.5.0",
+            "earcut": "2.2.3",
+            "es6-weak-map": "2.0.3",
+            "flatten-vertex-data": "1.0.2",
+            "glslify": "7.1.1",
+            "object-assign": "4.1.1",
+            "parse-rect": "1.2.0",
+            "pick-by-alias": "1.2.0",
+            "to-float32": "1.1.0",
+        },
+        transitive_closure = {
+            "regl-line2d": ["3.1.2"],
+            "array-bounds": ["1.0.1"],
+            "array-find-index": ["1.0.2"],
+            "array-normalize": ["1.1.4"],
+            "color-normalize": ["1.5.0"],
+            "earcut": ["2.2.3"],
+            "es6-weak-map": ["2.0.3"],
+            "flatten-vertex-data": ["1.0.2"],
+            "glslify": ["7.1.1"],
+            "object-assign": ["4.1.1"],
+            "parse-rect": ["1.2.0"],
+            "pick-by-alias": ["1.2.0"],
+            "to-float32": ["1.1.0"],
+            "bl": ["2.2.1"],
+            "concat-stream": ["1.6.2"],
+            "duplexify": ["3.7.1"],
+            "falafel": ["2.2.5"],
+            "from2": ["2.3.0"],
+            "glsl-resolve": ["0.0.1"],
+            "glsl-token-whitespace-trim": ["1.0.0"],
+            "glslify-bundle": ["5.1.1"],
+            "glslify-deps": ["1.3.2"],
+            "minimist": ["1.2.6"],
+            "resolve": ["0.6.3", "1.22.0"],
+            "stack-trace": ["0.0.9"],
+            "static-eval": ["2.1.0"],
+            "through2": ["0.6.5", "2.0.5"],
+            "xtend": ["2.2.0", "4.0.2"],
+            "readable-stream": ["1.0.34", "2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["2.0.5", "0.0.1", "1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.2.1", "5.1.2"],
+            "string_decoder": ["0.10.31", "1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "@choojs/findup": ["0.2.1"],
+            "events": ["3.3.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "map-limit": ["0.0.1"],
+            "once": ["1.4.0", "1.3.3"],
+            "wrappy": ["1.0.2"],
+            "commander": ["2.20.3"],
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-scope": ["1.1.2"],
+            "glsl-token-string": ["1.0.1"],
+            "murmurhash-js": ["1.0.0"],
+            "shallow-copy": ["0.0.1"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-inject-block": ["1.1.0"],
+            "acorn": ["7.4.1"],
+            "end-of-stream": ["1.4.4"],
+            "stream-shift": ["1.0.1"],
+            "buffer-from": ["1.1.2"],
+            "typedarray": ["0.0.6"],
+            "dtype": ["2.0.0"],
+            "d": ["1.0.1"],
+            "es5-ext": ["0.10.61"],
+            "es6-iterator": ["2.0.3"],
+            "es6-symbol": ["3.1.3"],
+            "ext": ["1.6.0"],
+            "type": ["1.2.0", "2.6.0"],
+            "next-tick": ["1.1.0"],
+            "clamp": ["1.0.1"],
+            "color-rgba": ["2.1.1"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__regl-scatter2d__3.2.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regl-scatter2d",
+        version = "3.2.8",
+        integrity = "sha512-bqrqJyeHkGBa9mEfuBnRd7FUtdtZ1l+gsM2C5Ugr1U3vJG5K3mdWdVWtOAllZ5FHHyWJV/vgjVvftgFUg6CDig==",
+        deps = {
+            "@plotly/point-cluster": "3.1.9",
+            "array-range": "1.0.1",
+            "array-rearrange": "2.2.2",
+            "clamp": "1.0.1",
+            "color-id": "1.1.0",
+            "color-normalize": "1.5.0",
+            "color-rgba": "2.1.1",
+            "flatten-vertex-data": "1.0.2",
+            "glslify": "7.1.1",
+            "image-palette": "2.1.0",
+            "is-iexplorer": "1.0.0",
+            "object-assign": "4.1.1",
+            "parse-rect": "1.2.0",
+            "pick-by-alias": "1.2.0",
+            "to-float32": "1.1.0",
+            "update-diff": "1.1.0",
+        },
+        transitive_closure = {
+            "regl-scatter2d": ["3.2.8"],
+            "@plotly/point-cluster": ["3.1.9"],
+            "array-range": ["1.0.1"],
+            "array-rearrange": ["2.2.2"],
+            "clamp": ["1.0.1"],
+            "color-id": ["1.1.0"],
+            "color-normalize": ["1.5.0"],
+            "color-rgba": ["2.1.1"],
+            "flatten-vertex-data": ["1.0.2"],
+            "glslify": ["7.1.1"],
+            "image-palette": ["2.1.0"],
+            "is-iexplorer": ["1.0.0"],
+            "object-assign": ["4.1.1"],
+            "parse-rect": ["1.2.0"],
+            "pick-by-alias": ["1.2.0"],
+            "to-float32": ["1.1.0"],
+            "update-diff": ["1.1.0"],
+            "pxls": ["2.3.2"],
+            "quantize": ["1.0.2"],
+            "arr-flatten": ["1.1.0"],
+            "compute-dims": ["1.1.0"],
+            "flip-pixels": ["1.0.2"],
+            "is-browser": ["2.1.0"],
+            "is-buffer": ["2.0.5"],
+            "to-uint8": ["1.4.1"],
+            "is-base64": ["0.1.0"],
+            "is-float-array": ["1.0.0"],
+            "to-array-buffer": ["3.2.0"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "utils-copy": ["1.1.1"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-matrix-like": ["1.0.2"],
+            "validate.io-ndarray-like": ["1.0.0"],
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+            "bl": ["2.2.1"],
+            "concat-stream": ["1.6.2"],
+            "duplexify": ["3.7.1"],
+            "falafel": ["2.2.5"],
+            "from2": ["2.3.0"],
+            "glsl-resolve": ["0.0.1"],
+            "glsl-token-whitespace-trim": ["1.0.0"],
+            "glslify-bundle": ["5.1.1"],
+            "glslify-deps": ["1.3.2"],
+            "minimist": ["1.2.6"],
+            "resolve": ["0.6.3", "1.22.0"],
+            "stack-trace": ["0.0.9"],
+            "static-eval": ["2.1.0"],
+            "through2": ["0.6.5", "2.0.5"],
+            "xtend": ["2.2.0", "4.0.2"],
+            "readable-stream": ["1.0.34", "2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["2.0.5", "0.0.1", "1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.2.1", "5.1.2"],
+            "string_decoder": ["0.10.31", "1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "@choojs/findup": ["0.2.1"],
+            "events": ["3.3.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "map-limit": ["0.0.1"],
+            "once": ["1.4.0", "1.3.3"],
+            "wrappy": ["1.0.2"],
+            "commander": ["2.20.3"],
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-scope": ["1.1.2"],
+            "glsl-token-string": ["1.0.1"],
+            "murmurhash-js": ["1.0.0"],
+            "shallow-copy": ["0.0.1"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-inject-block": ["1.1.0"],
+            "acorn": ["7.4.1"],
+            "end-of-stream": ["1.4.4"],
+            "stream-shift": ["1.0.1"],
+            "buffer-from": ["1.1.2"],
+            "typedarray": ["0.0.6"],
+            "dtype": ["2.0.0"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+            "array-bounds": ["1.0.1"],
+            "binary-search-bounds": ["2.0.5"],
+            "is-obj": ["1.0.1"],
+            "math-log2": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__regl-splom__1.0.14",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regl-splom",
+        version = "1.0.14",
+        integrity = "sha512-OiLqjmPRYbd7kDlHC6/zDf6L8lxgDC65BhC8JirhP4ykrK4x22ZyS+BnY8EUinXKDeMgmpRwCvUmk7BK4Nweuw==",
+        deps = {
+            "array-bounds": "1.0.1",
+            "array-range": "1.0.1",
+            "color-alpha": "1.0.4",
+            "flatten-vertex-data": "1.0.2",
+            "parse-rect": "1.2.0",
+            "pick-by-alias": "1.2.0",
+            "raf": "3.4.1",
+            "regl-scatter2d": "3.2.8",
+        },
+        transitive_closure = {
+            "regl-splom": ["1.0.14"],
+            "array-bounds": ["1.0.1"],
+            "array-range": ["1.0.1"],
+            "color-alpha": ["1.0.4"],
+            "flatten-vertex-data": ["1.0.2"],
+            "parse-rect": ["1.2.0"],
+            "pick-by-alias": ["1.2.0"],
+            "raf": ["3.4.1"],
+            "regl-scatter2d": ["3.2.8"],
+            "@plotly/point-cluster": ["3.1.9"],
+            "array-rearrange": ["2.2.2"],
+            "clamp": ["1.0.1"],
+            "color-id": ["1.1.0"],
+            "color-normalize": ["1.5.0"],
+            "color-rgba": ["2.1.1"],
+            "glslify": ["7.1.1"],
+            "image-palette": ["2.1.0"],
+            "is-iexplorer": ["1.0.0"],
+            "object-assign": ["4.1.1"],
+            "to-float32": ["1.1.0"],
+            "update-diff": ["1.1.0"],
+            "pxls": ["2.3.2"],
+            "quantize": ["1.0.2"],
+            "arr-flatten": ["1.1.0"],
+            "compute-dims": ["1.1.0"],
+            "flip-pixels": ["1.0.2"],
+            "is-browser": ["2.1.0"],
+            "is-buffer": ["2.0.5"],
+            "to-uint8": ["1.4.1"],
+            "is-base64": ["0.1.0"],
+            "is-float-array": ["1.0.0"],
+            "to-array-buffer": ["3.2.0"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "utils-copy": ["1.1.1"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-matrix-like": ["1.0.2"],
+            "validate.io-ndarray-like": ["1.0.0"],
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+            "bl": ["2.2.1"],
+            "concat-stream": ["1.6.2"],
+            "duplexify": ["3.7.1"],
+            "falafel": ["2.2.5"],
+            "from2": ["2.3.0"],
+            "glsl-resolve": ["0.0.1"],
+            "glsl-token-whitespace-trim": ["1.0.0"],
+            "glslify-bundle": ["5.1.1"],
+            "glslify-deps": ["1.3.2"],
+            "minimist": ["1.2.6"],
+            "resolve": ["0.6.3", "1.22.0"],
+            "stack-trace": ["0.0.9"],
+            "static-eval": ["2.1.0"],
+            "through2": ["0.6.5", "2.0.5"],
+            "xtend": ["2.2.0", "4.0.2"],
+            "readable-stream": ["1.0.34", "2.3.7"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["2.0.5", "0.0.1", "1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.2.1", "5.1.2"],
+            "string_decoder": ["0.10.31", "1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "@choojs/findup": ["0.2.1"],
+            "events": ["3.3.0"],
+            "glsl-tokenizer": ["2.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "map-limit": ["0.0.1"],
+            "once": ["1.4.0", "1.3.3"],
+            "wrappy": ["1.0.2"],
+            "commander": ["2.20.3"],
+            "glsl-inject-defines": ["1.0.3"],
+            "glsl-token-defines": ["1.0.0"],
+            "glsl-token-depth": ["1.1.2"],
+            "glsl-token-descope": ["1.0.2"],
+            "glsl-token-scope": ["1.1.2"],
+            "glsl-token-string": ["1.0.1"],
+            "murmurhash-js": ["1.0.0"],
+            "shallow-copy": ["0.0.1"],
+            "glsl-token-assignments": ["2.0.2"],
+            "glsl-token-properties": ["1.0.1"],
+            "glsl-token-inject-block": ["1.1.0"],
+            "acorn": ["7.4.1"],
+            "end-of-stream": ["1.4.4"],
+            "stream-shift": ["1.0.1"],
+            "buffer-from": ["1.1.2"],
+            "typedarray": ["0.0.6"],
+            "color-parse": ["1.3.8"],
+            "color-space": ["1.16.0"],
+            "hsluv": ["0.0.3"],
+            "mumath": ["3.3.4"],
+            "almost-equal": ["1.1.0"],
+            "color-name": ["1.1.4"],
+            "defined": ["1.0.0"],
+            "is-plain-obj": ["1.1.0"],
+            "dtype": ["2.0.0"],
+            "binary-search-bounds": ["2.0.5"],
+            "is-obj": ["1.0.1"],
+            "math-log2": ["1.0.1"],
+            "performance-now": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__regl__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regl",
+        version = "2.1.0",
+        integrity = "sha512-oWUce/aVoEvW5l2V0LK7O5KJMzUSKeiOwFuJehzpSFd43dO5spP9r+sSUfhKtsky4u6MCqWJaRL+abzExynfTg==",
+        transitive_closure = {
+            "regl": ["2.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__require-directory__2.1.1",
         root_package = "",
         link_workspace = "",
@@ -2626,6 +6941,36 @@ def npm_repositories():
         integrity = "sha1-jGStX9MNqxyXbiNE/+f3kqam30I=",
         transitive_closure = {
             "require-directory": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__resolve-protobuf-schema__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "resolve-protobuf-schema",
+        version = "2.1.0",
+        integrity = "sha512-kI5ffTiZWmJaS/huM8wZfEMer1eRd7oJQhDuxeCLe3t7N7mX3z94CN0xPxBQxFYQTSNz9T0i+v6inKqSdK8xrQ==",
+        deps = {
+            "protocol-buffers-schema": "3.6.0",
+        },
+        transitive_closure = {
+            "resolve-protobuf-schema": ["2.1.0"],
+            "protocol-buffers-schema": ["3.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__resolve__0.6.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "resolve",
+        version = "0.6.3",
+        integrity = "sha512-UHBY3viPlJKf85YijDUcikKX6tmF4SokIDp518ZDVT92JNDcG5uKIthaT/owt3Sar0lwtOafsQuwrg22/v2Dwg==",
+        transitive_closure = {
+            "resolve": ["0.6.3"],
         },
     )
 
@@ -2653,6 +6998,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__right-now__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "right-now",
+        version = "1.0.0",
+        integrity = "sha512-DA8+YS+sMIVpbsuKgy+Z67L9Lxb1p05mNxRpDPNksPDEFir4vmBlUtuN9jkTGn9YMMdlBuK7XQgFiz6ws+yhSg==",
+        transitive_closure = {
+            "right-now": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__rollup__2.70.2",
         root_package = "",
         link_workspace = "",
@@ -2668,6 +7026,19 @@ def npm_repositories():
         transitive_closure = {
             "rollup": ["2.70.2"],
             "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__rw__1.3.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "rw",
+        version = "1.3.3",
+        integrity = "sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==",
+        transitive_closure = {
+            "rw": ["1.3.3"],
         },
     )
 
@@ -2689,6 +7060,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__safe-buffer__5.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "safe-buffer",
+        version = "5.1.2",
+        integrity = "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==",
+        transitive_closure = {
+            "safe-buffer": ["5.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__safe-buffer__5.2.1",
         root_package = "",
         link_workspace = "",
@@ -2698,6 +7082,32 @@ def npm_repositories():
         integrity = "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==",
         transitive_closure = {
             "safe-buffer": ["5.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__safer-buffer__2.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "safer-buffer",
+        version = "2.1.2",
+        integrity = "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==",
+        transitive_closure = {
+            "safer-buffer": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__sax__1.2.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "sax",
+        version = "1.2.4",
+        integrity = "sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==",
+        transitive_closure = {
+            "sax": ["1.2.4"],
         },
     )
 
@@ -2716,6 +7126,32 @@ def npm_repositories():
             "serialize-javascript": ["6.0.0"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__shallow-copy__0.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "shallow-copy",
+        version = "0.0.1",
+        integrity = "sha1-QV9CcC1z2BAzApLMXuhurhoRoXA=",
+        transitive_closure = {
+            "shallow-copy": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__signum__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "signum",
+        version = "1.0.0",
+        integrity = "sha512-yodFGwcyt59XRh7w5W3jPcIQb3Bwi21suEfT7MAWnBX3iCdklJpgDgvGT9o04UonglZN5SNMfJFkHIR/jO8GHw==",
+        transitive_closure = {
+            "signum": ["1.0.0"],
         },
     )
 
@@ -2741,6 +7177,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__source-map__0.6.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "source-map",
+        version = "0.6.1",
+        integrity = "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
+        transitive_closure = {
+            "source-map": ["0.6.1"],
+        },
+        run_lifecycle_hooks = True,
+    )
+
+    npm_import(
         name = "npm__sourcemap-codec__1.4.8",
         root_package = "",
         link_workspace = "",
@@ -2750,6 +7200,114 @@ def npm_repositories():
         integrity = "sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==",
         transitive_closure = {
             "sourcemap-codec": ["1.4.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__stack-trace__0.0.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "stack-trace",
+        version = "0.0.9",
+        integrity = "sha1-qPbq7KkGdMMz58Q5U/J1tFFRBpU=",
+        transitive_closure = {
+            "stack-trace": ["0.0.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__static-eval__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "static-eval",
+        version = "2.1.0",
+        integrity = "sha512-agtxZ/kWSsCkI5E4QifRwsaPs0P0JmZV6dkLz6ILYfFYQGn+5plctanRN+IC8dJRiFkyXHrwEE3W9Wmx67uDbw==",
+        deps = {
+            "escodegen": "1.14.3",
+        },
+        transitive_closure = {
+            "static-eval": ["2.1.0"],
+            "escodegen": ["1.14.3"],
+            "esprima": ["4.0.1"],
+            "estraverse": ["4.3.0"],
+            "esutils": ["2.0.3"],
+            "optionator": ["0.8.3"],
+            "source-map": ["0.6.1"],
+            "deep-is": ["0.1.4"],
+            "fast-levenshtein": ["2.0.6"],
+            "levn": ["0.3.0"],
+            "prelude-ls": ["1.1.2"],
+            "type-check": ["0.3.2"],
+            "word-wrap": ["1.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__stream-parser__0.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "stream-parser",
+        version = "0.3.1",
+        integrity = "sha512-bJ/HgKq41nlKvlhccD5kaCr/P+Hu0wPNKPJOH7en+YrJu/9EgqUF+88w5Jb6KNcjOFMhfX4B2asfeAtIGuHObQ==",
+        deps = {
+            "debug": "2.6.9",
+        },
+        transitive_closure = {
+            "stream-parser": ["0.3.1"],
+            "debug": ["2.6.9"],
+            "ms": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__stream-shift__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "stream-shift",
+        version = "1.0.1",
+        integrity = "sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==",
+        transitive_closure = {
+            "stream-shift": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__string-split-by__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "string-split-by",
+        version = "1.0.0",
+        integrity = "sha512-KaJKY+hfpzNyet/emP81PJA9hTVSfxNLS9SFTWxdCnnW1/zOOwiV248+EfoX7IQFcBaOp4G5YE6xTJMF+pLg6A==",
+        deps = {
+            "parenthesis": "3.1.8",
+        },
+        transitive_closure = {
+            "string-split-by": ["1.0.0"],
+            "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__string-to-arraybuffer__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "string-to-arraybuffer",
+        version = "1.0.2",
+        integrity = "sha512-DaGZidzi93dwjQen5I2osxR9ERS/R7B1PFyufNMnzhj+fmlDQAc1DSDIJVJhgI8Oq221efIMbABUBdPHDRt43Q==",
+        deps = {
+            "atob-lite": "2.0.0",
+            "is-base64": "0.1.0",
+        },
+        transitive_closure = {
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "is-base64": ["0.1.0"],
         },
     )
 
@@ -2772,6 +7330,36 @@ def npm_repositories():
             "is-fullwidth-code-point": ["3.0.0"],
             "strip-ansi": ["6.0.1"],
             "ansi-regex": ["5.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__string_decoder__0.10.31",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "string_decoder",
+        version = "0.10.31",
+        integrity = "sha512-ev2QzSzWPYmy9GuqfIVildA4OdcGLeFZQrq5ys6RtiuF+RQQiZWr8TZNyAcuVXyQRYfEO+MsoB/1BuQVhOJuoQ==",
+        transitive_closure = {
+            "string_decoder": ["0.10.31"],
+        },
+    )
+
+    npm_import(
+        name = "npm__string_decoder__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "string_decoder",
+        version = "1.1.1",
+        integrity = "sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==",
+        deps = {
+            "safe-buffer": "5.1.2",
+        },
+        transitive_closure = {
+            "string_decoder": ["1.1.1"],
+            "safe-buffer": ["5.1.2"],
         },
     )
 
@@ -2802,6 +7390,49 @@ def npm_repositories():
         integrity = "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==",
         transitive_closure = {
             "strip-json-comments": ["3.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__strongly-connected-components__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "strongly-connected-components",
+        version = "1.0.1",
+        integrity = "sha512-i0TFx4wPcO0FwX+4RkLJi1MxmcTv90jNZgxMu9XRnMXMeFUY1VJlIoXpZunPUvUUqbCT1pg5PEkFqqpcaElNaA==",
+        transitive_closure = {
+            "strongly-connected-components": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__supercluster__7.1.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "supercluster",
+        version = "7.1.5",
+        integrity = "sha512-EulshI3pGUM66o6ZdH3ReiFcvHpM3vAigyK+vcxdjpJyEbIIrtbmBdY23mGgnI24uXiGFvrGq9Gkum/8U7vJWg==",
+        deps = {
+            "kdbush": "3.0.0",
+        },
+        transitive_closure = {
+            "supercluster": ["7.1.5"],
+            "kdbush": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__superscript-text__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "superscript-text",
+        version = "1.0.0",
+        integrity = "sha512-gwu8l5MtRZ6koO0icVTlmN5pm7Dhh1+Xpe9O4x6ObMAsW+3jPbW14d1DsBq1F4wiI+WOFjXF35pslgec/G8yCQ==",
+        transitive_closure = {
+            "superscript-text": ["1.0.0"],
         },
     )
 
@@ -2853,6 +7484,200 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__svg-arc-to-cubic-bezier__3.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "svg-arc-to-cubic-bezier",
+        version = "3.2.0",
+        integrity = "sha512-djbJ/vZKZO+gPoSDThGNpKDO+o+bAeA4XQKovvkNCqnIS2t+S4qnLAGQhyyrulhCFRl1WWzAp0wUDV8PpTVU3g==",
+        transitive_closure = {
+            "svg-arc-to-cubic-bezier": ["3.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__svg-path-bounds__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "svg-path-bounds",
+        version = "1.0.2",
+        integrity = "sha512-H4/uAgLWrppIC0kHsb2/dWUYSmb4GE5UqH06uqWBcg6LBjX2fu0A8+JrO2/FJPZiSsNOKZAhyFFgsLTdYUvSqQ==",
+        deps = {
+            "abs-svg-path": "0.1.1",
+            "is-svg-path": "1.0.2",
+            "normalize-svg-path": "1.1.0",
+            "parse-svg-path": "0.1.2",
+        },
+        transitive_closure = {
+            "svg-path-bounds": ["1.0.2"],
+            "abs-svg-path": ["0.1.1"],
+            "is-svg-path": ["1.0.2"],
+            "normalize-svg-path": ["1.1.0"],
+            "parse-svg-path": ["0.1.2"],
+            "svg-arc-to-cubic-bezier": ["3.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__svg-path-sdf__1.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "svg-path-sdf",
+        version = "1.1.3",
+        integrity = "sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==",
+        deps = {
+            "bitmap-sdf": "1.0.4",
+            "draw-svg-path": "1.0.0",
+            "is-svg-path": "1.0.2",
+            "parse-svg-path": "0.1.2",
+            "svg-path-bounds": "1.0.2",
+        },
+        transitive_closure = {
+            "svg-path-sdf": ["1.1.3"],
+            "bitmap-sdf": ["1.0.4"],
+            "draw-svg-path": ["1.0.0"],
+            "is-svg-path": ["1.0.2"],
+            "parse-svg-path": ["0.1.2"],
+            "svg-path-bounds": ["1.0.2"],
+            "abs-svg-path": ["0.1.1"],
+            "normalize-svg-path": ["0.1.0", "1.1.0"],
+            "svg-arc-to-cubic-bezier": ["3.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__through2__0.6.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "through2",
+        version = "0.6.5",
+        integrity = "sha512-RkK/CCESdTKQZHdmKICijdKKsCRVHs5KsLZ6pACAmF/1GPUQhonHSXWNERctxEp7RmvjdNbZTL5z9V7nSCXKcg==",
+        deps = {
+            "readable-stream": "1.0.34",
+            "xtend": "4.0.2",
+        },
+        transitive_closure = {
+            "through2": ["0.6.5"],
+            "readable-stream": ["1.0.34"],
+            "xtend": ["4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["0.0.1"],
+            "string_decoder": ["0.10.31"],
+        },
+    )
+
+    npm_import(
+        name = "npm__through2__2.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "through2",
+        version = "2.0.5",
+        integrity = "sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==",
+        deps = {
+            "readable-stream": "2.3.7",
+            "xtend": "4.0.2",
+        },
+        transitive_closure = {
+            "through2": ["2.0.5"],
+            "readable-stream": ["2.3.7"],
+            "xtend": ["4.0.2"],
+            "core-util-is": ["1.0.3"],
+            "inherits": ["2.0.4"],
+            "isarray": ["1.0.0"],
+            "process-nextick-args": ["2.0.1"],
+            "safe-buffer": ["5.1.2"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__tinycolor2__1.4.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tinycolor2",
+        version = "1.4.2",
+        integrity = "sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==",
+        transitive_closure = {
+            "tinycolor2": ["1.4.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__tinyqueue__2.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tinyqueue",
+        version = "2.0.3",
+        integrity = "sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==",
+        transitive_closure = {
+            "tinyqueue": ["2.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__to-array-buffer__3.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "to-array-buffer",
+        version = "3.2.0",
+        integrity = "sha512-zN33mwi0gpL+7xW1ITLfJ48CEj6ZQW0ZAP0MU+2W3kEY0PAIncyuxmD4OqkUVhPAbTP7amq9j/iwvZKYS+lzSQ==",
+        deps = {
+            "flatten-vertex-data": "1.0.2",
+            "is-blob": "2.1.0",
+            "string-to-arraybuffer": "1.0.2",
+        },
+        transitive_closure = {
+            "to-array-buffer": ["3.2.0"],
+            "flatten-vertex-data": ["1.0.2"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "is-base64": ["0.1.0"],
+            "dtype": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__to-float32__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "to-float32",
+        version = "1.1.0",
+        integrity = "sha512-keDnAusn/vc+R3iEiSDw8TOF7gPiTLdK1ArvWtYbJQiVfmRg6i/CAvbKq3uIS0vWroAC7ZecN3DjQKw3aSklUg==",
+        transitive_closure = {
+            "to-float32": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__to-px__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "to-px",
+        version = "1.0.1",
+        integrity = "sha512-2y3LjBeIZYL19e5gczp14/uRWFDtDUErJPVN3VU9a7SJO+RjGRtYR47aMN2bZgGlxvW4ZcEz2ddUPVHXcMfuXw==",
+        deps = {
+            "parse-unit": "1.0.1",
+        },
+        transitive_closure = {
+            "to-px": ["1.0.1"],
+            "parse-unit": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__to-regex-range__5.0.1",
         root_package = "",
         link_workspace = "",
@@ -2870,6 +7695,53 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__to-uint8__1.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "to-uint8",
+        version = "1.4.1",
+        integrity = "sha512-o+ochsMlTZyucbww8It401FC2Rx+OP2RpDeYbA6h+y9HgedDl1UjdsJ9CmzKEG7AFP9es5PmJ4eDWeeeXihESg==",
+        deps = {
+            "arr-flatten": "1.1.0",
+            "clamp": "1.0.1",
+            "is-base64": "0.1.0",
+            "is-float-array": "1.0.0",
+            "to-array-buffer": "3.2.0",
+        },
+        transitive_closure = {
+            "to-uint8": ["1.4.1"],
+            "arr-flatten": ["1.1.0"],
+            "clamp": ["1.0.1"],
+            "is-base64": ["0.1.0"],
+            "is-float-array": ["1.0.0"],
+            "to-array-buffer": ["3.2.0"],
+            "flatten-vertex-data": ["1.0.2"],
+            "is-blob": ["2.1.0"],
+            "string-to-arraybuffer": ["1.0.2"],
+            "atob-lite": ["2.0.0"],
+            "dtype": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__topojson-client__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "topojson-client",
+        version = "3.1.0",
+        integrity = "sha512-605uxS6bcYxGXw9qi62XyrV6Q3xwbndjachmNxu8HWTtVPxZfEJN9fd/SZS1Q54Sn2y0TMyMxFj/cJINqGHrKw==",
+        deps = {
+            "commander": "2.20.3",
+        },
+        transitive_closure = {
+            "topojson-client": ["3.1.0"],
+            "commander": ["2.20.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__totalist__1.1.0",
         root_package = "",
         link_workspace = "",
@@ -2879,6 +7751,94 @@ def npm_repositories():
         integrity = "sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==",
         transitive_closure = {
             "totalist": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__type-check__0.3.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "type-check",
+        version = "0.3.2",
+        integrity = "sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==",
+        deps = {
+            "prelude-ls": "1.1.2",
+        },
+        transitive_closure = {
+            "type-check": ["0.3.2"],
+            "prelude-ls": ["1.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__type-name__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "type-name",
+        version = "2.0.2",
+        integrity = "sha512-kkgkuqR/jKdKO5oh/I2SMu2dGbLXoJq0zkdgbxaqYK+hr9S9edwVVGf+tMUFTx2gH9TN2+Zu9JZ/Njonb3cjhA==",
+        transitive_closure = {
+            "type-name": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__type__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "type",
+        version = "1.2.0",
+        integrity = "sha512-+5nt5AAniqsCnu2cEQQdpzCAh33kVx8n0VoFidKpB1dVVLAN/F+bgVOqOJqOnEnrhp222clB5p3vUlD+1QAnfg==",
+        transitive_closure = {
+            "type": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__type__2.6.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "type",
+        version = "2.6.0",
+        integrity = "sha512-eiDBDOmkih5pMbo9OqsqPRGMljLodLcwd5XD5JbtNB0o89xZAwynY9EdCDsJU7LtcVCClu9DvM7/0Ep1hYX3EQ==",
+        transitive_closure = {
+            "type": ["2.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__typedarray-pool__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "typedarray-pool",
+        version = "1.2.0",
+        integrity = "sha512-YTSQbzX43yvtpfRtIDAYygoYtgT+Rpjuxy9iOpczrjpXLgGoyG7aS5USJXV2d3nn8uHTeb9rXDvzS27zUg5KYQ==",
+        deps = {
+            "bit-twiddle": "1.0.2",
+            "dup": "1.0.0",
+        },
+        transitive_closure = {
+            "typedarray-pool": ["1.2.0"],
+            "bit-twiddle": ["1.0.2"],
+            "dup": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__typedarray__0.0.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "typedarray",
+        version = "0.0.6",
+        integrity = "sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==",
+        transitive_closure = {
+            "typedarray": ["0.0.6"],
         },
     )
 
@@ -2898,6 +7858,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__unquote__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "unquote",
+        version = "1.1.1",
+        integrity = "sha512-vRCqFv6UhXpWxZPyGDh/F3ZpNv8/qo7w6iufLpQg9aKnQ71qM4B5KiI7Mia9COcjEhrO9LueHpMYjYzsWH3OIg==",
+        transitive_closure = {
+            "unquote": ["1.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__unused__0.2.2",
         root_package = "",
         link_workspace = "",
@@ -2906,7 +7879,7 @@ def npm_repositories():
         },
         package = "unused",
         version = "0.2.2",
-        integrity = "sha1-zhJIBInz3ZPRDxt6yDzA1YQj6qA=",
+        integrity = "sha512-u8P6WPj2iObTiHcXn60TYfVaB6wAmvP92Dd+vdV2UTi7pNnjliL6MkGEK23ahTydZyxb7KJQrblYS7Cn6av03Q==",
         deps = {
             "esprima": "1.0.0",
             "optimist": "0.6.0",
@@ -2917,6 +7890,147 @@ def npm_repositories():
             "optimist": ["0.6.0"],
             "minimist": ["0.0.10"],
             "wordwrap": ["0.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__update-diff__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "update-diff",
+        version = "1.1.0",
+        integrity = "sha512-rCiBPiHxZwT4+sBhEbChzpO5hYHjm91kScWgdHf4Qeafs6Ba7MBl+d9GlGv72bcTZQO0sLmtQS1pHSWoCLtN/A==",
+        transitive_closure = {
+            "update-diff": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__util-deprecate__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "util-deprecate",
+        version = "1.0.2",
+        integrity = "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
+        transitive_closure = {
+            "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__utils-copy-error__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "utils-copy-error",
+        version = "1.0.1",
+        integrity = "sha512-RbJcGPZ6Ru2HQk9SWkvbdWNPX58pt4MO5uXsOQRu4LEGWB3LglkRrmnE/Ph1qWg6ywQ0qj95wTz1OeqQ2l8DCA==",
+        deps = {
+            "object-keys": "1.1.1",
+            "utils-copy": "1.1.1",
+        },
+        transitive_closure = {
+            "utils-copy-error": ["1.0.1"],
+            "object-keys": ["1.1.1"],
+            "utils-copy": ["1.1.1"],
+            "const-pinf-float64": ["1.0.0"],
+            "type-name": ["2.0.2"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__utils-copy__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "utils-copy",
+        version = "1.1.1",
+        integrity = "sha512-+NhJVV+PcxjdpkMrVTqXhQHPldlFGca5XR9YnGyNn7kQ0fMi+DqNLzdnhJ4TJ1HNy/HzB7c+FPg3y+4icY99ZA==",
+        deps = {
+            "const-pinf-float64": "1.0.0",
+            "object-keys": "1.1.1",
+            "type-name": "2.0.2",
+            "utils-copy-error": "1.0.1",
+            "utils-indexof": "1.0.0",
+            "utils-regex-from-string": "1.0.0",
+            "validate.io-array": "1.0.6",
+            "validate.io-buffer": "1.0.2",
+            "validate.io-nonnegative-integer": "1.0.0",
+        },
+        transitive_closure = {
+            "utils-copy": ["1.1.1"],
+            "const-pinf-float64": ["1.0.0"],
+            "object-keys": ["1.1.1"],
+            "type-name": ["2.0.2"],
+            "utils-copy-error": ["1.0.1"],
+            "utils-indexof": ["1.0.0"],
+            "utils-regex-from-string": ["1.0.0"],
+            "validate.io-array": ["1.0.6"],
+            "validate.io-buffer": ["1.0.2"],
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__utils-indexof__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "utils-indexof",
+        version = "1.0.0",
+        integrity = "sha512-76QBfRJpn4A0P5uTO1x00x+Yog36w2Pab0n+aT9UfUvVa4l+e8k3p7YwNpDvfQ6+aKGZdxZpxcNotNS4YjFcyg==",
+        deps = {
+            "validate.io-array-like": "1.0.2",
+            "validate.io-integer-primitive": "1.0.0",
+        },
+        transitive_closure = {
+            "utils-indexof": ["1.0.0"],
+            "validate.io-array-like": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+            "const-max-uint32": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__utils-regex-from-string__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "utils-regex-from-string",
+        version = "1.0.0",
+        integrity = "sha512-xKfdmEF19iUu9TKxFiohQUlQTuqYdV80/CxHiudVI37iEV/OA4HHlXZoc4qvuO1B74EcBVpErBreRO/dpdLeYA==",
+        deps = {
+            "regex-regex": "1.0.0",
+            "validate.io-string-primitive": "1.0.1",
+        },
+        transitive_closure = {
+            "utils-regex-from-string": ["1.0.0"],
+            "regex-regex": ["1.0.0"],
+            "validate.io-string-primitive": ["1.0.1"],
         },
     )
 
@@ -2958,6 +8072,241 @@ def npm_repositories():
             "kleur": ["4.1.4"],
             "sade": ["1.8.1"],
             "mri": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-array-like__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-array-like",
+        version = "1.0.2",
+        integrity = "sha512-rGLiN0cvY9OWzQcWP+RtqZR/MK9RUz3gKDTCcRLtEQ/BvlanMF5PyqtVIN+CgrIBCv/ypfme9v7r4yMJPYpbNA==",
+        deps = {
+            "const-max-uint32": "1.0.2",
+            "validate.io-integer-primitive": "1.0.0",
+        },
+        transitive_closure = {
+            "validate.io-array-like": ["1.0.2"],
+            "const-max-uint32": ["1.0.2"],
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-array__1.0.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-array",
+        version = "1.0.6",
+        integrity = "sha512-DeOy7CnPEziggrOO5CZhVKJw6S3Yi7e9e65R1Nl/RTN1vTQKnzjfvks0/8kQ40FP/dsjRAOd4hxmJ7uLa6vxkg==",
+        transitive_closure = {
+            "validate.io-array": ["1.0.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-buffer__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-buffer",
+        version = "1.0.2",
+        integrity = "sha512-6Tad+/QYOxWEXsesKYak1mHOzGdPYS4QeHFImWn7ECi4GR0x3vh7+6+1yoLKNXiklKuTFOxHLG3kZy9tPX0GvQ==",
+        transitive_closure = {
+            "validate.io-buffer": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-integer-primitive__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-integer-primitive",
+        version = "1.0.0",
+        integrity = "sha512-4ARGKA4FImVWJgrgttLYsYJmDGwxlhLfDCdq09gyVgohLKKRUfD3VAo1L2vTRCLt6hDhDtFKdZiuYUTWyBggwg==",
+        deps = {
+            "validate.io-number-primitive": "1.0.0",
+        },
+        transitive_closure = {
+            "validate.io-integer-primitive": ["1.0.0"],
+            "validate.io-number-primitive": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-integer__1.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-integer",
+        version = "1.0.5",
+        integrity = "sha512-22izsYSLojN/P6bppBqhgUDjCkr5RY2jd+N2a3DCAUey8ydvrZ/OkGvFPR7qfOpwR2LC5p4Ngzxz36g5Vgr/hQ==",
+        deps = {
+            "validate.io-number": "1.0.3",
+        },
+        transitive_closure = {
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-matrix-like__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-matrix-like",
+        version = "1.0.2",
+        integrity = "sha512-86mqLUIkZCRAOVKZvpCB7sDCw1dKBjBkY+C6WO/wLo/jQx0sOqQZz3LLtDw0DCfuAKxRuhSmIpX3nzr0nWrbdw==",
+        transitive_closure = {
+            "validate.io-matrix-like": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-ndarray-like__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-ndarray-like",
+        version = "1.0.0",
+        integrity = "sha512-OV85AosxraPFSXJwzv/d7Cu5/dLiyLtsHmxtHTJcHW1N0uscd0eJ2df1Zk+HdID0eUctUllW/1YuQPUJFv1pTA==",
+        transitive_closure = {
+            "validate.io-ndarray-like": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-nonnegative-integer__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-nonnegative-integer",
+        version = "1.0.0",
+        integrity = "sha512-uOMekPwcl84yg8NR7zgIZCZ9pHCtd9CK1Ri51N+ZJLTe1HyLbmdFdy7ZmfkiHkMvB1pOxeQmd1/LBjKhUD1L3A==",
+        deps = {
+            "validate.io-integer": "1.0.5",
+        },
+        transitive_closure = {
+            "validate.io-nonnegative-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-number-primitive__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-number-primitive",
+        version = "1.0.0",
+        integrity = "sha512-8rlCe7N0TRTd50dwk4WNoMXNbX/4+RdtqE3TO6Bk0GJvAgbQlfL5DGr/Pl9ZLbWR6CutMjE2cu+yOoCnFWk+Qw==",
+        transitive_closure = {
+            "validate.io-number-primitive": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-number__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-number",
+        version = "1.0.3",
+        integrity = "sha512-kRAyotcbNaSYoDnXvb4MHg/0a1egJdLwS6oJ38TJY7aw9n93Fl/3blIXdyYvPOp55CNxywooG/3BcrwNrBpcSg==",
+        transitive_closure = {
+            "validate.io-number": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-positive-integer__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-positive-integer",
+        version = "1.0.0",
+        integrity = "sha512-eg4LSdyqjICNUZWRilcQ5l+YayRlu6yi+GQsWw1bCmtG9yayOPmLa1fPymEHPPhbvWPAv3w0LLbCsf03pBHZkg==",
+        deps = {
+            "validate.io-integer": "1.0.5",
+        },
+        transitive_closure = {
+            "validate.io-positive-integer": ["1.0.0"],
+            "validate.io-integer": ["1.0.5"],
+            "validate.io-number": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate.io-string-primitive__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate.io-string-primitive",
+        version = "1.0.1",
+        integrity = "sha512-TORbkLMdOFkEbPtfdx76FSVQGSAzyUEMxI+pBq5pfFm1ZzIesP+XiGc6eIK75aKu7RA7a8EcqUv5OrY5wfog5w==",
+        transitive_closure = {
+            "validate.io-string-primitive": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__vt-pbf__3.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "vt-pbf",
+        version = "3.1.3",
+        integrity = "sha512-2LzDFzt0mZKZ9IpVF2r69G9bXaP2Q2sArJCmcCgvfTdCCZzSyz4aCLoQyUilu37Ll56tCblIZrXFIjNUpGIlmA==",
+        deps = {
+            "@mapbox/point-geometry": "0.1.0",
+            "@mapbox/vector-tile": "1.3.1",
+            "pbf": "3.2.1",
+        },
+        transitive_closure = {
+            "vt-pbf": ["3.1.3"],
+            "@mapbox/point-geometry": ["0.1.0"],
+            "@mapbox/vector-tile": ["1.3.1"],
+            "pbf": ["3.2.1"],
+            "ieee754": ["1.2.1"],
+            "resolve-protobuf-schema": ["2.1.0"],
+            "protocol-buffers-schema": ["3.6.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__weak-map__1.0.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "weak-map",
+        version = "1.0.8",
+        integrity = "sha512-lNR9aAefbGPpHO7AEnY0hCFjz1eTkWCXYvkTRrTHs9qv8zJp+SkVYpzfLIFXQQiG3tVvbNFQgVg2bQS8YGgxyw==",
+        transitive_closure = {
+            "weak-map": ["1.0.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__webgl-context__2.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "webgl-context",
+        version = "2.2.0",
+        integrity = "sha512-q/fGIivtqTT7PEoF07axFIlHNk/XCPaYpq64btnepopSWvKNFkoORlQYgqDigBIuGA1ExnFd/GnSUnBNEPQY7Q==",
+        deps = {
+            "get-canvas-context": "1.0.2",
+        },
+        transitive_closure = {
+            "webgl-context": ["2.2.0"],
+            "get-canvas-context": ["1.0.2"],
         },
     )
 
@@ -3008,13 +8357,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__word-wrap__1.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "word-wrap",
+        version = "1.2.3",
+        integrity = "sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==",
+        transitive_closure = {
+            "word-wrap": ["1.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__wordwrap__0.0.3",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "wordwrap",
         version = "0.0.3",
-        integrity = "sha1-o9XabNXAvAAI03I0u68b7WMFkQc=",
+        integrity = "sha512-1tMA907+V4QmxV7dbRvb4/8MaRALK6q9Abid3ndMYnbyo8piisCmeONVqVSXqQA3KaP4SLt5b7ud6E2sqP8TFw==",
         transitive_closure = {
             "wordwrap": ["0.0.3"],
         },
@@ -3030,6 +8392,23 @@ def npm_repositories():
         integrity = "sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==",
         transitive_closure = {
             "workerpool": ["6.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__world-calendars__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "world-calendars",
+        version = "1.0.3",
+        integrity = "sha512-sAjLZkBnsbHkHWVhrsCU5Sa/EVuf9QqgvrN8zyJ2L/F9FR9Oc6CvVK0674+PGAtmmmYQMH98tCUSO4QLQv3/TQ==",
+        deps = {
+            "object-assign": "4.1.1",
+        },
+        transitive_closure = {
+            "world-calendars": ["1.0.3"],
+            "object-assign": ["4.1.1"],
         },
     )
 
@@ -3100,6 +8479,32 @@ def npm_repositories():
         integrity = "sha1-eLpyAgApxbyHuKgaPPzXS0ovweU=",
         transitive_closure = {
             "xml": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__xtend__2.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "xtend",
+        version = "2.2.0",
+        integrity = "sha512-SLt5uylT+4aoXxXuwtQp5ZnMMzhDb1Xkg4pEqc00WUJCQifPfV9Ub1VrNhp9kXkrjZD2I2Hl8WnjP37jzZLPZw==",
+        transitive_closure = {
+            "xtend": ["2.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__xtend__4.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "xtend",
+        version = "4.0.2",
+        integrity = "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==",
+        transitive_closure = {
+            "xtend": ["4.0.2"],
         },
     )
 
