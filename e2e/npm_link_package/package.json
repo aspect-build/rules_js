@@ -8,6 +8,6 @@
         "@aspect-test/b": "5.0.0"
     },
     "optionalDependencies": {
-        "@aspect-test/c": "2.0.0"
+        "@aspect-test/c": "2.0.1"
     }
 }
