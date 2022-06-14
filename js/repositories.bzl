@@ -8,7 +8,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 versions = struct(
-    aspect_bazel_lib = "1.0.0",
+    aspect_bazel_lib = "1.1.0",
     rules_nodejs = "5.5.0",
 )
 
@@ -39,7 +39,7 @@ def rules_js_dependencies():
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "b381ac4dca544ecc5515916f38066e9793628477e2577edb7b2ab04e8c210738",
+        sha256 = "c5dac6d324e847aef36d3b87961df43709fd1ea1b77bc643faf6bf8e218f713a",
         strip_prefix = "bazel-lib-{}".format(versions.aspect_bazel_lib),
         url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v{}.tar.gz".format(versions.aspect_bazel_lib),
     )
