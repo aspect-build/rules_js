@@ -4073,6 +4073,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__inline-fixtures__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["inline-fixtures"],
+        },
+        package = "inline-fixtures",
+        version = "1.1.0",
+        integrity = "sha512-wIQ0SS5nncjuTXHEgNuvAj6l3kwvYv75YVcQecDRaoL1YHwynG/fxKxrDV0f45Eu6EsUPlomFKqFDR9DD6hxlQ==",
+        deps = {
+            "make-dir": "2.1.0",
+            "tmp": "0.0.33",
+        },
+        transitive_closure = {
+            "inline-fixtures": ["1.1.0"],
+            "make-dir": ["2.1.0"],
+            "tmp": ["0.0.33"],
+            "os-tmpdir": ["1.0.2"],
+            "pify": ["4.0.1"],
+            "semver": ["5.7.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-base64__0.1.0",
         root_package = "",
         link_workspace = "",
@@ -4602,6 +4626,25 @@ def npm_repositories():
         transitive_closure = {
             "magic-string": ["0.25.9"],
             "sourcemap-codec": ["1.4.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__make-dir__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "make-dir",
+        version = "2.1.0",
+        integrity = "sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==",
+        deps = {
+            "pify": "4.0.1",
+            "semver": "5.7.1",
+        },
+        transitive_closure = {
+            "make-dir": ["2.1.0"],
+            "pify": ["4.0.1"],
+            "semver": ["5.7.1"],
         },
     )
 
@@ -5613,6 +5656,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__os-tmpdir__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "os-tmpdir",
+        version = "1.0.2",
+        integrity = "sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==",
+        transitive_closure = {
+            "os-tmpdir": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__p-limit__3.1.0",
         root_package = "",
         link_workspace = "",
@@ -5798,6 +5854,19 @@ def npm_repositories():
         integrity = "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==",
         transitive_closure = {
             "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__pify__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "pify",
+        version = "4.0.1",
+        integrity = "sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==",
+        transitive_closure = {
+            "pify": ["4.0.1"],
         },
     )
 
@@ -7112,6 +7181,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__semver__5.7.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "semver",
+        version = "5.7.1",
+        integrity = "sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==",
+        transitive_closure = {
+            "semver": ["5.7.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__serialize-javascript__6.0.0",
         root_package = "",
         link_workspace = "",
@@ -7620,6 +7702,23 @@ def npm_repositories():
         integrity = "sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==",
         transitive_closure = {
             "tinyqueue": ["2.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__tmp__0.0.33",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tmp",
+        version = "0.0.33",
+        integrity = "sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==",
+        deps = {
+            "os-tmpdir": "1.0.2",
+        },
+        transitive_closure = {
+            "tmp": ["0.0.33"],
+            "os-tmpdir": ["1.0.2"],
         },
     )
 
