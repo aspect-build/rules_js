@@ -249,6 +249,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{node}}": _target_tool_short_path(node_bin.target_tool_path),
         "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
         "{{workspace_name}}": ctx.workspace_name,
+        "{{node_patches_entry_short_path}}": ctx.file._node_patches_entry.short_path,
     }
 
     ctx.actions.expand_template(

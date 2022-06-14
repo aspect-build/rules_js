@@ -321,7 +321,7 @@ done
 export JS_BINARY__FS_PATH_ROOTS="$execroot:$RUNFILES"
 if [ -z "${JS_BINARY__DISABLE_NODE_PATCHES:-}" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
     logf_debug "adding node fs patches with roots: %s" "$JS_BINARY__FS_PATH_ROOTS"
-    NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register" )
+    NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register.js" )
 fi
 
 # Put bazel managed node on the path
