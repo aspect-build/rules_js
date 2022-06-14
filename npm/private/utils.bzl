@@ -8,7 +8,7 @@ def _bazel_name(name, version = None):
     if not version:
         return escaped_name
     version_segments = version.split("_")
-    escaped_version = version_segments[0].replace("/", "_")
+    escaped_version = version_segments[0].replace("@", "at_").replace("/", "_")
     peer_version = "_".join(version_segments[1:])
     if peer_version.startswith("@"):
         peer_version = "at_" + peer_version[1:]

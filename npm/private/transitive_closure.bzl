@@ -44,7 +44,7 @@ def _gather_package_info(package_path, package_snapshot):
         package = package_path[1:]
         name, version = utils.parse_pnpm_name(package)
         friendly_version = utils.strip_peer_dep_version(version)
-    elif package_path.startswith("github.com/"):
+    else:
         package = package_path
         if "name" not in package_snapshot:
             fail("expected package %s to have a name field" % package_path)
@@ -53,8 +53,6 @@ def _gather_package_info(package_path, package_snapshot):
         name = package_snapshot["name"]
         version = package_path
         friendly_version = package_snapshot["version"]
-    else:
-        fail("unsupported package path " + package_path)
 
     if "resolution" not in package_snapshot:
         fail("package %s has no resolution field" % package_path)
@@ -63,6 +61,7 @@ def _gather_package_info(package_path, package_snapshot):
     tarball = resolution["tarball"] if "tarball" in resolution else None
     if not integrity and not tarball:
         fail("expected package %s to have an integrity and/or tarball fields but found neither" % package_path)
+    registry = resolution["registry"] if "registry" in resolution else None
 
     return utils.pnpm_name(name, version), {
         "name": name,
@@ -70,6 +69,7 @@ def _gather_package_info(package_path, package_snapshot):
         "friendly_version": friendly_version,
         "integrity": integrity,
         "tarball": tarball,
+        "registry": registry,
         "dependencies": package_snapshot.get("dependencies", {}),
         "optionalDependencies": package_snapshot.get("optionalDependencies", {}),
         "dev": "dev" in package_snapshot.keys(),
