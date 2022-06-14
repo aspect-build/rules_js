@@ -24,17 +24,17 @@ npm_link_package(
     # the package where the pnpm-lock.yaml file is located.
     deps = {
         # Package store link targets names for 3rd party packages that come from
-        # npm_translate_package lock start with the name passed to npm_link_all_packages macro
-        # (typically 'node_modules') followed by `/<package>/store/<version>` where `package` is the
+        # npm_translate_package lock start with `.aspect_rules_js/` then the name passed to `npm_link_all_packages`
+        # macro (typically 'node_modules') followed by `/<package>/<version>` where `package` is the
         # package name (including @scope segment if any) and `version` is the specific version of
         # the package that comes from the pnpm-lock.yaml file.
-        "//:node_modules/uuid/store/8.3.2": "",
+        "//:.aspect_rules_js/node_modules/uuid/8.3.2": "",
         # Package store link targets names for 3rd party package that come directly from an
-        # npm_import start with the name passed to the `npm_import`'s `npm_link_imported_package`
-        # macro (typically 'node_modules') followed by `/<package>/store/<version>` where `package`
+        # npm_import start with `.aspect_rules_js/` then the name passed to the `npm_import`'s
+        # `npm_link_imported_package` macro (typically 'node_modules') followed by `/<package>/<version>` where `package`
         # matches the `package` attribute in the npm_import of the package and `version` matches the
         # `version` attribute.
-        "//:node_modules/acorn/store/8.4.0": "",
+        "//:.aspect_rules_js/node_modules/acorn/8.4.0": "",
     },
 )
 
