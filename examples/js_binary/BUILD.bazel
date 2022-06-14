@@ -301,6 +301,7 @@ write_file(
         "        [--tokenize] [--locations] [---allow-hash-bang] [--allow-await-outside-function] [--compact] [--silent] [--module] [--help] [--] [infile]",
         "",
     ],
+    newline = "unix",
 )
 
 diff_test(
