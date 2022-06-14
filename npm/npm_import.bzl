@@ -29,11 +29,30 @@ load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock_lib = "npm_translate_lock")
 
-npm_translate_lock = repository_rule(
-    doc = _npm_translate_lock_lib.doc,
+npm_translate_lock_rule = repository_rule(
+    doc = """Most users should load the [npm_translate_lock](#npm_translate_lock) wrapper macro.
+
+    """ + _npm_translate_lock_lib.doc,
     implementation = _npm_translate_lock_lib.implementation,
     attrs = _npm_translate_lock_lib.attrs,
 )
+
+def npm_translate_lock(name, **kwargs):
+    """Wrapper around [`npm_translate_lock_rule`](#npm_translate_lock_rule).
+
+    Sets verify_node_modules_ignored to the .bazelignore file path.
+    """
+
+    # Avoid trying to check a lockfile installed from an external repo, like with
+    # pnpm_lock = "@rules_foo//foo:pnpm-lock.yaml",
+    is_local = kwargs.get("pnpm_lock").startswith("//")
+    bazelignore = Label("//:.bazelignore") if is_local else None
+
+    npm_translate_lock_rule(
+        name = name,
+        verify_node_modules_ignored = kwargs.pop("verify_node_modules_ignored", bazelignore),
+        **kwargs
+    )
 
 _npm_import_links = repository_rule(
     implementation = _npm_import_links_lib.implementation,
