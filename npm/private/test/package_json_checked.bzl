@@ -4,7 +4,7 @@ load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_p
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 
 def _rollup_internal(name, link_root_name, **kwargs):
-    store_target_name = "{}/rollup/store/2.70.2".format(link_root_name)
+    store_target_name = ".aspect_rules_js/{}/rollup/2.70.2".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@//:{}/dir".format(store_target_name),
@@ -22,7 +22,7 @@ def _rollup_internal(name, link_root_name, **kwargs):
     )
 
 def _rollup_test_internal(name, link_root_name, **kwargs):
-    store_target_name = "{}/rollup/store/2.70.2".format(link_root_name)
+    store_target_name = ".aspect_rules_js/{}/rollup/2.70.2".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@//:{}/dir".format(store_target_name),
@@ -36,7 +36,7 @@ def _rollup_test_internal(name, link_root_name, **kwargs):
     )
 
 def _rollup_binary_internal(name, link_root_name, **kwargs):
-    store_target_name = "{}/rollup/store/2.70.2".format(link_root_name)
+    store_target_name = ".aspect_rules_js/{}/rollup/2.70.2".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@//:{}/dir".format(store_target_name),

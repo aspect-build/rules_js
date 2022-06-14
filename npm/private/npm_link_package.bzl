@@ -62,43 +62,43 @@ _ATTRS_STORE = {
         You can find all the package store link targets in your repository with
 
         ```
-        bazel query ... | grep /store/ | grep -v /dir | grep -v /pkg | grep -v /ref
+        bazel query ... | grep //:.aspect_rules_js | grep -v /dir | grep -v /pkg | grep -v /ref
         ```
 
         1st party deps will typically be versioned 0.0.0 (unless set to another version explicitly in
         npm_link_package). For example,
 
         ```
-        //:node_modules/@mycorp/mylib/store/0.0.0
+        //:.aspect_rules_js/node_modules/@mycorp/mylib/0.0.0
         ```
 
         3rd party package store link targets will include the version. For example,
 
         ```
-        //:node_modules/cliui/store/7.0.4
+        //:.aspect_rules_js/node_modules/cliui/7.0.4
         ```
 
         If imported via npm_translate_lock, the version may include peer dep(s),
 
         ```
-        //:node_modules/debug/store/4.3.4_supports-color@8.1.1
+        //:.aspect_rules_js/node_modules/debug/4.3.4_supports-color@8.1.1
         ```
 
         It could be also be a `github.com` url based version,
 
         ```
-        //:node_modules/debug/store/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
+        //:.aspect_rules_js/node_modules/debug/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
         ```
 
         In general, package store link targets names for 3rd party packages that come from
-        `npm_translate_lock` start with the name passed to the `npm_link_all_packages` macro
-        (typically 'node_modules') followed by `/<package>/store/<version>` where `package` is the
+        `npm_translate_lock` start with `.aspect_rules_js/` then name passed to the `npm_link_all_packages` macro
+        (typically 'node_modules') followed by `/<package>/<version>` where `package` is the
         package name (including @scope segment if any) and `version` is the specific version of
         the package that comes from the pnpm-lock.yaml file.
 
         Package store link targets names for 3rd party package that come directly from an
-        `npm_import` start with the name passed to the `npm_import`'s `npm_link_imported_package`
-        macro (typically 'node_modules') followed by `/<package>/store/<version>` where `package`
+        `npm_import` start with `.aspect_rules_js/` then the name passed to the `npm_import`'s `npm_link_imported_package`
+        macro (typically 'node_modules') followed by `/<package>/<version>` where `package`
         matches the `package` attribute in the npm_import of the package and `version` matches the
         `version` attribute.
 
@@ -407,7 +407,11 @@ def npm_link_package(
         msg = "src may only be specified when linking in the root package '{}'".format(root_package)
         fail(msg)
 
-    store_target_name = "{}/store/{}".format(name, version)
+    store_target_name = "{virtual_store_root}/{name}/{version}".format(
+        name = name,
+        version = version,
+        virtual_store_root = utils.virtual_store_root,
+    )
 
     tags = kwargs.pop("tags", [])
     if auto_manual and "manual" not in tags:

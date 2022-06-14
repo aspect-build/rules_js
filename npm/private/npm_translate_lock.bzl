@@ -177,7 +177,7 @@ _FP_STORE_TMPL = \
     """
     if is_root:
          _npm_link_package_store(
-            name = "{{}}/{package}/store/0.0.0".format(name),
+            name = "{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
             src = "{npm_package_target}",
             package = "{package}",
             version = "0.0.0",
@@ -193,7 +193,7 @@ _FP_DIRECT_TMPL = \
             # terminal target for direct dependencies
             _npm_link_package_direct(
                 name = "{{}}/{name}".format(name),
-                src = "//{root_package}:{{}}/{package}/store/0.0.0".format(name),
+                src = "//{root_package}:{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
             )
@@ -499,23 +499,26 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
                         raw_deps = importers.get(dep_importer).get("dependencies")
                     for raw_package, raw_version in raw_deps.items():
                         if raw_version.startswith("link:"):
-                            dep_store_target = """"//{root_package}:{{}}/{package}/store/{version}".format(name)""".format(
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
                                 root_package = root_package,
                                 package = raw_package,
                                 version = "0.0.0",
+                                virtual_store_root = utils.virtual_store_root,
                             )
                         elif raw_version.startswith("/"):
                             store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
-                            dep_store_target = """"//{root_package}:{{}}/{package}/store/{version}".format(name)""".format(
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
                                 root_package = root_package,
                                 package = store_package,
                                 version = store_version,
+                                virtual_store_root = utils.virtual_store_root,
                             )
                         else:
-                            dep_store_target = """"//{root_package}:{{}}/{package}/store/{version}".format(name)""".format(
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
                                 root_package = root_package,
                                 package = raw_package,
                                 version = raw_version,
+                                virtual_store_root = utils.virtual_store_root,
                             )
                         if dep_store_target not in transitive_deps:
                             transitive_deps[dep_store_target] = [raw_package]
@@ -700,6 +703,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
+            virtual_store_root = utils.virtual_store_root,
         ))
 
         defs_bzl_body.append(_FP_DIRECT_TMPL.format(
@@ -709,6 +713,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             package = fp_package,
             package_directory_output_group = utils.package_directory_output_group,
             root_package = root_package,
+            virtual_store_root = utils.virtual_store_root,
         ))
 
         if len(fp_package.split("/", 1)) > 1:
