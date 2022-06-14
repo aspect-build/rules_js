@@ -3,24 +3,24 @@
 This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
 accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 
-- Lazy: only fetches/installs npm packages needed for the requested build/test targets.
-- Correct: works seamlessly with node.js module resolution. For example there are no pathMapping issues with TypeScript `rootDirs`.
-- Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
-- Supports npm "workspaces": nested npm packages in a monorepo.
+-   Lazy: only fetches/installs npm packages needed for the requested build/test targets.
+-   Correct: works seamlessly with node.js module resolution. For example there are no pathMapping issues with TypeScript `rootDirs`.
+-   Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
+-   Supports npm "workspaces": nested npm packages in a monorepo.
 
 <https://hackmd.io/@aspect/npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 
 Known issues:
-- Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
-- Doesn't work with rules_docker due to https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1137465914.
-- Actions may follow symlinks out of the sandbox, leading to non-hermeticity. Fix planned for 1.0: https://github.com/aspect-build/rules_js/issues/114.
-- No examples yet for proto/gRPC, though this may "just work".
-- No examples yet for publishing npm packages.
+
+-   Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
+-   Doesn't work with rules_docker due to https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1137465914.
+-   No examples yet for proto/gRPC, though this may "just work".
+-   No examples yet for publishing npm packages.
 
 rules_js is just a part of what Aspect provides:
 
--  _Need help?_ This ruleset has support provided by https://aspect.dev.
--  See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
+-   _Need help?_ This ruleset has support provided by https://aspect.dev.
+-   See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
 
 ## Installation
 
