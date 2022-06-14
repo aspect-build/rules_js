@@ -147,6 +147,9 @@ _ATTRS = {
         See https://github.com/bazelbuild/bazel/issues/8106
         """,
     ),
+    "warn_on_unqualified_tarball_url": attr.bool(
+        default = True,
+    ),
 }
 
 def _process_lockfile(rctx):
@@ -228,6 +231,9 @@ def _link_package(root_package, import_path, rel_path = "."):
         link_package = ""
     return link_package
 
+def _is_url(url):
+    return url.find("://") != -1
+
 def _gen_npm_imports(lockfile, attr):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
@@ -258,6 +264,7 @@ def _gen_npm_imports(lockfile, attr):
         requires_build = package_info.get("requiresBuild")
         integrity = package_info.get("integrity")
         tarball = package_info.get("tarball")
+        registry = package_info.get("registry")
         transitive_closure = package_info.get("transitiveClosure")
 
         if attr.prod and dev:
@@ -331,6 +338,41 @@ def _gen_npm_imports(lockfile, attr):
             friendly_name not in attr.lifecycle_hooks_exclude
         )
 
+        url = None
+        if tarball:
+            if _is_url(tarball):
+                if registry and tarball.startswith("https://registry.npmjs.org/"):
+                    url = registry + tarball[len("https://registry.npmjs.org/"):]
+                else:
+                    url = tarball
+            else:
+                # pnpm 6.x may omit the registry component from the tarball value when it is configured
+                # via an .npmrc registry setting for the package. If there is a registry value, then use
+                # that as the prefix. If there isn't then prefix with the default npm registry value and
+                # suggest upgrading to a newer version pnpm.
+                if not registry:
+                    registry = "https://registry.npmjs.org/"
+
+                    # buildifier: disable=print
+                    if attr.warn_on_unqualified_tarball_url:
+                        print("""
+
+====================================================================================================
+WARNING: The pnpm lockfile package entry for {} ({})
+does not contain a fully qualified tarball URL or a registry setting to indiciate which registry to
+use. Prefixing tarball url `{}`
+with the default npm registry url `https://registry.npmjs.org/`.
+
+If you are using an older version of pnpm such as 6.x, upgrading to 7.x or newer and
+re-generating the lockfile should generate a fully qualified tarball URL for this package.
+
+To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
+`npm_translate_lock` repository rule.
+====================================================================================================
+
+""".format(name, version, tarball))
+                url = registry + tarball
+
         result.append(struct(
             custom_postinstall = custom_postinstall,
             deps = deps,
@@ -343,7 +385,7 @@ def _gen_npm_imports(lockfile, attr):
             root_package = root_package,
             run_lifecycle_hooks = run_lifecycle_hooks,
             transitive_closure = transitive_closure,
-            url = tarball,
+            url = url,
             version = version,
         ))
     return result

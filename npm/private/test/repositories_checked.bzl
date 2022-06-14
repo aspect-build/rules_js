@@ -483,7 +483,7 @@ def npm_repositories():
             "has": ["1.0.3"],
             "function-bind": ["1.1.1"],
             "sourcemap-codec": ["1.4.8"],
-            "@types/estree": ["0.0.39", "0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39", "registry.npmjs.org/@types/estree/0.0.51"],
             "fs.realpath": ["1.0.0"],
             "inflight": ["1.0.6"],
             "inherits": ["2.0.4"],
@@ -507,14 +507,14 @@ def npm_repositories():
         version = "3.1.0_rollup@2.70.2",
         integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
         deps = {
-            "@types/estree": "0.0.39",
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.39",
             "estree-walker": "1.0.1",
             "picomatch": "2.3.1",
             "rollup": "2.70.2",
         },
         transitive_closure = {
             "@rollup/pluginutils": ["3.1.0_rollup@2.70.2"],
-            "@types/estree": ["0.0.39"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
             "estree-walker": ["1.0.1"],
             "picomatch": ["2.3.1"],
             "rollup": ["2.70.2"],
@@ -606,47 +606,6 @@ def npm_repositories():
         transitive_closure = {
             "@turf/meta": ["6.5.0"],
             "@turf/helpers": ["6.5.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_estree__0.0.39",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/estree",
-        version = "0.0.39",
-        integrity = "sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==",
-        transitive_closure = {
-            "@types/estree": ["0.0.39"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_estree__0.0.51",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/estree",
-        version = "0.0.51",
-        integrity = "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==",
-        transitive_closure = {
-            "@types/estree": ["0.0.51"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__16.11.36",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "": ["@types/node"],
-        },
-        package = "@types/node",
-        version = "16.11.36",
-        integrity = "sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==",
-        transitive_closure = {
-            "@types/node": ["16.11.36"],
         },
     )
 
@@ -4365,11 +4324,11 @@ def npm_repositories():
         version = "1.2.1",
         integrity = "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
         deps = {
-            "@types/estree": "0.0.51",
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
         },
         transitive_closure = {
             "is-reference": ["1.2.1"],
-            "@types/estree": ["0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
         },
     )
 
@@ -5307,15 +5266,15 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mrmime__1.0.0",
+        name = "npm__mrmime__1.0.1",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "mrmime",
-        version = "1.0.0",
-        integrity = "sha512-a70zx7zFfVO7XpnQ2IX1Myh9yY4UYvfld/dikWRnsXxbyvMcfz+u6UfgNAtH+k2QqtJuzVpv6eLTx1G2+WKZbQ==",
+        version = "1.0.1",
+        integrity = "sha512-hzzEagAgDyoU1Q6yg5uI+AorQgdvMCur3FcKf7NhMKWsaYg+RnbTyHRa/9IlLF9rf455MOCtcqqrQQ83pPP7Uw==",
         transitive_closure = {
-            "mrmime": ["1.0.0"],
+            "mrmime": ["1.0.1"],
         },
     )
 
@@ -7007,7 +6966,7 @@ def npm_repositories():
         link_packages = {},
         package = "require-directory",
         version = "2.1.1",
-        integrity = "sha1-jGStX9MNqxyXbiNE/+f3kqam30I=",
+        integrity = "sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==",
         transitive_closure = {
             "require-directory": ["2.1.1"],
         },
@@ -7247,13 +7206,13 @@ def npm_repositories():
         integrity = "sha512-JuLThK3TnZG1TAKDwNIqNq6QA2afLOCcm+iE8D1Kj3GA40pSPsxQjjJl0J8X3tsR7T+CP1GavpzLwYkgVLWrZQ==",
         deps = {
             "@polka/url": "1.0.0-next.21",
-            "mrmime": "1.0.0",
+            "mrmime": "1.0.1",
             "totalist": "1.1.0",
         },
         transitive_closure = {
             "sirv": ["1.0.19"],
             "@polka/url": ["1.0.0-next.21"],
-            "mrmime": ["1.0.0"],
+            "mrmime": ["1.0.1"],
             "totalist": ["1.1.0"],
         },
     )
@@ -8444,7 +8403,7 @@ def npm_repositories():
             "bufferutil": ["4.0.1"],
             "node-gyp-build": ["3.7.0"],
             "@polka/url": ["1.0.0-next.21"],
-            "mrmime": ["1.0.0"],
+            "mrmime": ["1.0.1"],
             "totalist": ["1.1.0"],
             "duplexer": ["0.1.2"],
             "ansi-styles": ["4.3.0"],
@@ -8544,7 +8503,7 @@ def npm_repositories():
         link_packages = {},
         package = "wrappy",
         version = "1.0.2",
-        integrity = "sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=",
+        integrity = "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==",
         transitive_closure = {
             "wrappy": ["1.0.2"],
         },
@@ -8575,7 +8534,7 @@ def npm_repositories():
         link_packages = {},
         package = "xml",
         version = "1.0.1",
-        integrity = "sha1-eLpyAgApxbyHuKgaPPzXS0ovweU=",
+        integrity = "sha512-huCv9IH9Tcf95zuYCsQraZtWnJvBtLVE0QHMOs8bWyZAFZNDcYjsPq1nEx8jKA9y+Beo9v+7OBPRisQTjinQMw==",
         transitive_closure = {
             "xml": ["1.0.1"],
         },
@@ -8722,5 +8681,49 @@ def npm_repositories():
         transitive_closure = {
             "debug": ["github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53"],
             "ms": ["0.7.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_estree__registry.npmjs.org_at_types_estree_0.0.39",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/estree",
+        version = "registry.npmjs.org/@types/estree/0.0.39",
+        integrity = "sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==",
+        url = "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz",
+        transitive_closure = {
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_estree__registry.npmjs.org_at_types_estree_0.0.51",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/estree",
+        version = "registry.npmjs.org/@types/estree/0.0.51",
+        integrity = "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==",
+        url = "https://registry.npmjs.org/@types/estree/-/estree-0.0.51.tgz",
+        transitive_closure = {
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.36",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["@types/node"],
+        },
+        package = "@types/node",
+        version = "registry.npmjs.org/@types/node/16.11.36",
+        integrity = "sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz",
+        transitive_closure = {
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
         },
     )

@@ -58,6 +58,7 @@ npm_translate_lock(
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
+    warn_on_unqualified_tarball_url = False,
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
