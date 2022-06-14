@@ -148,6 +148,7 @@ write_file(
         "rollup v2.70.2",
         "",
     ],
+    newline = "unix",
 )
 
 diff_test(
