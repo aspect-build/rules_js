@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as assert from 'assert'
-import * as fs from 'fs'
-import { withFixtures } from 'inline-fixtures'
-import * as path from 'path'
-import * as util from 'util'
+const assert = require('assert')
+const fs = require('fs')
+const withFixtures = require('inline-fixtures').withFixtures
+const path = require('path')
+const util = require('util')
 
-import { patcher } from '../../node-patches/src/fs'
+const patcher = require('../../node-patches/src/fs').patcher
 
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {

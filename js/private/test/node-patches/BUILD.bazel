@@ -1,40 +1,22 @@
-load("@npm//typescript:package_json.bzl", typescript_bin = "bin")
 load("//js:defs.bzl", "js_test")
 
 TESTS = [
-    "escape.ts",
-    "lstat.ts",
-    "opendir.ts",
-    "readdir.ts",
-    "readlink.ts",
-    "realpath.ts",
+    "escape.js",
+    "lstat.js",
+    "opendir.js",
+    "readdir.js",
+    "readlink.js",
+    "realpath.js",
 ]
-
-typescript_bin.tsc(
-    name = "compile",
-    srcs = TESTS + [
-        "tsconfig.json",
-        "//:node_modules/@types/node",
-        "//:node_modules/inline-fixtures",
-        "//js/private/node-patches/src:compile",
-    ],
-    outs = [t.replace(".ts", ".js") for t in TESTS],
-    chdir = package_name(),
-    args = [
-        "-p",
-        "tsconfig.json",
-    ],
-)
 
 [
     js_test(
-        name = "{}_test".format(t.replace(".ts", "")),
+        name = "{}_test".format(t.replace(".js", "")),
         data = [
-            ":compile",
             "//:node_modules/inline-fixtures",
             "//js/private/node-patches/src:compile",
         ],
-        entry_point = t.replace(".ts", ".js"),
+        entry_point = t,
         env = {
             "JS_BINARY__DISABLE_NODE_PATCHES": "1",
         },
