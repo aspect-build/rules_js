@@ -1,8 +1,8 @@
 {
     "private": true,
     "devDependencies": {
-        "@aspect-test/a": "5.0.0",
-        "@aspect-test/c": "2.0.0",
+        "@aspect-test/a": "5.0.2",
+        "@aspect-test/c": "2.0.2",
         "@gregmagolan/test-b": "0.0.2",
         "@rollup/plugin-commonjs": "21.1.0",
         "mobx-react": "7.3.0",

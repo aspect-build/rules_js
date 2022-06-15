@@ -5,112 +5,80 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")
 def npm_repositories():
     "Generated npm_import repository rules corresponding to npm packages in @//:pnpm-lock.yaml"
     npm_import(
-        name = "npm__at_aspect-test_a__5.0.0",
+        name = "npm__at_aspect-test_a__5.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "examples/npm_deps": ["@aspect-test/a"],
         },
         package = "@aspect-test/a",
-        version = "5.0.0",
-        integrity = "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
+        version = "5.0.2",
+        integrity = "sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==",
         deps = {
-            "@aspect-test/b": "5.0.0",
-            "@aspect-test/c": "1.0.0",
-            "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0",
+            "@aspect-test/b": "5.0.2",
+            "@aspect-test/c": "2.0.2",
+            "@aspect-test/d": "2.0.0_@aspect-test+c@2.0.2",
         },
         transitive_closure = {
-            "@aspect-test/a": ["5.0.0"],
-            "@aspect-test/b": ["5.0.0"],
-            "@aspect-test/c": ["2.0.0", "1.0.0"],
-            "@aspect-test/d": ["2.0.0_@aspect-test+c@2.0.0", "2.0.0_@aspect-test+c@1.0.0"],
+            "@aspect-test/a": ["5.0.2"],
+            "@aspect-test/b": ["5.0.2"],
+            "@aspect-test/c": ["2.0.2"],
+            "@aspect-test/d": ["2.0.0_@aspect-test+c@2.0.2"],
         },
     )
 
     npm_import(
-        name = "npm__at_aspect-test_b__5.0.0",
+        name = "npm__at_aspect-test_b__5.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@aspect-test/b",
-        version = "5.0.0",
-        integrity = "sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==",
+        version = "5.0.2",
+        integrity = "sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==",
         deps = {
-            "@aspect-test/a": "5.0.0",
-            "@aspect-test/c": "2.0.0",
-            "@aspect-test/d": "2.0.0_@aspect-test+c@2.0.0",
+            "@aspect-test/a": "5.0.2",
+            "@aspect-test/c": "2.0.2",
+            "@aspect-test/d": "2.0.0_@aspect-test+c@2.0.2",
         },
         transitive_closure = {
-            "@aspect-test/b": ["5.0.0"],
-            "@aspect-test/a": ["5.0.0"],
-            "@aspect-test/c": ["1.0.0", "2.0.0"],
-            "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0", "2.0.0_@aspect-test+c@2.0.0"],
+            "@aspect-test/b": ["5.0.2"],
+            "@aspect-test/a": ["5.0.2"],
+            "@aspect-test/c": ["2.0.2"],
+            "@aspect-test/d": ["2.0.0_@aspect-test+c@2.0.2"],
         },
     )
 
     npm_import(
-        name = "npm__at_aspect-test_c__1.0.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@aspect-test/c",
-        version = "1.0.0",
-        integrity = "sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==",
-        transitive_closure = {
-            "@aspect-test/c": ["1.0.0"],
-        },
-        run_lifecycle_hooks = True,
-        custom_postinstall = "echo 'moo' > cow.txt",
-    )
-
-    npm_import(
-        name = "npm__at_aspect-test_c__2.0.0",
+        name = "npm__at_aspect-test_c__2.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "examples/npm_deps": ["@aspect-test/c"],
         },
         package = "@aspect-test/c",
-        version = "2.0.0",
-        integrity = "sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==",
+        version = "2.0.2",
+        integrity = "sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==",
         transitive_closure = {
-            "@aspect-test/c": ["2.0.0"],
+            "@aspect-test/c": ["2.0.2"],
         },
         run_lifecycle_hooks = True,
-        custom_postinstall = "echo 'moo' > cow.txt && echo 'mooo' >> cow.txt",
+        custom_postinstall = "echo moo > cow.txt && echo mooo >> cow.txt",
     )
 
     npm_import(
-        name = "npm__at_aspect-test_d__2.0.0__at_aspect-test_c_1.0.0",
+        name = "npm__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@aspect-test/d",
-        version = "2.0.0_@aspect-test+c@1.0.0",
+        version = "2.0.0_@aspect-test+c@2.0.2",
         integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
         deps = {
-            "@aspect-test/c": "1.0.0",
+            "@aspect-test/c": "2.0.2",
         },
         transitive_closure = {
-            "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"],
-            "@aspect-test/c": ["1.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@aspect-test/d",
-        version = "2.0.0_@aspect-test+c@2.0.0",
-        integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
-        deps = {
-            "@aspect-test/c": "2.0.0",
-        },
-        transitive_closure = {
-            "@aspect-test/d": ["2.0.0_@aspect-test+c@2.0.0"],
-            "@aspect-test/c": ["2.0.0"],
+            "@aspect-test/d": ["2.0.0_@aspect-test+c@2.0.2"],
+            "@aspect-test/c": ["2.0.2"],
         },
     )
 
@@ -8706,7 +8674,7 @@ def npm_repositories():
         package = "@types/estree",
         version = "registry.npmjs.org/@types/estree/0.0.51",
         integrity = "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==",
-        url = "https://registry.npmjs.org/@types/estree/-/estree-0.0.51.tgz",
+        url = "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz",
         transitive_closure = {
             "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
         },

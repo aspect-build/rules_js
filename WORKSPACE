@@ -46,8 +46,8 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 npm_translate_lock(
     name = "npm",
     custom_postinstalls = {
-        "@aspect-test/c": "echo 'moo' > cow.txt",
-        "@aspect-test/c@2.0.0": "echo 'mooo' >> cow.txt",
+        "@aspect-test/c": "echo moo > cow.txt",
+        "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
     },
     patch_args = {
         "@gregmagolan/test-a": ["-p1"],
