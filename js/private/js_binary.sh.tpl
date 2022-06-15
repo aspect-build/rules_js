@@ -212,7 +212,7 @@ else
         fi
     done
 
-    if [ -z "$RUNFILES" ]; then
+    if [ -z "${RUNFILES:-}" ]; then
         logf_fatal "RUNFILES environment variable is not set"
         exit 1
     fi
