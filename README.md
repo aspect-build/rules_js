@@ -8,7 +8,7 @@ accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 -   Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
 -   Supports npm "workspaces": nested npm packages in a monorepo.
 
-<https://hackmd.io/@aspect/npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
+<https://blog.aspect.dev/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 
 Known issues:
 
