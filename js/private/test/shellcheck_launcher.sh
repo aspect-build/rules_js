@@ -187,7 +187,10 @@ function normalize_windows_path {
 # blaze.
 # Case 5a is handled like case 1.
 # Case 6a is handled like case 3.
-if [ "${RUNFILES_MANIFEST_ONLY:-}" ]; then
+if [ "${TEST_SRCDIR:-}" ]; then
+    # Case 4, bazel has identified runfiles for us.
+    RUNFILES="$TEST_SRCDIR"
+elif [ "${RUNFILES_MANIFEST_ONLY:-}" ]; then
     # Windows only has a manifest file instead of symlinks.
     if [ "$(is_windows)" -eq "1" ]; then
         # If Windows normalizing the path and case insensitive removing the `/MANIFEST` part of the path
@@ -197,9 +200,6 @@ if [ "${RUNFILES_MANIFEST_ONLY:-}" ]; then
     else
         RUNFILES=${RUNFILES_MANIFEST_FILE%/MANIFEST}
     fi
-elif [ "${TEST_SRCDIR:-}" ]; then
-    # Case 4, bazel has identified runfiles for us.
-    RUNFILES="$TEST_SRCDIR"
 else
     case "$0" in
     /*) self="$0" ;;
