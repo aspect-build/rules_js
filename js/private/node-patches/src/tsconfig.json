@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017",
-        "declaration": true
+        "target": "es2017"
     },
     "include": ["*.ts"]
 }

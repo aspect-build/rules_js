@@ -8,7 +8,6 @@ typescript_bin.tsc(
         "//:node_modules/@types/node",
     ],
     outs = [
-        "fs.d.ts",
         "fs.js",
     ],
     chdir = package_name(),
