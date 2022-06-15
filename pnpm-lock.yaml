@@ -33,8 +33,8 @@ importers:
 
   examples/npm_deps:
     specifiers:
-      '@aspect-test/a': 5.0.0
-      '@aspect-test/c': 2.0.0
+      '@aspect-test/a': 5.0.2
+      '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0
       mobx: 6.3.0
@@ -43,8 +43,8 @@ importers:
       rollup: 2.70.2
       uvu: 0.5.3
     devDependencies:
-      '@aspect-test/a': 5.0.0
-      '@aspect-test/c': 2.0.0
+      '@aspect-test/a': 5.0.2
+      '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       mobx: 6.3.0
@@ -75,52 +75,37 @@ importers:
 
 packages:
 
-  /@aspect-test/a/5.0.0:
-    resolution: {integrity: sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==}
+  /@aspect-test/a/5.0.2:
+    resolution: {integrity: sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==}
     hasBin: true
     dependencies:
-      '@aspect-test/b': 5.0.0
-      '@aspect-test/c': 1.0.0
-      '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
+      '@aspect-test/b': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
     dev: true
 
-  /@aspect-test/b/5.0.0:
-    resolution: {integrity: sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==}
+  /@aspect-test/b/5.0.2:
+    resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
     hasBin: true
     dependencies:
-      '@aspect-test/a': 5.0.0
-      '@aspect-test/c': 2.0.0
-      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
+      '@aspect-test/a': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
     dev: true
 
-  /@aspect-test/c/1.0.0:
-    resolution: {integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==}
+  /@aspect-test/c/2.0.2:
+    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
     requiresBuild: true
     dev: true
 
-  /@aspect-test/c/2.0.0:
-    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
-    hasBin: true
-    requiresBuild: true
-    dev: true
-
-  /@aspect-test/d/2.0.0_@aspect-test+c@1.0.0:
+  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.2:
     resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
     hasBin: true
     peerDependencies:
       '@aspect-test/c': x.x.x
     dependencies:
-      '@aspect-test/c': 1.0.0
-    dev: true
-
-  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
-    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
-    hasBin: true
-    peerDependencies:
-      '@aspect-test/c': x.x.x
-    dependencies:
-      '@aspect-test/c': 2.0.0
+      '@aspect-test/c': 2.0.2
     dev: true
 
   /@choojs/findup/0.2.1:
@@ -2996,13 +2981,13 @@ packages:
     dev: true
 
   registry.npmjs.org/@types/estree/0.0.39:
-    resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==, registry: https://registry.yarnpkg.com/, tarball: '@types/estree/-/estree-0.0.39.tgz'}
+    resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz}
     name: '@types/estree'
     version: 0.0.39
     dev: true
 
   registry.npmjs.org/@types/estree/0.0.51:
-    resolution: {integrity: sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==, tarball: '@types/estree/-/estree-0.0.51.tgz'}
+    resolution: {integrity: sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz}
     name: '@types/estree'
     version: 0.0.51
     dev: true
