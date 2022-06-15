@@ -28,6 +28,8 @@ type Dirent = any
 // es modules
 const _fs = require('fs')
 
+const isWindows = process.platform === 'win32'
+
 export const patcher = (fs: any = _fs, roots: string[]) => {
     fs = fs || _fs
     roots = roots || []
@@ -194,7 +196,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     } catch (e) {
                         if (e.code === 'EINVAL') {
                             // the path was not a symlink; just return the resolved path in that case
-                            cb(null, str)
+                            return cb(null, str)
+                        }
+                        if (isWindows) {
+                            // windows has a harder time with readlink if the path is
+                            // through a junction; just return the realpath in this case
+                            return cb(null, str)
                         }
                         throw e
                     }
@@ -205,13 +212,13 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     )
                     if (!isEscape(args[0], realPathRoot, [escapedRoot])) {
                         // this realpath can be mapped back to a relative equivalent in the escaped root; return that instead
-                        cb(null, realPathRoot)
+                        return cb(null, realPathRoot)
                     } else {
                         // the realpath has no relative equivalent within the root; return the actual realpath
-                        cb(null, str)
+                        return cb(null, str)
                     }
                 } else {
-                    cb(null, str)
+                    return cb(null, str)
                 }
             }
         }
@@ -237,7 +244,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     } catch (e) {
                         if (e.code === 'EINVAL') {
                             // the path was not a symlink; just return the resolved path in that case
-                            cb(null, str)
+                            return cb(null, str)
+                        }
+                        if (isWindows) {
+                            // windows has a harder time with readlink if the path is
+                            // through a junction; just return the realpath in this case
+                            return cb(null, str)
                         }
                         throw e
                     }
@@ -248,13 +260,13 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     )
                     if (!isEscape(args[0], realPathRoot, [escapedRoot])) {
                         // this realpath can be mapped back to a relative equivalent in the escaped root; return that instead
-                        cb(null, realPathRoot)
+                        return cb(null, realPathRoot)
                     } else {
                         // the realpath has no relative equivalent within the root; return the actual realpath
-                        cb(null, str)
+                        return cb(null, str)
                     }
                 } else {
-                    cb(null, str)
+                    return cb(null, str)
                 }
             }
         }
@@ -276,6 +288,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             } catch (e) {
                 if (e.code === 'EINVAL') {
                     // the path was not a symlink; just return the resolved path in that case
+                    return str
+                }
+                if (isWindows) {
+                    // windows has a harder time with readlink if the path is
+                    // through a junction; just return the realpath in this case
                     return str
                 }
                 throw e
@@ -311,6 +328,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             } catch (e) {
                 if (e.code === 'EINVAL') {
                     // the path was not a symlink; just return the resolved path in that case
+                    return str
+                }
+                if (isWindows) {
+                    // windows has a harder time with readlink if the path is
+                    // through a junction; just return the realpath in this case
                     return str
                 }
                 throw e
