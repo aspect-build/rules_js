@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { deepStrictEqual, ok } from 'assert'
-import * as fs from 'fs'
-import { withFixtures } from 'inline-fixtures'
-import * as path from 'path'
-import * as util from 'util'
+const assert = require('assert')
+const fs = require('fs')
+const withFixtures = require('inline-fixtures').withFixtures
+const path = require('path')
+const util = require('util')
 
-import { patcher } from '../../node-patches/src/fs'
+const patcher = require('../../node-patches/src/fs').patcher
 
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {
@@ -48,7 +48,6 @@ describe('testing opendir', async () => {
                 const patchedFs = Object.assign({}, fs)
                 patchedFs.promises = Object.assign({}, fs.promises)
                 patcher(patchedFs, [fixturesDir])
-                ;(patchedFs as any).DEBUG = true
 
                 let dir
                 dir = await util.promisify(patchedFs.opendir)(
@@ -60,12 +59,12 @@ describe('testing opendir', async () => {
 
                 let names = [entry1.name, entry2.name]
                 names.sort()
-                deepStrictEqual(names, ['apples', 'link'])
+                assert.deepStrictEqual(names, ['apples', 'link'])
 
                 let maybeLink = entry1.name === 'link' ? entry1 : entry2
-                ok(maybeLink!.isSymbolicLink())
+                assert.ok(maybeLink.isSymbolicLink())
 
-                ok(!empty, 'last read should be falsey')
+                assert.ok(!empty, 'last read should be falsey')
             }
         )
     })
@@ -87,7 +86,6 @@ describe('testing opendir', async () => {
                 const patchedFs = Object.assign({}, fs)
                 patchedFs.promises = Object.assign({}, fs.promises)
                 patcher(patchedFs, [path.join(fixturesDir, 'a')])
-                ;(patchedFs as any).DEBUG = true
 
                 let dir
                 dir = await util.promisify(patchedFs.opendir)(
@@ -100,13 +98,13 @@ describe('testing opendir', async () => {
                 let names = [entry1.name, entry2.name]
                 names.sort()
 
-                ok(!empty)
-                deepStrictEqual(names, ['apples', 'link'])
+                assert.ok(!empty)
+                assert.deepStrictEqual(names, ['apples', 'link'])
 
                 let maybeLink = entry1.name === 'link' ? entry1 : entry2
 
                 console.error(entry1, entry2)
-                ok(!maybeLink!.isSymbolicLink())
+                assert.ok(!maybeLink.isSymbolicLink())
             }
         )
     })
@@ -128,7 +126,6 @@ describe('testing opendir', async () => {
                 const patchedFs = Object.assign({}, fs)
                 patchedFs.promises = Object.assign({}, fs.promises)
                 patcher(patchedFs, [path.join(fixturesDir)])
-                ;(patchedFs as any).DEBUG = true
 
                 const dir = await util.promisify(patchedFs.opendir)(
                     path.join(fixturesDir, 'a')
@@ -137,13 +134,13 @@ describe('testing opendir', async () => {
                 for await (const entry of dir) {
                     names.push(entry.name)
                     if (entry.name === 'link') {
-                        ok(entry.isSymbolicLink())
+                        assert.ok(entry.isSymbolicLink())
                     } else if (entry.name === 'apples') {
-                        ok(entry.isFile())
+                        assert.ok(entry.isFile())
                     }
                 }
                 names.sort()
-                deepStrictEqual(names, ['apples', 'link'])
+                assert.deepStrictEqual(names, ['apples', 'link'])
             }
         )
     })
@@ -165,7 +162,6 @@ describe('testing opendir', async () => {
                 const patchedFs = Object.assign({}, fs)
                 patchedFs.promises = Object.assign({}, fs.promises)
                 patcher(patchedFs, [path.join(fixturesDir, 'a')])
-                ;(patchedFs as any).DEBUG = true
 
                 const dir = await util.promisify(patchedFs.opendir)(
                     path.join(fixturesDir, 'a')
@@ -174,14 +170,14 @@ describe('testing opendir', async () => {
                 for await (const entry of dir) {
                     names.push(entry.name)
                     if (entry.name === 'link') {
-                        ok(!entry.isSymbolicLink())
-                        ok(entry.isFile())
+                        assert.ok(!entry.isSymbolicLink())
+                        assert.ok(entry.isFile())
                     } else if (entry.name === 'apples') {
-                        ok(entry.isFile())
+                        assert.ok(entry.isFile())
                     }
                 }
                 names.sort()
-                deepStrictEqual(names, ['apples', 'link'])
+                assert.deepStrictEqual(names, ['apples', 'link'])
             }
         )
     })
