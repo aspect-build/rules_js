@@ -6,11 +6,11 @@ importers:
     specifiers:
       '@aspect-test/a': 5.0.0
       '@aspect-test/b': 5.0.0
-      '@aspect-test/c': 2.0.1
+      '@aspect-test/c': 2.0.2
     dependencies:
       '@aspect-test/a': 5.0.0
     optionalDependencies:
-      '@aspect-test/c': 2.0.1
+      '@aspect-test/c': 2.0.2
     devDependencies:
       '@aspect-test/b': 5.0.0
 
@@ -76,8 +76,8 @@ packages:
     hasBin: true
     requiresBuild: true
 
-  /@aspect-test/c/2.0.1:
-    resolution: {integrity: sha512-pyetgkZm4yfHYJYFaIi0rXM2VeR9qGw+gukEkrUO7LXuDIfkuvQd5TDduwIYIVvXGRjHKKjCa2BaA153nZfFyQ==}
+  /@aspect-test/c/2.0.2:
+    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
     requiresBuild: true
     dev: false
