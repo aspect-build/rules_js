@@ -84,7 +84,8 @@ Downloading packages should be Bazel's job. It has a full featured remote downlo
 into starlark code, then use only Bazel repository rules to perform fetches and translate the
 dependency graph into Bazel's representation.
 
-See the [design doc](https://hackmd.io/gu2Nj0TKS068LKAf8KanuA)
+For historical context, we started thinking about this in February 2021 in a (now outdated) [design doc](https://hackmd.io/gu2Nj0TKS068LKAf8KanuA)
+and have been working through the details since then.
 
 ### Running nodejs programs
 
