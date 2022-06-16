@@ -390,9 +390,6 @@ To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
         ))
     return result
 
-def _join(*elements):
-    return "/".join([f for f in elements if f])
-
 def _normalize_bazelignore(lines):
     """Make bazelignore lines predictable
 
@@ -418,9 +415,9 @@ def _verify_node_modules_ignored(rctx, importer_paths, bazelignore):
         if i == ".":
             expected = root
         else:
-            expected = paths.normalize(_join(root, i))
+            expected = paths.normalize(paths.join(root, i))
 
-        expected = _join(expected, "node_modules")
+        expected = paths.join(expected, "node_modules")
         if expected not in bazelignore:
             missing_ignores.append(expected)
     return missing_ignores
