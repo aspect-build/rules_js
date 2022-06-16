@@ -2,11 +2,13 @@
 
 There are more migration steps needed, this guide is still a work-in-progress.
 
-## Upgrade to Bazel 5.0 or greater
+## Upgrade to Bazel 5.1 or greater
 
 We follow [Bazel's LTS policy](https://bazel.build/release/versioning).
 
 `rules_js` and the related rules depend on APIs that were introduced in Bazel 5.0.
+
+However we recommend 5.1 because it includes a [cache for MerkleTree computations](https://github.com/bazelbuild/bazel/pull/13879), which makes our copy operations a lot faster.
 
 ## Upgrade to rules_nodejs 5.0 or greater
 
