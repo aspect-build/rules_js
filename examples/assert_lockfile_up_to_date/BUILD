@@ -12,12 +12,25 @@ js_test(
         ":pnpm-lock.yaml",
     ],
     entry_point = "assert_lockfile_frozen.js",
+    env = {
+        # The script overrides the cache dir to point to the output tree but pnpm
+        # will complain on Windows if it can't resolve a path to the default one.
+        # The env var APPDATA just needs to exist but not be undefined.
+        "APPDATA": "unused"
+
+    }
 )
 
 js_binary(
     name = "update_lockfile_js",
     data = [":node_modules/pnpm"],
     entry_point = ":update_lockfile.js",
+    env = {
+        # The script overrides the cache dir to point to the output tree but pnpm
+        # will complain on Windows if it can't resolve a path to the default one.
+        # The env var APPDATA just needs to exist but not be undefined.
+        "APPDATA": "unused"
+    }
 )
 
 js_run_binary(
