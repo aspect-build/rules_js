@@ -18,6 +18,7 @@ def _rollup_internal(name, link_root_name, **kwargs):
     _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
+        mnemonic = kwargs.pop("mnemonic", "rollup"),
         **kwargs
     )
 

@@ -235,6 +235,7 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
     _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
+        mnemonic = kwargs.pop("mnemonic", "{bin_name}"),
         **kwargs
     )
 
