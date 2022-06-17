@@ -14,7 +14,6 @@ Known issues:
 
 -   Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
 -   Doesn't work with rules_docker due to https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1137465914.
--   No examples yet for proto/gRPC, though this may "just work".
 -   No examples yet for publishing npm packages.
 
 rules_js is just a part of what Aspect provides:
