@@ -210,3 +210,28 @@ uvu_test(
         ":uvu_spec",
     ],
 )
+
+#######################################
+# Use case 6: depend on a hoisted npm package, ms, that isn't a direct dependency
+# in package.json but is a transitive dep of debug@3.2.7. Hoisted packages are
+# currently specified in the translate_package_lock rule. In the future we'll
+# add support for parsing the .npmrc and hoisting via public-hoist-pattern[]
+# directives.
+
+write_file(
+    name = "write6",
+    out = "case6.js",
+    content = ["""
+const ms = require('ms')
+const assert = require('assert')
+assert.ok(ms('2 days') == 172800000)
+"""],
+)
+
+js_test(
+    name = "test6",
+    data = [
+        ":node_modules/ms",
+    ],
+    entry_point = "case6.js",
+)

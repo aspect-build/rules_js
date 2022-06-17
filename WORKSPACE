@@ -57,6 +57,13 @@ npm_translate_lock(
         "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
+    public_hoist_packages = {
+        # Instructs the linker to hoist the ms@2.1.3 npm package to `node_modules/ms` in the `examples/npm_deps` package.
+        # Similar to adding `public-hoist-pattern[]=ms` in .npmrc but with control over which version to hoist and where
+        # to hoist it. This hoisted package can be referenced by the label `//examples/npm_deps:node_modules/ms` same as
+        # other direct dependencies in the `examples/npm_deps/package.json`.
+        "ms@2.1.3": ["examples/npm_deps"],
+    },
     verify_node_modules_ignored = "//:.bazelignore",
     warn_on_unqualified_tarball_url = False,
 )

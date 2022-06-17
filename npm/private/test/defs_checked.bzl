@@ -113,7 +113,7 @@ load("@npm__d3-time-format__2.3.0__links//:defs.bzl", link_107_store = "npm_link
 load("@npm__d3-time__1.1.0__links//:defs.bzl", link_108_store = "npm_link_imported_package_store")
 load("@npm__d3-timer__1.0.10__links//:defs.bzl", link_109_store = "npm_link_imported_package_store")
 load("@npm__debug__2.6.9__links//:defs.bzl", link_110_store = "npm_link_imported_package_store")
-load("@npm__debug__3.2.7__links//:defs.bzl", link_111_store = "npm_link_imported_package_store")
+load("@npm__debug__3.2.7__links//:defs.bzl", link_111_direct = "npm_link_imported_package_direct", link_111_store = "npm_link_imported_package_store")
 load("@npm__debug__4.3.4__links//:defs.bzl", link_112_store = "npm_link_imported_package_store")
 load("@npm__debug__4.3.4__supports-color_8.1.1__links//:defs.bzl", link_113_store = "npm_link_imported_package_store")
 load("@npm__decamelize__4.0.0__links//:defs.bzl", link_114_store = "npm_link_imported_package_store")
@@ -286,7 +286,7 @@ load("@npm__mrmime__1.0.1__links//:defs.bzl", link_280_store = "npm_link_importe
 load("@npm__ms__0.7.3__links//:defs.bzl", link_281_store = "npm_link_imported_package_store")
 load("@npm__ms__2.0.0__links//:defs.bzl", link_282_store = "npm_link_imported_package_store")
 load("@npm__ms__2.1.2__links//:defs.bzl", link_283_store = "npm_link_imported_package_store")
-load("@npm__ms__2.1.3__links//:defs.bzl", link_284_store = "npm_link_imported_package_store")
+load("@npm__ms__2.1.3__links//:defs.bzl", link_284_direct = "npm_link_imported_package_direct", link_284_store = "npm_link_imported_package_store")
 load("@npm__mumath__3.3.4__links//:defs.bzl", link_285_store = "npm_link_imported_package_store")
 load("@npm__murmurhash-js__1.0.0__links//:defs.bzl", link_286_store = "npm_link_imported_package_store")
 load("@npm__nanoid__3.3.3__links//:defs.bzl", link_287_store = "npm_link_imported_package_store")
@@ -938,8 +938,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scoped_direct_targets["@gregmagolan"] = scoped_direct_targets["@gregmagolan"] + [direct_targets[-1]] if "@gregmagolan" in scoped_direct_targets else [direct_targets[-1]]
             direct_targets.append(link_22_direct(name = "{}/@rollup/plugin-commonjs".format(name)))
             scoped_direct_targets["@rollup"] = scoped_direct_targets["@rollup"] + [direct_targets[-1]] if "@rollup" in scoped_direct_targets else [direct_targets[-1]]
+            direct_targets.append(link_111_direct(name = "{}/debug".format(name)))
             direct_targets.append(link_270_direct(name = "{}/mobx-react".format(name)))
             direct_targets.append(link_271_direct(name = "{}/mobx".format(name)))
+            direct_targets.append(link_284_direct(name = "{}/ms".format(name)))
             direct_targets.append(link_330_direct(name = "{}/react".format(name)))
             direct_targets.append(link_345_direct(name = "{}/rollup".format(name)))
             direct_targets.append(link_407_direct(name = "{}/uvu".format(name)))
