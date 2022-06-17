@@ -1930,7 +1930,9 @@ def npm_repositories():
         name = "npm__debug__3.2.7",
         root_package = "",
         link_workspace = "",
-        link_packages = {},
+        link_packages = {
+            "examples/npm_deps": ["debug"],
+        },
         package = "debug",
         version = "3.2.7",
         integrity = "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==",
@@ -5289,7 +5291,9 @@ def npm_repositories():
         name = "npm__ms__2.1.3",
         root_package = "",
         link_workspace = "",
-        link_packages = {},
+        link_packages = {
+            "examples/npm_deps": ["ms"],
+        },
         package = "ms",
         version = "2.1.3",
         integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",

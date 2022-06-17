@@ -39,6 +39,7 @@ importers:
       '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0
+      debug: 3.2.7
       mobx: 6.3.0
       mobx-react: 7.3.0
       react: 17.0.2
@@ -49,6 +50,7 @@ importers:
       '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
+      debug: 3.2.7
       mobx: 6.3.0
       mobx-react: 7.3.0_mobx@6.3.0+react@17.0.2
       react: 17.0.2

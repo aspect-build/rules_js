@@ -124,6 +124,14 @@ _ATTRS = {
     "prod": attr.bool(
         doc = """If true, only install dependencies""",
     ),
+    "public_hoist_packages": attr.string_list_dict(
+        doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
+        to a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree when linking.
+
+        This is similar to setting https://pnpm.io/npmrc#public-hoist-pattern in an .npmrc file outside of Bazel, however,
+        wild-cards are not yet supported and translate_pnpm_lock will fail if there are multiple versions of a package that
+        are to be hoisted.""",
+    ),
     "dev": attr.bool(
         doc = """If true, only install devDependencies""",
     ),
@@ -330,6 +338,18 @@ def _gen_npm_imports(lockfile, attr):
                         link_packages[link_package] = [dep_package]
                     else:
                         link_packages[link_package].append(dep_package)
+
+        # check if this package should be hoisted via public_hoist_packages
+        public_hoist_packages = []
+        public_hoist_packages = attr.public_hoist_packages.get(name, [])[:]
+        public_hoist_packages.extend(attr.public_hoist_packages.get(friendly_name, []))
+        if unfriendly_name:
+            public_hoist_packages.extend(attr.patches.get(unfriendly_name, []))
+        for public_hoist_package in public_hoist_packages:
+            if public_hoist_package not in link_packages:
+                link_packages[public_hoist_package] = [name]
+            elif name not in link_packages[public_hoist_package]:
+                link_packages[public_hoist_package].append(name)
 
         run_lifecycle_hooks = (
             requires_build and
