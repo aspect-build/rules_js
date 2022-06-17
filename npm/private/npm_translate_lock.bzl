@@ -442,6 +442,51 @@ def _verify_node_modules_ignored(rctx, importer_paths, bazelignore):
             missing_ignores.append(expected)
     return missing_ignores
 
+def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
+    if not public_hoist_packages:
+        return
+    all_public_links = {}
+    for (i, _import) in enumerate(npm_imports):
+        for link_package, link_names in _import.link_packages.items():
+            if link_package not in all_public_links:
+                all_public_links[link_package] = {}
+            for link_name in link_names:
+                if link_name not in all_public_links[link_package]:
+                    all_public_links[link_package][link_name] = []
+                all_public_links[link_package][link_name].append("{}@{}".format(_import.package, _import.version))
+    for link_package, link_names in all_public_links.items():
+        for link_name, link_packages in link_names.items():
+            if len(link_packages) > 1:
+                if link_name in public_hoist_packages:
+                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to `{}/node_modules/{}`: {}
+
+Trying selecting a specific version of `{}` to hoist in public_hoist_packages. For example `{}`:
+
+    ```
+    public_hoist_packages = {{
+        "{}": ["{}"]
+    }}
+    ```
+""".format(
+                        link_package,
+                        link_name,
+                        link_packages,
+                        link_name,
+                        link_packages[0],
+                        link_packages[0],
+                        link_package,
+                    )
+                else:
+                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to `{}/node_modules/{}`: {}
+
+Check the public_hoist_packages attribute for duplicates.
+""".format(
+                        link_package,
+                        link_name,
+                        link_packages,
+                    )
+                fail(msg)
+
 def _impl(rctx):
     lockfile = _process_lockfile(rctx)
 
@@ -604,6 +649,9 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             defs_bzl_file = "@{}//:{}".format(rctx.name, _DEFS_BZL_FILENAME),
         ),
     ]
+
+    # check all links and fail if there are duplicates which can happen with public hoisting
+    _check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
     root_links_bzl = []
     direct_links_bzl = {}
