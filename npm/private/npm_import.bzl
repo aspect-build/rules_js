@@ -32,7 +32,7 @@ def npm_link_imported_package_store(
     lc_deps = {lc_deps}
     ref_deps = {ref_deps}
 
-    lifecycle_build_target = {lifecycle_build_target}
+    has_lifecycle_build_target = {has_lifecycle_build_target}
     store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
 
     # reference target used to avoid circular deps
@@ -46,7 +46,7 @@ def npm_link_imported_package_store(
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _npm_link_package_store(
         name = "{{}}/pkg".format(store_target_name),
-        src = "{{}}/pkg_lc".format(store_target_name) if lifecycle_build_target else "{npm_package_target}",
+        src = "{{}}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
         deps = ref_deps,
@@ -74,7 +74,7 @@ def npm_link_imported_package_store(
         tags = ["manual"],
     )
 
-    if lifecycle_build_target:
+    if has_lifecycle_build_target:
         # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
         _npm_link_package_store(
             name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
@@ -95,7 +95,7 @@ def npm_link_imported_package_store(
 
         # lifecycle build action
         _js_run_binary(
-            name = "{lifecycle_target_name}",
+            name = "{{}}/lc".format(store_target_name),
             srcs = [
                 "{npm_package_target_lc}",
                 ":{{}}/pkg_pre_lc".format(store_target_name)
@@ -108,14 +108,16 @@ def npm_link_imported_package_store(
             ],
             copy_srcs_to_bin = False,
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
-            output_dir = True,
+            out_dirs = ["{lifecycle_output_dir}"],
             tags = ["manual"],
+            mnemonic = "NpmLifecycleHook",
+            progress_message = "Running lifecycle hooks on npm package {package}@{version}",
         )
 
         # post-lifecycle npm_package
         _npm_package(
             name = "{{}}/pkg_lc".format(store_target_name),
-            src = ":{lifecycle_target_name}",
+            src = ":{{}}/lc".format(store_target_name),
             package = "{package}",
             version = "{version}",
             tags = ["manual"],
@@ -503,7 +505,7 @@ def _impl_links(rctx):
     virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
 
     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-    lifecycle_target_name = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
+    lifecycle_output_dir = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(utils.links_repo_suffix)]
@@ -532,8 +534,8 @@ def _impl_links(rctx):
         npm_package_target = npm_package_target,
         npm_package_target_lc = npm_package_target_lc,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 2, quote_key = False),
-        lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
-        lifecycle_target_name = lifecycle_target_name,
+        has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
+        lifecycle_output_dir = lifecycle_output_dir,
         npm_link_package_bzl = "@%s//:%s" % (rctx.name, _DEFS_BZL_FILENAME),
         link_packages = starlark_codegen_utils.to_dict_attr(link_packages, 1, quote_value = False),
         package = rctx.attr.package,
