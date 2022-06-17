@@ -10,3 +10,4 @@ Since rules_js users download this whole repo, our larger examples are in
 <https://github.com/aspect-build/bazel-examples>. These include:
 
 -   Vue 3.x with Vite: https://github.com/aspect-build/bazel-examples/tree/main/vue
+-   Protobuf and gRPC: https://github.com/aspect-build/bazel-examples/tree/main/protobufjs
