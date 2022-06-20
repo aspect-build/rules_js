@@ -2,9 +2,7 @@
     "name": "@mycorp/mylib",
     "private": true,
     "dependencies": {
-        "uuid": "8.3.2"
-    },
-    "optionalDependencies": {
-        "acorn": "*"
+        "uuid": "8.3.2",
+        "acorn": "8.7.1"
     }
 }
