@@ -17,11 +17,12 @@ We need at least version 5.0.
 
 This also requires you upgrade `build_bazel_rules_nodejs` to 5.0, along with `@bazel`-scoped npm packages like `@bazel/typescript`.
 
-## Install pnpm (optional)
+## Install pnpm
 
 `rules_js` is based on the pnpm package manager.
-Our implementation is self-contained, so it doesn't matter if users install pnpm,
-however it's typically useful to manipulate the lockfile or to install packages for use outside of Bazel.
+Our implementation is self-contained, so it doesn't matter if Bazel users of your project install pnpm.
+However it's typically useful to create or manipulate the lockfile, or to install packages for use outside of Bazel.
+So if you don't have a pnpm lockfile, you'll need pnpm as part of migrating.
 
 You can follow the [pnpm install docs](https://pnpm.io/installation).
 
