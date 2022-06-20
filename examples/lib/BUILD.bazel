@@ -6,6 +6,9 @@ npm_package(
         "index.js",
         "package.json",
     ],
-    package = "@mycorp/mylib",
+    # `package = "@mycorp/mylib"` does not need to be specified since the name
+    # that this package is linked as is set by the pnpm lockfile. If it is
+    # specified here then it won't be load bearing since the value in the pnpm
+    # lockfile will take precendence.
     visibility = ["//visibility:public"],
 )
