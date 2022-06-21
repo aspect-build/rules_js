@@ -1,9 +1,14 @@
 {
     "private": true,
+    "dependencies": {
+        "mathjs": "10.6.1"
+    },
     "devDependencies": {
         "@types/node": "16.11.36",
         "inline-fixtures": "1.1.0",
-        "typescript": "4.7.2"
+        "typescript": "4.7.2",
+        "webpack-cli": "^4.0.0",
+        "webpack": "^4.0.0"
     },
     "pnpm": {
         "packageExtensions": {

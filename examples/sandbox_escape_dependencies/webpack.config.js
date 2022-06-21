@@ -7,6 +7,8 @@ module.exports = (webpackEnv = {}) => {
   return {
     entry: path.join(__dirname, 'index.js'),
     // stats: 'verbose',
+    mode: 'development',
+    stats: 'detailed',
     output: {
       filename: 'main.js',
       path: out_path,

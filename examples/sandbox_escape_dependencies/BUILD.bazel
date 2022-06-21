@@ -18,7 +18,7 @@ npm_link_all_packages(
 )
 
 js_test(
-    name = "test_test",
+    name = "test",
     data = [
         ":node_modules/mathjs",
         ":package.json"
@@ -38,5 +38,33 @@ bin.webpack_cli(
     outs = [
         "dist/main.js"
     ],
+    log_level = "debug",
+    chdir = package_name(),
+)
+
+# Try the same thing using the root npm deps:
+
+js_test(
+    name = "test_root",
+    data = [
+        "//:node_modules/mathjs",
+        ":package.json"
+    ],
+    entry_point = "index.js",
+)
+
+bin.webpack_cli(
+    name="bundle_root",
+    srcs=[
+        ":files",
+        "//:node_modules/mathjs",
+    ],
+    args = [
+       "--config webpack.config.js",
+    ],
+    outs = [
+        "dist2/main.js"
+    ],
+    log_level = "debug",
     chdir = package_name(),
 )
