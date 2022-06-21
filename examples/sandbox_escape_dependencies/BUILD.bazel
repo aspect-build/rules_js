@@ -1,0 +1,42 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//examples/sandbox_escape_dependencies/webpack-cli:package_json.bzl", "bin")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+
+copy_to_bin(
+    name="files",
+    srcs = [
+        "index.js",
+        "webpack.config.js",
+        "package.json",
+    ],
+)
+
+
+npm_link_all_packages(
+    name = "node_modules",
+)
+
+js_test(
+    name = "test_test",
+    data = [
+        ":node_modules/mathjs",
+        ":package.json"
+    ],
+    entry_point = "index.js",
+)
+
+bin.webpack_cli(
+    name="bundle",
+    srcs=[
+        ":files",
+        ":node_modules/mathjs",
+    ],
+    args = [
+       "--config webpack.config.js",
+    ],
+    outs = [
+        "dist/main.js"
+    ],
+    chdir = package_name(),
+)

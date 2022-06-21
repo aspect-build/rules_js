@@ -1,0 +1,13 @@
+{
+    "name": "@mycorp/sandbox_escape_showcase",
+    "private": true,
+    "main": "index.js",
+    "dependencies": {
+        "mathjs": "10.6.1",
+        "webpack-cli": "^4.0.0",
+        "webpack": "^4.0.0"
+    },
+    "scripts": {
+        "build": "pnpm exec webpack-cli --config webpack.config.js"
+    }
+}

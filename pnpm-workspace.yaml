@@ -2,4 +2,5 @@ packages:
     - 'examples/lib'
     - 'examples/macro'
     - 'examples/npm_deps'
+    - 'examples/sandbox_escape_dependencies'
     - 'npm/private/test'

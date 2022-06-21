@@ -586,8 +586,15 @@ const escapeFunction = (_roots) => {
             }
         }
         if (escapedRoot) {
+            console.log(`-- SYMLINK ESCAPES --`);
+            console.log(`link:        ${linkPath}`);
+            console.log(`target:      ${linkTarget}`);
+            console.log(`escapedRoot: ${escapedRoot}`);
             return escapedRoot;
         }
+        console.log(`-- SYMLINK DOES NOT ESCAPE --`);
+        console.log(`link:   ${linkPath}`);
+        console.log(`target: ${linkTarget}`);
         return false;
     }
     return _isEscape;
