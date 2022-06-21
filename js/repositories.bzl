@@ -7,10 +7,6 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-versions = struct(
-    rules_nodejs = "5.5.0",
-)
-
 # WARNING: any changes in this function may be BREAKING CHANGES for users
 # because we'll fetch a dependency which may be different from one that
 # they were previously fetching later in their WORKSPACE setup, and now
@@ -32,13 +28,13 @@ def rules_js_dependencies():
         http_archive,
         name = "rules_nodejs",
         sha256 = "4d48998e3fa1e03c684e6bdf7ac98051232c7486bfa412e5b5475bbaec7bb257",
-        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/{0}/rules_nodejs-core-{0}.tar.gz".format(versions.rules_nodejs)],
+        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.5.0/rules_nodejs-core-5.5.0.tar.gz"],
     )
 
     maybe(
         http_archive,
         name = "aspect_bazel_lib",
-        sha256 = "8860aab705fe9f427fbebe388bdfacf8a6b267cb3c0d71ebeaf1dcceedd29193",
-        strip_prefix = "bazel-lib-1.3.0",
-        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.3.0.tar.gz",
+        sha256 = "4ef2f746bae7bd7f1ec39dc9b53a9d7e8002f18233ea2c2ee4702bbb5283c7ca",
+        strip_prefix = "bazel-lib-1.3.1",
+        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.3.1.tar.gz",
     )
