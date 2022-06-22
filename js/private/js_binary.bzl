@@ -315,10 +315,43 @@ def _impl(ctx):
         log_prefix_rule_set = "aspect_rules_js",
         log_prefix_rule = "js_test" if ctx.attr.testonly else "js_binary",
     )
-    return DefaultInfo(
-        executable = launcher.executable,
-        runfiles = launcher.runfiles,
-    )
+    runfiles = launcher.runfiles
+
+    providers = []
+
+    if ctx.attr.testonly and ctx.configuration.coverage_enabled:
+        # We have to instruct rule implementers to have this attribute present.
+        if not hasattr(ctx.attr, "_lcov_merger"):
+            fail("_lcov_merger attribute is missing and coverage was requested")
+
+        # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
+        # See: https://github.com/bazelbuild/bazel/issues/4033
+        runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
+        providers = [
+            coverage_common.instrumented_files_info(
+                ctx,
+                source_attributes = ["data"],
+                # TODO: check if there is more extensions
+                # TODO: .ts should not be here since we ought to only instrument transpiled files?
+                extensions = [
+                    "mjs",
+                    "mts",
+                    "cjs",
+                    "cts",
+                    "ts",
+                    "js",
+                    "jsx",
+                    "tsx",
+                ],
+            ),
+        ]
+
+    return providers + [
+        DefaultInfo(
+            executable = launcher.executable,
+            runfiles = runfiles,
+        ),
+    ]
 
 js_binary_lib = struct(
     attrs = _ATTRS,
@@ -342,7 +375,13 @@ js_binary = rule(
 js_test = rule(
     doc = "Identical to js_binary, but usable under `bazel test`.",
     implementation = js_binary_lib.implementation,
-    attrs = js_binary_lib.attrs,
+    attrs = dict(js_binary_lib.attrs, **{
+        "_lcov_merger": attr.label(
+            executable = True,
+            default = Label("//js/private/coverage:merger"),
+            cfg = "exec",
+        ),
+    }),
     test = True,
     toolchains = js_binary_lib.toolchains,
 )

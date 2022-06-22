@@ -1,5 +1,6 @@
-docs/
-min/
 **/pnpm-lock.yaml
-js/private/node-patches/fs.js
+docs/
 examples/**/*-docs.md
+js/private/coverage/coverage.js
+js/private/node-patches/fs.js
+min/

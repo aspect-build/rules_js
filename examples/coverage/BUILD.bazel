@@ -1,0 +1,10 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+js_test(
+    name = "coverage",
+    data = [
+        "coverage.js",
+        "//:node_modules/@types/node",
+    ],
+    entry_point = "test.js",
+)
