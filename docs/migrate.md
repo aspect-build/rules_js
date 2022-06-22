@@ -60,8 +60,10 @@ Useful pnpm resources for these patterns:
 
 In our mocha example, the solution is to declare the expected dependency in `package.json` using the `pnpm.packageExtensions` key: <https://github.com/aspect-build/rules_js/blob/main/package.json>.
 
-Another approach is to just give up on pnpm's stricter visibility for npm modules, and use the `--shamefully-hoist` option.
-This will write a `pnpm-lock.yaml` file which provides a hoisted node_modules structure, which rules_js will naturally translate into the bazel-out folder.
+Another approach is to just give up on pnpm's stricter visibility for npm modules, and hoist packages as needed.
+pnpm has flags `public-hoist-pattern` and `shamefully-hoist` which can do this, however we don't support those flags in rules_js yet.
+Instead we have the `public_hoist_packages` attribute of [npm_translate_lock](/docs/npm_import.md#npm_translate_lock).
+In the future we plan to read these settings from `.npmrc` like pnpm does; follow https://github.com/aspect-build/rules_js/issues/239.
 
 As long as you're able to run your build and test under pnpm, we expect the behavior of `rules_js` should match.
 
