@@ -439,7 +439,7 @@ def _sanitize_bin_name(name):
 
 def _mnemonic_for_bin(name):
     """ Sanitize a package name so we can use it in starlark function names """
-    return name.replace("-", " ")
+    return name.replace("-", " ").replace("_", " ")
 
 def _impl_links(rctx):
     ref_deps = {}
