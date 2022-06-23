@@ -1,0 +1,12 @@
+{
+    "homepage": "https://docs.aspect.dev/rules_js",
+    "maintainers": [
+        {
+            "email": "hello@aspect.dev",
+            "github": "aspect-build",
+            "name": "Aspect team"
+        }
+    ],
+    "versions": [],
+    "yanked_versions": {}
+}
