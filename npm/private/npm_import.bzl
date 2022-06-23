@@ -235,7 +235,7 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
     _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
-        mnemonic = kwargs.pop("mnemonic", "{bin_name}"),
+        mnemonic = kwargs.pop("mnemonic", "{bin_mnemonic}"),
         **kwargs
     )
 
@@ -383,6 +383,7 @@ def _impl(rctx):
                     _BIN_MACRO_TMPL.format(
                         bazel_name = bazel_name,
                         bin_name = _sanitize_bin_name(name),
+                        bin_mnemonic = _mnemonic_for_bin(name),
                         bin_path = bins[name],
                         link_workspace = rctx.attr.link_workspace,
                         package = rctx.attr.package,
@@ -435,6 +436,10 @@ bin = bin_factory("node_modules")
 def _sanitize_bin_name(name):
     """ Sanitize a package name so we can use it in starlark function names """
     return name.replace("-", "_")
+
+def _mnemonic_for_bin(name):
+    """ Sanitize a package name so we can use it in starlark function names """
+    return name.replace("-", " ")
 
 def _impl_links(rctx):
     ref_deps = {}
