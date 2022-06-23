@@ -439,7 +439,7 @@ def _sanitize_bin_name(name):
     return name.replace("-", "_")
 
 def _mnemonic_for_bin(bin_name):
-    """ Sanitize a package name so we can use it action mnemonics.
+    """ Sanitize a bin name so we can use it as a mnemonic.
 
     Creates a CamelCase version of the bin name.
     """
