@@ -1,4 +1,4 @@
-load("@npm//typescript:package_json.bzl", typescript_bin = "bin")
+load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
 
 typescript_bin.tsc(
     name = "compile",

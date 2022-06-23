@@ -176,7 +176,7 @@ _NPM_IMPORT_TMPL = \
 """
 
 _BIN_TMPL = \
-    """load("@{repo_name}//{repo_package_json_bzl}", _bin = "bin", _bin_factory = "bin_factory")
+    """load("{repo_package_json_bzl}", _bin = "bin", _bin_factory = "bin_factory")
 bin = _bin
 bin_factory = _bin_factory
 """
@@ -733,17 +733,17 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             # If this is a problem, we could lookup into the packages again like
             # if lockfile.get("packages").values()[i].get("hasBin"):
             if True:
-                build_file_path = paths.normalize(paths.join(link_package, _import.package, "BUILD.bazel"))
+                build_file_path = paths.normalize(paths.join(link_package, "BUILD.bazel"))
                 rctx.file(build_file_path, "\n".join(generated_by_lines))
                 package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
-                repo_package_json_bzl = paths.normalize(paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)).rsplit("/", 1)
-                if len(repo_package_json_bzl) == 1:
-                    repo_package_json_bzl = [""] + repo_package_json_bzl
-                repo_package_json_bzl = ":".join(repo_package_json_bzl)
+                repo_package_json_bzl = "@{repo_name}//{link_package}:{package_json_bzl}".format(
+                    repo_name = _import.name,
+                    link_package = link_package,
+                    package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,
+                )
                 rctx.file(package_json_bzl_file_path, "\n".join([
                     _BIN_TMPL.format(
                         repo_package_json_bzl = repo_package_json_bzl,
-                        repo_name = _import.name,
                     ),
                 ]))
 

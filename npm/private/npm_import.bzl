@@ -360,7 +360,17 @@ def _impl(rctx):
 
     bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
-    root_package_json_bzl = False
+    rctx_files = {
+        "BUILD.bazel": generated_by_lines + [
+            """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package = "npm_package_internal")""",
+        ],
+    }
+
+    rctx_files["BUILD.bazel"].append(_JS_PACKAGE_TMPL.format(
+        extract_to_dirname = _EXTRACT_TO_DIRNAME,
+        package = rctx.attr.package,
+        version = rctx.attr.version,
+    ))
 
     if bins:
         for link_package in rctx.attr.link_packages.keys():
@@ -406,13 +416,12 @@ bin = bin_factory("node_modules")
                 bin_struct_fields = "\n".join(bin_struct_fields),
             ))
 
-            if link_package == "":
-                root_package_json_bzl = True
-            else:
-                rctx.file(paths.normalize(paths.join(link_package, "BUILD.bazel")), "\n".join(generated_by_lines + [
-                    "exports_files({})".format(starlark_codegen_utils.to_list_attr([_PACKAGE_JSON_BZL_FILENAME])),
-                ]))
-            rctx.file(paths.normalize(paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)), "\n".join(bin_bzl))
+            rctx_files[paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)] = bin_bzl
+
+            build_file = paths.join(link_package, "BUILD.bazel")
+            if build_file not in rctx_files:
+                rctx_files[build_file] = generated_by_lines[:]
+            rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
 
     if rctx.attr.run_lifecycle_hooks:
         _inject_run_lifecycle_hooks(rctx, pkg_json_path)
@@ -420,20 +429,8 @@ bin = bin_factory("node_modules")
     if rctx.attr.custom_postinstall:
         _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.custom_postinstall)
 
-    build_file = generated_by_lines + [
-        """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package = "npm_package_internal")""",
-    ]
-
-    build_file.append(_JS_PACKAGE_TMPL.format(
-        extract_to_dirname = _EXTRACT_TO_DIRNAME,
-        package = rctx.attr.package,
-        version = rctx.attr.version,
-    ))
-
-    if root_package_json_bzl:
-        build_file.append("exports_files(%s)" % starlark_codegen_utils.to_list_attr([_PACKAGE_JSON_BZL_FILENAME]))
-
-    rctx.file("BUILD.bazel", "\n".join(build_file))
+    for filename, contents in rctx_files.items():
+        rctx.file(filename, "\n".join(contents))
 
 def _sanitize_bin_name(name):
     """ Sanitize a package name so we can use it in starlark function names """

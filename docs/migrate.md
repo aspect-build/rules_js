@@ -128,7 +128,7 @@ npm_check(
 Example, after:
 
 ```starlark
-load("@npm//npm-check:package_json.bzl", "bin")
+load("@npm//:npm-check/package_json.bzl", "bin")
 
 exports_files(["package.json"])
 
