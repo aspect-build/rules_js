@@ -18,7 +18,7 @@ def _webpack_bundle_analyzer_internal(name, link_root_name, **kwargs):
     _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
-        mnemonic = kwargs.pop("mnemonic", "webpack bundle analyzer"),
+        mnemonic = kwargs.pop("mnemonic", "WebpackBundleAnalyzer"),
         **kwargs
     )
 

@@ -379,11 +379,12 @@ def _impl(rctx):
                 """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
             ]
             for name in bins:
+                bin_name = _sanitize_bin_name(name)
                 bin_bzl.append(
                     _BIN_MACRO_TMPL.format(
                         bazel_name = bazel_name,
-                        bin_name = _sanitize_bin_name(name),
-                        bin_mnemonic = _mnemonic_for_bin(name),
+                        bin_name = bin_name,
+                        bin_mnemonic = _mnemonic_for_bin(bin_name),
                         bin_path = bins[name],
                         link_workspace = rctx.attr.link_workspace,
                         package = rctx.attr.package,
@@ -437,9 +438,13 @@ def _sanitize_bin_name(name):
     """ Sanitize a package name so we can use it in starlark function names """
     return name.replace("-", "_")
 
-def _mnemonic_for_bin(name):
-    """ Sanitize a package name so we can use it action mnemonics """
-    return name.replace("-", " ").replace("_", " ")
+def _mnemonic_for_bin(bin_name):
+    """ Sanitize a package name so we can use it action mnemonics.
+
+    Creates a CamelCase version of the bin name.
+    """
+    bin_words = bin_name.split("_")
+    return "".join([word.capitalize() for word in bin_words])
 
 def _impl_links(rctx):
     ref_deps = {}
