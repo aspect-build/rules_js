@@ -11,7 +11,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
 
 # Load from the "bin" property from the package.json of the uvu package
-load("@npm//examples/npm_deps/uvu:package_json.bzl", uvu_bin = "bin")
+load("@npm//examples/npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
 
 ###########################
 

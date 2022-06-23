@@ -1,6 +1,6 @@
 "Example macro wrapping the mocha CLI"
 
-load("@npm//examples/macro/mocha:package_json.bzl", "bin")
+load("@npm//examples/macro:mocha/package_json.bzl", "bin")
 
 def mocha_test(name, srcs, args = [], data = [], env = {}, **kwargs):
     bin.mocha_test(
