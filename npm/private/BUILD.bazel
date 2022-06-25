@@ -63,6 +63,12 @@ bzl_library(
 )
 
 bzl_library(
+    name = "ini",
+    srcs = ["ini.bzl"],
+    visibility = ["//npm:__subpackages__"],
+)
+
+bzl_library(
     name = "utils",
     srcs = ["utils.bzl"],
     visibility = ["//npm:__subpackages__"],
