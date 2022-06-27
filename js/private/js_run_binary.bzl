@@ -11,6 +11,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 """
 
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
+load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js/private:js_binary.bzl", _js_binary_envs_for_log_level = "envs_for_log_level")
@@ -181,6 +182,20 @@ def js_run_binary(
     if log_level:
         for log_level_env in _js_binary_envs_for_log_level(log_level):
             extra_env[log_level_env] = "1"
+
+    if len(outs) + len(out_dirs) < 1:
+        # run_binary will produce the actual error, but we want to give an additional JS-specific
+        # warning message here. Note that as a macro, we can't tell the name of the rule provided
+        # by the users BUILD file (e.g. for "typescript_bin.tsc(outs = [])" we'd wish to say
+        # "try using tsc_binary instead")
+        # buildifier: disable=print
+        print("""\
+WARNING: {name} is not configured to produce outputs.
+        
+If this is a generated bin from package_json.bzl, consider using the *_binary variant instead.
+""".format(
+            name = to_label(name),
+        ))
 
     _run_binary(
         name = name,
