@@ -218,6 +218,15 @@ _FP_DIRECT_TMPL = \
             )
             """
 
+_BZL_LIBRARY_TMPL = \
+    """
+bzl_library(
+    name = "{name}",
+    srcs = ["{src}"],
+    deps = ["{dep}"],
+    visibility = ["//visibility:public"],
+)"""
+
 _DEFS_BZL_FILENAME = "defs.bzl"
 _REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
@@ -540,6 +549,16 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
     npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
     fp_links = {}
+    rctx_files = {
+        "BUILD.bazel": generated_by_lines + [
+            """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
+            "",
+            "exports_files({})".format(starlark_codegen_utils.to_list_attr([
+                _DEFS_BZL_FILENAME,
+                _REPOSITORIES_BZL_FILENAME,
+            ])),
+        ],
+    }
 
     # Look for first-party links
     for import_path, importer in importers.items():
@@ -734,7 +753,19 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             # if lockfile.get("packages").values()[i].get("hasBin"):
             if True:
                 build_file_path = paths.normalize(paths.join(link_package, "BUILD.bazel"))
-                rctx.file(build_file_path, "\n".join(generated_by_lines))
+                if build_file_path not in rctx_files.keys():
+                    rctx_files[build_file_path] = generated_by_lines + [
+                        """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
+                    ]
+                rctx_files[build_file_path].append(_BZL_LIBRARY_TMPL.format(
+                    name = _import.package,
+                    src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
+                    dep = "@{repo_name}//{link_package}:{package_name}".format(
+                        repo_name = _import.name,
+                        link_package = link_package,
+                        package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
+                    ),
+                ))
                 package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
                 repo_package_json_bzl = "@{repo_name}//{link_package}:{package_json_bzl}".format(
                     repo_name = _import.name,
@@ -806,12 +837,8 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
 
     rctx.file(_DEFS_BZL_FILENAME, "\n".join(defs_bzl_header + [""] + defs_bzl_body + [""]))
     rctx.file(_REPOSITORIES_BZL_FILENAME, "\n".join(repositories_bzl))
-    rctx.file("BUILD.bazel", "\n".join(generated_by_lines + [
-        "exports_files({})".format(starlark_codegen_utils.to_list_attr([
-            _DEFS_BZL_FILENAME,
-            _REPOSITORIES_BZL_FILENAME,
-        ])),
-    ]))
+    for filename, contents in rctx_files.items():
+        rctx.file(filename, "\n".join(contents))
 
 npm_translate_lock = struct(
     doc = _DOC,

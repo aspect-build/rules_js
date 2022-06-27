@@ -296,16 +296,29 @@ _npm_package(
 )
 """
 
+_BZL_LIBRARY_TMPL = \
+    """
+bzl_library(
+    name = "{name}",
+    srcs = ["{src}"],
+    deps = [
+        "@aspect_bazel_lib//lib:directory_path",
+        "@aspect_rules_js//js:defs",
+    ],
+    visibility = ["//visibility:public"],
+)"""
+
 _TARBALL_FILENAME = "package.tgz"
 _EXTRACT_TO_DIRNAME = "package"
 _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _impl(rctx):
+    # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
+    package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
     download_url = rctx.attr.url if rctx.attr.url else "https://registry.npmjs.org/{0}/-/{1}-{2}.tgz".format(
         rctx.attr.package,
-        # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
-        rctx.attr.package.rsplit("/", 1)[-1],
+        package_name_no_scope,
         utils.strip_peer_dep_version(rctx.attr.version),
     )
 
@@ -363,6 +376,7 @@ def _impl(rctx):
     rctx_files = {
         "BUILD.bazel": generated_by_lines + [
             """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package = "npm_package_internal")""",
+            """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
         ],
     }
 
@@ -422,8 +436,15 @@ bin = bin_factory("node_modules")
 
             build_file = paths.join(link_package, "BUILD.bazel")
             if build_file not in rctx_files:
-                rctx_files[build_file] = generated_by_lines[:]
-            rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
+                rctx_files[build_file] = generated_by_lines[:] + [
+                    """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
+                    "",
+                    """exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME),
+                ]
+            rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
+                name = link_package.split("/")[-1] or package_name_no_scope,
+                src = _PACKAGE_JSON_BZL_FILENAME,
+            ))
 
     if rctx.attr.run_lifecycle_hooks:
         _inject_run_lifecycle_hooks(rctx, pkg_json_path)

@@ -1,7 +1,9 @@
-load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
+load(":tsc.bzl", "tsc")
+load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
-typescript_bin.tsc(
+tsc(
     name = "two",
     srcs = [
         "tsconfig.json",
@@ -12,11 +14,6 @@ typescript_bin.tsc(
     outs = [
         "two.js",
     ],
-    chdir = package_name(),
-    args = [
-        "-p",
-        "tsconfig.json",
-    ],
 )
 
 js_test(
@@ -24,3 +21,19 @@ js_test(
     data = ["//examples/js_library/one"],
     entry_point = "two.js",
 )
+
+bzl_library(
+    name = "tsc",
+    srcs = ["tsc.bzl"],
+    deps = [
+        # this is a bzl_library target, exposing the package_json.bzl file we depend on
+        "@npm//:typescript",
+    ],
+)
+
+stardoc_with_diff_test(
+    name = "tsc-docs",
+    bzl_library_target = ":tsc",
+)
+
+update_docs(name = "docs")

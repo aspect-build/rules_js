@@ -2,3 +2,4 @@ docs/
 min/
 **/pnpm-lock.yaml
 js/private/node-patches/fs.js
+examples/**/*-docs.md
