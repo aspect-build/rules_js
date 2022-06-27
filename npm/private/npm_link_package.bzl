@@ -181,6 +181,7 @@ def _impl_store(ctx):
     virtual_store_directory = None
     direct_files = []
     direct_ref_deps = {}
+    symlinks = {}
 
     if ctx.attr.src:
         # output the package as a TreeArtifact to its virtual store location
@@ -221,6 +222,7 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                         target_file = dep_virtual_store_directory,
                     )
                     direct_files.append(dep_symlink)
+                    symlinks.update({dep_symlink_path: dep_virtual_store_directory})
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm depedency will create the dep symlinks for this dep;
@@ -273,10 +275,11 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                                 target_file = dep_ref_def_virtual_store_directory,
                             )
                             direct_files.append(dep_ref_dep_symlink)
+                            symlinks.update({dep_ref_dep_symlink_path: dep_ref_def_virtual_store_directory})
 
     direct_files = depset(direct = direct_files)
     files_depsets = [direct_files]
-    runfiles = ctx.runfiles(transitive_files = direct_files)
+    runfiles = ctx.runfiles(transitive_files = direct_files, symlinks = symlinks)
     for dep in ctx.attr.deps:
         files_depsets.append(dep[DefaultInfo].files)
         runfiles = runfiles.merge(dep[DefaultInfo].data_runfiles)
@@ -315,19 +318,21 @@ def _impl_direct(ctx):
 
     # symlink the package's path in the virtual store to the root of the node_modules
     # as a direct dependency
-    root_symlink = ctx.actions.declare_file(
-        # "node_modules/{package}"
-        paths.join("node_modules", package),
-    )
+    # "node_modules/{package}"
+    direct_dep_path = paths.join("node_modules", package)
+    root_symlink = ctx.actions.declare_file(direct_dep_path)
+
     ctx.actions.symlink(
         output = root_symlink,
         target_file = virtual_store_directory,
     )
 
+    symlinks = {direct_dep_path: virtual_store_directory}
+
     result = [
         DefaultInfo(
             files = depset([root_symlink], transitive = [ctx.attr.src[DefaultInfo].files]),
-            runfiles = ctx.runfiles([root_symlink]).merge(ctx.attr.src[DefaultInfo].data_runfiles),
+            runfiles = ctx.runfiles([root_symlink], symlinks = symlinks).merge(ctx.attr.src[DefaultInfo].data_runfiles),
         ),
         declaration_info(
             declarations = depset([root_symlink], transitive = [ctx.attr.src[DeclarationInfo].transitive_declarations]),

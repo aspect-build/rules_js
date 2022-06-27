@@ -25,6 +25,7 @@ jobs:
                     - 'e2e/pnpm_workspace'
                     - 'e2e/pnpm_workspace_dot_dot'
                     - 'e2e/rules_foo'
+                    - 'e2e/js_image'
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
