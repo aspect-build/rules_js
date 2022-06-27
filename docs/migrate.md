@@ -15,14 +15,14 @@ However we recommend 5.1 because it includes a [cache for MerkleTree computation
 As explained in the [README](/README.md), rules_js depends on rules_nodejs.
 We need at least version 5.0.
 
-This also requires you upgrade `build_bazel_rules_nodejs` to 5.0, along with `@bazel`-scoped npm packages like `@bazel/typescript`.
+This also requires you upgrade `build_bazel_rules_nodejs` to 5.x,
+along with `@bazel`-scoped npm packages like `@bazel/typescript`.
 
-## Install pnpm
+## Install pnpm (optional)
 
 `rules_js` is based on the pnpm package manager.
 Our implementation is self-contained, so it doesn't matter if Bazel users of your project install pnpm.
 However it's typically useful to create or manipulate the lockfile, or to install packages for use outside of Bazel.
-So if you don't have a pnpm lockfile, you'll need pnpm as part of migrating.
 
 You can follow the [pnpm install docs](https://pnpm.io/installation).
 
@@ -36,11 +36,15 @@ Alternatively, you can skip the install. All commands in this guide will use `np
    so we recommend taking care to keep all dependencies the same (including transitive).
    Run `npx pnpm import` to translate the existing file. See the [pnpm import docs](https://pnpm.io/cli/import)  
 2. If you don't care about keeping identical versions, or don't have a lockfile,
-   you could just run `npx pnpm install` which generates a new lockfile.
+   you could just run `npx pnpm install --lockfile-only` which generates a new lockfile.
+
+> To make those commands shorter, we rely on the `npx` binary already on your machine.
+> However you could use the Bazel-managed one from rules_nodejs instead, like so:
+> `bazel run -- @nodejs_host//:npx_bin pnpm@latest i --lockfile-only`
 
 The new `pnpm-lock.yaml` file needs to be updated by engineers on the team as well,
-so when you're ready to switch over to rules_js, you'll have to train them to run `pnpm` rather than `npm` or `yarn`
-when changing dependency versions.
+so when you're ready to switch over to rules_js, you'll have to train them to run `pnpm`
+rather than `npm` or `yarn` when changing dependency versions or adding new dependencies.
 
 If needed, you might have both the pnpm lockfile and your legacy one checked into the repo during a migration window.
 You'll have to avoid version skew between the two files during that time.
