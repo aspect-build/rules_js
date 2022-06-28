@@ -5,6 +5,7 @@ load(":translate_lock_tests.bzl", "translate_lock_tests")
 load(":yaml_tests.bzl", "yaml_tests")
 load(":utils_tests.bzl", "utils_tests")
 load(":ini_test.bzl", "ini_tests")
+load(":pkg_glob_tests.bzl", "pkg_glob_tests")
 
 # gazelle:exclude *_checked.bzl
 
@@ -13,6 +14,7 @@ npm_link_all_packages(name = "node_modules")
 # Unit tests
 utils_tests(name = "test_utils")
 ini_tests(name = "test_ini")
+pkg_glob_tests(name = "test_pkg_glob")
 
 transitive_closure_tests(name = "test_transitive_closure")
 
