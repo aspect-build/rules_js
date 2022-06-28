@@ -31,6 +31,126 @@ async function it(_, fn) {
 }
 
 describe('testing realpath', async () => {
+    await it('can handle empty, dot, undefined & null values', async () => {
+        const patchedFs = Object.assign({}, fs)
+        patchedFs.promises = Object.assign({}, fs.promises)
+
+        patcher(patchedFs, [process.cwd()])
+
+        // ---------------------------------------------------------------------
+        // empty string
+
+        assert.deepStrictEqual(
+            patchedFs.realpathSync(''),
+            process.cwd(),
+            'should handle an empty string'
+        )
+
+        assert.throws(() => {
+            patchedFs.realpathSync.native('')
+        }, 'should throw if empty string is passed')
+
+        assert.deepStrictEqual(
+            await util.promisify(patchedFs.realpath)(''),
+            process.cwd(),
+            'should handle an empty string'
+        )
+
+        let thrown
+        try {
+            await util.promisify(patchedFs.realpath.native)('')
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if empty string is passed')
+        }
+
+        // ---------------------------------------------------------------------
+        // '.'
+
+        assert.deepStrictEqual(
+            patchedFs.realpathSync('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        assert.deepStrictEqual(
+            patchedFs.realpathSync.native('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        assert.deepStrictEqual(
+            await util.promisify(patchedFs.realpath)('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        assert.deepStrictEqual(
+            await util.promisify(patchedFs.realpath.native)('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        // ---------------------------------------------------------------------
+        // undefined
+
+        assert.throws(() => {
+            patchedFs.realpathSync(undefined)
+        }, 'should throw if undefined is passed')
+
+        assert.throws(() => {
+            patchedFs.realpathSync.native(undefined)
+        }, 'should throw if undefined is passed')
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath)(undefined)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if undefined is passed')
+        }
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath.native)(undefined)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if undefined is passed')
+        }
+
+        // ---------------------------------------------------------------------
+        // null
+
+        assert.throws(() => {
+            patchedFs.realpathSync(null)
+        }, 'should throw if null is passed')
+
+        assert.throws(() => {
+            patchedFs.realpathSync.native(null)
+        }, 'should throw if null is passed')
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath)(null)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if null is passed')
+        }
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath.native)(null)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if null is passed')
+        }
+    })
+
     await it('can resolve symlink in root', async () => {
         await withFixtures(
             {
