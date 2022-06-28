@@ -1,5 +1,10 @@
 # How to Contribute
 
+## Setup
+
+Install bazelisk following https://bazel.build/install/bazelisk
+or run `npm i -g @bazel/bazelisk`.
+
 ## Formatting
 
 Starlark files should be formatted by buildifier.
@@ -31,11 +36,17 @@ directory:
 
 ```sh
 OVERRIDE="--override_repository=aspect_rules_js=$(pwd)/rules_js"
-echo "build $OVERRIDE" >> ~/.bazelrc
-echo "query $OVERRIDE" >> ~/.bazelrc
+echo "common:override $OVERRIDE" >> ~/.bazelrc
 ```
 
-This means that any usage of `@aspect_rules_js` on your system will point to this folder.
+This means that any usage of `@aspect_rules_js` on your system will point to this folder, if you
+pass the `--config=override` flag to Bazel.
+(We don't want to enable this for all builds, since you'll later forget this was done and wonder
+why you don't reproduce the same behavior as others.)
+
+## Running tests
+
+Simply run `bazel test //...`
 
 ## Releasing
 

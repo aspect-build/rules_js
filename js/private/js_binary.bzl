@@ -1,9 +1,17 @@
 """Rules for running JavaScript programs under Bazel, as tools or with `bazel run` or `bazel test`.
 
-Load these with
+For example, this binary references the `acorn` npm package which was already linked
+using an API like `npm_link_all_packages`.
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+
+js_binary(
+    name = "bin",
+    # Reference the location where the acorn npm module was linked in the root Bazel package
+    data = ["//:node_modules/acorn"],
+    entry_point = "require_acorn.js",
+)
 ```
 """
 
