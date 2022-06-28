@@ -15,8 +15,6 @@ From the release you wish to use:
 <https://github.com/aspect-build/rules_js/releases>
 copy the WORKSPACE snippet into your `WORKSPACE` file.
 
-Note that [bzlmod] is experimentally supported as well.
-
 ## Usage
 
 ### Bazel basics
@@ -45,12 +43,12 @@ Installation is included in the `WORKSPACE` snippet you pasted from the Installa
 
 **API docs:**
 
--   Installing and choosing the version of Node.js:
+-   Choosing the version of Node.js:
     <https://bazelbuild.github.io/rules_nodejs/install.html>
 -   Rules API: <https://bazelbuild.github.io/rules_nodejs/Core.html>
 -   The Node.js toolchain: <https://bazelbuild.github.io/rules_nodejs/Toolchains.html>
 
-### Use third-party packages from npm
+### Fetch third-party packages from npm
 
 rules_js accesses npm packages using [pnpm].
 pnpm's "virtual store" of packages aligns with Bazel's "external repositories",
@@ -68,10 +66,21 @@ For example, this command creates a lockfile with minimal installation needed:
 $ npx pnpm install --lockfile-only
 ```
 
-Next, you'll typically use `npm_translate_lock` to translate the Yaml file to Starlark, which Bazel extensions understand.
+Next, you'll typically use `npm_translate_lock` to translate the lock file to Starlark, which Bazel extensions understand.
 The `WORKSPACE` snippet you pasted above already contains this code.
 
-Technically, we run a port of pnpm rather than pnpm itself. The reasoning is as follows:
+After `npm_translate_lock`, you have two choices:
+
+1.  `load` from the generated `repositories.bzl` file in `WORKSPACE`, like the `WORKSPACE` snippet does.
+    This will cause every Bazel execution to evaluate the `npm_translate_lock`, making it "eager".
+    The execution is fast and only invalidated when the `pnpm-lock.yaml` file changes, so we recommend
+    this approach.
+1.  Check the generated `repositories.bzl` file into your version control, and `load` it from there.
+    This fixes the "eager" execution, however it means you need some way to ensure the file stays
+    up-to-date as the `pnpm-lock.yaml` file changes. This approach can be useful for bazel rules which
+    want to hide their transitive dependencies from users. See https://github.com/bazelbuild/rules_python/issues/608 for a similar discussion about rules_python `pip_parse` which is similar.
+
+Technically, we run a port of pnpm rather than pnpm itself. Here are some design details:
 
 1. You don't need to install pnpm on your machine to build and test with Bazel.
 1. We re-use pnpm's resolver, by consuming the `pnpm-lock.yaml` file it produces.
@@ -90,7 +99,11 @@ Assuming your `npm_translate_lock` was named `npm`, you can run:
 $ bazel fetch @npm//...
 ```
 
+### Link the node_modules
+
 Next, we'll need to "link" these npm packages into a `node_modules` tree.
+If you use [pnpm workspaces], the `node_modules` tree contains first-party packages from your
+monorepo as well as third-party packages from npm.
 
 > Bazel doesn't use the `node_modules` installed in your source tree.
 > You do not need to run `pnpm install` before running Bazel commands.
@@ -129,6 +142,22 @@ bazel-bin/packages/some_pkg/node_modules/some_dep
 
 rules_js provides some primitives to work with JS files.
 However, since JavaScript is an interpreted language, simple use cases don't require performing build steps like compilation.
+
+The Node.js module resolution algorithm requires that all files (sources, generated code, and dependencies) be co-located in a common filesystem tree, which is the working directory for the
+Node.js interpreter.
+
+As described earlier, the dependencies were linked into `bazel-bin/[path/to/package]/node_modules`,
+and Bazel places generated files in `bazel-bin/[path/to/package]`. This leaves source files to be
+copied to this location.
+
+> Copying sources to the bazel-bin folder is surprising if you come from a Bazel background, as other
+> Bazel rulesets accomodate tooling by teaching it to mix a source folder and an output folder.
+> This is not possible with Node.js, without breaking compatibility of many tools.
+
+Our custom rules will take care of copying their sources to the `bazel-bin` output folder automatically.
+However this only works when those sources are under the same `BUILD` file as the target that does
+the copying. If you have a source file in another `BUILD` file, you'll need to explicitly copy that
+with a rule like [`copy_to_bin`](https://docs.aspect.build/aspect-build/bazel-lib/v1.0.0/docs/copy_to_bin-docgen.html#copy_to_bin).
 
 **API docs:**
 
@@ -205,7 +234,7 @@ Each bin exposes three rules, one for each Bazel command ("verb"):
 Make sure to follow the [Style Guide](https://bazel.build/rules/bzl-style#macros) when writing a macro,
 since some anti-patterns can make your BUILD files difficult to change in the future.
 
-Like Custom Rules, Macros require you to use the starlark language, but writing a macro is much easier
+Like Custom Rules, Macros require you to use the Starlark language, but writing a macro is much easier
 since it merely composes existing rules together, rather than writing any from scratch.
 We believe that most use cases can be accomplished with macros, and discourage you learning how to write
 custom rules unless you're really interested in investing time becoming a Bazel expert.
@@ -271,10 +300,10 @@ You can use [stardoc] to produce API documentation from Starlark code.
 We recommend producing Markdown output, and checking those `.md` files into your source repository.
 This makes it easy to browse them at the same revision as the sources.
 
-You'll need to create `bzl_library` targets for your starlark files.
+You'll need to create `bzl_library` targets for your Starlark files.
 This is a good practice as it lets users of your code generate their own documentation as well.
 
-In addition, Aspect's bazel-lib provides some helpers that make it easy to run stardoc and check that it's up-to-date.
+In addition, Aspect's bazel-lib provides some helpers that make it easy to run stardoc and check that it's always up-to-date.
 
 Continuing our example, where we wrote a macro in `tsc.bzl`, we'd write this to document it, in `BUILD`:
 
@@ -299,6 +328,8 @@ stardoc_with_diff_test(
 update_docs(name = "docs")
 ```
 
+This setup appears in [examples/macro](../examples/macro).
+
 ### Create first-party npm packages
 
 You can declare an npm package from sources in your repository.
@@ -315,6 +346,5 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 
 [pnpm]: https://pnpm.io/
 [pnpm workspaces]: https://pnpm.io/workspaces
-[bzlmod]: https://blog.aspect.dev/bzlmod
 [bazel macros]: https://bazel.build/rules/macros
 [gazelle]: https://github.com/bazelbuild/bazel-gazelle
