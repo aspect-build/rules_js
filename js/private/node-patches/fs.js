@@ -43,7 +43,6 @@ const util = require("util");
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
 const _fs = require('fs');
-const isWindows = process.platform === 'win32';
 const patcher = (fs = _fs, roots) => {
     fs = fs || _fs;
     roots = roots || [];
@@ -65,61 +64,43 @@ const patcher = (fs = _fs, roots) => {
     const origRealpathSync = fs.realpathSync.bind(fs);
     const origRealpathSyncNative = fs.realpathSync.native;
     const isEscape = (0, exports.escapeFunction)(roots);
-    const logged = {};
     // =========================================================================
     // fs.lstat
     // =========================================================================
     fs.lstat = (...args) => {
-        const ekey = new Error('').stack || '';
-        if (!logged[ekey]) {
-            logged[ekey] = true;
-        }
         let cb = args.length > 1 ? args[args.length - 1] : undefined;
-        // preserve error when calling function without required callback.
-        if (cb) {
-            cb = once(cb);
-            args[args.length - 1] = (err, stats) => {
-                if (err)
-                    return cb(err);
-                if (!stats.isSymbolicLink()) {
-                    // the file is not a symbolic link so there is nothing more to do
+        // preserve error when calling function without required callback
+        if (!cb) {
+            return origLstat(...args);
+        }
+        cb = once(cb);
+        // override the callback
+        args[args.length - 1] = (err, stats) => {
+            if (err)
+                return cb(err);
+            if (!stats.isSymbolicLink()) {
+                // the file is not a symbolic link so there is nothing more to do
+                return cb(null, stats);
+            }
+            args[0] = path.resolve(args[0]);
+            return guardedReadLink(args[0], (str) => {
+                if (str != args[0]) {
+                    // there are one or more hops within the guards so there is nothing more to do
                     return cb(null, stats);
                 }
-                // the file is a symbolic link; lets do a readlink and check where it points to
-                const linkPath = path.resolve(args[0]);
-                return origReadlink(linkPath, (err, str) => {
+                // there are no hops so lets report the stats of the real file
+                origRealpath(args[0], (err, str) => {
                     if (err) {
                         if (err.code === 'ENOENT') {
+                            // broken link so there is nothing more to do
                             return cb(null, stats);
                         }
-                        else {
-                            // some other file system related error.
-                            return cb(err);
-                        }
+                        return cb(err);
                     }
-                    const linkTarget = path.resolve(path.dirname(linkPath), str);
-                    if (isEscape(linkPath, linkTarget)) {
-                        // if the linkTarget is an escape, then return the lstat of the
-                        // target instead
-                        return origLstat(linkTarget, (err, linkTargetStats) => {
-                            if (err) {
-                                if (err.code === 'ENOENT') {
-                                    return cb(null, stats);
-                                }
-                                else {
-                                    // some other file system related error.
-                                    return cb(err);
-                                }
-                            }
-                            // return the lstat of the linkTarget
-                            cb(null, linkTargetStats);
-                        });
-                    }
-                    // its a symlink and its inside of the root.
-                    cb(null, stats);
+                    return origLstat(str, (err, str) => cb(err, str));
                 });
-            };
-        }
+            });
+        };
         origLstat(...args);
     };
     fs.lstatSync = (...args) => {
@@ -128,154 +109,72 @@ const patcher = (fs = _fs, roots) => {
             // the file is not a symbolic link so there is nothing more to do
             return stats;
         }
-        const linkPath = path.resolve(args[0]);
-        let linkTarget;
+        args[0] = path.resolve(args[0]);
+        const guardedReadLink = guardedReadLinkSync(args[0]);
+        if (guardedReadLink != args[0]) {
+            // there are one or more hops within the guards so there is nothing more to do
+            return stats;
+        }
         try {
-            linkTarget = path.resolve(path.dirname(args[0]), origReadlinkSync(linkPath));
+            // there are no hops so lets report the stats of the real file
+            return origLstatSync(origRealpathSync(args[0]), args.slice(1));
         }
         catch (e) {
             if (e.code === 'ENOENT') {
+                // broken link so there is nothing more to do
                 return stats;
             }
             throw e;
         }
-        if (isEscape(linkPath, linkTarget)) {
-            // if the linkTarget is an escape, then return the lstat of the
-            // target instead
-            try {
-                return origLstatSync(linkTarget, ...args.slice(1));
-            }
-            catch (e) {
-                if (e.code === 'ENOENT') {
-                    return stats;
-                }
-                throw e;
-            }
-        }
-        return stats;
     };
     // =========================================================================
     // fs.realpath
     // =========================================================================
     fs.realpath = (...args) => {
         let cb = args.length > 1 ? args[args.length - 1] : undefined;
-        if (cb) {
-            cb = once(cb);
-            args[args.length - 1] = (err, str) => {
-                if (err)
-                    return cb(err);
-                const escapedRoot = isEscape(args[0], str);
-                if (escapedRoot) {
-                    // we've escaped a root; lets the file we've resolved is a symlink and see if our
-                    // realpath can be mapped back to the root
-                    let linkTarget;
-                    try {
-                        linkTarget = path.resolve(path.dirname(args[0]), origReadlinkSync(args[0]));
-                    }
-                    catch (e) {
-                        if (e.code === 'EINVAL') {
-                            // the path was not a symlink; just return the resolved path in that case
-                            return cb(null, str);
-                        }
-                        if (isWindows) {
-                            // windows has a harder time with readlink if the path is
-                            // through a junction; just return the realpath in this case
-                            return cb(null, str);
-                        }
-                        throw e;
-                    }
-                    const realPathRoot = path.resolve(args[0], path.relative(linkTarget, str));
-                    if (!isEscape(args[0], realPathRoot, [escapedRoot])) {
-                        // this realpath can be mapped back to a relative equivalent in the escaped root; return that instead
-                        return cb(null, realPathRoot);
-                    }
-                    else {
-                        // the realpath has no relative equivalent within the root; return the actual realpath
-                        return cb(null, str);
-                    }
-                }
-                else {
-                    return cb(null, str);
-                }
-            };
+        // preserve error when calling function without required callback
+        if (!cb) {
+            return origRealpath(...args);
         }
+        cb = once(cb);
+        args[args.length - 1] = (err, str) => {
+            if (err)
+                return cb(err);
+            const escapedRoot = isEscape(args[0], str);
+            if (escapedRoot) {
+                return guardedRealPath(args[0], (err, str) => cb(err, str), escapedRoot);
+            }
+            else {
+                return cb(null, str);
+            }
+        };
         origRealpath(...args);
     };
     fs.realpath.native = (...args) => {
         let cb = args.length > 1 ? args[args.length - 1] : undefined;
-        if (cb) {
-            cb = once(cb);
-            args[args.length - 1] = (err, str) => {
-                if (err)
-                    return cb(err);
-                const escapedRoot = isEscape(args[0], str);
-                if (escapedRoot) {
-                    // we've escaped a root; lets the file we've resolved is a symlink and see if our
-                    // realpath can be mapped back to the root
-                    let linkTarget;
-                    try {
-                        linkTarget = path.resolve(path.dirname(args[0]), origReadlinkSync(args[0]));
-                    }
-                    catch (e) {
-                        if (e.code === 'EINVAL') {
-                            // the path was not a symlink; just return the resolved path in that case
-                            return cb(null, str);
-                        }
-                        if (isWindows) {
-                            // windows has a harder time with readlink if the path is
-                            // through a junction; just return the realpath in this case
-                            return cb(null, str);
-                        }
-                        throw e;
-                    }
-                    const realPathRoot = path.resolve(args[0], path.relative(linkTarget, str));
-                    if (!isEscape(args[0], realPathRoot, [escapedRoot])) {
-                        // this realpath can be mapped back to a relative equivalent in the escaped root; return that instead
-                        return cb(null, realPathRoot);
-                    }
-                    else {
-                        // the realpath has no relative equivalent within the root; return the actual realpath
-                        return cb(null, str);
-                    }
-                }
-                else {
-                    return cb(null, str);
-                }
-            };
+        // preserve error when calling function without required callback
+        if (!cb) {
+            return origRealpathNative(...args);
         }
+        cb = once(cb);
+        args[args.length - 1] = (err, str) => {
+            if (err)
+                return cb(err);
+            const escapedRoot = isEscape(args[0], str);
+            if (escapedRoot) {
+                return guardedRealPath(args[0], (err, str) => cb(err, str), escapedRoot);
+            }
+            else {
+                return cb(null, str);
+            }
+        };
         origRealpathNative(...args);
     };
     fs.realpathSync = (...args) => {
         const str = origRealpathSync(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
-            // we've escaped a root; lets the file we've resolved is a symlink and see if our
-            // realpath can be mapped back to the root
-            let linkTarget;
-            try {
-                linkTarget = path.resolve(path.dirname(args[0]), origReadlinkSync(args[0]));
-            }
-            catch (e) {
-                if (e.code === 'EINVAL') {
-                    // the path was not a symlink; just return the resolved path in that case
-                    return str;
-                }
-                if (isWindows) {
-                    // windows has a harder time with readlink if the path is
-                    // through a junction; just return the realpath in this case
-                    return str;
-                }
-                throw e;
-            }
-            const realPathRoot = path.resolve(args[0], path.relative(linkTarget, str));
-            if (!isEscape(args[0], realPathRoot, [escapedRoot])) {
-                // this realpath can be mapped back to a relative equivalent in the escaped root; return that instead
-                return realPathRoot;
-            }
-            else {
-                // the realpath has no relative equivalent within the root; return the actual realpath
-                return str;
-            }
+            return guardedRealPathSync(args[0], escapedRoot);
         }
         return str;
     };
@@ -283,33 +182,7 @@ const patcher = (fs = _fs, roots) => {
         const str = origRealpathSyncNative(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
-            // we've escaped a root; lets the file we've resolved is a symlink and see if our
-            // realpath can be mapped back to the root
-            let linkTarget;
-            try {
-                linkTarget = path.resolve(path.dirname(args[0]), origReadlinkSync(args[0]));
-            }
-            catch (e) {
-                if (e.code === 'EINVAL') {
-                    // the path was not a symlink; just return the resolved path in that case
-                    return str;
-                }
-                if (isWindows) {
-                    // windows has a harder time with readlink if the path is
-                    // through a junction; just return the realpath in this case
-                    return str;
-                }
-                throw e;
-            }
-            const realPathRoot = path.resolve(args[0], path.relative(linkTarget, str));
-            if (!isEscape(args[0], realPathRoot, [escapedRoot])) {
-                // this realpath can be mapped back to a relative equivalent in the escaped root; return that instead
-                return realPathRoot;
-            }
-            else {
-                // the realpath has no relative equivalent within the root; return the actual realpath
-                return str;
-            }
+            return guardedRealPathSync(args[0], escapedRoot);
         }
         return str;
     };
@@ -318,29 +191,72 @@ const patcher = (fs = _fs, roots) => {
     // =========================================================================
     fs.readlink = (...args) => {
         let cb = args.length > 1 ? args[args.length - 1] : undefined;
-        if (cb) {
-            cb = once(cb);
-            args[args.length - 1] = (err, str) => {
-                args[0] = path.resolve(args[0]);
-                if (str)
-                    str = path.resolve(path.dirname(args[0]), str);
-                if (err)
-                    return cb(err);
-                if (isEscape(args[0], str)) {
-                    // if we've escaped then call readlink on the escaped file
-                    return origReadlink(str, ...args.slice(1));
-                }
-                cb(null, str);
-            };
+        // preserve error when calling function without required callback
+        if (!cb) {
+            return origReadlink(...args);
         }
+        cb = once(cb);
+        args[args.length - 1] = (err, str) => {
+            if (err)
+                return cb(err);
+            const resolved = path.resolve(args[0]);
+            str = path.resolve(path.dirname(resolved), str);
+            const escapedRoot = isEscape(resolved, str);
+            if (escapedRoot) {
+                return nextHop(str, (next) => {
+                    if (!next) {
+                        if (next == undefined) {
+                            // The escape from the root is not mappable back into the root; throw EINVAL
+                            return cb(enoent('readlink', args[0]));
+                        }
+                        else {
+                            // The escape from the root is not mappable back into the root; throw EINVAL
+                            return cb(einval('readlink', args[0]));
+                        }
+                    }
+                    next = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
+                    if (next != resolved &&
+                        !isEscape(resolved, next, [escapedRoot])) {
+                        return cb(null, next);
+                    }
+                    // The escape from the root is not mappable back into the root; we must make
+                    // this look like a real file so we call readlink on the realpath which we
+                    // expect to return an error
+                    return origRealpath(resolved, (err, str) => {
+                        if (err)
+                            return cb(err);
+                        return origReadlink(str, (err, str) => cb(err, str));
+                    });
+                });
+            }
+            else {
+                return cb(null, str);
+            }
+        };
         origReadlink(...args);
     };
     fs.readlinkSync = (...args) => {
-        args[0] = path.resolve(args[0]);
-        const str = path.resolve(path.dirname(args[0]), origReadlinkSync(...args));
-        if (isEscape(args[0], str)) {
-            // if we've escaped then call readlink on the escaped file
-            return origReadlinkSync(str, ...args.slice(1));
+        const resolved = path.resolve(args[0]);
+        const str = path.resolve(path.dirname(resolved), origReadlinkSync(...args));
+        const escapedRoot = isEscape(resolved, str);
+        if (escapedRoot) {
+            let next = nextHopSync(str);
+            if (!next) {
+                if (next == undefined) {
+                    // The escape from the root is not mappable back into the root; throw EINVAL
+                    throw enoent('readlink', args[0]);
+                }
+                else {
+                    // The escape from the root is not mappable back into the root; throw EINVAL
+                    throw einval('readlink', args[0]);
+                }
+            }
+            next = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
+            if (next != resolved && !isEscape(resolved, next, [escapedRoot])) {
+                return next;
+            }
+            // The escape from the root is not mappable back into the root; throw EINVAL
+            throw einval('readlink', args[0]);
         }
         return str;
     };
@@ -495,7 +411,7 @@ const patcher = (fs = _fs, roots) => {
         };
         const origReadSync = dir.readSync.bind(dir);
         dir.readSync = () => {
-            return handleDirentSync(p, origReadSync());
+            return handleDirentSync(p, origReadSync()); // intentionally sync for simplicity
         };
         return dir;
     }
@@ -504,34 +420,24 @@ const patcher = (fs = _fs, roots) => {
             if (!v.isSymbolicLink()) {
                 return resolve(v);
             }
-            const linkPath = path.join(p, v.name);
-            origReadlink(linkPath, (err, target) => {
-                if (err) {
-                    return reject(err);
-                }
-                if (!isEscape(linkPath, path.resolve(target))) {
+            const f = path.resolve(p, v.name);
+            return guardedReadLink(f, (str) => {
+                if (f != str) {
                     return resolve(v);
                 }
-                fs.stat(target, (err, stat) => {
+                // There are no hops so we should hide the fact that the file is a symlink
+                v.isSymbolicLink = () => false;
+                origRealpath(f, (err, str) => {
                     if (err) {
-                        if (err.code === 'ENOENT') {
-                            // this is a broken symlink
-                            // even though this broken symlink points outside of the root
-                            // we'll return it.
-                            // the alternative choice here is to omit it from the directory listing altogether
-                            // this would add complexity because readdir output would be different than readdir
-                            // withFileTypes unless readdir was changed to match. if readdir was changed to match
-                            // it's performance would be greatly impacted because we would always have to use the
-                            // withFileTypes version which is slower.
-                            return resolve(v);
-                        }
-                        // transient fs related error. busy etc.
-                        return reject(err);
+                        throw err;
                     }
-                    // add all stat is methods to Dirent instances with their result.
-                    v.isSymbolicLink = () => origLstatSync(target).isSymbolicLink;
-                    patchDirent(v, stat);
-                    resolve(v);
+                    fs.stat(str, (err, stat) => {
+                        if (err) {
+                            throw err;
+                        }
+                        patchDirent(v, stat);
+                        resolve(v);
+                    });
                 });
             });
         });
@@ -539,16 +445,200 @@ const patcher = (fs = _fs, roots) => {
     function handleDirentSync(p, v) {
         if (v && v.isSymbolicLink) {
             if (v.isSymbolicLink()) {
-                // any errors thrown here are valid. things like transient fs errors
-                const target = path.resolve(p, origReadlinkSync(path.join(p, v.name)));
-                if (isEscape(path.join(p, v.name), target)) {
-                    // Dirent exposes file type so if we want to hide that this is a link
-                    // we need to find out if it's a file or directory.
-                    v.isSymbolicLink = () => origLstatSync(target).isSymbolicLink;
-                    const stat = fs.statSync(target);
-                    // add all stat is methods to Dirent instances with their result.
+                const f = path.resolve(p, v.name);
+                if (f == guardedReadLinkSync(f)) {
+                    // There are no hops so we should hide the fact that the file is a symlink
+                    v.isSymbolicLink = () => false;
+                    const stat = fs.statSync(origRealpathSync(f));
                     patchDirent(v, stat);
                 }
+            }
+        }
+    }
+    function nextHop(loc, cb) {
+        let nested = [];
+        const oneHop = (maybe, cb) => {
+            origReadlink(maybe, (err, str) => {
+                if (err) {
+                    if (err.code === 'ENOENT') {
+                        // file does not exist
+                        return cb(undefined);
+                    }
+                    nested.push(path.basename(maybe));
+                    const dirname = path.dirname(maybe);
+                    if (!dirname ||
+                        dirname == maybe ||
+                        dirname == '.' ||
+                        dirname == '/') {
+                        // not a link
+                        return cb(false);
+                    }
+                    maybe = dirname;
+                    return oneHop(maybe, cb);
+                }
+                if (!path.isAbsolute(str)) {
+                    str = path.resolve(maybe, str);
+                }
+                return cb(path.join(str, ...nested.reverse()));
+            });
+        };
+        oneHop(loc, cb);
+    }
+    function nextHopSync(loc) {
+        let readlink;
+        let nested = [];
+        let maybe = loc;
+        for (;;) {
+            try {
+                readlink = origReadlinkSync(maybe);
+            }
+            catch (e) {
+                if (e.code === 'ENOENT') {
+                    // file does not exist
+                    return undefined;
+                }
+                nested.push(path.basename(maybe));
+                const dirname = path.dirname(maybe);
+                if (!dirname ||
+                    dirname == maybe ||
+                    dirname == '.' ||
+                    dirname == '/') {
+                    // not a link
+                    return false;
+                }
+                maybe = dirname;
+                continue;
+            }
+            if (!path.isAbsolute(readlink)) {
+                readlink = path.resolve(maybe, readlink);
+            }
+            return path.join(readlink, ...nested.reverse());
+        }
+    }
+    function guardedReadLink(start, cb) {
+        let loc = start;
+        return nextHop(loc, (next) => {
+            if (!next) {
+                // we're no longer hopping but we haven't escaped;
+                // something funky happened in the filesystem
+                return cb(loc);
+            }
+            if (isEscape(loc, next)) {
+                // this hop takes us out of the guard
+                return nextHop(next, (next2) => {
+                    if (!next2) {
+                        // the chain is done
+                        return cb(loc);
+                    }
+                    const maybe = path.resolve(path.dirname(loc), path.relative(path.dirname(next), next2));
+                    if (!isEscape(loc, maybe)) {
+                        // outside of the guard is a symlink but it is a relative link path
+                        // we can map within the guard so return that
+                        return cb(maybe);
+                    }
+                    // outside of the guard is a symlink that is not mappable inside the guard
+                    return cb(loc);
+                });
+            }
+            return cb(next);
+        });
+    }
+    function guardedReadLinkSync(start) {
+        let loc = start;
+        let next = nextHopSync(loc);
+        if (!next) {
+            // we're no longer hopping but we haven't escaped;
+            // something funky happened in the filesystem
+            return loc;
+        }
+        if (isEscape(loc, next)) {
+            // this hop takes us out of the guard
+            const next2 = nextHopSync(next);
+            if (!next2) {
+                // the chain is done
+                return loc;
+            }
+            const maybe = path.resolve(path.dirname(loc), path.relative(path.dirname(next), next2));
+            if (!isEscape(loc, maybe)) {
+                // outside of the guard is a symlink but it is a relative link path
+                // we can map within the guard so return that
+                return maybe;
+            }
+            // outside of the guard is a symlink that is not mappable inside the guard
+            return loc;
+        }
+        return next;
+    }
+    function guardedRealPath(start, cb, escapedRoot = undefined) {
+        if (!start) {
+            return cb(enoent('realpath', start));
+        }
+        const oneHop = (loc, cb) => {
+            nextHop(loc, (next) => {
+                if (!next) {
+                    // we're no longer hopping but we haven't escaped;
+                    // something funky happened in the filesystem; throw ENOENT
+                    return cb(enoent('realpath', start));
+                }
+                if (escapedRoot
+                    ? isEscape(loc, next, [escapedRoot])
+                    : isEscape(loc, next)) {
+                    // this hop takes us out of the guard
+                    return nextHop(next, (next2) => {
+                        if (!next2) {
+                            // the chain is done
+                            return cb(null, loc);
+                        }
+                        const maybe = path.resolve(path.dirname(loc), path.relative(path.dirname(next), next2));
+                        if (isEscape(loc, maybe)) {
+                            // outside of the guard is a symlink that is not mappable inside the guard;
+                            // call the unguarded realpath which will throw if the link is dangling;
+                            // if it doesn't throw then return the last path within the guard
+                            return origRealpath(start, (err, _) => {
+                                if (err)
+                                    return cb(err);
+                                return cb(null, loc);
+                            });
+                        }
+                        return oneHop(maybe, cb);
+                    });
+                }
+                oneHop(next, cb);
+            });
+        };
+        oneHop(start, cb);
+    }
+    function guardedRealPathSync(start, escapedRoot = undefined) {
+        if (!start) {
+            return start;
+        }
+        for (let loc = start, next;; loc = next) {
+            next = nextHopSync(loc);
+            if (!next) {
+                // we're no longer hopping but we haven't escaped;
+                // something funky happened in the filesystem; throw ENOENT
+                throw enoent('realpath', start);
+            }
+            if (escapedRoot
+                ? isEscape(loc, next, [escapedRoot])
+                : isEscape(loc, next)) {
+                // this hop takes us out of the guard
+                const next2 = nextHopSync(next);
+                if (!next2) {
+                    // the chain is done
+                    return loc;
+                }
+                const maybe = path.resolve(path.dirname(loc), path.relative(path.dirname(next), next2));
+                if (isEscape(loc, maybe)) {
+                    // outside of the guard is a symlink that is not mappable inside the guard;
+                    // call the unguarded realpath which will throw if the link is dangling;
+                    // if it doesn't throw then return the last path within the guard
+                    origRealpathSync(start);
+                    return loc;
+                }
+                next = maybe;
+                // outside of the guard is a symlink but it is a relative link path
+                // we can map within the guard so lets iterate one more time
             }
         }
     }
@@ -626,4 +716,20 @@ function patchDirent(dirent, stat) {
                 dirent[i] = () => false;
         }
     }
+}
+function enoent(s, p) {
+    let err = new Error(`ENOENT: no such file or directory, ${s} '${p}'`);
+    err.errno = -2;
+    err.syscall = s;
+    err.code = 'ENOENT';
+    err.path = p;
+    return err;
+}
+function einval(s, p) {
+    let err = new Error(`EINVAL: invalid argument, ${s} '${p}'`);
+    err.errno = -22;
+    err.syscall = s;
+    err.code = 'EINVAL';
+    err.path = p;
+    return err;
 }

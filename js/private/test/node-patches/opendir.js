@@ -181,4 +181,77 @@ describe('testing opendir', async () => {
             }
         )
     })
+
+    await it('can opendir dirent in a sandbox', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link2 to execroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link2')
+                )
+                // create symlink from execroot/link to execroot/link2
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'sandbox', 'file')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'sandbox', 'link2')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+
+                let dir
+                dir = await util.promisify(patchedFs.opendir)(
+                    path.join(fixturesDir, 'sandbox')
+                )
+                const entry1 = await dir.read()
+                const entry2 = await util.promisify(dir.read.bind(dir))()
+                const entry3 = await util.promisify(dir.read.bind(dir))()
+                const empty = await dir.read()
+
+                let names = [entry1.name, entry2.name, entry3.name]
+                names.sort()
+                assert.deepStrictEqual(names, ['file', 'link', 'link2'])
+
+                assert.ok(
+                    entry1.name === 'file'
+                        ? !entry1.isSymbolicLink()
+                        : entry1.isSymbolicLink()
+                )
+                assert.ok(
+                    entry2.name === 'file'
+                        ? !entry2.isSymbolicLink()
+                        : entry2.isSymbolicLink()
+                )
+                assert.ok(
+                    entry3.name === 'file'
+                        ? !entry3.isSymbolicLink()
+                        : entry3.isSymbolicLink()
+                )
+
+                assert.ok(!empty, 'last read should be falsey')
+            }
+        )
+    })
 })
