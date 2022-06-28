@@ -15,7 +15,6 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
-        "@aspect_bazel_lib//lib:copy_directory",
         "@aspect_bazel_lib//lib:copy_to_directory",
         "@bazel_skylib//lib:dicts",
         "@rules_nodejs//nodejs:bzl",
