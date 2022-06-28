@@ -26,9 +26,5 @@ rollup_bin.rollup(
         "bundle.js",
     ],
     chdir = package_name(),
-    execution_requirements = {
-        # TODO: fix in the sandbox
-        "no-sandbox": "1",
-    },
     visibility = ["//js/private/coverage:__pkg__"],
 )

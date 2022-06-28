@@ -88,8 +88,10 @@ const patcher = (fs = _fs, roots) => {
                     // there are one or more hops within the guards so there is nothing more to do
                     return cb(null, stats);
                 }
-                // there are no hops so lets report the stats of the real file
-                origRealpath(args[0], (err, str) => {
+                // there are no hops so lets report the stats of the real file;
+                // we can't use origRealPath here since that function calls lstat internally
+                // which can result in an infinite loop
+                return unguardedRealPath(args[0], (err, str) => {
                     if (err) {
                         if (err.code === 'ENOENT') {
                             // broken link so there is nothing more to do
@@ -116,15 +118,17 @@ const patcher = (fs = _fs, roots) => {
             return stats;
         }
         try {
-            // there are no hops so lets report the stats of the real file
-            return origLstatSync(origRealpathSync(args[0]), args.slice(1));
+            // there are no hops so lets report the stats of the real file;
+            // we can't use origRealPathSync here since that function calls lstat internally
+            // which can result in an infinite loop
+            return origLstatSync(unguardedRealPathSync(args[0]), args.slice(1));
         }
-        catch (e) {
-            if (e.code === 'ENOENT') {
+        catch (err) {
+            if (err.code === 'ENOENT') {
                 // broken link so there is nothing more to do
                 return stats;
             }
-            throw e;
+            throw err;
         }
     };
     // =========================================================================
@@ -314,8 +318,8 @@ const patcher = (fs = _fs, roots) => {
                     try {
                         cb(null, await handleDir(dir));
                     }
-                    catch (e) {
-                        cb(e);
+                    catch (err) {
+                        cb(err);
                     }
                 };
                 origOpendir(...args);
@@ -492,8 +496,8 @@ const patcher = (fs = _fs, roots) => {
             try {
                 readlink = origReadlinkSync(maybe);
             }
-            catch (e) {
-                if (e.code === 'ENOENT') {
+            catch (err) {
+                if (err.code === 'ENOENT') {
                     // file does not exist
                     return undefined;
                 }
@@ -569,10 +573,25 @@ const patcher = (fs = _fs, roots) => {
         }
         return next;
     }
+    function unguardedRealPath(start, cb) {
+        start = String(start); // handle the "undefined" case (matches behavior as fs.realpath)
+        const oneHop = (loc, cb) => {
+            nextHop(loc, (next) => {
+                if (next == undefined) {
+                    // file does not exist (broken link)
+                    return cb(enoent('realpath', start));
+                }
+                else if (!next) {
+                    // we've hit a real file
+                    return cb(null, loc);
+                }
+                oneHop(next, cb);
+            });
+        };
+        oneHop(start, cb);
+    }
     function guardedRealPath(start, cb, escapedRoot = undefined) {
-        if (!start) {
-            return cb(enoent('realpath', start));
-        }
+        start = String(start); // handle the "undefined" case (matches behavior as fs.realpath)
         const oneHop = (loc, cb) => {
             nextHop(loc, (next) => {
                 if (!next) {
@@ -608,10 +627,22 @@ const patcher = (fs = _fs, roots) => {
         };
         oneHop(start, cb);
     }
-    function guardedRealPathSync(start, escapedRoot = undefined) {
-        if (!start) {
-            return start;
+    function unguardedRealPathSync(start) {
+        start = String(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
+        for (let loc = start, next;; loc = next) {
+            next = nextHopSync(loc);
+            if (next == undefined) {
+                // file does not exist (broken link)
+                throw enoent('realpath', start);
+            }
+            else if (!next) {
+                // we've hit a real file
+                return loc;
+            }
         }
+    }
+    function guardedRealPathSync(start, escapedRoot = undefined) {
+        start = String(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
         for (let loc = start, next;; loc = next) {
             next = nextHopSync(loc);
             if (!next) {
