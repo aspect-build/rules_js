@@ -348,3 +348,4 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 [pnpm workspaces]: https://pnpm.io/workspaces
 [bazel macros]: https://bazel.build/rules/macros
 [gazelle]: https://github.com/bazelbuild/bazel-gazelle
+[stardoc]: https://github.com/bazelbuild/stardoc
