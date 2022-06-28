@@ -2,3 +2,4 @@ bazel-*
 node_modules/
 .pnpm-*
 .DS_Store
+.bazelrc.user

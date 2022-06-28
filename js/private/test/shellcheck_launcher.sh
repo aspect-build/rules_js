@@ -324,6 +324,12 @@ if [ -z "${JS_BINARY__DISABLE_NODE_PATCHES:-}" ] && [ "${JS_BINARY__FS_PATH_ROOT
     NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register.js" )
 fi
 
+# Enable coverage if requested
+if [ "${COVERAGE_DIR:-}" ]; then
+  logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
+  export NODE_V8_COVERAGE=${COVERAGE_DIR}
+fi
+
 # Put bazel managed node on the path
 PATH="$(dirname "$node"):$PATH"
 export PATH
@@ -425,11 +431,6 @@ if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
     else
         exit 0
     fi
-fi
-
-if [ $RESULT -eq 0 ]; then
-    # TODO: add optional coverage support
-    echo -n
 fi
 
 if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then

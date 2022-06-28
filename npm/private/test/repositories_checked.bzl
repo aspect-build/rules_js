@@ -100,6 +100,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_bcoe_v8-coverage__0.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@bcoe/v8-coverage",
+        version = "0.2.3",
+        integrity = "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==",
+        transitive_closure = {
+            "@bcoe/v8-coverage": ["0.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_choojs_findup__0.2.1",
         root_package = "",
         link_workspace = "",
@@ -160,6 +173,19 @@ def npm_repositories():
         transitive_closure = {
             "@gregmagolan/test-b": ["0.0.2"],
             "@gregmagolan/test-a": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_istanbuljs_schema__0.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@istanbuljs/schema",
+        version = "0.1.3",
+        integrity = "sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==",
+        transitive_closure = {
+            "@istanbuljs/schema": ["0.1.3"],
         },
     )
 
@@ -599,6 +625,125 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_rollup_plugin-commonjs__22.0.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
+        },
+        package = "@rollup/plugin-commonjs",
+        version = "22.0.0_rollup@2.75.7",
+        integrity = "sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==",
+        deps = {
+            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "commondir": "1.0.1",
+            "estree-walker": "2.0.2",
+            "glob": "7.2.3",
+            "is-reference": "1.2.1",
+            "magic-string": "0.25.9",
+            "resolve": "1.22.0",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/plugin-commonjs": ["22.0.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "commondir": ["1.0.1"],
+            "estree-walker": ["1.0.1", "2.0.2"],
+            "glob": ["7.2.3"],
+            "is-reference": ["1.2.1"],
+            "magic-string": ["0.25.9"],
+            "resolve": ["1.22.0"],
+            "rollup": ["2.75.7"],
+            "fsevents": ["2.3.2"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "sourcemap-codec": ["1.4.8"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39", "registry.npmjs.org/@types/estree/0.0.51"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_plugin-json__4.1.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["@rollup/plugin-json"],
+        },
+        package = "@rollup/plugin-json",
+        version = "4.1.0_rollup@2.75.7",
+        integrity = "sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==",
+        deps = {
+            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/plugin-json": ["4.1.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "rollup": ["2.75.7"],
+            "fsevents": ["2.3.2"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_plugin-node-resolve__13.3.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
+        },
+        package = "@rollup/plugin-node-resolve",
+        version = "13.3.0_rollup@2.75.7",
+        integrity = "sha512-Lus8rbUo1eEcnS4yTFKLZrVumLPY+YayBdWXgFSHYhTT2iJbMhoaaBL3xl5NCdeRytErGr8tZ0L71BMRmnlwSw==",
+        deps = {
+            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "@types/resolve": "registry.npmjs.org/@types/resolve/1.17.1",
+            "deepmerge": "4.2.2",
+            "is-builtin-module": "3.1.0",
+            "is-module": "1.0.0",
+            "resolve": "1.22.0",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/plugin-node-resolve": ["13.3.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
+            "deepmerge": ["4.2.2"],
+            "is-builtin-module": ["3.1.0"],
+            "is-module": ["1.0.0"],
+            "resolve": ["1.22.0"],
+            "rollup": ["2.75.7"],
+            "fsevents": ["2.3.2"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "builtin-modules": ["3.3.0"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.70.2",
         root_package = "",
         link_workspace = "",
@@ -618,6 +763,30 @@ def npm_repositories():
             "estree-walker": ["1.0.1"],
             "picomatch": ["2.3.1"],
             "rollup": ["2.70.2"],
+            "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@rollup/pluginutils",
+        version = "3.1.0_rollup@2.75.7",
+        integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
+        deps = {
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.39",
+            "estree-walker": "1.0.1",
+            "picomatch": "2.3.1",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "picomatch": ["2.3.1"],
+            "rollup": ["2.75.7"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -1986,6 +2155,108 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__builtin-modules__3.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "builtin-modules",
+        version = "3.3.0",
+        integrity = "sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==",
+        transitive_closure = {
+            "builtin-modules": ["3.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__c8__7.11.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["c8"],
+        },
+        package = "c8",
+        version = "7.11.3",
+        integrity = "sha512-6YBmsaNmqRm9OS3ZbIiL2EZgi1+Xc4O24jL3vMYGE6idixYuGdy76rIfIdltSKDj9DpLNrcXSonUTR1miBD0wA==",
+        deps = {
+            "@bcoe/v8-coverage": "0.2.3",
+            "@istanbuljs/schema": "0.1.3",
+            "find-up": "5.0.0",
+            "foreground-child": "2.0.0",
+            "istanbul-lib-coverage": "3.2.0",
+            "istanbul-lib-report": "3.0.0",
+            "istanbul-reports": "3.1.4",
+            "rimraf": "3.0.2",
+            "test-exclude": "6.0.0",
+            "v8-to-istanbul": "9.0.1",
+            "yargs": "16.2.0",
+            "yargs-parser": "20.2.9",
+        },
+        transitive_closure = {
+            "c8": ["7.11.3"],
+            "@bcoe/v8-coverage": ["0.2.3"],
+            "@istanbuljs/schema": ["0.1.3"],
+            "find-up": ["5.0.0"],
+            "foreground-child": ["2.0.0"],
+            "istanbul-lib-coverage": ["3.2.0"],
+            "istanbul-lib-report": ["3.0.0"],
+            "istanbul-reports": ["3.1.4"],
+            "rimraf": ["3.0.2"],
+            "test-exclude": ["6.0.0"],
+            "v8-to-istanbul": ["9.0.1"],
+            "yargs": ["16.2.0"],
+            "yargs-parser": ["20.2.4", "20.2.9"],
+            "cliui": ["7.0.4"],
+            "escalade": ["3.1.1"],
+            "get-caller-file": ["2.0.5"],
+            "require-directory": ["2.1.1"],
+            "string-width": ["4.2.3"],
+            "y18n": ["5.0.8"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
+            "convert-source-map": ["1.8.0"],
+            "safe-buffer": ["5.1.2"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "glob": ["7.2.3"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "html-escaper": ["2.0.2"],
+            "make-dir": ["3.1.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "semver": ["6.3.0"],
+            "cross-spawn": ["7.0.3"],
+            "signal-exit": ["3.0.7"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "locate-path": ["6.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__camelcase__6.3.0",
         root_package = "",
         link_workspace = "",
@@ -2510,6 +2781,23 @@ def npm_repositories():
         integrity = "sha512-wfs+V4HdSN7C3CWJWR7hVa24yTPn3mDJthwhRIObZBh6UjTjkUMUrCP3UrNGozB/HjTpcScnGXtQUNa+yjsIJQ==",
         transitive_closure = {
             "const-pinf-float64": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__convert-source-map__1.8.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "convert-source-map",
+        version = "1.8.0",
+        integrity = "sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==",
+        deps = {
+            "safe-buffer": "5.1.2",
+        },
+        transitive_closure = {
+            "convert-source-map": ["1.8.0"],
+            "safe-buffer": ["5.1.2"],
         },
     )
 
@@ -3081,6 +3369,19 @@ def npm_repositories():
         integrity = "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==",
         transitive_closure = {
             "deep-is": ["0.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__deepmerge__4.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "deepmerge",
+        version = "4.2.2",
+        integrity = "sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==",
+        transitive_closure = {
+            "deepmerge": ["4.2.2"],
         },
     )
 
@@ -4281,6 +4582,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__foreground-child__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "foreground-child",
+        version = "2.0.0",
+        integrity = "sha512-dCIq9FpEcyQyXKCkyzmlPTFNgrCzPudOe+mhvJU5zAtlBnGVy2yKxtfsxK2tQBThwq225jcvBjpw1Gr40uzZCA==",
+        deps = {
+            "cross-spawn": "7.0.3",
+            "signal-exit": "3.0.7",
+        },
+        transitive_closure = {
+            "foreground-child": ["2.0.0"],
+            "cross-spawn": ["7.0.3"],
+            "signal-exit": ["3.0.7"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__fraction.js__4.2.0",
         root_package = "",
         link_workspace = "",
@@ -5166,6 +5491,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__html-escaper__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "html-escaper",
+        version = "2.0.2",
+        integrity = "sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==",
+        transitive_closure = {
+            "html-escaper": ["2.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__iconv-lite__0.4.24",
         root_package = "",
         link_workspace = "",
@@ -5430,6 +5768,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-builtin-module__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-builtin-module",
+        version = "3.1.0",
+        integrity = "sha512-OV7JjAgOTfAFJmHZLvpSTb4qi0nIILDV1gWPYDnDJUTNFM5aGlRAhk4QcT8i7TuAleeEV5Fdkqn3t4mS+Q11fg==",
+        deps = {
+            "builtin-modules": "3.3.0",
+        },
+        transitive_closure = {
+            "is-builtin-module": ["3.1.0"],
+            "builtin-modules": ["3.3.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-core-module__2.9.0",
         root_package = "",
         link_workspace = "",
@@ -5552,6 +5907,19 @@ def npm_repositories():
         integrity = "sha512-wW/SXnYJkTjs++tVK5b6kVITZpAZPtUrt9SF80vvxGiF/Oywal+COk1jlRkiVq15RFNEQKQY31TkV24/1T5cVg==",
         transitive_closure = {
             "is-mobile": ["2.2.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-module__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-module",
+        version = "1.0.0",
+        integrity = "sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==",
+        transitive_closure = {
+            "is-module": ["1.0.0"],
         },
     )
 
@@ -5742,6 +6110,66 @@ def npm_repositories():
         integrity = "sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==",
         transitive_closure = {
             "isobject": ["3.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__istanbul-lib-coverage__3.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "istanbul-lib-coverage",
+        version = "3.2.0",
+        integrity = "sha512-eOeJ5BHCmHYvQK7xt9GkdHuzuCGS1Y6g9Gvnx3Ym33fz/HpLRYxiS0wHNr+m/MBC8B647Xt608vCDEvhl9c6Mw==",
+        transitive_closure = {
+            "istanbul-lib-coverage": ["3.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__istanbul-lib-report__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "istanbul-lib-report",
+        version = "3.0.0",
+        integrity = "sha512-wcdi+uAKzfiGT2abPpKZ0hSU1rGQjUQnLvtY5MpQ7QCTahD3VODhcu4wcfY1YtkGaDD5yuydOLINXsfbus9ROw==",
+        deps = {
+            "istanbul-lib-coverage": "3.2.0",
+            "make-dir": "3.1.0",
+            "supports-color": "7.2.0",
+        },
+        transitive_closure = {
+            "istanbul-lib-report": ["3.0.0"],
+            "istanbul-lib-coverage": ["3.2.0"],
+            "make-dir": ["3.1.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "semver": ["6.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__istanbul-reports__3.1.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "istanbul-reports",
+        version = "3.1.4",
+        integrity = "sha512-r1/DshN4KSE7xWEknZLLLLDn5CJybV3nw01VTkp6D5jzLuELlcbudfj/eSQFvrKsJuTVCGnePO7ho82Nw9zzfw==",
+        deps = {
+            "html-escaper": "2.0.2",
+            "istanbul-lib-report": "3.0.0",
+        },
+        transitive_closure = {
+            "istanbul-reports": ["3.1.4"],
+            "html-escaper": ["2.0.2"],
+            "istanbul-lib-report": ["3.0.0"],
+            "istanbul-lib-coverage": ["3.2.0"],
+            "make-dir": ["3.1.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "semver": ["6.3.0"],
         },
     )
 
@@ -6045,6 +6473,23 @@ def npm_repositories():
             "make-dir": ["2.1.0"],
             "pify": ["4.0.1"],
             "semver": ["5.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__make-dir__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "make-dir",
+        version = "3.1.0",
+        integrity = "sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==",
+        deps = {
+            "semver": "6.3.0",
+        },
+        transitive_closure = {
+            "make-dir": ["3.1.0"],
+            "semver": ["6.3.0"],
         },
     )
 
@@ -8761,6 +9206,33 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__rimraf__3.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "rimraf",
+        version = "3.0.2",
+        integrity = "sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==",
+        deps = {
+            "glob": "7.2.3",
+        },
+        transitive_closure = {
+            "rimraf": ["3.0.2"],
+            "glob": ["7.2.3"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__rollup__2.70.2",
         root_package = "",
         link_workspace = "",
@@ -8775,6 +9247,25 @@ def npm_repositories():
         },
         transitive_closure = {
             "rollup": ["2.70.2"],
+            "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__rollup__2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["rollup"],
+        },
+        package = "rollup",
+        version = "2.75.7",
+        integrity = "sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==",
+        deps = {
+            "fsevents": "2.3.2",
+        },
+        transitive_closure = {
+            "rollup": ["2.75.7"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -8914,6 +9405,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__semver__6.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "semver",
+        version = "6.3.0",
+        integrity = "sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==",
+        transitive_closure = {
+            "semver": ["6.3.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__serialize-javascript__6.0.0",
         root_package = "",
         link_workspace = "",
@@ -8988,6 +9492,19 @@ def npm_repositories():
         integrity = "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==",
         transitive_closure = {
             "shebang-regex": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__signal-exit__3.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "signal-exit",
+        version = "3.0.7",
+        integrity = "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==",
+        transitive_closure = {
+            "signal-exit": ["3.0.7"],
         },
     )
 
@@ -9591,6 +10108,36 @@ def npm_repositories():
             "@jridgewell/resolve-uri": ["3.0.7"],
             "@jridgewell/sourcemap-codec": ["1.4.13"],
             "@jridgewell/set-array": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__test-exclude__6.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "test-exclude",
+        version = "6.0.0",
+        integrity = "sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==",
+        deps = {
+            "@istanbuljs/schema": "0.1.3",
+            "glob": "7.2.3",
+            "minimatch": "3.1.2",
+        },
+        transitive_closure = {
+            "test-exclude": ["6.0.0"],
+            "@istanbuljs/schema": ["0.1.3"],
+            "glob": ["7.2.3"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
         },
     )
 
@@ -10202,6 +10749,30 @@ def npm_repositories():
             "kleur": ["4.1.4"],
             "sade": ["1.8.1"],
             "mri": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__v8-to-istanbul__9.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "v8-to-istanbul",
+        version = "9.0.1",
+        integrity = "sha512-74Y4LqY74kLE6IFyIjPtkSTWzUZmj8tdHT9Ii/26dvQ6K9Dl2NbEfj0XgU2sHCtKgt5VupqhlO/5aWuqS+IY1w==",
+        deps = {
+            "@jridgewell/trace-mapping": "0.3.13",
+            "@types/istanbul-lib-coverage": "registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4",
+            "convert-source-map": "1.8.0",
+        },
+        transitive_closure = {
+            "v8-to-istanbul": ["9.0.1"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
+            "convert-source-map": ["1.8.0"],
+            "safe-buffer": ["5.1.2"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
         },
     )
 
@@ -11050,6 +11621,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__yargs-parser__20.2.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "yargs-parser",
+        version = "20.2.9",
+        integrity = "sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==",
+        transitive_closure = {
+            "yargs-parser": ["20.2.9"],
+        },
+    )
+
+    npm_import(
         name = "npm__yargs-unparser__2.0.0",
         root_package = "",
         link_workspace = "",
@@ -11211,6 +11795,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_types_istanbul-lib-coverage__registry.npmjs.org_at_types_istanbul-lib-coverage_2.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/istanbul-lib-coverage",
+        version = "registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4",
+        integrity = "sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==",
+        url = "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz",
+        transitive_closure = {
+            "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_json-schema__registry.npmjs.org_at_types_json-schema_7.0.11",
         root_package = "",
         link_workspace = "",
@@ -11236,6 +11834,24 @@ def npm_repositories():
         integrity = "sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==",
         url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz",
         transitive_closure = {
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_resolve__registry.npmjs.org_at_types_resolve_1.17.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/resolve",
+        version = "registry.npmjs.org/@types/resolve/1.17.1",
+        integrity = "sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==",
+        url = "https://registry.yarnpkg.com/@types/resolve/-/resolve-1.17.1.tgz",
+        deps = {
+            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+        },
+        transitive_closure = {
+            "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
             "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
         },
     )

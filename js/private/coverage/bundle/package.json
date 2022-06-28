@@ -1,0 +1,11 @@
+{
+    "dependencies": {
+        "c8": "7.11.3"
+    },
+    "devDependencies": {
+        "rollup": "2.75.7",
+        "@rollup/plugin-commonjs": "22.0.0",
+        "@rollup/plugin-node-resolve": "13.3.0",
+        "@rollup/plugin-json": "4.1.0"
+    }
+}

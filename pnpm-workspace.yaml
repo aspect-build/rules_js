@@ -5,3 +5,4 @@ packages:
     - 'examples/npm_deps'
     - 'examples/webpack_cli'
     - 'npm/private/test'
+    - 'js/private/coverage/bundle'
