@@ -86,7 +86,7 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
 
     return [
         DefaultInfo(
-            files = depset(transitive = files_depsets),
+            files = depset(direct = output_srcs),
             runfiles = runfiles.merge_all(deps_runfiles),
         ),
         declaration_info(
