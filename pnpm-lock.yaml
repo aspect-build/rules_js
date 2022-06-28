@@ -76,7 +76,7 @@ importers:
 
   js/private/coverage/bundle:
     specifiers:
-      '@rollup/plugin-commonjs': 22.0.0
+      '@rollup/plugin-commonjs': 22.0.1
       '@rollup/plugin-json': 4.1.0
       '@rollup/plugin-node-resolve': 13.3.0
       c8: 7.11.3
@@ -84,7 +84,7 @@ importers:
     dependencies:
       c8: 7.11.3
     devDependencies:
-      '@rollup/plugin-commonjs': 22.0.0_rollup@2.75.7
+      '@rollup/plugin-commonjs': 22.0.1_rollup@2.75.7
       '@rollup/plugin-json': 4.1.0_rollup@2.75.7
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.75.7
       rollup: 2.75.7
@@ -327,8 +327,8 @@ packages:
       rollup: 2.70.2
     dev: true
 
-  /@rollup/plugin-commonjs/22.0.0_rollup@2.75.7:
-    resolution: {integrity: sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==}
+  /@rollup/plugin-commonjs/22.0.1_rollup@2.75.7:
+    resolution: {integrity: sha512-dGfEZvdjDHObBiP5IvwTKMVeq/tBZGMBHZFMdIV1ClMM/YoWS34xrHFGfag9SN2ZtMgNZRFruqvxZQEa70O6nQ==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
       rollup: ^2.68.0
