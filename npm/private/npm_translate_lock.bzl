@@ -184,7 +184,7 @@ bin_factory = _bin_factory
 _FP_STORE_TMPL = \
     """
     if is_root:
-         _npm_link_package_store(
+        _npm_link_package_store(
             name = "{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
             src = "{npm_package_target}",
             package = "{package}",
@@ -215,8 +215,7 @@ _FP_DIRECT_TMPL = \
                 output_group = "{package_directory_output_group}",
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
-            )
-            """
+            )"""
 
 _BZL_LIBRARY_TMPL = \
     """
@@ -617,9 +616,11 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
                     }
 
     if fp_links:
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package.bzl",
+        defs_bzl_header.append("""load(
+    "@aspect_rules_js//npm/private:npm_link_package.bzl",
+    _npm_link_package_direct = "npm_link_package_direct",
     _npm_link_package_store = "npm_link_package_store",
-    _npm_link_package_direct = "npm_link_package_direct")""")
+)""")
 
     defs_bzl_body = [
         """def npm_link_all_packages(name = "node_modules", imported_links = []):
