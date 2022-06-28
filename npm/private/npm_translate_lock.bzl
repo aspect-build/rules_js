@@ -267,9 +267,12 @@ def _gen_npm_imports(lockfile, attr):
     if not packages:
         fail("expected packages in processed lockfile")
 
+    importers = lockfile.get("importers")
+    if not importers:
+        fail("expected importers in processed lockfile")
+
     result = []
-    for (i, v) in enumerate(packages.items()):
-        (package, package_info) = v
+    for package, package_info in packages.items():
         name = package_info.get("name")
         version = package_info.get("version")
         friendly_version = package_info.get("friendly_version")
@@ -282,6 +285,10 @@ def _gen_npm_imports(lockfile, attr):
         tarball = package_info.get("tarball")
         registry = package_info.get("registry")
         transitive_closure = package_info.get("transitiveClosure")
+
+        if version.startswith("file:"):
+            # this package is treated as a first-party dep
+            continue
 
         if attr.prod and dev:
             # when prod attribute is set, skip devDependencies
@@ -328,7 +335,7 @@ def _gen_npm_imports(lockfile, attr):
 
         link_packages = {}
 
-        for import_path, importer in lockfile.get("importers").items():
+        for import_path, importer in importers.items():
             dependencies = importer.get("dependencies")
             if type(dependencies) != "dict":
                 fail("expected dict of dependencies in processed importer '%s'" % import_path)
@@ -336,11 +343,13 @@ def _gen_npm_imports(lockfile, attr):
             for dep_package, dep_version in dependencies.items():
                 if dep_version.startswith("link:"):
                     continue
-                if dep_version.startswith("/"):
-                    pnpm_name = dep_version[1:]
+                if dep_version[0].isdigit():
+                    maybe_package = utils.pnpm_name(dep_package, dep_version)
+                elif dep_version.startswith("/"):
+                    maybe_package = dep_version[1:]
                 else:
-                    pnpm_name = utils.pnpm_name(dep_package, dep_version)
-                if package == pnpm_name:
+                    maybe_package = dep_version
+                if package == maybe_package:
                     # this package is a direct dependency at this import path
                     if link_package not in link_packages:
                         link_packages[link_package] = [dep_package]
@@ -416,6 +425,7 @@ To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
             url = url,
             version = version,
         ))
+
     return result
 
 def _normalize_bazelignore(lines):
@@ -454,7 +464,7 @@ def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
     if not public_hoist_packages:
         return
     all_public_links = {}
-    for (i, _import) in enumerate(npm_imports):
+    for _import in npm_imports:
         for link_package, link_names in _import.link_packages.items():
             if link_package not in all_public_links:
                 all_public_links[link_package] = {}
@@ -513,6 +523,10 @@ def _impl(rctx):
         ),
     ]
 
+    packages = lockfile.get("packages")
+    if not packages:
+        fail("expected packages in processed lockfile")
+
     importers = lockfile.get("importers")
     if not importers:
         fail("expected importers in processed lockfile")
@@ -566,7 +580,52 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             fail("expected dict of dependencies in processed importer '%s'" % import_path)
         link_package = _link_package(root_package, import_path)
         for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
+            if dep_version.startswith("file:"):
+                dep_path = _link_package(root_package, dep_version[len("file:"):])
+                dep_key = "{}+{}".format(dep_package, dep_version)
+                if dep_key in fp_links.keys():
+                    fp_links[dep_key]["link_packages"][link_package] = []
+                else:
+                    if dep_version not in packages.keys():
+                        msg = "expected '{}' file package to be in packages".format(dep_version)
+                        fail(msg)
+                    transitive_deps = {}
+                    raw_deps = packages.get(dep_version).get("dependencies")
+                    for raw_package, raw_version in raw_deps.items():
+                        if raw_version.startswith("link:"):
+                            fail("link deps not supported in packages")
+                        elif raw_version.startswith("file:"):
+                            fail("link deps not supported in packages")
+                        elif raw_version.startswith("/"):
+                            store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                                root_package = root_package,
+                                package = store_package,
+                                version = store_version,
+                                virtual_store_root = utils.virtual_store_root,
+                            )
+                        else:
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                                root_package = root_package,
+                                package = raw_package,
+                                version = raw_version,
+                                virtual_store_root = utils.virtual_store_root,
+                            )
+                        if dep_store_target not in transitive_deps:
+                            transitive_deps[dep_store_target] = [raw_package]
+                        else:
+                            transitive_deps[dep_store_target].append(raw_package)
+
+                    # collapse link aliases lists into to acomma separated strings
+                    for dep_store_target in transitive_deps.keys():
+                        transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+                    fp_links[dep_key] = {
+                        "package": dep_package,
+                        "path": dep_path,
+                        "link_packages": {link_package: []},
+                        "deps": transitive_deps,
+                    }
+            elif dep_version.startswith("link:"):
                 dep_importer = paths.normalize(paths.join(import_path, dep_version[len("link:"):]))
                 dep_path = _link_package(root_package, import_path, dep_version[len("link:"):])
                 dep_key = "{}+{}".format(dep_package, dep_path)
@@ -578,7 +637,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
                     if dep_importer in importers.keys():
                         raw_deps = importers.get(dep_importer).get("dependencies")
                     for raw_package, raw_version in raw_deps.items():
-                        if raw_version.startswith("link:"):
+                        if raw_version.startswith("link:") or raw_version.startswith("file:"):
                             dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
                                 root_package = root_package,
                                 package = raw_package,
