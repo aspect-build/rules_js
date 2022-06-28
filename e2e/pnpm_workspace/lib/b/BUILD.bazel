@@ -9,5 +9,6 @@ npm_package(
         "index.js",
         "package.json",
     ],
+    out = "pkg",
     visibility = ["//visibility:public"],
 )

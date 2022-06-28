@@ -6,10 +6,10 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-_LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
-load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
+_LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
 load("@aspect_rules_js//npm/private:npm_link_package_store_internal.bzl", _npm_link_package_store = "npm_link_package_store_internal")
 load("@aspect_rules_js//npm/private:npm_link_package.bzl", _npm_link_package_direct = "npm_link_package_direct")
+load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
 load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
 load("@bazel_skylib//lib:paths.bzl", _paths = "paths")
 
@@ -115,7 +115,7 @@ def npm_link_imported_package_store(
         )
 
         # post-lifecycle npm_package
-        _npm_package(
+        _npm_package_internal(
             name = "{{}}/pkg_lc".format(store_target_name),
             src = ":{{}}/lc".format(store_target_name),
             package = "{package}",
@@ -278,16 +278,15 @@ def {bin_name}_binary(name, **kwargs):
 """
 
 _JS_PACKAGE_TMPL = """
-_npm_package(
+_npm_package_internal(
     name = "source_directory",
     src = ":{extract_to_dirname}",
-    provide_source_directory = True,
     package = "{package}",
     version = "{version}",
     visibility = ["//visibility:public"],
 )
 
-_npm_package(
+_npm_package_internal(
     name = "pkg",
     src = ":{extract_to_dirname}",
     package = "{package}",
@@ -375,7 +374,7 @@ def _impl(rctx):
 
     rctx_files = {
         "BUILD.bazel": generated_by_lines + [
-            """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package = "npm_package_internal")""",
+            """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
         ],
     }
