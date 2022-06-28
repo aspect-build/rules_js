@@ -1,11 +1,9 @@
 const packageJson = require('./package.json')
-const e = require('@aspect-test/e')
-const libB = require('@lib/b')
+const f = require('@aspect-test/f')
 module.exports = {
     id: () =>
         `${packageJson.name}@${
             packageJson.version ? package.version : '0.0.0'
         }`,
-    idE: () => e.id(),
-    idLibB: () => libB.id(),
+    idF: () => f.id(),
 }

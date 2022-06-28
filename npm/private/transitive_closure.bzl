@@ -27,15 +27,20 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
         deps = stack.pop()
         for name in deps.keys():
             version = deps[name]
-            if version.startswith("/"):
+            if version[0].isdigit():
+                package_key = utils.pnpm_name(name, version)
+            elif version.startswith("/"):
                 # an aliased dependency
                 version = version[1:]
+                package_key = version
                 name, version = utils.parse_pnpm_name(version)
+            else:
+                package_key = version
             transitive_closure[name] = transitive_closure.get(name, [])
             if version in transitive_closure[name]:
                 continue
             transitive_closure[name].insert(0, version)
-            package_info = packages[utils.pnpm_name(name, version)]
+            package_info = packages[package_key]
             stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"]))
 
 def _gather_package_info(package_path, package_snapshot):
@@ -44,6 +49,15 @@ def _gather_package_info(package_path, package_snapshot):
         package = package_path[1:]
         name, version = utils.parse_pnpm_name(package)
         friendly_version = utils.strip_peer_dep_version(version)
+        package_key = package
+    elif package_path.startswith("file:"):
+        package = package_path
+        if "name" not in package_snapshot:
+            fail("expected package %s to have a name field" % package_path)
+        name = package_snapshot["name"]
+        version = package_path
+        friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
+        package_key = package
     else:
         package = package_path
         if "name" not in package_snapshot:
@@ -53,22 +67,25 @@ def _gather_package_info(package_path, package_snapshot):
         name = package_snapshot["name"]
         version = package_path
         friendly_version = package_snapshot["version"]
+        package_key = package
 
     if "resolution" not in package_snapshot:
         fail("package %s has no resolution field" % package_path)
     resolution = package_snapshot["resolution"]
     integrity = resolution["integrity"] if "integrity" in resolution else None
     tarball = resolution["tarball"] if "tarball" in resolution else None
-    if not integrity and not tarball:
-        fail("expected package %s to have an integrity and/or tarball fields but found neither" % package_path)
+    directory = resolution["directory"] if "directory" in resolution else None
+    if not integrity and not tarball and not directory:
+        fail("expected package %s to have an integrity, tarball or directory fields but found none" % package_path)
     registry = resolution["registry"] if "registry" in resolution else None
 
-    return utils.pnpm_name(name, version), {
+    return package_key, {
         "name": name,
         "version": version,
         "friendly_version": friendly_version,
         "integrity": integrity,
         "tarball": tarball,
+        "directory": directory,
         "registry": registry,
         "dependencies": package_snapshot.get("dependencies", {}),
         "optionalDependencies": package_snapshot.get("optionalDependencies", {}),
@@ -110,8 +127,6 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
 
     if "." not in lock_importers.keys():
         fail("no root importers in lockfile")
-
-    root_importers = lock_importers["."]
 
     importers = {}
     for importPath in lock_importers.keys():

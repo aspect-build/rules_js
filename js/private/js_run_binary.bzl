@@ -183,7 +183,7 @@ def js_run_binary(
         for log_level_env in _js_binary_envs_for_log_level(log_level):
             extra_env[log_level_env] = "1"
 
-    if len(outs) + len(out_dirs) < 1:
+    if not stdout and not stderr and not exit_code_out and (len(outs) + len(out_dirs) < 1):
         # run_binary will produce the actual error, but we want to give an additional JS-specific
         # warning message here. Note that as a macro, we can't tell the name of the rule provided
         # by the users BUILD file (e.g. for "typescript_bin.tsc(outs = [])" we'd wish to say
