@@ -33,7 +33,7 @@ my-workspace/
 
 However, Bazel has a constraint that outputs for a given Bazel package (a directory containing a `BUILD` file) must be written under the corresponding output folder. This means that you have two choices:
 
-1. Keep your output structure the same. This implies there must be a single `BUILD` file under `my-workspace`, since this is the only Bazel package which can output to paths beneath `my-workspace/dist`. The downside is that this `BUILD` file may get long, accumulate a lot of `load` statements, and the paths inside will be longer.
+1. **Keep your output structure the same.** This implies there must be a single `BUILD` file under `my-workspace`, since this is the only Bazel package which can output to paths beneath `my-workspace/dist`. The downside is that this `BUILD` file may get long, accumulate a lot of `load` statements, and the paths inside will be longer.
 
 The result looks like this:
 
@@ -43,13 +43,13 @@ my-workspace/
 ├─ packages/
 │  ├─ lib1/
 │  ├─ lib2/
-├─ bazel-bin/
+├─ bazel-bin/packages/
 │  ├─ lib1/
 │  ├─ lib2/
 ```
 
 
-2. Change your output structure to distribute `dist` folders beneath `lib1` and `lib2`. Now you can have `BUILD` files underneath each library, which is more Bazel-idiomatic.
+2. **Change your output structure** to distribute `dist` folders beneath `lib1` and `lib2`. Now you can have `BUILD` files underneath each library, which is more Bazel-idiomatic.
 
 The result looks like this:
 
@@ -60,7 +60,7 @@ my-workspace/
 │  |  ├─ BUILD.bazel
 │  ├─ lib2/
 │  |  ├─ BUILD.bazel
-├─ bazel-bin/
+├─ bazel-bin/packages/
 │  ├─ lib1/
 │  |  ├─ dist/
 │  ├─ lib2/
