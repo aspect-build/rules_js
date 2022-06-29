@@ -97,16 +97,22 @@ js_binary(
 
 js_run_binary(
     name = "run4",
-    outs = ["out4"],
-    args = ["out4"],
+    args = ["out4-dist/out4"],
     chdir = package_name(),
+    out_dirs = ["out4-dist"],
     tool = ":bin4",
+)
+
+directory_path(
+    name = "out4",
+    directory = ":run4",
+    path = "out4",
 )
 
 diff_test(
     name = "test4",
     file1 = "//examples:expected_one_ast.json",
-    file2 = "out4",
+    file2 = ":out4",
 )
 
 #######################################
