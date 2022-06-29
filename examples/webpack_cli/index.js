@@ -11,7 +11,6 @@ const {
     sqrt,
 } = require('mathjs')
 
-
 // functions and constants
 round(e, 3) // 2.718
 atan2(3, -3) / pi // 0.75

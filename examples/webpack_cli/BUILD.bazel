@@ -48,5 +48,4 @@ bin.webpack_cli(
     ],
     log_level = "debug",
     chdir = package_name(),
-    silent_on_success = False,
 )
