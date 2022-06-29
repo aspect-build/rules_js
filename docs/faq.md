@@ -34,4 +34,39 @@ my-workspace/
 However, Bazel has a constraint that outputs for a given Bazel package (a directory containing a `BUILD` file) must be written under the corresponding output folder. This means that you have two choices:
 
 1. Keep your output structure the same. This implies there must be a single `BUILD` file under `my-workspace`, since this is the only Bazel package which can output to paths beneath `my-workspace/dist`. The downside is that this `BUILD` file may get long, accumulate a lot of `load` statements, and the paths inside will be longer.
-2. Change your output structure to distribute `dist` folders beneath `lib1` and `lib2`. Now you can have `BUILD` files underneath each library, which is more Bazel-idiomatic. This might mean updating some configuration files which refer to the original output locations. To keep your legacy build system working during the migration, you might want to avoid changing those configuration files in-place. For this purpose, you can use [the `jq` rule](https://docs.aspect.build/aspect-build/bazel-lib/v1.0.0/docs/jq-docgen.html#jq) in place of `copy_to_bin`, using a `filter` expression so the copy of the configuration file in `bazel-bin` that's used by the Bazel build can have a different path than the configuration file in the source tree.
+
+The result looks like this:
+
+```
+my-workspace/
+├─ BUILD.bazel
+├─ packages/
+│  ├─ lib1/
+│  ├─ lib2/
+├─ bazel-bin/
+│  ├─ lib1/
+│  ├─ lib2/
+```
+
+
+2. Change your output structure to distribute `dist` folders beneath `lib1` and `lib2`. Now you can have `BUILD` files underneath each library, which is more Bazel-idiomatic.
+
+The result looks like this:
+
+```
+my-workspace/
+├─ packages/
+│  ├─ lib1/
+│  |  ├─ BUILD.bazel
+│  ├─ lib2/
+│  |  ├─ BUILD.bazel
+├─ bazel-bin/
+│  ├─ lib1/
+│  |  ├─ dist/
+│  ├─ lib2/
+│  |  ├─ dist/
+```
+
+Note that when following option 2, it might require updating some configuration files which refer to the original output locations. For example, your `tsconfig.json` file might have a `paths` section which points to the `../../dist` folder.
+
+To keep your legacy build system working during the migration, you might want to avoid changing those configuration files in-place. For this purpose, you can use [the `jq` rule](https://docs.aspect.build/aspect-build/bazel-lib/v1.0.0/docs/jq-docgen.html#jq) in place of `copy_to_bin`, using a `filter` expression so the copy of the configuration file in `bazel-bin` that's used by the Bazel build can have a different path than the configuration file in the source tree.
