@@ -25,10 +25,10 @@ Many projects have a structure like the following:
 my-workspace/
 ├─ packages/
 │  ├─ lib1/
-│  ├─ lib2/
-├─ dist/
-│  ├─ lib1/
-│  ├─ lib2/
+│  └─ lib2/
+└─ dist/
+   ├─ lib1/
+   └─ lib2/
 ```
 
 However, Bazel has a constraint that outputs for a given Bazel package (a directory containing a `BUILD` file) must be written under the corresponding output folder. This means that you have two choices:
@@ -42,10 +42,10 @@ my-workspace/
 ├─ BUILD.bazel
 ├─ packages/
 │  ├─ lib1/
-│  ├─ lib2/
-├─ bazel-bin/packages/
-│  ├─ lib1/
-│  ├─ lib2/
+│  └─ lib2/
+└─ bazel-bin/packages/
+   ├─ lib1/
+   └─ lib2/
 ```
 
 
@@ -57,14 +57,14 @@ The result looks like this:
 my-workspace/
 ├─ packages/
 │  ├─ lib1/
-│  |  ├─ BUILD.bazel
+│  |  └─ BUILD.bazel
 │  ├─ lib2/
-│  |  ├─ BUILD.bazel
-├─ bazel-bin/packages/
-│  ├─ lib1/
-│  |  ├─ dist/
-│  ├─ lib2/
-│  |  ├─ dist/
+│  |  └─ BUILD.bazel
+└─ bazel-bin/packages/
+   ├─ lib1/
+   |  └─ dist/ 
+   └─ lib2/
+      └─ dist/
 ```
 
 Note that when following option 2, it might require updating some configuration files which refer to the original output locations. For example, your `tsconfig.json` file might have a `paths` section which points to the `../../dist` folder.
