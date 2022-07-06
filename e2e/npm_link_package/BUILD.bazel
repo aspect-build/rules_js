@@ -9,6 +9,11 @@ npm_link_package(
     src = "//lib",
 )
 
+npm_link_package(
+    name = "node_modules/@e2e/wrapper-lib",
+    src = "//wrapper-lib",
+)
+
 aspect_test_a_bin.bin_a_test(
     name = "aspect_test_a_bin_test",
 )

@@ -15,6 +15,11 @@ console.log(c.id())
 const fp = require('@e2e/lib')
 console.log('--@e2e/lib--')
 console.log(fp.id())
+const wrapper = require('@e2e/wrapper-lib');
+console.log('--@e2e/wrapper-lib--')
+console.log(wrapper.id());
+console.log(wrapper.libId());
+console.log(wrapper.subdirId());
 const rulesFooA = require('../../rules_foo/foo/node_modules/@aspect-test/a')
 console.log('--rulesFooA--')
 console.log(rulesFooA.id())
