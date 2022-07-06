@@ -68,6 +68,8 @@ npm_translate_lock(
     # Creates a new repository named "@npm_deps"
     name = "npm_deps",
     pnpm_lock = "//:pnpm-lock.yaml",
+    # Recommended attribute that also checks the .bazelignore file
+    verify_node_modules_ignored = "//:.bazelignore",
 )
 ```
 
@@ -85,21 +87,10 @@ However it causes Bazel to eagerly evaluate the `npm_translate_lock` rule for ev
 even if the user didn't ask for anything JavaScript-related.
 
 ```starlark
+# Following our example above, we named this "npm_deps"
 load("@npm_deps//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
-```
-
-In BUILD files, declare dependencies on the packages using the same external repository.
-
-Following the same example, this might look like:
-
-```starlark
-js_test(
-    name = "test_test",
-    data = ["@npm_deps//@types/node"],
-    entry_point = "test.js",
-)
 ```
 
 2. Check in the `repositories.bzl` file to version control, and load that instead.
@@ -123,8 +114,6 @@ write_source_files(
 ```
 
 Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do so.
-In this case, the aliases are not created, so you get only the `npm_import` behavior
-and must depend on packages with their versioned label like `@npm__types_node-15.12.2`.
 
 
 **ATTRIBUTES**
