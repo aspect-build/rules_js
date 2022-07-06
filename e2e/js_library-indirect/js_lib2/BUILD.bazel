@@ -1,0 +1,23 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+# A named package depending on:
+#   1. another named package
+#   2. a relative path to js_library()
+
+js_library(
+    name = "js",
+    srcs = ["index.js"],
+    deps = [
+        "//:node_modules/@myorg/js_lib",
+        "//js_lib2/inner",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+npm_package(
+    name = "js_lib2",
+    srcs = [":js"],
+    package = "@myorg/js_lib2",
+    visibility = ["//visibility:public"],
+)

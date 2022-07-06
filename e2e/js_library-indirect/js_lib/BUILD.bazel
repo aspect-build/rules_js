@@ -1,0 +1,10 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+# A basic single-file no dependencies npm_package()
+
+npm_package(
+    name = "js_lib",
+    srcs = ["index.js"],
+    package = "@myorg/js_lib",
+    visibility = ["//visibility:public"],
+)
