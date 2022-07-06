@@ -102,3 +102,13 @@ npm_import(
     root_package = "",
     version = "6.32.19",
 )
+
+npm_translate_lock(
+    name = "npm_translate_package_lock",
+    npm_package_json = "//examples/npm_translate_package_lock:package.json",
+    npm_package_lock = "//examples/npm_translate_package_lock:package-lock.json",
+)
+
+load("@npm_translate_package_lock//:repositories.bzl", npm_translate_package_lock_repositories = "npm_repositories")
+
+npm_translate_package_lock_repositories()

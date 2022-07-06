@@ -8,9 +8,9 @@ load("//npm/private:npm_translate_lock.bzl", t = "npm_translate_lock_testonly")
 # buildifier: disable=function-docstring
 def test_verify_ignores_in_root(ctx):
     env = unittest.begin(ctx)
-    rctx = struct(attr = struct(pnpm_lock = Label("//:pnpm-lock.yaml")))
+    root_package = Label("//:pnpm-lock.yaml").package
     actual = t.verify_node_modules_ignored(
-        rctx,
+        root_package,
         [
             ".",
             "dir",
@@ -25,7 +25,7 @@ def test_verify_ignores_in_root(ctx):
 
     nothing_missing = []
     asserts.equals(env, nothing_missing, t.verify_node_modules_ignored(
-        rctx,
+        root_package,
         [
             ".",
             "dir",
@@ -42,9 +42,9 @@ dir/node_modules/
 # buildifier: disable=function-docstring
 def test_verify_ignores_in_subdir(ctx):
     env = unittest.begin(ctx)
-    rctx = struct(attr = struct(pnpm_lock = Label("//some/package:pnpm-lock.yaml")))
+    root_package = Label("//some/package:pnpm-lock.yaml").package
     actual = t.verify_node_modules_ignored(
-        rctx,
+        root_package,
         [
             ".",
             "../../dir",

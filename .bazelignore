@@ -5,6 +5,7 @@ examples/lib/node_modules/
 examples/webpack_cli/node_modules/
 examples/macro/node_modules/
 examples/npm_deps/node_modules/
+examples/npm_translate_package_lock/node_modules/
 node_modules/
 npm/private/test/node_modules/
 js/private/coverage/bundle/node_modules

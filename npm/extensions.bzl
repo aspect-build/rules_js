@@ -13,7 +13,7 @@ def _extension_impl(module_ctx):
         for attr in mod.tags.npm_translate_lock:
             lockfile = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             trans = translate_to_transitive_closure(lockfile, attr.prod, attr.dev, attr.no_optional)
-            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr)
+            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr.pnpm_lock.package, attr)
             for i in imports:
                 npm_import(
                     name = i.name,
