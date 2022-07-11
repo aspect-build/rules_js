@@ -47,7 +47,7 @@ The tradeoffs are similar to
 [this rules_python thread](https://github.com/bazelbuild/rules_python/issues/608).
 
 1. Immediately load from the generated `repositories.bzl` file in `WORKSPACE`.
-This is similar to the 
+This is similar to the
 [`pip_parse`](https://github.com/bazelbuild/rules_python/blob/main/docs/pip.md#pip_parse)
 rule in rules_python for example.
 It has the advantage of also creating aliases for simpler dependencies that don't require
@@ -135,12 +135,23 @@ _ATTRS = {
         doc = """If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist""",
         default = True,
     ),
+    "lifecycle_hooks_envs": attr.string_list_dict(
+        doc = """Environment variables applied to the preinstall, install and postinstall lifecycle hooks on npm packages.
+        The environment variables can be defined per package by package name or globally using "*".
+        Variables are declared as key/value pairs of the form "key=value".
+        For example:
+        lifecycle_hooks_envs: {
+            "*": ["GLOBAL_KEY1=value1", "GLOBAL_KEY2=value2"],
+            "@foo/bar": ["PREBULT_BINARY=http://downloadurl"],
+        }
+        """,
+    ),
     "verify_node_modules_ignored": attr.label(
         doc = """node_modules folders in the source tree should be ignored by Bazel.
 
         This points to a `.bazelignore` file to verify that all nested node_modules directories
         pnpm will create are listed.
-        
+
         See https://github.com/bazelbuild/bazel/issues/8106
         """,
     ),
@@ -160,7 +171,7 @@ _NPM_IMPORT_TMPL = \
         link_workspace = "{link_workspace}",
         link_packages = {link_packages},
         package = "{package}",
-        version = "{version}",{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}
+        version = "{version}",{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}
     )
 """
 
@@ -359,6 +370,11 @@ def _gen_npm_imports(lockfile, attr):
             friendly_name not in attr.lifecycle_hooks_exclude
         )
 
+        lifecycle_hooks_env = []
+        for package in attr.lifecycle_hooks_envs:
+            if package == "*" or package == name or package == friendly_name or package == unfriendly_name:
+                lifecycle_hooks_env.extend(attr.lifecycle_hooks_envs[package])
+
         url = None
         if tarball:
             if _is_url(tarball):
@@ -405,6 +421,7 @@ To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
             patches = patches,
             root_package = root_package,
             run_lifecycle_hooks = run_lifecycle_hooks,
+            lifecycle_hooks_env = lifecycle_hooks_env,
             transitive_closure = transitive_closure,
             url = url,
             version = version,
@@ -522,7 +539,7 @@ def _impl(rctx):
         if missing_ignores:
             fail("""\
 
-ERROR: in verify_node_modules_ignored:                
+ERROR: in verify_node_modules_ignored:
 pnpm install will create nested node_modules, but not all of them are ignored by Bazel.
 We recommend that all node_modules folders in the source tree be ignored,
 to avoid Bazel printing confusing error messages.
@@ -743,6 +760,8 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
         custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
         maybe_run_lifecycle_hooks = ("""
         run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
+        maybe_lifecycle_hooks_env = ("""
+        lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -753,6 +772,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             maybe_patch_args = maybe_patch_args,
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
+            maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_transitive_closure = maybe_transitive_closure,
             maybe_url = maybe_url,
             name = _import.name,
