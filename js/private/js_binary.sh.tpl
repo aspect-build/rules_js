@@ -302,7 +302,7 @@ done
 
 # Run node patches if needed
 export JS_BINARY__FS_PATH_ROOTS="$execroot:$RUNFILES"
-if [ -z "${JS_BINARY__DISABLE_NODE_PATCHES:-}" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
+if [ "${JS_BINARY__PATCH_NODE_FS:-}" ] && [ "${JS_BINARY__PATCH_NODE_FS}" != "0" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
     logf_debug "adding node fs patches with roots: %s" "$JS_BINARY__FS_PATH_ROOTS"
     NODE_OPTIONS+=( "--require" "$RUNFILES/{{workspace_name}}/{{node_patches_entry_short_path}}" )
 fi

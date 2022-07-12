@@ -34,6 +34,7 @@ def js_run_binary(
         mnemonic = "JsRunBinary",
         progress_message = None,
         execution_requirements = None,
+        patch_node_fs = True,
         **kwargs):
     """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
 
@@ -127,6 +128,17 @@ def js_run_binary(
 
             See https://docs.bazel.build/versions/main/be/common-definitions.html#common.tags for useful keys.
 
+        patch_node_fs: Patch the to Node.js `fs` API (https://nodejs.org/api/fs.html) for this node program
+            to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.
+
+            When enabled, `js_binary` patches the Node.js sync and async `fs` API functions `lstat`,
+            `readlink`, `realpath`, `readdir` and `opendir` so that the node program being
+            run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,
+            these patches prevent the program being run from resolving symlinks out of the sandbox.
+
+            When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
+            which can lead to non-hermetic behavior.
+
         **kwargs: Additional arguments
     """
 
@@ -177,6 +189,13 @@ def js_run_binary(
     # Configure silent on success
     if silent_on_success:
         extra_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
+
+    # Disable node patches if requested
+    if patch_node_fs:
+        extra_env["JS_BINARY__PATCH_NODE_FS"] = "1"
+    else:
+        # Set explicitly to "0" so disable overrides any enable in the js_binary
+        extra_env["JS_BINARY__PATCH_NODE_FS"] = "0"
 
     # Configure log_level if specified
     if log_level:
