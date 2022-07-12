@@ -17,9 +17,7 @@ TESTS = [
             "//js/private/node-patches/src:compile",
         ],
         entry_point = t,
-        env = {
-            "JS_BINARY__DISABLE_NODE_PATCHES": "1",
-        },
+        patch_node_fs = False,
     )
     for t in TESTS
 ]

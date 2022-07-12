@@ -168,6 +168,19 @@ _ATTRS = {
         values = _LOG_LEVELS.keys(),
         default = "error",
     ),
+    "patch_node_fs": attr.bool(
+        doc = """Patch the to Node.js `fs` API (https://nodejs.org/api/fs.html) for this node program
+        to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.
+
+        When enabled, `js_binary` patches the Node.js sync and async `fs` API functions `lstat`,
+        `readlink`, `realpath`, `readdir` and `opendir` so that the node program being
+        run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,
+        these patches prevent the program being run from resolving symlinks out of the sandbox.
+
+        When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
+        which can lead to non-hermetic behavior.""",
+        default = True,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -196,7 +209,6 @@ def _target_tool_short_path(path):
     return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
 def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args):
-    bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
 
@@ -221,6 +233,10 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             var = key,
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
         ))
+
+    if ctx.attr.patch_node_fs:
+        # Set patch node fs API env if not already set to allow js_run_binary to override
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__PATCH_NODE_FS", value = "1"))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(

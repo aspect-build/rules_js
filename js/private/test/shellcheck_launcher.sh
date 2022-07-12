@@ -23,6 +23,7 @@ export JS_BINARY__COMPILATION_MODE="fastbuild"
 export JS_BINARY__TARGET_CPU="k8"
 export JS_BINARY__TARGET="@//js/private/test:shellcheck_launcher"
 export JS_BINARY__WORKSPACE="aspect_rules_js"
+if [[ -z "${JS_BINARY__PATCH_NODE_FS:-}" ]]; then export JS_BINARY__PATCH_NODE_FS="1"; fi
 if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; fi
 if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
 
@@ -319,7 +320,7 @@ done
 
 # Run node patches if needed
 export JS_BINARY__FS_PATH_ROOTS="$execroot:$RUNFILES"
-if [ -z "${JS_BINARY__DISABLE_NODE_PATCHES:-}" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
+if [ "${JS_BINARY__PATCH_NODE_FS:-}" ] && [ "${JS_BINARY__PATCH_NODE_FS}" != "0" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
     logf_debug "adding node fs patches with roots: %s" "$JS_BINARY__FS_PATH_ROOTS"
     NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register.js" )
 fi

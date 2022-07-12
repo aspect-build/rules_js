@@ -19,7 +19,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 <pre>
 js_run_binary(<a href="#js_run_binary-name">name</a>, <a href="#js_run_binary-tool">tool</a>, <a href="#js_run_binary-env">env</a>, <a href="#js_run_binary-srcs">srcs</a>, <a href="#js_run_binary-outs">outs</a>, <a href="#js_run_binary-out_dirs">out_dirs</a>, <a href="#js_run_binary-args">args</a>, <a href="#js_run_binary-chdir">chdir</a>, <a href="#js_run_binary-stdout">stdout</a>, <a href="#js_run_binary-stderr">stderr</a>, <a href="#js_run_binary-exit_code_out">exit_code_out</a>,
               <a href="#js_run_binary-silent_on_success">silent_on_success</a>, <a href="#js_run_binary-copy_srcs_to_bin">copy_srcs_to_bin</a>, <a href="#js_run_binary-log_level">log_level</a>, <a href="#js_run_binary-mnemonic">mnemonic</a>, <a href="#js_run_binary-progress_message">progress_message</a>,
-              <a href="#js_run_binary-execution_requirements">execution_requirements</a>, <a href="#js_run_binary-kwargs">kwargs</a>)
+              <a href="#js_run_binary-execution_requirements">execution_requirements</a>, <a href="#js_run_binary-patch_node_fs">patch_node_fs</a>, <a href="#js_run_binary-kwargs">kwargs</a>)
 </pre>
 
 Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
@@ -49,6 +49,7 @@ This rule does not require Bash `native.genrule`.
 | <a id="js_run_binary-mnemonic"></a>mnemonic |  A one-word description of the action, for example, CppCompile or GoLink.   |  <code>"JsRunBinary"</code> |
 | <a id="js_run_binary-progress_message"></a>progress_message |  Progress message to show to the user during the build, for example, "Compiling foo.cc to create foo.o". The message may contain %{label}, %{input}, or %{output} patterns, which are substituted with label string, first input, or output's path, respectively. Prefer to use patterns instead of static strings, because the former are more efficient.   |  <code>None</code> |
 | <a id="js_run_binary-execution_requirements"></a>execution_requirements |  Information for scheduling the action.<br><br>For example,<br><br><pre><code> execution_requirements = {     "no-cache": "1", }, </code></pre><br><br>See https://docs.bazel.build/versions/main/be/common-definitions.html#common.tags for useful keys.   |  <code>None</code> |
+| <a id="js_run_binary-patch_node_fs"></a>patch_node_fs |  Patch the to Node.js <code>fs</code> API (https://nodejs.org/api/fs.html) for this node program to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.<br><br>When enabled, <code>js_binary</code> patches the Node.js sync and async <code>fs</code> API functions <code>lstat</code>, <code>readlink</code>, <code>realpath</code>, <code>readdir</code> and <code>opendir</code> so that the node program being run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox, these patches prevent the program being run from resolving symlinks out of the sandbox.<br><br>When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks which can lead to non-hermetic behavior.   |  <code>True</code> |
 | <a id="js_run_binary-kwargs"></a>kwargs |  Additional arguments   |  none |
 
 
