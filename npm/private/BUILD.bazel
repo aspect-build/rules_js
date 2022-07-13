@@ -32,6 +32,7 @@ bzl_library(
         ":npm_package",
         ":utils",
         "@aspect_bazel_lib//lib:copy_directory",
+        "@aspect_bazel_lib//lib:paths",
         "@bazel_skylib//lib:paths",
         "@rules_nodejs//nodejs:bzl",
     ],

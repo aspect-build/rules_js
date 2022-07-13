@@ -41,6 +41,10 @@ def npm_link_imported_package_store(
         package = "{package}",
         version = "{version}",
         tags = ["manual"],
+        allow_unresolved_symlinks = select({{
+            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "//conditions:default": False,
+        }}),
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -51,6 +55,10 @@ def npm_link_imported_package_store(
         version = "{version}",
         deps = ref_deps,
         tags = ["manual"],
+        allow_unresolved_symlinks = select({{
+            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "//conditions:default": False,
+        }}),
     )
 
     # virtual store target with transitive closure of all node package dependencies
@@ -62,6 +70,10 @@ def npm_link_imported_package_store(
         deps = deps,
         visibility = visibility,
         tags = ["manual"],
+        allow_unresolved_symlinks = select({{
+            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "//conditions:default": False,
+        }}),
     )
 
     # filegroup target that provides a single file which is
@@ -82,6 +94,10 @@ def npm_link_imported_package_store(
             version = "{version}",
             deps = ref_deps,
             tags = ["manual"],
+            allow_unresolved_symlinks = select({{
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }}),
         )
 
         # terminal pre-lifecycle target for use in lifecycle build target below
@@ -91,6 +107,10 @@ def npm_link_imported_package_store(
             version = "{version}",
             deps = lc_deps,
             tags = ["manual"],
+            allow_unresolved_symlinks = select({{
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }}),
         )
 
         # lifecycle build action
@@ -155,6 +175,10 @@ def npm_link_imported_package_direct(
         src = "//{root_package}:{{}}".format(store_target_name),
         visibility = visibility,
         tags = ["manual"],
+        allow_unresolved_symlinks = select({{
+            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "//conditions:default": False,
+        }}),
     )
 
     # filegroup target that provides a single file which is

@@ -1266,6 +1266,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
+            allow_unresolved_symlinks = select({
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }),
         )
 
     for link_package in []:
@@ -1276,6 +1280,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/is-odd/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
+                allow_unresolved_symlinks = select({
+                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                    "//conditions:default": False,
+                }),
             )
             direct_targets.append(":{}/is-odd".format(name))
 
@@ -1301,6 +1309,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
+            allow_unresolved_symlinks = select({
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }),
         )
 
     for link_package in []:
@@ -1311,6 +1323,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/semver-max/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
+                allow_unresolved_symlinks = select({
+                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                    "//conditions:default": False,
+                }),
             )
             direct_targets.append(":{}/semver-max".format(name))
 
@@ -1336,6 +1352,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
+            allow_unresolved_symlinks = select({
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }),
         )
 
     for link_package in ["examples/js_binary", "examples/npm_deps"]:
@@ -1346,6 +1366,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/@mycorp/mylib/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
+                allow_unresolved_symlinks = select({
+                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                    "//conditions:default": False,
+                }),
             )
             direct_targets.append(":{}/@mycorp/mylib".format(name))
 

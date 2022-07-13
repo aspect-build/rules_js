@@ -42,3 +42,6 @@ build:openbsd --nolegacy_external_runfiles
 # on the host.
 # See https://github.com/angular/angular/issues/27514.
 build --incompatible_strict_action_env
+
+# TODO: enable once this is supported in Bazel
+# build --experimental_allow_unresolved_symlinks

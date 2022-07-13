@@ -1,6 +1,7 @@
 "npm_link_package rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
+load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":utils.bzl", "utils")
@@ -147,6 +148,16 @@ If unset, the package version in the NpmPackageInfo src must be set.
 If set, takes precendance over the package version in the NpmPackageInfo src.
 """,
     ),
+    "allow_unresolved_symlinks": attr.bool(
+        mandatory = True,
+        doc = """Whether unresolved symlinks are enabled in the current build configuration.
+
+        These are enabled with the --experimental_allow_unresolved_symlinks flag.
+
+        Typical usage of this rule is via a macro which automatically sets this
+        attribute based on a `config_setting` rule.
+        """,
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
@@ -163,7 +174,35 @@ If unset, the package name of the src npm_link_package_store is used.
 If set, takes precendance over the package name in the src npm_link_package_store.
 """,
     ),
+    "allow_unresolved_symlinks": attr.bool(
+        mandatory = True,
+        doc = """Whether unresolved symlinks are enabled in the current build configuration.
+
+        These are enabled with the --experimental_allow_unresolved_symlinks flag.
+
+        Typical usage of this rule is via a macro which automatically sets this
+        attribute based on a `config_setting` rule.
+        """,
+    ),
 }
+
+def _make_symlink(ctx, symlink_path, target_file):
+    files = []
+    if ctx.attr.allow_unresolved_symlinks:
+        symlink = ctx.actions.declare_symlink(symlink_path)
+        ctx.actions.symlink(
+            output = symlink,
+            target_path = relative_file(target_file, symlink.path),
+        )
+        files.append(target_file)
+    else:
+        symlink = ctx.actions.declare_file(symlink_path)
+        ctx.actions.symlink(
+            output = symlink,
+            target_file = target_file,
+        )
+    files.append(symlink)
+    return files
 
 def _impl_store(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -208,19 +247,13 @@ def _impl_store(ctx):
 deps of npm_link_package_store must be in the same package.""" % (ctx.label.package, dep[_StoreInfo].root_package)
                 fail(msg)
             dep_package = dep[_StoreInfo].package
-            dep_version = dep[_StoreInfo].version
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
             dep_virtual_store_directory = dep[_StoreInfo].virtual_store_directory
             if dep_virtual_store_directory:
                 for dep_alias in dep_aliases:
                     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                     dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_alias)
-                    dep_symlink = ctx.actions.declare_file(dep_symlink_path)
-                    ctx.actions.symlink(
-                        output = dep_symlink,
-                        target_file = dep_virtual_store_directory,
-                    )
-                    direct_files.append(dep_symlink)
+                    direct_files.extend(_make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm depedency will create the dep symlinks for this dep;
@@ -267,12 +300,7 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                         for dep_ref_dep_alias in dep_ref_dep_aliases:
                             # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                             dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
-                            dep_ref_dep_symlink = ctx.actions.declare_file(dep_ref_dep_symlink_path)
-                            ctx.actions.symlink(
-                                output = dep_ref_dep_symlink,
-                                target_file = dep_ref_def_virtual_store_directory,
-                            )
-                            direct_files.append(dep_ref_dep_symlink)
+                            direct_files.extend(_make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
 
     direct_files = depset(direct = direct_files)
     files_depsets = [direct_files]
@@ -313,24 +341,20 @@ def _impl_direct(ctx):
 
     package = ctx.attr.package if ctx.attr.package else ctx.attr.src[_StoreInfo].package
 
+    output_files = []
+
     # symlink the package's path in the virtual store to the root of the node_modules
-    # as a direct dependency
-    root_symlink = ctx.actions.declare_file(
-        # "node_modules/{package}"
-        paths.join("node_modules", package),
-    )
-    ctx.actions.symlink(
-        output = root_symlink,
-        target_file = virtual_store_directory,
-    )
+    # "node_modules/{package}" so it is available as a direct dependency
+    root_symlink_path = paths.join("node_modules", package)
+    output_files = _make_symlink(ctx, root_symlink_path, virtual_store_directory)
 
     result = [
         DefaultInfo(
-            files = depset([root_symlink], transitive = [ctx.attr.src[DefaultInfo].files]),
-            runfiles = ctx.runfiles([root_symlink]).merge(ctx.attr.src[DefaultInfo].data_runfiles),
+            files = depset(output_files, transitive = [ctx.attr.src[DefaultInfo].files]),
+            runfiles = ctx.runfiles(output_files).merge(ctx.attr.src[DefaultInfo].data_runfiles),
         ),
         declaration_info(
-            declarations = depset([root_symlink], transitive = [ctx.attr.src[DeclarationInfo].transitive_declarations]),
+            declarations = depset(output_files, transitive = [ctx.attr.src[DeclarationInfo].transitive_declarations]),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
@@ -440,6 +464,10 @@ def npm_link_package(
             deps = deps,
             visibility = visibility,
             tags = tags,
+            allow_unresolved_symlinks = select({
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }),
             **kwargs
         )
 
@@ -454,6 +482,10 @@ def npm_link_package(
             ),
             tags = tags,
             visibility = visibility,
+            allow_unresolved_symlinks = select({
+                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "//conditions:default": False,
+            }),
         )
         direct_target = ":{}".format(name)
 
