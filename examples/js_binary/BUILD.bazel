@@ -327,3 +327,52 @@ diff_test(
 aspect_test_a_bin.bin_a_test(
     name = "aspect_bin_a_test",
 )
+
+####################################################
+# Use case 10
+# Show launching js_binary() indirectly from a sh_binary()
+
+write_file(
+    name = "write10_js",
+    out = "case10.js",
+    content = ["""\
+        console.log("js_binary: ", __filename);
+        process.exit(0);
+"""],
+)
+js_binary(
+    name = "bin10-js_binary",
+    entry_point = "case10.js",
+)
+
+write_file(
+    name = "write10_launch_sh",
+    out = "launch_case10.sh",
+    content = ["""\
+        echo "sh launcher: $0"
+
+        # --- begin runfiles.bash initialization v2 ---
+        # Copy-pasted from the Bazel Bash runfiles library v2.
+        set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+        source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+        source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+        source "$0.runfiles/$f" 2>/dev/null || \
+        source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+        source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+        { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
+        # --- end runfiles.bash initialization v2 ---
+
+        $(rlocation aspect_rules_js/examples/js_binary/bin10-js_binary.sh) -h
+"""],
+)
+
+sh_binary(
+    name = "test10",
+    srcs = [":launch_case10.sh"],
+    data = [
+        ":bin10-js_binary",
+    ],
+    deps = [
+        "@bazel_tools//tools/bash/runfiles",
+    ],
+)
