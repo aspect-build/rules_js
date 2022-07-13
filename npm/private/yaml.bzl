@@ -8,13 +8,17 @@ _STATE = struct(
     CONSUME_SPACE_FLOW = 1,
     # Parse the next key or value
     PARSE_NEXT = 2,
+    # Parse a multiline string
+    PARSE_MULTILINE_STRING = 3,
     # Parse the next key or value inside of a flow
-    PARSE_NEXT_FLOW = 3,
+    PARSE_NEXT_FLOW = 4,
     # Pseudo-states that don't perform any logic but indicate the current
     # hierarchical result being formed in the starlark output.
-    KEY = 4,
-    SEQUENCE = 5,
+    KEY = 5,
+    SEQUENCE = 6,
 )
+
+EOF = {}
 
 def parse(yaml):
     """Parse yaml into starlark
@@ -31,7 +35,10 @@ def parse(yaml):
     stack = []
     stack.append(_new_CONSUME_SPACE(indent = ""))
 
-    for input in yaml.elems():
+    inputs = yaml.elems()[:]
+    inputs.append(EOF)
+
+    for input in inputs:
         state = _peek(stack)
 
         if state["id"] == _STATE.CONSUME_SPACE:
@@ -40,6 +47,8 @@ def parse(yaml):
             _handle_CONSUME_SPACE_FLOW(state, input, stack, starlark)
         elif state["id"] == _STATE.PARSE_NEXT:
             _handle_PARSE_NEXT(state, input, stack, starlark)
+        elif state["id"] == _STATE.PARSE_MULTILINE_STRING:
+            _handle_PARSE_MULTILINE_STRING(state, input, stack, starlark)
         elif state["id"] == _STATE.PARSE_NEXT_FLOW:
             _handle_PARSE_NEXT_FLOW(state, input, stack, starlark)
         else:
@@ -48,6 +57,9 @@ def parse(yaml):
     return starlark["result"]
 
 def _handle_CONSUME_SPACE(state, input, stack, starlark):
+    if input == EOF:
+        return;
+
     if input == "\n":
         # Reset the indentation
         state["indent"] = ""
@@ -81,6 +93,13 @@ def _handle_CONSUME_SPACE(state, input, stack, starlark):
 
         # Consume any space following the [
         stack.append(_new_CONSUME_SPACE_FLOW())
+    elif input == "|":
+        stack.pop()
+
+        # We are at the beginning of a multiline string
+        stack.append(_new_PARSE_MULTILINE_STRING(
+            indent = state["indent"]
+        ))
     else:
         # Reached the beginning of a value or key
         stack.pop()
@@ -90,7 +109,17 @@ def _handle_CONSUME_SPACE(state, input, stack, starlark):
         ))
 
 def _handle_PARSE_NEXT(state, input, stack, starlark):
-    if input.isspace():
+    if input == EOF:
+        stack.pop()
+
+        # We just parsed a scalar
+        _set_result_value(starlark, stack, _parse_scalar(state["buffer"]))
+
+        # Consume any space following the scalar
+        stack.append(_new_CONSUME_SPACE(
+            indent = "",
+        ))
+    elif input.isspace():
         if state["buffer"].endswith(":"):
             stack.pop()
 
@@ -150,6 +179,58 @@ def _handle_PARSE_NEXT(state, input, stack, starlark):
     else:
         # Accumulate the current text until we know what to do with it
         state["buffer"] += input
+
+def _handle_PARSE_MULTILINE_STRING(state, input, stack, starlark):
+    # Consume the rest of the line after the multiline indicator
+    if not state["consumed_first_newline"]:
+        if input == "+":
+            state["keep"] = True
+        elif input == "-":
+            state["strip"] = True
+        elif input == "\n":
+            state["consumed_first_newline"] = True
+        elif input.isspace():
+            pass
+        else:
+            fail("Unexpected input '%s' after start of multiline string" % input)
+    # Establish the indent of the value
+    elif state["value_indent"] == None:
+        if input == "\n" and state["buffer"] == "":
+            state["value"] += "\n"
+        elif input.isspace():
+            state["buffer"] += input
+        else:
+            state["value_indent"] = state["buffer"]
+            if not state["value_indent"].startswith(state["indent"]):
+                fail("Value indent of multiline string does not match indent of property")
+            elif len(state["value_indent"]) <= len(state["indent"]):
+                fail("Value indent of multiline is not greater than the indent of the property")
+            state["buffer"] += input
+    # Parse all lines of the string value
+    else:
+        if input == EOF:
+            state["value"] = _finalize_multiline_string(state["value"], state["keep"], state["strip"])
+            _set_result_value(starlark, stack, state["value"])
+        elif input == "\n":
+            state["buffer"] += input
+            if state["buffer"] == "\n":
+                state["value"] += "\n"
+            else:
+                state["value"] += state["buffer"][len(state["value_indent"]):]
+            state["buffer"] = ""
+        elif not input.isspace() and not state["buffer"].startswith(state["value_indent"]):
+            state["value"] = _finalize_multiline_string(state["value"], state["keep"], state["strip"])
+            _set_result_value(starlark, stack, state["value"])
+
+            stack.pop()
+            # Parse the next thing
+            stack.append(_new_PARSE_NEXT(
+                indent = state["buffer"],
+                buffer = input,
+            ))
+        else:
+            state["buffer"] += input
+
 
 def _handle_CONSUME_SPACE_FLOW(state, input, stack, starlark):
     if input.isspace():
@@ -282,6 +363,19 @@ def _new_PARSE_NEXT(indent, buffer):
         "buffer": buffer,
     }
 
+def _new_PARSE_MULTILINE_STRING(indent):
+    return {
+        "id": _STATE.PARSE_MULTILINE_STRING,
+        "type": "literal", # In case we support "folded" (>) later
+        "indent": indent,
+        "value_indent": None,
+        "buffer": "",
+        "value": "",
+        "strip": False,
+        "keep": False,
+        "consumed_first_newline": False,
+    }
+
 def _new_PARSE_NEXT_FLOW(buffer):
     return {
         "id": _STATE.PARSE_NEXT_FLOW,
@@ -306,8 +400,6 @@ def _new_SEQUENCE(index, flow, indent = None):
 
 def _normalize_yaml(yaml):
     yaml = yaml.replace("\r", "")
-    if not yaml.endswith("\n"):
-        yaml = yaml + "\n"
     return yaml
 
 def _initialize_result_value(starlark, stack):
@@ -368,6 +460,16 @@ def _parse_scalar(value):
         return value.strip("'")
     else:
         return value.strip("\"")
+
+def _finalize_multiline_string(value, keep, strip):
+    if keep and strip:
+        fail("Error: a multiline string cannot both keep and strip trailing newlines. This is probably a bug.")
+    if not keep and not strip:
+        value = value.rstrip(" \t\n") + "\n"
+    elif strip:
+        value = value.rstrip(" \t\n")
+
+    return value
 
 def _is_float(value):
     return value.replace(".", "", 1).isdigit()
