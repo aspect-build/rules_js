@@ -519,7 +519,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     return oneHop(maybe, cb)
                 }
                 if (!path.isAbsolute(str)) {
-                    str = path.resolve(maybe, str)
+                    str = path.resolve(path.dirname(maybe), str)
                 }
                 return cb(path.join(str, ...nested.reverse()))
             })
@@ -554,7 +554,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 continue
             }
             if (!path.isAbsolute(readlink)) {
-                readlink = path.resolve(maybe, readlink)
+                readlink = path.resolve(path.dirname(maybe), readlink)
             }
             return path.join(readlink, ...nested.reverse())
         }
