@@ -9,6 +9,25 @@ TESTS = [
     "realpath.js",
 ]
 
+# Multiple node toolchains for testing across versions
+TOOLCHAINS_NAMES = [
+    "node14",
+    "node16",
+]
+TOOLCHAINS_VERSIONS = [
+    select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@node14_linux_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:darwin": "@node14_darwin_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:windows": "@node14_windows_amd64//:node_toolchain",
+    }),
+    select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@node14_linux_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:darwin": "@node14_darwin_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:windows": "@node14_windows_amd64//:node_toolchain",
+    }),
+]
+
+# Basic tests
 [
     js_test(
         name = "{}_test".format(t.replace(".js", "")),
@@ -20,4 +39,22 @@ TESTS = [
         patch_node_fs = False,
     )
     for t in TESTS
+]
+
+# Node process spawning tests
+[
+    js_test(
+        name = "spawn_test_%s" % toolchain_name,
+        args = ["$(location //js/private/test/node-patches:spawn_print.js)", "$(location //js/private/test/node-patches:spawn_which.sh)"],
+        data = [
+            "//js/private/test/node-patches:spawn_print.js",
+            "//js/private/test/node-patches:spawn_which.sh",
+        ],
+        entry_point = "spawn.js",
+        patch_node_fs = True,
+    )
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
+    )
 ]
