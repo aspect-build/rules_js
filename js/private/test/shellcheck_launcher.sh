@@ -156,13 +156,12 @@ function is_windows {
 # It helps to normalizes paths when running on Windows.
 #
 # Example:
-# C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/users/xuser/_bazel_xuser/7q7kkv32/execroot/a/b/c
+# C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
 function normalize_windows_path {
     # Apply the followings paths transformations to normalize paths on Windows
     # -process driver letter
     # -convert path separator
-    # -lowercase everything
-    sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' -e 's/[A-Z]/\L&/g' <<< "$1"
+    sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<< "$1"
     return
 }
 
@@ -191,15 +190,24 @@ function normalize_windows_path {
 if [ "${TEST_SRCDIR:-}" ]; then
     # Case 4, bazel has identified runfiles for us.
     RUNFILES="$TEST_SRCDIR"
-elif [ "${RUNFILES_MANIFEST_ONLY:-}" ]; then
-    # Windows only has a manifest file instead of symlinks.
+elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
     if [ "$(is_windows)" -eq "1" ]; then
-        # If Windows normalizing the path and case insensitive removing the `/MANIFEST` part of the path
-        NORMALIZED_RUNFILES_MANIFEST_FILE_PATH=$(normalize_windows_path "$RUNFILES_MANIFEST_FILE")
-        # shellcheck disable=SC2001
-        RUNFILES=$(sed 's|\/MANIFEST$||i' <<< "$NORMALIZED_RUNFILES_MANIFEST_FILE_PATH")
+        # If Windows, normalize the path
+        NORMALIZED_RUNFILES_MANIFEST_FILE=$(normalize_windows_path "$RUNFILES_MANIFEST_FILE")
     else
-        RUNFILES=${RUNFILES_MANIFEST_FILE%/MANIFEST}
+        NORMALIZED_RUNFILES_MANIFEST_FILE="$RUNFILES_MANIFEST_FILE"
+    fi
+    if [[ "${NORMALIZED_RUNFILES_MANIFEST_FILE}" == *.runfiles_manifest ]]; then
+        # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
+        # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
+        # runfiles directory and named my_binary.runfiles_manifest
+        RUNFILES=${NORMALIZED_RUNFILES_MANIFEST_FILE%_manifest}
+    elif [[ "${NORMALIZED_RUNFILES_MANIFEST_FILE}" == */MANIFEST ]]; then
+        # Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
+        RUNFILES=${NORMALIZED_RUNFILES_MANIFEST_FILE%/MANIFEST}
+    else
+        logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
+        exit 1
     fi
 else
     case "$0" in
