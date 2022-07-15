@@ -239,6 +239,17 @@ def _link_package(root_package, import_path, rel_path = "."):
 def _is_url(url):
     return url.find("://") != -1
 
+def _gather_values_from_matching_names(keyed_lists, *names):
+    result = []
+    for name in names:
+        if name:
+            v = keyed_lists.get(name, [])
+            if type(v) == "list":
+                result.extend(v)
+            else:
+                result.append(v)
+    return result
+
 def _gen_npm_imports(lockfile, attr):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
@@ -298,24 +309,12 @@ def _gen_npm_imports(lockfile, attr):
             # there is no unfriendly name for this package
             unfriendly_name = None
 
-        # gather patches by name, friendly_name and unfriendly_name (if any)
-        patches = attr.patches.get(name, [])[:]
-        patches.extend(attr.patches.get(friendly_name, []))
-        if unfriendly_name:
-            patches.extend(attr.patches.get(unfriendly_name, []))
-        patch_args = attr.patch_args.get(name, [])[:]
-        patch_args.extend(attr.patch_args.get(friendly_name, []))
-        if unfriendly_name:
-            patch_args.extend(attr.patch_args.get(unfriendly_name, []))
+        # gather patches & patch args
+        patches = _gather_values_from_matching_names(attr.patches, name, friendly_name, unfriendly_name)
+        patch_args = _gather_values_from_matching_names(attr.patch_args, name, friendly_name, unfriendly_name)
 
-        # gather custom postinstalls by name, friendly_name and unfriendly_name (if any)
-        custom_postinstalls = []
-        if name in attr.custom_postinstalls:
-            custom_postinstalls.append(attr.custom_postinstalls.get(name))
-        if friendly_name in attr.custom_postinstalls:
-            custom_postinstalls.append(attr.custom_postinstalls.get(friendly_name))
-        if unfriendly_name and unfriendly_name in attr.custom_postinstalls:
-            custom_postinstalls.append(attr.custom_postinstalls.get(unfriendly_name))
+        # gather custom postinstalls
+        custom_postinstalls = _gather_values_from_matching_names(attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
         repo_name = "%s__%s" % (attr.name, utils.bazel_name(name, version))
@@ -346,11 +345,7 @@ def _gen_npm_imports(lockfile, attr):
                         link_packages[link_package].append(dep_package)
 
         # check if this package should be hoisted via public_hoist_packages
-        public_hoist_packages = []
-        public_hoist_packages = attr.public_hoist_packages.get(name, [])[:]
-        public_hoist_packages.extend(attr.public_hoist_packages.get(friendly_name, []))
-        if unfriendly_name:
-            public_hoist_packages.extend(attr.patches.get(unfriendly_name, []))
+        public_hoist_packages = _gather_values_from_matching_names(attr.public_hoist_packages, name, friendly_name, unfriendly_name)
         for public_hoist_package in public_hoist_packages:
             if public_hoist_package not in link_packages:
                 link_packages[public_hoist_package] = [name]
