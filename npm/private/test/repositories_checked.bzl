@@ -5924,6 +5924,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-number__6.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-number",
+        version = "6.0.0",
+        integrity = "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==",
+        transitive_closure = {
+            "is-number": ["6.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-number__7.0.0",
         root_package = "",
         link_workspace = "",
@@ -9388,6 +9401,29 @@ def npm_repositories():
         integrity = "sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==",
         transitive_closure = {
             "seedrandom": ["3.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__semver-first-satisfied__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["semver-first-satisfied"],
+        },
+        package = "semver-first-satisfied",
+        version = "1.1.0",
+        integrity = "sha512-GxUu9YDXEgirwz7KQAYTXzO00w4kfF85J6gkRhGWsrKH/UGkInyai/Xoc5EVwblmWDUlZ2rPoaDE4i0NVgnT0w==",
+        deps = {
+            "semver": "5.7.1",
+            "semver-max": "file:npm/private/test/vendored/semver-max",
+        },
+        transitive_closure = {
+            "semver-first-satisfied": ["1.1.0"],
+            "semver": ["5.7.1"],
+            "semver-max": ["file:npm/private/test/vendored/semver-max"],
+            "is-odd": ["file:npm/private/test/vendored/is-odd"],
+            "is-number": ["6.0.0"],
         },
     )
 
