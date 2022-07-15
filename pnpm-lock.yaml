@@ -1,5 +1,9 @@
 lockfileVersion: 5.4
 
+overrides:
+  semver-max: file:../../../npm/private/test/vendored/semver-max
+  is-odd: file:../../../../../npm/private/test/vendored/is-odd
+
 packageExtensionsChecksum: ae4e327fc1d11dc79e24a6b7ec7be55d
 
 importers:
@@ -97,6 +101,7 @@ importers:
       esbuild: 0.14.38
       plotly.js: 2.12.1
       regl: npm:@plotly/regl@2.1.2
+      semver-first-satisfied: 1.1.0
       unused: latest
       webpack-bundle-analyzer: 4.5.0
     devDependencies:
@@ -106,6 +111,7 @@ importers:
       esbuild: 0.14.38
       plotly.js: 2.12.1
       regl: /@plotly/regl/2.1.2
+      semver-first-satisfied: 1.1.0
       unused: 0.2.2
       webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
@@ -2090,6 +2096,11 @@ packages:
     resolution: {integrity: sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==}
     dev: true
 
+  /is-number/6.0.0:
+    resolution: {integrity: sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==}
+    engines: {node: '>=0.10.0'}
+    dev: true
+
   /is-number/7.0.0:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
@@ -3112,6 +3123,14 @@ packages:
     resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
     dev: false
 
+  /semver-first-satisfied/1.1.0:
+    resolution: {integrity: sha512-GxUu9YDXEgirwz7KQAYTXzO00w4kfF85J6gkRhGWsrKH/UGkInyai/Xoc5EVwblmWDUlZ2rPoaDE4i0NVgnT0w==}
+    engines: {node: '>=0.10'}
+    dependencies:
+      semver: 5.7.1
+      semver-max: file:npm/private/test/vendored/semver-max
+    dev: true
+
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
     hasBin: true
@@ -3871,6 +3890,24 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  file:npm/private/test/vendored/is-odd:
+    resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
+    name: is-odd
+    version: 3.0.1
+    engines: {node: '>=4'}
+    dependencies:
+      is-number: 6.0.0
+    dev: true
+
+  file:npm/private/test/vendored/semver-max:
+    resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
+    name: semver-max
+    version: 1.0.0
+    dependencies:
+      is-odd: file:npm/private/test/vendored/is-odd
+      semver: 5.7.1
+    dev: true
 
   github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53:
     resolution: {tarball: https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53}
