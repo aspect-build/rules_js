@@ -48,9 +48,11 @@ importers:
     specifiers:
       '@aspect-test/e': 1.0.0
       '@lib/b': workspace:*
+      vendored-a: file:../../vendored/a
     dependencies:
       '@aspect-test/e': 1.0.0
       '@lib/b': link:../b
+      vendored-a: file:vendored/a
 
   lib/b:
     specifiers:
@@ -138,6 +140,14 @@ packages:
   file:lib/c:
     resolution: {directory: lib/c, type: directory}
     name: '@lib/c'
+    dependencies:
+      '@aspect-test/f': 1.0.0
+    dev: false
+
+  file:vendored/a:
+    resolution: {directory: vendored/a, type: directory}
+    name: vendored-a
+    version: 1.0.0
     dependencies:
       '@aspect-test/f': 1.0.0
     dev: false
