@@ -34,6 +34,7 @@ def js_run_binary(
         mnemonic = "JsRunBinary",
         progress_message = None,
         execution_requirements = None,
+        stamp = 0,
         patch_node_fs = True,
         **kwargs):
     """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
@@ -128,6 +129,34 @@ def js_run_binary(
 
             See https://docs.bazel.build/versions/main/be/common-definitions.html#common.tags for useful keys.
 
+        stamp: Whether to include build status files as inputs to the tool. Possible values:
+
+            - `stamp = 0 (default)`: Never include build status files as inputs to the tool.
+                This gives good build result caching.
+                Most tools don't use the status files, so including them in `--stamp` builds makes those
+                builds have many needless cache misses.
+                (Note: this default is different from most rules with an integer-typed `stamp` attribute.)
+            - `stamp = 1`: Always include build status files as inputs to the tool, even in
+                [--nostamp](https://docs.bazel.build/versions/main/user-manual.html#flag--stamp) builds.
+                This setting should be avoided, since it is non-deterministic.
+                It potentially causes remote cache misses for the target and
+                any downstream actions that depend on the result.
+            - `stamp = -1`: Inclusion of build status files as inputs is controlled by the
+                [--[no]stamp](https://docs.bazel.build/versions/main/user-manual.html#flag--stamp) flag.
+                Stamped targets are not rebuilt unless their dependencies change.
+
+            Default value is `0` since the majority of js_run_binary targets in a build graph typically do not use build
+            status files and including them for all js_run_binary actions whenever `--stamp` is set would result in
+            invalidating the entire graph and would prevent cache hits. Stamping is typically done in terminal targets
+            when building release artifacts and stamp should typically be set explicitly in these targets to `-1` so it
+            is enabled when the `--stamp` flag is set.
+
+            When stamping is enabled, an additional two environment variables will be set for the action:
+                - `BAZEL_STABLE_STATUS_FILE`
+                - `BAZEL_VOLATILE_STATUS_FILE`
+
+            These files can be read and parsed by the action, for example to pass some values to a bundler.
+
         patch_node_fs: Patch the to Node.js `fs` API (https://nodejs.org/api/fs.html) for this node program
             to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.
 
@@ -163,10 +192,8 @@ def js_run_binary(
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
         "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
-        "BAZEL_INFO_FILE": "$(INFO_FILE)",
         "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
         "BAZEL_TARGET": "$(TARGET)",
-        "BAZEL_VERSION_FILE": "$(VERSION_FILE)",
         "BAZEL_WORKSPACE": "$(WORKSPACE)",
     }
 
@@ -227,5 +254,6 @@ If this is a generated bin from package_json.bzl, consider using the *_binary va
         mnemonic = mnemonic,
         progress_message = progress_message,
         execution_requirements = execution_requirements,
+        stamp = stamp,
         **kwargs
     )
