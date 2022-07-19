@@ -20,3 +20,17 @@ console.log('--rulesFooA--')
 console.log(rulesFooA.id())
 console.log(rulesFooA.idB())
 console.log(rulesFooA.idC())
+const sharp = require('sharp')
+const roundedCorners = Buffer.from(
+    '<svg><rect x="0" y="0" width="200" height="200" rx="50" ry="50"/></svg>'
+)
+
+const roundedCornerResizer = sharp()
+    .resize(200, 200)
+    .composite([
+        {
+            input: roundedCorners,
+            blend: 'dest-in',
+        },
+    ])
+    .png()
