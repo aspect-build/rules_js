@@ -23,7 +23,7 @@ jobs:
                     - 'e2e/bzlmod'
                     - 'e2e/npm_link_package'
                     - 'e2e/pnpm_workspace'
-                    - 'e2e/pnpm_workspace_dot_dot'
+                    - 'e2e/pnpm_workspace_rerooted'
                     - 'e2e/rules_foo'
                     - 'e2e/js_image'
 

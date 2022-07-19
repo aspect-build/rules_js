@@ -126,6 +126,81 @@ def _parse_basic_test_impl(ctx):
 }
 """))
 
+    # Literal multiline strings (|), strip (-) and keep (+)
+    asserts.equals(env, {"foo":"bar\n" }, parse("""\
+foo: |
+    bar
+"""))
+    asserts.equals(env, {"foo":"bar\n", "moo": "cow\n" }, parse("""\
+foo: |
+    bar
+moo: |
+    cow
+"""))
+    asserts.equals(env, {"foo":{"bar": "baz  \n faz\n"} }, parse("""\
+foo:
+    bar: |
+     baz  
+      faz
+"""))
+    asserts.equals(env, {"a":"b\nc\nd\n" }, parse("""\
+a: |
+    b
+    c
+    d
+
+
+"""))
+    asserts.equals(env, {"a":"\n\nb\n\nc\n\nd\n" }, parse("""\
+a: |
+
+
+    b
+
+    c
+
+    d
+
+
+"""))
+    asserts.equals(env, {"foo":"bar" }, parse("""\
+foo: |-
+    bar
+"""))
+    asserts.equals(env, {"foo":"bar", "moo": "cow" }, parse("""\
+foo: |-
+    bar
+moo: |-
+    cow
+"""))
+    asserts.equals(env, {"foo":"bar\n" }, parse("""\
+foo: |+
+    bar
+"""))
+    asserts.equals(env, {"a":"\n\nb\n\nc\n\nd\n\n\n" }, parse("""\
+a: |+
+
+
+    b
+
+    c
+
+    d
+
+
+"""))
+    asserts.equals(env, {"foo":"bar\n", "moo": "cow", "faz": "baz\n\n" }, parse("""\
+foo: |
+    bar
+moo: |-
+    cow
+
+faz: |+
+    baz
+
+"""))
+
+
     # Mixed sequence and map flows
     asserts.equals(env, {"foo": ["moo"]}, parse("{foo: [moo]}"))
     asserts.equals(env, ["foo", {"moo": "cow"}], parse("[foo, {moo: cow}]"))
@@ -208,6 +283,12 @@ foo:
 loo:
     - roo
     - goo
+"""))
+
+    asserts.equals(env, {"foo": "bar\n", "baz": 5}, parse("""\
+foo: |
+    bar
+baz: 5
 """))
 
     return unittest.end(env)

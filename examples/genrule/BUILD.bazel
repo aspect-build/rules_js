@@ -11,7 +11,7 @@ https://github.com/bazelbuild/rules_nodejs/tree/stable/examples/toolchain
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 ##########################################################

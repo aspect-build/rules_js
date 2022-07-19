@@ -15,7 +15,6 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
-        "@aspect_bazel_lib//lib:copy_directory",
         "@aspect_bazel_lib//lib:copy_to_directory",
         "@bazel_skylib//lib:dicts",
         "@rules_nodejs//nodejs:bzl",
@@ -60,6 +59,18 @@ bzl_library(
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
     ],
+)
+
+bzl_library(
+    name = "pkg_glob",
+    srcs = ["pkg_glob.bzl"],
+    visibility = ["//npm:__subpackages__"],
+)
+
+bzl_library(
+    name = "ini",
+    srcs = ["ini.bzl"],
+    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(

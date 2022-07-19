@@ -34,15 +34,33 @@ importers:
       '@lib/b': link:../../lib/b
       '@lib/b_alias': link:../../lib/b
 
+  app/c:
+    specifiers:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/g': 1.0.0
+      '@lib/c': file:../../lib/c
+    dependencies:
+      '@aspect-test/a': 5.0.0
+      '@aspect-test/g': 1.0.0
+      '@lib/c': file:lib/c
+
   lib/a:
     specifiers:
       '@aspect-test/e': 1.0.0
       '@lib/b': workspace:*
+      vendored-a: file:../../vendored/a
     dependencies:
       '@aspect-test/e': 1.0.0
       '@lib/b': link:../b
+      vendored-a: file:vendored/a
 
   lib/b:
+    specifiers:
+      '@aspect-test/f': 1.0.0
+    dependencies:
+      '@aspect-test/f': 1.0.0
+
+  lib/c:
     specifiers:
       '@aspect-test/f': 1.0.0
     dependencies:
@@ -117,4 +135,19 @@ packages:
   /@aspect-test/h/1.0.0:
     resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
     hasBin: true
+    dev: false
+
+  file:lib/c:
+    resolution: {directory: lib/c, type: directory}
+    name: '@lib/c'
+    dependencies:
+      '@aspect-test/f': 1.0.0
+    dev: false
+
+  file:vendored/a:
+    resolution: {directory: vendored/a, type: directory}
+    name: vendored-a
+    version: 1.0.0
+    dependencies:
+      '@aspect-test/f': 1.0.0
     dev: false

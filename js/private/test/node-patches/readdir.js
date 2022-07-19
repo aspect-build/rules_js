@@ -139,4 +139,81 @@ describe('testing readdir', async () => {
             }
         )
     })
+
+    await it('can readdir dirent in a sandbox', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link2 to execroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link2')
+                )
+                // create symlink from execroot/link to execroot/link2
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'sandbox', 'file')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'sandbox', 'link2')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+
+                let dirents = patchedFs.readdirSync(
+                    path.join(fixturesDir, 'sandbox'),
+                    {
+                        withFileTypes: true,
+                    }
+                )
+                assert.deepStrictEqual(dirents[0].name, 'file')
+                assert.deepStrictEqual(dirents[1].name, 'link')
+                assert.deepStrictEqual(dirents[2].name, 'link2')
+                assert.ok(dirents[0].isFile())
+                assert.ok(dirents[1].isSymbolicLink())
+                assert.ok(dirents[2].isSymbolicLink())
+
+                dirents = await util.promisify(patchedFs.readdir)(
+                    path.join(fixturesDir, 'sandbox'),
+                    { withFileTypes: true }
+                )
+                assert.deepStrictEqual(dirents[0].name, 'file')
+                assert.deepStrictEqual(dirents[1].name, 'link')
+                assert.deepStrictEqual(dirents[2].name, 'link2')
+                assert.ok(dirents[0].isFile())
+                assert.ok(dirents[1].isSymbolicLink())
+                assert.ok(dirents[2].isSymbolicLink())
+
+                dirents = await patchedFs.promises.readdir(
+                    path.join(fixturesDir, 'sandbox'),
+                    { withFileTypes: true }
+                )
+                assert.deepStrictEqual(dirents[0].name, 'file')
+                assert.deepStrictEqual(dirents[1].name, 'link')
+                assert.deepStrictEqual(dirents[2].name, 'link2')
+                assert.ok(dirents[0].isFile())
+                assert.ok(dirents[1].isSymbolicLink())
+                assert.ok(dirents[2].isSymbolicLink())
+            }
+        )
+    })
 })

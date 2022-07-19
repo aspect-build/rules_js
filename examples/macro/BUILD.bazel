@@ -1,4 +1,6 @@
 load("//examples/macro:mocha.bzl", "mocha_test")
+load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 # Link all direct dependencies in /examples/macro/package.json to
@@ -9,3 +11,20 @@ mocha_test(
     name = "test",
     srcs = ["test.js"],
 )
+
+bzl_library(
+    name = "mocha",
+    srcs = ["mocha.bzl"],
+    deps = [
+        "@aspect_bazel_lib//lib:copy_to_bin",
+        # this is a bzl_library target, exposing the package_json.bzl file we depend on
+        "@npm//examples/macro:mocha",
+    ],
+)
+
+stardoc_with_diff_test(
+    name = "mocha-docs",
+    bzl_library_target = ":mocha",
+)
+
+update_docs(name = "docs")

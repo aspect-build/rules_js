@@ -1,4 +1,7 @@
-docs/
-min/
 **/pnpm-lock.yaml
+docs/*_*.md
+examples/**/*-docs.md
+js/private/coverage/coverage.js
 js/private/node-patches/fs.js
+min/
+npm/private/test/vendored/

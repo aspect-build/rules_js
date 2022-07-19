@@ -83,6 +83,36 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_babel_runtime__7.18.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@babel/runtime",
+        version = "7.18.3",
+        integrity = "sha512-38Y8f7YUhce/K7RMwTp7m0uCumpv9hZkitCbBClqQIow1qSbCvGkcegKOXpEWCQLfWmevgRiWokZ1GkpfhbZug==",
+        deps = {
+            "regenerator-runtime": "0.13.9",
+        },
+        transitive_closure = {
+            "@babel/runtime": ["7.18.3"],
+            "regenerator-runtime": ["0.13.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_bcoe_v8-coverage__0.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@bcoe/v8-coverage",
+        version = "0.2.3",
+        integrity = "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==",
+        transitive_closure = {
+            "@bcoe/v8-coverage": ["0.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_choojs_findup__0.2.1",
         root_package = "",
         link_workspace = "",
@@ -96,6 +126,19 @@ def npm_repositories():
         transitive_closure = {
             "@choojs/findup": ["0.2.1"],
             "commander": ["2.20.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_discoveryjs_json-ext__0.5.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@discoveryjs/json-ext",
+        version = "0.5.7",
+        integrity = "sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==",
+        transitive_closure = {
+            "@discoveryjs/json-ext": ["0.5.7"],
         },
     )
 
@@ -130,6 +173,121 @@ def npm_repositories():
         transitive_closure = {
             "@gregmagolan/test-b": ["0.0.2"],
             "@gregmagolan/test-a": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_istanbuljs_schema__0.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@istanbuljs/schema",
+        version = "0.1.3",
+        integrity = "sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==",
+        transitive_closure = {
+            "@istanbuljs/schema": ["0.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_gen-mapping__0.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/gen-mapping",
+        version = "0.3.1",
+        integrity = "sha512-GcHwniMlA2z+WFPWuY8lp3fsza0I8xPFMWL5+n8LYyP6PSvPrXf4+n8stDHZY2DM0zy9sVkRDy1jDI4XGzYVqg==",
+        deps = {
+            "@jridgewell/set-array": "1.1.1",
+            "@jridgewell/sourcemap-codec": "1.4.13",
+            "@jridgewell/trace-mapping": "0.3.13",
+        },
+        transitive_closure = {
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_resolve-uri__3.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/resolve-uri",
+        version = "3.0.7",
+        integrity = "sha512-8cXDaBBHOr2pQ7j77Y6Vp5VDT2sIqWyWQ56TjEq4ih/a4iST3dItRe8Q9fp0rrIl9DoKhWQtUQz/YpOxLkXbNA==",
+        transitive_closure = {
+            "@jridgewell/resolve-uri": ["3.0.7"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_set-array__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/set-array",
+        version = "1.1.1",
+        integrity = "sha512-Ct5MqZkLGEXTVmQYbGtx9SVqD2fqwvdubdps5D3djjAkgkKwT918VNOz65pEHFaYTeWcukmJmH5SwsA9Tn2ObQ==",
+        transitive_closure = {
+            "@jridgewell/set-array": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_source-map__0.3.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/source-map",
+        version = "0.3.2",
+        integrity = "sha512-m7O9o2uR8k2ObDysZYzdfhb08VuEml5oWGiosa1VdaPZ/A6QyPkAJuwN0Q1lhULOf6B7MtQmHENS743hWtCrgw==",
+        deps = {
+            "@jridgewell/gen-mapping": "0.3.1",
+            "@jridgewell/trace-mapping": "0.3.13",
+        },
+        transitive_closure = {
+            "@jridgewell/source-map": ["0.3.2"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "@jridgewell/set-array": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_sourcemap-codec__1.4.13",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/sourcemap-codec",
+        version = "1.4.13",
+        integrity = "sha512-GryiOJmNcWbovBxTfZSF71V/mXbgcV3MewDe3kIMCLyIh5e7SKAeUZs+rMnJ8jkMolZ/4/VsdBmMrw3l+VdZ3w==",
+        transitive_closure = {
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_trace-mapping__0.3.13",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/trace-mapping",
+        version = "0.3.13",
+        integrity = "sha512-o1xbKhp9qnIAoHJSWd6KlCZfqslL4valSF81H8ImioOAxluWYWOpWkpyktY2vnt4tbrX9XYaxovq6cgowaJp2w==",
+        deps = {
+            "@jridgewell/resolve-uri": "3.0.7",
+            "@jridgewell/sourcemap-codec": "1.4.13",
+        },
+        transitive_closure = {
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
         },
     )
 
@@ -467,6 +625,125 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_rollup_plugin-commonjs__22.0.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
+        },
+        package = "@rollup/plugin-commonjs",
+        version = "22.0.0_rollup@2.75.7",
+        integrity = "sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==",
+        deps = {
+            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "commondir": "1.0.1",
+            "estree-walker": "2.0.2",
+            "glob": "7.2.3",
+            "is-reference": "1.2.1",
+            "magic-string": "0.25.9",
+            "resolve": "1.22.0",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/plugin-commonjs": ["22.0.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "commondir": ["1.0.1"],
+            "estree-walker": ["1.0.1", "2.0.2"],
+            "glob": ["7.2.3"],
+            "is-reference": ["1.2.1"],
+            "magic-string": ["0.25.9"],
+            "resolve": ["1.22.0"],
+            "rollup": ["2.75.7"],
+            "fsevents": ["2.3.2"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "sourcemap-codec": ["1.4.8"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39", "registry.npmjs.org/@types/estree/0.0.51"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_plugin-json__4.1.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["@rollup/plugin-json"],
+        },
+        package = "@rollup/plugin-json",
+        version = "4.1.0_rollup@2.75.7",
+        integrity = "sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==",
+        deps = {
+            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/plugin-json": ["4.1.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "rollup": ["2.75.7"],
+            "fsevents": ["2.3.2"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_plugin-node-resolve__13.3.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
+        },
+        package = "@rollup/plugin-node-resolve",
+        version = "13.3.0_rollup@2.75.7",
+        integrity = "sha512-Lus8rbUo1eEcnS4yTFKLZrVumLPY+YayBdWXgFSHYhTT2iJbMhoaaBL3xl5NCdeRytErGr8tZ0L71BMRmnlwSw==",
+        deps = {
+            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "@types/resolve": "registry.npmjs.org/@types/resolve/1.17.1",
+            "deepmerge": "4.2.2",
+            "is-builtin-module": "3.1.0",
+            "is-module": "1.0.0",
+            "resolve": "1.22.0",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/plugin-node-resolve": ["13.3.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
+            "deepmerge": ["4.2.2"],
+            "is-builtin-module": ["3.1.0"],
+            "is-module": ["1.0.0"],
+            "resolve": ["1.22.0"],
+            "rollup": ["2.75.7"],
+            "fsevents": ["2.3.2"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "builtin-modules": ["3.3.0"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.70.2",
         root_package = "",
         link_workspace = "",
@@ -486,6 +763,30 @@ def npm_repositories():
             "estree-walker": ["1.0.1"],
             "picomatch": ["2.3.1"],
             "rollup": ["2.70.2"],
+            "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@rollup/pluginutils",
+        version = "3.1.0_rollup@2.75.7",
+        integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
+        deps = {
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.39",
+            "estree-walker": "1.0.1",
+            "picomatch": "2.3.1",
+            "rollup": "2.75.7",
+        },
+        transitive_closure = {
+            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "picomatch": ["2.3.1"],
+            "rollup": ["2.75.7"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -591,6 +892,752 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_webassemblyjs_ast__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/ast",
+        version = "1.11.1",
+        integrity = "sha512-ukBh14qFLjxTQNTXocdyksN5QdM28S1CxHt2rdskFyL+xFV7VremuBLVbmCePj+URalXBENx/9Lm7lnhihtCSw==",
+        deps = {
+            "@webassemblyjs/helper-numbers": "1.11.1",
+            "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+        },
+        transitive_closure = {
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_floating-point-hex-parser__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/floating-point-hex-parser",
+        version = "1.11.1",
+        integrity = "sha512-iGRfyc5Bq+NnNuX8b5hwBrRjzf0ocrJPI6GWFodBFzmFnyvrQ83SHKhmilCU/8Jv67i4GJZBMhEzltxzcNagtQ==",
+        transitive_closure = {
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_helper-api-error__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/helper-api-error",
+        version = "1.11.1",
+        integrity = "sha512-RlhS8CBCXfRUR/cwo2ho9bkheSXG0+NwooXcc3PAILALf2QLdFyj7KGsKRbVc95hZnhnERon4kW/D3SZpp6Tcg==",
+        transitive_closure = {
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_helper-buffer__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/helper-buffer",
+        version = "1.11.1",
+        integrity = "sha512-gwikF65aDNeeXa8JxXa2BAk+REjSyhrNC9ZwdT0f8jc4dQQeDQ7G4m0f2QCLPJiMTTO6wfDmRmj/pW0PsUvIcA==",
+        transitive_closure = {
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_helper-numbers__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/helper-numbers",
+        version = "1.11.1",
+        integrity = "sha512-vDkbxiB8zfnPdNK9Rajcey5C0w+QJugEglN0of+kmO8l7lDb77AnlKYQF7aarZuCrv+l0UvqL+68gSDr3k9LPQ==",
+        deps = {
+            "@webassemblyjs/floating-point-hex-parser": "1.11.1",
+            "@webassemblyjs/helper-api-error": "1.11.1",
+            "@xtuc/long": "4.2.2",
+        },
+        transitive_closure = {
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_helper-wasm-bytecode__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/helper-wasm-bytecode",
+        version = "1.11.1",
+        integrity = "sha512-PvpoOGiJwXeTrSf/qfudJhwlvDQxFgelbMqtq52WWiXC6Xgg1IREdngmPN3bs4RoO83PnL/nFrxucXj1+BX62Q==",
+        transitive_closure = {
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_helper-wasm-section__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/helper-wasm-section",
+        version = "1.11.1",
+        integrity = "sha512-10P9No29rYX1j7F3EVPX3JvGPQPae+AomuSTPiF9eBQeChHI6iqjMIwR9JmOJXwpnn/oVGDk7I5IlskuMwU/pg==",
+        deps = {
+            "@webassemblyjs/ast": "1.11.1",
+            "@webassemblyjs/helper-buffer": "1.11.1",
+            "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+            "@webassemblyjs/wasm-gen": "1.11.1",
+        },
+        transitive_closure = {
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_ieee754__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/ieee754",
+        version = "1.11.1",
+        integrity = "sha512-hJ87QIPtAMKbFq6CGTkZYJivEwZDbQUgYd3qKSadTNOhVY7p+gfP6Sr0lLRVTaG1JjFj+r3YchoqRYxNH3M0GQ==",
+        deps = {
+            "@xtuc/ieee754": "1.2.0",
+        },
+        transitive_closure = {
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@xtuc/ieee754": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_leb128__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/leb128",
+        version = "1.11.1",
+        integrity = "sha512-BJ2P0hNZ0u+Th1YZXJpzW6miwqQUGcIHT1G/sf72gLVD9DZ5AdYTqPNbHZh6K1M5VmKvFXwGSWZADz+qBWxeRw==",
+        deps = {
+            "@xtuc/long": "4.2.2",
+        },
+        transitive_closure = {
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_utf8__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/utf8",
+        version = "1.11.1",
+        integrity = "sha512-9kqcxAEdMhiwQkHpkNiorZzqpGrodQQ2IGrHHxCy+Ozng0ofyMA0lTqiLkVs1uzTRejX+/O0EOT7KxqVPuXosQ==",
+        transitive_closure = {
+            "@webassemblyjs/utf8": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_wasm-edit__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/wasm-edit",
+        version = "1.11.1",
+        integrity = "sha512-g+RsupUC1aTHfR8CDgnsVRVZFJqdkFHpsHMfJuWQzWU3tvnLC07UqHICfP+4XyL2tnr1amvl1Sdp06TnYCmVkA==",
+        deps = {
+            "@webassemblyjs/ast": "1.11.1",
+            "@webassemblyjs/helper-buffer": "1.11.1",
+            "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+            "@webassemblyjs/helper-wasm-section": "1.11.1",
+            "@webassemblyjs/wasm-gen": "1.11.1",
+            "@webassemblyjs/wasm-opt": "1.11.1",
+            "@webassemblyjs/wasm-parser": "1.11.1",
+            "@webassemblyjs/wast-printer": "1.11.1",
+        },
+        transitive_closure = {
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_wasm-gen__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/wasm-gen",
+        version = "1.11.1",
+        integrity = "sha512-F7QqKXwwNlMmsulj6+O7r4mmtAlCWfO/0HdgOxSklZfQcDu0TpLiD1mRt/zF25Bk59FIjEuGAIyn5ei4yMfLhA==",
+        deps = {
+            "@webassemblyjs/ast": "1.11.1",
+            "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+            "@webassemblyjs/ieee754": "1.11.1",
+            "@webassemblyjs/leb128": "1.11.1",
+            "@webassemblyjs/utf8": "1.11.1",
+        },
+        transitive_closure = {
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_wasm-opt__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/wasm-opt",
+        version = "1.11.1",
+        integrity = "sha512-VqnkNqnZlU5EB64pp1l7hdm3hmQw7Vgqa0KF/KCNO9sIpI6Fk6brDEiX+iCOYrvMuBWDws0NkTOxYEb85XQHHw==",
+        deps = {
+            "@webassemblyjs/ast": "1.11.1",
+            "@webassemblyjs/helper-buffer": "1.11.1",
+            "@webassemblyjs/wasm-gen": "1.11.1",
+            "@webassemblyjs/wasm-parser": "1.11.1",
+        },
+        transitive_closure = {
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_wasm-parser__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/wasm-parser",
+        version = "1.11.1",
+        integrity = "sha512-rrBujw+dJu32gYB7/Lup6UhdkPx9S9SnobZzRVL7VcBH9Bt9bCBLEuX/YXOOtBsOZ4NQrRykKhffRWHvigQvOA==",
+        deps = {
+            "@webassemblyjs/ast": "1.11.1",
+            "@webassemblyjs/helper-api-error": "1.11.1",
+            "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+            "@webassemblyjs/ieee754": "1.11.1",
+            "@webassemblyjs/leb128": "1.11.1",
+            "@webassemblyjs/utf8": "1.11.1",
+        },
+        transitive_closure = {
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webassemblyjs_wast-printer__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webassemblyjs/wast-printer",
+        version = "1.11.1",
+        integrity = "sha512-IQboUWM4eKzWW+N/jij2sRatKMh99QEelo3Eb2q0qXkvPRISAj8Qxtmw5itwqK+TTkBuUIE45AxYPToqPtL5gg==",
+        deps = {
+            "@webassemblyjs/ast": "1.11.1",
+            "@xtuc/long": "4.2.2",
+        },
+        transitive_closure = {
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webpack-cli_configtest__1.2.0__77l47gmqkrqiei5z7sbwz5iaj4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webpack-cli/configtest",
+        version = "1.2.0_77l47gmqkrqiei5z7sbwz5iaj4",
+        integrity = "sha512-4FB8Tj6xyVkyqjj1OaTqCjXYULB9FMkqQ8yGrZjRDrYh0nOE+7Lhs45WioWQQMV+ceFlE368Ukhe6xdvJM9Egg==",
+        deps = {
+            "webpack": "5.73.0_webpack-cli@4.10.0",
+            "webpack-cli": "4.10.0_webpack@5.73.0",
+        },
+        transitive_closure = {
+            "@webpack-cli/configtest": ["1.2.0_77l47gmqkrqiei5z7sbwz5iaj4"],
+            "webpack": ["5.73.0_webpack-cli@4.10.0"],
+            "webpack-cli": ["4.10.0_webpack@5.73.0"],
+            "@discoveryjs/json-ext": ["0.5.7"],
+            "@webpack-cli/info": ["1.5.0_webpack-cli@4.10.0"],
+            "@webpack-cli/serve": ["1.7.0_webpack-cli@4.10.0"],
+            "colorette": ["2.0.19"],
+            "commander": ["2.20.3", "7.2.0"],
+            "cross-spawn": ["7.0.3"],
+            "fastest-levenshtein": ["1.0.12"],
+            "import-local": ["3.1.0"],
+            "interpret": ["2.2.0"],
+            "rechoir": ["0.7.1"],
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "envinfo": ["7.8.1"],
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "acorn": ["8.7.1"],
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "browserslist": ["4.21.0"],
+            "chrome-trace-event": ["1.0.3"],
+            "enhanced-resolve": ["5.9.3"],
+            "es-module-lexer": ["0.9.3"],
+            "eslint-scope": ["5.1.1"],
+            "events": ["3.3.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "loader-runner": ["4.3.0"],
+            "mime-types": ["2.1.35"],
+            "neo-async": ["2.6.2"],
+            "schema-utils": ["3.1.1"],
+            "tapable": ["2.2.1"],
+            "terser-webpack-plugin": ["5.3.3_webpack@5.73.0"],
+            "watchpack": ["2.4.0"],
+            "webpack-sources": ["3.2.3"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "jest-worker": ["27.5.1"],
+            "serialize-javascript": ["6.0.0"],
+            "terser": ["5.14.1"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+            "mime-db": ["1.52.0"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webpack-cli_info__1.5.0__webpack-cli_4.10.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webpack-cli/info",
+        version = "1.5.0_webpack-cli@4.10.0",
+        integrity = "sha512-e8tSXZpw2hPl2uMJY6fsMswaok5FdlGNRTktvFk2sD8RjH0hE2+XistawJx1vmKteh4NmGmNUrp+Tb2w+udPcQ==",
+        deps = {
+            "envinfo": "7.8.1",
+            "webpack-cli": "4.10.0_webpack@5.73.0",
+        },
+        transitive_closure = {
+            "@webpack-cli/info": ["1.5.0_webpack-cli@4.10.0"],
+            "envinfo": ["7.8.1"],
+            "webpack-cli": ["4.10.0_webpack@5.73.0"],
+            "@discoveryjs/json-ext": ["0.5.7"],
+            "@webpack-cli/configtest": ["1.2.0_77l47gmqkrqiei5z7sbwz5iaj4"],
+            "@webpack-cli/serve": ["1.7.0_webpack-cli@4.10.0"],
+            "colorette": ["2.0.19"],
+            "commander": ["2.20.3", "7.2.0"],
+            "cross-spawn": ["7.0.3"],
+            "fastest-levenshtein": ["1.0.12"],
+            "import-local": ["3.1.0"],
+            "interpret": ["2.2.0"],
+            "rechoir": ["0.7.1"],
+            "webpack": ["5.73.0_webpack-cli@4.10.0"],
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "acorn": ["8.7.1"],
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "browserslist": ["4.21.0"],
+            "chrome-trace-event": ["1.0.3"],
+            "enhanced-resolve": ["5.9.3"],
+            "es-module-lexer": ["0.9.3"],
+            "eslint-scope": ["5.1.1"],
+            "events": ["3.3.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "loader-runner": ["4.3.0"],
+            "mime-types": ["2.1.35"],
+            "neo-async": ["2.6.2"],
+            "schema-utils": ["3.1.1"],
+            "tapable": ["2.2.1"],
+            "terser-webpack-plugin": ["5.3.3_webpack@5.73.0"],
+            "watchpack": ["2.4.0"],
+            "webpack-sources": ["3.2.3"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "jest-worker": ["27.5.1"],
+            "serialize-javascript": ["6.0.0"],
+            "terser": ["5.14.1"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+            "mime-db": ["1.52.0"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_webpack-cli_serve__1.7.0__webpack-cli_4.10.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@webpack-cli/serve",
+        version = "1.7.0_webpack-cli@4.10.0",
+        integrity = "sha512-oxnCNGj88fL+xzV+dacXs44HcDwf1ovs3AuEzvP7mqXw7fQntqIhQ1BRmynh4qEKQSSSRSWVyXRjmTbZIX9V2Q==",
+        deps = {
+            "webpack-cli": "4.10.0_webpack@5.73.0",
+        },
+        transitive_closure = {
+            "@webpack-cli/serve": ["1.7.0_webpack-cli@4.10.0"],
+            "webpack-cli": ["4.10.0_webpack@5.73.0"],
+            "@discoveryjs/json-ext": ["0.5.7"],
+            "@webpack-cli/configtest": ["1.2.0_77l47gmqkrqiei5z7sbwz5iaj4"],
+            "@webpack-cli/info": ["1.5.0_webpack-cli@4.10.0"],
+            "colorette": ["2.0.19"],
+            "commander": ["2.20.3", "7.2.0"],
+            "cross-spawn": ["7.0.3"],
+            "fastest-levenshtein": ["1.0.12"],
+            "import-local": ["3.1.0"],
+            "interpret": ["2.2.0"],
+            "rechoir": ["0.7.1"],
+            "webpack": ["5.73.0_webpack-cli@4.10.0"],
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "acorn": ["8.7.1"],
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "browserslist": ["4.21.0"],
+            "chrome-trace-event": ["1.0.3"],
+            "enhanced-resolve": ["5.9.3"],
+            "es-module-lexer": ["0.9.3"],
+            "eslint-scope": ["5.1.1"],
+            "events": ["3.3.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "loader-runner": ["4.3.0"],
+            "mime-types": ["2.1.35"],
+            "neo-async": ["2.6.2"],
+            "schema-utils": ["3.1.1"],
+            "tapable": ["2.2.1"],
+            "terser-webpack-plugin": ["5.3.3_webpack@5.73.0"],
+            "watchpack": ["2.4.0"],
+            "webpack-sources": ["3.2.3"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "jest-worker": ["27.5.1"],
+            "serialize-javascript": ["6.0.0"],
+            "terser": ["5.14.1"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+            "mime-db": ["1.52.0"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "envinfo": ["7.8.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_xtuc_ieee754__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@xtuc/ieee754",
+        version = "1.2.0",
+        integrity = "sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==",
+        transitive_closure = {
+            "@xtuc/ieee754": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_xtuc_long__4.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@xtuc/long",
+        version = "4.2.2",
+        integrity = "sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==",
+        transitive_closure = {
+            "@xtuc/long": ["4.2.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__abs-svg-path__0.1.1",
         root_package = "",
         link_workspace = "",
@@ -600,6 +1647,23 @@ def npm_repositories():
         integrity = "sha512-d8XPSGjfyzlXC3Xx891DJRyZfqk5JU0BJrDQcsWomFIV1/BIzPW5HDH5iDdWpqWaav0YVIEzT1RHTwWr0FFshA==",
         transitive_closure = {
             "abs-svg-path": ["0.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__acorn-import-assertions__1.8.0__acorn_8.7.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "acorn-import-assertions",
+        version = "1.8.0_acorn@8.7.1",
+        integrity = "sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==",
+        deps = {
+            "acorn": "8.7.1",
+        },
+        transitive_closure = {
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "acorn": ["8.7.1"],
         },
     )
 
@@ -641,6 +1705,52 @@ def npm_repositories():
         integrity = "sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==",
         transitive_closure = {
             "acorn": ["8.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ajv-keywords__3.5.2__ajv_6.12.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ajv-keywords",
+        version = "3.5.2_ajv@6.12.6",
+        integrity = "sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==",
+        deps = {
+            "ajv": "6.12.6",
+        },
+        transitive_closure = {
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "ajv": ["6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ajv__6.12.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ajv",
+        version = "6.12.6",
+        integrity = "sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==",
+        deps = {
+            "fast-deep-equal": "3.1.3",
+            "fast-json-stable-stringify": "2.1.0",
+            "json-schema-traverse": "0.4.1",
+            "uri-js": "4.4.1",
+        },
+        transitive_closure = {
+            "ajv": ["6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
         },
     )
 
@@ -987,6 +2097,31 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__browserslist__4.21.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "browserslist",
+        version = "4.21.0",
+        integrity = "sha512-UQxE0DIhRB5z/zDz9iA03BOfxaN2+GQdBYH/2WrSIWEUrnpzTPJbhqt+umq6r3acaPRTW1FNTkrcp0PXgtFkvA==",
+        deps = {
+            "caniuse-lite": "1.0.30001358",
+            "electron-to-chromium": "1.4.166",
+            "node-releases": "2.0.5",
+            "update-browserslist-db": "1.0.3_browserslist@4.21.0",
+        },
+        transitive_closure = {
+            "browserslist": ["4.21.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__buffer-from__1.1.2",
         root_package = "",
         link_workspace = "",
@@ -1020,6 +2155,108 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__builtin-modules__3.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "builtin-modules",
+        version = "3.3.0",
+        integrity = "sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==",
+        transitive_closure = {
+            "builtin-modules": ["3.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__c8__7.11.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["c8"],
+        },
+        package = "c8",
+        version = "7.11.3",
+        integrity = "sha512-6YBmsaNmqRm9OS3ZbIiL2EZgi1+Xc4O24jL3vMYGE6idixYuGdy76rIfIdltSKDj9DpLNrcXSonUTR1miBD0wA==",
+        deps = {
+            "@bcoe/v8-coverage": "0.2.3",
+            "@istanbuljs/schema": "0.1.3",
+            "find-up": "5.0.0",
+            "foreground-child": "2.0.0",
+            "istanbul-lib-coverage": "3.2.0",
+            "istanbul-lib-report": "3.0.0",
+            "istanbul-reports": "3.1.4",
+            "rimraf": "3.0.2",
+            "test-exclude": "6.0.0",
+            "v8-to-istanbul": "9.0.1",
+            "yargs": "16.2.0",
+            "yargs-parser": "20.2.9",
+        },
+        transitive_closure = {
+            "c8": ["7.11.3"],
+            "@bcoe/v8-coverage": ["0.2.3"],
+            "@istanbuljs/schema": ["0.1.3"],
+            "find-up": ["5.0.0"],
+            "foreground-child": ["2.0.0"],
+            "istanbul-lib-coverage": ["3.2.0"],
+            "istanbul-lib-report": ["3.0.0"],
+            "istanbul-reports": ["3.1.4"],
+            "rimraf": ["3.0.2"],
+            "test-exclude": ["6.0.0"],
+            "v8-to-istanbul": ["9.0.1"],
+            "yargs": ["16.2.0"],
+            "yargs-parser": ["20.2.4", "20.2.9"],
+            "cliui": ["7.0.4"],
+            "escalade": ["3.1.1"],
+            "get-caller-file": ["2.0.5"],
+            "require-directory": ["2.1.1"],
+            "string-width": ["4.2.3"],
+            "y18n": ["5.0.8"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "strip-ansi": ["6.0.1"],
+            "ansi-regex": ["5.0.1"],
+            "wrap-ansi": ["7.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
+            "convert-source-map": ["1.8.0"],
+            "safe-buffer": ["5.1.2"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "glob": ["7.2.3"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "html-escaper": ["2.0.2"],
+            "make-dir": ["3.1.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "semver": ["6.3.0"],
+            "cross-spawn": ["7.0.3"],
+            "signal-exit": ["3.0.7"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "locate-path": ["6.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["5.0.0"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__camelcase__6.3.0",
         root_package = "",
         link_workspace = "",
@@ -1029,6 +2266,19 @@ def npm_repositories():
         integrity = "sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==",
         transitive_closure = {
             "camelcase": ["6.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__caniuse-lite__1.0.30001358",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "caniuse-lite",
+        version = "1.0.30001358",
+        integrity = "sha512-hvp8PSRymk85R20bsDra7ZTCpSVGN/PAz9pSAjPSjKC+rNmnUk5vCRgJwiTT/O4feQ/yu/drvZYpKxxhbFuChw==",
+        transitive_closure = {
+            "caniuse-lite": ["1.0.30001358"],
         },
     )
 
@@ -1122,6 +2372,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__chrome-trace-event__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "chrome-trace-event",
+        version = "1.0.3",
+        integrity = "sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==",
+        transitive_closure = {
+            "chrome-trace-event": ["1.0.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__clamp__1.0.1",
         root_package = "",
         link_workspace = "",
@@ -1158,6 +2421,28 @@ def npm_repositories():
             "ansi-regex": ["5.0.1"],
             "emoji-regex": ["8.0.0"],
             "is-fullwidth-code-point": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__clone-deep__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "clone-deep",
+        version = "4.0.1",
+        integrity = "sha512-neHB9xuzh/wk0dIHweyAXv2aPGZIVk3pLMe+/RNzINf17fe0OG96QroktYAUm7SM1PBnzTabaLboqqxDyMU+SQ==",
+        deps = {
+            "is-plain-object": "2.0.4",
+            "kind-of": "6.0.3",
+            "shallow-clone": "3.0.1",
+        },
+        transitive_closure = {
+            "clone-deep": ["4.0.1"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
         },
     )
 
@@ -1326,6 +2611,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__colorette__2.0.19",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "colorette",
+        version = "2.0.19",
+        integrity = "sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==",
+        transitive_closure = {
+            "colorette": ["2.0.19"],
+        },
+    )
+
+    npm_import(
         name = "npm__commander__2.20.3",
         root_package = "",
         link_workspace = "",
@@ -1361,6 +2659,19 @@ def npm_repositories():
         integrity = "sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==",
         transitive_closure = {
             "commondir": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__complex.js__2.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "complex.js",
+        version = "2.1.1",
+        integrity = "sha512-8njCHOTtFFLtegk6zQo0kkVX1rngygb/KQI6z1qZxlFI3scluC+LVTCFbrkWjBv4vvLlbQ9t88IPMC6k95VTTg==",
+        transitive_closure = {
+            "complex.js": ["2.1.1"],
         },
     )
 
@@ -1474,6 +2785,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__convert-source-map__1.8.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "convert-source-map",
+        version = "1.8.0",
+        integrity = "sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==",
+        deps = {
+            "safe-buffer": "5.1.2",
+        },
+        transitive_closure = {
+            "convert-source-map": ["1.8.0"],
+            "safe-buffer": ["5.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__core-util-is__1.0.3",
         root_package = "",
         link_workspace = "",
@@ -1496,6 +2824,29 @@ def npm_repositories():
         integrity = "sha512-iSPlClZP8vX7MC3/u6s3lrDuoQyhQukh5LyABJ3hvfzbQ3Yyayd4fp04zjLnfi267B/B2FkumcWWgrbban7sSA==",
         transitive_closure = {
             "country-regex": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__cross-spawn__7.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "cross-spawn",
+        version = "7.0.3",
+        integrity = "sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==",
+        deps = {
+            "path-key": "3.1.1",
+            "shebang-command": "2.0.0",
+            "which": "2.0.2",
+        },
+        transitive_closure = {
+            "cross-spawn": ["7.0.3"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
         },
     )
 
@@ -1996,6 +3347,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__decimal.js__10.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "decimal.js",
+        version = "10.3.1",
+        integrity = "sha512-V0pfhfr8suzyPGOx3nmq4aHqabehUZn6Ch9kyFpV79TGDTWFmHqUqXdabR7QHqxzrYolF4+tVmJhUG4OURg5dQ==",
+        transitive_closure = {
+            "decimal.js": ["10.3.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__deep-is__0.1.4",
         root_package = "",
         link_workspace = "",
@@ -2005,6 +3369,19 @@ def npm_repositories():
         integrity = "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==",
         transitive_closure = {
             "deep-is": ["0.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__deepmerge__4.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "deepmerge",
+        version = "4.2.2",
+        integrity = "sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==",
+        transitive_closure = {
+            "deepmerge": ["4.2.2"],
         },
     )
 
@@ -2176,6 +3553,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__electron-to-chromium__1.4.166",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "electron-to-chromium",
+        version = "1.4.166",
+        integrity = "sha512-ZPLdq3kcATkD6dwne5M4SgJBHw21t90BqTGzf3AceJwj3cE/ICv6jyDwHYyJoF4JNuXM3pzRxlaRmpO7pdwmcg==",
+        transitive_closure = {
+            "electron-to-chromium": ["1.4.166"],
+        },
+    )
+
+    npm_import(
         name = "npm__element-size__1.1.1",
         root_package = "",
         link_workspace = "",
@@ -2233,6 +3623,51 @@ def npm_repositories():
             "end-of-stream": ["1.4.4"],
             "once": ["1.4.0"],
             "wrappy": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__enhanced-resolve__5.9.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "enhanced-resolve",
+        version = "5.9.3",
+        integrity = "sha512-Bq9VSor+kjvW3f9/MiiR4eE3XYgOl7/rS8lnSxbRbF3kS0B2r+Y9w5krBWxZgDxASVZbdYrn5wT4j/Wb0J9qow==",
+        deps = {
+            "graceful-fs": "4.2.10",
+            "tapable": "2.2.1",
+        },
+        transitive_closure = {
+            "enhanced-resolve": ["5.9.3"],
+            "graceful-fs": ["4.2.10"],
+            "tapable": ["2.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__envinfo__7.8.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "envinfo",
+        version = "7.8.1",
+        integrity = "sha512-/o+BXHmB7ocbHEAs6F2EnG0ogybVVUdkRunTT2glZU9XAaGmhqskrvKwqXuDfNjEO0LZKWdejEEpnq8aM0tOaw==",
+        transitive_closure = {
+            "envinfo": ["7.8.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__es-module-lexer__0.9.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "es-module-lexer",
+        version = "0.9.3",
+        integrity = "sha512-1HQ2M2sPtxwnvOvT1ZClHyQDiggdNjURWpY2we6aMKCQiUVxTmVs2UYPLIrD84sS+kMdUwfBSylbJPwNnBrnHQ==",
+        transitive_closure = {
+            "es-module-lexer": ["0.9.3"],
         },
     )
 
@@ -2686,6 +4121,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__escape-latex__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "escape-latex",
+        version = "1.2.0",
+        integrity = "sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw==",
+        transitive_closure = {
+            "escape-latex": ["1.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__escape-string-regexp__4.0.0",
         root_package = "",
         link_workspace = "",
@@ -2730,6 +4178,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__eslint-scope__5.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "eslint-scope",
+        version = "5.1.1",
+        integrity = "sha512-2NxwbF/hZ0KpepYN0cNbo+FN6XoK7GaHlQhgx/hIZl6Va0bF45RQOOwhLIy8lQDbuCiadSLCBnH2CFYquit5bw==",
+        deps = {
+            "esrecurse": "4.3.0",
+            "estraverse": "4.3.0",
+        },
+        transitive_closure = {
+            "eslint-scope": ["5.1.1"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__esprima__1.0.0",
         root_package = "",
         link_workspace = "",
@@ -2756,6 +4223,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__esrecurse__4.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "esrecurse",
+        version = "4.3.0",
+        integrity = "sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==",
+        deps = {
+            "estraverse": "5.3.0",
+        },
+        transitive_closure = {
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__estraverse__4.3.0",
         root_package = "",
         link_workspace = "",
@@ -2765,6 +4249,19 @@ def npm_repositories():
         integrity = "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==",
         transitive_closure = {
             "estraverse": ["4.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__estraverse__5.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "estraverse",
+        version = "5.3.0",
+        integrity = "sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==",
+        transitive_closure = {
+            "estraverse": ["5.3.0"],
         },
     )
 
@@ -2857,6 +4354,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__fast-deep-equal__3.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-deep-equal",
+        version = "3.1.3",
+        integrity = "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==",
+        transitive_closure = {
+            "fast-deep-equal": ["3.1.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__fast-isnumeric__1.1.4",
         root_package = "",
         link_workspace = "",
@@ -2874,6 +4384,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__fast-json-stable-stringify__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-json-stable-stringify",
+        version = "2.1.0",
+        integrity = "sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==",
+        transitive_closure = {
+            "fast-json-stable-stringify": ["2.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__fast-levenshtein__2.0.6",
         root_package = "",
         link_workspace = "",
@@ -2883,6 +4406,19 @@ def npm_repositories():
         integrity = "sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==",
         transitive_closure = {
             "fast-levenshtein": ["2.0.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fastest-levenshtein__1.0.12",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fastest-levenshtein",
+        version = "1.0.12",
+        integrity = "sha512-On2N+BpYJ15xIC974QNVuYGMOlEVt4s0EOI3wwMqOmK1fdDY+FN/zltPV8vosq4ad4c/gJ1KHScUn/6AWIgiow==",
+        transitive_closure = {
+            "fastest-levenshtein": ["1.0.12"],
         },
     )
 
@@ -2901,6 +4437,28 @@ def npm_repositories():
             "fill-range": ["7.0.1"],
             "to-regex-range": ["5.0.1"],
             "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__find-up__4.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "find-up",
+        version = "4.1.0",
+        integrity = "sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==",
+        deps = {
+            "locate-path": "5.0.0",
+            "path-exists": "4.0.0",
+        },
+        transitive_closure = {
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
         },
     )
 
@@ -3020,6 +4578,43 @@ def npm_repositories():
             "string-split-by": ["1.0.0"],
             "unquote": ["1.1.1"],
             "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__foreground-child__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "foreground-child",
+        version = "2.0.0",
+        integrity = "sha512-dCIq9FpEcyQyXKCkyzmlPTFNgrCzPudOe+mhvJU5zAtlBnGVy2yKxtfsxK2tQBThwq225jcvBjpw1Gr40uzZCA==",
+        deps = {
+            "cross-spawn": "7.0.3",
+            "signal-exit": "3.0.7",
+        },
+        transitive_closure = {
+            "foreground-child": ["2.0.0"],
+            "cross-spawn": ["7.0.3"],
+            "signal-exit": ["3.0.7"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fraction.js__4.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fraction.js",
+        version = "4.2.0",
+        integrity = "sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==",
+        transitive_closure = {
+            "fraction.js": ["4.2.0"],
         },
     )
 
@@ -3292,6 +4887,19 @@ def npm_repositories():
             "glob-parent": ["5.1.2"],
             "is-glob": ["4.0.3"],
             "is-extglob": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__glob-to-regexp__0.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glob-to-regexp",
+        version = "0.4.1",
+        integrity = "sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==",
+        transitive_closure = {
+            "glob-to-regexp": ["0.4.1"],
         },
     )
 
@@ -3883,6 +5491,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__html-escaper__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "html-escaper",
+        version = "2.0.2",
+        integrity = "sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==",
+        transitive_closure = {
+            "html-escaper": ["2.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__iconv-lite__0.4.24",
         root_package = "",
         link_workspace = "",
@@ -3970,6 +5591,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__import-local__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "import-local",
+        version = "3.1.0",
+        integrity = "sha512-ASB07uLtnDs1o6EHjKpX34BKYDSqnFerfTOJL2HvMqF70LnxpjkzDB8J44oT9pu4AMPkQwf8jl6szgvNd2tRIg==",
+        deps = {
+            "pkg-dir": "4.2.0",
+            "resolve-cwd": "3.0.0",
+        },
+        transitive_closure = {
+            "import-local": ["3.1.0"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__inflight__1.0.6",
         root_package = "",
         link_workspace = "",
@@ -4022,6 +5669,19 @@ def npm_repositories():
             "os-tmpdir": ["1.0.2"],
             "pify": ["4.0.1"],
             "semver": ["5.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__interpret__2.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "interpret",
+        version = "2.2.0",
+        integrity = "sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==",
+        transitive_closure = {
+            "interpret": ["2.2.0"],
         },
     )
 
@@ -4104,6 +5764,23 @@ def npm_repositories():
         integrity = "sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==",
         transitive_closure = {
             "is-buffer": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-builtin-module__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-builtin-module",
+        version = "3.1.0",
+        integrity = "sha512-OV7JjAgOTfAFJmHZLvpSTb4qi0nIILDV1gWPYDnDJUTNFM5aGlRAhk4QcT8i7TuAleeEV5Fdkqn3t4mS+Q11fg==",
+        deps = {
+            "builtin-modules": "3.3.0",
+        },
+        transitive_closure = {
+            "is-builtin-module": ["3.1.0"],
+            "builtin-modules": ["3.3.0"],
         },
     )
 
@@ -4234,6 +5911,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-module__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-module",
+        version = "1.0.0",
+        integrity = "sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==",
+        transitive_closure = {
+            "is-module": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-number__6.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-number",
+        version = "6.0.0",
+        integrity = "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==",
+        transitive_closure = {
+            "is-number": ["6.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-number__7.0.0",
         root_package = "",
         link_workspace = "",
@@ -4282,6 +5985,23 @@ def npm_repositories():
         integrity = "sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==",
         transitive_closure = {
             "is-plain-obj": ["2.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-plain-object__2.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-plain-object",
+        version = "2.0.4",
+        integrity = "sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==",
+        deps = {
+            "isobject": "3.0.1",
+        },
+        transitive_closure = {
+            "is-plain-object": ["2.0.4"],
+            "isobject": ["3.0.1"],
         },
     )
 
@@ -4381,6 +6101,127 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__isexe__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "isexe",
+        version = "2.0.0",
+        integrity = "sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==",
+        transitive_closure = {
+            "isexe": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__isobject__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "isobject",
+        version = "3.0.1",
+        integrity = "sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==",
+        transitive_closure = {
+            "isobject": ["3.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__istanbul-lib-coverage__3.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "istanbul-lib-coverage",
+        version = "3.2.0",
+        integrity = "sha512-eOeJ5BHCmHYvQK7xt9GkdHuzuCGS1Y6g9Gvnx3Ym33fz/HpLRYxiS0wHNr+m/MBC8B647Xt608vCDEvhl9c6Mw==",
+        transitive_closure = {
+            "istanbul-lib-coverage": ["3.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__istanbul-lib-report__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "istanbul-lib-report",
+        version = "3.0.0",
+        integrity = "sha512-wcdi+uAKzfiGT2abPpKZ0hSU1rGQjUQnLvtY5MpQ7QCTahD3VODhcu4wcfY1YtkGaDD5yuydOLINXsfbus9ROw==",
+        deps = {
+            "istanbul-lib-coverage": "3.2.0",
+            "make-dir": "3.1.0",
+            "supports-color": "7.2.0",
+        },
+        transitive_closure = {
+            "istanbul-lib-report": ["3.0.0"],
+            "istanbul-lib-coverage": ["3.2.0"],
+            "make-dir": ["3.1.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "semver": ["6.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__istanbul-reports__3.1.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "istanbul-reports",
+        version = "3.1.4",
+        integrity = "sha512-r1/DshN4KSE7xWEknZLLLLDn5CJybV3nw01VTkp6D5jzLuELlcbudfj/eSQFvrKsJuTVCGnePO7ho82Nw9zzfw==",
+        deps = {
+            "html-escaper": "2.0.2",
+            "istanbul-lib-report": "3.0.0",
+        },
+        transitive_closure = {
+            "istanbul-reports": ["3.1.4"],
+            "html-escaper": ["2.0.2"],
+            "istanbul-lib-report": ["3.0.0"],
+            "istanbul-lib-coverage": ["3.2.0"],
+            "make-dir": ["3.1.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "semver": ["6.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__javascript-natural-sort__0.7.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "javascript-natural-sort",
+        version = "0.7.1",
+        integrity = "sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw==",
+        transitive_closure = {
+            "javascript-natural-sort": ["0.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__jest-worker__27.5.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "jest-worker",
+        version = "27.5.1",
+        integrity = "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==",
+        deps = {
+            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+            "merge-stream": "2.0.0",
+            "supports-color": "8.1.1",
+        },
+        transitive_closure = {
+            "jest-worker": ["27.5.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__js-tokens__4.0.0",
         root_package = "",
         link_workspace = "",
@@ -4411,6 +6252,32 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__json-parse-even-better-errors__2.3.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "json-parse-even-better-errors",
+        version = "2.3.1",
+        integrity = "sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==",
+        transitive_closure = {
+            "json-parse-even-better-errors": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__json-schema-traverse__0.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "json-schema-traverse",
+        version = "0.4.1",
+        integrity = "sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==",
+        transitive_closure = {
+            "json-schema-traverse": ["0.4.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__kdbush__3.0.0",
         root_package = "",
         link_workspace = "",
@@ -4420,6 +6287,19 @@ def npm_repositories():
         integrity = "sha512-hRkd6/XW4HTsA9vjVpY9tuXJYLSlelnkTmVFu4M9/7MIYQtFcHpbugAU7UbOfjOiVSVYl2fqgBuJ32JUmRo5Ew==",
         transitive_closure = {
             "kdbush": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__kind-of__6.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "kind-of",
+        version = "6.0.3",
+        integrity = "sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==",
+        transitive_closure = {
+            "kind-of": ["6.0.3"],
         },
     )
 
@@ -4452,6 +6332,38 @@ def npm_repositories():
             "levn": ["0.3.0"],
             "prelude-ls": ["1.1.2"],
             "type-check": ["0.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__loader-runner__4.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "loader-runner",
+        version = "4.3.0",
+        integrity = "sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==",
+        transitive_closure = {
+            "loader-runner": ["4.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__locate-path__5.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "locate-path",
+        version = "5.0.0",
+        integrity = "sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==",
+        deps = {
+            "p-locate": "4.1.0",
+        },
+        transitive_closure = {
+            "locate-path": ["5.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
         },
     )
 
@@ -4578,6 +6490,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__make-dir__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "make-dir",
+        version = "3.1.0",
+        integrity = "sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==",
+        deps = {
+            "semver": "6.3.0",
+        },
+        transitive_closure = {
+            "make-dir": ["3.1.0"],
+            "semver": ["6.3.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__map-limit__0.0.1",
         root_package = "",
         link_workspace = "",
@@ -4675,6 +6604,42 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__mathjs__10.6.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "examples/webpack_cli": ["mathjs"],
+        },
+        package = "mathjs",
+        version = "10.6.1",
+        integrity = "sha512-8iZp6uUKKBoCFoUHze9ydsrSji9/IOEzMhwURyoQXaLL1+ILEZnraw4KzZnUBt/XN6lPJPV+7JO94oil3AmosQ==",
+        deps = {
+            "@babel/runtime": "7.18.3",
+            "complex.js": "2.1.1",
+            "decimal.js": "10.3.1",
+            "escape-latex": "1.2.0",
+            "fraction.js": "4.2.0",
+            "javascript-natural-sort": "0.7.1",
+            "seedrandom": "3.0.5",
+            "tiny-emitter": "2.1.0",
+            "typed-function": "2.1.0",
+        },
+        transitive_closure = {
+            "mathjs": ["10.6.1"],
+            "@babel/runtime": ["7.18.3"],
+            "complex.js": ["2.1.1"],
+            "decimal.js": ["10.3.1"],
+            "escape-latex": ["1.2.0"],
+            "fraction.js": ["4.2.0"],
+            "javascript-natural-sort": ["0.7.1"],
+            "seedrandom": ["3.0.5"],
+            "tiny-emitter": ["2.1.0"],
+            "typed-function": ["2.1.0"],
+            "regenerator-runtime": ["0.13.9"],
+        },
+    )
+
+    npm_import(
         name = "npm__md5__2.3.0",
         root_package = "",
         link_workspace = "",
@@ -4692,6 +6657,49 @@ def npm_repositories():
             "charenc": ["0.0.2"],
             "crypt": ["0.0.2"],
             "is-buffer": ["1.1.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__merge-stream__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "merge-stream",
+        version = "2.0.0",
+        integrity = "sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==",
+        transitive_closure = {
+            "merge-stream": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mime-db__1.52.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mime-db",
+        version = "1.52.0",
+        integrity = "sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==",
+        transitive_closure = {
+            "mime-db": ["1.52.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mime-types__2.1.35",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mime-types",
+        version = "2.1.35",
+        integrity = "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==",
+        deps = {
+            "mime-db": "1.52.0",
+        },
+        transitive_closure = {
+            "mime-types": ["2.1.35"],
+            "mime-db": ["1.52.0"],
         },
     )
 
@@ -5382,6 +7390,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__neo-async__2.6.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "neo-async",
+        version = "2.6.2",
+        integrity = "sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==",
+        transitive_closure = {
+            "neo-async": ["2.6.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__next-tick__1.1.0",
         root_package = "",
         link_workspace = "",
@@ -5404,6 +7425,19 @@ def npm_repositories():
         integrity = "sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==",
         transitive_closure = {
             "node-gyp-build": ["3.7.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__node-releases__2.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "node-releases",
+        version = "2.0.5",
+        integrity = "sha512-U9h1NLROZTq9uE1SNffn6WuPDg8icmi3ns4rEl/oTfIle4iLjTliCzgTsbaIFMq/Xn078/lfY/BL0GWZ+psK4Q==",
+        transitive_closure = {
+            "node-releases": ["2.0.5"],
         },
     )
 
@@ -5600,6 +7634,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__p-limit__2.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "p-limit",
+        version = "2.3.0",
+        integrity = "sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==",
+        deps = {
+            "p-try": "2.2.0",
+        },
+        transitive_closure = {
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__p-limit__3.1.0",
         root_package = "",
         link_workspace = "",
@@ -5613,6 +7664,24 @@ def npm_repositories():
         transitive_closure = {
             "p-limit": ["3.1.0"],
             "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__p-locate__4.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "p-locate",
+        version = "4.1.0",
+        integrity = "sha512-R79ZZ/0wAxKGu3oYMlz8jy/kbhsNrS7SKZ7PxEHBgJ5+F2mtFW2fK2cOtBh1cHYkQsbzFV7I+EoRKe6Yt0oK7A==",
+        deps = {
+            "p-limit": "2.3.0",
+        },
+        transitive_closure = {
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
         },
     )
 
@@ -5631,6 +7700,19 @@ def npm_repositories():
             "p-locate": ["5.0.0"],
             "p-limit": ["3.1.0"],
             "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__p-try__2.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "p-try",
+        version = "2.2.0",
+        integrity = "sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==",
+        transitive_closure = {
+            "p-try": ["2.2.0"],
         },
     )
 
@@ -5717,6 +7799,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__path-key__3.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "path-key",
+        version = "3.1.1",
+        integrity = "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==",
+        transitive_closure = {
+            "path-key": ["3.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__path-parse__1.0.7",
         root_package = "",
         link_workspace = "",
@@ -5776,6 +7871,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__picocolors__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "picocolors",
+        version = "1.0.0",
+        integrity = "sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==",
+        transitive_closure = {
+            "picocolors": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__picomatch__2.3.1",
         root_package = "",
         link_workspace = "",
@@ -5798,6 +7906,28 @@ def npm_repositories():
         integrity = "sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==",
         transitive_closure = {
             "pify": ["4.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__pkg-dir__4.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "pkg-dir",
+        version = "4.2.0",
+        integrity = "sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==",
+        deps = {
+            "find-up": "4.1.0",
+        },
+        transitive_closure = {
+            "pkg-dir": ["4.2.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
         },
     )
 
@@ -6223,6 +8353,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__punycode__2.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "punycode",
+        version = "2.1.1",
+        integrity = "sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==",
+        transitive_closure = {
+            "punycode": ["2.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__pxls__2.3.2",
         root_package = "",
         link_workspace = "",
@@ -6427,6 +8570,41 @@ def npm_repositories():
         transitive_closure = {
             "readdirp": ["3.6.0"],
             "picomatch": ["2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__rechoir__0.7.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "rechoir",
+        version = "0.7.1",
+        integrity = "sha512-/njmZ8s1wVeR6pjTZ+0nCnv8SpZNRMT2D1RLOJQESlYFDBvwpTA4KWJpZ+sBJ4+vhjILRcK7JIFdGCdxEAAitg==",
+        deps = {
+            "resolve": "1.22.0",
+        },
+        transitive_closure = {
+            "rechoir": ["0.7.1"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__regenerator-runtime__0.13.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "regenerator-runtime",
+        version = "0.13.9",
+        integrity = "sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==",
+        transitive_closure = {
+            "regenerator-runtime": ["0.13.9"],
         },
     )
 
@@ -6945,6 +9123,36 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__resolve-cwd__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "resolve-cwd",
+        version = "3.0.0",
+        integrity = "sha512-OrZaX2Mb+rJCpH/6CpSqt9xFVpN++x01XnN2ie9g6P5/3xelLAkXWVADpdz1IHD/KFfEXyE6V0U01OQ3UO2rEg==",
+        deps = {
+            "resolve-from": "5.0.0",
+        },
+        transitive_closure = {
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__resolve-from__5.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "resolve-from",
+        version = "5.0.0",
+        integrity = "sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==",
+        transitive_closure = {
+            "resolve-from": ["5.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__resolve-protobuf-schema__2.1.0",
         root_package = "",
         link_workspace = "",
@@ -7011,6 +9219,33 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__rimraf__3.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "rimraf",
+        version = "3.0.2",
+        integrity = "sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==",
+        deps = {
+            "glob": "7.2.3",
+        },
+        transitive_closure = {
+            "rimraf": ["3.0.2"],
+            "glob": ["7.2.3"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__rollup__2.70.2",
         root_package = "",
         link_workspace = "",
@@ -7025,6 +9260,25 @@ def npm_repositories():
         },
         transitive_closure = {
             "rollup": ["2.70.2"],
+            "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__rollup__2.75.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/coverage/bundle": ["rollup"],
+        },
+        package = "rollup",
+        version = "2.75.7",
+        integrity = "sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==",
+        deps = {
+            "fsevents": "2.3.2",
+        },
+        transitive_closure = {
+            "rollup": ["2.75.7"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -7112,6 +9366,68 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__schema-utils__3.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "schema-utils",
+        version = "3.1.1",
+        integrity = "sha512-Y5PQxS4ITlC+EahLuXaY86TXfR7Dc5lw294alXOq86JAHCihAIZfqv8nNCWvaEJvaC51uN9hbLGeV0cFBdH+Fw==",
+        deps = {
+            "@types/json-schema": "registry.npmjs.org/@types/json-schema/7.0.11",
+            "ajv": "6.12.6",
+            "ajv-keywords": "3.5.2_ajv@6.12.6",
+        },
+        transitive_closure = {
+            "schema-utils": ["3.1.1"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__seedrandom__3.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "seedrandom",
+        version = "3.0.5",
+        integrity = "sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==",
+        transitive_closure = {
+            "seedrandom": ["3.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__semver-first-satisfied__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["semver-first-satisfied"],
+        },
+        package = "semver-first-satisfied",
+        version = "1.1.0",
+        integrity = "sha512-GxUu9YDXEgirwz7KQAYTXzO00w4kfF85J6gkRhGWsrKH/UGkInyai/Xoc5EVwblmWDUlZ2rPoaDE4i0NVgnT0w==",
+        deps = {
+            "semver": "5.7.1",
+            "semver-max": "file:npm/private/test/vendored/semver-max",
+        },
+        transitive_closure = {
+            "semver-first-satisfied": ["1.1.0"],
+            "semver": ["5.7.1"],
+            "semver-max": ["file:npm/private/test/vendored/semver-max"],
+            "is-odd": ["file:npm/private/test/vendored/is-odd"],
+            "is-number": ["6.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__semver__5.7.1",
         root_package = "",
         link_workspace = "",
@@ -7121,6 +9437,19 @@ def npm_repositories():
         integrity = "sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==",
         transitive_closure = {
             "semver": ["5.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__semver__6.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "semver",
+        version = "6.3.0",
+        integrity = "sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==",
+        transitive_closure = {
+            "semver": ["6.3.0"],
         },
     )
 
@@ -7143,6 +9472,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__shallow-clone__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "shallow-clone",
+        version = "3.0.1",
+        integrity = "sha512-/6KqX+GVUdqPuPPd2LxDDxzX6CAbjJehAAOKlNpqqUpAqPM6HeL8f+o3a+JsyGjn2lv0WY8UsTgUJjU9Ok55NA==",
+        deps = {
+            "kind-of": "6.0.3",
+        },
+        transitive_closure = {
+            "shallow-clone": ["3.0.1"],
+            "kind-of": ["6.0.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__shallow-copy__0.0.1",
         root_package = "",
         link_workspace = "",
@@ -7152,6 +9498,49 @@ def npm_repositories():
         integrity = "sha1-QV9CcC1z2BAzApLMXuhurhoRoXA=",
         transitive_closure = {
             "shallow-copy": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__shebang-command__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "shebang-command",
+        version = "2.0.0",
+        integrity = "sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==",
+        deps = {
+            "shebang-regex": "3.0.0",
+        },
+        transitive_closure = {
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__shebang-regex__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "shebang-regex",
+        version = "3.0.0",
+        integrity = "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==",
+        transitive_closure = {
+            "shebang-regex": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__signal-exit__3.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "signal-exit",
+        version = "3.0.7",
+        integrity = "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==",
+        transitive_closure = {
+            "signal-exit": ["3.0.7"],
         },
     )
 
@@ -7186,6 +9575,25 @@ def npm_repositories():
             "@polka/url": ["1.0.0-next.21"],
             "mrmime": ["1.0.1"],
             "totalist": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__source-map-support__0.5.21",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "source-map-support",
+        version = "0.5.21",
+        integrity = "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==",
+        deps = {
+            "buffer-from": "1.1.2",
+            "source-map": "0.6.1",
+        },
+        transitive_closure = {
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
         },
     )
 
@@ -7562,6 +9970,214 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__tapable__2.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tapable",
+        version = "2.2.1",
+        integrity = "sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==",
+        transitive_closure = {
+            "tapable": ["2.2.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__terser-webpack-plugin__5.3.3__webpack_5.73.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "terser-webpack-plugin",
+        version = "5.3.3_webpack@5.73.0",
+        integrity = "sha512-Fx60G5HNYknNTNQnzQ1VePRuu89ZVYWfjRAeT5rITuCY/1b08s49e5kSQwHDirKZWuoKOBRFS98EUUoZ9kLEwQ==",
+        deps = {
+            "@jridgewell/trace-mapping": "0.3.13",
+            "jest-worker": "27.5.1",
+            "schema-utils": "3.1.1",
+            "serialize-javascript": "6.0.0",
+            "terser": "5.14.1",
+            "webpack": "5.73.0_webpack-cli@4.10.0",
+        },
+        transitive_closure = {
+            "terser-webpack-plugin": ["5.3.3_webpack@5.73.0"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "jest-worker": ["27.5.1"],
+            "schema-utils": ["3.1.1"],
+            "serialize-javascript": ["6.0.0"],
+            "terser": ["5.14.1"],
+            "webpack": ["5.73.0_webpack-cli@4.10.0"],
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "acorn": ["8.7.1"],
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "browserslist": ["4.21.0"],
+            "chrome-trace-event": ["1.0.3"],
+            "enhanced-resolve": ["5.9.3"],
+            "es-module-lexer": ["0.9.3"],
+            "eslint-scope": ["5.1.1"],
+            "events": ["3.3.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "loader-runner": ["4.3.0"],
+            "mime-types": ["2.1.35"],
+            "neo-async": ["2.6.2"],
+            "tapable": ["2.2.1"],
+            "watchpack": ["2.4.0"],
+            "webpack-cli": ["4.10.0_webpack@5.73.0"],
+            "webpack-sources": ["3.2.3"],
+            "@discoveryjs/json-ext": ["0.5.7"],
+            "@webpack-cli/configtest": ["1.2.0_77l47gmqkrqiei5z7sbwz5iaj4"],
+            "@webpack-cli/info": ["1.5.0_webpack-cli@4.10.0"],
+            "@webpack-cli/serve": ["1.7.0_webpack-cli@4.10.0"],
+            "colorette": ["2.0.19"],
+            "commander": ["2.20.3", "7.2.0"],
+            "cross-spawn": ["7.0.3"],
+            "fastest-levenshtein": ["1.0.12"],
+            "import-local": ["3.1.0"],
+            "interpret": ["2.2.0"],
+            "rechoir": ["0.7.1"],
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "envinfo": ["7.8.1"],
+            "mime-db": ["1.52.0"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+        },
+    )
+
+    npm_import(
+        name = "npm__terser__5.14.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "terser",
+        version = "5.14.1",
+        integrity = "sha512-+ahUAE+iheqBTDxXhTisdA8hgvbEG1hHOQ9xmNjeUJSoi6DU/gMrKNcfZjHkyY6Alnuyc+ikYJaxxfHkT3+WuQ==",
+        deps = {
+            "@jridgewell/source-map": "0.3.2",
+            "acorn": "8.7.1",
+            "commander": "2.20.3",
+            "source-map-support": "0.5.21",
+        },
+        transitive_closure = {
+            "terser": ["5.14.1"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "acorn": ["8.7.1"],
+            "commander": ["2.20.3"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "@jridgewell/set-array": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__test-exclude__6.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "test-exclude",
+        version = "6.0.0",
+        integrity = "sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==",
+        deps = {
+            "@istanbuljs/schema": "0.1.3",
+            "glob": "7.2.3",
+            "minimatch": "3.1.2",
+        },
+        transitive_closure = {
+            "test-exclude": ["6.0.0"],
+            "@istanbuljs/schema": ["0.1.3"],
+            "glob": ["7.2.3"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__through2__0.6.5",
         root_package = "",
         link_workspace = "",
@@ -7607,6 +10223,19 @@ def npm_repositories():
             "safe-buffer": ["5.1.2"],
             "string_decoder": ["1.1.1"],
             "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__tiny-emitter__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tiny-emitter",
+        version = "2.1.0",
+        integrity = "sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==",
+        transitive_closure = {
+            "tiny-emitter": ["2.1.0"],
         },
     )
 
@@ -7841,6 +10470,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__typed-function__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "typed-function",
+        version = "2.1.0",
+        integrity = "sha512-bctQIOqx2iVbWGDGPWwIm18QScpu2XRmkC19D8rQGFsjKSgteq/o1hTZvIG/wuDq8fanpBDrLkLq+aEN/6y5XQ==",
+        transitive_closure = {
+            "typed-function": ["2.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__typedarray-pool__1.2.0",
         root_package = "",
         link_workspace = "",
@@ -7924,6 +10566,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__update-browserslist-db__1.0.3__browserslist_4.21.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "update-browserslist-db",
+        version = "1.0.3_browserslist@4.21.0",
+        integrity = "sha512-ufSazemeh9Gty0qiWtoRpJ9F5Q5W3xdIPm1UZQqYQv/q0Nyb9EMHUB2lu+O9x1re9WsorpMAUu4Y6Lxcs5n+XQ==",
+        deps = {
+            "browserslist": "4.21.0",
+            "escalade": "3.1.1",
+            "picocolors": "1.0.0",
+        },
+        transitive_closure = {
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "browserslist": ["4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+        },
+    )
+
+    npm_import(
         name = "npm__update-diff__1.1.0",
         root_package = "",
         link_workspace = "",
@@ -7933,6 +10599,23 @@ def npm_repositories():
         integrity = "sha512-rCiBPiHxZwT4+sBhEbChzpO5hYHjm91kScWgdHf4Qeafs6Ba7MBl+d9GlGv72bcTZQO0sLmtQS1pHSWoCLtN/A==",
         transitive_closure = {
             "update-diff": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__uri-js__4.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "uri-js",
+        version = "4.4.1",
+        integrity = "sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==",
+        deps = {
+            "punycode": "2.1.1",
+        },
+        transitive_closure = {
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
         },
     )
 
@@ -8102,6 +10785,30 @@ def npm_repositories():
             "kleur": ["4.1.4"],
             "sade": ["1.8.1"],
             "mri": ["1.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__v8-to-istanbul__9.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "v8-to-istanbul",
+        version = "9.0.1",
+        integrity = "sha512-74Y4LqY74kLE6IFyIjPtkSTWzUZmj8tdHT9Ii/26dvQ6K9Dl2NbEfj0XgU2sHCtKgt5VupqhlO/5aWuqS+IY1w==",
+        deps = {
+            "@jridgewell/trace-mapping": "0.3.13",
+            "@types/istanbul-lib-coverage": "registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4",
+            "convert-source-map": "1.8.0",
+        },
+        transitive_closure = {
+            "v8-to-istanbul": ["9.0.1"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
+            "convert-source-map": ["1.8.0"],
+            "safe-buffer": ["5.1.2"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
         },
     )
 
@@ -8311,6 +11018,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__watchpack__2.4.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "watchpack",
+        version = "2.4.0",
+        integrity = "sha512-Lcvm7MGST/4fup+ifyKi2hjyIAwcdI4HRgtvTpIUxBRhB+RFtUh8XtDOxUfctVCnhVi+QQj49i91OyvzkJl6cg==",
+        deps = {
+            "glob-to-regexp": "0.4.1",
+            "graceful-fs": "4.2.10",
+        },
+        transitive_closure = {
+            "watchpack": ["2.4.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+        },
+    )
+
+    npm_import(
         name = "npm__weak-map__1.0.8",
         root_package = "",
         link_workspace = "",
@@ -8383,6 +11109,372 @@ def npm_repositories():
             "has-flag": ["4.0.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__webpack-cli__4.10.0__webpack_5.73.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "examples/webpack_cli": ["webpack-cli"],
+        },
+        package = "webpack-cli",
+        version = "4.10.0_webpack@5.73.0",
+        integrity = "sha512-NLhDfH/h4O6UOy+0LSso42xvYypClINuMNBVVzX4vX98TmTaTUxwRbXdhucbFMd2qLaCTcLq/PdYrvi8onw90w==",
+        deps = {
+            "@discoveryjs/json-ext": "0.5.7",
+            "@webpack-cli/configtest": "1.2.0_77l47gmqkrqiei5z7sbwz5iaj4",
+            "@webpack-cli/info": "1.5.0_webpack-cli@4.10.0",
+            "@webpack-cli/serve": "1.7.0_webpack-cli@4.10.0",
+            "colorette": "2.0.19",
+            "commander": "7.2.0",
+            "cross-spawn": "7.0.3",
+            "fastest-levenshtein": "1.0.12",
+            "import-local": "3.1.0",
+            "interpret": "2.2.0",
+            "rechoir": "0.7.1",
+            "webpack": "5.73.0_webpack-cli@4.10.0",
+            "webpack-merge": "5.8.0",
+        },
+        transitive_closure = {
+            "webpack-cli": ["4.10.0_webpack@5.73.0"],
+            "@discoveryjs/json-ext": ["0.5.7"],
+            "@webpack-cli/configtest": ["1.2.0_77l47gmqkrqiei5z7sbwz5iaj4"],
+            "@webpack-cli/info": ["1.5.0_webpack-cli@4.10.0"],
+            "@webpack-cli/serve": ["1.7.0_webpack-cli@4.10.0"],
+            "colorette": ["2.0.19"],
+            "commander": ["2.20.3", "7.2.0"],
+            "cross-spawn": ["7.0.3"],
+            "fastest-levenshtein": ["1.0.12"],
+            "import-local": ["3.1.0"],
+            "interpret": ["2.2.0"],
+            "rechoir": ["0.7.1"],
+            "webpack": ["5.73.0_webpack-cli@4.10.0"],
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "acorn": ["8.7.1"],
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "browserslist": ["4.21.0"],
+            "chrome-trace-event": ["1.0.3"],
+            "enhanced-resolve": ["5.9.3"],
+            "es-module-lexer": ["0.9.3"],
+            "eslint-scope": ["5.1.1"],
+            "events": ["3.3.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "loader-runner": ["4.3.0"],
+            "mime-types": ["2.1.35"],
+            "neo-async": ["2.6.2"],
+            "schema-utils": ["3.1.1"],
+            "tapable": ["2.2.1"],
+            "terser-webpack-plugin": ["5.3.3_webpack@5.73.0"],
+            "watchpack": ["2.4.0"],
+            "webpack-sources": ["3.2.3"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "jest-worker": ["27.5.1"],
+            "serialize-javascript": ["6.0.0"],
+            "terser": ["5.14.1"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+            "mime-db": ["1.52.0"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "envinfo": ["7.8.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__webpack-merge__5.8.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "webpack-merge",
+        version = "5.8.0",
+        integrity = "sha512-/SaI7xY0831XwP6kzuwhKWVKDP9t1QY1h65lAFLbZqMPIuYcD9QAW4u9STIbU9kaJbPBB/geU/gLr1wDjOhQ+Q==",
+        deps = {
+            "clone-deep": "4.0.1",
+            "wildcard": "2.0.0",
+        },
+        transitive_closure = {
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__webpack-sources__3.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "webpack-sources",
+        version = "3.2.3",
+        integrity = "sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==",
+        transitive_closure = {
+            "webpack-sources": ["3.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__webpack__5.73.0__webpack-cli_4.10.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "examples/webpack_cli": ["webpack"],
+        },
+        package = "webpack",
+        version = "5.73.0_webpack-cli@4.10.0",
+        integrity = "sha512-svjudQRPPa0YiOYa2lM/Gacw0r6PvxptHj4FuEKQ2kX05ZLkjbVc5MnPs6its5j7IZljnIqSVo/OsY2X0IpHGA==",
+        deps = {
+            "@types/eslint-scope": "registry.npmjs.org/@types/eslint-scope/3.7.3",
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
+            "@webassemblyjs/ast": "1.11.1",
+            "@webassemblyjs/wasm-edit": "1.11.1",
+            "@webassemblyjs/wasm-parser": "1.11.1",
+            "acorn": "8.7.1",
+            "acorn-import-assertions": "1.8.0_acorn@8.7.1",
+            "browserslist": "4.21.0",
+            "chrome-trace-event": "1.0.3",
+            "enhanced-resolve": "5.9.3",
+            "es-module-lexer": "0.9.3",
+            "eslint-scope": "5.1.1",
+            "events": "3.3.0",
+            "glob-to-regexp": "0.4.1",
+            "graceful-fs": "4.2.10",
+            "json-parse-even-better-errors": "2.3.1",
+            "loader-runner": "4.3.0",
+            "mime-types": "2.1.35",
+            "neo-async": "2.6.2",
+            "schema-utils": "3.1.1",
+            "tapable": "2.2.1",
+            "terser-webpack-plugin": "5.3.3_webpack@5.73.0",
+            "watchpack": "2.4.0",
+            "webpack-cli": "4.10.0_webpack@5.73.0",
+            "webpack-sources": "3.2.3",
+        },
+        transitive_closure = {
+            "webpack": ["5.73.0_webpack-cli@4.10.0"],
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@webassemblyjs/ast": ["1.11.1"],
+            "@webassemblyjs/wasm-edit": ["1.11.1"],
+            "@webassemblyjs/wasm-parser": ["1.11.1"],
+            "acorn": ["8.7.1"],
+            "acorn-import-assertions": ["1.8.0_acorn@8.7.1"],
+            "browserslist": ["4.21.0"],
+            "chrome-trace-event": ["1.0.3"],
+            "enhanced-resolve": ["5.9.3"],
+            "es-module-lexer": ["0.9.3"],
+            "eslint-scope": ["5.1.1"],
+            "events": ["3.3.0"],
+            "glob-to-regexp": ["0.4.1"],
+            "graceful-fs": ["4.2.10"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "loader-runner": ["4.3.0"],
+            "mime-types": ["2.1.35"],
+            "neo-async": ["2.6.2"],
+            "schema-utils": ["3.1.1"],
+            "tapable": ["2.2.1"],
+            "terser-webpack-plugin": ["5.3.3_webpack@5.73.0"],
+            "watchpack": ["2.4.0"],
+            "webpack-cli": ["4.10.0_webpack@5.73.0"],
+            "webpack-sources": ["3.2.3"],
+            "@discoveryjs/json-ext": ["0.5.7"],
+            "@webpack-cli/configtest": ["1.2.0_77l47gmqkrqiei5z7sbwz5iaj4"],
+            "@webpack-cli/info": ["1.5.0_webpack-cli@4.10.0"],
+            "@webpack-cli/serve": ["1.7.0_webpack-cli@4.10.0"],
+            "colorette": ["2.0.19"],
+            "commander": ["2.20.3", "7.2.0"],
+            "cross-spawn": ["7.0.3"],
+            "fastest-levenshtein": ["1.0.12"],
+            "import-local": ["3.1.0"],
+            "interpret": ["2.2.0"],
+            "rechoir": ["0.7.1"],
+            "webpack-merge": ["5.8.0"],
+            "clone-deep": ["4.0.1"],
+            "wildcard": ["2.0.0"],
+            "is-plain-object": ["2.0.4"],
+            "kind-of": ["6.0.3"],
+            "shallow-clone": ["3.0.1"],
+            "isobject": ["3.0.1"],
+            "resolve": ["1.22.0"],
+            "is-core-module": ["2.9.0"],
+            "path-parse": ["1.0.7"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "pkg-dir": ["4.2.0"],
+            "resolve-cwd": ["3.0.0"],
+            "resolve-from": ["5.0.0"],
+            "find-up": ["4.1.0"],
+            "locate-path": ["5.0.0"],
+            "path-exists": ["4.0.0"],
+            "p-locate": ["4.1.0"],
+            "p-limit": ["2.3.0"],
+            "p-try": ["2.2.0"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "envinfo": ["7.8.1"],
+            "@jridgewell/trace-mapping": ["0.3.13"],
+            "jest-worker": ["27.5.1"],
+            "serialize-javascript": ["6.0.0"],
+            "terser": ["5.14.1"],
+            "@jridgewell/source-map": ["0.3.2"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+            "source-map": ["0.6.1"],
+            "@jridgewell/gen-mapping": ["0.3.1"],
+            "@jridgewell/set-array": ["1.1.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "randombytes": ["2.1.0"],
+            "safe-buffer": ["5.2.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "merge-stream": ["2.0.0"],
+            "supports-color": ["8.1.1"],
+            "has-flag": ["4.0.0"],
+            "@jridgewell/resolve-uri": ["3.0.7"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+            "ajv": ["6.12.6"],
+            "ajv-keywords": ["3.5.2_ajv@6.12.6"],
+            "fast-deep-equal": ["3.1.3"],
+            "fast-json-stable-stringify": ["2.1.0"],
+            "json-schema-traverse": ["0.4.1"],
+            "uri-js": ["4.4.1"],
+            "punycode": ["2.1.1"],
+            "mime-db": ["1.52.0"],
+            "esrecurse": ["4.3.0"],
+            "estraverse": ["5.3.0", "4.3.0"],
+            "caniuse-lite": ["1.0.30001358"],
+            "electron-to-chromium": ["1.4.166"],
+            "node-releases": ["2.0.5"],
+            "update-browserslist-db": ["1.0.3_browserslist@4.21.0"],
+            "escalade": ["3.1.1"],
+            "picocolors": ["1.0.0"],
+            "@webassemblyjs/helper-api-error": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
+            "@webassemblyjs/ieee754": ["1.11.1"],
+            "@webassemblyjs/leb128": ["1.11.1"],
+            "@webassemblyjs/utf8": ["1.11.1"],
+            "@xtuc/long": ["4.2.2"],
+            "@xtuc/ieee754": ["1.2.0"],
+            "@webassemblyjs/helper-buffer": ["1.11.1"],
+            "@webassemblyjs/helper-wasm-section": ["1.11.1"],
+            "@webassemblyjs/wasm-gen": ["1.11.1"],
+            "@webassemblyjs/wasm-opt": ["1.11.1"],
+            "@webassemblyjs/wast-printer": ["1.11.1"],
+            "@webassemblyjs/helper-numbers": ["1.11.1"],
+            "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__which__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "which",
+        version = "2.0.2",
+        integrity = "sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==",
+        deps = {
+            "isexe": "2.0.0",
+        },
+        transitive_closure = {
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__wildcard__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "wildcard",
+        version = "2.0.0",
+        integrity = "sha512-JcKqAHLPxcdb9KM49dufGXn2x3ssnfjbcaQdLlfZsL9rH9wgDQjUtDxbo8NE0F6SFvydeu1VhZe7hZuHsB2/pw==",
+        transitive_closure = {
+            "wildcard": ["2.0.0"],
         },
     )
 
@@ -8565,6 +11657,19 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__yargs-parser__20.2.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "yargs-parser",
+        version = "20.2.9",
+        integrity = "sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==",
+        transitive_closure = {
+            "yargs-parser": ["20.2.9"],
+        },
+    )
+
+    npm_import(
         name = "npm__yargs-unparser__2.0.0",
         root_package = "",
         link_workspace = "",
@@ -8657,6 +11762,47 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_types_eslint-scope__registry.npmjs.org_at_types_eslint-scope_3.7.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/eslint-scope",
+        version = "registry.npmjs.org/@types/eslint-scope/3.7.3",
+        integrity = "sha512-PB3ldyrcnAicT35TWPs5IcwKD8S333HMaa2VVv4+wdvebJkjWuW/xESoB8IwRcog8HYVYamb1g/R31Qv5Bx03g==",
+        url = "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.3.tgz",
+        deps = {
+            "@types/eslint": "registry.npmjs.org/@types/eslint/8.4.3",
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
+        },
+        transitive_closure = {
+            "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_eslint__registry.npmjs.org_at_types_eslint_8.4.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/eslint",
+        version = "registry.npmjs.org/@types/eslint/8.4.3",
+        integrity = "sha512-YP1S7YJRMPs+7KZKDb9G63n8YejIwW9BALq7a5j2+H4yl6iOv9CB29edho+cuFRrvmJbbaH2yiVChKLJVysDGw==",
+        url = "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.4.3.tgz",
+        deps = {
+            "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
+            "@types/json-schema": "registry.npmjs.org/@types/json-schema/7.0.11",
+        },
+        transitive_closure = {
+            "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_estree__registry.npmjs.org_at_types_estree_0.0.39",
         root_package = "",
         link_workspace = "",
@@ -8685,6 +11831,34 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_types_istanbul-lib-coverage__registry.npmjs.org_at_types_istanbul-lib-coverage_2.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/istanbul-lib-coverage",
+        version = "registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4",
+        integrity = "sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==",
+        url = "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz",
+        transitive_closure = {
+            "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_json-schema__registry.npmjs.org_at_types_json-schema_7.0.11",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/json-schema",
+        version = "registry.npmjs.org/@types/json-schema/7.0.11",
+        integrity = "sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==",
+        url = "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz",
+        transitive_closure = {
+            "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.36",
         root_package = "",
         link_workspace = "",
@@ -8696,6 +11870,24 @@ def npm_repositories():
         integrity = "sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==",
         url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz",
         transitive_closure = {
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_resolve__registry.npmjs.org_at_types_resolve_1.17.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/resolve",
+        version = "registry.npmjs.org/@types/resolve/1.17.1",
+        integrity = "sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==",
+        url = "https://registry.yarnpkg.com/@types/resolve/-/resolve-1.17.1.tgz",
+        deps = {
+            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+        },
+        transitive_closure = {
+            "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
             "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
         },
     )

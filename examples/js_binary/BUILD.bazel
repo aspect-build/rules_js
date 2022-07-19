@@ -6,7 +6,7 @@ Simple examples of running JS programs in node with js_binary, js_run_binary, an
 
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -97,16 +97,22 @@ js_binary(
 
 js_run_binary(
     name = "run4",
-    outs = ["out4"],
-    args = ["out4"],
+    args = ["out4-dist/out4"],
     chdir = package_name(),
+    out_dirs = ["out4-dist"],
     tool = ":bin4",
+)
+
+directory_path(
+    name = "out4",
+    directory = ":run4",
+    path = "out4",
 )
 
 diff_test(
     name = "test4",
     file1 = "//examples:expected_one_ast.json",
-    file2 = "out4",
+    file2 = ":out4",
 )
 
 #######################################
@@ -263,7 +269,7 @@ js_test(
     log_level = "debug",
 )
 
-# bazel run //examples:test10_binary
+# bazel run //examples:case7_binary
 js_binary(
     name = "case7_binary",
     args = ["dummy"],
@@ -320,4 +326,59 @@ diff_test(
 
 aspect_test_a_bin.bin_a_test(
     name = "aspect_bin_a_test",
+)
+
+####################################################
+# Use case 10
+# Show launching js_binary() indirectly from a sh_binary()
+
+write_file(
+    name = "write10_js",
+    out = "case10.js",
+    content = ["require('fs').writeFileSync(process.argv[2], 'case10')"],
+)
+
+js_binary(
+    name = "bin10-js_binary",
+    entry_point = "case10.js",
+)
+
+write_file(
+    name = "write10_launch_sh",
+    out = "launch_case10.sh",
+    content = ["""\
+        # --- begin runfiles.bash initialization v2 ---
+        set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
+        source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
+        source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
+        source "$0.runfiles/$f" 2>/dev/null || \
+        source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+        source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
+        { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
+        # --- end runfiles.bash initialization v2 ---
+
+        $(rlocation aspect_rules_js/examples/js_binary/bin10-js_binary.sh) "$@"
+"""],
+)
+
+# NB: https://github.com/aspect-build/rules_js/issues/285 is only reproducable
+# with 'bazel run //examples/js_binary:bin10'. The genrule below that runs
+# the same binary does not reproduce as the environment is setup differently.
+sh_binary(
+    name = "bin10",
+    srcs = [":launch_case10.sh"],
+    args = ["out10"],
+    data = [
+        ":bin10-js_binary",
+        "@bazel_tools//tools/bash/runfiles",
+    ],
+)
+
+genrule(
+    name = "test10",
+    outs = ["out10"],
+    # All js_binary rules need a BAZEL_BINDIR environment variable set so they can
+    # run from that directory as the working directory.
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :bin10) {}/out10".format(package_name()),
+    tools = [":bin10"],
 )

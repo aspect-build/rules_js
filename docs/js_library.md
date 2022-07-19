@@ -1,11 +1,25 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-Expose some files with DeclarationInfo, like filegroup but can be a dep of ts_project.
+`js_library` is similar to [`filegroup`](https://docs.bazel.build/versions/main/be/general.html#filegroup); there are no Bazel actions to run.
 
-Load this with,
+It only groups JS files together, and propagates their dependencies, along with a DeclarationInfo so that it can be a dep of ts_project.
+
+For example, this `BUILD` file groups a pair of `.js/.d.ts` files along with the `package.json`.
+The latter is needed because it contains a `typings` key that allows downstream
+users of this library to resolve the `one.d.ts` file.
+The `main` key is another commonly used field in `package.json` which would require including it in the library.
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+js_library(
+    name = "one",
+    srcs = [
+        "one.d.ts",
+        "one.js",
+        "package.json",
+    ],
+)
 ```
 
 

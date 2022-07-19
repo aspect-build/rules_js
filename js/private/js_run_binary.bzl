@@ -11,6 +11,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 """
 
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
+load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js/private:js_binary.bzl", _js_binary_envs_for_log_level = "envs_for_log_level")
@@ -33,6 +34,8 @@ def js_run_binary(
         mnemonic = "JsRunBinary",
         progress_message = None,
         execution_requirements = None,
+        stamp = 0,
+        patch_node_fs = True,
         **kwargs):
     """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
 
@@ -126,6 +129,45 @@ def js_run_binary(
 
             See https://docs.bazel.build/versions/main/be/common-definitions.html#common.tags for useful keys.
 
+        stamp: Whether to include build status files as inputs to the tool. Possible values:
+
+            - `stamp = 0 (default)`: Never include build status files as inputs to the tool.
+                This gives good build result caching.
+                Most tools don't use the status files, so including them in `--stamp` builds makes those
+                builds have many needless cache misses.
+                (Note: this default is different from most rules with an integer-typed `stamp` attribute.)
+            - `stamp = 1`: Always include build status files as inputs to the tool, even in
+                [--nostamp](https://docs.bazel.build/versions/main/user-manual.html#flag--stamp) builds.
+                This setting should be avoided, since it is non-deterministic.
+                It potentially causes remote cache misses for the target and
+                any downstream actions that depend on the result.
+            - `stamp = -1`: Inclusion of build status files as inputs is controlled by the
+                [--[no]stamp](https://docs.bazel.build/versions/main/user-manual.html#flag--stamp) flag.
+                Stamped targets are not rebuilt unless their dependencies change.
+
+            Default value is `0` since the majority of js_run_binary targets in a build graph typically do not use build
+            status files and including them for all js_run_binary actions whenever `--stamp` is set would result in
+            invalidating the entire graph and would prevent cache hits. Stamping is typically done in terminal targets
+            when building release artifacts and stamp should typically be set explicitly in these targets to `-1` so it
+            is enabled when the `--stamp` flag is set.
+
+            When stamping is enabled, an additional two environment variables will be set for the action:
+                - `BAZEL_STABLE_STATUS_FILE`
+                - `BAZEL_VOLATILE_STATUS_FILE`
+
+            These files can be read and parsed by the action, for example to pass some values to a bundler.
+
+        patch_node_fs: Patch the to Node.js `fs` API (https://nodejs.org/api/fs.html) for this node program
+            to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.
+
+            When enabled, `js_binary` patches the Node.js sync and async `fs` API functions `lstat`,
+            `readlink`, `realpath`, `readdir` and `opendir` so that the node program being
+            run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,
+            these patches prevent the program being run from resolving symlinks out of the sandbox.
+
+            When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
+            which can lead to non-hermetic behavior.
+
         **kwargs: Additional arguments
     """
 
@@ -150,10 +192,8 @@ def js_run_binary(
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
         "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
-        "BAZEL_INFO_FILE": "$(INFO_FILE)",
         "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
         "BAZEL_TARGET": "$(TARGET)",
-        "BAZEL_VERSION_FILE": "$(VERSION_FILE)",
         "BAZEL_WORKSPACE": "$(WORKSPACE)",
     }
 
@@ -177,10 +217,31 @@ def js_run_binary(
     if silent_on_success:
         extra_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
 
+    # Disable node patches if requested
+    if patch_node_fs:
+        extra_env["JS_BINARY__PATCH_NODE_FS"] = "1"
+    else:
+        # Set explicitly to "0" so disable overrides any enable in the js_binary
+        extra_env["JS_BINARY__PATCH_NODE_FS"] = "0"
+
     # Configure log_level if specified
     if log_level:
         for log_level_env in _js_binary_envs_for_log_level(log_level):
             extra_env[log_level_env] = "1"
+
+    if not stdout and not stderr and not exit_code_out and (len(outs) + len(out_dirs) < 1):
+        # run_binary will produce the actual error, but we want to give an additional JS-specific
+        # warning message here. Note that as a macro, we can't tell the name of the rule provided
+        # by the users BUILD file (e.g. for "typescript_bin.tsc(outs = [])" we'd wish to say
+        # "try using tsc_binary instead")
+        # buildifier: disable=print
+        print("""\
+WARNING: {name} is not configured to produce outputs.
+        
+If this is a generated bin from package_json.bzl, consider using the *_binary variant instead.
+""".format(
+            name = to_label(name),
+        ))
 
     _run_binary(
         name = name,
@@ -193,5 +254,6 @@ def js_run_binary(
         mnemonic = mnemonic,
         progress_message = progress_message,
         execution_requirements = execution_requirements,
+        stamp = stamp,
         **kwargs
     )

@@ -120,4 +120,110 @@ describe('testing readlink', async () => {
             }
         )
     })
+
+    await it('can resolve symlink to a symlink in the sandbox if it has a corresponding location', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link to execroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'sandbox', 'file')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(fixturesDir, 'sandbox', 'link')
+                const filePath = path.join(fixturesDir, 'sandbox', 'file')
+
+                assert.deepStrictEqual(
+                    patchedFs.readlinkSync(linkPath),
+                    filePath,
+                    'SYNC: should read the symlink in the sandbox'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.readlink)(linkPath),
+                    filePath,
+                    'CB: should read the symlink in the sandbox'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.readlink(linkPath),
+                    filePath,
+                    'Promise: should read the symlink in the sandbox'
+                )
+            }
+        )
+    })
+
+    await it('cant resolve symlink to a symlink in the sandbox if it has no corresponding location', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: {},
+                otherroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create dangling symlink from execroot/link to execroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'otherroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(fixturesDir, 'sandbox', 'link')
+                const filePath = path.join(fixturesDir, 'sandbox', 'file')
+
+                assert.throws(() => {
+                    patchedFs.readlinkSync(linkPath)
+                }, "should throw because it's not a resolvable link")
+
+                let thrown
+                try {
+                    await util.promisify(patchedFs.readlink)(linkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown) assert.fail('must throw einval error')
+                }
+
+                thrown = undefined
+                try {
+                    await patchedFs.promises.readlink(linkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown) assert.fail('must throw einval error')
+                }
+            }
+        )
+    })
 })

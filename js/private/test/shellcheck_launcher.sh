@@ -23,6 +23,7 @@ export JS_BINARY__COMPILATION_MODE="fastbuild"
 export JS_BINARY__TARGET_CPU="k8"
 export JS_BINARY__TARGET="@//js/private/test:shellcheck_launcher"
 export JS_BINARY__WORKSPACE="aspect_rules_js"
+if [[ -z "${JS_BINARY__PATCH_NODE_FS:-}" ]]; then export JS_BINARY__PATCH_NODE_FS="1"; fi
 if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; fi
 if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
 
@@ -155,13 +156,12 @@ function is_windows {
 # It helps to normalizes paths when running on Windows.
 #
 # Example:
-# C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/users/xuser/_bazel_xuser/7q7kkv32/execroot/a/b/c
+# C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
 function normalize_windows_path {
     # Apply the followings paths transformations to normalize paths on Windows
     # -process driver letter
     # -convert path separator
-    # -lowercase everything
-    sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' -e 's/[A-Z]/\L&/g' <<< "$1"
+    sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<< "$1"
     return
 }
 
@@ -190,15 +190,24 @@ function normalize_windows_path {
 if [ "${TEST_SRCDIR:-}" ]; then
     # Case 4, bazel has identified runfiles for us.
     RUNFILES="$TEST_SRCDIR"
-elif [ "${RUNFILES_MANIFEST_ONLY:-}" ]; then
-    # Windows only has a manifest file instead of symlinks.
+elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
     if [ "$(is_windows)" -eq "1" ]; then
-        # If Windows normalizing the path and case insensitive removing the `/MANIFEST` part of the path
-        NORMALIZED_RUNFILES_MANIFEST_FILE_PATH=$(normalize_windows_path "$RUNFILES_MANIFEST_FILE")
-        # shellcheck disable=SC2001
-        RUNFILES=$(sed 's|\/MANIFEST$||i' <<< "$NORMALIZED_RUNFILES_MANIFEST_FILE_PATH")
+        # If Windows, normalize the path
+        NORMALIZED_RUNFILES_MANIFEST_FILE=$(normalize_windows_path "$RUNFILES_MANIFEST_FILE")
     else
-        RUNFILES=${RUNFILES_MANIFEST_FILE%/MANIFEST}
+        NORMALIZED_RUNFILES_MANIFEST_FILE="$RUNFILES_MANIFEST_FILE"
+    fi
+    if [[ "${NORMALIZED_RUNFILES_MANIFEST_FILE}" == *.runfiles_manifest ]]; then
+        # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
+        # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
+        # runfiles directory and named my_binary.runfiles_manifest
+        RUNFILES=${NORMALIZED_RUNFILES_MANIFEST_FILE%_manifest}
+    elif [[ "${NORMALIZED_RUNFILES_MANIFEST_FILE}" == */MANIFEST ]]; then
+        # Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
+        RUNFILES=${NORMALIZED_RUNFILES_MANIFEST_FILE%/MANIFEST}
+    else
+        logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
+        exit 1
     fi
 else
     case "$0" in
@@ -319,9 +328,15 @@ done
 
 # Run node patches if needed
 export JS_BINARY__FS_PATH_ROOTS="$execroot:$RUNFILES"
-if [ -z "${JS_BINARY__DISABLE_NODE_PATCHES:-}" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
+if [ "${JS_BINARY__PATCH_NODE_FS:-}" ] && [ "${JS_BINARY__PATCH_NODE_FS}" != "0" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
     logf_debug "adding node fs patches with roots: %s" "$JS_BINARY__FS_PATH_ROOTS"
     NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register.js" )
+fi
+
+# Enable coverage if requested
+if [ "${COVERAGE_DIR:-}" ]; then
+  logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
+  export NODE_V8_COVERAGE=${COVERAGE_DIR}
 fi
 
 # Put bazel managed node on the path
@@ -425,11 +440,6 @@ if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
     else
         exit 0
     fi
-fi
-
-if [ $RESULT -eq 0 ]; then
-    # TODO: add optional coverage support
-    echo -n
 fi
 
 if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then

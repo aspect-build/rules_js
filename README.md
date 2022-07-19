@@ -29,7 +29,7 @@ copy the WORKSPACE snippet into your `WORKSPACE` file.
 
 ## Usage
 
-See the API documentation in the [docs](docs/) folder and the example usage in the [examples](examples/) folder.
+See the documentation in the [docs](docs/) folder and the example usages in the [examples](examples/) folder.
 
 > Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
 
@@ -39,11 +39,11 @@ Read our [migration guide](docs/migrate.md) to adopt rules_js in an existing pro
 
 rules_js replaces some parts of [bazelbuild/rules_nodejs](http://github.com/bazelbuild/rules_nodejs) and re-uses other parts:
 
-| Layer            |     Legacy                |  Modern      |
-| ------------     | ------------------------- | ------------ |
-| Custom rules     | `npm:@bazel/typescript`, etc. |  `aspect_rules_ts`, etc.|
-| Package manager and Basic rules | `build_bazel_rules_nodejs`  |  `aspect_rules_js`    |
-| Toolchain and core providers    |   `rules_nodejs` | `rules_nodejs`   |
+| Layer                           | Legacy                        | Modern                  |
+| ------------------------------- | ----------------------------- | ----------------------- |
+| Custom rules                    | `npm:@bazel/typescript`, etc. | `aspect_rules_ts`, etc. |
+| Package manager and Basic rules | `build_bazel_rules_nodejs`    | `aspect_rules_js`       |
+| Toolchain and core providers    | `rules_nodejs`                | `rules_nodejs`          |
 
 The common layer here is the `rules_nodejs` Bazel module, documented as the "core" in
 https://bazelbuild.github.io/rules_nodejs/:

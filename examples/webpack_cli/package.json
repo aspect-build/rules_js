@@ -1,0 +1,8 @@
+{
+    "private": true,
+    "dependencies": {
+        "mathjs": "10.6.1",
+        "webpack-cli": "4.10.0",
+        "webpack": "5.73.0"
+    }
+}

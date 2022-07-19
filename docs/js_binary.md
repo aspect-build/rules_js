@@ -2,10 +2,18 @@
 
 Rules for running JavaScript programs under Bazel, as tools or with `bazel run` or `bazel test`.
 
-Load these with
+For example, this binary references the `acorn` npm package which was already linked
+using an API like `npm_link_all_packages`.
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+
+js_binary(
+    name = "bin",
+    # Reference the location where the acorn npm module was linked in the root Bazel package
+    data = ["//:node_modules/acorn"],
+    entry_point = "require_acorn.js",
+)
 ```
 
 
@@ -15,7 +23,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 
 <pre>
 js_binary(<a href="#js_binary-name">name</a>, <a href="#js_binary-chdir">chdir</a>, <a href="#js_binary-data">data</a>, <a href="#js_binary-enable_runfiles">enable_runfiles</a>, <a href="#js_binary-entry_point">entry_point</a>, <a href="#js_binary-env">env</a>, <a href="#js_binary-expected_exit_code">expected_exit_code</a>, <a href="#js_binary-log_level">log_level</a>,
-          <a href="#js_binary-node_options">node_options</a>)
+          <a href="#js_binary-node_options">node_options</a>, <a href="#js_binary-patch_node_fs">patch_node_fs</a>)
 </pre>
 
 Execute a program in the node.js runtime.
@@ -54,6 +62,7 @@ This rules requires that Bazel was run with
 | <a id="js_binary-expected_exit_code"></a>expected_exit_code |  The expected exit code.<br><br>        Can be used to write tests that are expected to fail.   | Integer | optional | 0 |
 | <a id="js_binary-log_level"></a>log_level |  Set the logging level.<br><br>        Log from are written to stderr. They will be supressed on success when running as the tool         of a js_run_binary when silent_on_success is True. In that case, they will be shown         only on a build failure along with the stdout & stderr of the node tool being run.   | String | optional | "error" |
 | <a id="js_binary-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
+| <a id="js_binary-patch_node_fs"></a>patch_node_fs |  Patch the to Node.js <code>fs</code> API (https://nodejs.org/api/fs.html) for this node program         to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.<br><br>        When enabled, <code>js_binary</code> patches the Node.js sync and async <code>fs</code> API functions <code>lstat</code>,         <code>readlink</code>, <code>realpath</code>, <code>readdir</code> and <code>opendir</code> so that the node program being         run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,         these patches prevent the program being run from resolving symlinks out of the sandbox.<br><br>        When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks         which can lead to non-hermetic behavior.   | Boolean | optional | True |
 
 
 <a id="#js_test"></a>
@@ -62,7 +71,7 @@ This rules requires that Bazel was run with
 
 <pre>
 js_test(<a href="#js_test-name">name</a>, <a href="#js_test-chdir">chdir</a>, <a href="#js_test-data">data</a>, <a href="#js_test-enable_runfiles">enable_runfiles</a>, <a href="#js_test-entry_point">entry_point</a>, <a href="#js_test-env">env</a>, <a href="#js_test-expected_exit_code">expected_exit_code</a>, <a href="#js_test-log_level">log_level</a>,
-        <a href="#js_test-node_options">node_options</a>)
+        <a href="#js_test-node_options">node_options</a>, <a href="#js_test-patch_node_fs">patch_node_fs</a>)
 </pre>
 
 Identical to js_binary, but usable under `bazel test`.
@@ -81,6 +90,7 @@ Identical to js_binary, but usable under `bazel test`.
 | <a id="js_test-expected_exit_code"></a>expected_exit_code |  The expected exit code.<br><br>        Can be used to write tests that are expected to fail.   | Integer | optional | 0 |
 | <a id="js_test-log_level"></a>log_level |  Set the logging level.<br><br>        Log from are written to stderr. They will be supressed on success when running as the tool         of a js_run_binary when silent_on_success is True. In that case, they will be shown         only on a build failure along with the stdout & stderr of the node tool being run.   | String | optional | "error" |
 | <a id="js_test-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
+| <a id="js_test-patch_node_fs"></a>patch_node_fs |  Patch the to Node.js <code>fs</code> API (https://nodejs.org/api/fs.html) for this node program         to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.<br><br>        When enabled, <code>js_binary</code> patches the Node.js sync and async <code>fs</code> API functions <code>lstat</code>,         <code>readlink</code>, <code>realpath</code>, <code>readdir</code> and <code>opendir</code> so that the node program being         run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,         these patches prevent the program being run from resolving symlinks out of the sandbox.<br><br>        When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks         which can lead to non-hermetic behavior.   | Boolean | optional | True |
 
 
 <a id="#envs_for_log_level"></a>

@@ -1,9 +1,17 @@
 """Rules for running JavaScript programs under Bazel, as tools or with `bazel run` or `bazel test`.
 
-Load these with
+For example, this binary references the `acorn` npm package which was already linked
+using an API like `npm_link_all_packages`.
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+
+js_binary(
+    name = "bin",
+    # Reference the location where the acorn npm module was linked in the root Bazel package
+    data = ["//:node_modules/acorn"],
+    entry_point = "require_acorn.js",
+)
 ```
 """
 
@@ -160,6 +168,19 @@ _ATTRS = {
         values = _LOG_LEVELS.keys(),
         default = "error",
     ),
+    "patch_node_fs": attr.bool(
+        doc = """Patch the to Node.js `fs` API (https://nodejs.org/api/fs.html) for this node program
+        to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.
+
+        When enabled, `js_binary` patches the Node.js sync and async `fs` API functions `lstat`,
+        `readlink`, `realpath`, `readdir` and `opendir` so that the node program being
+        run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,
+        these patches prevent the program being run from resolving symlinks out of the sandbox.
+
+        When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
+        which can lead to non-hermetic behavior.""",
+        default = True,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -188,7 +209,6 @@ def _target_tool_short_path(path):
     return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
 def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args):
-    bash_bin = ctx.toolchains["@bazel_tools//tools/sh:toolchain_type"].path
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
 
@@ -213,6 +233,10 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             var = key,
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
         ))
+
+    if ctx.attr.patch_node_fs:
+        # Set patch node fs API env if not already set to allow js_run_binary to override
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__PATCH_NODE_FS", value = "1"))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
@@ -315,10 +339,43 @@ def _impl(ctx):
         log_prefix_rule_set = "aspect_rules_js",
         log_prefix_rule = "js_test" if ctx.attr.testonly else "js_binary",
     )
-    return DefaultInfo(
-        executable = launcher.executable,
-        runfiles = launcher.runfiles,
-    )
+    runfiles = launcher.runfiles
+
+    providers = []
+
+    if ctx.attr.testonly and ctx.configuration.coverage_enabled:
+        # We have to instruct rule implementers to have this attribute present.
+        if not hasattr(ctx.attr, "_lcov_merger"):
+            fail("_lcov_merger attribute is missing and coverage was requested")
+
+        # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
+        # See: https://github.com/bazelbuild/bazel/issues/4033
+        runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
+        providers = [
+            coverage_common.instrumented_files_info(
+                ctx,
+                source_attributes = ["data"],
+                # TODO: check if there is more extensions
+                # TODO: .ts should not be here since we ought to only instrument transpiled files?
+                extensions = [
+                    "mjs",
+                    "mts",
+                    "cjs",
+                    "cts",
+                    "ts",
+                    "js",
+                    "jsx",
+                    "tsx",
+                ],
+            ),
+        ]
+
+    return providers + [
+        DefaultInfo(
+            executable = launcher.executable,
+            runfiles = runfiles,
+        ),
+    ]
 
 js_binary_lib = struct(
     attrs = _ATTRS,
@@ -342,7 +399,13 @@ js_binary = rule(
 js_test = rule(
     doc = "Identical to js_binary, but usable under `bazel test`.",
     implementation = js_binary_lib.implementation,
-    attrs = js_binary_lib.attrs,
+    attrs = dict(js_binary_lib.attrs, **{
+        "_lcov_merger": attr.label(
+            executable = True,
+            default = Label("//js/private/coverage:merger"),
+            cfg = "exec",
+        ),
+    }),
     test = True,
     toolchains = js_binary_lib.toolchains,
 )

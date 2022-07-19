@@ -31,6 +31,126 @@ async function it(_, fn) {
 }
 
 describe('testing realpath', async () => {
+    await it('can handle empty, dot, undefined & null values', async () => {
+        const patchedFs = Object.assign({}, fs)
+        patchedFs.promises = Object.assign({}, fs.promises)
+
+        patcher(patchedFs, [process.cwd()])
+
+        // ---------------------------------------------------------------------
+        // empty string
+
+        assert.deepStrictEqual(
+            patchedFs.realpathSync(''),
+            process.cwd(),
+            'should handle an empty string'
+        )
+
+        assert.throws(() => {
+            patchedFs.realpathSync.native('')
+        }, 'should throw if empty string is passed')
+
+        assert.deepStrictEqual(
+            await util.promisify(patchedFs.realpath)(''),
+            process.cwd(),
+            'should handle an empty string'
+        )
+
+        let thrown
+        try {
+            await util.promisify(patchedFs.realpath.native)('')
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if empty string is passed')
+        }
+
+        // ---------------------------------------------------------------------
+        // '.'
+
+        assert.deepStrictEqual(
+            patchedFs.realpathSync('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        assert.deepStrictEqual(
+            patchedFs.realpathSync.native('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        assert.deepStrictEqual(
+            await util.promisify(patchedFs.realpath)('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        assert.deepStrictEqual(
+            await util.promisify(patchedFs.realpath.native)('.'),
+            process.cwd(),
+            "should handle '.'"
+        )
+
+        // ---------------------------------------------------------------------
+        // undefined
+
+        assert.throws(() => {
+            patchedFs.realpathSync(undefined)
+        }, 'should throw if undefined is passed')
+
+        assert.throws(() => {
+            patchedFs.realpathSync.native(undefined)
+        }, 'should throw if undefined is passed')
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath)(undefined)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if undefined is passed')
+        }
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath.native)(undefined)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if undefined is passed')
+        }
+
+        // ---------------------------------------------------------------------
+        // null
+
+        assert.throws(() => {
+            patchedFs.realpathSync(null)
+        }, 'should throw if null is passed')
+
+        assert.throws(() => {
+            patchedFs.realpathSync.native(null)
+        }, 'should throw if null is passed')
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath)(null)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if null is passed')
+        }
+
+        thrown = undefined
+        try {
+            await util.promisify(patchedFs.realpath.native)(null)
+        } catch (e) {
+            thrown = e
+        } finally {
+            if (!thrown) assert.fail('should throw if null is passed')
+        }
+    })
+
     await it('can resolve symlink in root', async () => {
         await withFixtures(
             {
@@ -133,6 +253,277 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'a', 'link'),
                     'should pretend symlink is in the root'
                 )
+            }
+        )
+    })
+
+    await it('can resolve symlink to a symlink in the sandbox if it has a corresponding location', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link2 to execroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link2')
+                )
+                // create symlink from execroot/link to execroot/link2
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'file'),
+                    path.join(fixturesDir, 'sandbox', 'file')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'sandbox', 'link2')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(fixturesDir, 'sandbox', 'link')
+                const filePath = path.join(fixturesDir, 'sandbox', 'file')
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(linkPath),
+                    filePath,
+                    'SYNC: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(linkPath),
+                    filePath,
+                    'SYNC.native: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(linkPath),
+                    filePath,
+                    'CB: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    filePath,
+                    'CB: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(linkPath),
+                    filePath,
+                    'Promise: should resolve the symlink the same because its within root'
+                )
+            }
+        )
+    })
+
+    await it('can resolve symlink to a symlink in the sandbox if there is no corresponding location in the sandbox but is a realpath outside', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: {},
+                otherroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link to otherroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'otherroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(fixturesDir, 'sandbox', 'link')
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(linkPath),
+                    linkPath,
+                    'SYNC: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(linkPath),
+                    linkPath,
+                    'SYNC.native: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(linkPath),
+                    linkPath,
+                    'CB: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    linkPath,
+                    'CB: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(linkPath),
+                    linkPath,
+                    'Promise: should resolve the symlink the same because its within root'
+                )
+            }
+        )
+    })
+
+    await it('realpath will stop resolving at the last hop with a corresponding path in the sandbox', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: {},
+                otherroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link2 to otherroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'otherroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link2')
+                )
+                // create symlink from execroot/link to execroot/link2
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link2'),
+                    path.join(fixturesDir, 'sandbox', 'link2')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(fixturesDir, 'sandbox', 'link')
+                const link2Path = path.join(fixturesDir, 'sandbox', 'link2')
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(linkPath),
+                    link2Path,
+                    'SYNC: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(linkPath),
+                    link2Path,
+                    'SYNC.native: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(linkPath),
+                    link2Path,
+                    'CB: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    link2Path,
+                    'CB: should resolve the symlink the same because its within root'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(linkPath),
+                    link2Path,
+                    'Promise: should resolve the symlink the same because its within root'
+                )
+            }
+        )
+    })
+
+    await it('cant resolve symlink to a symlink in the sandbox if it is dangling outside of the sandbox', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: {},
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/link to otherroot/file
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'otherroot', 'file'),
+                    path.join(fixturesDir, 'execroot', 'link')
+                )
+
+                // create sandbox
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'link'),
+                    path.join(fixturesDir, 'sandbox', 'link')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(fixturesDir, 'sandbox', 'link')
+
+                assert.throws(() => {
+                    patchedFs.realpathSync(linkPath)
+                }, "should throw because it's not a resolvable link")
+
+                assert.throws(() => {
+                    patchedFs.realpathSync.native(linkPath)
+                }, "should throw because it's not a resolvable link")
+
+                let thrown
+                try {
+                    await util.promisify(patchedFs.realpath)(linkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown) assert.fail('must throw einval error')
+                }
+
+                thrown = undefined
+                try {
+                    await util.promisify(patchedFs.realpath.native)(linkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown) assert.fail('must throw einval error')
+                }
+
+                thrown = undefined
+                try {
+                    await patchedFs.promises.realpath(linkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown) assert.fail('must throw einval error')
+                }
             }
         )
     })

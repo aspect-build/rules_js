@@ -4,6 +4,8 @@ load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_tests.bzl", "translate_lock_tests")
 load(":yaml_tests.bzl", "yaml_tests")
 load(":utils_tests.bzl", "utils_tests")
+load(":ini_test.bzl", "ini_tests")
+load(":pkg_glob_tests.bzl", "pkg_glob_tests")
 
 # gazelle:exclude *_checked.bzl
 
@@ -11,6 +13,10 @@ npm_link_all_packages(name = "node_modules")
 
 # Unit tests
 utils_tests(name = "test_utils")
+
+ini_tests(name = "test_ini")
+
+pkg_glob_tests(name = "test_pkg_glob")
 
 transitive_closure_tests(name = "test_transitive_closure")
 
@@ -31,13 +37,14 @@ write_source_files(
 filegroup(
     name = "build_some_node_modules",
     srcs = [
-        "node_modules/@plotly/regl",
-        "node_modules/bufferutil",
-        "node_modules/debug",
-        "node_modules/esbuild",
-        "node_modules/plotly.js",
-        "node_modules/regl",
-        "node_modules/webpack-bundle-analyzer",
+        ":node_modules/@plotly/regl",
+        ":node_modules/bufferutil",
+        ":node_modules/debug",
+        ":node_modules/esbuild",
+        ":node_modules/plotly.js",
+        ":node_modules/regl",
+        ":node_modules/webpack-bundle-analyzer",
+        ":node_modules/semver-first-satisfied",
         # intentionally don't include node_modules/unused
     ],
 )
