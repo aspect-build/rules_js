@@ -80,12 +80,9 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
         ):
             typings.append(src)
 
-    typings_depsets = [depset(typings)]
     files_depsets = [depset(output_srcs)]
 
     for dep in ctx.attr.deps:
-        if DeclarationInfo in dep:
-            typings_depsets.append(dep[DeclarationInfo].declarations)
         if DefaultInfo in dep:
             files_depsets.append(dep[DefaultInfo].files)
 
@@ -96,7 +93,6 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
         transitive_files = depset(transitive = files_depsets),
     )
     deps_runfiles = [d[DefaultInfo].default_runfiles for d in ctx.attr.deps]
-    decls = depset(transitive = typings_depsets)
 
     return [
         DefaultInfo(
@@ -104,10 +100,10 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
             runfiles = runfiles.merge_all(deps_runfiles),
         ),
         declaration_info(
-            declarations = decls,
+            declarations = depset(typings),
             deps = ctx.attr.deps,
         ),
-        OutputGroupInfo(types = decls),
+        OutputGroupInfo(types = typings),
     ]
 
 js_library_lib = struct(

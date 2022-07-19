@@ -3,6 +3,8 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@aspect_bazel_lib_host//:defs.bzl", "host")
 load("//js:defs.bzl", "js_binary")
 
+load(":js_library_test.bzl", "js_library_test_suite")
+
 ####################################################################################################
 # Write a js_binary launcher to the source tree so it is shell checked on commit
 
@@ -33,3 +35,5 @@ write_source_files(
         "shellcheck_launcher.sh": ":shell_launcher_sed",
     },
 )
+
+js_library_test_suite(name = "js_library_test")
