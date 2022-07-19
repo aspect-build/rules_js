@@ -370,10 +370,7 @@ def _gen_npm_imports(lockfile, attr):
             friendly_name not in attr.lifecycle_hooks_exclude
         )
 
-        lifecycle_hooks_env = []
-        for package in attr.lifecycle_hooks_envs:
-            if package == "*" or package == name or package == friendly_name or package == unfriendly_name:
-                lifecycle_hooks_env.extend(attr.lifecycle_hooks_envs[package])
+        lifecycle_hooks_env = _gather_values_from_matching_names(attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
 
         url = None
         if tarball:
