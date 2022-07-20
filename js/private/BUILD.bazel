@@ -12,6 +12,7 @@ exports_files(["js_binary.sh.tpl"])
 config_setting(
     name = "enable_runfiles",
     values = {"enable_runfiles": "true"},
+    visibility = ["//visibility:public"],
 )
 
 bzl_library(
