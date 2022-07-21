@@ -1,8 +1,9 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
-load(":runfiles.bzl", "js_image_layer")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 load("@io_bazel_rules_docker//contrib:test.bzl", "container_test")
+load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
+load(":js_image_layer.bzl", "js_image_layer")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -18,9 +19,19 @@ js_binary(
 
 # Image
 js_image_layer(
-    name = "layer",
+    name = "layers",
     binary = ":main",
     root = "/app",
+)
+
+container_layer(
+    name = "app_layer",
+    tars = [":layers/app.tar"],
+)
+
+container_layer(
+    name = "node_modules_layer",
+    tars = [":layers/node_modules.tar"],
 )
 
 container_image(
@@ -32,7 +43,10 @@ container_image(
     # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}.sh
     cmd = ["/app/main.sh"],
     entrypoint = ["bash"],
-    tars = [":layer.tar"],
+    layers = [
+        ":app_layer",
+        ":node_modules_layer",
+    ],
 )
 
 container_test(

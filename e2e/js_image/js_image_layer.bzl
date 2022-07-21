@@ -3,15 +3,8 @@
 load("@rules_pkg//:providers.bzl", "PackageFilegroupInfo", "PackageFilesInfo", "PackageSymlinkInfo")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@aspect_bazel_lib//lib:paths.bzl", "to_manifest_path")
 load("@rules_python//python:defs.bzl", "py_binary")
-
-def _runfile_path(ctx, file, runfiles_dir):
-    path = file.short_path
-    if path.startswith(".."):
-        return path.replace("..", runfiles_dir)
-    if not file.owner.workspace_name:
-        return "/".join([runfiles_dir, ctx.workspace_name, path])
-    return path
 
 _LAUNCHER_TMPL = """
 export BAZEL_BINDIR=.
@@ -29,6 +22,14 @@ def _write_laucher(ctx, executable_path):
 
     return launcher
 
+def _runfile_path(ctx, file, runfiles_dir):
+    return "/".join([runfiles_dir, to_manifest_path(ctx, file)])
+
+def _should_include(destination, include, exclude):
+    included = include in destination or include == ""
+    excluded = exclude in destination and exclude != ""
+    return included and not excluded
+
 def _runfiles_impl(ctx):
     default = ctx.attr.binary[DefaultInfo]
 
@@ -37,29 +38,36 @@ def _runfiles_impl(ctx):
     original_executable_path = executable_path.replace(".sh", "_.sh")
     launcher = _write_laucher(ctx, original_executable_path)
 
-    files = depset(transitive = [default.files, default.default_runfiles.files])
-    file_map = {
-        original_executable_path: executable,
-        executable_path: launcher,
-    }
+    file_map = {}
+
+    if _should_include(original_executable_path, ctx.attr.include, ctx.attr.exclude):
+        file_map[original_executable_path] = executable
+
+    if _should_include(executable_path, ctx.attr.include, ctx.attr.exclude):
+        file_map[executable_path] = launcher
 
     manifest = default.files_to_run.runfiles_manifest
     runfiles_dir = "/".join([ctx.attr.root, manifest.short_path.replace(manifest.basename, "")[:-1]])
 
+    files = depset(transitive = [default.files, default.default_runfiles.files])
+
     for file in files.to_list():
-        file_map[_runfile_path(ctx, file, runfiles_dir)] = file
+        destination = _runfile_path(ctx, file, runfiles_dir)
+        if _should_include(destination, ctx.attr.include, ctx.attr.exclude):
+            file_map[destination] = file
 
     # executable and launcher should not go into runfiles directory so we add it to files here
     files = depset([executable, launcher], transitive = [files])
 
     symlinks = []
 
-    # NOTE: pkg_tar is not capable of handling relative symlinks so they always have to be absolute
-    # NOTE: symlinks is different than root_symlinks. See: https://bazel.build/rules/rules#runfiles_symlinks for distinction between root_symlinks and symlinks
-    # and why they have to be handled differently.
+    # NOTE: symlinks is different than root_symlinks. See: https://bazel.build/rules/rules#runfiles_symlinks for distinction between
+    # root_symlinks and symlinks and why they have to be handled differently.
     for symlink in default.data_runfiles.symlinks.to_list():
         destination = "/".join([runfiles_dir, ctx.workspace_name, symlink.path])
-        if hasattr(file_map, "build_tar"):
+        if not _should_include(destination, ctx.attr.include, ctx.attr.exclude):
+            continue
+        if hasattr(file_map, destination):
             file_map.pop(destination)
         info = PackageSymlinkInfo(
             target = "/%s" % _runfile_path(ctx, symlink.target_file, runfiles_dir),
@@ -70,7 +78,9 @@ def _runfiles_impl(ctx):
 
     for symlink in default.data_runfiles.root_symlinks.to_list():
         destination = "/".join([runfiles_dir, symlink.path])
-        if hasattr(file_map, "build_tar"):
+        if not _should_include(destination, ctx.attr.include, ctx.attr.exclude):
+            continue
+        if hasattr(file_map, destination):
             file_map.pop(destination)
         info = PackageSymlinkInfo(
             target = "/%s" % _runfile_path(ctx, symlink.target_file, runfiles_dir),
@@ -93,11 +103,13 @@ def _runfiles_impl(ctx):
         DefaultInfo(files = files),
     ]
 
-expand_runfiles = rule(
+runfiles = rule(
     implementation = _runfiles_impl,
     attrs = {
         "binary": attr.label(mandatory = True),
         "root": attr.string(),
+        "include": attr.string(),
+        "exclude": attr.string(),
     },
 )
 
@@ -143,8 +155,6 @@ os.remove(manifest_path)
 with open(manifest_path, "w") as manifest_w:
     manifest_w.write(json.dumps(manifest))
 
-print(os.path.realpath(build_tar_path))
-
 r = subprocess.run([build_tar_path] + sys.argv[1:])
 sys.exit(r.returncode)
 """
@@ -165,6 +175,7 @@ def js_image_layer(name, binary, root = None, **kwargs):
         fail("use 'root' attribute instead of 'package_dir'.")
 
     entrypoint_name = "%s_build_tar_entrypoint.py" % name
+
     write_file(
         name = "%s.build_tar_entrypoint" % name,
         out = entrypoint_name,
@@ -183,17 +194,46 @@ def js_image_layer(name, binary, root = None, **kwargs):
         tags = ["manual"],
     )
 
-    expand_runfiles(
-        name = "%s.runfiles" % name,
-        binary = binary,
-        root = root,
+    runfiles_kwargs = {
+        "binary": binary,
+        "root": root,
+    }
+
+    pkg_tar_kwargs = dict(
+        kwargs,
+        # Be careful with this option. Leave it as is if you don't know what you are doing
+        strip_prefix = kwargs.pop("strip_prefix", "."),
+        build_tar = "%s.build_tar" % name,
+    )
+
+    runfiles(
+        name = "%s/app/runfiles" % name,
+        exclude = "/node_modules/",
+        **runfiles_kwargs
     )
 
     pkg_tar(
+        name = "%s/app" % name,
+        srcs = ["%s/app/runfiles" % name],
+        **pkg_tar_kwargs
+    )
+
+    runfiles(
+        name = "%s/node_modules/runfiles" % name,
+        include = "/node_modules/",
+        **runfiles_kwargs
+    )
+
+    pkg_tar(
+        name = "%s/node_modules" % name,
+        srcs = ["%s/node_modules/runfiles" % name],
+        **pkg_tar_kwargs
+    )
+
+    native.filegroup(
         name = name,
-        # Be careful with this option. Leave it as is if you don't know what you are doing
-        strip_prefix = kwargs.pop("strip_prefix", "."),
-        srcs = ["%s.runfiles" % name],
-        build_tar = "%s.build_tar" % name,
-        **kwargs
+        srcs = [
+            "%s/node_modules" % name,
+            "%s/app" % name,
+        ],
     )
