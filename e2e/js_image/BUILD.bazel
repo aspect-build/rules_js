@@ -22,6 +22,8 @@ js_image_layer(
     name = "layers",
     binary = ":main",
     root = "/app",
+    tags = [],
+    visibility = ["//visibility:__pkg__"],
 )
 
 container_layer(

@@ -12,7 +12,7 @@ source {executable_path}
 """
 
 def _write_laucher(ctx, executable_path):
-    launcher = ctx.actions.declare_file("launcher.sh")
+    launcher = ctx.actions.declare_file("%s_launcher.sh" % ctx.label.package)
 
     ctx.actions.write(
         output = launcher,
@@ -194,16 +194,23 @@ def js_image_layer(name, binary, root = None, **kwargs):
         tags = ["manual"],
     )
 
-    runfiles_kwargs = {
-        "binary": binary,
-        "root": root,
+    common_kwargs = {
+        "tags": kwargs.pop("tags", None),
+        "visibility": kwargs.pop("visibility", None),
     }
+
+    runfiles_kwargs = dict(
+        common_kwargs,
+        binary = binary,
+        root = root,
+    )
 
     pkg_tar_kwargs = dict(
         kwargs,
         # Be careful with this option. Leave it as is if you don't know what you are doing
         strip_prefix = kwargs.pop("strip_prefix", "."),
         build_tar = "%s.build_tar" % name,
+        **common_kwargs
     )
 
     runfiles(
@@ -236,4 +243,5 @@ def js_image_layer(name, binary, root = None, **kwargs):
             "%s/node_modules" % name,
             "%s/app" % name,
         ],
+        **common_kwargs
     )
