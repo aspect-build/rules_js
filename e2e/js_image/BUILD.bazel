@@ -1,0 +1,58 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image")
+load("@io_bazel_rules_docker//contrib:test.bzl", "container_test")
+load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
+load(":js_image_layer.bzl", "js_image_layer")
+
+npm_link_all_packages(name = "node_modules")
+
+js_binary(
+    name = "main",
+    args = ["foo"],
+    data = [
+        "src/ascii.art",
+        "//:node_modules/chalk",
+    ],
+    entry_point = "src/main.js",
+)
+
+# Image
+js_image_layer(
+    name = "layers",
+    binary = ":main",
+    root = "/app",
+    tags = [],
+    visibility = ["//visibility:__pkg__"],
+)
+
+container_layer(
+    name = "app_layer",
+    tars = [":layers/app.tar"],
+)
+
+container_layer(
+    name = "node_modules_layer",
+    tars = [":layers/node_modules.tar"],
+)
+
+container_image(
+    name = "image",
+    architecture = "amd64",  # or arm64
+
+    # Since js_binary depends on bash we have to bring in a base image that has bash
+    base = "@debian_amd64//image",  # or "@debian_arm64//image", if you are on an arm machine
+    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}.sh
+    cmd = ["/app/main.sh"],
+    entrypoint = ["bash"],
+    layers = [
+        ":app_layer",
+        ":node_modules_layer",
+    ],
+)
+
+container_test(
+    name = "image_test",
+    configs = [":smoketest.yaml"],
+    image = ":image",
+)
