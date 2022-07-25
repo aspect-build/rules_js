@@ -36,3 +36,31 @@ Image efficiency score: 100 %
 
 As seen in the [dive](https://github.com/wagoodman/dive) output the largest layer is our base image which is `118 MB` followed by `78 MB` which is the dependencies and finally `97 kB` which is the app itself.
 Additionally, we get a `100%` efficiency score which means there are no duplicate or `whiteout` files to waste space.
+
+## Selecting the right NodeJS interpreter
+
+By default `js_binary` gets the nodejs interpreter for the host platform. However, this is not the case when including the js_binary in container_image thanks to transitions. See [#3373](https://github.com/bazelbuild/rules_nodejs/pull/3373) and [#1963](https://github.com/bazelbuild/rules_docker/pull/1963) for how this works.
+
+Toolchain selection is controlled by `operating_system` and `architecture` attribute on `container_image` which is `linux/amd64` by default.
+
+NodeJS interpreter for a different platform can be obtained by changing `operating_system` and `architecture`.
+
+Here is what the final image looks like when the platform is `linux/arm64`
+
+app
+|-- main.sh
+|-- main.sh.runfiles
+| |-- **main**
+| | |-- main.sh
+| | |-- node*modules
+| | | `-- chalk -> /app/main.sh.runfiles/__main__/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk | | `-- src
+| | |-- ascii.art
+| | `-- main.js | |-- aspect_rules_js | | `-- js
+| | `-- private | | `-- node-patches
+| | |-- fs.js
+| | `-- register.js | |-- bazel_tools | | `-- tools
+| | `-- bash | | `-- runfiles
+| | `-- runfiles.bash | `-- nodejs_linux_arm64
+| `-- bin | `-- nodejs
+| `-- bin | `-- node
+`-- main*.sh

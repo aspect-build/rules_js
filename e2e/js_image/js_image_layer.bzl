@@ -6,12 +6,15 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@aspect_bazel_lib//lib:paths.bzl", "to_manifest_path")
 load("@rules_python//python:defs.bzl", "py_binary")
 
+# BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
+# See: https://github.com/aspect-build/rules_js#running-nodejs-programs for why this is needed.
 _LAUNCHER_TMPL = """
 export BAZEL_BINDIR=.
 source {executable_path}
 """
 
 def _write_laucher(ctx, executable_path):
+    "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
     launcher = ctx.actions.declare_file("%s_launcher.sh" % ctx.label.package)
 
     ctx.actions.write(
@@ -113,6 +116,21 @@ runfiles = rule(
     },
 )
 
+# pkg_tar has poor support for symlinks due to bazel not providing enough information about symlinks.
+#
+# ```starlark
+#   actual_file = ctx.actions.declare_file("thefile.txt")
+#   symlink_file = ctx.actions.declare_file("this_is_a_symlink.txt")
+#   ctx.actions.symlink(symlink_file, target_file = actual_file)
+# ```
+# to determine a file is file or directory pkg_tar checks `is_directory` if it is false then it makes the assumption
+# that the file is in fact is a file which not true for `symlink_file` above. this is where pkg_tar fails to build
+# a correct tar file.
+# In order to fix this, manifest written pkg_tar should be fixed by looking for files that are symlink instead of file.
+
+# TODO(thesayyn): remove this once pkg_tar is fixed.
+#
+# See: https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1190494335
 BUILD_TAR = """
 import os
 import sys
@@ -160,7 +178,12 @@ sys.exit(r.returncode)
 """
 
 def js_image_layer(name, binary, root = None, **kwargs):
-    """Creates a tar file containing runfiles from the binary
+    """Creates two tar files `:<name>/app.tar` and `:<name>/node_modules.tar`
+
+    Final directory tree will look like below
+
+    /{root of js_image_layer}/{package_name() if any}/{name of js_binary}.sh -> entrypoint
+    /{root of js_image_layer}/{package_name() if any}/{name of js_binary}.sh.runfiles -> runfiles directory (almost identical to one bazel lays out)
 
     Args:
         name: name for this target. Not reflected anywhere in the final tar.
