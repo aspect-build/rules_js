@@ -7,7 +7,11 @@ exports_files(
     visibility = ["//docs:__pkg__"],
 )
 
-exports_files(["js_binary.sh.tpl"])
+exports_files([
+    "js_binary.sh.tpl",
+    "node_wrapper.bat",
+    "node_wrapper.sh",
+])
 
 config_setting(
     name = "enable_runfiles",

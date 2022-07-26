@@ -185,13 +185,21 @@ _ATTRS = {
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
     ),
+    "_node_wrapper_sh": attr.label(
+        default = Label("//js/private:node_wrapper.sh"),
+        allow_single_file = True,
+    ),
+    "_node_wrapper_bat": attr.label(
+        default = Label("//js/private:node_wrapper.bat"),
+        allow_single_file = True,
+    ),
     "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
         default = ["@aspect_rules_js//js/private/node-patches:fs.js"],
     ),
-    "_node_patches_entry": attr.label(
+    "_node_patches": attr.label(
         allow_single_file = True,
         default = "@aspect_rules_js//js/private/node-patches:register.js",
     ),
@@ -208,10 +216,7 @@ _NODE_OPTION = """NODE_OPTIONS+=(\"{value}\")"""
 def _target_tool_short_path(path):
     return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
-def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args):
-    node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
-    launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
-
+def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, is_windows):
     envs = []
     for (key, value) in ctx.attr.env.items():
         envs.append(_ENV_SET.format(
@@ -263,6 +268,23 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
 
     fixed_args_expanded = [expand_variables(ctx, fixed_arg, attribute_name = "fixed_args") for fixed_arg in fixed_args]
 
+    if is_windows:
+        node_wrapper = ctx.actions.declare_file("%s_node_wrapper/node.bat" % ctx.label.name)
+        ctx.actions.expand_template(
+            template = ctx.file._node_wrapper_bat,
+            output = node_wrapper,
+            substitutions = {},
+            is_executable = True,
+        )
+    else:
+        node_wrapper = ctx.actions.declare_file("%s_node_wrapper/node" % ctx.label.name)
+        ctx.actions.expand_template(
+            template = ctx.file._node_wrapper_sh,
+            output = node_wrapper,
+            substitutions = {},
+            is_executable = True,
+        )
+
     launcher_subst = {
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
@@ -270,12 +292,14 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
-        "{{node}}": _target_tool_short_path(node_bin.target_tool_path),
+        "{{node_patches}}": ctx.file._node_patches.short_path,
+        "{{node_wrapper}}": node_wrapper.short_path,
+        "{{node}}": _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path),
         "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
         "{{workspace_name}}": ctx.workspace_name,
-        "{{node_patches_entry_short_path}}": ctx.file._node_patches_entry.short_path,
     }
 
+    launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = launcher,
@@ -283,7 +307,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         is_executable = True,
     )
 
-    return launcher
+    return launcher, node_wrapper
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = []):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -308,16 +332,17 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
 
     output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows)
 
-    bash_launcher = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args)
+    bash_launcher, node_wrapper = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
     all_files = []
     all_files.extend(output_data_files)
     all_files.extend(ctx.files._runfiles_lib)
-    all_files.append(ctx.file._node_patches_entry)
+    all_files.append(ctx.file._node_patches)
     all_files.extend(ctx.files._node_patches_files)
     all_files.append(output_entry_point)
     all_files.append(bash_launcher)
+    all_files.append(node_wrapper)
     all_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
 
     runfiles = ctx.runfiles(

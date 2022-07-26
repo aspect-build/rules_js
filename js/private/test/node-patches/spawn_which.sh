@@ -1,1 +1,0 @@
-realpath `which node`

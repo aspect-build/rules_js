@@ -14,6 +14,7 @@ TOOLCHAINS_NAMES = [
     "node14",
     "node16",
 ]
+
 TOOLCHAINS_VERSIONS = [
     select({
         "@bazel_tools//src/conditions:linux_x86_64": "@node14_linux_amd64//:node_toolchain",
@@ -45,10 +46,17 @@ TOOLCHAINS_VERSIONS = [
 [
     js_test(
         name = "spawn_test_%s" % toolchain_name,
-        args = ["$(location //js/private/test/node-patches:spawn_print.js)", "$(location //js/private/test/node-patches:spawn_which.sh)"],
+        args = [
+            "$(rootpath //js/private/test/node-patches:spawn_node_path.js)",
+            "$(rootpath //js/private/test/node-patches:spawn_node_path.sh)",
+            "$(rootpath //js/private/test/node-patches:spawn_patch_depth.js)",
+            "$(rootpath //js/private/test/node-patches:spawn_patch_depth.sh)",
+        ],
         data = [
-            "//js/private/test/node-patches:spawn_print.js",
-            "//js/private/test/node-patches:spawn_which.sh",
+            "//js/private/test/node-patches:spawn_node_path.js",
+            "//js/private/test/node-patches:spawn_node_path.sh",
+            "//js/private/test/node-patches:spawn_patch_depth.js",
+            "//js/private/test/node-patches:spawn_patch_depth.sh",
         ],
         entry_point = "spawn.js",
         patch_node_fs = True,
