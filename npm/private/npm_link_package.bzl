@@ -186,8 +186,7 @@ If set, takes precendance over the package name in the src npm_link_package_stor
     ),
 }
 
-def _make_symlink(ctx, symlink_path, target_file):
-    files = []
+def _make_symlink(ctx, symlink_path, target_file, files, symlinks):
     if ctx.attr.allow_unresolved_symlinks:
         symlink = ctx.actions.declare_symlink(symlink_path)
         ctx.actions.symlink(
@@ -195,14 +194,14 @@ def _make_symlink(ctx, symlink_path, target_file):
             target_path = relative_file(target_file.path, symlink.path),
         )
         files.append(target_file)
+        symlinks.append(symlink)
     else:
         symlink = ctx.actions.declare_file(symlink_path)
         ctx.actions.symlink(
             output = symlink,
             target_file = target_file,
         )
-    files.append(symlink)
-    return files
+        files.append(symlink)
 
 def _impl_store(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -219,6 +218,7 @@ def _impl_store(ctx):
 
     virtual_store_directory = None
     direct_files = []
+    direct_symlinks = []
     direct_ref_deps = {}
 
     if ctx.attr.src:
@@ -253,7 +253,7 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                 for dep_alias in dep_aliases:
                     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                     dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_alias)
-                    direct_files.extend(_make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+                    _make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory, files = direct_files, symlinks = direct_symlinks)
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm depedency will create the dep symlinks for this dep;
@@ -300,17 +300,23 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                         for dep_ref_dep_alias in dep_ref_dep_aliases:
                             # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                             dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
-                            direct_files.extend(_make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
+                            _make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory, files = direct_files, symlinks = direct_symlinks)
 
     direct_files = depset(direct = direct_files)
     files_depsets = [direct_files]
-    runfiles = ctx.runfiles(transitive_files = direct_files)
+    if ctx.attr.allow_unresolved_symlinks:
+        runfiles = ctx.runfiles(
+            transitive_files = direct_files,
+            declared_symlinks = direct_symlinks,
+        )
+    else:
+        runfiles = ctx.runfiles(transitive_files = direct_files)
     for dep in ctx.attr.deps:
         files_depsets.append(dep[DefaultInfo].files)
         runfiles = runfiles.merge(dep[DefaultInfo].data_runfiles)
 
     result = [
-        DefaultInfo(files = depset(transitive = files_depsets), runfiles = runfiles),
+        DefaultInfo(files = depset(direct_symlinks, transitive = files_depsets), runfiles = runfiles),
         # Always assume that packages provide typings, so we don't need to use an action to
         # inspect the package.json#typings field or search for .d.ts files in the package.
         declaration_info(
@@ -342,11 +348,12 @@ def _impl_direct(ctx):
     package = ctx.attr.package if ctx.attr.package else ctx.attr.src[_StoreInfo].package
 
     output_files = []
+    output_symlinks = []
 
     # symlink the package's path in the virtual store to the root of the node_modules
     # "node_modules/{package}" so it is available as a direct dependency
     root_symlink_path = paths.join("node_modules", package)
-    output_files = _make_symlink(ctx, root_symlink_path, virtual_store_directory)
+    _make_symlink(ctx, root_symlink_path, virtual_store_directory, files = output_files, symlinks = output_symlinks)
 
     result = [
         DefaultInfo(
