@@ -47,6 +47,7 @@ NodeJS interpreter for a different platform can be obtained by changing `operati
 
 Here is what the final image looks like when the platform is `linux/arm64`
 
+```
 app
 |-- main.sh
 |-- main.sh.runfiles
@@ -64,3 +65,4 @@ app
 | `-- bin | `-- nodejs
 | `-- bin | `-- node
 `-- main*.sh
+```
