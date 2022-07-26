@@ -192,7 +192,7 @@ def _make_symlink(ctx, symlink_path, target_file):
         symlink = ctx.actions.declare_symlink(symlink_path)
         ctx.actions.symlink(
             output = symlink,
-            target_path = relative_file(target_file, symlink.path),
+            target_path = relative_file(target_file.path, symlink.path),
         )
         files.append(target_file)
     else:
