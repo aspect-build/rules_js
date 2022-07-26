@@ -39,7 +39,7 @@ if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS
     STDERR_CAPTURE=$(mktemp)
 fi
 
-LOG_PREFIX="aspect_rules_js[js_binary]"
+export JS_BINARY__LOG_PREFIX="aspect_rules_js[js_binary]"
 
 function logf_stderr {
     local format_string="$1\n"
@@ -56,9 +56,9 @@ function logf_stderr {
 function logf_fatal {
     if [ "${JS_BINARY__LOG_FATAL:-}" ]; then
         if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "FATAL: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+            printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
         else
-            printf "FATAL: %s: " "$LOG_PREFIX" >&2
+            printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         fi
         logf_stderr "$@"
     fi
@@ -67,9 +67,9 @@ function logf_fatal {
 function logf_error {
     if [ "${JS_BINARY__LOG_ERROR:-}" ]; then
         if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "ERROR: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+            printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
         else
-            printf "ERROR: %s: " "$LOG_PREFIX" >&2
+            printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         fi
         logf_stderr "$@"
     fi
@@ -78,9 +78,9 @@ function logf_error {
 function logf_warn {
     if [ "${JS_BINARY__LOG_WARN:-}" ]; then
         if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "WARN: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+            printf "WARN: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
         else
-            printf "WARN: %s: " "$LOG_PREFIX" >&2
+            printf "WARN: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         fi
         logf_stderr "$@"
     fi
@@ -89,9 +89,9 @@ function logf_warn {
 function logf_info {
     if [ "${JS_BINARY__LOG_INFO:-}" ]; then
         if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "INFO: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+            printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
         else
-            printf "INFO: %s: " "$LOG_PREFIX" >&2
+            printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         fi
         logf_stderr "$@"
     fi
@@ -100,9 +100,9 @@ function logf_info {
 function logf_debug {
     if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
         if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "DEBUG: %s: " "$LOG_PREFIX" >>"$STDERR_CAPTURE"
+            printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
         else
-            printf "DEBUG: %s: " "$LOG_PREFIX" >&2
+            printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         fi
         logf_stderr "$@"
     fi
@@ -266,18 +266,14 @@ if [[ "$PWD" == *"/bazel-out/"* ]]; then
     rest="${PWD#*"$bazel_out"}"
     index=$(( ${#PWD} - ${#rest} - ${#bazel_out} ))
     if [ ${index} -lt 0 ]; then
-        printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$LOG_PREFIX" >&2
+        printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
         exit 1
     fi
     execroot="${PWD:0:$index}"
-    node="$PWD/../nodejs_linux_amd64/bin/nodejs/bin/node"
-    entry_point="$PWD/js/private/test/shellcheck.js"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
     execroot="$PWD"
-    node="$RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
-    entry_point="$RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
         logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
 run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
@@ -292,16 +288,35 @@ aspect_rules_js README https://github.com/aspect-build/rules_js#running-nodejs-p
     cd "$BAZEL_BINDIR"
 fi
 
-if [ ! -f "$node" ]; then
-    logf_fatal "the node binary '%s' not found in runfiles" "$node"
-    exit 1
-fi
-if [ ! -x "$node" ]; then
-    logf_fatal "the node binary '%s' is not executable" "$node"
-    exit 1
-fi
+entry_point="$RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
 if [ ! -f "$entry_point" ]; then
     logf_fatal "the entry_point '%s' not found in runfiles" "$entry_point"
+    exit 1
+fi
+
+export JS_BINARY__NODE_BINARY="$RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
+if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
+    logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
+    exit 1
+fi
+if [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
+    logf_fatal "node binary '%s' is not executable" "$JS_BINARY__NODE_BINARY"
+    exit 1
+fi
+
+export JS_BINARY__NODE_WRAPPER="$RUNFILES/aspect_rules_js/js/private/test/shellcheck_launcher_node_wrapper/node"
+if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
+    logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
+    exit 1
+fi
+if [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
+    logf_fatal "node wrapper '%s' is not executable" "$JS_BINARY__NODE_WRAPPER"
+    exit 1
+fi
+
+export JS_BINARY__NODE_PATCHES="$RUNFILES/aspect_rules_js/js/private/node-patches/register.js"
+if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
+    logf_fatal "node patches '%s' not found in runfiles" "$JS_BINARY__NODE_PATCHES"
     exit 1
 fi
 
@@ -326,12 +341,8 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     esac
 done
 
-# Run node patches if needed
-export JS_BINARY__FS_PATH_ROOTS="$execroot:$RUNFILES"
-if [ "${JS_BINARY__PATCH_NODE_FS:-}" ] && [ "${JS_BINARY__PATCH_NODE_FS}" != "0" ] && [ "${JS_BINARY__FS_PATH_ROOTS:-}" ]; then
-    logf_debug "adding node fs patches with roots: %s" "$JS_BINARY__FS_PATH_ROOTS"
-    NODE_OPTIONS+=( "--require" "$RUNFILES/aspect_rules_js/js/private/node-patches/register.js" )
-fi
+# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper
+export JS_BINARY__FS_PATCH_ROOTS="$execroot:$RUNFILES"
 
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
@@ -339,8 +350,8 @@ if [ "${COVERAGE_DIR:-}" ]; then
   export NODE_V8_COVERAGE=${COVERAGE_DIR}
 fi
 
-# Put bazel managed node on the path
-PATH="$(dirname "$node"):$PATH"
+# Put the node wrapper directory on the path so that child processes find it first
+PATH="$(dirname "$JS_BINARY__NODE_WRAPPER"):$PATH"
 export PATH
 
 # Debug logs
@@ -371,6 +382,7 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     logf_debug "binary target COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
     logf_debug "binary target WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
     logf_debug "binary target BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
+    logf_debug "binary target node binary %s" "${JS_BINARY__NODE_BINARY:-}"
 fi
 
 # Info logs
@@ -379,6 +391,8 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
         logf_info "BAZEL_TARGET %s" "${BAZEL_TARGET:-}"
     fi
     logf_info "binary target %s" "${JS_BINARY__TARGET:-}"
+    logf_info "RUNFILES %s" "$RUNFILES"
+    logf_info "execroot %s" "$execroot"
     logf_info "PWD %s" "$PWD"
 fi
 
@@ -387,19 +401,19 @@ fi
 # ==============================================================================
 
 if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-    logf_info "$(echo -n "running" "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
+    logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
 set +e
 
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
+    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
 elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
+    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
 elif [ "${STDERR_CAPTURE:-}" ]; then
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
+    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
 else
-    "$node" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
+    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 fi
 
 # ==============================================================================
