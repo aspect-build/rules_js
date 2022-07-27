@@ -51,18 +51,30 @@ Here is what the final image looks like when the platform is `linux/arm64`
 app
 |-- main.sh
 |-- main.sh.runfiles
-| |-- **main**
-| | |-- main.sh
-| | |-- node*modules
-| | | `-- chalk -> /app/main.sh.runfiles/__main__/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk | | `-- src
-| | |-- ascii.art
-| | `-- main.js | |-- aspect_rules_js | | `-- js
-| | `-- private | | `-- node-patches
-| | |-- fs.js
-| | `-- register.js | |-- bazel_tools | | `-- tools
-| | `-- bash | | `-- runfiles
-| | `-- runfiles.bash | `-- nodejs_linux_arm64
-| `-- bin | `-- nodejs
-| `-- bin | `-- node
-`-- main*.sh
+|   |-- __main__
+|   |   |-- main.sh
+|   |   |-- node_modules
+|   |   |   `-- chalk -> /app/main.sh.runfiles/__main__/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk
+|   |   `-- src
+|   |       |-- ascii.art
+|   |       `-- main.js
+|   |-- aspect_rules_js
+|   |   `-- js
+|   |       `-- private
+|   |           `-- node-patches
+|   |               |-- fs.js
+|   |               `-- register.js
+|   |-- bazel_tools
+|   |   `-- tools
+|   |       `-- bash
+|   |           `-- runfiles
+|   |               `-- runfiles.bash
+|   `-- nodejs_linux_arm64
+|       `-- bin
+|           `-- nodejs
+|               `-- bin
+|                   `-- node
+`-- main_.sh
+
+17 directories, 9 files
 ```
