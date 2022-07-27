@@ -19,6 +19,25 @@ bzl_library(
 )
 
 bzl_library(
+    name = "libs",
+    srcs = ["libs.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//js/private:js_binary",
+        "//js/private:js_library",
+    ],
+)
+
+bzl_library(
+    name = "providers",
+    srcs = ["providers.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//js/private:js_info",
+    ],
+)
+
+bzl_library(
     name = "repositories",
     srcs = ["repositories.bzl"],
     visibility = ["//visibility:public"],

@@ -7,7 +7,8 @@ load("@aspect_bazel_lib//lib:paths.bzl", "to_manifest_path")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
-# See: https://github.com/aspect-build/rules_js#running-nodejs-programs for why this is needed.
+# See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
+# for why this is needed.
 _LAUNCHER_TMPL = """
 export BAZEL_BINDIR=.
 source {executable_path}

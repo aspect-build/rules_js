@@ -14,6 +14,7 @@ tsc(
     outs = [
         "two.js",
     ],
+    include_declarations = True,
 )
 
 js_test(

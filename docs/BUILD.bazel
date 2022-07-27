@@ -16,6 +16,11 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
+    name = "js_filegroup",
+    bzl_library_target = "//js/private:js_filegroup",
+)
+
+stardoc_with_diff_test(
     name = "npm_package",
     bzl_library_target = "//npm/private:npm_package",
 )

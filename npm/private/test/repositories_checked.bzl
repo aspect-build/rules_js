@@ -1698,7 +1698,8 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
-            "examples/lib": ["acorn"],
+            "examples/npm_package/packages/pkg_a": ["acorn"],
+            "examples/npm_package/packages/pkg_b": ["acorn"],
         },
         package = "acorn",
         version = "8.7.1",
@@ -2318,6 +2319,21 @@ def npm_repositories():
             "has-flag": ["4.0.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__chalk__5.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "examples/npm_package/libs/lib_a": ["chalk"],
+        },
+        package = "chalk",
+        version = "5.0.1",
+        integrity = "sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==",
+        transitive_closure = {
+            "chalk": ["5.0.1"],
         },
     )
 
@@ -10752,7 +10768,8 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
-            "examples/lib": ["uuid"],
+            "examples/npm_package/packages/pkg_a": ["uuid"],
+            "examples/npm_package/packages/pkg_b": ["uuid"],
         },
         package = "uuid",
         version = "8.3.2",

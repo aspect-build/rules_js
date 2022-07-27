@@ -109,7 +109,7 @@ js_test(
 ###############################
 # Use case 4
 # A first-party library which we want to run as a program.
-# This relies on a `require("@mycorp/mylib")` which is a package within this monorepo.
+# This relies on @mycorp/pkg-a and @mycorp/pkg-b which are packages within this monorepo.
 
 write_file(
     name = "write4",
@@ -117,35 +117,58 @@ write_file(
     content = [
         """require('fs').writeFileSync(
             process.argv[2],
-            require("@mycorp/mylib").toAst("1")
+            require(process.argv[3]).toAst("1")
         )""",
     ],
 )
 
 js_binary(
     name = "bin4",
-    data = [":node_modules/@mycorp/mylib"],
+    data = [
+        ":node_modules/@mycorp/pkg-a",
+        "//:node_modules/@mycorp/pkg-b",
+    ],
     entry_point = "case4.js",
 )
 
 js_run_binary(
-    name = "run4",
-    args = ["out4-dist/out4"],
+    name = "run4-a",
+    args = [
+        "out4-dist/out4-a",
+        "@mycorp/pkg-a",
+    ],
     chdir = package_name(),
     out_dirs = ["out4-dist"],
     tool = ":bin4",
 )
 
 directory_path(
-    name = "out4",
-    directory = ":run4",
-    path = "out4",
+    name = "out4-a",
+    directory = ":run4-a",
+    path = "out4-a",
 )
 
 diff_test(
-    name = "test4",
+    name = "test4-a",
     file1 = "//examples:expected_one_ast.json",
-    file2 = ":out4",
+    file2 = ":out4-a",
+)
+
+js_run_binary(
+    name = "run4-b",
+    outs = ["out4-b"],
+    args = [
+        "out4-b",
+        "@mycorp/pkg-b",
+    ],
+    chdir = package_name(),
+    tool = ":bin4",
+)
+
+diff_test(
+    name = "test4-b",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = ":out4-b",
 )
 
 #######################################

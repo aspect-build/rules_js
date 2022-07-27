@@ -19,6 +19,7 @@ load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load(":js_binary_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -31,40 +32,6 @@ Bazel option to see more detail about the selection.
 This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
 """
-
-_LOG_LEVELS = {
-    "fatal": 1,
-    "error": 2,
-    "warn": 3,
-    "info": 4,
-    "debug": 5,
-}
-
-def envs_for_log_level(log_level):
-    """Returns a list environment variables to set for a given log level
-
-    Args:
-        log_level: The log level string value
-
-    Returns:
-        A list of environment variables to set to turn on the js_binary runtime
-        logs for the given log level. Typically, they are each set to "1".
-    """
-    if log_level not in _LOG_LEVELS.keys():
-        fail("log_level must be one of {} but got {}".format(_LOG_LEVELS.keys(), log_level))
-    envs = []
-    log_level_numeric = _LOG_LEVELS[log_level]
-    if log_level_numeric >= _LOG_LEVELS["fatal"]:
-        envs.append("JS_BINARY__LOG_FATAL")
-    if log_level_numeric >= _LOG_LEVELS["error"]:
-        envs.append("JS_BINARY__LOG_ERROR")
-    if log_level_numeric >= _LOG_LEVELS["warn"]:
-        envs.append("JS_BINARY__LOG_WARN")
-    if log_level_numeric >= _LOG_LEVELS["info"]:
-        envs.append("JS_BINARY__LOG_INFO")
-    if log_level_numeric >= _LOG_LEVELS["debug"]:
-        envs.append("JS_BINARY__LOG_DEBUG")
-    return envs
 
 _ATTRS = {
     "chdir": attr.string(
@@ -154,7 +121,7 @@ _ATTRS = {
         Log from are written to stderr. They will be supressed on success when running as the tool
         of a js_run_binary when silent_on_success is True. In that case, they will be shown
         only on a build failure along with the stdout & stderr of the node tool being run.""",
-        values = _LOG_LEVELS.keys(),
+        values = LOG_LEVELS.keys(),
         default = "error",
     ),
     "patch_node_fs": attr.bool(
@@ -168,6 +135,24 @@ _ATTRS = {
 
         When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
         which can lead to non-hermetic behavior.""",
+        default = True,
+    ),
+    "include_transitive_sources": attr.bool(
+        doc = """When True, 'transitive_sources' from 'JsInfo' providers in data targets are included in the runfiles of the target.""",
+        default = True,
+    ),
+    "include_declarations": attr.bool(
+        doc = """When True, 'declarations' and 'transitive_declarations' from 'JsInfo' providers in data targets are included in the runfiles of the target.
+
+        Defaults to false since declarations are generally not needed at runtime and introducing them could slow down developer round trip
+        time due to having to generate typings on source file changes.""",
+        default = False,
+    ),
+    "include_npm_linked_packages": attr.bool(
+        doc = """When True, files in 'npm_linked_packages' and 'transitive_npm_linked_packages' from 'JsInfo' providers in data targets are included in the runfiles of the target.
+
+        'transitive_files' from 'NpmPackageStoreInfo' providers in data targets are also included in the runfiles of the target.
+        """,
         default = True,
     ),
     "_launcher_template": attr.label(
@@ -319,24 +304,31 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
     bash_launcher, node_wrapper = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    all_files = []
-    all_files.extend(ctx.files.data)
-    all_files.extend(ctx.files._runfiles_lib)
-    all_files.append(ctx.file._node_patches)
-    all_files.extend(ctx.files._node_patches_files)
-    all_files.append(entry_point)
-    all_files.append(bash_launcher)
-    all_files.append(node_wrapper)
-    all_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+    files = [
+        ctx.file._node_patches,
+        entry_point,
+        bash_launcher,
+        node_wrapper,
+    ]
+    files.extend(ctx.files.data)
+    files.extend(ctx.files._runfiles_lib)
+    files.extend(ctx.files._node_patches_files)
+    files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+
+    files.extend(gather_files_from_js_providers(
+        targets = ctx.attr.data,
+        include_transitive_sources = ctx.attr.include_transitive_sources,
+        include_declarations = ctx.attr.include_declarations,
+        include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
+    ))
 
     runfiles = ctx.runfiles(
-        files = all_files,
-        transitive_files = depset(all_files),
-    )
-    runfiles = runfiles.merge_all([
-        dep[DefaultInfo].default_runfiles
-        for dep in ctx.attr.data
+        files = files,
+    ).merge_all([
+        target[DefaultInfo].default_runfiles
+        for target in ctx.attr.data
     ])
+
     return struct(
         executable = launcher,
         runfiles = runfiles,

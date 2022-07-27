@@ -20,6 +20,26 @@ bzl_library(
 )
 
 bzl_library(
+    name = "libs",
+    srcs = ["libs.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//npm/private:npm_package",
+    ],
+)
+
+bzl_library(
+    name = "providers",
+    srcs = ["providers.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//npm/private:npm_linked_package_info",
+        "//npm/private:npm_package_info",
+        "//npm/private:npm_package_store_info",
+    ],
+)
+
+bzl_library(
     name = "npm_import",
     srcs = ["npm_import.bzl"],
     visibility = ["//visibility:public"],

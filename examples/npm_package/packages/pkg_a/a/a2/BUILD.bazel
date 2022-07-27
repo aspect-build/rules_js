@@ -1,0 +1,32 @@
+load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
+load("//js:defs.bzl", "js_library")
+
+# Generate the js and d.ts files for this js_library from typescript code
+typescript_bin.tsc(
+    name = "compile",
+    srcs = [
+        "a2.ts",
+        "index.ts",
+        "tsconfig.json",
+    ],
+    outs = [
+        "a2.d.ts",
+        "a2.js",
+        "index.d.ts",
+        "index.js",
+    ],
+    args = [
+        "-p",
+        "tsconfig.json",
+    ],
+    chdir = package_name(),
+)
+
+# The sources of this js_library will be included transitively in the terminal
+# //examples/npm_package/packages/pkg_a npm_package for this package.
+js_library(
+    name = "lib",
+    # You can pass generated sources to a js_library
+    srcs = [":compile"],
+    visibility = ["//examples/npm_package:__subpackages__"],
+)

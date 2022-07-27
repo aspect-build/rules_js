@@ -14,7 +14,8 @@ load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load("//js/private:js_binary.bzl", _js_binary_envs_for_log_level = "envs_for_log_level")
+load(":js_binary_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
+load(":js_filegroup.bzl", _js_filegroup = "js_filegroup")
 
 def js_run_binary(
         name,
@@ -30,6 +31,9 @@ def js_run_binary(
         exit_code_out = None,
         silent_on_success = True,
         copy_srcs_to_bin = True,
+        include_transitive_sources = True,
+        include_declarations = False,
+        include_npm_linked_packages = True,
         log_level = None,
         mnemonic = "JsRunBinary",
         progress_message = None,
@@ -37,7 +41,7 @@ def js_run_binary(
         stamp = 0,
         patch_node_fs = True,
         **kwargs):
-    """Wrapper around @aspect_bazel_lib run_binary that adds convienence attributes for using a js_binary tool.
+    """Wrapper around @aspect_bazel_lib 'run_binary' that adds convienence attributes for using a 'js_binary' tool.
 
     This rule does not require Bash `native.genrule`.
 
@@ -105,9 +109,15 @@ def js_run_binary(
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
-        log_level: Set the logging level of the js_binary tool.
+        include_transitive_sources: see 'js_filegroup' documentation
 
-            This overrides the log level set on the js_binary tool target.
+        include_declarations: see 'js_filegroup' documentation
+
+        include_npm_linked_packages: see 'js_filegroup' documentation
+
+        log_level: Set the logging level of the 'js_binary' tool.
+
+            This overrides the log level set on the 'js_binary' tool target.
 
         mnemonic: A one-word description of the action, for example, CppCompile or GoLink.
 
@@ -176,16 +186,33 @@ def js_run_binary(
     if data != None:
         fail("Use srcs instead of data in js_run_binary: https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md#js_run_binary-srcs.")
 
-    # Copy srcs to bin
     extra_srcs = []
+
+    # Hoist js provider files to DefaultInfo
+    make_js_filegroup_target = (include_transitive_sources or
+                                include_declarations or
+                                include_npm_linked_packages)
+    if make_js_filegroup_target:
+        js_filegroup_name = "{}_js_filegroup".format(name)
+        _js_filegroup(
+            name = js_filegroup_name,
+            srcs = srcs,
+            include_transitive_sources = include_transitive_sources,
+            include_declarations = include_declarations,
+            include_npm_linked_packages = include_npm_linked_packages,
+            tags = kwargs.get("tags"),
+        )
+        extra_srcs.append(":{}".format(js_filegroup_name))
+
+    # Copy srcs to bin
     if copy_srcs_to_bin:
-        copy_to_bin_name = "%s_copy_srcs_to_bin" % name
+        copy_to_bin_name = "{}_copy_srcs_to_bin".format(name)
         _copy_to_bin(
             name = copy_to_bin_name,
             srcs = srcs,
             tags = kwargs.get("tags"),
         )
-        extra_srcs = [":%s" % copy_to_bin_name]
+        extra_srcs.append(":{}".format(copy_to_bin_name))
 
     # Automatically add common and useful make variables to the environment for js_run_binary build targets
     extra_env = {
@@ -226,7 +253,7 @@ def js_run_binary(
 
     # Configure log_level if specified
     if log_level:
-        for log_level_env in _js_binary_envs_for_log_level(log_level):
+        for log_level_env in _envs_for_log_level(log_level):
             extra_env[log_level_env] = "1"
 
     if not stdout and not stderr and not exit_code_out and (len(outs) + len(out_dirs) < 1):

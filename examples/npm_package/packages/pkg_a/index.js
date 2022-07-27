@@ -3,6 +3,7 @@
  */
 const acorn = require('acorn')
 const { v4: uuid } = require('uuid')
+const { a } = require('./a')
 
 function toAst(program) {
     return JSON.stringify(acorn.parse(program, { ecmaVersion: 2020 })) + '\n'
@@ -12,4 +13,9 @@ function getAcornVersion() {
     return acorn.version
 }
 
-module.exports = { toAst, getAcornVersion, uuid }
+module.exports = {
+    toAst,
+    getAcornVersion,
+    uuid,
+    a,
+}

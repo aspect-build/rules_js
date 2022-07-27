@@ -16,9 +16,9 @@ bzl_library(
     ],
     deps = [
         ":npm_package_info",
+        "//js:providers",
         "@aspect_bazel_lib//lib:copy_to_directory",
         "@bazel_skylib//lib:dicts",
-        "@rules_nodejs//nodejs:bzl",
     ],
 )
 
@@ -47,8 +47,8 @@ bzl_library(
         ":npm_linked_package_info",
         ":npm_package_store_info",
         ":utils",
+        "//js:providers",
         "@bazel_skylib//lib:paths",
-        "@rules_nodejs//nodejs:bzl",
     ],
 )
 
@@ -65,7 +65,6 @@ bzl_library(
         ":utils",
         "@aspect_bazel_lib//lib:copy_directory",
         "@bazel_skylib//lib:paths",
-        "@rules_nodejs//nodejs:bzl",
     ],
 )
 

@@ -1,0 +1,19 @@
+load("//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+# An example of a library that is use directly and not via a npm_package.
+# This library could be used by build steps of packages as a "dev dependency"
+# but its sources won't be included in the terminal npm_package output
+# since its usage is not leaked into the public API of that package.
+js_library(
+    name = "lib_a",
+    srcs = [
+        "index.js",
+    ],
+    visibility = ["//examples/npm_package:__subpackages__"],
+    deps = [
+        ":node_modules/chalk",
+    ],
+)

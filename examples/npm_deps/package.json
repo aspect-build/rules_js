@@ -4,7 +4,7 @@
         "@aspect-test/a": "5.0.2",
         "@aspect-test/c": "2.0.2",
         "@gregmagolan/test-b": "0.0.2",
-        "@mycorp/mylib": "workspace:*",
+        "@mycorp/pkg-a": "workspace:*",
         "@rollup/plugin-commonjs": "21.1.0",
         "debug": "3.2.7",
         "mobx-react": "7.3.0",

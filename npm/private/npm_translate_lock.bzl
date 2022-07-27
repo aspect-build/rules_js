@@ -575,7 +575,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
     link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", _npm_linked_packages = "npm_linked_packages")"""]
+load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
     npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
@@ -905,14 +905,14 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     # Generate catch all & scoped npm_linked_packages target
     defs_bzl_body.append("""
     for scope, scoped_targets in scope_targets.items():
-        _npm_linked_packages(
+        _js_library(
             name = "{}/{}".format(name, scope),
             srcs = scoped_targets,
             tags = ["manual"],
             visibility = ["//visibility:public"],
         )
 
-    _npm_linked_packages(
+    _js_library(
         name = name,
         srcs = link_targets,
         tags = ["manual"],

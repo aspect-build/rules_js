@@ -1,7 +1,9 @@
 e2e/
 examples/assert_lockfile_up_to_date/node_modules/
 examples/js_binary/node_modules/
-examples/lib/node_modules/
+examples/npm_package/libs/lib_a/node_modules/
+examples/npm_package/packages/pkg_a/node_modules/
+examples/npm_package/packages/pkg_b/node_modules/
 examples/webpack_cli/node_modules/
 examples/macro/node_modules/
 examples/npm_deps/node_modules/

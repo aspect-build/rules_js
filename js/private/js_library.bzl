@@ -1,6 +1,5 @@
-"""`js_library` is similar to [`filegroup`](https://docs.bazel.build/versions/main/be/general.html#filegroup); there are no Bazel actions to run.
-
-It only groups JS files together, and propagates their dependencies, along with a DeclarationInfo so that it can be a dep of ts_project.
+"""js_library groups together JS sources and arranges them and their transitive and npm dependencies into a provided
+`JsInfo`. There are no Bazel actions to run.
 
 For example, this `BUILD` file groups a pair of `.js/.d.ts` files along with the `package.json`.
 The latter is needed because it contains a `typings` key that allows downstream
@@ -19,35 +18,96 @@ js_library(
     ],
 )
 ```
+
+| This is similar to [`py_library`](https://docs.bazel.build/versions/main/be/python.html#py_library) which depends on
+| Python sources and provides a `PyInfo`.
 """
 
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_files_to_bin_actions")
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
+load(":js_info.bzl", "JsInfo", "js_info")
+load(":js_library_helpers.bzl", "gather_npm_linked_packages", "gather_npm_package_stores", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 
-_DOC = """Copies all sources to the output tree and expose some files with DeclarationInfo.
+_DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
+and derivative rule sets.
 
-Can be used as a dep for rules that expect a DeclarationInfo such as ts_project."""
+Declaration files are handled separately from sources since they are generally not needed at
+runtime and build rules, such as ts_project, are optimal in their build graph if they only depend
+on declarations from 'deps' since these they don't need the JavaScript source files from deps to
+typecheck.
+
+Linked npm dependences are also handled separately from sources since not all rules require them and it
+is optimal for these rules to not depend on them in the build graph.
+
+NB: 'js_library' copies all source files to the output tree before providing them in JsInfo. See
+https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155/docs#javascript
+for more context on why we do this."""
 
 _ATTRS = {
-    "srcs": attr.label_list(allow_files = True),
-    "deps": attr.label_list(allow_files = True),
+    "srcs": attr.label_list(
+        doc = """Source files that are included in this library.
+
+        This includes all your checked-in code and any generated source files.
+        """,
+        allow_files = True,
+    ),
+    "deps": attr.label_list(
+        doc = """Dependencies of this library.
+
+        The default outputs and runfiles of targets in the data attribute should appear in the '*.runfiles' area of any
+        executable which is output by or has a runtime dependency on this target.
+
+        This may include other js_library targets or other targets that provide.
+        """,
+        providers = [JsInfo],
+    ),
+    "data": attr.label_list(
+        doc = """Runtime dependencies to include in binaries/tests that depend on this library.
+        
+        If this list contains linked npm packages, npm package store targets or other targets that provide 'JsInfo',
+        'NpmPackageStoreInfo' providers are gathered from 'JsInfo'. This is done directly from 'npm_package_stores' and
+        'transitive_npm_package_stores' fields of these and for linked npm package targets, from the underlying
+        npm_package_store target(s) that back the links via 'npm_linked_packages' and 'transitive_npm_linked_packages'.
+
+        Gathered 'NpmPackageStoreInfo' providers are used downstream as direct dependencies when linking a downstream
+        'npm_package' target with 'npm_link_package'.
+        """,
+        allow_files = True,
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-def _js_library_impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+def _gather_sources_and_declarations(ctx, targets, is_windows = False):
+    """Gathers sources and declarations from a list of targets
 
-    typings = []
+    Args:
+        ctx: the rule context
 
-    for file in ctx.files.srcs:
-        if ctx.label.package != file.owner.package:
-            msg = """
+        targets: List of targets to gather sources and declarations from.
 
-Expected to find file {file_basename} in {this_package}, but instead it is in {file_package}.
+            These typically come from the `srcs` and/or `data` attributes of a rule
 
-All srcs in a js_library must be in the same package as the js_library target.
+        is_windows: If true, an cmd.exe actions are created when copying files to the output tree so there is no bash dependency
 
-Either move {file_basename} to {this_package}, or create a js_library
+    Returns:
+        Sources & declaration files lists in the sequence (sources, declarations)
+    """
+    sources = []
+    declarations = []
+
+    for target in targets:
+        for file in target[DefaultInfo].files.to_list():
+            if file.is_source:
+                if ctx.label.package != file.owner.package:
+                    msg = """
+
+Expected to find source file {file_basename} in {this_package}, but instead it is in {file_package}.
+
+All source files in rules_js rules must be in the same package as the target.
+
+See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155/docs#javascript
+for more context on why this is required.
+
+Either move {file_basename} to {this_package}, or add a 'js_library'
 target in {file_basename}'s package and add that target to the deps of {this_target}:
 
     buildozer 'new_load @aspect_rules_js//js:defs.bzl js_library' {file_package}:__pkg__
@@ -55,70 +115,119 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
     buildozer 'add srcs {file_basename}' {file_package}:{new_target_name}
     buildozer 'add visibility {this_package}:__pkg__' {file_package}:{new_target_name}
     buildozer 'remove srcs {file_package}:{file_basename}' {this_target}
-    buildozer 'add deps {file_package}:{new_target_name}' {this_target}
+    buildozer 'add srcs {file_package}:{new_target_name}' {this_target}
 
 """.format(
-                file_basename = file.basename,
-                file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
-                new_target_name = file.basename.replace(".", "_"),
-                this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
-                this_target = ctx.label,
-            )
-            fail(msg)
+                        file_basename = file.basename,
+                        file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
+                        new_target_name = file.basename.replace(".", "_"),
+                        this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
+                        this_target = ctx.label,
+                    )
+                    fail(msg)
+                file = copy_file_to_bin_action(ctx, file, is_windows = is_windows)
 
-    output_srcs = copy_files_to_bin_actions(ctx, ctx.files.srcs, is_windows = is_windows)
+            if file.is_directory:
+                # assume a directory contains declarations since we can't know that it doesn't
+                declarations.append(file)
+                sources.append(file)
+            elif (
+                file.path.endswith(".d.ts") or
+                file.path.endswith(".d.ts.map") or
+                file.path.endswith(".d.mts") or
+                file.path.endswith(".d.mts.map") or
+                file.path.endswith(".d.cts") or
+                file.path.endswith(".d.cts.map")
+            ):
+                declarations.append(file)
+            elif file.path.endswith("/package.json"):
+                # package.json may be required to resolve declarations with the "typings" key
+                declarations.append(file)
+                sources.append(file)
+            else:
+                sources.append(file)
 
-    for src in output_srcs:
-        if src.is_directory:
-            # assume a directory contains typings since we can't know that it doesn't
-            typings.append(src)
-        elif (
-            src.path.endswith(".d.ts") or
-            src.path.endswith(".d.ts.map") or
-            # package.json may be required to resolve "typings" key
-            src.path.endswith("/package.json")
-        ):
-            typings.append(src)
+    # sources
+    sources.extend([
+        item
+        for target in targets
+        if JsInfo in target and hasattr(target[JsInfo], "sources")
+        for item in target[JsInfo].sources
+    ])
+    sources = [file for file in sources if file]
 
-    files_depsets = [depset(output_srcs)]
+    # declarations
+    declarations.extend([
+        item
+        for target in targets
+        if JsInfo in target and hasattr(target[JsInfo], "declarations")
+        for item in target[JsInfo].declarations
+    ])
+    declarations = [file for file in declarations if file]
 
-    for dep in ctx.attr.deps:
-        if DefaultInfo in dep:
-            files_depsets.append(dep[DefaultInfo].files)
+    return (sources, declarations)
 
-    runfiles = ctx.runfiles(
-        files = output_srcs,
-        # We do not include typings_depsets in the runfiles because that would cause type-check actions to occur
-        # in every development workflow.
-        transitive_files = depset(transitive = files_depsets),
+def _js_library_impl(ctx):
+    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+
+    sources, declarations = _gather_sources_and_declarations(
+        ctx = ctx,
+        targets = ctx.attr.srcs,
+        is_windows = is_windows,
     )
-    deps_runfiles = [d[DefaultInfo].default_runfiles for d in ctx.attr.deps]
+
+    transitive_sources = gather_transitive_sources(
+        sources = sources,
+        targets = ctx.attr.srcs + ctx.attr.deps,
+    )
+
+    transitive_declarations = gather_transitive_declarations(
+        declarations = declarations,
+        targets = ctx.attr.srcs + ctx.attr.deps,
+    )
+
+    npm_linked_packages = gather_npm_linked_packages(
+        srcs = ctx.attr.srcs,
+        deps = ctx.attr.deps,
+    )
+
+    npm_package_stores = gather_npm_package_stores(
+        targets = ctx.attr.data,
+    )
+
+    runfiles = gather_runfiles(
+        ctx = ctx,
+        sources = transitive_sources,
+        data = ctx.attr.data,
+        deps = ctx.attr.srcs + ctx.attr.deps,
+    )
 
     return [
+        js_info(
+            declarations = declarations,
+            npm_linked_packages = npm_linked_packages.direct,
+            npm_package_stores = npm_package_stores.direct,
+            sources = sources,
+            transitive_declarations = transitive_declarations,
+            transitive_npm_linked_packages = npm_linked_packages.transitive,
+            transitive_npm_package_stores = npm_package_stores.transitive,
+            transitive_sources = transitive_sources,
+        ),
         DefaultInfo(
-            files = depset(transitive = files_depsets),
-            runfiles = runfiles.merge_all(deps_runfiles),
+            files = depset(sources),
+            runfiles = runfiles,
         ),
-        declaration_info(
-            # Add direct declarations including those from srcs targets that have a DeclarationInfo.
-            # Do not add the transitive_declarations here; that is handled by deps below.
-            declarations = depset(typings, transitive = [
-                target[DeclarationInfo].declarations
-                for target in ctx.attr.srcs
-                if DeclarationInfo in target
-            ]),
-            # Look in both deps and sources for transitive DeclarationInfos so that
-            # when a js_library is used to wrap a rules such as ts_project we get the
-            # transitive declarations via the target passed to srcs.
-            deps = ctx.attr.deps + ctx.attr.srcs,
+        OutputGroupInfo(
+            transitive_sources = depset(transitive_sources),
+            declarations = depset(declarations),
+            transitive_declarations = depset(transitive_declarations),
         ),
-        OutputGroupInfo(types = typings),
     ]
 
 js_library_lib = struct(
     attrs = _ATTRS,
     implementation = _js_library_impl,
-    provides = [DefaultInfo, DeclarationInfo],
+    provides = [DefaultInfo, JsInfo, OutputGroupInfo],
 )
 
 js_library = rule(

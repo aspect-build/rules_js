@@ -10,14 +10,23 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_action", "copy_to_directory_lib")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
+load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
-_DOC = """A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a NpmPackageInfo.
+_DOC = """A rule that packages sources into a directory (a tree artifact) and provides an 'NpmPackageInfo'.
 
-This target can be used as the src attribute to npm_link_package.
+This target can be used as the 'src' attribute to 'npm_link_package'.
 
-A DeclarationInfo is also provided so that the target can be used as an input to rules that expect one such as ts_project."""
+'npm_package' makes use of 'copy_to_directory'
+(https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md) under the hood,
+adopting its API and its copy action using composition. However, unlike copy_to_directory,
+npm_package includes transitive_sources and transitive_declarations files from JsInfo providers in srcs.
+
+The default 'include_srcs_packages', [".", "./**"], prevents files from outside of the target's
+package and subpackages from being included.
+
+The default 'exclude_srcs_patterns', of ["node_modules/**", "**/node_modules/**"],
+"""
 
 # Pull in all copy_to_directory attributes except for exclude_prefixes
 copy_to_directory_lib_attrs = dict(copy_to_directory_lib.attrs)
@@ -43,6 +52,66 @@ If unset, a npm_link_package that references this npm_package must define the pa
 """,
         default = "0.0.0",
     ),
+    "include_srcs_packages": attr.string_list(
+        default = [".", "./**"],
+        doc = """List of Bazel packages (with glob support) to include in output directory.
+
+        Glob patterns `**`, `*` and `?` are supported. See `glob_match` documentation for
+        more details on how to use glob patterns:
+        https://github.com/aspect-build/bazel-lib/blob/main/docs/glob_match.md.
+
+        Files and directories in srcs are only copied to the output directory if
+        the Bazel package of the file or directory matches one of the patterns specified.
+
+        Forward slashes (`/`) should be used as path separators.
+
+        A "." value expands to the target's package path (`ctx.label.package`).
+        A "./**" value expands to the target's package path followed by a slash and a
+        globstar (`"{{}}/**".format(ctx.label.package)`).
+
+        Defaults to [".", "./**"] which includes sources target's package and subpackages.
+
+        Files and directories that have matching Bazel packages are subject to subsequent filters and
+        transformations to determine if they are copied and what their path in the output
+        directory will be.
+
+        See `copy_to_directory_action` documentation for list of order of filters and transformations:
+        https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md#copy_to_directory.
+        """,
+    ),
+    "exclude_srcs_patterns": attr.string_list(
+        default = [
+            "node_modules/**",
+            "**/node_modules/**",
+        ],
+        doc = """List of paths (with glob support) to exclude from output directory.
+
+        Glob patterns `**`, `*` and `?` are supported. See `glob_match` documentation for
+        more details on how to use glob patterns:
+        https://github.com/aspect-build/bazel-lib/blob/main/docs/glob_match.md.
+
+        Files and directories in srcs are not copied to the output directory if their output
+        directory path, after applying `root_paths`, matches one of the patterns specified.
+
+        Patterns do not look into files within source directory or generated directory (TreeArtifact)
+        targets since matches are performed in Starlark. To use `include_srcs_patterns` on files
+        within directories you can use the `make_directory_paths` helper to specify individual files inside
+        directories in `srcs`. This restriction may be fixed in a future release by performing matching
+        inside the copy action instead of in Starlark.
+
+        Forward slashes (`/`) should be used as path separators.
+
+        Defaults to ["node_modules/**", "**/node_modules/**"] which excludes all node_modules folders
+        from the output directory.
+
+        Files and directories that do not have matching output directory paths are subject to subsequent
+        filters and transformations to determine if they are copied and what their path in the output
+        directory will be.
+
+        See `copy_to_directory_action` documentation for list of order of filters and transformations:
+        https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md#copy_to_directory.
+        """,
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 })
 
@@ -51,18 +120,38 @@ def _impl(ctx):
 
     dst = ctx.actions.declare_directory(ctx.attr.out if ctx.attr.out else ctx.attr.name)
 
-    # include direct declaration files from DeclarationInfo of srcs; not transitive
-    additional_files_depset = depset(transitive = [
-        target[DeclarationInfo].declarations
+    # include all transitive sources and declarations in the package
+    additional_files = [
+        item
         for target in ctx.attr.srcs
-        if DeclarationInfo in target
-    ])
+        if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
+        for item in target[JsInfo].transitive_sources
+    ] + [
+        item
+        for target in ctx.attr.srcs
+        if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
+        for item in target[JsInfo].transitive_declarations
+    ]
+
+    # include runfiles from srcs
+    for target in ctx.attr.srcs:
+        for file in target[DefaultInfo].default_runfiles.files.to_list():
+            additional_files.append(file)
+
+    # forward all transitive npm_package_stores
+    npm_package_stores = [
+        item
+        for target in ctx.attr.srcs
+        if JsInfo in target
+        if hasattr(target[JsInfo], "transitive_npm_package_stores")
+        for item in target[JsInfo].transitive_npm_package_stores
+    ]
 
     copy_to_directory_action(
         ctx,
         srcs = ctx.attr.srcs,
         dst = dst,
-        additional_files = additional_files_depset.to_list(),
+        additional_files = additional_files,
         root_paths = ctx.attr.root_paths,
         include_external_repositories = ctx.attr.include_external_repositories,
         include_srcs_packages = ctx.attr.include_srcs_packages,
@@ -80,21 +169,19 @@ def _impl(ctx):
     return [
         DefaultInfo(
             files = depset([dst]),
-            runfiles = ctx.runfiles([dst]),
         ),
-        declaration_info(depset([dst])),
         NpmPackageInfo(
-            label = ctx.label,
             package = ctx.attr.package,
             version = ctx.attr.version,
             directory = dst,
+            npm_package_stores = npm_package_stores,
         ),
     ]
 
 npm_package_lib = struct(
     attrs = _ATTRS,
     implementation = _impl,
-    provides = [DefaultInfo, DeclarationInfo, NpmPackageInfo],
+    provides = [DefaultInfo, NpmPackageInfo],
 )
 
 npm_package = rule(

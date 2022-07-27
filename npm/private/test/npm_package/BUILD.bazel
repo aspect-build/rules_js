@@ -1,15 +1,16 @@
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//npm:defs.bzl", "npm_package")
-load(":lib.bzl", "lib")
+load("//js:defs.bzl", "js_library")
 
-lib(
+js_library(
     name = "lib_a",
-    srcs = [":index.js"],
-    decl = [":index.d.ts"],
+    srcs = [
+        ":index.d.ts",
+        ":index.js",
+    ],
 )
 
-# npm_package should copy DefaultInfo files and DeclarationInfo files
 npm_package(
     name = "pkg_a",
     srcs = [":lib_a"],
