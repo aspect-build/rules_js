@@ -1,15 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//examples/webpack_cli:webpack-cli/package_json.bzl", "bin")
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-
-copy_to_bin(
-    name = "files",
-    srcs = [
-        "package.json",
-        "webpack.config.js",
-    ],
-)
 
 npm_link_all_packages(
     name = "node_modules",
@@ -28,6 +19,7 @@ js_library(
     name = "lib",
     srcs = [
         "index.js",
+        "package.json",
     ],
     deps = [
         ":node_modules/mathjs",
@@ -37,15 +29,15 @@ js_library(
 bin.webpack_cli(
     name = "bundle",
     srcs = [
-        ":files",
+        "webpack.config.js",
         ":lib",
-    ],
-    args = [
-        "--config webpack.config.js",
     ],
     outs = [
         "dist/main.js",
     ],
-    log_level = "debug",
+    args = [
+        "--config webpack.config.js",
+    ],
     chdir = package_name(),
+    log_level = "debug",
 )
