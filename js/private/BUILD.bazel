@@ -33,6 +33,7 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
+        "//npm:defs",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:directory_path",
         "@aspect_bazel_lib//lib:expand_make_vars",
@@ -50,6 +51,7 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
+        "//npm:defs",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@rules_nodejs//nodejs:bzl",
     ],

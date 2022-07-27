@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":npm_link_package.bzl", _npm_link_package_store_lib = "npm_link_package_store_lib")
-load(":npm_package.bzl", "NpmPackageInfo")
+load(":npm_package_info.bzl", "NpmPackageInfo")
 
 _INTERNAL_ATTRS_STORE = dicts.add(_npm_link_package_store_lib.attrs, {
     "src": attr.label(

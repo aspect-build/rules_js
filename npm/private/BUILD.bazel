@@ -15,6 +15,9 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
+        ":npm_linked_package_store_deps_info",
+        ":npm_linked_package_store_info",
+        ":npm_package_info",
         "@aspect_bazel_lib//lib:copy_to_directory",
         "@bazel_skylib//lib:dicts",
         "@rules_nodejs//nodejs:bzl",
@@ -29,7 +32,9 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
-        ":npm_package",
+        ":npm_linked_package_direct_info",
+        ":npm_linked_package_store_info",
+        ":npm_package_info",
         ":utils",
         "@aspect_bazel_lib//lib:copy_directory",
         "@aspect_bazel_lib//lib:paths",
@@ -79,6 +84,34 @@ bzl_library(
     srcs = ["utils.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [":yaml"],
+)
+
+bzl_library(
+    name = "npm_package_info",
+    srcs = ["npm_package_info.bzl"],
+    visibility = ["//npm:__subpackages__"],
+)
+
+bzl_library(
+    name = "npm_linked_package_direct_info",
+    srcs = ["npm_linked_package_direct_info.bzl"],
+    visibility = [
+        "//npm:__subpackages__",
+    ],
+)
+
+bzl_library(
+    name = "npm_linked_package_store_info",
+    srcs = ["npm_linked_package_store_info.bzl"],
+    visibility = [
+        "//npm:__subpackages__",
+    ],
+)
+
+bzl_library(
+    name = "npm_linked_package_store_deps_info",
+    srcs = ["npm_linked_package_store_deps_info.bzl"],
+    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(

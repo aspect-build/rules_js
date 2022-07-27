@@ -11,16 +11,9 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_action", "copy_to_directory_lib")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
-
-NpmPackageInfo = provider(
-    doc = "A provider that carries the output directory (a TreeArtifact) of an npm package which contains the packages sources along with the package name and version",
-    fields = {
-        "label": "the label of the target the created this provider",
-        "package": "name of this node package",
-        "version": "version of this node package",
-        "directory": "the output directory (a TreeArtifact) that contains the package sources",
-    },
-)
+load(":npm_package_info.bzl", "NpmPackageInfo")
+load(":npm_linked_package_store_deps_info.bzl", "NpmLinkedPackageStoreDepsInfo")
+load(":npm_linked_package_store_info.bzl", "NpmLinkedPackageStoreInfo")
 
 _DOC = """A rule that packages sources into a TreeArtifact or forwards a tree artifact and provides a NpmPackageInfo.
 
@@ -28,7 +21,29 @@ This target can be used as the src attribute to npm_link_package.
 
 A DeclarationInfo is also provided so that the target can be used as an input to rules that expect one such as ts_project."""
 
-_ATTRS = dicts.add({
+def _npm_linked_package_deps_aspect_impl(target, ctx):
+    deps = []
+    if hasattr(ctx.rule.attr, "npm_linked_package_deps"):
+        for target in ctx.rule.attr.npm_linked_package_deps:
+            if NpmLinkedPackageStoreInfo in target:
+                deps.append(target[NpmLinkedPackageStoreInfo])
+            if NpmLinkedPackageStoreDepsInfo in target:
+                deps.extend(target[NpmLinkedPackageStoreDepsInfo].deps)
+    return NpmLinkedPackageStoreDepsInfo(deps = deps)
+
+_npm_linked_package_deps_aspect = aspect(
+    doc = "Accumulates NpmLinkedPackageStoreInfo providers and exports them with a NpmLinkedPackageStoreDepsInfo provider",
+    implementation = _npm_linked_package_deps_aspect_impl,
+    attr_aspects = ["npm_linked_package_deps"],
+)
+
+_ATTRS = dicts.add(copy_to_directory_lib.attrs, {
+    "srcs": attr.label_list(
+        allow_files = True,
+        doc = """Files and/or directories or targets that provide DirectoryPathInfo to copy
+        into the output directory.""",
+        aspects = [_npm_linked_package_deps_aspect],
+    ),
     "package": attr.string(
         doc = """The package name. If set, should match the `name` field in the `package.json` file for this package.
 
@@ -48,8 +63,20 @@ If unset, a npm_link_package target that references this npm_package must define
 """,
         default = "0.0.0",
     ),
+    "npm_linked_package_deps": attr.label_list(
+        doc = """Direct npm dependencies to link with this npm package.
+
+        These can be direct npm links targets from any directly linked npm package such as //:node_modules/foo
+        or virtual store npm link targets such as //.aspect_rules_js/node_modules/foo/1.2.3.
+
+        When a direct npm link target is passed, the underlying virtual store target is used. In other words,
+        the direct link itself is not used but rather the virtual store that is backing it that is linked as a
+        direct dependency of this npm package when this npm package is linked downstream.
+        """,
+        providers = [NpmLinkedPackageStoreInfo],
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
-}, copy_to_directory_lib.attrs)
+})
 
 def _impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -58,10 +85,16 @@ def _impl(ctx):
 
     additional_files_depsets = []
 
-    # include direct declaration files from DeclarationInfo of srcs; not transitive
+    npm_linked_package_deps = ctx.attr.npm_linked_package_deps[:]
+
     for src in ctx.attr.srcs:
+        # include direct declaration files from DeclarationInfo of srcs; not transitive
         if DeclarationInfo in src:
             additional_files_depsets.append(src[DeclarationInfo].declarations)
+
+        # gather additional direct npm dependencies to link with this package from srcs
+        if NpmLinkedPackageStoreDepsInfo in src:
+            npm_linked_package_deps.extend(src[NpmLinkedPackageStoreDepsInfo].deps)
 
     copy_to_directory_action(
         ctx,
@@ -90,6 +123,7 @@ def _impl(ctx):
             package = ctx.attr.package,
             version = ctx.attr.version,
             directory = dst,
+            npm_linked_package_deps = npm_linked_package_deps,
         ),
     ]
 

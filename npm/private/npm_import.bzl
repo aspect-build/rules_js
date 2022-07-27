@@ -61,7 +61,7 @@ def npm_link_imported_package_store(
         }}),
     )
 
-    # virtual store target with transitive closure of all node package dependencies
+    # virtual store target with transitive closure of all npm package dependencies
     _npm_link_package_store(
         name = store_target_name,
         src = None if {transitive_closure_pattern} else "{npm_package_target}",

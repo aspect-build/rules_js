@@ -13,7 +13,11 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//npm/private:npm_link_package",
+        "//npm/private:npm_linked_package_direct_info",
+        "//npm/private:npm_linked_package_store_deps_info",
+        "//npm/private:npm_linked_package_store_info",
         "//npm/private:npm_package",
+        "//npm/private:npm_package_info",
     ],
 )
 

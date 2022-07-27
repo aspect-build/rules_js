@@ -4,24 +4,14 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
+load(":npm_linked_package_store_info.bzl", "NpmLinkedPackageStoreInfo")
+load(":npm_linked_package_direct_info.bzl", "NpmLinkedPackageDirectInfo")
+load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":utils.bzl", "utils")
-load(":npm_package.bzl", "NpmPackageInfo")
 
-_StoreInfo = provider(
-    doc = "Internal use only",
-    fields = {
-        "label": "the label of the npm_link_package_store target the created this provider",
-        "root_package": "package that this node package store is linked at",
-        "package": "name of this node package",
-        "version": "version of this node package",
-        "ref_deps": "list of dependency ref targets",
-        "virtual_store_directory": "the TreeArtifact of this node package's virtual store location",
-    },
-)
+_DOC_STORE = """Defines a npm package that is linked into a node_modules tree.
 
-_DOC_STORE = """Defines a node package that is linked into a node_modules tree.
-
-The node package is linked with a pnpm style symlinked node_modules output tree.
+The npm package is linked with a pnpm style symlinked node_modules output tree.
 
 The term "package" is defined at
 <https://nodejs.org/docs/latest-v16.x/api/packages.html>
@@ -33,7 +23,7 @@ Npm may also support a symlinked node_modules structure called
 https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 """
 
-_DOC_DIRECT = """Defines a node package that is linked into a node_modules tree as a direct dependency.
+_DOC_DIRECT = """Defines a npm package that is linked into a node_modules tree as a direct dependency.
 
 This is used in co-ordination with the npm_link_package_store rule that links into the
 node_modules/.apsect_rules_js virtual store with a pnpm style symlinked node_modules output tree.
@@ -56,7 +46,7 @@ _ATTRS_STORE = {
         mandatory = True,
     ),
     "deps": attr.label_keyed_string_dict(
-        doc = """Other node packages store link targets one depends on mapped to the name to link them under in this packages deps.
+        doc = """Other npm packages store link targets one depends on mapped to the name to link them under in this packages deps.
 
         This should include *all* modules the program may need at runtime.
 
@@ -132,7 +122,7 @@ _ATTRS_STORE = {
         > In contrast, Bazel makes it possible to make builds hermetic, which means that
         > all dependencies of a program must be declared when running in Bazel's sandbox.
         """,
-        providers = [_StoreInfo],
+        providers = [NpmLinkedPackageStoreInfo],
     ),
     "package": attr.string(
         doc = """The package name to link to.
@@ -164,7 +154,7 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
 _ATTRS_DIRECT = {
     "src": attr.label(
         doc = """The npm_link_package target to link as a direct dependency.""",
-        providers = [_StoreInfo],
+        providers = [NpmLinkedPackageStoreInfo],
         mandatory = True,
     ),
     "package": attr.string(
@@ -219,6 +209,7 @@ def _impl_store(ctx):
 
     virtual_store_directory = None
     direct_files = []
+    transitive_files = []
     direct_ref_deps = {}
 
     if ctx.attr.src:
@@ -242,13 +233,13 @@ def _impl_store(ctx):
 
         for dep, _dep_aliases in ctx.attr.deps.items():
             # symlink the package's direct deps to its virtual store location
-            if dep[_StoreInfo].root_package != ctx.label.package:
+            if dep[NpmLinkedPackageStoreInfo].root_package != ctx.label.package:
                 msg = """npm_link_package_store in %s package cannot depend on npm_link_package_store in %s package.
-deps of npm_link_package_store must be in the same package.""" % (ctx.label.package, dep[_StoreInfo].root_package)
+deps of npm_link_package_store must be in the same package.""" % (ctx.label.package, dep[NpmLinkedPackageStoreInfo].root_package)
                 fail(msg)
-            dep_package = dep[_StoreInfo].package
+            dep_package = dep[NpmLinkedPackageStoreInfo].package
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
-            dep_virtual_store_directory = dep[_StoreInfo].virtual_store_directory
+            dep_virtual_store_directory = dep[NpmLinkedPackageStoreInfo].virtual_store_directory
             if dep_virtual_store_directory:
                 for dep_alias in dep_aliases:
                     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
@@ -267,27 +258,27 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
         # party npm deps; it is not recommended for 1st party deps
         deps_map = {}
         for dep, _dep_aliases in ctx.attr.deps.items():
-            dep_package = dep[_StoreInfo].package
+            dep_package = dep[NpmLinkedPackageStoreInfo].package
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
 
             # create a map of deps that have virtual store directories
-            if dep[_StoreInfo].virtual_store_directory:
-                deps_map[utils.virtual_store_name(dep[_StoreInfo].package, dep[_StoreInfo].version)] = dep
+            if dep[NpmLinkedPackageStoreInfo].virtual_store_directory:
+                deps_map[utils.virtual_store_name(dep[NpmLinkedPackageStoreInfo].package, dep[NpmLinkedPackageStoreInfo].version)] = dep
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
         for dep in ctx.attr.deps:
-            dep_virtual_store_name = utils.virtual_store_name(dep[_StoreInfo].package, dep[_StoreInfo].version)
-            dep_ref_deps = dep[_StoreInfo].ref_deps
+            dep_virtual_store_name = utils.virtual_store_name(dep[NpmLinkedPackageStoreInfo].package, dep[NpmLinkedPackageStoreInfo].version)
+            dep_ref_deps = dep[NpmLinkedPackageStoreInfo].ref_deps
             if virtual_store_name == dep_virtual_store_name:
                 # provide the node_modules directory for this package if found in the transitive_closure
-                virtual_store_directory = dep[_StoreInfo].virtual_store_directory
+                virtual_store_directory = dep[NpmLinkedPackageStoreInfo].virtual_store_directory
                 if virtual_store_directory:
-                    direct_files.append(virtual_store_directory)
+                    transitive_files.append(virtual_store_directory)
             for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
-                dep_ref_dep_virtual_store_name = utils.virtual_store_name(dep_ref_dep[_StoreInfo].package, dep_ref_dep[_StoreInfo].version)
+                dep_ref_dep_virtual_store_name = utils.virtual_store_name(dep_ref_dep[NpmLinkedPackageStoreInfo].package, dep_ref_dep[NpmLinkedPackageStoreInfo].version)
                 if dep_ref_dep_virtual_store_name == virtual_store_name:
                     # ignore reference back to self in dyadic circular deps
                     pass
@@ -295,35 +286,38 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
                     if not dep_ref_dep_virtual_store_name in deps_map:
                         fail("Expecting {} to be in deps".format(dep_ref_dep_virtual_store_name))
                     actual_dep = deps_map[dep_ref_dep_virtual_store_name]
-                    dep_ref_def_virtual_store_directory = actual_dep[_StoreInfo].virtual_store_directory
+                    dep_ref_def_virtual_store_directory = actual_dep[NpmLinkedPackageStoreInfo].virtual_store_directory
                     if dep_ref_def_virtual_store_directory:
                         for dep_ref_dep_alias in dep_ref_dep_aliases:
                             # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                             dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
-                            direct_files.extend(_make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
+                            transitive_files.extend(_make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
 
     direct_files = depset(direct = direct_files)
-    files_depsets = [direct_files]
-    runfiles = ctx.runfiles(transitive_files = direct_files)
-    for dep in ctx.attr.deps:
-        files_depsets.append(dep[DefaultInfo].files)
-        runfiles = runfiles.merge(dep[DefaultInfo].data_runfiles)
+    transitive_files = depset(direct = transitive_files)
+
+    transitive_closure_files = depset(transitive = [direct_files, transitive_files])
 
     result = [
-        DefaultInfo(files = depset(transitive = files_depsets), runfiles = runfiles),
+        # DefaultInfo is needed for the run_binary dynamic deps case via srcs
+        DefaultInfo(
+            files = transitive_closure_files,
+            runfiles = ctx.runfiles(transitive_files = transitive_closure_files),
+        ),
         # Always assume that packages provide typings, so we don't need to use an action to
         # inspect the package.json#typings field or search for .d.ts files in the package.
         declaration_info(
             declarations = direct_files,
             deps = ctx.attr.deps.keys(),
         ),
-        _StoreInfo(
+        NpmLinkedPackageStoreInfo(
             label = ctx.label,
             root_package = ctx.label.package,
             package = package,
             version = version,
             ref_deps = direct_ref_deps,
             virtual_store_directory = virtual_store_directory,
+            files = transitive_closure_files,
         ),
     ]
     if virtual_store_directory:
@@ -335,27 +329,41 @@ deps of npm_link_package_store must be in the same package.""" % (ctx.label.pack
     return result
 
 def _impl_direct(ctx):
-    virtual_store_directory = ctx.attr.src[_StoreInfo].virtual_store_directory
+    virtual_store_directory = ctx.attr.src[NpmLinkedPackageStoreInfo].virtual_store_directory
     if not virtual_store_directory:
         fail("src must be a npm_link_package that provides a virtual_store_directory")
 
-    package = ctx.attr.package if ctx.attr.package else ctx.attr.src[_StoreInfo].package
+    package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmLinkedPackageStoreInfo].package
 
     output_files = []
 
     # symlink the package's path in the virtual store to the root of the node_modules
     # "node_modules/{package}" so it is available as a direct dependency
     root_symlink_path = paths.join("node_modules", package)
-    output_files = _make_symlink(ctx, root_symlink_path, virtual_store_directory)
+    output_files = depset(_make_symlink(ctx, root_symlink_path, virtual_store_directory))
+
+    transitive_closure_files = depset(transitive = [output_files, ctx.attr.src[NpmLinkedPackageStoreInfo].files])
 
     result = [
+        # DefaultInfo is needed for the run_binary dynamic deps case via srcs
         DefaultInfo(
-            files = depset(output_files, transitive = [ctx.attr.src[DefaultInfo].files]),
-            runfiles = ctx.runfiles(output_files).merge(ctx.attr.src[DefaultInfo].data_runfiles),
+            files = transitive_closure_files,
+            runfiles = ctx.runfiles(transitive_files = transitive_closure_files),
+        ),
+        NpmLinkedPackageDirectInfo(
+            label = ctx.label,
+            link_package = ctx.label.package,
+            package = ctx.attr.src[NpmLinkedPackageStoreInfo].package,
+            version = ctx.attr.src[NpmLinkedPackageStoreInfo].version,
+            direct_files = output_files,
+            files = transitive_closure_files,
+            store_info = ctx.attr.src[NpmLinkedPackageStoreInfo],
         ),
         declaration_info(
-            declarations = depset(output_files, transitive = [ctx.attr.src[DeclarationInfo].transitive_declarations]),
+            declarations = depset(transitive = [output_files, ctx.attr.src[DeclarationInfo].transitive_declarations]),
         ),
+        # Forward the NpmLinkedPackageStoreInfo that backs this direct link for downstream use
+        ctx.attr.src[NpmLinkedPackageStoreInfo],
     ]
     if OutputGroupInfo in ctx.attr.src:
         result.append(ctx.attr.src[OutputGroupInfo])
@@ -365,7 +373,7 @@ def _impl_direct(ctx):
 npm_link_package_store_lib = struct(
     attrs = _ATTRS_STORE,
     implementation = _impl_store,
-    provides = [DefaultInfo, DeclarationInfo, _StoreInfo],
+    provides = [DeclarationInfo, NpmLinkedPackageStoreInfo],
 )
 
 npm_link_package_store = rule(
@@ -378,7 +386,7 @@ npm_link_package_store = rule(
 npm_link_package_direct_lib = struct(
     attrs = _ATTRS_DIRECT,
     implementation = _impl_direct,
-    provides = [DefaultInfo, DeclarationInfo],
+    provides = [DeclarationInfo, NpmLinkedPackageDirectInfo],
 )
 
 npm_link_package_direct = rule(

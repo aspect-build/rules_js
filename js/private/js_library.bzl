@@ -22,30 +22,41 @@ js_library(
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_files_to_bin_actions")
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
+load("//npm:defs.bzl", "NPM_LINKED_PACKAGE_STORE_DEPS_ATTRS")
 
 _DOC = """Copies all sources to the output tree and expose some files with DeclarationInfo.
 
 Can be used as a dep for rules that expect a DeclarationInfo such as ts_project."""
 
-_ATTRS = {
-    "srcs": attr.label_list(allow_files = True),
-    "deps": attr.label_list(allow_files = True),
+_ATTRS = dicts.add(NPM_LINKED_PACKAGE_STORE_DEPS_ATTRS, {
+    "srcs": attr.label_list(
+        doc = """The list of source files that are processed to create the target.
+
+        This includes all your checked-in code and any generated source files.
+        
+        Other js_library targets and npm dependencies belong in `deps`.
+        """,
+        allow_files = True,
+    ),
+    "deps": attr.label_list(
+        doc = """Direct dependencies of this library. This may include
+        other js_library targets as well as npm dependencies.""",
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
-}
+})
 
 def _js_library_impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
-    typings = []
-
     for file in ctx.files.srcs:
-        if ctx.label.package != file.owner.package:
+        if file.is_source and ctx.label.package != file.owner.package:
             msg = """
 
-Expected to find file {file_basename} in {this_package}, but instead it is in {file_package}.
+Expected to find source file {file_basename} in {this_package}, but instead it is in {file_package}.
 
-All srcs in a js_library must be in the same package as the js_library target.
+All source files in srcs in a js_library must be in the same package as the js_library target.
 
 Either move {file_basename} to {this_package}, or create a js_library
 target in {file_basename}'s package and add that target to the deps of {this_target}:
@@ -67,43 +78,40 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
             fail(msg)
 
     output_srcs = copy_files_to_bin_actions(ctx, ctx.files.srcs, is_windows = is_windows)
+    output_deps = copy_files_to_bin_actions(ctx, ctx.files.deps, is_windows = is_windows)
 
+    output_files_depsets = [depset(output_srcs), depset(output_deps)]
+
+    # Gather direct typings in srcs to add to the provided DeclarationInfo
+    direct_typings = []
     for src in output_srcs:
         if src.is_directory:
             # assume a directory contains typings since we can't know that it doesn't
-            typings.append(src)
+            direct_typings.append(src)
         elif (
             src.path.endswith(".d.ts") or
             src.path.endswith(".d.ts.map") or
             # package.json may be required to resolve "typings" key
             src.path.endswith("/package.json")
         ):
-            typings.append(src)
-
-    files_depsets = [depset(output_srcs)]
-
-    for dep in ctx.attr.deps:
-        if DefaultInfo in dep:
-            files_depsets.append(dep[DefaultInfo].files)
+            direct_typings.append(src)
 
     runfiles = ctx.runfiles(
-        files = output_srcs,
-        # We do not include typings_depsets in the runfiles because that would cause type-check actions to occur
-        # in every development workflow.
-        transitive_files = depset(transitive = files_depsets),
+        transitive_files = depset(transitive = output_files_depsets),
+    ).merge_all(
+        [d[DefaultInfo].default_runfiles for d in ctx.attr.deps],
     )
-    deps_runfiles = [d[DefaultInfo].default_runfiles for d in ctx.attr.deps]
 
     return [
         DefaultInfo(
-            files = depset(transitive = files_depsets),
-            runfiles = runfiles.merge_all(deps_runfiles),
+            files = depset(transitive = output_files_depsets),
+            runfiles = runfiles,
         ),
         declaration_info(
-            declarations = depset(typings),
+            declarations = depset(direct_typings),
             deps = ctx.attr.deps,
         ),
-        OutputGroupInfo(types = typings),
+        OutputGroupInfo(types = direct_typings),
     ]
 
 js_library_lib = struct(

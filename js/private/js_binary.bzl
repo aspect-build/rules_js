@@ -20,6 +20,7 @@ load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("//npm:defs.bzl", "NpmLinkedPackageDirectInfo", "NpmLinkedPackageStoreInfo")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -77,6 +78,45 @@ def envs_for_log_level(log_level):
         envs.append("JS_BINARY__LOG_DEBUG")
     return envs
 
+_JsBinaryNpmDepsInfo = provider(
+    doc = """For js_binary internal use""",
+    fields = {
+        "files": "depset of files that are the transitive closure of npm dependencies for a target",
+    },
+)
+
+def _js_binary_npm_deps_aspect_impl(target, ctx):
+    files_depsets = []
+
+    if NpmLinkedPackageDirectInfo in target:
+        files_depsets.append(target[NpmLinkedPackageDirectInfo].files)
+    if NpmLinkedPackageStoreInfo in target:
+        files_depsets.append(target[NpmLinkedPackageStoreInfo].files)
+
+    if hasattr(ctx.rule.attr, "deps"):
+        for transitive_target in ctx.rule.attr.deps:
+            if _JsBinaryNpmDepsInfo in transitive_target:
+                files_depsets.append(transitive_target[_JsBinaryNpmDepsInfo].files)
+    if hasattr(ctx.rule.attr, "data"):
+        for transitive_target in ctx.rule.attr.data:
+            if _JsBinaryNpmDepsInfo in transitive_target:
+                files_depsets.append(transitive_target[_JsBinaryNpmDepsInfo].files)
+    if hasattr(ctx.rule.attr, "src") and ctx.rule.attr.src:
+        if _JsBinaryNpmDepsInfo in ctx.rule.attr.src:
+            files_depsets.append(ctx.rule.attr.src[_JsBinaryNpmDepsInfo].files)
+    if hasattr(ctx.rule.attr, "srcs"):
+        for transitive_target in ctx.rule.attr.srcs:
+            if _JsBinaryNpmDepsInfo in transitive_target:
+                files_depsets.append(transitive_target[_JsBinaryNpmDepsInfo].files)
+
+    return [_JsBinaryNpmDepsInfo(files = depset(transitive = files_depsets))]
+
+_js_binary_npm_deps_aspect = aspect(
+    doc = """For js_binary internal use""",
+    implementation = _js_binary_npm_deps_aspect_impl,
+    attr_aspects = ["deps", "data", "src", "srcs"],
+)
+
 _ATTRS = {
     "chdir": attr.string(
         doc = """Working directory to run the binary or test in, relative to the workspace.
@@ -119,6 +159,7 @@ _ATTRS = {
         npm packages are also linked into the `.runfiles/node_modules` folder
         so they may be resolved directly from runfiles.
         """,
+        aspects = [_js_binary_npm_deps_aspect],
     ),
     "entry_point": attr.label(
         allow_files = True,
@@ -335,24 +376,30 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
     bash_launcher, node_wrapper = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    all_files = []
-    all_files.extend(output_data_files)
-    all_files.extend(ctx.files._runfiles_lib)
-    all_files.append(ctx.file._node_patches)
-    all_files.extend(ctx.files._node_patches_files)
-    all_files.append(output_entry_point)
-    all_files.append(bash_launcher)
-    all_files.append(node_wrapper)
-    all_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+    # Collect runfiles
+    runfiles_depsets = []
+    for data in ctx.attr.data:
+        if _JsBinaryNpmDepsInfo in data:
+            runfiles_depsets.append(data[_JsBinaryNpmDepsInfo].files)
+
+    runfiles_files = []
+    runfiles_files.extend(output_data_files)
+    runfiles_files.extend(ctx.files._runfiles_lib)
+    runfiles_files.append(ctx.file._node_patches)
+    runfiles_files.extend(ctx.files._node_patches_files)
+    runfiles_files.append(output_entry_point)
+    runfiles_files.append(bash_launcher)
+    runfiles_files.append(node_wrapper)
+    runfiles_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
 
     runfiles = ctx.runfiles(
-        files = all_files,
-        transitive_files = depset(all_files),
-    )
-    runfiles = runfiles.merge_all([
+        files = runfiles_files,
+        transitive_files = depset(transitive = runfiles_depsets),
+    ).merge_all([
         dep[DefaultInfo].default_runfiles
         for dep in ctx.attr.data
     ])
+
     return struct(
         executable = launcher,
         runfiles = runfiles,
