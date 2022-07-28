@@ -10,6 +10,7 @@ load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//examples/npm_deps:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load(":custom_rule.bzl", "custom_rule")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
@@ -37,6 +38,12 @@ genrule(
     tools = [":bin"],
 )
 
+diff_test(
+    name = "test_js_binary_under_genrule",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = "out1",
+)
+
 ####################################################
 # Use case 2
 # Using js_run_binary has some nice syntax sugar vs.
@@ -60,6 +67,32 @@ diff_test(
     name = "test_js_binary_under_js_run_binary",
     file1 = "//examples:expected_one_ast.json",
     file2 = "out2",
+)
+
+# Also test with local (no sandbox) exection by setting execution_requirements "local" to "1".
+# Bazel sets different environment variables in this case such as RUNFILES_MANIFEST_FILE.
+# This case tests for regression of the fix in https://github.com/aspect-build/rules_js/pull/323.
+js_run_binary(
+    name = "run2_local",
+    srcs = [],
+    outs = ["out2_local"],
+    args = ["out2_local"],
+    chdir = package_name(),
+    execution_requirements = {
+        "local": "1",
+    },
+    # Request that the rules_js launcher prints extra information
+    log_level = "debug",
+    tool = ":bin",
+    # Uncomment the setting below to see debug output even on a
+    # successful run of the build action.
+    # silent_on_success = False,
+)
+
+diff_test(
+    name = "test_js_binary_under_js_run_binary_local",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = "out2_local",
 )
 
 ################################
@@ -381,4 +414,36 @@ genrule(
     # run from that directory as the working directory.
     cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :bin10) {}/out10".format(package_name()),
     tools = [":bin10"],
+)
+
+####################################################
+# Use case 11
+# js_binary can be used with a simple custom_role
+# because everything it needs to run is in the runfiles
+custom_rule(
+    name = "run11",
+    tool = ":bin",
+)
+
+diff_test(
+    name = "test_js_binary_under_custom_rule",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = ":run11",
+)
+
+# Also test with local (no sandbox) exection by setting execution_requirements "local" to "1".
+# Bazel sets different environment variables in this case such as RUNFILES_MANIFEST_FILE.
+# This case tests for regression of the fix in https://github.com/aspect-build/rules_js/pull/323.
+custom_rule(
+    name = "run11_local",
+    execution_requirements = {
+        "local": "1",
+    },
+    tool = ":bin",
+)
+
+diff_test(
+    name = "test_js_binary_under_custom_rule_local",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = ":run11_local",
 )
