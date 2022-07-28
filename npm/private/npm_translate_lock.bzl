@@ -821,14 +821,9 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
                     direct_links_bzl[link_package].append("""            scoped_direct_targets["{package_scope}"] = scoped_direct_targets["{package_scope}"] + [direct_targets[-1]] if "{package_scope}" in scoped_direct_targets else [direct_targets[-1]]""".format(
                         package_scope = package_scope,
                     ))
-
+        pkgs = lockfile.get("packages").values()
         for link_package in _import.link_packages.keys():
-            # Generate a package_json.bzl file for the bin entries (even if there are none)
-            # Note, there's no has_bin attribute on npm_import so we can't get the boolean
-            # value from the _import struct.
-            # If this is a problem, we could lookup into the packages again like
-            # if lockfile.get("packages").values()[i].get("hasBin"):
-            if True:
+            if pkgs[i].get("hasBin"):
                 build_file_path = paths.normalize(paths.join(link_package, "BUILD.bazel"))
                 if build_file_path not in rctx_files.keys():
                     rctx_files[build_file_path] = generated_by_lines + [
