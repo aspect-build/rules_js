@@ -225,6 +225,11 @@ else
         exit 1
     fi
 fi
+if [ "${RUNFILES:0:1}" != "/" ]; then
+    # Ensure RUNFILES set above is an absolute path. It may be a path relative
+    # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
+    RUNFILES="$PWD/$RUNFILES"
+fi
 export RUNFILES
 
 # ==============================================================================
@@ -266,6 +271,11 @@ BAZEL_BINDIR to '.' instead to supress this error. For more context on this desi
 aspect_rules_js README https://github.com/aspect-build/rules_js#running-nodejs-programs."
         exit 1
     fi
+
+    # Since the process was launched in the execroot, we automatically change directory into the root of the
+    # output tree (which we expect to be set in BAZEL_BIN). See
+    # https://github.com/aspect-build/rules_js/tree/67c561e08fa8baaf6fbfe00094fa0d757159e1ef#running-nodejs-programs
+    # for more context on why we do this.
     logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
     cd "$BAZEL_BINDIR"
 fi
