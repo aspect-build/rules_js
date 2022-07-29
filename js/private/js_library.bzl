@@ -100,8 +100,17 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
             runfiles = runfiles.merge_all(deps_runfiles),
         ),
         declaration_info(
-            declarations = depset(typings),
-            deps = ctx.attr.deps,
+            # Add direct declarations including those from srcs targets that have a DeclarationInfo.
+            # Do not add the transitive_declarations here; that is handled by deps below.
+            declarations = depset(typings, transitive = [
+                target[DeclarationInfo].declarations
+                for target in ctx.attr.srcs
+                if DeclarationInfo in target
+            ]),
+            # Look in both deps and sources for transitive DeclarationInfos so that
+            # when a js_library is used to wrap a rules such as ts_project we get the
+            # transitive declarations via the target passed to srcs.
+            deps = ctx.attr.deps + ctx.attr.srcs,
         ),
         OutputGroupInfo(types = typings),
     ]
