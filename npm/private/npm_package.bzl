@@ -28,7 +28,11 @@ This target can be used as the src attribute to npm_link_package.
 
 A DeclarationInfo is also provided so that the target can be used as an input to rules that expect one such as ts_project."""
 
-_ATTRS = dicts.add({
+# Pull in all copy_to_directory attributes except for exclude_prefixes
+copy_to_directory_lib_attrs = dict(copy_to_directory_lib.attrs)
+copy_to_directory_lib_attrs.pop("exclude_prefixes")
+
+_ATTRS = dicts.add(copy_to_directory_lib_attrs, {
     "package": attr.string(
         doc = """The package name. If set, should match the `name` field in the `package.json` file for this package.
 
@@ -49,7 +53,7 @@ If unset, a npm_link_package target that references this npm_package must define
         default = "0.0.0",
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
-}, copy_to_directory_lib.attrs)
+})
 
 def _impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -70,7 +74,10 @@ def _impl(ctx):
         additional_files = depset(transitive = additional_files_depsets).to_list(),
         root_paths = ctx.attr.root_paths,
         include_external_repositories = ctx.attr.include_external_repositories,
-        exclude_prefixes = ctx.attr.exclude_prefixes,
+        include_srcs_packages = ctx.attr.include_srcs_packages,
+        exclude_srcs_packages = ctx.attr.exclude_srcs_packages,
+        include_srcs_patterns = ctx.attr.include_srcs_patterns,
+        exclude_srcs_patterns = ctx.attr.exclude_srcs_patterns,
         replace_prefixes = ctx.attr.replace_prefixes,
         allow_overwrites = ctx.attr.allow_overwrites,
         is_windows = is_windows,
