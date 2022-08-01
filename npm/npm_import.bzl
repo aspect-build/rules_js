@@ -185,7 +185,7 @@ def npm_import(
         lifecycle_hooks_execution_requirements: Execution requirements when running the lifecycle hooks.
             For example:
 
-            lifecycle_hooks_execution_requirements: { "requires-network": "1" }
+            lifecycle_hooks_execution_requirements: [ "requires-network" ]
         integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
             This must match the checksum of the file downloaded.
 

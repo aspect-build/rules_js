@@ -151,8 +151,8 @@ _ATTRS = {
         The execution requirements can be defined per package by package name or globally using "*".
         For example:
         lifecycle_hooks_execution_requirements: {
-            "*": ["requires_network"],
-            "@foo/bar": ["no_sandbox"],
+            "*": ["requires-network"],
+            "@foo/bar": ["no-sandbox"],
         }
         """,
     ),

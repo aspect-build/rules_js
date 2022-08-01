@@ -1,7 +1,6 @@
 "Repository rules for importing packages from npm"
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
-load("@aspect_bazel_lib//lib:utils.bzl", "propagate_well_known_tags")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
@@ -617,9 +616,8 @@ def _impl_links(rctx):
             msg = "lifecycle_hooks_env contains invalid key value pair '%s', required '=' separator not found" % env
             fail(msg)
 
-    well_known_tags = propagate_well_known_tags(rctx.attr.lifecycle_hooks_execution_requirements)
     lifecycle_hooks_execution_requirements = {}
-    for ec in well_known_tags:
+    for ec in rctx.attr.lifecycle_hooks_execution_requirements:
         lifecycle_hooks_execution_requirements[ec] = "1"
 
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
