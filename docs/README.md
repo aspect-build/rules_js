@@ -66,6 +66,11 @@ For example, this command creates a lockfile with minimal installation needed:
 $ npx pnpm install --lockfile-only
 ```
 
+Instead of checking in a `pnpm-lock.yaml` file, you could use a `package-lock.json` or `yarn.lock`
+file with the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`.
+If you do, rules_js will run `pnpm import` to generate a `pnpm-lock.yaml` file on-the-fly.
+This is only recommended during migrations; see the notes about these attributes in the [migration guide](./migrate.md).
+
 Next, you'll typically use `npm_translate_lock` to translate the lock file to Starlark, which Bazel extensions understand.
 The `WORKSPACE` snippet you pasted above already contains this code.
 

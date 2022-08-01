@@ -87,16 +87,33 @@ Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do
 
 _ATTRS = {
     "pnpm_lock": attr.label(
-        doc = """The pnpm-lock.yaml file. Mandatory unless npm_package_json and npm_package_lock attributes are provided.
-        Mutually exclusive with npm_package_json and npm_package_lock.""",
+        doc = """The pnpm-lock.yaml file.
+        
+        Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.""",
     ),
-    "npm_package_json": attr.label(
-        doc = """The package.json file. From this file and the corresponding package-lock.json file (specified with
-        the package_lock attribute), a pnpm-lock.yaml file will be generated using `pnpm import`. Mandatory unless the
-        pnpm_lock attribute is provided. Mutually exclusive with pnpm_lock."""
+    "package_json": attr.label(
+        doc = """The package.json file. From this file and the corresponding package-lock.json/yarn.lock file
+        (specified with the npm_package_lock/yarn_lock attributes),
+        a pnpm-lock.yaml file will be generated using `pnpm import`.
+
+        Note that *any* changes to the package.json file will invalidate the npm_translate_lock
+        repository rule, causing it to re-run on the next invocation of Bazel.
+        
+        Mandatory when using npm_package_lock or yarn_lock, otherwise must be unset.""",
     ),
     "npm_package_lock": attr.label(
-        doc = """The package-lock.json file. See documentation for the npm_package_json attribute."""
+        doc = """The package-lock.json file written by `npm install`.
+        
+        When set, the `package_json` attribute must be set as well.
+        Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
+        """,
+    ),
+    "yarn_lock": attr.label(
+        doc = """The yarn.lock file written by `yarn install`.
+        
+        When set, the `package_json` attribute must be set as well.
+        Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
+        """,
     ),
     "patches": attr.string_list_dict(
         doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
@@ -514,44 +531,65 @@ Check the public_hoist_packages attribute for duplicates.
                     )
                 fail(msg)
 
+def _validate_attrs(rctx):
+    count = 0
+    if rctx.attr.yarn_lock:
+        count += 1
+    if rctx.attr.npm_package_lock:
+        count += 1
+    if count and not rctx.attr.package_json:
+        fail("npm_translate_lock with yarn_lock or npm_package_lock attribute also requires that the package_json attribute is set")
+    if rctx.attr.pnpm_lock:
+        count += 1
+
+        # don't allow a pnpm lock file that isn't in the root directory of a bazel package
+        if paths.dirname(rctx.attr.pnpm_lock.name):
+            fail("pnpm-lock.yaml file must be at the root of a bazel package")
+        if rctx.attr.package_json:
+            fail("The package_json attribute should not be used with pnpm_lock.")
+    if count != 1:
+        fail("npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count))
+
 def _impl(rctx):
     lockfile = None
     root_package = None
     link_workspace = None
     lockfile_description = None
 
+    _validate_attrs(rctx)
+
     if rctx.attr.pnpm_lock != None:
-        if rctx.attr.npm_package_json != None or rctx.attr.npm_package_lock != None:
-            fail("npm_translate_lock requires either pnpm_lock or npm_package_json/npm_package_lock attributes, not both.")
-
-        # don't allow a pnpm lock file that isn't in the root directory of a bazel package
-        if paths.dirname(rctx.attr.pnpm_lock.name):
-            fail("pnpm-lock.yaml file must be at the root of a bazel package")
-
         lockfile = _process_lockfile(rctx, rctx.attr.pnpm_lock)
 
         # root package is the directory of the pnpm_lock file
         root_package = rctx.attr.pnpm_lock.package
         link_workspace = rctx.attr.pnpm_lock.workspace_name
 
-        lockfile_description = "@{}{}".format(
-            str(rctx.attr.pnpm_lock.workspace_name),
-            str(rctx.attr.pnpm_lock),
-        )
+        lockfile_description = str(rctx.attr.pnpm_lock)
     else:
-        if rctx.attr.npm_package_json == None or rctx.attr.npm_package_lock == None:
-            fail("npm_translate_lock requires either pnpm_lock or npm_package_json/npm_package_lock attributes.")
-
         rctx.file(
             "package.json",
-            content = rctx.read(rctx.attr.npm_package_json),
+            content = rctx.read(rctx.attr.package_json),
             executable = False,
         )
-        rctx.file(
-            "package-lock.json",
-            content = rctx.read(rctx.attr.npm_package_lock),
-            executable = False,
-        )
+
+        if rctx.attr.npm_package_lock:
+            lock_attr = rctx.attr.npm_package_lock
+            rctx.file(
+                "package-lock.json",
+                content = rctx.read(rctx.attr.npm_package_lock),
+                executable = False,
+            )
+        elif rctx.attr.yarn_lock:
+            lock_attr = rctx.attr.yarn_lock
+            rctx.file(
+                "yarn.lock",
+                content = rctx.read(rctx.attr.yarn_lock),
+                executable = False,
+            )
+        else:
+            fail("rules_js internal validation error, please file an issue")
+
         rctx.execute([
             rctx.path(Label("@nodejs_host//:bin/node")),
             rctx.path(Label("@pnpm//:package/bin/pnpm.cjs")),
@@ -560,20 +598,18 @@ def _impl(rctx):
 
         lockfile = _process_lockfile(rctx, "pnpm-lock.yaml")
 
-        # root package is the directory of the package-lock.json file
-        root_package = rctx.attr.npm_package_lock.package
-        link_workspace = rctx.attr.npm_package_lock.workspace_name
+        # root package is the directory of the lockfile
+        root_package = lock_attr.package
+        link_workspace = lock_attr.workspace_name
 
-        lockfile_description = "@{}{} and @{}{}".format(
-            str(rctx.attr.npm_package_json.workspace_name),
-            str(rctx.attr.npm_package_json),
-            str(rctx.attr.npm_package_lock.workspace_name),
-            str(rctx.attr.npm_package_lock),
+        lockfile_description = "@{} and @{}".format(
+            str(rctx.attr.package_json),
+            str(lock_attr),
         )
 
     generated_by_lines = [
         "\"@generated by @aspect_rules_js//npm/private:npm_translate_lock.bzl from {}\"".format(lockfile_description),
-        "", # empty line after bzl docstring since buildifier expects this if this file is vendored in
+        "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
     repositories_bzl = generated_by_lines + [

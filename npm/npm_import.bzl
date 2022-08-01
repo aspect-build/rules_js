@@ -29,11 +29,35 @@ load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock_lib = "npm_translate_lock")
 
-npm_translate_lock = repository_rule(
+npm_translate_lock_rule = repository_rule(
     doc = _npm_translate_lock_lib.doc,
     implementation = _npm_translate_lock_lib.implementation,
     attrs = _npm_translate_lock_lib.attrs,
 )
+
+def npm_translate_lock(name, npm_package_lock = None, yarn_lock = None, **kwargs):
+    """Wrapper macro around [npm_translate_lock_rule](#npm_translate_lock_rule)
+
+    This macro creates a "pnpm" repository if necessary to call `pnpm import`, which is the case
+    when npm_package_lock or yarn_lock are used rather than pnpm_lock.
+
+    The user can create a "pnpm" repository before calling this in order to get a different version.
+    """
+    if (npm_package_lock != None or yarn_lock != None) and not native.existing_rule("pnpm"):
+        npm_import(
+            name = "pnpm",
+            integrity = "sha512-IY+62k/caP5GsMQm5YcOJ03XDkze68aBiiXrlwqMUAYFhSstLETlenIC73AukJyUd7o4Y18HcV2gfQYCKb0PEA==",
+            package = "pnpm",
+            root_package = "",
+            version = "6.32.19",
+        )
+
+    npm_translate_lock_rule(
+        name = name,
+        npm_package_lock = npm_package_lock,
+        yarn_lock = yarn_lock,
+        **kwargs
+    )
 
 _npm_import_links = repository_rule(
     implementation = _npm_import_links_lib.implementation,

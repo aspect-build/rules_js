@@ -1,0 +1,28 @@
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "nodejs",
+    node_version = "16.9.0",
+)
+
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
+
+# Validate that we can use a package-lock.json file in place of pnpm-lock.yaml
+npm_translate_lock(
+    name = "npm_package_lock",
+    npm_package_lock = "//:package-lock.json",
+    package_json = "//:package.json",
+)
+
+load("@npm_package_lock//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
