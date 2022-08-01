@@ -130,6 +130,7 @@ def npm_imported_package_store(
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
             out_dirs = ["{lifecycle_output_dir}"],
             tags = ["manual"],
+            execution_requirements = {lifecycle_hooks_execution_requirements},
             mnemonic = "NpmLifecycleHook",
             progress_message = "Running lifecycle hooks on npm package {package}@{version}",
             env = {lifecycle_hooks_env},
@@ -615,6 +616,10 @@ def _impl_links(rctx):
             msg = "lifecycle_hooks_env contains invalid key value pair '%s', required '=' separator not found" % env
             fail(msg)
 
+    lifecycle_hooks_execution_requirements = {}
+    for ec in rctx.attr.lifecycle_hooks_execution_requirements:
+        lifecycle_hooks_execution_requirements[ec] = "1"
+
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
@@ -623,6 +628,7 @@ def _impl_links(rctx):
         npm_package_target_lc = npm_package_target_lc,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 2, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
+        lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
         lifecycle_output_dir = lifecycle_output_dir,
         npm_link_package_bzl = "@%s//:%s" % (rctx.name, _DEFS_BZL_FILENAME),
@@ -654,6 +660,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "transitive_closure": attr.string_list_dict(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
+    "lifecycle_hooks_execution_requirements": attr.string_list(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
