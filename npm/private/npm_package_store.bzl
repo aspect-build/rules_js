@@ -121,14 +121,22 @@ If unset, the package version in the NpmPackageInfo src must be set.
 If set, takes precendance over the package version in the NpmPackageInfo src.
 """,
     ),
-    "allow_unresolved_symlinks": attr.bool(
+    "use_declare_symlink": attr.bool(
         mandatory = True,
-        doc = """Whether unresolved symlinks are enabled in the current build configuration.
+        doc = """Whether to use ctx.actions.declare_symlink to create symlinks.
 
-        These are enabled with the --experimental_allow_unresolved_symlinks flag.
+        In Bazel 5.x these are enabled with the --experimental_allow_unresolved_symlinks flag.
 
         Typical usage of this rule is via a macro which automatically sets this
-        attribute based on a `config_setting` rule.
+        attribute with `select` based on a `config_setting` rule such as,
+
+        ```
+        config_setting(
+            name = "experimental_allow_unresolved_symlinks",
+            values = {"experimental_allow_unresolved_symlinks": "true"},
+            visibility = ["//visibility:public"],
+        )
+        ```
         """,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),

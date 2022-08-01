@@ -86,7 +86,7 @@ def _virtual_store_name(name, version):
 
 def _make_symlink(ctx, symlink_path, target_file):
     files = []
-    if ctx.attr.allow_unresolved_symlinks:
+    if ctx.attr.use_declare_symlink:
         symlink = ctx.actions.declare_symlink(symlink_path)
         ctx.actions.symlink(
             output = symlink,

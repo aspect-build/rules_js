@@ -20,7 +20,7 @@ config_setting(
 )
 
 config_setting(
-    name = "allow_unresolved_symlinks",
+    name = "experimental_allow_unresolved_symlinks",
     values = {"experimental_allow_unresolved_symlinks": "true"},
     visibility = ["//visibility:public"],
 )
