@@ -605,20 +605,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     """
 
     root_package = ""
-    direct_packages = ["", "examples/js_binary", "examples/lib", "examples/macro", "examples/npm_deps", "examples/webpack_cli", "js/private/coverage/bundle", "npm/private/test"]
+    link_packages = ["", "examples/js_binary", "examples/lib", "examples/macro", "examples/npm_deps", "examples/webpack_cli", "js/private/coverage/bundle", "npm/private/test"]
     is_root = native.package_name() == root_package
-    is_direct = native.package_name() in direct_packages
-    if not is_root and not is_direct:
+    link = native.package_name() in link_packages
+    if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages ['', 'examples/js_binary', 'examples/lib', 'examples/macro', 'examples/npm_deps', 'examples/webpack_cli', 'js/private/coverage/bundle', 'npm/private/test']" % native.package_name()
         fail(msg)
     link_targets = []
-    scoped_direct_targets = {}
+    scope_targets = {}
 
     for link_fn in imported_links:
-        new_direct_targets, new_scoped_targets = link_fn(name)
-        link_targets.extend(new_direct_targets)
-        for _scope, _targets in new_scoped_targets.items():
-            scoped_direct_targets[_scope] = scoped_direct_targets[_scope] + _targets if _scope in scoped_direct_targets else _targets
+        new_link_targets, new_scope_targets = link_fn(name)
+        link_targets.extend(new_link_targets)
+        for _scope, _targets in new_scope_targets.items():
+            scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
 
     if is_root:
         store_0(name = "{}/@aspect-test/a".format(name))
@@ -1198,16 +1198,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_574(name = "{}/@types/json-schema".format(name))
         store_575(name = "{}/@types/node".format(name))
         store_576(name = "{}/@types/resolve".format(name))
-    if is_direct:
+    if link:
         if native.package_name() == "examples/npm_deps":
             link_targets.append(link_0(name = "{}/@aspect-test/a".format(name)))
-            scoped_direct_targets["@aspect-test"] = scoped_direct_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
             link_targets.append(link_2(name = "{}/@aspect-test/c".format(name)))
-            scoped_direct_targets["@aspect-test"] = scoped_direct_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
             link_targets.append(link_9(name = "{}/@gregmagolan/test-b".format(name)))
-            scoped_direct_targets["@gregmagolan"] = scoped_direct_targets["@gregmagolan"] + [link_targets[-1]] if "@gregmagolan" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@gregmagolan"] = scope_targets["@gregmagolan"] + [link_targets[-1]] if "@gregmagolan" in scope_targets else [link_targets[-1]]
             link_targets.append(link_32(name = "{}/@rollup/plugin-commonjs".format(name)))
-            scoped_direct_targets["@rollup"] = scoped_direct_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
             link_targets.append(link_158(name = "{}/debug".format(name)))
             link_targets.append(link_358(name = "{}/mobx-react".format(name)))
             link_targets.append(link_359(name = "{}/mobx".format(name)))
@@ -1217,7 +1217,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(link_527(name = "{}/uvu".format(name)))
         if native.package_name() == "npm/private/test":
             link_targets.append(link_30(name = "{}/@plotly/regl".format(name)))
-            scoped_direct_targets["@plotly"] = scoped_direct_targets["@plotly"] + [link_targets[-1]] if "@plotly" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@plotly"] = scope_targets["@plotly"] + [link_targets[-1]] if "@plotly" in scope_targets else [link_targets[-1]]
             link_targets.append(link_30(name = "{}/regl".format(name)))
             link_targets.append(link_96(name = "{}/bufferutil".format(name)))
             link_targets.append(link_208(name = "{}/esbuild".format(name)))
@@ -1228,11 +1228,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(link_568(name = "{}/debug".format(name)))
         if native.package_name() == "js/private/coverage/bundle":
             link_targets.append(link_33(name = "{}/@rollup/plugin-commonjs".format(name)))
-            scoped_direct_targets["@rollup"] = scoped_direct_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
             link_targets.append(link_34(name = "{}/@rollup/plugin-json".format(name)))
-            scoped_direct_targets["@rollup"] = scoped_direct_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
             link_targets.append(link_35(name = "{}/@rollup/plugin-node-resolve".format(name)))
-            scoped_direct_targets["@rollup"] = scoped_direct_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
             link_targets.append(link_98(name = "{}/c8".format(name)))
             link_targets.append(link_448(name = "{}/rollup".format(name)))
         if native.package_name() == "examples/lib":
@@ -1242,7 +1242,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(link_287(name = "{}/inline-fixtures".format(name)))
             link_targets.append(link_515(name = "{}/typescript".format(name)))
             link_targets.append(link_575(name = "{}/@types/node".format(name)))
-            scoped_direct_targets["@types"] = scoped_direct_targets["@types"] + [link_targets[-1]] if "@types" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
         if native.package_name() == "examples/webpack_cli":
             link_targets.append(link_347(name = "{}/mathjs".format(name)))
             link_targets.append(link_546(name = "{}/webpack-cli".format(name)))
@@ -1379,9 +1379,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
             )
-            scoped_direct_targets["@mycorp"] = scoped_direct_targets["@mycorp"] + [link_targets[-1]] if "@mycorp" in scoped_direct_targets else [link_targets[-1]]
+            scope_targets["@mycorp"] = scope_targets["@mycorp"] + [link_targets[-1]] if "@mycorp" in scope_targets else [link_targets[-1]]
 
-    for scope, scoped_targets in scoped_direct_targets.items():
+    for scope, scoped_targets in scope_targets.items():
         _npm_linked_packages(
             name = "{}/{}".format(name, scope),
             srcs = scoped_targets,
