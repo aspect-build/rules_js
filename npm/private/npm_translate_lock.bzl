@@ -146,6 +146,16 @@ _ATTRS = {
         }
         """,
     ),
+    "lifecycle_hooks_execution_requirements": attr.string_list_dict(
+        doc = """Execution requirements applied to the preinstall, install and postinstall lifecycle hooks on npm packages.
+        The execution requirements can be defined per package by package name or globally using "*".
+        For example:
+        lifecycle_hooks_execution_requirements: {
+            "*": ["requires_network"],
+            "@foo/bar": ["no_sandbox"],
+        }
+        """,
+    ),
     "verify_node_modules_ignored": attr.label(
         doc = """node_modules folders in the source tree should be ignored by Bazel.
 
@@ -171,7 +181,7 @@ _NPM_IMPORT_TMPL = \
         link_workspace = "{link_workspace}",
         link_packages = {link_packages},
         package = "{package}",
-        version = "{version}",{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}
+        version = "{version}",{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}
     )
 """
 
@@ -379,6 +389,7 @@ def _gen_npm_imports(lockfile, attr):
         )
 
         lifecycle_hooks_env = _gather_values_from_matching_names(attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks_execution_requirements = _gather_values_from_matching_names(attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
 
         url = None
         if tarball:
@@ -427,6 +438,7 @@ To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
             root_package = root_package,
             run_lifecycle_hooks = run_lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
+            lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
             transitive_closure = transitive_closure,
             url = url,
             version = version,
@@ -767,6 +779,8 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
         run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
         maybe_lifecycle_hooks_env = ("""
         lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
+        maybe_lifecycle_hooks_execution_requirements = ("""
+        lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_execution_requirements else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -778,6 +792,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
+            maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
             maybe_transitive_closure = maybe_transitive_closure,
             maybe_url = maybe_url,
             name = _import.name,

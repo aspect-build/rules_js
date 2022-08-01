@@ -27,6 +27,9 @@ npm_translate_lock(
         # be copied to ~/.npm folder which is readonly for bazel.
         "sharp": ["APPDATA=."],
     },
+    lifecycle_hooks_execution_requirements = {
+        "sharp": ["requires-network"],
+    },
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )

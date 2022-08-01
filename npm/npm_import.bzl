@@ -55,6 +55,7 @@ def npm_import(
         link_workspace = "",
         link_packages = {},
         run_lifecycle_hooks = False,
+        lifecycle_hooks_execution_requirements = [],
         lifecycle_hooks_env = [],
         integrity = "",
         url = "",
@@ -181,6 +182,10 @@ def npm_import(
             For example:
 
             lifecycle_hooks_env: [ "PREBULT_BINARY=https://downloadurl"],
+        lifecycle_hooks_execution_requirements: Execution requirements when running the lifecycle hooks.
+            For example:
+
+            lifecycle_hooks_execution_requirements: { "requires-network": "1" }
         integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
             This must match the checksum of the file downloaded.
 
@@ -229,4 +234,5 @@ def npm_import(
         transitive_closure = transitive_closure,
         lifecycle_build_target = run_lifecycle_hooks or not (not custom_postinstall),
         lifecycle_hooks_env = lifecycle_hooks_env,
+        lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
     )
