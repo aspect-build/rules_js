@@ -41,8 +41,8 @@ def npm_imported_package_store(
         package = "{package}",
         version = "{version}",
         tags = ["manual"],
-        allow_unresolved_symlinks = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+        use_declare_symlink = select({{
+            "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )
@@ -55,8 +55,8 @@ def npm_imported_package_store(
         version = "{version}",
         deps = ref_deps,
         tags = ["manual"],
-        allow_unresolved_symlinks = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+        use_declare_symlink = select({{
+            "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )
@@ -70,8 +70,8 @@ def npm_imported_package_store(
         deps = deps,
         visibility = visibility,
         tags = ["manual"],
-        allow_unresolved_symlinks = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+        use_declare_symlink = select({{
+            "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )
@@ -94,8 +94,8 @@ def npm_imported_package_store(
             version = "{version}",
             deps = ref_deps,
             tags = ["manual"],
-            allow_unresolved_symlinks = select({{
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({{
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }}),
         )
@@ -107,8 +107,8 @@ def npm_imported_package_store(
             version = "{version}",
             deps = lc_deps,
             tags = ["manual"],
-            allow_unresolved_symlinks = select({{
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({{
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }}),
         )
@@ -176,8 +176,8 @@ def npm_link_imported_package_store(
         src = "//{root_package}:{{}}".format(store_target_name),
         visibility = visibility,
         tags = ["manual"],
-        allow_unresolved_symlinks = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+        use_declare_symlink = select({{
+            "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )

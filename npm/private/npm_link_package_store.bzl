@@ -34,7 +34,7 @@ If unset, the package name of the src npm_package_store is used.
 If set, takes precendance over the package name in the src npm_package_store.
 """,
     ),
-    "allow_unresolved_symlinks": attr.bool(
+    "use_declare_symlink": attr.bool(
         mandatory = True,
         doc = """Whether unresolved symlinks are enabled in the current build configuration.
 

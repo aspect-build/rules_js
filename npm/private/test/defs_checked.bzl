@@ -1263,8 +1263,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            allow_unresolved_symlinks = select({
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }),
         )
@@ -1277,8 +1277,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/is-odd/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
-                allow_unresolved_symlinks = select({
-                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                use_declare_symlink = select({
+                    "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                     "//conditions:default": False,
                 }),
             )
@@ -1306,8 +1306,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            allow_unresolved_symlinks = select({
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }),
         )
@@ -1320,8 +1320,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/semver-max/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
-                allow_unresolved_symlinks = select({
-                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                use_declare_symlink = select({
+                    "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                     "//conditions:default": False,
                 }),
             )
@@ -1349,8 +1349,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            allow_unresolved_symlinks = select({
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }),
         )
@@ -1363,8 +1363,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/@mycorp/mylib/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
-                allow_unresolved_symlinks = select({
-                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                use_declare_symlink = select({
+                    "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                     "//conditions:default": False,
                 }),
             )

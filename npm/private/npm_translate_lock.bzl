@@ -202,8 +202,8 @@ _FP_STORE_TMPL = \
             deps = {deps},
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            allow_unresolved_symlinks = select({{
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({{
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }}),
         )"""
@@ -218,8 +218,8 @@ _FP_DIRECT_TMPL = \
                 src = "//{root_package}:{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
-                allow_unresolved_symlinks = select({{
-                    "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                use_declare_symlink = select({{
+                    "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                     "//conditions:default": False,
                 }}),
             )

@@ -78,8 +78,8 @@ def npm_link_package(
             deps = deps,
             visibility = visibility,
             tags = tags,
-            allow_unresolved_symlinks = select({
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }),
             **kwargs
@@ -96,8 +96,8 @@ def npm_link_package(
             ),
             tags = tags,
             visibility = visibility,
-            allow_unresolved_symlinks = select({
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            use_declare_symlink = select({
+                "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }),
         )
