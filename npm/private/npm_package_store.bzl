@@ -1,0 +1,289 @@
+"npm_package_store rule"
+
+load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
+load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo")
+load(":utils.bzl", "utils")
+load(":npm_package_info.bzl", "NpmPackageInfo")
+load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
+
+_DOC = """Defines a npm package that is linked into a node_modules tree.
+
+The npm package is linked with a pnpm style symlinked node_modules output tree.
+
+The term "package" is defined at
+<https://nodejs.org/docs/latest-v16.x/api/packages.html>
+
+See https://pnpm.io/symlinked-node-modules-structure for more information on
+the symlinked node_modules structure.
+Npm may also support a symlinked node_modules structure called
+"Isolated mode" in the future:
+https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
+"""
+
+_ATTRS = {
+    "src": attr.label(
+        doc = """A npm_package target or or any other target that provides a NpmPackageInfo.
+        """,
+        providers = [NpmPackageInfo],
+        mandatory = True,
+    ),
+    "deps": attr.label_keyed_string_dict(
+        doc = """Other node packages store link targets one depends on mapped to the name to link them under in this packages deps.
+
+        This should include *all* modules the program may need at runtime.
+
+        You can find all the package store link targets in your repository with
+
+        ```
+        bazel query ... | grep :.aspect_rules_js | grep -v /dir | grep -v /pkg | grep -v /ref
+        ```
+
+        Package store link targets names for 3rd party packages that come from `npm_translate_lock`
+        start with `.aspect_rules_js/` then the name passed to the `npm_link_all_packages` macro
+        (typically 'node_modules') followed by `/<package>/<version>` where `package` is the
+        package name (including @scope segment if any) and `version` is the specific version of
+        the package that comes from the pnpm-lock.yaml file.
+
+        For example,
+
+        ```
+        //:.aspect_rules_js/node_modules/cliui/7.0.4
+        ```
+
+        The version may include peer dep(s),
+
+        ```
+        //:.aspect_rules_js/node_modules/debug/4.3.4_supports-color@8.1.1
+        ```
+
+        It could be also be a url based version,
+
+        ```
+        //:.aspect_rules_js/node_modules/debug/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
+        ```
+
+        Package store link targets names for 3rd party package that come directly from an
+        `npm_import` start with `.aspect_rules_js/` then the name passed to the `npm_import`'s `npm_link_imported_package`
+        macro (typically 'node_modules') followed by `/<package>/<version>` where `package`
+        matches the `package` attribute in the npm_import of the package and `version` matches the
+        `version` attribute.
+
+        For example,
+
+        ```
+        //:.aspect_rules_js/node_modules/cliui/7.0.4
+        ```
+
+        Package store link targets names for 1st party packages automatically linked by `npm_link_all_packages`
+        using workspaces will follow the same pattern as 3rd party packages with the version typically defaulting
+        to "0.0.0".
+
+        For example,
+
+        ```
+        //:.aspect_rules_js/node_modules/@mycorp/mylib/0.0.0
+        ```
+
+        Package store link targets names for 1st party packages manually linked with `npm_link_package`
+        start with `.aspect_rules_js/` followed by the name passed to the `npm_link_package`.
+
+        For example,
+
+        ```
+        //:.aspect_rules_js/node_modules/@mycorp/mylib
+        ```
+
+        > In typical usage, a node.js program sometimes requires modules which were
+        > never declared as dependencies.
+        > This pattern is typically used when the program has conditional behavior
+        > that is enabled when the module is found (like a plugin) but the program
+        > also runs without the dependency.
+        > 
+        > This is possible because node.js doesn't enforce the dependencies are sound.
+        > All files under `node_modules` are available to any program.
+        > In contrast, Bazel makes it possible to make builds hermetic, which means that
+        > all dependencies of a program must be declared when running in Bazel's sandbox.
+        """,
+        providers = [NpmPackageStoreInfo],
+    ),
+    "package": attr.string(
+        doc = """The package name to link to.
+
+If unset, the package name in the NpmPackageInfo src must be set.
+If set, takes precendance over the package name in the NpmPackageInfo src.
+""",
+    ),
+    "version": attr.string(
+        doc = """The package version being linked.
+
+If unset, the package version in the NpmPackageInfo src must be set.
+If set, takes precendance over the package version in the NpmPackageInfo src.
+""",
+    ),
+    "allow_unresolved_symlinks": attr.bool(
+        mandatory = True,
+        doc = """Whether unresolved symlinks are enabled in the current build configuration.
+
+        These are enabled with the --experimental_allow_unresolved_symlinks flag.
+
+        Typical usage of this rule is via a macro which automatically sets this
+        attribute based on a `config_setting` rule.
+        """,
+    ),
+    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
+}
+
+def _impl(ctx):
+    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+
+    package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
+    version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
+
+    if not package:
+        fail("No package name specified to link to. Package name must either be specified explicitly via `package` attribute or come from the `src` `NpmPackageInfo`, typically a `npm_package` target")
+    if not version:
+        fail("No package version specified to link to. Package version must either be specified explicitly via `version` attribute or come from the `src` `NpmPackageInfo`, typically a `npm_package` target")
+
+    virtual_store_name = utils.virtual_store_name(package, version)
+
+    virtual_store_directory = None
+    transitive_files = []
+    direct_ref_deps = {}
+
+    if ctx.attr.src:
+        # output the package as a TreeArtifact to its virtual store location
+        # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+        virtual_store_directory_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", package)
+
+        if ctx.label.workspace_name:
+            expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, virtual_store_directory_path)
+        else:
+            expected_short_path = paths.join(ctx.label.package, virtual_store_directory_path)
+        src_directory = ctx.attr.src[NpmPackageInfo].directory
+        if src_directory.short_path == expected_short_path:
+            # the input is already the desired output; this is the pattern for
+            # packages with lifecycle hooks
+            virtual_store_directory = src_directory
+        else:
+            virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
+            copy_directory_action(ctx, src_directory, virtual_store_directory, is_windows = is_windows)
+
+        for dep, _dep_aliases in ctx.attr.deps.items():
+            # symlink the package's direct deps to its virtual store location
+            if dep[NpmPackageStoreInfo].root_package != ctx.label.package:
+                msg = """npm_package_store in %s package cannot depend on npm_package_store in %s package.
+deps of npm_package_store must be in the same package.""" % (ctx.label.package, dep[NpmPackageStoreInfo].root_package)
+                fail(msg)
+            dep_package = dep[NpmPackageStoreInfo].package
+            dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
+            dep_virtual_store_directory = dep[NpmPackageStoreInfo].virtual_store_directory
+            if dep_virtual_store_directory:
+                for dep_alias in dep_aliases:
+                    # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                    dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_alias)
+                    transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+            else:
+                # this is a ref npm_link_package, a downstream terminal npm_link_package
+                # for this npm depedency will create the dep symlinks for this dep;
+                # this pattern is used to break circular dependencies between 3rd
+                # party npm deps; it is not recommended for 1st party deps
+                direct_ref_deps[dep] = dep_aliases
+    else:
+        # if ctx.attr.src is _not_ set and ctx.attr.deps is, this is a terminal
+        # package with deps being the transitive closure of deps;
+        # this pattern is used to break circular dependencies between 3rd
+        # party npm deps; it is not recommended for 1st party deps
+        deps_map = {}
+        for dep, _dep_aliases in ctx.attr.deps.items():
+            dep_package = dep[NpmPackageStoreInfo].package
+            dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
+
+            # create a map of deps that have virtual store directories
+            if dep[NpmPackageStoreInfo].virtual_store_directory:
+                deps_map[utils.virtual_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)] = dep
+            else:
+                # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
+                # depedency will create the dep symlinks for this dep; this pattern is used to break
+                # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
+                direct_ref_deps[dep] = dep_aliases
+        for dep in ctx.attr.deps:
+            dep_virtual_store_name = utils.virtual_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)
+            dep_ref_deps = dep[NpmPackageStoreInfo].ref_deps
+            if virtual_store_name == dep_virtual_store_name:
+                # provide the node_modules directory for this package if found in the transitive_closure
+                virtual_store_directory = dep[NpmPackageStoreInfo].virtual_store_directory
+                if virtual_store_directory:
+                    transitive_files.append(virtual_store_directory)
+            for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
+                dep_ref_dep_virtual_store_name = utils.virtual_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
+                if dep_ref_dep_virtual_store_name == virtual_store_name:
+                    # ignore reference back to self in dyadic circular deps
+                    pass
+                else:
+                    if not dep_ref_dep_virtual_store_name in deps_map:
+                        fail("Expecting {} to be in deps".format(dep_ref_dep_virtual_store_name))
+                    actual_dep = deps_map[dep_ref_dep_virtual_store_name]
+                    dep_ref_def_virtual_store_directory = actual_dep[NpmPackageStoreInfo].virtual_store_directory
+                    if dep_ref_def_virtual_store_directory:
+                        for dep_ref_dep_alias in dep_ref_dep_aliases:
+                            # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                            dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
+                            transitive_files.extend(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
+
+    files = [virtual_store_directory] if virtual_store_directory else []
+
+    files_depset = depset(files)
+    transitive_files_depset = depset(files + transitive_files, transitive = [
+        target[NpmPackageStoreInfo].transitive_files
+        for target in ctx.attr.deps
+    ])
+
+    declarations_depset = files_depset
+    transitive_declarations_depset = depset(files, transitive = [transitive_files_depset] + [
+        target[DeclarationInfo].transitive_declarations
+        for target in ctx.attr.deps
+        if DeclarationInfo in target
+    ])
+
+    providers = [
+        DefaultInfo(files = transitive_files_depset),
+        # Always assume that packages provide typings, so we don't need to use an action to
+        # inspect the package.json#typings field or search for .d.ts files in the package and
+        # so that any package can be passed as dep to rules that require DeclarationInfo such
+        # as ts_project.
+        DeclarationInfo(
+            declarations = declarations_depset,
+            transitive_declarations = transitive_declarations_depset,
+        ),
+        NpmPackageStoreInfo(
+            label = ctx.label,
+            root_package = ctx.label.package,
+            package = package,
+            version = version,
+            ref_deps = direct_ref_deps,
+            virtual_store_directory = virtual_store_directory,
+            files = files_depset,
+            transitive_files = transitive_files_depset,
+        ),
+    ]
+    if virtual_store_directory:
+        # Provide an output group that provides a single file which is the
+        # package directory for use in $(execpath) and $(rootpath).
+        # Output group name must match utils.package_directory_output_group
+        providers.append(OutputGroupInfo(package_directory = depset([virtual_store_directory])))
+
+    return providers
+
+npm_package_store_lib = struct(
+    attrs = _ATTRS,
+    implementation = _impl,
+    provides = [DefaultInfo, DeclarationInfo, NpmPackageStoreInfo],
+)
+
+npm_package_store = rule(
+    doc = _DOC,
+    implementation = npm_package_store_lib.implementation,
+    attrs = npm_package_store_lib.attrs,
+    provides = npm_package_store_lib.provides,
+)

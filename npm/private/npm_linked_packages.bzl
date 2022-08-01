@@ -1,9 +1,9 @@
 "npm_linked_packages rule"
 
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
-load(":npm_link_package.bzl", _npm_link_package_direct_lib = "npm_link_package_direct_lib")
+load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 
-_DOC = """Combines multiple npm_link_package_direct targets into a single target.
+_DOC = """Combines multiple linked npm targets into a single target.
 
 New target provides DefaultInfo and DeclarationInfo.
 
@@ -12,24 +12,23 @@ For internal use only. Used for create `@npm//@scope` targets.
 
 _ATTRS = {
     "srcs": attr.label_list(
-        doc = """The npm_link_package targets to forward.""",
-        providers = _npm_link_package_direct_lib.provides,
+        doc = """The linked npm targets to forward.""",
+        providers = [NpmLinkedPackageInfo],
         mandatory = True,
     ),
 }
 
 def _impl(ctx):
-    files_depsets = []
-    runfiles = ctx.runfiles()
-
-    for src in ctx.attr.srcs:
-        files_depsets.append(src[DefaultInfo].files)
-        runfiles = runfiles.merge(src[DefaultInfo].data_runfiles)
-
     result = [
         DefaultInfo(
-            files = depset(transitive = files_depsets),
-            runfiles = runfiles,
+            files = depset(transitive = [
+                target[DefaultInfo].files
+                for target in ctx.attr.srcs
+            ]),
+            runfiles = ctx.runfiles().merge_all([
+                target[DefaultInfo].default_runfiles
+                for target in ctx.attr.srcs
+            ]),
         ),
         declaration_info(declarations = depset(), deps = ctx.attr.srcs),
     ]

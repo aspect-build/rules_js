@@ -14,6 +14,8 @@ bzl_library(
     deps = [
         "//npm/private:npm_link_package",
         "//npm/private:npm_package",
+        "//npm/private:npm_package_info",
+        "//npm/private:npm_package_store_info",
     ],
 )
 

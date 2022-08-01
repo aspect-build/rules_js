@@ -1,10 +1,10 @@
-"npm_link_package_store_internal rule"
+"npm_package_store_internal rule"
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":npm_link_package.bzl", _npm_link_package_store_lib = "npm_link_package_store_lib")
-load(":npm_package.bzl", "NpmPackageInfo")
+load(":npm_package_store.bzl", _npm_package_store_lib = "npm_package_store_lib")
+load(":npm_package_info.bzl", "NpmPackageInfo")
 
-_INTERNAL_ATTRS_STORE = dicts.add(_npm_link_package_store_lib.attrs, {
+_INTERNAL_ATTRS_STORE = dicts.add(_npm_package_store_lib.attrs, {
     "src": attr.label(
         doc = """A npm_package target or or any other target that provides a NpmPackageInfo.
 
@@ -31,8 +31,8 @@ _INTERNAL_ATTRS_STORE = dicts.add(_npm_link_package_store_lib.attrs, {
     ),
 })
 
-npm_link_package_store_internal = rule(
-    implementation = _npm_link_package_store_lib.implementation,
+npm_package_store_internal = rule(
+    implementation = _npm_package_store_lib.implementation,
     attrs = _INTERNAL_ATTRS_STORE,
-    provides = _npm_link_package_store_lib.provides,
+    provides = _npm_package_store_lib.provides,
 )

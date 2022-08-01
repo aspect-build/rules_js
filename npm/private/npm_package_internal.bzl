@@ -1,7 +1,7 @@
 "npm_package_internal rule"
 
-load(":npm_package.bzl", "NpmPackageInfo")
 load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
+load(":npm_package_info.bzl", "NpmPackageInfo")
 
 _ATTRS = {
     "src": attr.label(

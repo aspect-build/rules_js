@@ -7,16 +7,16 @@ load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 _LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
-load("@aspect_rules_js//npm/private:npm_link_package_store_internal.bzl", _npm_link_package_store = "npm_link_package_store_internal")
-load("@aspect_rules_js//npm/private:npm_link_package.bzl", _npm_link_package_direct = "npm_link_package_direct")
+load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
 load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
 load("@bazel_skylib//lib:paths.bzl", _paths = "paths")
 
-def npm_link_imported_package_store(
+def npm_imported_package_store(
     name,
     visibility = ["//visibility:public"]):
-    "Generated npm_link_package_store targets for npm package {package}@{version}"
+    "Generated npm_package_store targets for npm package {package}@{version}"
 
     root_package = "{root_package}"
     is_root = native.package_name() == root_package
@@ -36,7 +36,7 @@ def npm_link_imported_package_store(
     store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
 
     # reference target used to avoid circular deps
-    _npm_link_package_store(
+    _npm_package_store(
         name = "{{}}/ref".format(store_target_name),
         package = "{package}",
         version = "{version}",
@@ -48,7 +48,7 @@ def npm_link_imported_package_store(
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
-    _npm_link_package_store(
+    _npm_package_store(
         name = "{{}}/pkg".format(store_target_name),
         src = "{{}}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else "{npm_package_target}",
         package = "{package}",
@@ -61,8 +61,8 @@ def npm_link_imported_package_store(
         }}),
     )
 
-    # virtual store target with transitive closure of all node package dependencies
-    _npm_link_package_store(
+    # virtual store target with transitive closure of all npm package dependencies
+    _npm_package_store(
         name = store_target_name,
         src = None if {transitive_closure_pattern} else "{npm_package_target}",
         package = "{package}",
@@ -88,7 +88,7 @@ def npm_link_imported_package_store(
 
     if has_lifecycle_build_target:
         # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
-        _npm_link_package_store(
+        _npm_package_store(
             name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
             package = "{package}",
             version = "{version}",
@@ -101,7 +101,7 @@ def npm_link_imported_package_store(
         )
 
         # terminal pre-lifecycle target for use in lifecycle build target below
-        _npm_link_package_store(
+        _npm_package_store(
             name = "{{}}/pkg_pre_lc".format(store_target_name),
             package = "{package}",
             version = "{version}",
@@ -144,10 +144,10 @@ def npm_link_imported_package_store(
             tags = ["manual"],
         )
 
-def npm_link_imported_package_direct(
+def npm_link_imported_package_store(
     name,
     visibility = ["//visibility:public"]):
-    "Generated npm_link_package_store and npm_link_package_direct targets for npm package {package}@{version}"
+    "Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}"
 
     link_packages = {link_packages}
     if native.package_name() in link_packages:
@@ -168,8 +168,8 @@ def npm_link_imported_package_direct(
     link_root_name = name[:-len("/{{}}".format(link_alias))]
     store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
 
-    # terminal target for direct dependencies
-    _npm_link_package_direct(
+    # terminal package store target to link
+    _npm_link_package_store(
         name = name,
         package = link_alias,
         src = "//{root_package}:{{}}".format(store_target_name),
@@ -195,53 +195,53 @@ def npm_link_imported_package_direct(
 
 def npm_link_imported_package(
     name = "node_modules",
-    direct = {direct_default},
+    link = {link_default},
     fail_if_no_link = True,
     visibility = ["//visibility:public"]):
-    "Generated npm_link_package_store and npm_link_package_direct targets for npm package {package}@{version}"
+    "Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}"
 
     root_package = "{root_package}"
     link_packages = {link_packages}
 
-    if link_packages and direct != None:
-        fail("direct attribute cannot be specified when link_packages are set")
+    if link_packages and link != None:
+        fail("link attribute cannot be specified when link_packages are set")
 
-    is_direct = (direct == True) or (direct == None and native.package_name() in link_packages)
+    is_link = (link == True) or (link == None and native.package_name() in link_packages)
     is_root = native.package_name() == root_package
 
-    if fail_if_no_link and not is_root and not is_direct:
+    if fail_if_no_link and not is_root and not link:
         msg = "Nothing to link in bazel package '%s' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package." % native.package_name()
         fail(msg)
 
-    direct_targets = []
+    link_targets = []
     scoped_targets = {{}}
 
-    if is_direct:
+    if is_link:
         link_aliases = []
         if native.package_name() in link_packages:
             link_aliases = link_packages[native.package_name()]
         if not link_aliases:
             link_aliases = ["{package}"]
         for link_alias in link_aliases:
-            direct_target_name = "{{}}/{{}}".format(name, link_alias)
-            npm_link_imported_package_direct(
-                name = direct_target_name,
+            link_target_name = "{{}}/{{}}".format(name, link_alias)
+            npm_link_imported_package_store(
+                name = link_target_name,
                 visibility = visibility,
             )
-            direct_targets.append(":{{}}".format(direct_target_name))
+            link_targets.append(":{{}}".format(link_target_name))
             if len(link_alias.split("/", 1)) > 1:
                 link_scope = link_alias.split("/", 1)[0]
                 if link_scope not in scoped_targets:
                     scoped_targets[link_scope] = []
-                scoped_targets[link_scope].append(direct_target_name)
+                scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
-        npm_link_imported_package_store(
+        npm_imported_package_store(
             "{{}}/{package}".format(name),
             visibility = visibility,
         )
 
-    return (direct_targets, scoped_targets)
+    return (link_targets, scoped_targets)
 """
 
 _BIN_MACRO_TMPL = """
@@ -617,7 +617,7 @@ def _impl_links(rctx):
 
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
-        direct_default = "None" if rctx.attr.link_packages else "True",
+        link_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
         npm_package_target_lc = npm_package_target_lc,

@@ -184,7 +184,7 @@ bin_factory = _bin_factory
 _FP_STORE_TMPL = \
     """
     if is_root:
-        _npm_link_package_store(
+        _npm_package_store(
             name = "{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
             src = "{npm_package_target}",
             package = "{package}",
@@ -203,7 +203,7 @@ _FP_DIRECT_TMPL = \
     for link_package in {link_packages}:
         if link_package == native.package_name():
             # terminal target for direct dependencies
-            _npm_link_package_direct(
+            _npm_link_package_store(
                 name = "{{}}/{name}".format(name),
                 src = "//{root_package}:{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
                 visibility = ["//visibility:public"],
@@ -563,7 +563,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
     direct_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packages")"""]
+load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", _npm_linked_packages = "npm_linked_packages")"""]
 
     npm_imports = _gen_npm_imports(lockfile, rctx.attr)
 
@@ -689,11 +689,8 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
                     }
 
     if fp_links:
-        defs_bzl_header.append("""load(
-    "@aspect_rules_js//npm/private:npm_link_package.bzl",
-    _npm_link_package_direct = "npm_link_package_direct",
-    _npm_link_package_store = "npm_link_package_store",
-)""")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
     defs_bzl_body = [
         """def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -788,7 +785,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
 
         if _import.link_packages:
             defs_bzl_header.append(
-                """load("@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i}_direct = "npm_link_imported_package_direct", link_{i}_store = "npm_link_imported_package_store")""".format(
+                """load("@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i}_direct = "npm_link_imported_package_store", link_{i}_store = "npm_imported_package_store")""".format(
                     i = i,
                     repo_name = _import.name,
                     links_repo_suffix = utils.links_repo_suffix,
@@ -796,7 +793,7 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
             )
         else:
             defs_bzl_header.append(
-                """load("@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i}_store = "npm_link_imported_package_store")""".format(
+                """load("@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i}_store = "npm_imported_package_store")""".format(
                     i = i,
                     repo_name = _import.name,
                     links_repo_suffix = utils.links_repo_suffix,
@@ -893,14 +890,14 @@ load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", "npm_linked_packag
     # Generate catch all & scoped npm_linked_packages target
     defs_bzl_body.append("""
     for scope, scoped_targets in scoped_direct_targets.items():
-        npm_linked_packages(
+        _npm_linked_packages(
             name = "{}/{}".format(name, scope),
             srcs = scoped_targets,
             tags = ["manual"],
             visibility = ["//visibility:public"],
         )
 
-    npm_linked_packages(
+    _npm_linked_packages(
         name = name,
         srcs = direct_targets,
         tags = ["manual"],

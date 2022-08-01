@@ -167,11 +167,11 @@ def npm_import(
         link_workspace: The workspace name where links will be created for this package.
             Typically this is the workspace that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
             Can be left unspecified if the link workspace is the user workspace.
-        link_packages: Dict of paths where direct links may be created at for this package to
+        link_packages: Dict of paths where links may be created at for this package to
             a list of link aliases to link as in each package. If aliases are an
             empty list this indicates to link as the package name.
 
-            Defaults to {} which indicates that direct links may be created in any package as specified by
+            Defaults to {} which indicates that links may be created in any package as specified by
             the `direct` attribute of the generated npm_link_package.
         run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
             package.

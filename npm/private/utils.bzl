@@ -1,5 +1,6 @@
 "Utility functions for npm rules"
 
+load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load(":yaml.bzl", _parse_yaml = "parse")
 
 def _bazel_name(name, version = None):
@@ -83,6 +84,24 @@ def _virtual_store_name(name, version):
     escaped_version = version.replace("/", "+")
     return "%s@%s" % (escaped_name, escaped_version)
 
+def _make_symlink(ctx, symlink_path, target_file):
+    files = []
+    if ctx.attr.allow_unresolved_symlinks:
+        symlink = ctx.actions.declare_symlink(symlink_path)
+        ctx.actions.symlink(
+            output = symlink,
+            target_path = relative_file(target_file.path, symlink.path),
+        )
+        files.append(target_file)
+    else:
+        symlink = ctx.actions.declare_file(symlink_path)
+        ctx.actions.symlink(
+            output = symlink,
+            target_file = target_file,
+        )
+    files.append(symlink)
+    return files
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -92,6 +111,7 @@ utils = struct(
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_version = _strip_peer_dep_version,
+    make_symlink = _make_symlink,
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",
     # Suffix for npm_import links repository
