@@ -1,4 +1,5 @@
 load("//js:defs.bzl", "js_test")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 
 TESTS = [
     "escape.js",
@@ -28,6 +29,17 @@ TOOLCHAINS_VERSIONS = [
     }),
 ]
 
+# We need to copy the entry points to the bin so that the tests below don't follow the execroot
+# symlink back to the source tree since the fs patches are not on for the tests as they are the code
+# under test
+[
+    copy_to_bin(
+        name = "copy_entry_{}".format(t),
+        srcs = [t],
+    )
+    for t in TESTS
+]
+
 # Basic tests
 [
     js_test(
@@ -36,8 +48,11 @@ TOOLCHAINS_VERSIONS = [
             "//:node_modules/inline-fixtures",
             "//js/private/node-patches/src:compile",
         ],
-        entry_point = t,
+        entry_point = "copy_entry_{}".format(t),
         patch_node_fs = False,
+        # Without node patches on for these tests, the program is going to escape the sandbox if it
+        # is on since the fs patches are not on for the tests as they are the code under test
+        tags = ["no-sandbox"],
     )
     for t in TESTS
 ]
