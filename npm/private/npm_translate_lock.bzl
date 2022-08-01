@@ -572,7 +572,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
                 repo = rctx.name,
             ))
 
-    direct_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
+    link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_linked_packages.bzl", _npm_linked_packages = "npm_linked_packages")"""]
@@ -728,26 +728,26 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     \"\"\"
 
     root_package = "{root_package}"
-    direct_packages = {direct_packages}
+    link_packages = {link_packages}
     is_root = native.package_name() == root_package
-    is_direct = native.package_name() in direct_packages
-    if not is_root and not is_direct:
-        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{direct_packages_comma_separated}]" % native.package_name()
+    link = native.package_name() in link_packages
+    if not is_root and not link:
+        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '{root_package}' and packages [{link_packages_comma_separated}]" % native.package_name()
         fail(msg)
     link_targets = []
-    scoped_direct_targets = {{}}
+    scope_targets = {{}}
 
     for link_fn in imported_links:
-        new_direct_targets, new_scoped_targets = link_fn(name)
-        link_targets.extend(new_direct_targets)
-        for _scope, _targets in new_scoped_targets.items():
-            scoped_direct_targets[_scope] = scoped_direct_targets[_scope] + _targets if _scope in scoped_direct_targets else _targets
+        new_link_targets, new_scope_targets = link_fn(name)
+        link_targets.extend(new_link_targets)
+        for _scope, _targets in new_scope_targets.items():
+            scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
 """.format(
             pnpm_lock_wksp = str(rctx.attr.pnpm_lock.workspace_name),
             pnpm_lock = str(rctx.attr.pnpm_lock),
             root_package = root_package,
-            direct_packages = str(direct_packages),
-            direct_packages_comma_separated = "'" + "', '".join(direct_packages) + "'" if len(direct_packages) else "",
+            link_packages = str(link_packages),
+            link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
             defs_bzl_file = "@{}//:{}".format(rctx.name, _DEFS_BZL_FILENAME),
         ),
     ]
@@ -830,7 +830,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                 ))
                 if len(link_alias.split("/", 1)) > 1:
                     package_scope = link_alias.split("/", 1)[0]
-                    links_bzl[link_package].append("""            scoped_direct_targets["{package_scope}"] = scoped_direct_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scoped_direct_targets else [link_targets[-1]]""".format(
+                    links_bzl[link_package].append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                         package_scope = package_scope,
                     ))
         pkgs = lockfile.get("packages").values()
@@ -865,7 +865,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     defs_bzl_body.append("""    if is_root:""")
     defs_bzl_body.extend(stores_bzl)
 
-    defs_bzl_body.append("""    if is_direct:""")
+    defs_bzl_body.append("""    if link:""")
     for link_package, bzl in links_bzl.items():
         defs_bzl_body.append("""        if native.package_name() == "{}":""".format(link_package))
         defs_bzl_body.extend(bzl)
@@ -898,13 +898,13 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
         if len(fp_package.split("/", 1)) > 1:
             package_scope = fp_package.split("/", 1)[0]
-            defs_bzl_body.append("""            scoped_direct_targets["{package_scope}"] = scoped_direct_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scoped_direct_targets else [link_targets[-1]]""".format(
+            defs_bzl_body.append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                 package_scope = package_scope,
             ))
 
     # Generate catch all & scoped npm_linked_packages target
     defs_bzl_body.append("""
-    for scope, scoped_targets in scoped_direct_targets.items():
+    for scope, scoped_targets in scope_targets.items():
         _npm_linked_packages(
             name = "{}/{}".format(name, scope),
             srcs = scoped_targets,
