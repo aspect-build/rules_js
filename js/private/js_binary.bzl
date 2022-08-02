@@ -17,7 +17,6 @@ js_binary(
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 
@@ -316,7 +315,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
         fail("need --enable_runfiles on Windows for to support rules_js")
 
     if DirectoryPathInfo in ctx.attr.entry_point:
-        output_entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
+        entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
         entry_point_path = "/".join([
             ctx.attr.entry_point[DirectoryPathInfo].directory.short_path,
             ctx.attr.entry_point[DirectoryPathInfo].path,
@@ -327,20 +326,18 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
 
         # Copy entry and data files that are not already in the output tree to the output tree.
         # See docstring at the top of this file for more info.
-        output_entry_point = copy_file_to_bin_action(ctx, ctx.files.entry_point[0], is_windows = is_windows)
-        entry_point_path = output_entry_point.short_path
-
-    output_data_files = copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows)
+        entry_point = ctx.files.entry_point[0]
+        entry_point_path = entry_point.short_path
 
     bash_launcher, node_wrapper = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
     all_files = []
-    all_files.extend(output_data_files)
+    all_files.extend(ctx.files.data)
     all_files.extend(ctx.files._runfiles_lib)
     all_files.append(ctx.file._node_patches)
     all_files.extend(ctx.files._node_patches_files)
-    all_files.append(output_entry_point)
+    all_files.append(entry_point)
     all_files.append(bash_launcher)
     all_files.append(node_wrapper)
     all_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
