@@ -4,6 +4,38 @@
 load(":js_binary_helpers.bzl", "gather_files_from_js_providers")
 load(":js_info.bzl", "JsInfo")
 
+# This attribute is exposed in //js:libs.bzl so that downstream build rules can use it
+JS_LIBRARY_DEPS_ATTR = attr.label_list(
+    doc = """Dependencies of this target.
+
+    The transitive npm dependencies, transitive sources & runfiles of targets in the deps attribute are added to the
+    runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
+    runtime dependency on this target.
+
+    This may include other js_library targets or other targets that provide JsInfo
+    """,
+    providers = [JsInfo],
+)
+
+# This attribute is exposed in //js:libs.bzl so that downstream build rules can use it
+JS_LIBRARY_DATA_ATTR = attr.label_list(
+    doc = """Runtime dependencies to include in binaries/tests that depend on this target.
+
+    The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the data attribute
+    are added to the runfiles of this taregt. Thery should appear in the '*.runfiles' area of any executable which has
+    a runtime dependency on this target.
+
+    If this list contains linked npm packages, npm package store targets or other targets that provide `JsInfo`,
+    `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from `npm_package_stores` and
+    `transitive_npm_package_stores` fields of these and for linked npm package targets, from the underlying
+    npm_package_store target(s) that back the links via `npm_linked_packages` and `transitive_npm_linked_packages`.
+
+    Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies when linking a downstream
+    `npm_package` target with `npm_link_package`.
+    """,
+    allow_files = True,
+)
+
 def gather_transitive_sources(sources, targets):
     """Gathers transitive sources from a list of direct sources and targets
 
