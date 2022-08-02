@@ -47,6 +47,10 @@ _ATTRS = {
         doc = """Source files that are included in this library.
 
         This includes all your checked-in code and any generated source files.
+
+        The transitive npm dependencies, transitive sources & runfiles of targets in the `srcs` attribute are added to the
+        runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
+        runtime dependency on this target.
         """,
         allow_files = True,
     ),

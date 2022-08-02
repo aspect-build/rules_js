@@ -8,11 +8,11 @@ load(":js_info.bzl", "JsInfo")
 JS_LIBRARY_DEPS_ATTR = attr.label_list(
     doc = """Dependencies of this target.
 
-    The transitive npm dependencies, transitive sources & runfiles of targets in the deps attribute are added to the
+    This may include other js_library targets or other targets that provide JsInfo
+
+    The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
     runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
     runtime dependency on this target.
-
-    This may include other js_library targets or other targets that provide JsInfo
     """,
     providers = [JsInfo],
 )
@@ -21,7 +21,7 @@ JS_LIBRARY_DEPS_ATTR = attr.label_list(
 JS_LIBRARY_DATA_ATTR = attr.label_list(
     doc = """Runtime dependencies to include in binaries/tests that depend on this target.
 
-    The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the data attribute
+    The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the `data` attribute
     are added to the runfiles of this taregt. Thery should appear in the '*.runfiles' area of any executable which has
     a runtime dependency on this target.
 
