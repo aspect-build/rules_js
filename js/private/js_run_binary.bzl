@@ -41,7 +41,7 @@ def js_run_binary(
         stamp = 0,
         patch_node_fs = True,
         **kwargs):
-    """Wrapper around @aspect_bazel_lib 'run_binary' that adds convienence attributes for using a 'js_binary' tool.
+    """Wrapper around @aspect_bazel_lib `run_binary` that adds convienence attributes for using a `js_binary` tool.
 
     This rule does not require Bash `native.genrule`.
 
@@ -109,15 +109,15 @@ def js_run_binary(
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
-        include_transitive_sources: see 'js_filegroup' documentation
+        include_transitive_sources: see `js_filegroup` documentation
 
-        include_declarations: see 'js_filegroup' documentation
+        include_declarations: see `js_filegroup` documentation
 
-        include_npm_linked_packages: see 'js_filegroup' documentation
+        include_npm_linked_packages: see `js_filegroup` documentation
 
-        log_level: Set the logging level of the 'js_binary' tool.
+        log_level: Set the logging level of the `js_binary` tool.
 
-            This overrides the log level set on the 'js_binary' tool target.
+            This overrides the log level set on the `js_binary` tool target.
 
         mnemonic: A one-word description of the action, for example, CppCompile or GoLink.
 

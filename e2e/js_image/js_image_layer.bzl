@@ -144,7 +144,7 @@ build_tar_path = r.Rlocation("rules_pkg/pkg/private/tar/build_tar")
 
 manifest_path = next((argv.replace("--manifest=", "") for argv in sys.argv if argv.startswith("--manifest=")), None)
 
-with open(manifest_path, 'r') as manifest_fp:
+with open(manifest_path, "r") as manifest_fp:
     manifest = json.load(manifest_fp)
 
 def strip_execroot(p):

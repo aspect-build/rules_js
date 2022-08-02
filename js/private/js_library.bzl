@@ -32,13 +32,13 @@ and derivative rule sets.
 
 Declaration files are handled separately from sources since they are generally not needed at
 runtime and build rules, such as ts_project, are optimal in their build graph if they only depend
-on declarations from 'deps' since these they don't need the JavaScript source files from deps to
+on declarations from `deps` since these they don't need the JavaScript source files from deps to
 typecheck.
 
 Linked npm dependences are also handled separately from sources since not all rules require them and it
 is optimal for these rules to not depend on them in the build graph.
 
-NB: 'js_library' copies all source files to the output tree before providing them in JsInfo. See
+NB: `js_library` copies all source files to the output tree before providing them in JsInfo. See
 https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155/docs#javascript
 for more context on why we do this."""
 
@@ -62,27 +62,31 @@ _ATTRS = {
     ),
     "data": attr.label_list(
         doc = """Runtime dependencies to include in binaries/tests that depend on this library.
-        
-        If this list contains linked npm packages, npm package store targets or other targets that provide 'JsInfo',
-        'NpmPackageStoreInfo' providers are gathered from 'JsInfo'. This is done directly from 'npm_package_stores' and
-        'transitive_npm_package_stores' fields of these and for linked npm package targets, from the underlying
-        npm_package_store target(s) that back the links via 'npm_linked_packages' and 'transitive_npm_linked_packages'.
 
-        Gathered 'NpmPackageStoreInfo' providers are used downstream as direct dependencies when linking a downstream
-        'npm_package' target with 'npm_link_package'.
+        If this list contains linked npm packages, npm package store targets or other targets that provide `JsInfo`,
+        `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from `npm_package_stores` and
+        `transitive_npm_package_stores` fields of these and for linked npm package targets, from the underlying
+        npm_package_store target(s) that back the links via `npm_linked_packages` and `transitive_npm_linked_packages`.
+
+        Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies when linking a downstream
+        `npm_package` target with `npm_link_package`.
         """,
         allow_files = True,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-def _gather_sources_and_declarations(ctx, targets, is_windows = False):
+def _gather_sources_and_declarations(ctx, targets, files, is_windows = False):
     """Gathers sources and declarations from a list of targets
 
     Args:
         ctx: the rule context
 
-        targets: List of targets to gather sources and declarations from.
+        targets: List of targets to gather sources and declarations from their JsInfo providers.
+
+            These typically come from the `srcs` and/or `data` attributes of a rule
+
+        files: List of files to gather as sources and declarations.
 
             These typically come from the `srcs` and/or `data` attributes of a rule
 
@@ -94,11 +98,10 @@ def _gather_sources_and_declarations(ctx, targets, is_windows = False):
     sources = []
     declarations = []
 
-    for target in targets:
-        for file in target[DefaultInfo].files.to_list():
-            if file.is_source:
-                if ctx.label.package != file.owner.package:
-                    msg = """
+    for file in files:
+        if file.is_source:
+            if ctx.label.package != file.owner.package:
+                msg = """
 
 Expected to find source file {file_basename} in {this_package}, but instead it is in {file_package}.
 
@@ -118,34 +121,34 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
     buildozer 'add srcs {file_package}:{new_target_name}' {this_target}
 
 """.format(
-                        file_basename = file.basename,
-                        file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
-                        new_target_name = file.basename.replace(".", "_"),
-                        this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
-                        this_target = ctx.label,
-                    )
-                    fail(msg)
-                file = copy_file_to_bin_action(ctx, file, is_windows = is_windows)
+                    file_basename = file.basename,
+                    file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
+                    new_target_name = file.basename.replace(".", "_"),
+                    this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
+                    this_target = ctx.label,
+                )
+                fail(msg)
+            file = copy_file_to_bin_action(ctx, file, is_windows = is_windows)
 
-            if file.is_directory:
-                # assume a directory contains declarations since we can't know that it doesn't
-                declarations.append(file)
-                sources.append(file)
-            elif (
-                file.path.endswith(".d.ts") or
-                file.path.endswith(".d.ts.map") or
-                file.path.endswith(".d.mts") or
-                file.path.endswith(".d.mts.map") or
-                file.path.endswith(".d.cts") or
-                file.path.endswith(".d.cts.map")
-            ):
-                declarations.append(file)
-            elif file.path.endswith("/package.json"):
-                # package.json may be required to resolve declarations with the "typings" key
-                declarations.append(file)
-                sources.append(file)
-            else:
-                sources.append(file)
+        if file.is_directory:
+            # assume a directory contains declarations since we can't know that it doesn't
+            declarations.append(file)
+            sources.append(file)
+        elif (
+            file.path.endswith(".d.ts") or
+            file.path.endswith(".d.ts.map") or
+            file.path.endswith(".d.mts") or
+            file.path.endswith(".d.mts.map") or
+            file.path.endswith(".d.cts") or
+            file.path.endswith(".d.cts.map")
+        ):
+            declarations.append(file)
+        elif file.path.endswith("/package.json"):
+            # package.json may be required to resolve declarations with the "typings" key
+            declarations.append(file)
+            sources.append(file)
+        else:
+            sources.append(file)
 
     # sources
     sources.extend([
@@ -173,6 +176,7 @@ def _js_library_impl(ctx):
     sources, declarations = _gather_sources_and_declarations(
         ctx = ctx,
         targets = ctx.attr.srcs,
+        files = ctx.files.srcs,
         is_windows = is_windows,
     )
 
@@ -218,9 +222,7 @@ def _js_library_impl(ctx):
             runfiles = runfiles,
         ),
         OutputGroupInfo(
-            transitive_sources = depset(transitive_sources),
-            declarations = depset(declarations),
-            transitive_declarations = depset(transitive_declarations),
+            types = depset(declarations),
         ),
     ]
 

@@ -8,8 +8,8 @@ def gather_transitive_sources(sources, targets):
     """Gathers transitive sources from a list of direct sources and targets
 
     Args:
-        sources: direct sources which should be included in 'transitive_sources'
-        targets: list of targets to gather 'transitive_sources' from 'JsInfo'
+        sources: direct sources which should be included in `transitive_sources`
+        targets: list of targets to gather `transitive_sources` from `JsInfo`
 
     Returns:
         List of transitive sources
@@ -27,8 +27,8 @@ def gather_transitive_declarations(declarations, targets):
     """Gathers transitive sources from a list of direct sources and targets
 
     Args:
-        declarations: Direct sources which should be included in 'transitive_declarations'
-        targets: List of targets to gather 'transitive_declarations' from 'JsInfo'
+        declarations: Direct sources which should be included in `transitive_declarations`
+        targets: List of targets to gather `transitive_declarations` from `JsInfo`
 
     Returns:
         List of transitive sources

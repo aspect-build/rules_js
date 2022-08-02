@@ -5,12 +5,12 @@ load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 
 _ATTRS = {
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
     "_launcher_template": attr.label(
         default = Label("//js/private/coverage:coverage.sh.tpl"),
         allow_single_file = True,
     ),
+    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
 def _to_manifest_path(ctx, file):

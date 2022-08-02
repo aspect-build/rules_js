@@ -13,19 +13,20 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
-_DOC = """A rule that packages sources into a directory (a tree artifact) and provides an 'NpmPackageInfo'.
+_DOC = """A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
-This target can be used as the 'src' attribute to 'npm_link_package'.
+This target can be used as the `src` attribute to `npm_link_package`.
 
-'npm_package' makes use of 'copy_to_directory'
+`npm_package` makes use of `copy_to_directory`
 (https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md) under the hood,
 adopting its API and its copy action using composition. However, unlike copy_to_directory,
 npm_package includes transitive_sources and transitive_declarations files from JsInfo providers in srcs.
 
-The default 'include_srcs_packages', [".", "./**"], prevents files from outside of the target's
+The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
 package and subpackages from being included.
 
-The default 'exclude_srcs_patterns', of ["node_modules/**", "**/node_modules/**"],
+The default `exclude_srcs_patterns`, of `["node_modules/**", "**/node_modules/**"]`, prevents
+`node_modules` files from being included.
 """
 
 # Pull in all copy_to_directory attributes except for exclude_prefixes
