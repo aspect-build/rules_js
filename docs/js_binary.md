@@ -34,16 +34,6 @@ based on the requested target platform. Use the
 [`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
 Bazel option to see more detail about the selection.
 
-For node_modules resolution support and to prevent node programs for following symlinks back to the
-user source tree when outside of the sandbox, this rule always copies the entry_point to the output
-tree (if it is not already there) and run the programs from the entry points's runfiles location.
-
-Data files that are not already in the output tree are also copied there so that node programs can
-find them when outside of the sandbox and so that they don't follow symlinks back to the user source
-tree.
-
-TODO: link to rules_js linker design doc
-
 This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
 
