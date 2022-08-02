@@ -181,9 +181,9 @@ write_file(
     content = [
         "const { test } = require('uvu');",
         "const assert = require('uvu/assert');",
-        "const mylib = require('@mycorp/mylib');",
+        "const pkg_a = require('@mycorp/pkg-a');",
         "test('version', () => {",
-        "  assert.is(mylib.getAcornVersion(), '8.7.1');",
+        "  assert.is(pkg_a.getAcornVersion(), '8.7.1');",
         "})",
         "test.run()",
     ],
@@ -204,7 +204,7 @@ uvu_test(
         "false",
     ],
     data = [
-        ":node_modules/@mycorp/mylib",
+        ":node_modules/@mycorp/pkg-a",
         # ":node_modules/uvu" dep required because our spec calls require('uvu')
         ":node_modules/uvu",
         ":uvu_spec",
@@ -242,13 +242,13 @@ js_test(
 write_file(
     name = "write7",
     out = "case7.js",
-    content = ["require('@mycorp/mylib')"],
+    content = ["require('@mycorp/pkg-a')"],
 )
 
 js_test(
     name = "test7",
     data = [
-        ":node_modules/@mycorp/mylib",
+        ":node_modules/@mycorp/pkg-a",
     ],
     entry_point = "case7.js",
 )

@@ -1,0 +1,28 @@
+load("//js:defs.bzl", "js_library")
+
+# The sources of this js_library will be included transitively in the terminal
+# //examples/npm_package/packages/pkg_a npm_package for this package via the
+# JsInfo provider.
+js_library(
+    name = "lib",
+    srcs = [
+        "index.d.ts",
+        "index.js",
+    ],
+    visibility = ["//examples/npm_package:__subpackages__"],
+    deps = [
+        # Dep on a 'js_library' in a child package. This 'js_library' will be included in the
+        # terminal npm_package //examples/npm_package/packages/pkg_a since it is in a sub-package.
+        "//examples/npm_package/packages/pkg_a/a/a2:lib",
+        # Intentionally depend directly on a 'js_library' in a parent or sibling package instead of
+        # a linked 'npm_package'. This is to show that 'js_library' deps in parent or sibling
+        # packaages don't automatically get included in an 'npm_package'. If that is desired, you
+        # can customize 'include_srcs_packages' in 'npm_package' to specify which package(s) to
+        # include and use 'root_paths' and 'replace_prefixes' to customize where the sources are
+        # copied to. This is a contrived example in this case since 'lib_a' is not used to create the
+        # outputs of this 'js_library' target. Typically you'd see this in a custom build rule where
+        # the dep is a "dev" dependency used by the tool to create the outputs but it is not needed
+        # by consumers of the 'npm_package' and does not need to be propogated there.
+        "//examples/npm_package/libs/lib_a",
+    ],
+)

@@ -26,6 +26,31 @@ config_setting(
 )
 
 bzl_library(
+    name = "js_filegroup",
+    srcs = ["js_filegroup.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
+    deps = [
+        ":js_binary_helpers",
+    ],
+)
+
+bzl_library(
+    name = "js_binary_helpers",
+    srcs = ["js_binary_helpers.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
+    deps = [
+        ":js_info",
+        "//npm:providers",
+    ],
+)
+
+bzl_library(
     name = "js_binary",
     srcs = ["js_binary.bzl"],
     visibility = [
@@ -33,12 +58,25 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
+        ":js_binary_helpers",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:directory_path",
         "@aspect_bazel_lib//lib:expand_make_vars",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
-        "@rules_nodejs//nodejs:bzl",
+    ],
+)
+
+bzl_library(
+    name = "js_library_helpers",
+    srcs = ["js_library_helpers.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
+    deps = [
+        ":js_binary_helpers",
+        ":js_info",
     ],
 )
 
@@ -50,8 +88,10 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
+        ":js_info",
+        ":js_library_helpers",
         "@aspect_bazel_lib//lib:copy_to_bin",
-        "@rules_nodejs//nodejs:bzl",
+        "@bazel_skylib//lib:dicts",
     ],
 )
 
@@ -63,9 +103,16 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
-        ":js_binary",
+        ":js_binary_helpers",
+        ":js_filegroup",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:run_binary",
         "@bazel_skylib//lib:dicts",
     ],
+)
+
+bzl_library(
+    name = "js_info",
+    srcs = ["js_info.bzl"],
+    visibility = ["//js:__subpackages__"],
 )

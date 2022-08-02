@@ -8,7 +8,7 @@ NpmLinkedPackageInfo = provider(
         "package": "name of this npm package",
         "version": "version of this npm package",
         "store_info": "the NpmPackageStoreInfo of the linked npm package store that is backing this link",
-        "files": "depset of files that are part of the linked npm package",
-        "transitive_files": "depset of the transitive files that are part of the linked npm package and its transitive deps",
+        "files": "list of files that are part of the linked npm package",
+        "transitive_files": "list of the transitive files that are part of the linked npm package and its transitive deps",
     },
 )

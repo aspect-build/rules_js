@@ -20,17 +20,9 @@ importers:
 
   examples/js_binary:
     specifiers:
-      '@mycorp/mylib': workspace:*
+      '@mycorp/pkg-a': workspace:*
     devDependencies:
-      '@mycorp/mylib': link:../lib
-
-  examples/lib:
-    specifiers:
-      acorn: 8.7.1
-      uuid: 8.3.2
-    dependencies:
-      acorn: 8.7.1
-      uuid: 8.3.2
+      '@mycorp/pkg-a': link:../npm_package/packages/pkg_a
 
   examples/macro:
     specifiers:
@@ -47,7 +39,7 @@ importers:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
-      '@mycorp/mylib': workspace:*
+      '@mycorp/pkg-a': workspace:*
       '@rollup/plugin-commonjs': 21.1.0
       debug: 3.2.7
       mobx: 6.3.0
@@ -59,7 +51,7 @@ importers:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@gregmagolan/test-b': 0.0.2
-      '@mycorp/mylib': link:../lib
+      '@mycorp/pkg-a': link:../npm_package/packages/pkg_a
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       debug: 3.2.7
       mobx: 6.3.0
@@ -67,6 +59,28 @@ importers:
       react: 17.0.2
       rollup: 2.70.2
       uvu: 0.5.3
+
+  examples/npm_package/libs/lib_a:
+    specifiers:
+      chalk: 5.0.1
+    dependencies:
+      chalk: 5.0.1
+
+  examples/npm_package/packages/pkg_a:
+    specifiers:
+      acorn: 8.7.1
+      uuid: 8.3.2
+    dependencies:
+      acorn: 8.7.1
+      uuid: 8.3.2
+
+  examples/npm_package/packages/pkg_b:
+    specifiers:
+      acorn: 8.7.1
+      uuid: 8.3.2
+    dependencies:
+      acorn: 8.7.1
+      uuid: 8.3.2
 
   examples/webpack_cli:
     specifiers:
@@ -802,6 +816,11 @@ packages:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
     dev: true
+
+  /chalk/5.0.1:
+    resolution: {integrity: sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+    dev: false
 
   /charenc/0.0.2:
     resolution: {integrity: sha1-wKHS86cJLgN3S/qD8UwPxXkKhmc=}

@@ -1,0 +1,37 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+# Use js_library so that npm_package picks up our transitive sources from deps
+# via the JsInfo provider.
+js_library(
+    name = "lib",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    # In this package, the npm dependencies needed for consumers as specified
+    # in its 'package.json' file so they don't need to be explicitly set as deps
+    # of this 'js_library' for the linker to link the as depenencies of the 'npm_package'
+    # since it is linked via 'npm_link_all_packages'.
+    deps = [
+        "//examples/npm_package/packages/pkg_a/a:lib",
+    ],
+)
+
+# The terminal npm_package target for this package. This target is linked from
+# information encoded in the 'pnpm-lock.yaml' file via pnpm workspaces (https://pnpm.io/workspaces).
+# These are defined in root 'pnpm-workspace.yaml'. The 'npm_translate_lock' repository
+# rule encodes the linking logic for this dependency into the generated 'npm_link_all_packages'
+# marco.
+npm_package(
+    name = "pkg_a",
+    srcs = [":lib"],
+    # The package name does not need to be specified in this target since the name
+    # that this package is linked as is set by the pnpm lockfile. If it is
+    # specified here then it won't be load bearing since the value in the pnpm
+    # lockfile will take precendence.
+    visibility = ["//visibility:public"],
+)

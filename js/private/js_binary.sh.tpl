@@ -268,13 +268,13 @@ tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefin
 by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended \
 rule to use for using a js_binary as the tool of a build action. If this is not a build action you can set the \
 BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the \
-aspect_rules_js README https://github.com/aspect-build/rules_js#running-nodejs-programs."
+aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs."
         exit 1
     fi
 
     # Since the process was launched in the execroot, we automatically change directory into the root of the
     # output tree (which we expect to be set in BAZEL_BIN). See
-    # https://github.com/aspect-build/rules_js/tree/67c561e08fa8baaf6fbfe00094fa0d757159e1ef#running-nodejs-programs
+    # https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
     # for more context on why we do this.
     logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
     cd "$BAZEL_BINDIR"

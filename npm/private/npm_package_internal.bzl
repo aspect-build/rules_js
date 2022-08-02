@@ -1,6 +1,5 @@
 "npm_package_internal rule"
 
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "declaration_info")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
 _ATTRS = {
@@ -29,19 +28,17 @@ def _impl(ctx):
     return [
         DefaultInfo(
             files = depset([dst]),
-            runfiles = ctx.runfiles([dst]),
         ),
-        declaration_info(depset([dst])),
         NpmPackageInfo(
-            label = ctx.label,
             package = ctx.attr.package,
             version = ctx.attr.version,
             directory = dst,
+            npm_package_stores = [],
         ),
     ]
 
 npm_package_internal = rule(
     implementation = _impl,
     attrs = _ATTRS,
-    provides = [DefaultInfo, DeclarationInfo, NpmPackageInfo],
+    provides = [DefaultInfo, NpmPackageInfo],
 )

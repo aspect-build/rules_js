@@ -2,7 +2,6 @@
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo")
 load(":utils.bzl", "utils")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
@@ -82,7 +81,7 @@ _ATTRS = {
         For example,
 
         ```
-        //:.aspect_rules_js/node_modules/@mycorp/mylib/0.0.0
+        //:.aspect_rules_js/node_modules/@mycorp/mypkg/0.0.0
         ```
 
         Package store link targets names for 1st party packages manually linked with `npm_link_package`
@@ -91,7 +90,7 @@ _ATTRS = {
         For example,
 
         ```
-        //:.aspect_rules_js/node_modules/@mycorp/mylib
+        //:.aspect_rules_js/node_modules/@mycorp/mypkg
         ```
 
         > In typical usage, a node.js program sometimes requires modules which were
@@ -177,6 +176,14 @@ def _impl(ctx):
             virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
             copy_directory_action(ctx, src_directory, virtual_store_directory, is_windows = is_windows)
 
+        for store in ctx.attr.src[NpmPackageInfo].npm_package_stores:
+            dep_package = store.package
+            dep_virtual_store_directory = store.virtual_store_directory
+
+            # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+            dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
+            transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+
         for dep, _dep_aliases in ctx.attr.deps.items():
             # symlink the package's direct deps to its virtual store location
             if dep[NpmPackageStoreInfo].root_package != ctx.label.package:
@@ -241,38 +248,31 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     files = [virtual_store_directory] if virtual_store_directory else []
 
-    files_depset = depset(files)
-    transitive_files_depset = depset(files + transitive_files, transitive = [
-        target[NpmPackageStoreInfo].transitive_files
+    npm_package_stores = ctx.attr.src[NpmPackageInfo].npm_package_stores[:] if ctx.attr.src else []
+    npm_package_stores.extend([
+        target[NpmPackageStoreInfo]
         for target in ctx.attr.deps
     ])
 
-    declarations_depset = files_depset
-    transitive_declarations_depset = depset(files, transitive = [transitive_files_depset] + [
-        target[DeclarationInfo].transitive_declarations
-        for target in ctx.attr.deps
-        if DeclarationInfo in target
+    transitive_files.extend(files)
+    transitive_files.extend([
+        item
+        for npm_package_store in npm_package_stores
+        for item in npm_package_store.transitive_files
     ])
 
     providers = [
-        DefaultInfo(files = transitive_files_depset),
-        # Always assume that packages provide typings, so we don't need to use an action to
-        # inspect the package.json#typings field or search for .d.ts files in the package and
-        # so that any package can be passed as dep to rules that require DeclarationInfo such
-        # as ts_project.
-        DeclarationInfo(
-            declarations = declarations_depset,
-            transitive_declarations = transitive_declarations_depset,
+        DefaultInfo(
+            files = depset(files),
         ),
         NpmPackageStoreInfo(
-            label = ctx.label,
             root_package = ctx.label.package,
             package = package,
             version = version,
             ref_deps = direct_ref_deps,
             virtual_store_directory = virtual_store_directory,
-            files = files_depset,
-            transitive_files = transitive_files_depset,
+            files = files,
+            transitive_files = transitive_files,
         ),
     ]
     if virtual_store_directory:
@@ -286,7 +286,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 npm_package_store_lib = struct(
     attrs = _ATTRS,
     implementation = _impl,
-    provides = [DefaultInfo, DeclarationInfo, NpmPackageStoreInfo],
+    provides = [DefaultInfo, NpmPackageStoreInfo],
 )
 
 npm_package_store = rule(

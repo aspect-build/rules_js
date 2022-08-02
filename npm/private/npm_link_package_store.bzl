@@ -1,10 +1,10 @@
 "npm_link_package_store rule"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo")
 load(":utils.bzl", "utils")
 load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
+load("//js:providers.bzl", "JsInfo", "js_info")
 
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
@@ -47,39 +47,39 @@ If set, takes precendance over the package name in the src npm_package_store.
 }
 
 def _impl(ctx):
-    virtual_store_directory = ctx.attr.src[NpmPackageStoreInfo].virtual_store_directory
+    store_info = ctx.attr.src[NpmPackageStoreInfo]
+
+    virtual_store_directory = store_info.virtual_store_directory
     if not virtual_store_directory:
         fail("src must be a npm_link_package that provides a virtual_store_directory")
 
-    package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageStoreInfo].package
+    package = ctx.attr.package if ctx.attr.package else store_info.package
 
     # symlink the package's path in the virtual store to the root of the node_modules
     # "node_modules/{package}" so it is available as a direct dependency
     root_symlink_path = paths.join("node_modules", package)
 
     files = utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)
-    files_depset = depset(files)
 
-    transitive_files_depset = depset(files, transitive = [ctx.attr.src[NpmPackageStoreInfo].transitive_files])
+    transitive_files = files + store_info.transitive_files
 
-    store_info = ctx.attr.src[NpmPackageStoreInfo]
+    npm_linked_package_info = NpmLinkedPackageInfo(
+        label = ctx.label,
+        link_package = ctx.label.package,
+        package = store_info.package,
+        version = store_info.version,
+        store_info = store_info,
+        files = files,
+        transitive_files = transitive_files,
+    )
 
     providers = [
         DefaultInfo(
-            files = transitive_files_depset,
+            files = depset(files),
         ),
-        NpmLinkedPackageInfo(
-            label = ctx.label,
-            link_package = ctx.label.package,
-            package = store_info.package,
-            version = store_info.version,
-            store_info = store_info,
-            files = files_depset,
-            transitive_files = transitive_files_depset,
-        ),
-        DeclarationInfo(
-            declarations = depset(files, transitive = [ctx.attr.src[DeclarationInfo].declarations]),
-            transitive_declarations = depset(files, transitive = [ctx.attr.src[DeclarationInfo].transitive_declarations]),
+        js_info(
+            npm_linked_packages = [npm_linked_package_info],
+            transitive_npm_linked_packages = [npm_linked_package_info],
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
@@ -91,5 +91,5 @@ npm_link_package_store = rule(
     doc = _DOC,
     implementation = _impl,
     attrs = _ATTRS,
-    provides = [DefaultInfo, DeclarationInfo, NpmLinkedPackageInfo],
+    provides = [DefaultInfo, JsInfo],
 )

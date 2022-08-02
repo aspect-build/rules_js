@@ -15,6 +15,14 @@ npm_link_all_packages(
     ],
 )
 
+# Example of manually linking a first-party dependency. Its transitive npm dependencies
+# are picked up automatically via 'npm_package_stores' in the js_library targets that
+# the`npm_package` target depends on.
+npm_link_package(
+    name = "node_modules/@mycorp/pkg-b",
+    src = "//examples/npm_package/packages/pkg_b",
+)
+
 gazelle_binary(
     name = "gazelle_bin",
     languages = ["@bazel_skylib//gazelle/bzl"],

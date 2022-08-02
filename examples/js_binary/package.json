@@ -1,6 +1,6 @@
 {
     "private": true,
     "devDependencies": {
-        "@mycorp/mylib": "workspace:*"
+        "@mycorp/pkg-a": "workspace:*"
     }
 }
