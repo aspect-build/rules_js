@@ -21,6 +21,7 @@ jobs:
                 folder:
                     - '.'
                     - 'e2e/bzlmod'
+                    - 'e2e/js_library-indirect'
                     - 'e2e/npm_link_package'
                     - 'e2e/pnpm_workspace'
                     - 'e2e/pnpm_workspace_rerooted'

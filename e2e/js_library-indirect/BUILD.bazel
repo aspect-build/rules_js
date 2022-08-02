@@ -1,0 +1,29 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+# A root "application" (test in this case) depending a tree of various
+# js-producing dependencies.
+
+js_test(
+    name = "test-runner",
+    data = [":node_modules/@myorg/js_lib2"],
+    entry_point = "main.js",
+)
+
+build_test(
+    name = "test",
+    targets = [":test-runner"],
+)
+
+
+# Packages to be linked into the node_modules
+npm_link_package(
+    name = "node_modules/@myorg/js_lib",
+    src = "//js_lib",
+)
+
+npm_link_package(
+    name = "node_modules/@myorg/js_lib2",
+    src = "//js_lib2",
+)
