@@ -12,7 +12,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 ```
 
 
-<a id="#js_run_binary"></a>
+<a id="js_run_binary"></a>
 
 ## js_run_binary
 
