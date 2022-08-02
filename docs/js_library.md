@@ -25,7 +25,7 @@ js_library(
 | Python sources and provides a `PyInfo`.
 
 
-<a id="#js_library"></a>
+<a id="js_library"></a>
 
 ## js_library
 
@@ -53,13 +53,13 @@ for more context on why we do this.
 
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
-| <a id="js_library-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| <a id="js_library-data"></a>data |  Runtime dependencies to include in binaries/tests that depend on this library.<br><br>        If this list contains linked npm packages, npm package store targets or other targets that provide 'JsInfo',         'NpmPackageStoreInfo' providers are gathered from 'JsInfo'. This is done directly from 'npm_package_stores' and         'transitive_npm_package_stores' fields of these and for linked npm package targets, from the underlying         npm_package_store target(s) that back the links via 'npm_linked_packages' and 'transitive_npm_linked_packages'.<br><br>        Gathered 'NpmPackageStoreInfo' providers are used downstream as direct dependencies when linking a downstream         'npm_package' target with 'npm_link_package'.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| <a id="js_library-deps"></a>deps |  Dependencies of this library.<br><br>        The default outputs and runfiles of targets in the data attribute should appear in the '*.runfiles' area of any         executable which is output by or has a runtime dependency on this target.<br><br>        This may include other js_library targets or other targets that provide.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| <a id="js_library-srcs"></a>srcs |  Source files that are included in this library.<br><br>        This includes all your checked-in code and any generated source files.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| <a id="js_library-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
+| <a id="js_library-data"></a>data |  Runtime dependencies to include in binaries/tests that depend on this library.<br><br>        If this list contains linked npm packages, npm package store targets or other targets that provide 'JsInfo',         'NpmPackageStoreInfo' providers are gathered from 'JsInfo'. This is done directly from 'npm_package_stores' and         'transitive_npm_package_stores' fields of these and for linked npm package targets, from the underlying         npm_package_store target(s) that back the links via 'npm_linked_packages' and 'transitive_npm_linked_packages'.<br><br>        Gathered 'NpmPackageStoreInfo' providers are used downstream as direct dependencies when linking a downstream         'npm_package' target with 'npm_link_package'.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | [] |
+| <a id="js_library-deps"></a>deps |  Dependencies of this library.<br><br>        The default outputs and runfiles of targets in the data attribute should appear in the '*.runfiles' area of any         executable which is output by or has a runtime dependency on this target.<br><br>        This may include other js_library targets or other targets that provide.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | [] |
+| <a id="js_library-srcs"></a>srcs |  Source files that are included in this library.<br><br>        This includes all your checked-in code and any generated source files.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | [] |
 
 
-<a id="#js_library_lib.implementation"></a>
+<a id="js_library_lib.implementation"></a>
 
 ## js_library_lib.implementation
 

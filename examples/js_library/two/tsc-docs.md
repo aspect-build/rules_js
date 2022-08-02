@@ -5,7 +5,7 @@ Simple macro exposing the typescript tsc binary.
 Most users should use ts_project from aspect-build/rules_ts instead.
 
 
-<a id="#tsc"></a>
+<a id="tsc"></a>
 
 ## tsc
 

@@ -2,7 +2,7 @@
 
 Example macro wrapping the mocha CLI
 
-<a id="#mocha_test"></a>
+<a id="mocha_test"></a>
 
 ## mocha_test
 
