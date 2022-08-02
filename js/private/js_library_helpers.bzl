@@ -5,19 +5,6 @@ load(":js_binary_helpers.bzl", "gather_files_from_js_providers")
 load(":js_info.bzl", "JsInfo")
 
 # This attribute is exposed in //js:libs.bzl so that downstream build rules can use it
-JS_LIBRARY_DEPS_ATTR = attr.label_list(
-    doc = """Dependencies of this target.
-
-    This may include other js_library targets or other targets that provide JsInfo
-
-    The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
-    runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
-    runtime dependency on this target.
-    """,
-    providers = [JsInfo],
-)
-
-# This attribute is exposed in //js:libs.bzl so that downstream build rules can use it
 JS_LIBRARY_DATA_ATTR = attr.label_list(
     doc = """Runtime dependencies to include in binaries/tests that depend on this target.
 

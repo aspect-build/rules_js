@@ -25,7 +25,7 @@ js_library(
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_library_helpers.bzl", "JS_LIBRARY_DATA_ATTR", "JS_LIBRARY_DEPS_ATTR", "gather_npm_linked_packages", "gather_npm_package_stores", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_library_helpers.bzl", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_stores", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
@@ -54,7 +54,17 @@ _ATTRS = {
         """,
         allow_files = True,
     ),
-    "deps": JS_LIBRARY_DEPS_ATTR,
+    "deps": attr.label_list(
+        doc = """Dependencies of this target.
+
+        This may include other js_library targets or other targets that provide JsInfo
+
+        The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
+        runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
+        runtime dependency on this target.
+        """,
+        providers = [JsInfo],
+    ),
     "data": JS_LIBRARY_DATA_ATTR,
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
