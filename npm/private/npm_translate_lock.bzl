@@ -502,15 +502,13 @@ def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
         for link_name, link_packages in link_names.items():
             if len(link_packages) > 1:
                 if link_name in public_hoist_packages:
-                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to `{}/node_modules/{}`: {}
+                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to '{}/node_modules/{}': {}
 
-Trying selecting a specific version of `{}` to hoist in public_hoist_packages. For example `{}`:
+Trying selecting a specific version of '{}' to hoist in public_hoist_packages. For example '{}':
 
-    ```
     public_hoist_packages = {{
         "{}": ["{}"]
     }}
-    ```
 """.format(
                         link_package,
                         link_name,
@@ -521,7 +519,7 @@ Trying selecting a specific version of `{}` to hoist in public_hoist_packages. F
                         link_package,
                     )
                 else:
-                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to `{}/node_modules/{}`: {}
+                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to '{}/node_modules/{}': {}
 
 Check the public_hoist_packages attribute for duplicates.
 """.format(

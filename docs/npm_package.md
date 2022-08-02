@@ -20,19 +20,20 @@ npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-allow_ov
             <a href="#npm_package-replace_prefixes">replace_prefixes</a>, <a href="#npm_package-root_paths">root_paths</a>, <a href="#npm_package-srcs">srcs</a>, <a href="#npm_package-version">version</a>)
 </pre>
 
-A rule that packages sources into a directory (a tree artifact) and provides an 'NpmPackageInfo'.
+A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
-This target can be used as the 'src' attribute to 'npm_link_package'.
+This target can be used as the `src` attribute to `npm_link_package`.
 
-'npm_package' makes use of 'copy_to_directory'
+`npm_package` makes use of `copy_to_directory`
 (https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md) under the hood,
 adopting its API and its copy action using composition. However, unlike copy_to_directory,
 npm_package includes transitive_sources and transitive_declarations files from JsInfo providers in srcs.
 
-The default 'include_srcs_packages', [".", "./**"], prevents files from outside of the target's
+The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
 package and subpackages from being included.
 
-The default 'exclude_srcs_patterns', of ["node_modules/**", "**/node_modules/**"],
+The default `exclude_srcs_patterns`, of `["node_modules/**", "**/node_modules/**"]`, prevents
+`node_modules` files from being included.
 
 
 **ATTRIBUTES**

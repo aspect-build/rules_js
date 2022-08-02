@@ -38,13 +38,13 @@ and derivative rule sets.
 
 Declaration files are handled separately from sources since they are generally not needed at
 runtime and build rules, such as ts_project, are optimal in their build graph if they only depend
-on declarations from 'deps' since these they don't need the JavaScript source files from deps to
+on declarations from `deps` since these they don't need the JavaScript source files from deps to
 typecheck.
 
 Linked npm dependences are also handled separately from sources since not all rules require them and it
 is optimal for these rules to not depend on them in the build graph.
 
-NB: 'js_library' copies all source files to the output tree before providing them in JsInfo. See
+NB: `js_library` copies all source files to the output tree before providing them in JsInfo. See
 https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155/docs#javascript
 for more context on why we do this.
 
@@ -54,7 +54,7 @@ for more context on why we do this.
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="js_library-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| <a id="js_library-data"></a>data |  Runtime dependencies to include in binaries/tests that depend on this library.<br><br>        If this list contains linked npm packages, npm package store targets or other targets that provide 'JsInfo',         'NpmPackageStoreInfo' providers are gathered from 'JsInfo'. This is done directly from 'npm_package_stores' and         'transitive_npm_package_stores' fields of these and for linked npm package targets, from the underlying         npm_package_store target(s) that back the links via 'npm_linked_packages' and 'transitive_npm_linked_packages'.<br><br>        Gathered 'NpmPackageStoreInfo' providers are used downstream as direct dependencies when linking a downstream         'npm_package' target with 'npm_link_package'.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| <a id="js_library-data"></a>data |  Runtime dependencies to include in binaries/tests that depend on this library.<br><br>        If this list contains linked npm packages, npm package store targets or other targets that provide <code>JsInfo</code>,         <code>NpmPackageStoreInfo</code> providers are gathered from <code>JsInfo</code>. This is done directly from <code>npm_package_stores</code> and         <code>transitive_npm_package_stores</code> fields of these and for linked npm package targets, from the underlying         npm_package_store target(s) that back the links via <code>npm_linked_packages</code> and <code>transitive_npm_linked_packages</code>.<br><br>        Gathered <code>NpmPackageStoreInfo</code> providers are used downstream as direct dependencies when linking a downstream         <code>npm_package</code> target with <code>npm_link_package</code>.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | <a id="js_library-deps"></a>deps |  Dependencies of this library.<br><br>        The default outputs and runfiles of targets in the data attribute should appear in the '*.runfiles' area of any         executable which is output by or has a runtime dependency on this target.<br><br>        This may include other js_library targets or other targets that provide.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | <a id="js_library-srcs"></a>srcs |  Source files that are included in this library.<br><br>        This includes all your checked-in code and any generated source files.   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 

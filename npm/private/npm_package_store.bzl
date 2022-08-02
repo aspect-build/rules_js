@@ -40,7 +40,7 @@ _ATTRS = {
 
         Package store link targets names for 3rd party packages that come from `npm_translate_lock`
         start with `.aspect_rules_js/` then the name passed to the `npm_link_all_packages` macro
-        (typically 'node_modules') followed by `/<package>/<version>` where `package` is the
+        (typically `node_modules`) followed by `/<package>/<version>` where `package` is the
         package name (including @scope segment if any) and `version` is the specific version of
         the package that comes from the pnpm-lock.yaml file.
 
@@ -64,7 +64,7 @@ _ATTRS = {
 
         Package store link targets names for 3rd party package that come directly from an
         `npm_import` start with `.aspect_rules_js/` then the name passed to the `npm_import`'s `npm_link_imported_package`
-        macro (typically 'node_modules') followed by `/<package>/<version>` where `package`
+        macro (typically `node_modules`) followed by `/<package>/<version>` where `package`
         matches the `package` attribute in the npm_import of the package and `version` matches the
         `version` attribute.
 
@@ -148,9 +148,9 @@ def _impl(ctx):
     version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
 
     if not package:
-        fail("No package name specified to link to. Package name must either be specified explicitly via `package` attribute or come from the `src` `NpmPackageInfo`, typically a `npm_package` target")
+        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
     if not version:
-        fail("No package version specified to link to. Package version must either be specified explicitly via `version` attribute or come from the `src` `NpmPackageInfo`, typically a `npm_package` target")
+        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
 
     virtual_store_name = utils.virtual_store_name(package, version)
 

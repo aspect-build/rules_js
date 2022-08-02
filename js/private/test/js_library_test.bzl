@@ -36,7 +36,7 @@ def _declarations_test_impl(ctx):
     asserts.true(env, transitive_declarations[0].path.find("/importing.d.ts") != -1)
 
     # types OutputGroupInfo should be the same as direct declarations
-    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].declarations.to_list())
+    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
 
     return analysistest.end(env)
 
@@ -53,7 +53,7 @@ def _declarations_empty_srcs_test_impl(ctx):
     asserts.true(env, len(transitive_declarations) > len(declarations))
 
     # types OutputGroupInfo should be the same as direct declarations
-    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].declarations.to_list())
+    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
 
     return analysistest.end(env)
 

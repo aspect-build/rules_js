@@ -25,15 +25,15 @@ def npm_link_package(
     the package directory for creating entry points or accessing files in the package.
 
     Args:
-        name: The name of the link target to create if 'link' is True.
+        name: The name of the link target to create if `link` is True.
             For first-party deps linked across a workspace, the name must match in all packages
             being linked as it is used to derive the virtual store link target name.
         root_package: the root package where the node_modules virtual store is linked to
         link: whether or not to link in this package
-            If false, only the npm_package_store target will be created _if_ this is called in the 'root_package'.
+            If false, only the npm_package_store target will be created _if_ this is called in the `root_package`.
         src: the npm_package target to link; may only to be specified when linking in the root package
         deps: list of npm_package_store; may only to be specified when linking in the root package
-        fail_if_no_link: whether or not to fail if this is called in a package that is not the root package and 'link' is False
+        fail_if_no_link: whether or not to fail if this is called in a package that is not the root package and `link` is False
         auto_manual: whether or not to automatically add a manual tag to the generated targets
             Links tagged "manual" dy default is desirable so that they are not built by `bazel build ...` if they
             are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are
