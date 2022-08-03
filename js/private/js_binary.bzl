@@ -19,6 +19,7 @@ load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
 load(":js_binary_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
 
 _DOC = """Execute a program in the node.js runtime.
@@ -167,6 +168,19 @@ _ATTRS = {
         See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.
         """,
         default = True,
+    ),
+    "copy_data_to_bin": attr.bool(
+        doc = """When True, data files and the entry_point file are copied to the Bazel output tree before being passed
+        as inputs to runfiles.
+
+        This default to False. It should only be needed if the program manages to skirt the node fs patches and leave
+        its runfiles and/or sandbox. In that case, setting this to True will prevent the program from following symlinks
+        into the source tree and it will end up in the output tree instead where node_modules and other inputs the
+        program may need will be.
+
+        Mocha, for example, has been observed to escape its runfiles & sandbox: https://github.com/aspect-build/rules_js/pull/353.
+        """,
+        default = False,
     ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
@@ -319,15 +333,15 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
     bash_launcher, node_wrapper = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    files = [
-        ctx.file._node_patches,
-        entry_point,
-        bash_launcher,
-        node_wrapper,
-    ]
-    files.extend(ctx.files.data)
+    files = [bash_launcher, node_wrapper]
+    if ctx.attr.copy_data_to_bin:
+        files.append(copy_file_to_bin_action(ctx, entry_point, is_windows = is_windows))
+        files.extend(copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows))
+    else:
+        files.append(entry_point)
+        files.extend(ctx.files.data)
+    files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     files.extend(ctx.files._runfiles_lib)
-    files.extend(ctx.files._node_patches_files)
     files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
 
     files.extend(gather_files_from_js_providers(
