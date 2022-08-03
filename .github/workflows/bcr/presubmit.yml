@@ -6,7 +6,5 @@ bcr_test_module:
     run_tests:
       name: "Run test module"
       platform: ${{ platform }}
-      test_flags:
-      - "--enable_runfiles"
       test_targets:
       - "//..."
