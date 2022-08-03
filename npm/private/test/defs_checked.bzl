@@ -366,7 +366,7 @@ load("@npm__mobx-react-lite__3.4.0__mobx_6.3.0_react_17.0.2__links//:defs.bzl", 
 load("@npm__mobx-react__7.3.0__mobx_6.3.0_react_17.0.2__links//:defs.bzl", link_359 = "npm_link_imported_package_store", store_359 = "npm_imported_package_store")
 load("@npm__mobx__6.3.0__links//:defs.bzl", link_360 = "npm_link_imported_package_store", store_360 = "npm_imported_package_store")
 load("@npm__mocha-junit-reporter__2.0.2__mocha_10.0.0__links//:defs.bzl", link_361 = "npm_link_imported_package_store", store_361 = "npm_imported_package_store")
-load("@npm__mocha-multi-reporters__1.5.1__mocha_10.0.0__links//:defs.bzl", link_362 = "npm_link_imported_package_store", store_362 = "npm_imported_package_store")
+load("@npm__mocha-multi-reporters__1.5.1__ta7lpi5wbajlqvkh4rve5z6nji__links//:defs.bzl", link_362 = "npm_link_imported_package_store", store_362 = "npm_imported_package_store")
 load("@npm__mocha__10.0.0__th2rfume6p4m5jxelm27wrhnly__links//:defs.bzl", link_363 = "npm_link_imported_package_store", store_363 = "npm_imported_package_store")
 load("@npm__mouse-change__1.4.0__links//:defs.bzl", store_364 = "npm_imported_package_store")
 load("@npm__mouse-event-offset__3.0.2__links//:defs.bzl", store_365 = "npm_imported_package_store")

@@ -4,7 +4,7 @@ overrides:
   semver-max: file:../../../npm/private/test/vendored/semver-max
   is-odd: file:../../../../../npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: ae4e327fc1d11dc79e24a6b7ec7be55d
+packageExtensionsChecksum: b643a4e7a203070d22bd506391db3bfa
 
 importers:
 
@@ -32,7 +32,7 @@ importers:
     devDependencies:
       mocha: 10.0.0_th2rfume6p4m5jxelm27wrhnly
       mocha-junit-reporter: 2.0.2_mocha@10.0.0
-      mocha-multi-reporters: 1.5.1_mocha@10.0.0
+      mocha-multi-reporters: 1.5.1_ta7lpi5wbajlqvkh4rve5z6nji
 
   examples/npm_deps:
     specifiers:
@@ -2486,15 +2486,17 @@ packages:
       - supports-color
     dev: true
 
-  /mocha-multi-reporters/1.5.1_mocha@10.0.0:
+  /mocha-multi-reporters/1.5.1_ta7lpi5wbajlqvkh4rve5z6nji:
     resolution: {integrity: sha512-Yb4QJOaGLIcmB0VY7Wif5AjvLMUFAdV57D2TWEva1Y0kU/3LjKpeRVmlMIfuO1SVbauve459kgtIizADqxMWPg==}
     engines: {node: '>=6.0.0'}
     peerDependencies:
       mocha: '>=3.1.2'
+      mocha-junit-reporter: '*'
     dependencies:
       debug: 4.3.4
       lodash: 4.17.21
       mocha: 10.0.0_th2rfume6p4m5jxelm27wrhnly
+      mocha-junit-reporter: 2.0.2_mocha@10.0.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2519,7 +2521,7 @@ packages:
       js-yaml: 4.1.0
       log-symbols: 4.1.0
       minimatch: 5.0.1
-      mocha-multi-reporters: 1.5.1_mocha@10.0.0
+      mocha-multi-reporters: 1.5.1_ta7lpi5wbajlqvkh4rve5z6nji
       ms: 2.1.3
       nanoid: 3.3.3
       serialize-javascript: 6.0.0
