@@ -155,6 +155,19 @@ _ATTRS = {
         """,
         default = True,
     ),
+    "preserve_symlinks_main": attr.bool(
+        doc = """When True, the --preserve-symlinks-main flag is passed to node.
+
+        This prevents node from following entry script out of runfiles and the sandbox which can happen for some entry
+        files such as `.mjs` where the fs node patches, which guard the runfiles and sandbox, are not used.
+
+        This flag was added in Node.js v10.2.0 (released 2018-05-23). If your node toolchain is configured to use a
+        Node.js version older than this you'll need to set this attribute to False.
+
+        See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.
+        """,
+        default = True,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -239,6 +252,8 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         node_options.append(_NODE_OPTION.format(
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, node_option, ctx.attr.data).split(" ")]),
         ))
+    if ctx.attr.preserve_symlinks_main and "--preserve-symlinks-main" not in node_options:
+        node_options.append(_NODE_OPTION.format(value = "--preserve-symlinks-main"))
 
     fixed_args_expanded = [expand_variables(ctx, fixed_arg, attribute_name = "fixed_args") for fixed_arg in fixed_args]
 

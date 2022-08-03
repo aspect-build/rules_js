@@ -24,7 +24,7 @@ js_binary(
 <pre>
 js_binary(<a href="#js_binary-name">name</a>, <a href="#js_binary-chdir">chdir</a>, <a href="#js_binary-data">data</a>, <a href="#js_binary-enable_runfiles">enable_runfiles</a>, <a href="#js_binary-entry_point">entry_point</a>, <a href="#js_binary-env">env</a>, <a href="#js_binary-expected_exit_code">expected_exit_code</a>,
           <a href="#js_binary-include_declarations">include_declarations</a>, <a href="#js_binary-include_npm_linked_packages">include_npm_linked_packages</a>, <a href="#js_binary-include_transitive_sources">include_transitive_sources</a>, <a href="#js_binary-log_level">log_level</a>,
-          <a href="#js_binary-node_options">node_options</a>, <a href="#js_binary-patch_node_fs">patch_node_fs</a>)
+          <a href="#js_binary-node_options">node_options</a>, <a href="#js_binary-patch_node_fs">patch_node_fs</a>, <a href="#js_binary-preserve_symlinks_main">preserve_symlinks_main</a>)
 </pre>
 
 Execute a program in the node.js runtime.
@@ -57,6 +57,7 @@ This rules requires that Bazel was run with
 | <a id="js_binary-log_level"></a>log_level |  Set the logging level.<br><br>        Log from are written to stderr. They will be supressed on success when running as the tool         of a js_run_binary when silent_on_success is True. In that case, they will be shown         only on a build failure along with the stdout & stderr of the node tool being run.   | String | optional | "error" |
 | <a id="js_binary-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
 | <a id="js_binary-patch_node_fs"></a>patch_node_fs |  Patch the to Node.js <code>fs</code> API (https://nodejs.org/api/fs.html) for this node program         to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.<br><br>        When enabled, <code>js_binary</code> patches the Node.js sync and async <code>fs</code> API functions <code>lstat</code>,         <code>readlink</code>, <code>realpath</code>, <code>readdir</code> and <code>opendir</code> so that the node program being         run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,         these patches prevent the program being run from resolving symlinks out of the sandbox.<br><br>        When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks         which can lead to non-hermetic behavior.   | Boolean | optional | True |
+| <a id="js_binary-preserve_symlinks_main"></a>preserve_symlinks_main |  When True, the --preserve-symlinks-main flag is passed to node.<br><br>        This prevents node from following entry script out of runfiles and the sandbox which can happen for some entry         files such as <code>.mjs</code> where the fs node patches, which guard the runfiles and sandbox, are not used.<br><br>        This flag was added in Node.js v10.2.0 (released 2018-05-23). If your node toolchain is configured to use a         Node.js version older than this you'll need to set this attribute to False.<br><br>        See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.   | Boolean | optional | True |
 
 
 <a id="#js_test"></a>
@@ -66,7 +67,7 @@ This rules requires that Bazel was run with
 <pre>
 js_test(<a href="#js_test-name">name</a>, <a href="#js_test-chdir">chdir</a>, <a href="#js_test-data">data</a>, <a href="#js_test-enable_runfiles">enable_runfiles</a>, <a href="#js_test-entry_point">entry_point</a>, <a href="#js_test-env">env</a>, <a href="#js_test-expected_exit_code">expected_exit_code</a>,
         <a href="#js_test-include_declarations">include_declarations</a>, <a href="#js_test-include_npm_linked_packages">include_npm_linked_packages</a>, <a href="#js_test-include_transitive_sources">include_transitive_sources</a>, <a href="#js_test-log_level">log_level</a>,
-        <a href="#js_test-node_options">node_options</a>, <a href="#js_test-patch_node_fs">patch_node_fs</a>)
+        <a href="#js_test-node_options">node_options</a>, <a href="#js_test-patch_node_fs">patch_node_fs</a>, <a href="#js_test-preserve_symlinks_main">preserve_symlinks_main</a>)
 </pre>
 
 Identical to js_binary, but usable under `bazel test`.
@@ -89,6 +90,7 @@ Identical to js_binary, but usable under `bazel test`.
 | <a id="js_test-log_level"></a>log_level |  Set the logging level.<br><br>        Log from are written to stderr. They will be supressed on success when running as the tool         of a js_run_binary when silent_on_success is True. In that case, they will be shown         only on a build failure along with the stdout & stderr of the node tool being run.   | String | optional | "error" |
 | <a id="js_test-node_options"></a>node_options |  Options to pass to the node.<br><br>        https://nodejs.org/api/cli.html   | List of strings | optional | [] |
 | <a id="js_test-patch_node_fs"></a>patch_node_fs |  Patch the to Node.js <code>fs</code> API (https://nodejs.org/api/fs.html) for this node program         to prevent the program from following symlinks out of the execroot, runfiles and the sandbox.<br><br>        When enabled, <code>js_binary</code> patches the Node.js sync and async <code>fs</code> API functions <code>lstat</code>,         <code>readlink</code>, <code>realpath</code>, <code>readdir</code> and <code>opendir</code> so that the node program being         run cannot resolve symlinks out of the execroot and the runfiles tree. When in the sandbox,         these patches prevent the program being run from resolving symlinks out of the sandbox.<br><br>        When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks         which can lead to non-hermetic behavior.   | Boolean | optional | True |
+| <a id="js_test-preserve_symlinks_main"></a>preserve_symlinks_main |  When True, the --preserve-symlinks-main flag is passed to node.<br><br>        This prevents node from following entry script out of runfiles and the sandbox which can happen for some entry         files such as <code>.mjs</code> where the fs node patches, which guard the runfiles and sandbox, are not used.<br><br>        This flag was added in Node.js v10.2.0 (released 2018-05-23). If your node toolchain is configured to use a         Node.js version older than this you'll need to set this attribute to False.<br><br>        See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.   | Boolean | optional | True |
 
 
 <a id="#js_binary_lib.create_launcher"></a>

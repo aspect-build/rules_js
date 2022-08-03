@@ -16,9 +16,4 @@ js_test(
         ":node_modules/meaning-of-life",
     ],
     entry_point = "main.mjs",
-    node_options = [
-        # Since the entry point is an mjs file, node will follow the symlink out
-        # of the sandbox unless we set --preserve-symlinks-main here.
-        "--preserve-symlinks-main",
-    ],
 )
