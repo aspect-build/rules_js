@@ -95,6 +95,7 @@ npm_import(
     version = "8.4.0",
 )
 
+# Used in examples/assert_lockfile_up_to_date
 npm_import(
     name = "pnpm",
     integrity = "sha512-IY+62k/caP5GsMQm5YcOJ03XDkze68aBiiXrlwqMUAYFhSstLETlenIC73AukJyUd7o4Y18HcV2gfQYCKb0PEA==",

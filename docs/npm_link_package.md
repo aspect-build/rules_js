@@ -2,7 +2,7 @@
 
 npm_link_package rule
 
-<a id="#npm_link_package"></a>
+<a id="npm_link_package"></a>
 
 ## npm_link_package
 
