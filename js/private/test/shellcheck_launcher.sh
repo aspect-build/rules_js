@@ -338,7 +338,7 @@ fi
 
 # Gather node options
 NODE_OPTIONS=()
-
+NODE_OPTIONS+=("--preserve-symlinks-main")
 
 ARGS=()
 ALL_ARGS=( "$@")
