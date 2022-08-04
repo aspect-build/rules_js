@@ -1,3 +1,22 @@
+## Making the editor happy
+
+Editors (and the language services they host) expect a couple of things:
+
+- third-party tooling like the TypeScript SDK under `<project root>/node_modules`
+- types for your first-party imports
+
+Since rules_js puts the outputs under Bazel's `bazel-out` tree, the editor doesn't find them by default.
+
+To get local tooling installed, you can continue to run `pnpm install` (or use whatever package manager your lockfile is for)
+to get a `node_modules` tree in your project.
+If there are many packages to install, you could reduce this by only installing the tooling
+actually needed for non-Bazel workflows, like the `@types/*` packages and `typescript`.
+
+To resolve first-party imports like `import '@myorg/my_lib'` to resolve in TypeScript, use the
+`paths` key in the `tsconfig.json` file to list additional search locations.
+This is the same thing you'd do outside of Bazel.
+See [example](https://github.com/aspect-build/rules_ts/blob/74d54bda208695d7e8992520e560166875cfbce7/examples/simple/tsconfig.json#L4-L10).
+
 ## Bazel isn't seeing my changes to package.json
 
 rules_js relies on what's in the `pnpm-lock.yaml` file.
