@@ -15,6 +15,7 @@ Known issues:
 -   Doesn't support Remote Execution (RBE) due to https://github.com/bazelbuild/bazel/issues/10298.
 -   Doesn't work with rules_docker due to https://github.com/bazelbuild/rules_pkg/issues/115#issuecomment-1137465914.
 -   No examples yet for publishing npm packages.
+-   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
 
 rules_js is just a part of what Aspect provides:
 

@@ -10,8 +10,6 @@ npm_link_all_packages(name = "node_modules")
 mocha_test(
     name = "test",
     srcs = ["test.js"],
-    # Work-around for mocha leaving the runfiles & sandbox
-    copy_data_to_bin = True,
 )
 
 bzl_library(
