@@ -125,9 +125,6 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
     })
     lock_packages = lockfile.get("packages")
 
-    if "." not in lock_importers.keys():
-        fail("no root importers in lockfile")
-
     importers = {}
     for importPath in lock_importers.keys():
         lock_importer = lock_importers[importPath]
