@@ -159,8 +159,10 @@ _ATTRS = {
     "preserve_symlinks_main": attr.bool(
         doc = """When True, the --preserve-symlinks-main flag is passed to node.
 
-        This prevents node from following entry script out of runfiles and the sandbox which can happen for some entry
-        files such as `.mjs` where the fs node patches, which guard the runfiles and sandbox, are not used.
+        This prevents node from following an ESM entry script out of runfiles and the sandbox. This can happen for `.mjs`
+        ESM entry points where the fs node patches, which guard the runfiles and sandbox, are not applied.
+        See https://github.com/aspect-build/rules_js/issues/362 for more information. Once #362 is resolved,
+        the default for this attribute can be set to False.
 
         This flag was added in Node.js v10.2.0 (released 2018-05-23). If your node toolchain is configured to use a
         Node.js version older than this you'll need to set this attribute to False.
@@ -173,14 +175,16 @@ _ATTRS = {
         doc = """When True, data files and the entry_point file are copied to the Bazel output tree before being passed
         as inputs to runfiles.
 
-        This default to False. It should only be needed if the program manages to skirt the node fs patches and leave
-        its runfiles and/or sandbox. In that case, setting this to True will prevent the program from following symlinks
-        into the source tree and it will end up in the output tree instead where node_modules and other inputs the
-        program may need will be.
+        Ideally, the default for this would be False as it is optimal, but there is a yet unresloved issue of ESM imports
+        skirting the node fs patches and escaping the sandbox: https://github.com/aspect-build/rules_js/issues/362.
+        This is hit in some test popular runners such as mocha, which use native `import()` statements
+        (https://github.com/aspect-build/rules_js/pull/353). 
 
-        Mocha, for example, has been observed to escape its runfiles & sandbox: https://github.com/aspect-build/rules_js/pull/353.
+        A default of True will prevent program such as mocha from following symlinks into the source tree. They will
+        escape the sandbox but they will end up in the output tree where node_modules and other inputs required will be
+        available. With this in mind, the default will remain true until issue #362 is resolved.
         """,
-        default = False,
+        default = True,
     ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
