@@ -3,7 +3,7 @@
     "private": true,
     "dependencies": {
         "@aspect-test/a": "1.0.0",
-        "@aspect-test/b": "1.0.0",
+        "@aspect-test/b": "5.0.2",
         "@aspect-test/c": "2.0.2",
         "@aspect-test/h": "1.0.0",
         "@lib/b": "workspace:*",
