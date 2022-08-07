@@ -32,7 +32,6 @@ jobs:
             - name: Release
               uses: softprops/action-gh-release@v1
               with:
-                  prerelease: true
                   # Use GH feature to populate the changelog automatically
                   generate_release_notes: true
                   body_path: release_notes.txt
