@@ -1,0 +1,14 @@
+lockfileVersion: 5.4
+
+specifiers:
+  '@aspect-test/f': 1.0.0
+
+dependencies:
+  '@aspect-test/f': 1.0.0
+
+packages:
+
+  /@aspect-test/f/1.0.0:
+    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
+    hasBin: true
+    dev: false

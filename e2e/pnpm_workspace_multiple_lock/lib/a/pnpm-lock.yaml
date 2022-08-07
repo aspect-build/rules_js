@@ -1,0 +1,31 @@
+lockfileVersion: 5.4
+
+specifiers:
+  '@aspect-test/e': 1.0.0
+  '@lib/b': workspace:*
+  vendored-a: file:../../vendored/a
+
+dependencies:
+  '@aspect-test/e': 1.0.0
+  '@lib/b': link:../b
+  vendored-a: file:../../vendored/a
+
+packages:
+
+  /@aspect-test/e/1.0.0:
+    resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
+    hasBin: true
+    dev: false
+
+  /@aspect-test/f/1.0.0:
+    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
+    hasBin: true
+    dev: false
+
+  file:../../vendored/a:
+    resolution: {directory: ../../vendored/a, type: directory}
+    name: vendored-a
+    version: 1.0.0
+    dependencies:
+      '@aspect-test/f': 1.0.0
+    dev: false

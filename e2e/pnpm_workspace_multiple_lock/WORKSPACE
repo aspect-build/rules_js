@@ -1,0 +1,57 @@
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+#---SNIP--- Below here is re-used in the workspace snippet published on releases
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "nodejs",
+    node_version = DEFAULT_NODE_VERSION,
+)
+
+load(":npm_translate_locks.bzl", "npm_translate_locks")
+
+npm_translate_locks([
+    "",
+    "app/a",
+    "app/b",
+    "app/c",
+    "lib/a",
+    "lib/b",
+    "lib/c",
+])
+
+load("@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
+
+load("@npm_app_a//:repositories.bzl", npm_app_a_repositories = "npm_repositories")
+
+npm_app_a_repositories()
+
+load("@npm_app_b//:repositories.bzl", npm_app_b_repositories = "npm_repositories")
+
+npm_app_b_repositories()
+
+load("@npm_app_c//:repositories.bzl", npm_app_c_repositories = "npm_repositories")
+
+npm_app_c_repositories()
+
+load("@npm_lib_a//:repositories.bzl", npm_lib_a_repositories = "npm_repositories")
+
+npm_lib_a_repositories()
+
+load("@npm_lib_b//:repositories.bzl", npm_lib_b_repositories = "npm_repositories")
+
+npm_lib_b_repositories()
+
+load("@npm_lib_c//:repositories.bzl", npm_lib_c_repositories = "npm_repositories")
+
+npm_lib_c_repositories()

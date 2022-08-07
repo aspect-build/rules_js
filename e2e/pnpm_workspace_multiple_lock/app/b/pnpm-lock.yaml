@@ -1,0 +1,18 @@
+lockfileVersion: 5.4
+
+specifiers:
+  '@aspect-test/h': 1.0.0
+  '@lib/b': workspace:*
+  '@lib/b_alias': workspace:@lib/b@*
+
+dependencies:
+  '@aspect-test/h': 1.0.0
+  '@lib/b': link:../../lib/b
+  '@lib/b_alias': link:../../lib/b
+
+packages:
+
+  /@aspect-test/h/1.0.0:
+    resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
+    hasBin: true
+    dev: false

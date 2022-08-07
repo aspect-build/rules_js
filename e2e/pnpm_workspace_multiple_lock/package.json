@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "dependencies": {
+        "@aspect-test/a": "5.0.0"
+    },
+    "devDependencies": {
+        "@aspect-test/b": "5.0.0"
+    },
+    "optionalDependencies": {
+        "@aspect-test/c": "2.0.2"
+    }
+}
