@@ -1,6 +1,5 @@
 {
-    "name": "simple",
-    "packageManager": "yarn@3.2.2",
+    "private": true,
     "dependencies": {
         "@aspect-test/a": "5.0.0"
     },
