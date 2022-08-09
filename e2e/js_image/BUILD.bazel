@@ -1,5 +1,7 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 load("@io_bazel_rules_docker//contrib:test.bzl", "container_test")
 load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
@@ -56,3 +58,34 @@ container_test(
     configs = [":smoketest.yaml"],
     image = ":image",
 )
+
+bzl_library(
+    name = "rules_python",
+    srcs = ["@rules_python//python:bzl"],
+)
+
+bzl_library(
+    name = "js_image_layer",
+    srcs = [
+        "js_image_layer.bzl",
+        "@bazel_tools//tools/python:private/defs.bzl",
+        "@bazel_tools//tools/python:srcs_version.bzl",
+        "@bazel_tools//tools/python:toolchain.bzl",
+        "@bazel_tools//tools/python:utils.bzl",
+        "@rules_pkg//:pkg.bzl",
+        "@rules_pkg//:providers.bzl",
+    ],
+    deps = [
+        ":rules_python",
+        "@aspect_bazel_lib//lib:paths",
+        "@bazel_skylib//rules:write_file",
+        "@rules_pkg//pkg:bzl_srcs",
+    ],
+)
+
+stardoc_with_diff_test(
+    name = "js_image_layer-docs",
+    bzl_library_target = ":js_image_layer",
+)
+
+update_docs(name = "docs")
