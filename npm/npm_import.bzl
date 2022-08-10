@@ -26,6 +26,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 """
 
 load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import_links_lib = "npm_import_links")
+load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock_lib = "npm_translate_lock")
 
@@ -35,21 +36,25 @@ npm_translate_lock_rule = repository_rule(
     attrs = _npm_translate_lock_lib.attrs,
 )
 
-def npm_translate_lock(name, npm_package_lock = None, yarn_lock = None, **kwargs):
+LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
+
+def npm_translate_lock(name, npm_package_lock = None, yarn_lock = None, pnpm_version = LATEST_PNPM_VERSION, **kwargs):
     """Wrapper macro around [npm_translate_lock_rule](#npm_translate_lock_rule)
 
-    This macro creates a "pnpm" repository if necessary to call `pnpm import`, which is the case
+    This macro creates a "pnpm" repository.
+    rules_js currently only uses this repository
     when npm_package_lock or yarn_lock are used rather than pnpm_lock.
+    Set pnpm_version to None to inhibit this repository creation.
 
-    The user can create a "pnpm" repository before calling this in order to get a different version.
+    The user can create a "pnpm" repository before calling this in order to override.
     """
-    if (npm_package_lock != None or yarn_lock != None) and not native.existing_rule("pnpm"):
+    if pnpm_version != None and not native.existing_rule("pnpm"):
         npm_import(
             name = "pnpm",
-            integrity = "sha512-IY+62k/caP5GsMQm5YcOJ03XDkze68aBiiXrlwqMUAYFhSstLETlenIC73AukJyUd7o4Y18HcV2gfQYCKb0PEA==",
+            integrity = PNPM_VERSIONS[pnpm_version],
             package = "pnpm",
             root_package = "",
-            version = "6.32.19",
+            version = pnpm_version,
         )
 
     npm_translate_lock_rule(

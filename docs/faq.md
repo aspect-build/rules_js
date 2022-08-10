@@ -2,8 +2,8 @@
 
 Editors (and the language services they host) expect a couple of things:
 
-- third-party tooling like the TypeScript SDK under `<project root>/node_modules`
-- types for your first-party imports
+-   third-party tooling like the TypeScript SDK under `<project root>/node_modules`
+-   types for your first-party imports
 
 Since rules_js puts the outputs under Bazel's `bazel-out` tree, the editor doesn't find them by default.
 
@@ -27,6 +27,16 @@ Want a Bazel test to assert the lockfile isn't stale? See our `examples/assert_l
 ## Can I edit files in `node_modules` for debugging?
 
 Try running Bazel with `--experimental_check_output_files=false` so that your edits inside the `bazel-out/node_modules` tree are preserved.
+
+## Can I use bazel-managed pnpm?
+
+Yes, but it's a bit clumsy right now.
+
+First, make sure you fetched it: `bazel fetch @pnpm//:*`
+
+Then run `bazel run @nodejs_host//:node $(bazel info output_base)/external/pnpm/package/bin/pnpm.cjs`
+
+You can use this recipe to make sure your developers run the exact same pnpm and node versions.
 
 ## Why can't Bazel fetch an npm package?
 
@@ -67,7 +77,6 @@ my-workspace/
    └─ lib2/
 ```
 
-
 2. **Change your output structure** to distribute `dist` folders beneath `lib1` and `lib2`. Now you can have `BUILD` files underneath each library, which is more Bazel-idiomatic.
 
 The result looks like this:
@@ -81,7 +90,7 @@ my-workspace/
 │  |  └─ BUILD.bazel
 └─ bazel-bin/packages/
    ├─ lib1/
-   |  └─ dist/ 
+   |  └─ dist/
    └─ lib2/
       └─ dist/
 ```

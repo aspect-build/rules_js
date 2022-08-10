@@ -47,5 +47,6 @@ bzl_library(
         "//npm/private:npm_import",
         "//npm/private:npm_translate_lock",
         "//npm/private:utils",
+        "//npm/private:versions",
     ],
 )
