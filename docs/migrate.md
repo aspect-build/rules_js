@@ -28,6 +28,8 @@ You can follow the [pnpm install docs](https://pnpm.io/installation).
 
 Alternatively, you can skip the install. All commands in this guide will use `npx` to run the pnpm tool without any installation.
 
+> If you want to use a hermetic, Bazel-managed pnpm and node rather than use whatever is on your machine or is installed by `npx`, see the [FAQ](./faq.md#can-i-use-bazel-managed-pnpm).
+
 ## Translate your lockfile to pnpm format (optional)
 
 `rules_js` uses the `pnpm` lockfile to declare dependency versions as well as a deterministic layout for the `node_modules` tree.

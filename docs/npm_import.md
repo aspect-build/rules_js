@@ -277,15 +277,17 @@ common --experimental_downloader_config=.bazel_downloader_config
 ## npm_translate_lock
 
 <pre>
-npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_translate_lock-npm_package_lock">npm_package_lock</a>, <a href="#npm_translate_lock-yarn_lock">yarn_lock</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
+npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_translate_lock-npm_package_lock">npm_package_lock</a>, <a href="#npm_translate_lock-yarn_lock">yarn_lock</a>, <a href="#npm_translate_lock-pnpm_version">pnpm_version</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
 </pre>
 
 Wrapper macro around [npm_translate_lock_rule](#npm_translate_lock_rule)
 
-This macro creates a "pnpm" repository if necessary to call `pnpm import`, which is the case
+This macro creates a "pnpm" repository.
+rules_js currently only uses this repository
 when npm_package_lock or yarn_lock are used rather than pnpm_lock.
+Set pnpm_version to None to inhibit this repository creation.
 
-The user can create a "pnpm" repository before calling this in order to get a different version.
+The user can create a "pnpm" repository before calling this in order to override.
 
 **PARAMETERS**
 
@@ -295,6 +297,7 @@ The user can create a "pnpm" repository before calling this in order to get a di
 | <a id="npm_translate_lock-name"></a>name |  <p align="center"> - </p>   |  none |
 | <a id="npm_translate_lock-npm_package_lock"></a>npm_package_lock |  <p align="center"> - </p>   |  <code>None</code> |
 | <a id="npm_translate_lock-yarn_lock"></a>yarn_lock |  <p align="center"> - </p>   |  <code>None</code> |
+| <a id="npm_translate_lock-pnpm_version"></a>pnpm_version |  <p align="center"> - </p>   |  <code>"7.9.1"</code> |
 | <a id="npm_translate_lock-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 

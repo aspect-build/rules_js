@@ -68,6 +68,7 @@ npm_translate_lock(
         "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_version = "6.32.19",
     public_hoist_packages = {
         # Instructs the linker to hoist the ms@2.1.3 npm package to `node_modules/ms` in the `examples/npm_deps` package.
         # Similar to adding `public-hoist-pattern[]=ms` in .npmrc but with control over which version to hoist and where
@@ -93,13 +94,4 @@ npm_import(
     # Root package where to link the virtual store
     root_package = "",
     version = "8.4.0",
-)
-
-# Used in examples/assert_lockfile_up_to_date
-npm_import(
-    name = "pnpm",
-    integrity = "sha512-IY+62k/caP5GsMQm5YcOJ03XDkze68aBiiXrlwqMUAYFhSstLETlenIC73AukJyUd7o4Y18HcV2gfQYCKb0PEA==",
-    package = "pnpm",
-    root_package = "",
-    version = "6.32.19",
 )

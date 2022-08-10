@@ -66,6 +66,8 @@ For example, this command creates a lockfile with minimal installation needed:
 $ npx pnpm install --lockfile-only
 ```
 
+> If you want to use a hermetic, Bazel-managed pnpm and node rather than use whatever is on your machine or is installed by `npx`, see the [FAQ](./faq.md#can-i-use-bazel-managed-pnpm).
+
 Instead of checking in a `pnpm-lock.yaml` file, you could use a `package-lock.json` or `yarn.lock`
 file with the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`.
 If you do, rules_js will run `pnpm import` to generate a `pnpm-lock.yaml` file on-the-fly.
