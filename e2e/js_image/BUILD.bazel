@@ -60,26 +60,35 @@ container_test(
 )
 
 bzl_library(
-    name = "rules_python",
-    srcs = ["@rules_python//python:bzl"],
-)
-
-bzl_library(
-    name = "js_image_layer",
+    name = "rules_pkg",
     srcs = [
-        "js_image_layer.bzl",
-        "@bazel_tools//tools/python:private/defs.bzl",
-        "@bazel_tools//tools/python:srcs_version.bzl",
-        "@bazel_tools//tools/python:toolchain.bzl",
-        "@bazel_tools//tools/python:utils.bzl",
         "@rules_pkg//:pkg.bzl",
         "@rules_pkg//:providers.bzl",
     ],
     deps = [
+        "@rules_pkg//pkg:bzl_srcs",
+    ],
+)
+
+bzl_library(
+    name = "rules_python",
+    srcs = [
+        "@bazel_tools//tools/python:private/defs.bzl",
+        "@bazel_tools//tools/python:srcs_version.bzl",
+        "@bazel_tools//tools/python:toolchain.bzl",
+        "@bazel_tools//tools/python:utils.bzl",
+        "@rules_python//python:bzl",
+    ],
+)
+
+bzl_library(
+    name = "js_image_layer",
+    srcs = ["js_image_layer.bzl"],
+    deps = [
+        ":rules_pkg",
         ":rules_python",
         "@aspect_bazel_lib//lib:paths",
         "@bazel_skylib//rules:write_file",
-        "@rules_pkg//pkg:bzl_srcs",
     ],
 )
 
