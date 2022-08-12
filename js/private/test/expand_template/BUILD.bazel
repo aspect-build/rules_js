@@ -1,0 +1,46 @@
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("//js/private:expand_template.bzl", "expand_template")
+
+expand_template(
+    name = "a_tmpl_stamp",
+    out = "a_stamp",
+    data = ["a.tmpl"],
+    stamp = 1,
+    stamp_substitutions = {
+        "{{VERSION}}": "v{{BUILD_SCM_VERSION}}",
+    },
+    substitutions = {
+        "{{WORKSPACE}}": "$(WORKSPACE)",
+        "{{VERSION}}": "v0.0.0",
+        "{{TMPL_PATH}}": "$(rootpath a.tmpl)",
+    },
+    template = "a.tmpl",
+)
+
+diff_test(
+    name = "a_stamp_test",
+    file1 = ":a_stamp",
+    file2 = "a_stamp_expected",
+)
+
+expand_template(
+    name = "a_tmpl",
+    out = "a",
+    data = ["a.tmpl"],
+    stamp = 0,
+    stamp_substitutions = {
+        "{{VERSION}}": "v{{BUILD_SCM_VERSION}}",
+    },
+    substitutions = {
+        "{{WORKSPACE}}": "$(WORKSPACE)",
+        "{{VERSION}}": "v0.0.0",
+        "{{TMPL_PATH}}": "$(rootpath a.tmpl)",
+    },
+    template = "a.tmpl",
+)
+
+diff_test(
+    name = "a_test",
+    file1 = ":a",
+    file2 = "a_expected",
+)

@@ -1,5 +1,8 @@
-# import common bazelrc shared with e2e workspaces
+# import common bazelrc settings used in this repository and in nested workspaces
 import %workspace%/.bazelrc.common
+
+# import bazelrc settings that are needed for testing in this repository
+import %workspace%/.bazelrc.testing
 
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
