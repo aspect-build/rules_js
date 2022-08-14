@@ -1,0 +1,4 @@
+# Bazel settings that are needed for testing in this repository.
+
+# Mock versioning command to test the --stamp behavior
+build --workspace_status_command="echo BUILD_SCM_VERSION 1.2.3"

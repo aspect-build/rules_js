@@ -1,6 +1,7 @@
 "Internal implementation details"
 
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("//js:defs.bzl", "js_binary")
 
 exports_files(
     glob(["*.bzl"]),
@@ -115,4 +116,12 @@ bzl_library(
     name = "js_info",
     srcs = ["js_info.bzl"],
     visibility = ["//js:__subpackages__"],
+)
+
+js_binary(
+    name = "expand_template_binary",
+    entry_point = "expand_template.js",
+    # meant to run out of the execroot
+    env = {"BAZEL_BINDIR": "."},
+    visibility = ["//visibility:public"],
 )
