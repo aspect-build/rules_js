@@ -12,11 +12,12 @@ However we recommend 5.1 because it includes a [cache for MerkleTree computation
 
 ## Upgrade to rules_nodejs 5.0 or greater
 
-As explained in the [README](/README.md), rules_js depends on rules_nodejs.
-We need at least version 5.0.
+As explained in the [README](/README.md), `rules_js` depends on `rules_nodejs`,
+the core module from https://github.com/bazelbuild/rules_nodejs.
+We need at least version 5.0 of the core `rules_nodejs` module.
 
-This also requires you upgrade `build_bazel_rules_nodejs` to 5.x,
-along with `@bazel`-scoped npm packages like `@bazel/typescript`.
+This does not require that you upgrade `build_bazel_rules_nodejs` to 5.x.
+`build_bazel_rules_nodejs` can remain at 4.x or older and work along side `rules_nodejs` 5.x and `rules_js`.
 
 ## Install pnpm (optional)
 
