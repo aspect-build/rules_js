@@ -33,7 +33,7 @@ def _impl(ctx):
             package = ctx.attr.package,
             version = ctx.attr.version,
             directory = dst,
-            npm_package_stores = [],
+            npm_package_stores = depset([]),
         ),
     ]
 

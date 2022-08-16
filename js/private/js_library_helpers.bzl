@@ -27,39 +27,41 @@ def gather_transitive_sources(sources, targets):
     """Gathers transitive sources from a list of direct sources and targets
 
     Args:
-        sources: direct sources which should be included in `transitive_sources`
+        sources: list or depset of direct sources which should be included in `transitive_sources`
         targets: list of targets to gather `transitive_sources` from `JsInfo`
 
     Returns:
-        List of transitive sources
+        Depset of transitive sources
     """
-    transitive_sources = sources + [
-        item
+    transitive_deps = [
+        target[JsInfo].transitive_sources
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-        for item in target[JsInfo].transitive_sources
+        if JsInfo in target
     ]
-    transitive_sources = [file for file in transitive_sources if file]
-    return transitive_sources
+    if type(sources) == "list":
+      return depset(sources, transitive = transitive_deps)
+    else:
+      return depset([], transitive = [sources] + transitive_deps)
 
 def gather_transitive_declarations(declarations, targets):
     """Gathers transitive sources from a list of direct sources and targets
 
     Args:
-        declarations: Direct sources which should be included in `transitive_declarations`
+        declarations: list or depset of direct sources which should be included in `transitive_declarations`
         targets: List of targets to gather `transitive_declarations` from `JsInfo`
 
     Returns:
-        List of transitive sources
+        Depset of transitive sources
     """
-    transitive_declarations = declarations + [
-        item
+    transitive_deps = [
+        target[JsInfo].transitive_declarations
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
-        for item in target[JsInfo].transitive_declarations
+        if JsInfo in target
     ]
-    transitive_declarations = [file for file in transitive_declarations if file]
-    return transitive_declarations
+    if type(declarations) == "list":
+      return depset(declarations, transitive = transitive_deps)
+    else:
+      return depset([], transitive = [declarations] + transitive_deps)
 
 def gather_npm_linked_packages(srcs, deps):
     """Gathers npm linked packages from a list of srcs and deps targets
@@ -74,24 +76,20 @@ def gather_npm_linked_packages(srcs, deps):
 
     # npm_linked_packages
     npm_linked_packages = [
-        item
+        target[JsInfo].npm_linked_packages
         for target in srcs
-        if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
-        for item in target[JsInfo].npm_linked_packages
+        if JsInfo in target
     ]
-    npm_linked_packages = [package for package in npm_linked_packages if package]
 
     # transitive_npm_linked_packages
-    transitive_npm_linked_packages = npm_linked_packages + [
-        item
+    transitive_npm_linked_packages = depset([], transitive = npm_linked_packages + [
+        target[JsInfo].transitive_npm_linked_packages
         for target in srcs + deps
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_npm_linked_packages")
-        for item in target[JsInfo].transitive_npm_linked_packages
-    ]
-    transitive_npm_linked_packages = [package for package in transitive_npm_linked_packages if package]
+        if JsInfo in target
+    ])
 
     return struct(
-        direct = npm_linked_packages,
+        direct = depset([], transitive = npm_linked_packages),
         transitive = transitive_npm_linked_packages,
     )
 
@@ -107,37 +105,27 @@ def gather_npm_package_stores(targets):
 
     # npm_package_stores
     npm_package_stores = [
-        item
+        target[JsInfo].npm_package_stores
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "npm_package_stores")
-        for item in target[JsInfo].npm_package_stores
+        if JsInfo in target
     ]
-    npm_package_stores = [store for store in npm_package_stores if store]
 
     # transitive_npm_package_stores
     transitive_npm_package_stores = npm_package_stores + [
-        item
+        target[JsInfo].transitive_npm_package_stores
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_npm_package_stores")
-        for item in target[JsInfo].transitive_npm_package_stores
+        if JsInfo in target
     ]
-    transitive_npm_package_stores = [store for store in transitive_npm_package_stores if store]
 
     # also pull npm_package_stores from npm_linked_packages and transitive_npm_linked_packages
     for target in targets:
         if JsInfo in target:
-            if hasattr(target[JsInfo], "npm_linked_packages"):
-                for package in target[JsInfo].npm_linked_packages:
-                    if package.store_info and package.store_info not in npm_package_stores:
-                        npm_package_stores.append(package.store_info)
-            if hasattr(target[JsInfo], "transitive_npm_linked_packages"):
-                for package in target[JsInfo].transitive_npm_linked_packages:
-                    if package.store_info and package.store_info not in transitive_npm_package_stores:
-                        transitive_npm_package_stores.append(package.store_info)
+            npm_package_stores.append(depset([package.store_info for package in target[JsInfo].npm_linked_packages.to_list()]))
+            transitive_npm_package_stores.append(depset([package.store_info for package in target[JsInfo].transitive_npm_linked_packages.to_list()]))
 
     return struct(
-        direct = npm_package_stores,
-        transitive = transitive_npm_package_stores,
+        direct = depset([], transitive = npm_package_stores),
+        transitive = depset([], transitive = transitive_npm_package_stores),
     )
 
 def gather_runfiles(ctx, sources, data, deps):

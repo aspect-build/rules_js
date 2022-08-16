@@ -86,7 +86,7 @@ def _gather_sources_and_declarations(ctx, targets, files, is_windows = False):
         is_windows: If true, an cmd.exe actions are created when copying files to the output tree so there is no bash dependency
 
     Returns:
-        Sources & declaration files lists in the sequence (sources, declarations)
+        Sources & declaration files depsets in the sequence (sources, declarations)
     """
     sources = []
     declarations = []
@@ -143,23 +143,19 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
         else:
             sources.append(file)
 
-    # sources
-    sources.extend([
-        item
+    # sources as depset
+    sources = depset(sources, transitive = [
+        target[JsInfo].sources
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "sources")
-        for item in target[JsInfo].sources
+        if JsInfo in target
     ])
-    sources = [file for file in sources if file]
 
-    # declarations
-    declarations.extend([
-        item
+    # declarations as depset
+    declarations = depset(declarations, transitive = [
+        target[JsInfo].declarations
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "declarations")
-        for item in target[JsInfo].declarations
+        if JsInfo in target
     ])
-    declarations = [file for file in declarations if file]
 
     return (sources, declarations)
 
@@ -194,7 +190,7 @@ def _js_library_impl(ctx):
 
     runfiles = gather_runfiles(
         ctx = ctx,
-        sources = transitive_sources,
+        sources = transitive_sources.to_list(),
         data = ctx.attr.data,
         deps = ctx.attr.srcs + ctx.attr.deps,
     )
@@ -211,11 +207,11 @@ def _js_library_impl(ctx):
             transitive_sources = transitive_sources,
         ),
         DefaultInfo(
-            files = depset(sources),
+            files = sources,
             runfiles = runfiles,
         ),
         OutputGroupInfo(
-            types = depset(declarations),
+            types = declarations,
         ),
     ]
 

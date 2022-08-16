@@ -61,7 +61,7 @@ def _impl(ctx):
 
     files = utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)
 
-    transitive_files = files + store_info.transitive_files
+    transitive_files = depset(files, transitive = [store_info.transitive_files])
 
     npm_linked_package_info = NpmLinkedPackageInfo(
         label = ctx.label,
@@ -69,7 +69,7 @@ def _impl(ctx):
         package = store_info.package,
         version = store_info.version,
         store_info = store_info,
-        files = files,
+        files = depset(files),
         transitive_files = transitive_files,
     )
 
@@ -78,8 +78,8 @@ def _impl(ctx):
             files = depset(files),
         ),
         js_info(
-            npm_linked_packages = [npm_linked_package_info],
-            transitive_npm_linked_packages = [npm_linked_package_info],
+            npm_linked_packages = depset([npm_linked_package_info]),
+            transitive_npm_linked_packages = depset([npm_linked_package_info]),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:

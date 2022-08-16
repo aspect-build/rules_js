@@ -176,7 +176,7 @@ def _impl(ctx):
             virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
             copy_directory_action(ctx, src_directory, virtual_store_directory, is_windows = is_windows)
 
-        for store in ctx.attr.src[NpmPackageInfo].npm_package_stores:
+        for store in ctx.attr.src[NpmPackageInfo].npm_package_stores.to_list():
             dep_package = store.package
             dep_virtual_store_directory = store.virtual_store_directory
 
@@ -248,17 +248,15 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     files = [virtual_store_directory] if virtual_store_directory else []
 
-    npm_package_stores = ctx.attr.src[NpmPackageInfo].npm_package_stores[:] if ctx.attr.src else []
+    npm_package_stores = ctx.attr.src[NpmPackageInfo].npm_package_stores.to_list() if ctx.attr.src else []
     npm_package_stores.extend([
         target[NpmPackageStoreInfo]
         for target in ctx.attr.deps
     ])
 
-    transitive_files.extend(files)
-    transitive_files.extend([
-        item
+    transitive_files_depset = depset(files, transitive = [depset(transitive_files)] + [
+        npm_package_store.transitive_files
         for npm_package_store in npm_package_stores
-        for item in npm_package_store.transitive_files
     ])
 
     providers = [
@@ -271,8 +269,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             version = version,
             ref_deps = direct_ref_deps,
             virtual_store_directory = virtual_store_directory,
-            files = files,
-            transitive_files = transitive_files,
+            files = depset(files),
+            transitive_files = transitive_files_depset,
         ),
     ]
     if virtual_store_directory:
