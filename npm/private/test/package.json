@@ -10,6 +10,7 @@
         "@plotly/regl": "2.1.2",
         "unused": "latest",
         "webpack-bundle-analyzer": "4.5.0",
-        "semver-first-satisfied": "1.1.0"
+        "semver-first-satisfied": "1.1.0",
+        "typescript": "*"
     }
 }

@@ -75,7 +75,11 @@ def _impl(ctx):
 
     providers = [
         DefaultInfo(
+            # Only provide direct files in DefaultInfo files
             files = depset(files),
+            # Include all transitives in runfiles so that this target can be used in the data
+            # of a generic binary target such as sh_binary
+            runfiles = ctx.runfiles(transitive_files),
         ),
         js_info(
             npm_linked_packages = [npm_linked_package_info],

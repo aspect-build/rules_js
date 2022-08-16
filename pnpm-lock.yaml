@@ -116,6 +116,7 @@ importers:
       plotly.js: 2.12.1
       regl: npm:@plotly/regl@2.1.2
       semver-first-satisfied: 1.1.0
+      typescript: '*'
       unused: latest
       webpack-bundle-analyzer: 4.5.0
     devDependencies:
@@ -126,6 +127,7 @@ importers:
       plotly.js: 2.12.1
       regl: /@plotly/regl/2.1.2
       semver-first-satisfied: 1.1.0
+      typescript: 4.7.2
       unused: 0.2.2
       webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
