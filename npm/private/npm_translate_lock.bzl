@@ -181,6 +181,16 @@ _ATTRS = {
         }
         """,
     ),
+    "lifecycle_hooks_no_sandbox": attr.bool(
+        doc = """If True, a "no-sandbox" execution requirement is added to all lifecycle hooks.
+
+        Equivalent to adding `"*": ["no-sandbox"]` to lifecycle_hooks_execution_requirements.
+
+        This defaults to True to limit the overhead of sandbox creation and copying the output
+        TreeArtifacts out of the sandbox.
+        """,
+        default = True,
+    ),
     "verify_node_modules_ignored": attr.label(
         doc = """node_modules folders in the source tree should be ignored by Bazel.
 
@@ -206,7 +216,8 @@ _NPM_IMPORT_TMPL = \
         link_workspace = "{link_workspace}",
         link_packages = {link_packages},
         package = "{package}",
-        version = "{version}",{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}
+        version = "{version}",
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}
     )
 """
 
@@ -865,6 +876,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
+            lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             maybe_transitive_closure = maybe_transitive_closure,
             maybe_url = maybe_url,
             name = _import.name,
