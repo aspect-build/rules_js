@@ -5,6 +5,7 @@ load(":utils.bzl", "utils")
 load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load("//js:providers.bzl", "JsInfo", "js_info")
+load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
@@ -34,6 +35,26 @@ If unset, the package name of the src npm_package_store is used.
 If set, takes precendance over the package name in the src npm_package_store.
 """,
     ),
+    "bins": attr.string_dict(
+        doc = """Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
+
+        This is typically derived from the "bin" attribute in the package.json
+        file of the npm package being linked.
+
+        For example:
+
+        ```
+        bins = {
+            "foo": "./foo.js",
+            "bar": "./bar.js",
+        }
+        ```
+
+        In the future, this field may be automatically populated by npm_translate_lock
+        from information in the pnpm lock file. That feature is currently blocked on
+        https://github.com/pnpm/pnpm/issues/5131.
+        """,
+    ),
     "use_declare_symlink": attr.bool(
         mandatory = True,
         doc = """Whether unresolved symlinks are enabled in the current build configuration.
@@ -46,12 +67,24 @@ If set, takes precendance over the package name in the src npm_package_store.
     ),
 }
 
+_BIN_TMPL = """#!/bin/sh
+basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
+exec node "$basedir/{bin_path}" "$@"
+"""
+
 def _impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
 
     virtual_store_directory = store_info.virtual_store_directory
     if not virtual_store_directory:
         fail("src must be a npm_link_package that provides a virtual_store_directory")
+
+    if virtual_store_directory.owner.workspace_name != ctx.label.workspace_name:
+        msg = "expected virtual_store_directory to be in the same workspace as the link target '{}' but found '{}'".format(
+            ctx.label.workspace_name,
+            virtual_store_directory.owner.workspace_name,
+        )
+        fail(msg)
 
     package = ctx.attr.package if ctx.attr.package else store_info.package
 
@@ -60,6 +93,17 @@ def _impl(ctx):
     root_symlink_path = paths.join("node_modules", package)
 
     files = utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)
+
+    for bin_name, bin_path in ctx.attr.bins.items():
+        path_to_root = relative_file(store_info.root_package, ctx.label.package + "/file")
+        bin_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name))
+        bin_path = paths.normalize(paths.join("../..", path_to_root, virtual_store_directory.short_path, bin_path))
+        ctx.actions.write(
+            bin_file,
+            _BIN_TMPL.format(bin_path = bin_path),
+            is_executable = True,
+        )
+        files.append(bin_file)
 
     transitive_files = files + store_info.transitive_files
 

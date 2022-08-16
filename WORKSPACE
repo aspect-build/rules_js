@@ -56,6 +56,13 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 
 npm_translate_lock(
     name = "npm",
+    bins = {
+        # derived from "bin" attribute in node_modules/typescript/package.json
+        "typescript": {
+            "tsc": "./bin/tsc",
+            "tsserver": "./bin/tsserver",
+        },
+    },
     custom_postinstalls = {
         "@aspect-test/c": "echo moo > cow.txt",
         "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
@@ -89,6 +96,7 @@ npm_repositories()
 # Just a demonstration of the syntax de-sugaring.
 npm_import(
     name = "acorn__8.4.0",
+    bins = {"acorn": "./bin/acorn"},
     integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     package = "acorn",
     # Root package where to link the virtual store

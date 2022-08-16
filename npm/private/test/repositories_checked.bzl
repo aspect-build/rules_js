@@ -11078,6 +11078,10 @@ def npm_repositories():
         transitive_closure = {
             "typescript": ["4.7.2"],
         },
+        bins = {
+            "tsc": "./bin/tsc",
+            "tsserver": "./bin/tsserver",
+        },
     )
 
     npm_import(
