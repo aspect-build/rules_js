@@ -13,6 +13,7 @@ def npm_repositories():
         },
         package = "@aspect-test/a",
         version = "5.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==",
         deps = {
             "@aspect-test/b": "5.0.2",
@@ -34,6 +35,7 @@ def npm_repositories():
         link_packages = {},
         package = "@aspect-test/b",
         version = "5.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==",
         deps = {
             "@aspect-test/a": "5.0.2",
@@ -57,6 +59,7 @@ def npm_repositories():
         },
         package = "@aspect-test/c",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==",
         transitive_closure = {
             "@aspect-test/c": ["2.0.2"],
@@ -72,6 +75,7 @@ def npm_repositories():
         link_packages = {},
         package = "@aspect-test/d",
         version = "2.0.0_@aspect-test+c@2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
         deps = {
             "@aspect-test/c": "2.0.2",
@@ -89,6 +93,7 @@ def npm_repositories():
         link_packages = {},
         package = "@babel/runtime",
         version = "7.18.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-38Y8f7YUhce/K7RMwTp7m0uCumpv9hZkitCbBClqQIow1qSbCvGkcegKOXpEWCQLfWmevgRiWokZ1GkpfhbZug==",
         deps = {
             "regenerator-runtime": "0.13.9",
@@ -106,6 +111,7 @@ def npm_repositories():
         link_packages = {},
         package = "@bcoe/v8-coverage",
         version = "0.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==",
         transitive_closure = {
             "@bcoe/v8-coverage": ["0.2.3"],
@@ -119,6 +125,7 @@ def npm_repositories():
         link_packages = {},
         package = "@choojs/findup",
         version = "0.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YstAqNb0MCN8PjdLCDfRsBcGVRN41f3vgLvaI0IrIcBp4AqILRSS0DeWNGkicC+f/zRIPJLc+9RURVSepwvfBw==",
         deps = {
             "commander": "2.20.3",
@@ -136,6 +143,7 @@ def npm_repositories():
         link_packages = {},
         package = "@discoveryjs/json-ext",
         version = "0.5.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==",
         transitive_closure = {
             "@discoveryjs/json-ext": ["0.5.7"],
@@ -149,6 +157,7 @@ def npm_repositories():
         link_packages = {},
         package = "@gregmagolan/test-a",
         version = "0.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nMZ3MKkXZ+uYbrm8R3dfdt3v1gOOLtf88CdDciWxMYGLr29oVjQG11y2fz4IRBR6R7hI2Gj+G9sHZ69wLTnjfA==",
         transitive_closure = {
             "@gregmagolan/test-a": ["0.0.1"],
@@ -166,6 +175,7 @@ def npm_repositories():
         },
         package = "@gregmagolan/test-b",
         version = "0.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-h+LeJUbUued9XyQwxKMUdklGiGxPYJ1RvTAK9612ctCiMS2Fn0wu/Au5kHsMHxm8l4bOfpgAWmQ0OQQy7wUBCg==",
         deps = {
             "@gregmagolan/test-a": "0.0.1",
@@ -183,6 +193,7 @@ def npm_repositories():
         link_packages = {},
         package = "@istanbuljs/schema",
         version = "0.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==",
         transitive_closure = {
             "@istanbuljs/schema": ["0.1.3"],
@@ -196,6 +207,7 @@ def npm_repositories():
         link_packages = {},
         package = "@jridgewell/gen-mapping",
         version = "0.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GcHwniMlA2z+WFPWuY8lp3fsza0I8xPFMWL5+n8LYyP6PSvPrXf4+n8stDHZY2DM0zy9sVkRDy1jDI4XGzYVqg==",
         deps = {
             "@jridgewell/set-array": "1.1.1",
@@ -218,6 +230,7 @@ def npm_repositories():
         link_packages = {},
         package = "@jridgewell/resolve-uri",
         version = "3.0.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8cXDaBBHOr2pQ7j77Y6Vp5VDT2sIqWyWQ56TjEq4ih/a4iST3dItRe8Q9fp0rrIl9DoKhWQtUQz/YpOxLkXbNA==",
         transitive_closure = {
             "@jridgewell/resolve-uri": ["3.0.7"],
@@ -231,6 +244,7 @@ def npm_repositories():
         link_packages = {},
         package = "@jridgewell/set-array",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Ct5MqZkLGEXTVmQYbGtx9SVqD2fqwvdubdps5D3djjAkgkKwT918VNOz65pEHFaYTeWcukmJmH5SwsA9Tn2ObQ==",
         transitive_closure = {
             "@jridgewell/set-array": ["1.1.1"],
@@ -244,6 +258,7 @@ def npm_repositories():
         link_packages = {},
         package = "@jridgewell/source-map",
         version = "0.3.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-m7O9o2uR8k2ObDysZYzdfhb08VuEml5oWGiosa1VdaPZ/A6QyPkAJuwN0Q1lhULOf6B7MtQmHENS743hWtCrgw==",
         deps = {
             "@jridgewell/gen-mapping": "0.3.1",
@@ -266,6 +281,7 @@ def npm_repositories():
         link_packages = {},
         package = "@jridgewell/sourcemap-codec",
         version = "1.4.13",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GryiOJmNcWbovBxTfZSF71V/mXbgcV3MewDe3kIMCLyIh5e7SKAeUZs+rMnJ8jkMolZ/4/VsdBmMrw3l+VdZ3w==",
         transitive_closure = {
             "@jridgewell/sourcemap-codec": ["1.4.13"],
@@ -279,6 +295,7 @@ def npm_repositories():
         link_packages = {},
         package = "@jridgewell/trace-mapping",
         version = "0.3.13",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-o1xbKhp9qnIAoHJSWd6KlCZfqslL4valSF81H8ImioOAxluWYWOpWkpyktY2vnt4tbrX9XYaxovq6cgowaJp2w==",
         deps = {
             "@jridgewell/resolve-uri": "3.0.7",
@@ -298,6 +315,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/geojson-rewind",
         version = "0.5.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==",
         deps = {
             "get-stream": "6.0.1",
@@ -317,6 +335,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/geojson-types",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-e9EBqHHv3EORHrSfbR9DqecPNn+AmuAoQxV6aL8Xu30bJMJR1o8PZLZzpk1Wq7/NfCbuhmakHTPYRhoqLsXRnw==",
         transitive_closure = {
             "@mapbox/geojson-types": ["1.0.2"],
@@ -330,6 +349,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/jsonlint-lines-primitives",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rY0o9A5ECsTQRVhv7tL/OyDpGAoUB4tTvLiW1DSzQGq4bvTPhNw1VpSNjDJc5GFZ2XuyOtSWSVN05qOtcD71qQ==",
         transitive_closure = {
             "@mapbox/jsonlint-lines-primitives": ["2.0.2"],
@@ -343,6 +363,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/mapbox-gl-supported",
         version = "1.5.0_mapbox-gl@1.10.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/PT1P6DNf7vjEEiPkVIRJkvibbqWtqnyGaBz3nfRdcxclNSnSdaLU5tfAgcD7I8Yt5i+L19s406YLl1koLnLbg==",
         deps = {
             "mapbox-gl": "1.10.1",
@@ -387,6 +408,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/point-geometry",
         version = "0.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6j56HdLTwWGO0fJPlrZtdU/B13q8Uwmo18Ck2GnGgN9PCFyKTZ3UbXeEdRFh18i9XQ92eH2VdtpJHpBD3aripQ==",
         transitive_closure = {
             "@mapbox/point-geometry": ["0.1.0"],
@@ -400,6 +422,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/tiny-sdf",
         version = "1.2.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-cD8A/zJlm6fdJOk6DqPUV8mcpyJkRz2x2R+/fYcWDYG3oWbG7/L7Yl/WqQ1VZCjnL9OTIMAn6c+BC5Eru4sQEw==",
         transitive_closure = {
             "@mapbox/tiny-sdf": ["1.2.5"],
@@ -413,6 +436,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/unitbezier",
         version = "0.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HPnRdYO0WjFjRTSwO3frz1wKaU649OBFPX3Zo/2WZvuRi6zMiRGui8SnPQiQABgqCf8YikDe5t3HViTVw1WUzA==",
         transitive_closure = {
             "@mapbox/unitbezier": ["0.0.0"],
@@ -426,6 +450,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/vector-tile",
         version = "1.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MCEddb8u44/xfQ3oD+Srl/tNcQoqTw3goGk2oLsrFxOTc3dUp+kAnby3PvAeeBYSMSjSPD1nd1AJA6W49WnoUw==",
         deps = {
             "@mapbox/point-geometry": "0.1.0",
@@ -443,6 +468,7 @@ def npm_repositories():
         link_packages = {},
         package = "@mapbox/whoots-js",
         version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==",
         transitive_closure = {
             "@mapbox/whoots-js": ["3.1.0"],
@@ -456,6 +482,7 @@ def npm_repositories():
         link_packages = {},
         package = "@plotly/d3-sankey-circular",
         version = "0.33.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-FgBV1HEvCr3DV7RHhDsPXyryknucxtfnLwPtCKKxdolKyTFYoLX/ibEfX39iFYIL7DYbVeRtP43dbFcrHNE+KQ==",
         deps = {
             "d3-array": "1.2.4",
@@ -481,6 +508,7 @@ def npm_repositories():
         link_packages = {},
         package = "@plotly/d3-sankey",
         version = "0.7.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2jdVos1N3mMp3QW0k2q1ph7Gd6j5PY1YihBrwpkFnKqO+cqtZq3AdEYUeSGXMeLsBDQYiqTVcihYfk8vr5tqhw==",
         deps = {
             "d3-array": "1.2.4",
@@ -503,6 +531,7 @@ def npm_repositories():
         link_packages = {},
         package = "@plotly/d3",
         version = "3.8.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-L10iHgzvw3uSic/nQpYehlNzxUQvImwms5U7S95pJAEhrllzkrdQNy1Mc5DW9ab881Yr4fh300gJztKXWZDfkQ==",
         transitive_closure = {
             "@plotly/d3": ["3.8.0"],
@@ -516,6 +545,7 @@ def npm_repositories():
         link_packages = {},
         package = "@plotly/point-cluster",
         version = "3.1.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MwaI6g9scKf68Orpr1pHZ597pYx9uP8UEFXLPbsCmuw3a84obwz6pnMXGc90VhgDNeNiLEdlmuK7CPo+5PIxXw==",
         deps = {
             "array-bounds": "1.0.1",
@@ -553,6 +583,7 @@ def npm_repositories():
         },
         package = "@plotly/regl",
         version = "2.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Mdk+vUACbQvjd0m/1JJjOOafmkp/EpmHjISsopEz5Av44CBq7rPC05HHNbYGKVyNUF2zmEoBS/TT0pd0SPFFyw==",
         transitive_closure = {
             "@plotly/regl": ["2.1.2"],
@@ -566,6 +597,7 @@ def npm_repositories():
         link_packages = {},
         package = "@polka/url",
         version = "1.0.0-next.21",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==",
         transitive_closure = {
             "@polka/url": ["1.0.0-next.21"],
@@ -581,6 +613,7 @@ def npm_repositories():
         },
         package = "@rollup/plugin-commonjs",
         version = "21.1.0_rollup@2.70.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6ZtHx3VHIp2ReNNDxHjuUml6ur+WcQ28N1yHgCQwsbNkQg2suhxGMDQGJOn/KuDxKtd1xuZP5xSTwBA4GQ8hbA==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup@2.70.2",
@@ -633,6 +666,7 @@ def npm_repositories():
         },
         package = "@rollup/plugin-commonjs",
         version = "22.0.0_rollup@2.75.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
@@ -685,6 +719,7 @@ def npm_repositories():
         },
         package = "@rollup/plugin-json",
         version = "4.1.0_rollup@2.75.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
@@ -710,6 +745,7 @@ def npm_repositories():
         },
         package = "@rollup/plugin-node-resolve",
         version = "13.3.0_rollup@2.75.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Lus8rbUo1eEcnS4yTFKLZrVumLPY+YayBdWXgFSHYhTT2iJbMhoaaBL3xl5NCdeRytErGr8tZ0L71BMRmnlwSw==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
@@ -750,6 +786,7 @@ def npm_repositories():
         link_packages = {},
         package = "@rollup/pluginutils",
         version = "3.1.0_rollup@2.70.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
         deps = {
             "@types/estree": "registry.npmjs.org/@types/estree/0.0.39",
@@ -774,6 +811,7 @@ def npm_repositories():
         link_packages = {},
         package = "@rollup/pluginutils",
         version = "3.1.0_rollup@2.75.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
         deps = {
             "@types/estree": "registry.npmjs.org/@types/estree/0.0.39",
@@ -798,6 +836,7 @@ def npm_repositories():
         link_packages = {},
         package = "@turf/area",
         version = "6.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xCZdiuojokLbQ+29qR6qoMD89hv+JAgWjLrwSEWL+3JV8IXKeNFl6XkEJz9HGkVpnXvQKJoRz4/liT+8ZZ5Jyg==",
         deps = {
             "@turf/helpers": "6.5.0",
@@ -817,6 +856,7 @@ def npm_repositories():
         link_packages = {},
         package = "@turf/bbox",
         version = "6.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RBbLaao5hXTYyyg577iuMtDB8ehxMlUqHEJiMs8jT1GHkFhr6sYre3lmLsPeYEi/ZKj5TP5tt7fkzNdJ4GIVyw==",
         deps = {
             "@turf/helpers": "6.5.0",
@@ -836,6 +876,7 @@ def npm_repositories():
         link_packages = {},
         package = "@turf/centroid",
         version = "6.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MwE1oq5E3isewPprEClbfU5pXljIK/GUOMbn22UM3IFPDJX0KeoyLNwghszkdmFp/qMGL/M13MMWvU+GNLXP/A==",
         deps = {
             "@turf/helpers": "6.5.0",
@@ -855,6 +896,7 @@ def npm_repositories():
         link_packages = {},
         package = "@turf/helpers",
         version = "6.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==",
         transitive_closure = {
             "@turf/helpers": ["6.5.0"],
@@ -868,6 +910,7 @@ def npm_repositories():
         link_packages = {},
         package = "@turf/meta",
         version = "6.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==",
         deps = {
             "@turf/helpers": "6.5.0",
@@ -885,6 +928,7 @@ def npm_repositories():
         link_packages = {},
         package = "@ungap/promise-all-settled",
         version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==",
         transitive_closure = {
             "@ungap/promise-all-settled": ["1.1.2"],
@@ -898,6 +942,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/ast",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ukBh14qFLjxTQNTXocdyksN5QdM28S1CxHt2rdskFyL+xFV7VremuBLVbmCePj+URalXBENx/9Lm7lnhihtCSw==",
         deps = {
             "@webassemblyjs/helper-numbers": "1.11.1",
@@ -920,6 +965,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/floating-point-hex-parser",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iGRfyc5Bq+NnNuX8b5hwBrRjzf0ocrJPI6GWFodBFzmFnyvrQ83SHKhmilCU/8Jv67i4GJZBMhEzltxzcNagtQ==",
         transitive_closure = {
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
@@ -933,6 +979,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/helper-api-error",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RlhS8CBCXfRUR/cwo2ho9bkheSXG0+NwooXcc3PAILALf2QLdFyj7KGsKRbVc95hZnhnERon4kW/D3SZpp6Tcg==",
         transitive_closure = {
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -946,6 +993,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/helper-buffer",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-gwikF65aDNeeXa8JxXa2BAk+REjSyhrNC9ZwdT0f8jc4dQQeDQ7G4m0f2QCLPJiMTTO6wfDmRmj/pW0PsUvIcA==",
         transitive_closure = {
             "@webassemblyjs/helper-buffer": ["1.11.1"],
@@ -959,6 +1007,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/helper-numbers",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vDkbxiB8zfnPdNK9Rajcey5C0w+QJugEglN0of+kmO8l7lDb77AnlKYQF7aarZuCrv+l0UvqL+68gSDr3k9LPQ==",
         deps = {
             "@webassemblyjs/floating-point-hex-parser": "1.11.1",
@@ -980,6 +1029,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/helper-wasm-bytecode",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-PvpoOGiJwXeTrSf/qfudJhwlvDQxFgelbMqtq52WWiXC6Xgg1IREdngmPN3bs4RoO83PnL/nFrxucXj1+BX62Q==",
         transitive_closure = {
             "@webassemblyjs/helper-wasm-bytecode": ["1.11.1"],
@@ -993,6 +1043,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/helper-wasm-section",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-10P9No29rYX1j7F3EVPX3JvGPQPae+AomuSTPiF9eBQeChHI6iqjMIwR9JmOJXwpnn/oVGDk7I5IlskuMwU/pg==",
         deps = {
             "@webassemblyjs/ast": "1.11.1",
@@ -1024,6 +1075,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/ieee754",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-hJ87QIPtAMKbFq6CGTkZYJivEwZDbQUgYd3qKSadTNOhVY7p+gfP6Sr0lLRVTaG1JjFj+r3YchoqRYxNH3M0GQ==",
         deps = {
             "@xtuc/ieee754": "1.2.0",
@@ -1041,6 +1093,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/leb128",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-BJ2P0hNZ0u+Th1YZXJpzW6miwqQUGcIHT1G/sf72gLVD9DZ5AdYTqPNbHZh6K1M5VmKvFXwGSWZADz+qBWxeRw==",
         deps = {
             "@xtuc/long": "4.2.2",
@@ -1058,6 +1111,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/utf8",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-9kqcxAEdMhiwQkHpkNiorZzqpGrodQQ2IGrHHxCy+Ozng0ofyMA0lTqiLkVs1uzTRejX+/O0EOT7KxqVPuXosQ==",
         transitive_closure = {
             "@webassemblyjs/utf8": ["1.11.1"],
@@ -1071,6 +1125,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/wasm-edit",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-g+RsupUC1aTHfR8CDgnsVRVZFJqdkFHpsHMfJuWQzWU3tvnLC07UqHICfP+4XyL2tnr1amvl1Sdp06TnYCmVkA==",
         deps = {
             "@webassemblyjs/ast": "1.11.1",
@@ -1110,6 +1165,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/wasm-gen",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-F7QqKXwwNlMmsulj6+O7r4mmtAlCWfO/0HdgOxSklZfQcDu0TpLiD1mRt/zF25Bk59FIjEuGAIyn5ei4yMfLhA==",
         deps = {
             "@webassemblyjs/ast": "1.11.1",
@@ -1140,6 +1196,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/wasm-opt",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VqnkNqnZlU5EB64pp1l7hdm3hmQw7Vgqa0KF/KCNO9sIpI6Fk6brDEiX+iCOYrvMuBWDws0NkTOxYEb85XQHHw==",
         deps = {
             "@webassemblyjs/ast": "1.11.1",
@@ -1172,6 +1229,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/wasm-parser",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rrBujw+dJu32gYB7/Lup6UhdkPx9S9SnobZzRVL7VcBH9Bt9bCBLEuX/YXOOtBsOZ4NQrRykKhffRWHvigQvOA==",
         deps = {
             "@webassemblyjs/ast": "1.11.1",
@@ -1203,6 +1261,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webassemblyjs/wast-printer",
         version = "1.11.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-IQboUWM4eKzWW+N/jij2sRatKMh99QEelo3Eb2q0qXkvPRISAj8Qxtmw5itwqK+TTkBuUIE45AxYPToqPtL5gg==",
         deps = {
             "@webassemblyjs/ast": "1.11.1",
@@ -1226,6 +1285,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webpack-cli/configtest",
         version = "1.2.0_77l47gmqkrqiei5z7sbwz5iaj4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-4FB8Tj6xyVkyqjj1OaTqCjXYULB9FMkqQ8yGrZjRDrYh0nOE+7Lhs45WioWQQMV+ceFlE368Ukhe6xdvJM9Egg==",
         deps = {
             "webpack": "5.73.0_webpack-cli@4.10.0",
@@ -1357,6 +1417,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webpack-cli/info",
         version = "1.5.0_webpack-cli@4.10.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-e8tSXZpw2hPl2uMJY6fsMswaok5FdlGNRTktvFk2sD8RjH0hE2+XistawJx1vmKteh4NmGmNUrp+Tb2w+udPcQ==",
         deps = {
             "envinfo": "7.8.1",
@@ -1488,6 +1549,7 @@ def npm_repositories():
         link_packages = {},
         package = "@webpack-cli/serve",
         version = "1.7.0_webpack-cli@4.10.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-oxnCNGj88fL+xzV+dacXs44HcDwf1ovs3AuEzvP7mqXw7fQntqIhQ1BRmynh4qEKQSSSRSWVyXRjmTbZIX9V2Q==",
         deps = {
             "webpack-cli": "4.10.0_webpack@5.73.0",
@@ -1618,6 +1680,7 @@ def npm_repositories():
         link_packages = {},
         package = "@xtuc/ieee754",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==",
         transitive_closure = {
             "@xtuc/ieee754": ["1.2.0"],
@@ -1631,6 +1694,7 @@ def npm_repositories():
         link_packages = {},
         package = "@xtuc/long",
         version = "4.2.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==",
         transitive_closure = {
             "@xtuc/long": ["4.2.2"],
@@ -1644,6 +1708,7 @@ def npm_repositories():
         link_packages = {},
         package = "abs-svg-path",
         version = "0.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-d8XPSGjfyzlXC3Xx891DJRyZfqk5JU0BJrDQcsWomFIV1/BIzPW5HDH5iDdWpqWaav0YVIEzT1RHTwWr0FFshA==",
         transitive_closure = {
             "abs-svg-path": ["0.1.1"],
@@ -1657,6 +1722,7 @@ def npm_repositories():
         link_packages = {},
         package = "acorn-import-assertions",
         version = "1.8.0_acorn@8.7.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-m7VZ3jwz4eK6A4Vtt8Ew1/mNbP24u0FhdyfA7fSvnJR6LMdfOYnmuIrrJAgrYfYJ10F/otaHTtrtrtmHdMNzEw==",
         deps = {
             "acorn": "8.7.1",
@@ -1674,6 +1740,7 @@ def npm_repositories():
         link_packages = {},
         package = "acorn-walk",
         version = "8.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==",
         transitive_closure = {
             "acorn-walk": ["8.2.0"],
@@ -1687,6 +1754,7 @@ def npm_repositories():
         link_packages = {},
         package = "acorn",
         version = "7.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==",
         transitive_closure = {
             "acorn": ["7.4.1"],
@@ -1703,6 +1771,7 @@ def npm_repositories():
         },
         package = "acorn",
         version = "8.7.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==",
         transitive_closure = {
             "acorn": ["8.7.1"],
@@ -1716,6 +1785,7 @@ def npm_repositories():
         link_packages = {},
         package = "ajv-keywords",
         version = "3.5.2_ajv@6.12.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==",
         deps = {
             "ajv": "6.12.6",
@@ -1738,6 +1808,7 @@ def npm_repositories():
         link_packages = {},
         package = "ajv",
         version = "6.12.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==",
         deps = {
             "fast-deep-equal": "3.1.3",
@@ -1762,6 +1833,7 @@ def npm_repositories():
         link_packages = {},
         package = "almost-equal",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0V/PkoculFl5+0Lp47JoxUcO0xSxhIBvm+BxHdD/OgXNmdRpRHCFnKVuUoWyS9EzQP+otSGv0m9Lb4yVkQBn2A==",
         transitive_closure = {
             "almost-equal": ["1.1.0"],
@@ -1775,6 +1847,7 @@ def npm_repositories():
         link_packages = {},
         package = "ansi-colors",
         version = "4.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-JoX0apGbHaUJBNl6yF+p6JAFYZ666/hhCGKN5t9QFjbJQKUU/g8MNbFDbvfrgKXvI1QpZplPOnwIo99lX/AAmA==",
         transitive_closure = {
             "ansi-colors": ["4.1.1"],
@@ -1788,6 +1861,7 @@ def npm_repositories():
         link_packages = {},
         package = "ansi-regex",
         version = "5.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
         transitive_closure = {
             "ansi-regex": ["5.0.1"],
@@ -1801,6 +1875,7 @@ def npm_repositories():
         link_packages = {},
         package = "ansi-styles",
         version = "4.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
         deps = {
             "color-convert": "2.0.1",
@@ -1819,6 +1894,7 @@ def npm_repositories():
         link_packages = {},
         package = "anymatch",
         version = "3.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-P43ePfOAIupkguHUycrc4qJ9kz8ZiuOUijaETwX7THt0Y/GNK7v0aa8rY816xWjZ7rJdA5XdMcpVFTKMq+RvWg==",
         deps = {
             "normalize-path": "3.0.0",
@@ -1838,6 +1914,7 @@ def npm_repositories():
         link_packages = {},
         package = "argparse",
         version = "2.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==",
         transitive_closure = {
             "argparse": ["2.0.1"],
@@ -1851,6 +1928,7 @@ def npm_repositories():
         link_packages = {},
         package = "arr-flatten",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-L3hKV5R/p5o81R7O02IGnwpDmkp6E982XhtbuwSe3O4qOtMMMtodicASA1Cny2U+aCXcNpml+m4dPsvsJ3jatg==",
         transitive_closure = {
             "arr-flatten": ["1.1.0"],
@@ -1864,6 +1942,7 @@ def npm_repositories():
         link_packages = {},
         package = "array-bounds",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8wdW3ZGk6UjMPJx/glyEt0sLzzwAE1bhToPsO1W2pbpR2gULyxe3BjSiuJFheP50T/GgODVPz2fuMUmIywt8cQ==",
         transitive_closure = {
             "array-bounds": ["1.0.1"],
@@ -1877,6 +1956,7 @@ def npm_repositories():
         link_packages = {},
         package = "array-find-index",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-M1HQyIXcBGtVywBt8WVdim+lrNaK7VHp99Qt5pSNziXznKHViIBbXWtfRTpEFpF/c4FdfxNAsCCwPp5phBYJtw==",
         transitive_closure = {
             "array-find-index": ["1.0.2"],
@@ -1890,6 +1970,7 @@ def npm_repositories():
         link_packages = {},
         package = "array-normalize",
         version = "1.1.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-fCp0wKFLjvSPmCn4F5Tiw4M3lpMZoHlCjfcs7nNzuj3vqQQ1/a8cgB9DXcpDSn18c+coLnaW7rqfcYCvKbyJXg==",
         deps = {
             "array-bounds": "1.0.1",
@@ -1907,6 +1988,7 @@ def npm_repositories():
         link_packages = {},
         package = "array-range",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-shdaI1zT3CVNL2hnx9c0JMc0ZogGaxDs5e85akgHWKYa0yVbIyp06Ind3dVkTj/uuFrzaHBOyqFzo+VV6aXgtA==",
         transitive_closure = {
             "array-range": ["1.0.1"],
@@ -1920,6 +2002,7 @@ def npm_repositories():
         link_packages = {},
         package = "array-rearrange",
         version = "2.2.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-UfobP5N12Qm4Qu4fwLDIi2v6+wZsSf6snYSxAMeKhrh37YGnNWZPRmVEKc/2wfms53TLQnzfpG8wCx2Y/6NG1w==",
         transitive_closure = {
             "array-rearrange": ["2.2.2"],
@@ -1933,6 +2016,7 @@ def npm_repositories():
         link_packages = {},
         package = "atob-lite",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-LEeSAWeh2Gfa2FtlQE1shxQ8zi5F9GHarrGKz08TMdODD5T4eH6BMsvtnhbWZ+XQn+Gb6om/917ucvRu7l7ukw==",
         transitive_closure = {
             "atob-lite": ["2.0.0"],
@@ -1946,6 +2030,7 @@ def npm_repositories():
         link_packages = {},
         package = "balanced-match",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         transitive_closure = {
             "balanced-match": ["1.0.2"],
@@ -1959,6 +2044,7 @@ def npm_repositories():
         link_packages = {},
         package = "binary-extensions",
         version = "2.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==",
         transitive_closure = {
             "binary-extensions": ["2.2.0"],
@@ -1972,6 +2058,7 @@ def npm_repositories():
         link_packages = {},
         package = "binary-search-bounds",
         version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-H0ea4Fd3lS1+sTEB2TgcLoK21lLhwEJzlQv3IN47pJS976Gx4zoWe0ak3q+uYh60ppQxg9F16Ri4tS1sfD4+jA==",
         transitive_closure = {
             "binary-search-bounds": ["2.0.5"],
@@ -1985,6 +2072,7 @@ def npm_repositories():
         link_packages = {},
         package = "bit-twiddle",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-B9UhK0DKFZhoTFcfvAzhqsjStvGJp9vYWf3+6SNTtdSQnvIgfkHbgHrg/e4+TH71N2GDu8tpmCVoyfrL1d7ntA==",
         transitive_closure = {
             "bit-twiddle": ["1.0.2"],
@@ -1998,6 +2086,7 @@ def npm_repositories():
         link_packages = {},
         package = "bitmap-sdf",
         version = "1.0.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1G3U4n5JE6RAiALMxu0p1XmeZkTeCwGKykzsLTCqVzfSDaN6S7fKnkIkfejogz+iwqBWc0UYAIKnKHNN7pSfDg==",
         transitive_closure = {
             "bitmap-sdf": ["1.0.4"],
@@ -2011,6 +2100,7 @@ def npm_repositories():
         link_packages = {},
         package = "bl",
         version = "2.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6Pesp1w0DEX1N550i/uGV/TqucVL4AM/pgThFSN/Qq9si1/DF9aIHs1BxD8V/QU0HoeHO6cQRTAuYnLPKq1e4g==",
         deps = {
             "readable-stream": "2.3.7",
@@ -2036,6 +2126,7 @@ def npm_repositories():
         link_packages = {},
         package = "brace-expansion",
         version = "1.1.11",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
         deps = {
             "balanced-match": "1.0.2",
@@ -2055,6 +2146,7 @@ def npm_repositories():
         link_packages = {},
         package = "brace-expansion",
         version = "2.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
         deps = {
             "balanced-match": "1.0.2",
@@ -2072,6 +2164,7 @@ def npm_repositories():
         link_packages = {},
         package = "braces",
         version = "3.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==",
         deps = {
             "fill-range": "7.0.1",
@@ -2091,6 +2184,7 @@ def npm_repositories():
         link_packages = {},
         package = "browser-stdout",
         version = "1.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==",
         transitive_closure = {
             "browser-stdout": ["1.3.1"],
@@ -2104,6 +2198,7 @@ def npm_repositories():
         link_packages = {},
         package = "browserslist",
         version = "4.21.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-UQxE0DIhRB5z/zDz9iA03BOfxaN2+GQdBYH/2WrSIWEUrnpzTPJbhqt+umq6r3acaPRTW1FNTkrcp0PXgtFkvA==",
         deps = {
             "caniuse-lite": "1.0.30001358",
@@ -2129,6 +2224,7 @@ def npm_repositories():
         link_packages = {},
         package = "buffer-from",
         version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==",
         transitive_closure = {
             "buffer-from": ["1.1.2"],
@@ -2144,6 +2240,7 @@ def npm_repositories():
         },
         package = "bufferutil",
         version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==",
         deps = {
             "node-gyp-build": "3.7.0",
@@ -2162,6 +2259,7 @@ def npm_repositories():
         link_packages = {},
         package = "builtin-modules",
         version = "3.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==",
         transitive_closure = {
             "builtin-modules": ["3.3.0"],
@@ -2177,6 +2275,7 @@ def npm_repositories():
         },
         package = "c8",
         version = "7.11.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6YBmsaNmqRm9OS3ZbIiL2EZgi1+Xc4O24jL3vMYGE6idixYuGdy76rIfIdltSKDj9DpLNrcXSonUTR1miBD0wA==",
         deps = {
             "@bcoe/v8-coverage": "0.2.3",
@@ -2264,6 +2363,7 @@ def npm_repositories():
         link_packages = {},
         package = "camelcase",
         version = "6.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==",
         transitive_closure = {
             "camelcase": ["6.3.0"],
@@ -2277,6 +2377,7 @@ def npm_repositories():
         link_packages = {},
         package = "caniuse-lite",
         version = "1.0.30001358",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-hvp8PSRymk85R20bsDra7ZTCpSVGN/PAz9pSAjPSjKC+rNmnUk5vCRgJwiTT/O4feQ/yu/drvZYpKxxhbFuChw==",
         transitive_closure = {
             "caniuse-lite": ["1.0.30001358"],
@@ -2290,6 +2391,7 @@ def npm_repositories():
         link_packages = {},
         package = "canvas-fit",
         version = "1.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-onIcjRpz69/Hx5bB5HGbYKUF2uC6QT6Gp+pfpGm3A7mPfcluSLV5v4Zu+oflDUwLdUw0rLIBhUbi0v8hM4FJQQ==",
         deps = {
             "element-size": "1.1.1",
@@ -2307,6 +2409,7 @@ def npm_repositories():
         link_packages = {},
         package = "chalk",
         version = "4.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==",
         deps = {
             "ansi-styles": "4.3.0",
@@ -2331,6 +2434,7 @@ def npm_repositories():
         },
         package = "chalk",
         version = "5.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==",
         transitive_closure = {
             "chalk": ["5.0.1"],
@@ -2344,6 +2448,7 @@ def npm_repositories():
         link_packages = {},
         package = "charenc",
         version = "0.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha1-wKHS86cJLgN3S/qD8UwPxXkKhmc=",
         transitive_closure = {
             "charenc": ["0.0.2"],
@@ -2357,6 +2462,7 @@ def npm_repositories():
         link_packages = {},
         package = "chokidar",
         version = "3.5.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==",
         deps = {
             "fsevents": "2.3.2",
@@ -2394,6 +2500,7 @@ def npm_repositories():
         link_packages = {},
         package = "chrome-trace-event",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==",
         transitive_closure = {
             "chrome-trace-event": ["1.0.3"],
@@ -2407,6 +2514,7 @@ def npm_repositories():
         link_packages = {},
         package = "clamp",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kgMuFyE78OC6Dyu3Dy7vcx4uy97EIbVxJB/B0eJ3bUNAkwdNcxYzgKltnyADiYwsR7SEqkkUPsEUT//OVS6XMA==",
         transitive_closure = {
             "clamp": ["1.0.1"],
@@ -2420,6 +2528,7 @@ def npm_repositories():
         link_packages = {},
         package = "cliui",
         version = "7.0.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==",
         deps = {
             "string-width": "4.2.3",
@@ -2447,6 +2556,7 @@ def npm_repositories():
         link_packages = {},
         package = "clone-deep",
         version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-neHB9xuzh/wk0dIHweyAXv2aPGZIVk3pLMe+/RNzINf17fe0OG96QroktYAUm7SM1PBnzTabaLboqqxDyMU+SQ==",
         deps = {
             "is-plain-object": "2.0.4",
@@ -2469,6 +2579,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-alpha",
         version = "1.0.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lr8/t5NPozTSqli+duAN+x+no/2WaKTeWvxhHGN+aXT6AJ8vPlzLa7UriyjWak0pSC2jHol9JgjBYnnHsGha9A==",
         deps = {
             "color-parse": "1.3.8",
@@ -2489,6 +2600,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-convert",
         version = "2.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==",
         deps = {
             "color-name": "1.1.4",
@@ -2506,6 +2618,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-id",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2iRtAn6dC/6/G7bBIo0uupVrIne1NsQJvJxZOBCzQOfk7jRq97feaDZ3RdzuHakRXXnHGNwglto3pqtRx1sX0g==",
         deps = {
             "clamp": "1.0.1",
@@ -2523,6 +2636,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-name",
         version = "1.1.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
         transitive_closure = {
             "color-name": ["1.1.4"],
@@ -2536,6 +2650,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-normalize",
         version = "1.5.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rUT/HDXMr6RFffrR53oX3HGWkDOP9goSAQGBkUaAYKjOE2JxozccdGyufageWDlInRAjm/jYPrf/Y38oa+7obw==",
         deps = {
             "clamp": "1.0.1",
@@ -2565,6 +2680,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-parse",
         version = "1.3.8",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1Y79qFv0n1xair3lNMTNeoFvmc3nirMVBij24zbs1f13+7fPpQClMg5b4AuKXLt3szj7BRlHMCXHplkce6XlmA==",
         deps = {
             "color-name": "1.1.4",
@@ -2586,6 +2702,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-rgba",
         version = "2.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VaX97wsqrMwLSOR6H7rU1Doa2zyVdmShabKrPEIFywLlHoibgD3QW9Dw6fSqM4+H/LfjprDNAUUW31qEQcGzNw==",
         deps = {
             "clamp": "1.0.1",
@@ -2613,6 +2730,7 @@ def npm_repositories():
         link_packages = {},
         package = "color-space",
         version = "1.16.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-A6WMiFzunQ8KEPFmj02OnnoUnqhmSaHaZ/0LVFcPTdlvm8+3aMJ5x1HRHy3bDHPkovkf4sS0f4wsVvwk71fKkg==",
         deps = {
             "hsluv": "0.0.3",
@@ -2633,6 +2751,7 @@ def npm_repositories():
         link_packages = {},
         package = "colorette",
         version = "2.0.19",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==",
         transitive_closure = {
             "colorette": ["2.0.19"],
@@ -2646,6 +2765,7 @@ def npm_repositories():
         link_packages = {},
         package = "commander",
         version = "2.20.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
         transitive_closure = {
             "commander": ["2.20.3"],
@@ -2659,6 +2779,7 @@ def npm_repositories():
         link_packages = {},
         package = "commander",
         version = "7.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==",
         transitive_closure = {
             "commander": ["7.2.0"],
@@ -2672,6 +2793,7 @@ def npm_repositories():
         link_packages = {},
         package = "commondir",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==",
         transitive_closure = {
             "commondir": ["1.0.1"],
@@ -2685,6 +2807,7 @@ def npm_repositories():
         link_packages = {},
         package = "complex.js",
         version = "2.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8njCHOTtFFLtegk6zQo0kkVX1rngygb/KQI6z1qZxlFI3scluC+LVTCFbrkWjBv4vvLlbQ9t88IPMC6k95VTTg==",
         transitive_closure = {
             "complex.js": ["2.1.1"],
@@ -2698,6 +2821,7 @@ def npm_repositories():
         link_packages = {},
         package = "compute-dims",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YHMiIKjH/8Eom8zATk3g8/lH3HxGCZcVQyEfEoVrfWI7od/WRpTgRGShnei3jArYSx77mQqPxZNokjGHCdLfxg==",
         deps = {
             "utils-copy": "1.1.1",
@@ -2739,6 +2863,7 @@ def npm_repositories():
         link_packages = {},
         package = "concat-map",
         version = "0.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=",
         transitive_closure = {
             "concat-map": ["0.0.1"],
@@ -2752,6 +2877,7 @@ def npm_repositories():
         link_packages = {},
         package = "concat-stream",
         version = "1.6.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==",
         deps = {
             "buffer-from": "1.1.2",
@@ -2781,6 +2907,7 @@ def npm_repositories():
         link_packages = {},
         package = "const-max-uint32",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-T8/9bffg5RThuejasJWrwqxs3Q0fsJvyl7/33IB6svroD8JC93E7X60AuuOnDE8RlP6Jlb5FxmlrVDpl9KiU2Q==",
         transitive_closure = {
             "const-max-uint32": ["1.0.2"],
@@ -2794,6 +2921,7 @@ def npm_repositories():
         link_packages = {},
         package = "const-pinf-float64",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wfs+V4HdSN7C3CWJWR7hVa24yTPn3mDJthwhRIObZBh6UjTjkUMUrCP3UrNGozB/HjTpcScnGXtQUNa+yjsIJQ==",
         transitive_closure = {
             "const-pinf-float64": ["1.0.0"],
@@ -2807,6 +2935,7 @@ def npm_repositories():
         link_packages = {},
         package = "convert-source-map",
         version = "1.8.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==",
         deps = {
             "safe-buffer": "5.1.2",
@@ -2824,6 +2953,7 @@ def npm_repositories():
         link_packages = {},
         package = "core-util-is",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==",
         transitive_closure = {
             "core-util-is": ["1.0.3"],
@@ -2837,6 +2967,7 @@ def npm_repositories():
         link_packages = {},
         package = "country-regex",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iSPlClZP8vX7MC3/u6s3lrDuoQyhQukh5LyABJ3hvfzbQ3Yyayd4fp04zjLnfi267B/B2FkumcWWgrbban7sSA==",
         transitive_closure = {
             "country-regex": ["1.1.0"],
@@ -2850,6 +2981,7 @@ def npm_repositories():
         link_packages = {},
         package = "cross-spawn",
         version = "7.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==",
         deps = {
             "path-key": "3.1.1",
@@ -2873,6 +3005,7 @@ def npm_repositories():
         link_packages = {},
         package = "crypt",
         version = "0.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=",
         transitive_closure = {
             "crypt": ["0.0.2"],
@@ -2886,6 +3019,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-font-size-keywords",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Q+svMDbMlelgCfH/RVDKtTDaf5021O486ZThQPIpahnIjUkMUslC+WuOQSWTgGSrNCH08Y7tYNEmmy0hkfMI8Q==",
         transitive_closure = {
             "css-font-size-keywords": ["1.0.0"],
@@ -2899,6 +3033,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-font-stretch-keywords",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-KmugPO2BNqoyp9zmBIUGwt58UQSfyk1X5DbOlkb2pckDXFSAfjsD5wenb88fNrD6fvS+vu90a/tsPpb9vb0SLg==",
         transitive_closure = {
             "css-font-stretch-keywords": ["1.0.1"],
@@ -2912,6 +3047,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-font-style-keywords",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0Fn0aTpcDktnR1RzaBYorIxQily85M2KXRpzmxQPgh8pxUN9Fcn00I8u9I3grNr1QXVgCl9T5Imx0ZwKU973Vg==",
         transitive_closure = {
             "css-font-style-keywords": ["1.0.1"],
@@ -2925,6 +3061,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-font-weight-keywords",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-5So8/NH+oDD+EzsnF4iaG4ZFHQ3vaViePkL1ZbZ5iC/KrsCY+WHq/lvOgrtmuOQ9pBBZ1ADGpaf+A4lj1Z9eYA==",
         transitive_closure = {
             "css-font-weight-keywords": ["1.0.0"],
@@ -2938,6 +3075,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-font",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-V4U4Wps4dPDACJ4WpgofJ2RT5Yqwe1lEH6wlOOaIxMi0gTjdIijsc5FmxQlZ7ZZyKQkkutqqvULOp07l9c7ssA==",
         deps = {
             "css-font-size-keywords": "1.0.0",
@@ -2972,6 +3110,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-global-keywords",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-X1xgQhkZ9n94WDwntqst5D/FKkmiU0GlJSFZSV3kLvyJ1WC5VeyoXDOuleUD+SIuH9C7W05is++0Woh0CGfKjQ==",
         transitive_closure = {
             "css-global-keywords": ["1.0.1"],
@@ -2985,6 +3124,7 @@ def npm_repositories():
         link_packages = {},
         package = "css-system-font-keywords",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1umTtVd/fXS25ftfjB71eASCrYhilmEsvDEI6wG/QplnmlfmVM5HkZ/ZX46DT5K3eblFPgLUHt5BRCb0YXkSFA==",
         transitive_closure = {
             "css-system-font-keywords": ["1.0.0"],
@@ -2998,6 +3138,7 @@ def npm_repositories():
         link_packages = {},
         package = "csscolorparser",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-umPSgYwZkdFoUrH5hIq5kf0wPSXiro51nPw0j2K/c83KflkPSTBGMz6NJvMB+07VlL0y7VPo6QJcDjcgKTTm3w==",
         transitive_closure = {
             "csscolorparser": ["1.0.3"],
@@ -3011,6 +3152,7 @@ def npm_repositories():
         link_packages = {},
         package = "d",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-m62ShEObQ39CfralilEQRjH6oAMtNCV1xJyEx5LpRYUVN+EviphDgUc/F3hnYbADmkiNs67Y+3ylmlG7Lnu+FA==",
         deps = {
             "es5-ext": "0.10.61",
@@ -3034,6 +3176,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-array",
         version = "1.2.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==",
         transitive_closure = {
             "d3-array": ["1.2.4"],
@@ -3047,6 +3190,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-collection",
         version = "1.0.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ii0/r5f4sjKNTfh84Di+DpztYwqKhEyUlKoPrzUFfeSkWxjW49xU2QzO9qrPrNkpdI0XJkfzvmTu8V2Zylln6A==",
         transitive_closure = {
             "d3-collection": ["1.0.7"],
@@ -3060,6 +3204,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-color",
         version = "1.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-p2sTHSLCJI2QKunbGb7ocOh7DgTAn8IrLx21QRc/BSnodXM4sv6aLQlnfpvehFMLZEfBc6g9pH9SWQccFYfJ9Q==",
         transitive_closure = {
             "d3-color": ["1.4.1"],
@@ -3073,6 +3218,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-dispatch",
         version = "1.0.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-fVjoElzjhCEy+Hbn8KygnmMS7Or0a9sI2UzGwoB7cCtvI1XpVN9GpoYlnb3xt2YV66oXYb1fLJ8GMvP4hdU1RA==",
         transitive_closure = {
             "d3-dispatch": ["1.0.6"],
@@ -3086,6 +3232,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-force",
         version = "1.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HHvehyaiUlVo5CxBJ0yF/xny4xoaxFxDnBXNvNcfW9adORGZfyNF1dj6DGLKyk4Yh3brP/1h3rnDzdIAwL08zg==",
         deps = {
             "d3-collection": "1.0.7",
@@ -3109,6 +3256,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-format",
         version = "1.4.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-J0piedu6Z8iB6TbIGfZgDzfXxUFN3qQRMofy2oPdXzQibYGqPB/9iMcxr/TGalU+2RsyDO+U4f33id8tbnSRMQ==",
         transitive_closure = {
             "d3-format": ["1.4.5"],
@@ -3122,6 +3270,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-geo-projection",
         version = "2.9.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZULvK/zBn87of5rWAfFMc9mJOipeSo57O+BBitsKIXmU4rTVAnX1kSsJkE0R+TxY8pGNoM1nbyRRE7GYHhdOEQ==",
         deps = {
             "commander": "2.20.3",
@@ -3150,6 +3299,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-geo",
         version = "1.12.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-XG4d1c/UJSEX9NfU02KwBL6BYPj8YKHxgBEw5om2ZnTRSbIcego6dhHwcxuSR3clxh0EpE38os1DVPOmnYtTPg==",
         deps = {
             "d3-array": "1.2.4",
@@ -3167,6 +3317,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-hierarchy",
         version = "1.1.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-j8tPxlqh1srJHAtxfvOUwKNYJkQuBFdM1+JAUfq6xqH5eAqf93L7oG1NVqDa4CpFZNvnNKtCYEUC8KY9yEn9lQ==",
         transitive_closure = {
             "d3-hierarchy": ["1.1.9"],
@@ -3180,6 +3331,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-interpolate",
         version = "1.4.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-V9znK0zc3jOPV4VD2zZn0sDhZU3WAE2bmlxdIwwQPPzPjvyLkd8B3JUVdS1IDUFDkWZ72c9qnv1GK2ZagTZ8EA==",
         deps = {
             "d3-color": "1.4.1",
@@ -3197,6 +3349,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-path",
         version = "1.0.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==",
         transitive_closure = {
             "d3-path": ["1.0.9"],
@@ -3210,6 +3363,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-quadtree",
         version = "1.0.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RKPAeXnkC59IDGD0Wu5mANy0Q2V28L+fNe65pOCXVdVuTJS3WPKaJlFHer32Rbh9gIo9qMuJXio8ra4+YmIymA==",
         transitive_closure = {
             "d3-quadtree": ["1.0.7"],
@@ -3223,6 +3377,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-shape",
         version = "1.3.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw==",
         deps = {
             "d3-path": "1.0.9",
@@ -3240,6 +3395,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-time-format",
         version = "2.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-guv6b2H37s2Uq/GefleCDtbe0XZAuy7Wa49VGkPVPMfLL9qObgBST3lEHJBMUp8S7NdLQAGIvr2KXk8Hc98iKQ==",
         deps = {
             "d3-time": "1.1.0",
@@ -3257,6 +3413,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-time",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Xh0isrZ5rPYYdqhAVk8VLnMEidhz5aP7htAADH6MfzgmmicPkTo8LhkLxci61/lCB7n7UmE3bN0leRt+qvkLxA==",
         transitive_closure = {
             "d3-time": ["1.1.0"],
@@ -3270,6 +3427,7 @@ def npm_repositories():
         link_packages = {},
         package = "d3-timer",
         version = "1.0.10",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==",
         transitive_closure = {
             "d3-timer": ["1.0.10"],
@@ -3283,6 +3441,7 @@ def npm_repositories():
         link_packages = {},
         package = "debug",
         version = "2.6.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==",
         deps = {
             "ms": "2.0.0",
@@ -3302,6 +3461,7 @@ def npm_repositories():
         },
         package = "debug",
         version = "3.2.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==",
         deps = {
             "ms": "2.1.3",
@@ -3319,6 +3479,7 @@ def npm_repositories():
         link_packages = {},
         package = "debug",
         version = "4.3.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
         deps = {
             "ms": "2.1.2",
@@ -3336,6 +3497,7 @@ def npm_repositories():
         link_packages = {},
         package = "debug",
         version = "4.3.4_supports-color@8.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
         deps = {
             "ms": "2.1.2",
@@ -3356,6 +3518,7 @@ def npm_repositories():
         link_packages = {},
         package = "decamelize",
         version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-9iE1PgSik9HeIIw2JO94IidnE3eBoQrFJ3w7sFuzSX4DpmZ3v5sZpUiV5Swcf6mQEF+Y0ru8Neo+p+nyh2J+hQ==",
         transitive_closure = {
             "decamelize": ["4.0.0"],
@@ -3369,6 +3532,7 @@ def npm_repositories():
         link_packages = {},
         package = "decimal.js",
         version = "10.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-V0pfhfr8suzyPGOx3nmq4aHqabehUZn6Ch9kyFpV79TGDTWFmHqUqXdabR7QHqxzrYolF4+tVmJhUG4OURg5dQ==",
         transitive_closure = {
             "decimal.js": ["10.3.1"],
@@ -3382,6 +3546,7 @@ def npm_repositories():
         link_packages = {},
         package = "deep-is",
         version = "0.1.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==",
         transitive_closure = {
             "deep-is": ["0.1.4"],
@@ -3395,6 +3560,7 @@ def npm_repositories():
         link_packages = {},
         package = "deepmerge",
         version = "4.2.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==",
         transitive_closure = {
             "deepmerge": ["4.2.2"],
@@ -3408,6 +3574,7 @@ def npm_repositories():
         link_packages = {},
         package = "defined",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Y2caI5+ZwS5c3RiNDJ6u53VhQHv+hHKwhkI1iHvceKUHw9Df6EK2zRLfjejRgMuCuxK7PfSWIMwWecceVvThjQ==",
         transitive_closure = {
             "defined": ["1.0.0"],
@@ -3421,6 +3588,7 @@ def npm_repositories():
         link_packages = {},
         package = "dequal",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==",
         transitive_closure = {
             "dequal": ["2.0.2"],
@@ -3434,6 +3602,7 @@ def npm_repositories():
         link_packages = {},
         package = "detect-kerning",
         version = "2.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-I3JIbrnKPAntNLl1I6TpSQQdQ4AutYzv/sKMFKbepawV/hlH0GmYKhUoOEMd4xqaUHT+Bm0f4127lh5qs1m1tw==",
         transitive_closure = {
             "detect-kerning": ["2.1.2"],
@@ -3447,6 +3616,7 @@ def npm_repositories():
         link_packages = {},
         package = "diff",
         version = "5.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==",
         transitive_closure = {
             "diff": ["5.0.0"],
@@ -3460,6 +3630,7 @@ def npm_repositories():
         link_packages = {},
         package = "diff",
         version = "5.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==",
         transitive_closure = {
             "diff": ["5.1.0"],
@@ -3473,6 +3644,7 @@ def npm_repositories():
         link_packages = {},
         package = "draw-svg-path",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-P8j3IHxcgRMcY6sDzr0QvJDLzBnJJqpTG33UZ2Pvp8rw0apCHhJCWqYprqrXjrgHnJ6tuhP1iTJSAodPDHxwkg==",
         deps = {
             "abs-svg-path": "0.1.1",
@@ -3492,6 +3664,7 @@ def npm_repositories():
         link_packages = {},
         package = "dtype",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-s2YVcLKdFGS0hpFqJaTwscsyt0E8nNFdmo73Ocd81xNPj4URI4rj6D60A+vFMIw7BXWlb4yRkEwfBqcZzPGiZg==",
         transitive_closure = {
             "dtype": ["2.0.0"],
@@ -3505,6 +3678,7 @@ def npm_repositories():
         link_packages = {},
         package = "dup",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Bz5jxMMC0wgp23Zm15ip1x8IhYRqJvF3nFC0UInJUDkN1z4uNPk9jTnfCUJXbOGiQ1JbXLQsiV41Fb+HXcj5BA==",
         transitive_closure = {
             "dup": ["1.0.0"],
@@ -3518,6 +3692,7 @@ def npm_repositories():
         link_packages = {},
         package = "duplexer",
         version = "0.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==",
         transitive_closure = {
             "duplexer": ["0.1.2"],
@@ -3531,6 +3706,7 @@ def npm_repositories():
         link_packages = {},
         package = "duplexify",
         version = "3.7.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-07z8uv2wMyS51kKhD1KsdXJg5WQ6t93RneqRxUHnskXVtlYYkLqM0gqStQZ3pj073g687jPCHrqNfCzawLYh5g==",
         deps = {
             "end-of-stream": "1.4.4",
@@ -3562,6 +3738,7 @@ def npm_repositories():
         link_packages = {},
         package = "earcut",
         version = "2.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iRDI1QeCQIhMCZk48DRDMVgQSSBDmbzzNhnxIo+pwx3swkfjMh6vh0nWLq1NdvGHLKH6wIrAM3vQWeTj6qeoug==",
         transitive_closure = {
             "earcut": ["2.2.3"],
@@ -3575,6 +3752,7 @@ def npm_repositories():
         link_packages = {},
         package = "electron-to-chromium",
         version = "1.4.166",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZPLdq3kcATkD6dwne5M4SgJBHw21t90BqTGzf3AceJwj3cE/ICv6jyDwHYyJoF4JNuXM3pzRxlaRmpO7pdwmcg==",
         transitive_closure = {
             "electron-to-chromium": ["1.4.166"],
@@ -3588,6 +3766,7 @@ def npm_repositories():
         link_packages = {},
         package = "element-size",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eaN+GMOq/Q+BIWy0ybsgpcYImjGIdNLyjLFJU4XsLHXYQao5jCNb36GyN6C2qwmDDYSfIBmKpPpr4VnBdLCsPQ==",
         transitive_closure = {
             "element-size": ["1.1.1"],
@@ -3601,6 +3780,7 @@ def npm_repositories():
         link_packages = {},
         package = "elementary-circuits-directed-graph",
         version = "1.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZEiB5qkn2adYmpXGnJKkxT8uJHlW/mxmBpmeqawEHzPxh9HkLD4/1mFYX5l0On+f6rcPIt8/EWlRU2Vo3fX6dQ==",
         deps = {
             "strongly-connected-components": "1.0.1",
@@ -3618,6 +3798,7 @@ def npm_repositories():
         link_packages = {},
         package = "emoji-regex",
         version = "8.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
         transitive_closure = {
             "emoji-regex": ["8.0.0"],
@@ -3631,6 +3812,7 @@ def npm_repositories():
         link_packages = {},
         package = "end-of-stream",
         version = "1.4.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==",
         deps = {
             "once": "1.4.0",
@@ -3649,6 +3831,7 @@ def npm_repositories():
         link_packages = {},
         package = "enhanced-resolve",
         version = "5.9.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Bq9VSor+kjvW3f9/MiiR4eE3XYgOl7/rS8lnSxbRbF3kS0B2r+Y9w5krBWxZgDxASVZbdYrn5wT4j/Wb0J9qow==",
         deps = {
             "graceful-fs": "4.2.10",
@@ -3668,6 +3851,7 @@ def npm_repositories():
         link_packages = {},
         package = "envinfo",
         version = "7.8.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/o+BXHmB7ocbHEAs6F2EnG0ogybVVUdkRunTT2glZU9XAaGmhqskrvKwqXuDfNjEO0LZKWdejEEpnq8aM0tOaw==",
         transitive_closure = {
             "envinfo": ["7.8.1"],
@@ -3681,6 +3865,7 @@ def npm_repositories():
         link_packages = {},
         package = "es-module-lexer",
         version = "0.9.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1HQ2M2sPtxwnvOvT1ZClHyQDiggdNjURWpY2we6aMKCQiUVxTmVs2UYPLIrD84sS+kMdUwfBSylbJPwNnBrnHQ==",
         transitive_closure = {
             "es-module-lexer": ["0.9.3"],
@@ -3694,6 +3879,7 @@ def npm_repositories():
         link_packages = {},
         package = "es5-ext",
         version = "0.10.61",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yFhIqQAzu2Ca2I4SE2Au3rxVfmohU9Y7wqGR+s7+H7krk26NXhIRAZDgqd6xqjCEFUomDEA3/Bo/7fKmIkW1kA==",
         deps = {
             "es6-iterator": "2.0.3",
@@ -3719,6 +3905,7 @@ def npm_repositories():
         link_packages = {},
         package = "es6-iterator",
         version = "2.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-zw4SRzoUkd+cl+ZoE15A9o1oQd920Bb0iOJMQkQhl3jNc03YqVjAhG7scf9C5KWRU/R13Orf588uCC6525o02g==",
         deps = {
             "d": "1.0.1",
@@ -3743,6 +3930,7 @@ def npm_repositories():
         link_packages = {},
         package = "es6-symbol",
         version = "3.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NJ6Yn3FuDinBaBRWl/q5X/s4koRHBrgKAu+yGI6JCBeiu3qrcbJhwT2GeR/EXVfylRk8dpQVJoLEFhK+Mu31NA==",
         deps = {
             "d": "1.0.1",
@@ -3766,6 +3954,7 @@ def npm_repositories():
         link_packages = {},
         package = "es6-weak-map",
         version = "2.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-p5um32HOTO1kP+w7PRnB+5lQ43Z6muuMuIMffvDN8ZB4GcnjLBV6zGStpbASIMk4DCAvEaamhe2zhyCb/QXXsA==",
         deps = {
             "d": "1.0.1",
@@ -3792,6 +3981,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-android-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-aRFxR3scRKkbmNuGAK+Gee3+yFxkTJO/cx83Dkyzo4CnQl/2zVSurtG6+G86EQIZ+w+VYngVyK7P3HyTBKu3nw==",
         transitive_closure = {
             "esbuild-android-64": ["0.14.38"],
@@ -3806,6 +3996,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-android-arm64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-L2NgQRWuHFI89IIZIlpAcINy9FvBk6xFVZ7xGdOwIm8VyhX1vNCEqUJO3DPSSy945Gzdg98cxtNt8Grv1CsyhA==",
         transitive_closure = {
             "esbuild-android-arm64": ["0.14.38"],
@@ -3820,6 +4011,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-darwin-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-5JJvgXkX87Pd1Og0u/NJuO7TSqAikAcQQ74gyJ87bqWRVeouky84ICoV4sN6VV53aTW+NE87qLdGY4QA2S7KNA==",
         transitive_closure = {
             "esbuild-darwin-64": ["0.14.38"],
@@ -3834,6 +4026,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-darwin-arm64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eqF+OejMI3mC5Dlo9Kdq/Ilbki9sQBw3QlHW3wjLmsLh+quNfHmGMp3Ly1eWm981iGBMdbtSS9+LRvR2T8B3eQ==",
         transitive_closure = {
             "esbuild-darwin-arm64": ["0.14.38"],
@@ -3848,6 +4041,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-freebsd-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-epnPbhZUt93xV5cgeY36ZxPXDsQeO55DppzsIgWM8vgiG/Rz+qYDLmh5ts3e+Ln1wA9dQ+nZmVHw+RjaW3I5Ig==",
         transitive_closure = {
             "esbuild-freebsd-64": ["0.14.38"],
@@ -3862,6 +4056,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-freebsd-arm64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/9icXUYJWherhk+y5fjPI5yNUdFPtXHQlwP7/K/zg8t8lQdHVj20SqU9/udQmeUo5pDFHMYzcEFfJqgOVeKNNQ==",
         transitive_closure = {
             "esbuild-freebsd-arm64": ["0.14.38"],
@@ -3876,6 +4071,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-32",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-QfgfeNHRFvr2XeHFzP8kOZVnal3QvST3A0cgq32ZrHjSMFTdgXhMhmWdKzRXP/PKcfv3e2OW9tT9PpcjNvaq6g==",
         transitive_closure = {
             "esbuild-linux-32": ["0.14.38"],
@@ -3890,6 +4086,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-uuZHNmqcs+Bj1qiW9k/HZU3FtIHmYiuxZ/6Aa+/KHb/pFKr7R3aVqvxlAudYI9Fw3St0VCPfv7QBpUITSmBR1Q==",
         transitive_closure = {
             "esbuild-linux-64": ["0.14.38"],
@@ -3904,6 +4101,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-arm",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-FiFvQe8J3VKTDXG01JbvoVRXQ0x6UZwyrU4IaLBZeq39Bsbatd94Fuc3F1RGqPF5RbIWW7RvkVQjn79ejzysnA==",
         transitive_closure = {
             "esbuild-linux-arm": ["0.14.38"],
@@ -3918,6 +4116,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-arm64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HlMGZTEsBrXrivr64eZ/EO0NQM8H8DuSENRok9d+Jtvq8hOLzrxfsAT9U94K3KOGk2XgCmkaI2KD8hX7F97lvA==",
         transitive_closure = {
             "esbuild-linux-arm64": ["0.14.38"],
@@ -3932,6 +4131,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-mips64le",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-qd1dLf2v7QBiI5wwfil9j0HG/5YMFBAmMVmdeokbNAMbcg49p25t6IlJFXAeLzogv1AvgaXRXvgFNhScYEUXGQ==",
         transitive_closure = {
             "esbuild-linux-mips64le": ["0.14.38"],
@@ -3946,6 +4146,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-ppc64le",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-mnbEm7o69gTl60jSuK+nn+pRsRHGtDPfzhrqEUXyCl7CTOCLtWN2bhK8bgsdp6J/2NyS/wHBjs1x8aBWwP2X9Q==",
         transitive_closure = {
             "esbuild-linux-ppc64le": ["0.14.38"],
@@ -3960,6 +4161,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-riscv64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+p6YKYbuV72uikChRk14FSyNJZ4WfYkffj6Af0/Tw63/6TJX6TnIKE+6D3xtEc7DeDth1fjUOEqm+ApKFXbbVQ==",
         transitive_closure = {
             "esbuild-linux-riscv64": ["0.14.38"],
@@ -3974,6 +4176,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-linux-s390x",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0zUsiDkGJiMHxBQ7JDU8jbaanUY975CdOW1YDrurjrM0vWHfjv9tLQsW9GSyEb/heSK1L5gaweRjzfUVBFoybQ==",
         transitive_closure = {
             "esbuild-linux-s390x": ["0.14.38"],
@@ -3988,6 +4191,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-netbsd-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-cljBAApVwkpnJZfnRVThpRBGzCi+a+V9Ofb1fVkKhtrPLDYlHLrSYGtmnoTVWDQdU516qYI8+wOgcGZ4XIZh0Q==",
         transitive_closure = {
             "esbuild-netbsd-64": ["0.14.38"],
@@ -4002,6 +4206,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-openbsd-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-CDswYr2PWPGEPpLDUO50mL3WO/07EMjnZDNKpmaxUPsrW+kVM3LoAqr/CE8UbzugpEiflYqJsGPLirThRB18IQ==",
         transitive_closure = {
             "esbuild-openbsd-64": ["0.14.38"],
@@ -4016,6 +4221,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-sunos-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2mfIoYW58gKcC3bck0j7lD3RZkqYA7MmujFYmSn9l6TiIcAMpuEvqksO+ntBgbLep/eyjpgdplF7b+4T9VJGOA==",
         transitive_closure = {
             "esbuild-sunos-64": ["0.14.38"],
@@ -4030,6 +4236,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-windows-32",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-L2BmEeFZATAvU+FJzJiRLFUP+d9RHN+QXpgaOrs2klshoAm1AE6Us4X6fS9k33Uy5SzScn2TpcgecbqJza1Hjw==",
         transitive_closure = {
             "esbuild-windows-32": ["0.14.38"],
@@ -4044,6 +4251,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-windows-64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Khy4wVmebnzue8aeSXLC+6clo/hRYeNIm0DyikoEqX+3w3rcvrhzpoix0S+MF9vzh6JFskkIGD7Zx47ODJNyCw==",
         transitive_closure = {
             "esbuild-windows-64": ["0.14.38"],
@@ -4058,6 +4266,7 @@ def npm_repositories():
         link_packages = {},
         package = "esbuild-windows-arm64",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-k3FGCNmHBkqdJXuJszdWciAH77PukEyDsdIryEHn9cKLQFxzhT39dSumeTuggaQcXY57UlmLGIkklWZo2qzHpw==",
         transitive_closure = {
             "esbuild-windows-arm64": ["0.14.38"],
@@ -4074,6 +4283,7 @@ def npm_repositories():
         },
         package = "esbuild",
         version = "0.14.38",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-12fzJ0fsm7gVZX1YQ1InkOE5f9Tl7cgf6JPYXRJtPIoE0zkWAbHdPHVPPaLi9tYAcEBqheGzqLn/3RdTOyBfcA==",
         deps = {
             "esbuild-android-64": "0.14.38",
@@ -4130,6 +4340,7 @@ def npm_repositories():
         link_packages = {},
         package = "escalade",
         version = "3.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==",
         transitive_closure = {
             "escalade": ["3.1.1"],
@@ -4143,6 +4354,7 @@ def npm_repositories():
         link_packages = {},
         package = "escape-latex",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw==",
         transitive_closure = {
             "escape-latex": ["1.2.0"],
@@ -4156,6 +4368,7 @@ def npm_repositories():
         link_packages = {},
         package = "escape-string-regexp",
         version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==",
         transitive_closure = {
             "escape-string-regexp": ["4.0.0"],
@@ -4169,6 +4382,7 @@ def npm_repositories():
         link_packages = {},
         package = "escodegen",
         version = "1.14.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==",
         deps = {
             "source-map": "0.6.1",
@@ -4200,6 +4414,7 @@ def npm_repositories():
         link_packages = {},
         package = "eslint-scope",
         version = "5.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2NxwbF/hZ0KpepYN0cNbo+FN6XoK7GaHlQhgx/hIZl6Va0bF45RQOOwhLIy8lQDbuCiadSLCBnH2CFYquit5bw==",
         deps = {
             "esrecurse": "4.3.0",
@@ -4219,6 +4434,7 @@ def npm_repositories():
         link_packages = {},
         package = "esprima",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-k344tuMul8eif80+WDaTCcS5g4xDSO6FRHmCkvlF6t/QSBYQDrvph2VqP23ry9y9oMVEJ/sdJEh8JXT0smlcQQ==",
         transitive_closure = {
             "esprima": ["1.0.0"],
@@ -4232,6 +4448,7 @@ def npm_repositories():
         link_packages = {},
         package = "esprima",
         version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==",
         transitive_closure = {
             "esprima": ["4.0.1"],
@@ -4245,6 +4462,7 @@ def npm_repositories():
         link_packages = {},
         package = "esrecurse",
         version = "4.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==",
         deps = {
             "estraverse": "5.3.0",
@@ -4262,6 +4480,7 @@ def npm_repositories():
         link_packages = {},
         package = "estraverse",
         version = "4.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==",
         transitive_closure = {
             "estraverse": ["4.3.0"],
@@ -4275,6 +4494,7 @@ def npm_repositories():
         link_packages = {},
         package = "estraverse",
         version = "5.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==",
         transitive_closure = {
             "estraverse": ["5.3.0"],
@@ -4288,6 +4508,7 @@ def npm_repositories():
         link_packages = {},
         package = "estree-walker",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==",
         transitive_closure = {
             "estree-walker": ["1.0.1"],
@@ -4301,6 +4522,7 @@ def npm_repositories():
         link_packages = {},
         package = "estree-walker",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==",
         transitive_closure = {
             "estree-walker": ["2.0.2"],
@@ -4314,6 +4536,7 @@ def npm_repositories():
         link_packages = {},
         package = "esutils",
         version = "2.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==",
         transitive_closure = {
             "esutils": ["2.0.3"],
@@ -4327,6 +4550,7 @@ def npm_repositories():
         link_packages = {},
         package = "events",
         version = "3.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==",
         transitive_closure = {
             "events": ["3.3.0"],
@@ -4340,6 +4564,7 @@ def npm_repositories():
         link_packages = {},
         package = "ext",
         version = "1.6.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sdBImtzkq2HpkdRLtlLWDa6w4DX22ijZLKx8BMPUuKe1c5lbN6xwQDQCxSfxBQnHZ13ls/FH0MQZx/q/gr6FQg==",
         deps = {
             "type": "2.6.0",
@@ -4357,6 +4582,7 @@ def npm_repositories():
         link_packages = {},
         package = "falafel",
         version = "2.2.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HuC1qF9iTnHDnML9YZAdCDQwT0yKl/U55K4XSUXqGAA2GLoafFgWRqdAbhWJxXaYD4pyoVxAJ8wH670jMpI9DQ==",
         deps = {
             "acorn": "7.4.1",
@@ -4376,6 +4602,7 @@ def npm_repositories():
         link_packages = {},
         package = "fast-deep-equal",
         version = "3.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==",
         transitive_closure = {
             "fast-deep-equal": ["3.1.3"],
@@ -4389,6 +4616,7 @@ def npm_repositories():
         link_packages = {},
         package = "fast-isnumeric",
         version = "1.1.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1mM8qOr2LYz8zGaUdmiqRDiuue00Dxjgcb1NQR7TnhLVh6sQyngP9xvLo7Sl7LZpP/sk5eb+bcyWXw530NTBZw==",
         deps = {
             "is-string-blank": "1.0.1",
@@ -4406,6 +4634,7 @@ def npm_repositories():
         link_packages = {},
         package = "fast-json-stable-stringify",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==",
         transitive_closure = {
             "fast-json-stable-stringify": ["2.1.0"],
@@ -4419,6 +4648,7 @@ def npm_repositories():
         link_packages = {},
         package = "fast-levenshtein",
         version = "2.0.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==",
         transitive_closure = {
             "fast-levenshtein": ["2.0.6"],
@@ -4432,6 +4662,7 @@ def npm_repositories():
         link_packages = {},
         package = "fastest-levenshtein",
         version = "1.0.12",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-On2N+BpYJ15xIC974QNVuYGMOlEVt4s0EOI3wwMqOmK1fdDY+FN/zltPV8vosq4ad4c/gJ1KHScUn/6AWIgiow==",
         transitive_closure = {
             "fastest-levenshtein": ["1.0.12"],
@@ -4445,6 +4676,7 @@ def npm_repositories():
         link_packages = {},
         package = "fill-range",
         version = "7.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==",
         deps = {
             "to-regex-range": "5.0.1",
@@ -4463,6 +4695,7 @@ def npm_repositories():
         link_packages = {},
         package = "find-up",
         version = "4.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==",
         deps = {
             "locate-path": "5.0.0",
@@ -4485,6 +4718,7 @@ def npm_repositories():
         link_packages = {},
         package = "find-up",
         version = "5.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==",
         deps = {
             "locate-path": "6.0.0",
@@ -4507,6 +4741,7 @@ def npm_repositories():
         link_packages = {},
         package = "flat",
         version = "5.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==",
         transitive_closure = {
             "flat": ["5.0.2"],
@@ -4520,6 +4755,7 @@ def npm_repositories():
         link_packages = {},
         package = "flatten-vertex-data",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-BvCBFK2NZqerFTdMDgqfHBwxYWnxeCkwONsw6PvBMcUXqo8U/KDWwmXhqx1x2kLIg7DqIsJfOaJFOmlua3Lxuw==",
         deps = {
             "dtype": "2.0.0",
@@ -4537,6 +4773,7 @@ def npm_repositories():
         link_packages = {},
         package = "flip-pixels",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-oXbJGbjDnfJRWPC7Va38EFhd+A8JWE5/hCiKcK8qjCdbLj9DTpsq6MEudwpRTH+V4qq+Jw7d3pUgQdSr3x3mTA==",
         transitive_closure = {
             "flip-pixels": ["1.0.2"],
@@ -4550,6 +4787,7 @@ def npm_repositories():
         link_packages = {},
         package = "font-atlas",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kP3AmvX+HJpW4w3d+PiPR2X6E1yvsBXt2yhuCw+yReO9F1WYhvZwx3c95DGZGwg9xYzDGrgJYa885xmVA+28Cg==",
         deps = {
             "css-font": "1.2.0",
@@ -4577,6 +4815,7 @@ def npm_repositories():
         link_packages = {},
         package = "font-measure",
         version = "1.2.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-mRLEpdrWzKe9hbfaF3Qpr06TAjquuBVP5cHy4b3hyeNdjc9i0PO6HniGsX5vjL5OWv7+Bd++NiooNpT/s8BvIA==",
         deps = {
             "css-font": "1.2.0",
@@ -4604,6 +4843,7 @@ def npm_repositories():
         link_packages = {},
         package = "foreground-child",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dCIq9FpEcyQyXKCkyzmlPTFNgrCzPudOe+mhvJU5zAtlBnGVy2yKxtfsxK2tQBThwq225jcvBjpw1Gr40uzZCA==",
         deps = {
             "cross-spawn": "7.0.3",
@@ -4628,6 +4868,7 @@ def npm_repositories():
         link_packages = {},
         package = "fraction.js",
         version = "4.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==",
         transitive_closure = {
             "fraction.js": ["4.2.0"],
@@ -4641,6 +4882,7 @@ def npm_repositories():
         link_packages = {},
         package = "from2",
         version = "2.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OMcX/4IC/uqEPVgGeyfN22LJk6AZrMkRZHxcHBMBvHScDGgwTm2GT2Wkgtocyd3JfZffjj2kYUDXXII0Fk9W0g==",
         deps = {
             "inherits": "2.0.4",
@@ -4666,6 +4908,7 @@ def npm_repositories():
         link_packages = {},
         package = "fs.realpath",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==",
         transitive_closure = {
             "fs.realpath": ["1.0.0"],
@@ -4679,6 +4922,7 @@ def npm_repositories():
         link_packages = {},
         package = "fsevents",
         version = "2.3.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==",
         transitive_closure = {
             "fsevents": ["2.3.2"],
@@ -4693,6 +4937,7 @@ def npm_repositories():
         link_packages = {},
         package = "function-bind",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==",
         transitive_closure = {
             "function-bind": ["1.1.1"],
@@ -4706,6 +4951,7 @@ def npm_repositories():
         link_packages = {},
         package = "geojson-vt",
         version = "3.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EvGQQi/zPrDA6zr6BnJD/YhwAkBP8nnJ9emh3EnHQKVMfg/MRVtPbMYdgVy/IaEmn4UfagD2a6fafPDL5hbtwg==",
         transitive_closure = {
             "geojson-vt": ["3.2.1"],
@@ -4719,6 +4965,7 @@ def npm_repositories():
         link_packages = {},
         package = "get-caller-file",
         version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==",
         transitive_closure = {
             "get-caller-file": ["2.0.5"],
@@ -4732,6 +4979,7 @@ def npm_repositories():
         link_packages = {},
         package = "get-canvas-context",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-LnpfLf/TNzr9zVOGiIY6aKCz8EKuXmlYNV7CM2pUjBa/B+c2I15tS7KLySep75+FuerJdmArvJLcsAXWEy2H0A==",
         transitive_closure = {
             "get-canvas-context": ["1.0.2"],
@@ -4745,6 +4993,7 @@ def npm_repositories():
         link_packages = {},
         package = "get-stream",
         version = "6.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==",
         transitive_closure = {
             "get-stream": ["6.0.1"],
@@ -4758,6 +5007,7 @@ def npm_repositories():
         link_packages = {},
         package = "gl-mat4",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sT5C0pwB1/e9G9AvAoLsoaJtbMGjfd/jfxo8jMCKqYYEnjZuFvqV5rehqar0538EmssjdDeiEWnKyBSTw7quoA==",
         transitive_closure = {
             "gl-mat4": ["1.2.0"],
@@ -4771,6 +5021,7 @@ def npm_repositories():
         link_packages = {},
         package = "gl-matrix",
         version = "3.4.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wcCp8vu8FT22BnvKVPjXa/ICBWRq/zjFfdofZy1WSpQZpphblv12/bOQLBC1rMM7SGOFS9ltVmKOHil5+Ml7gA==",
         transitive_closure = {
             "gl-matrix": ["3.4.3"],
@@ -4784,6 +5035,7 @@ def npm_repositories():
         link_packages = {},
         package = "gl-text",
         version = "1.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/f5gcEMiZd+UTBJLTl3D+CkCB/0UFGTx3nflH8ZmyWcLkZhsZ1+Xx5YYkw2rgWAzgPeE35xCqBuHSoMKQVsR+w==",
         deps = {
             "bit-twiddle": "1.0.2",
@@ -4865,6 +5117,7 @@ def npm_repositories():
         link_packages = {},
         package = "gl-util",
         version = "3.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dvRTggw5MSkJnCbh74jZzSoTOGnVYK+Bt+Ckqm39CVcl6+zSsxqWk4lr5NKhkqXHL6qvZAU9h17ZF8mIskY9mA==",
         deps = {
             "is-browser": "2.1.0",
@@ -4895,6 +5148,7 @@ def npm_repositories():
         link_packages = {},
         package = "glob-parent",
         version = "5.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
         deps = {
             "is-glob": "4.0.3",
@@ -4913,6 +5167,7 @@ def npm_repositories():
         link_packages = {},
         package = "glob-to-regexp",
         version = "0.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==",
         transitive_closure = {
             "glob-to-regexp": ["0.4.1"],
@@ -4926,6 +5181,7 @@ def npm_repositories():
         link_packages = {},
         package = "glob",
         version = "7.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==",
         deps = {
             "fs.realpath": "1.0.0",
@@ -4957,6 +5213,7 @@ def npm_repositories():
         link_packages = {},
         package = "glob",
         version = "7.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==",
         deps = {
             "fs.realpath": "1.0.0",
@@ -4988,6 +5245,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-inject-defines",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-W49jIhuDtF6w+7wCMcClk27a2hq8znvHtlGnrYkSWEr8tHe9eA2dcnohlcAmxLYBSpSSdzOkRdyPTrx9fw49+A==",
         deps = {
             "glsl-token-inject-block": "1.1.0",
@@ -5016,6 +5274,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-resolve",
         version = "0.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xxFNsfnhZTK9NBhzJjSBGX6IOqYpvBHxxmo+4vapiljyGNCY0Bekzn0firQkQrazK59c1hYxMDxYS8MDlhw4gA==",
         deps = {
             "resolve": "0.6.3",
@@ -5035,6 +5294,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-assignments",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OwXrxixCyHzzA0U2g4btSNAyB2Dx8XrztY5aVUCjRSh4/D0WoJn8Qdps7Xub3sz6zE73W3szLrmWtQ7QMpeHEQ==",
         transitive_closure = {
             "glsl-token-assignments": ["2.0.2"],
@@ -5048,6 +5308,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-defines",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Vb5QMVeLjmOwvvOJuPNg3vnRlffscq2/qvIuTpMzuO/7s5kT+63iL6Dfo2FYLWbzuiycWpbC0/KV0biqFwHxaQ==",
         deps = {
             "glsl-tokenizer": "2.1.5",
@@ -5072,6 +5333,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-depth",
         version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eQnIBLc7vFf8axF9aoi/xW37LSWd2hCQr/3sZui8aBJnksq9C7zMeUYHVJWMhFzXrBU7fgIqni4EhXVW4/krpg==",
         transitive_closure = {
             "glsl-token-depth": ["1.1.2"],
@@ -5085,6 +5347,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-descope",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kS2PTWkvi/YOeicVjXGgX5j7+8N7e56srNDEHDTVZ1dcESmbmpmgrnpjPcjxJjMxh56mSXYoFdZqb90gXkGjQw==",
         deps = {
             "glsl-token-assignments": "2.0.2",
@@ -5108,6 +5371,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-inject-block",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-q/m+ukdUBuHCOtLhSr0uFb/qYQr4/oKrPSdIK2C4TD+qLaJvqM9wfXIF/OOBjuSA3pUoYHurVRNao6LTVVUPWA==",
         transitive_closure = {
             "glsl-token-inject-block": ["1.1.0"],
@@ -5121,6 +5385,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-properties",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dSeW1cOIzbuUoYH0y+nxzwK9S9O3wsjttkq5ij9ZGw0OS41BirKJzzH48VLm8qLg+au6b0sINxGC0IrGwtQUcA==",
         transitive_closure = {
             "glsl-token-properties": ["1.0.1"],
@@ -5134,6 +5399,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-scope",
         version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YKyOMk1B/tz9BwYUdfDoHvMIYTGtVv2vbDSLh94PT4+f87z21FVdou1KNKgF+nECBTo0fJ20dpm0B1vZB1Q03A==",
         transitive_closure = {
             "glsl-token-scope": ["1.1.2"],
@@ -5147,6 +5413,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-string",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1mtQ47Uxd47wrovl+T6RshKGkRRCYWhnELmkEcUAPALWGTFe2XZpH3r45XAwL2B6v+l0KNsCnoaZCSnhzKEksg==",
         transitive_closure = {
             "glsl-token-string": ["1.0.1"],
@@ -5160,6 +5427,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-token-whitespace-trim",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZJtsPut/aDaUdLUNtmBYhaCmhIjpKNg7IgZSfX5wFReMc2vnj8zok+gB/3Quqs0TsBSX/fGnqUUYZDqyuc2xLQ==",
         transitive_closure = {
             "glsl-token-whitespace-trim": ["1.0.0"],
@@ -5173,6 +5441,7 @@ def npm_repositories():
         link_packages = {},
         package = "glsl-tokenizer",
         version = "2.1.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-XSZEJ/i4dmz3Pmbnpsy3cKh7cotvFlBiZnDOwnj/05EwNp2XrhQ4XKJxT7/pDt4kp4YcpRSKz8eTV7S+mwV6MA==",
         deps = {
             "through2": "0.6.5",
@@ -5196,6 +5465,7 @@ def npm_repositories():
         link_packages = {},
         package = "glslify-bundle",
         version = "5.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-plaAOQPv62M1r3OsWf2UbjN0hUYAB7Aph5bfH58VxJZJhloRNbxOL9tl/7H71K7OLJoSJ2ZqWOKk3ttQ6wy24A==",
         deps = {
             "glsl-inject-defines": "1.0.3",
@@ -5241,6 +5511,7 @@ def npm_repositories():
         link_packages = {},
         package = "glslify-deps",
         version = "1.3.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7S7IkHWygJRjcawveXQjRXLO2FTjijPDYC7QfZyAQanY+yGLCFHYnPtsGT9bdyHiwPTw/5a1m1M9hamT2aBpag==",
         deps = {
             "@choojs/findup": "0.2.1",
@@ -5286,6 +5557,7 @@ def npm_repositories():
         link_packages = {},
         package = "glslify",
         version = "7.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bud98CJ6kGZcP9Yxcsi7Iz647wuDz3oN+IZsjCRi5X1PI7t/xPKeL0mOwXJjo+CRZMqvq0CkSJiywCcY7kVYog==",
         deps = {
             "bl": "2.2.1",
@@ -5380,6 +5652,7 @@ def npm_repositories():
         link_packages = {},
         package = "graceful-fs",
         version = "4.2.10",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==",
         transitive_closure = {
             "graceful-fs": ["4.2.10"],
@@ -5393,6 +5666,7 @@ def npm_repositories():
         link_packages = {},
         package = "grid-index",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HZRwumpOGUrHyxO5bqKZL0B0GlUpwtCAzZ42sgxUPniu33R1LSFH5yrIcBCHjkctCAh3mtWKcKd9J4vDDdeVHA==",
         transitive_closure = {
             "grid-index": ["1.1.0"],
@@ -5406,6 +5680,7 @@ def npm_repositories():
         link_packages = {},
         package = "gzip-size",
         version = "6.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==",
         deps = {
             "duplexer": "0.1.2",
@@ -5423,6 +5698,7 @@ def npm_repositories():
         link_packages = {},
         package = "has-flag",
         version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==",
         transitive_closure = {
             "has-flag": ["4.0.0"],
@@ -5436,6 +5712,7 @@ def npm_repositories():
         link_packages = {},
         package = "has-hover",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0G6w7LnlcpyDzpeGUTuT0CEw05+QlMuGVk1IHNAlHrGJITGodjZu3x8BNDUMfKJSZXNB2ZAclqc1bvrd+uUpfg==",
         deps = {
             "is-browser": "2.1.0",
@@ -5453,6 +5730,7 @@ def npm_repositories():
         link_packages = {},
         package = "has-passive-events",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2vSj6IeIsgvsRMyeQ0JaCX5Q3lX4zMn5HpoVc7MEhQ6pv8Iq9rsXjsp+E5ZwaT7T0xhMT0KmU8gtt1EFVdbJiw==",
         deps = {
             "is-browser": "2.1.0",
@@ -5470,6 +5748,7 @@ def npm_repositories():
         link_packages = {},
         package = "has",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==",
         deps = {
             "function-bind": "1.1.1",
@@ -5487,6 +5766,7 @@ def npm_repositories():
         link_packages = {},
         package = "he",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==",
         transitive_closure = {
             "he": ["1.2.0"],
@@ -5500,6 +5780,7 @@ def npm_repositories():
         link_packages = {},
         package = "hsluv",
         version = "0.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-08iL2VyCRbkQKBySkSh6m8zMUa3sADAxGVWs3Z1aPcUkTJeK0ETG4Fc27tEmQBGUAXZjIsXOZqBvacuVNSC/fQ==",
         transitive_closure = {
             "hsluv": ["0.0.3"],
@@ -5513,6 +5794,7 @@ def npm_repositories():
         link_packages = {},
         package = "html-escaper",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==",
         transitive_closure = {
             "html-escaper": ["2.0.2"],
@@ -5526,6 +5808,7 @@ def npm_repositories():
         link_packages = {},
         package = "iconv-lite",
         version = "0.4.24",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==",
         deps = {
             "safer-buffer": "2.1.2",
@@ -5543,6 +5826,7 @@ def npm_repositories():
         link_packages = {},
         package = "ieee754",
         version = "1.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==",
         transitive_closure = {
             "ieee754": ["1.2.1"],
@@ -5556,6 +5840,7 @@ def npm_repositories():
         link_packages = {},
         package = "image-palette",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-3ImSEWD26+xuQFdP0RWR4WSXadZwvgrFhjGNpMEapTG1tf2XrBFS2dlKK5hNgH4UIaSQlSUFRn1NeA+zULIWbQ==",
         deps = {
             "color-id": "1.1.0",
@@ -5613,6 +5898,7 @@ def npm_repositories():
         link_packages = {},
         package = "import-local",
         version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ASB07uLtnDs1o6EHjKpX34BKYDSqnFerfTOJL2HvMqF70LnxpjkzDB8J44oT9pu4AMPkQwf8jl6szgvNd2tRIg==",
         deps = {
             "pkg-dir": "4.2.0",
@@ -5639,6 +5925,7 @@ def npm_repositories():
         link_packages = {},
         package = "inflight",
         version = "1.0.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==",
         deps = {
             "once": "1.4.0",
@@ -5658,6 +5945,7 @@ def npm_repositories():
         link_packages = {},
         package = "inherits",
         version = "2.0.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
         transitive_closure = {
             "inherits": ["2.0.4"],
@@ -5673,6 +5961,7 @@ def npm_repositories():
         },
         package = "inline-fixtures",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wIQ0SS5nncjuTXHEgNuvAj6l3kwvYv75YVcQecDRaoL1YHwynG/fxKxrDV0f45Eu6EsUPlomFKqFDR9DD6hxlQ==",
         deps = {
             "make-dir": "2.1.0",
@@ -5695,6 +5984,7 @@ def npm_repositories():
         link_packages = {},
         package = "interpret",
         version = "2.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==",
         transitive_closure = {
             "interpret": ["2.2.0"],
@@ -5708,6 +5998,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-base64",
         version = "0.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-WRRyllsGXJM7ZN7gPTCCQ/6wNPTRDwiWdPK66l5sJzcU/oOzcIcRRf0Rux8bkpox/1yjt0F6VJRsQOIG2qz5sg==",
         transitive_closure = {
             "is-base64": ["0.1.0"],
@@ -5721,6 +6012,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-binary-path",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
         deps = {
             "binary-extensions": "2.2.0",
@@ -5738,6 +6030,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-blob",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-SZ/fTft5eUhQM6oF/ZaASFDEdbFVe89Imltn9uZr03wdKMcWNVYSMjQPFtg05QuNkt5l5c135ElvXEQG0rk4tw==",
         transitive_closure = {
             "is-blob": ["2.1.0"],
@@ -5751,6 +6044,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-browser",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-F5rTJxDQ2sW81fcfOR1GnCXT6sVJC104fCyfj+mjpwNEwaPYSn5fte5jiHmBg3DHsIoL/l8Kvw5VN5SsTRcRFQ==",
         transitive_closure = {
             "is-browser": ["2.1.0"],
@@ -5764,6 +6058,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-buffer",
         version = "1.1.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==",
         transitive_closure = {
             "is-buffer": ["1.1.6"],
@@ -5777,6 +6072,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-buffer",
         version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==",
         transitive_closure = {
             "is-buffer": ["2.0.5"],
@@ -5790,6 +6086,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-builtin-module",
         version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OV7JjAgOTfAFJmHZLvpSTb4qi0nIILDV1gWPYDnDJUTNFM5aGlRAhk4QcT8i7TuAleeEV5Fdkqn3t4mS+Q11fg==",
         deps = {
             "builtin-modules": "3.3.0",
@@ -5807,6 +6104,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-core-module",
         version = "2.9.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+5FPy5PnwmO3lvfMb0AsoPaBG+5KHUI0wYFXOtYPnVVVspTFUuMZNfNaNVRt3FZadstu2c8x23vykRW/NBoU6A==",
         deps = {
             "has": "1.0.3",
@@ -5825,6 +6123,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-extglob",
         version = "2.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==",
         transitive_closure = {
             "is-extglob": ["2.1.1"],
@@ -5838,6 +6137,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-finite",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-cdyMtqX/BOqqNBBiKlIVkytNHm49MtMlYyn1zxzvJKWmFMlGzm+ry5BBfYyeY9YmNKbRSo/o7OX9w9ale0wg3w==",
         transitive_closure = {
             "is-finite": ["1.1.0"],
@@ -5851,6 +6151,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-firefox",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6Q9ITjvWIm0Xdqv+5U12wgOKEM2KoBw4Y926m0OFkvlCxnbG94HKAsVz8w3fWcfAS5YA2fJORXX1dLrkprCCxA==",
         transitive_closure = {
             "is-firefox": ["1.0.3"],
@@ -5864,6 +6165,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-float-array",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-4ew1Sx6B6kEAl3T3NOM0yB94J3NZnBdNt4paw0e8nY73yHHTeTEhyQ3Lj7EQEnv5LD+GxNTaT4L46jcKjjpLiQ==",
         transitive_closure = {
             "is-float-array": ["1.0.0"],
@@ -5877,6 +6179,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-fullwidth-code-point",
         version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==",
         transitive_closure = {
             "is-fullwidth-code-point": ["3.0.0"],
@@ -5890,6 +6193,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-glob",
         version = "4.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xelSayHH36ZgE7ZWhli7pW34hNbNl8Ojv5KVmkJD4hBdD3th8Tfk9vYasLM+mXWOZhFkgZfxhLSnrwRr4elSSg==",
         deps = {
             "is-extglob": "2.1.1",
@@ -5907,6 +6211,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-iexplorer",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YeLzceuwg3K6O0MLM3UyUUjKAlyULetwryFp1mHy1I5PfArK0AEqlfa+MR4gkJjcbuJXoDJCvXbyqZVf5CR2Sg==",
         transitive_closure = {
             "is-iexplorer": ["1.0.0"],
@@ -5920,6 +6225,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-mobile",
         version = "2.2.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wW/SXnYJkTjs++tVK5b6kVITZpAZPtUrt9SF80vvxGiF/Oywal+COk1jlRkiVq15RFNEQKQY31TkV24/1T5cVg==",
         transitive_closure = {
             "is-mobile": ["2.2.2"],
@@ -5933,6 +6239,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-module",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==",
         transitive_closure = {
             "is-module": ["1.0.0"],
@@ -5946,6 +6253,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-number",
         version = "6.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==",
         transitive_closure = {
             "is-number": ["6.0.0"],
@@ -5959,6 +6267,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-number",
         version = "7.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
         transitive_closure = {
             "is-number": ["7.0.0"],
@@ -5972,6 +6281,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-obj",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-l4RyHgRqGN4Y3+9JHVrNqO+tN0rV5My76uW5/nuO4K1b6vw5G8d/cmFjP9tRfEsdhZNt0IFdZuK/c2Vr4Nb+Qg==",
         transitive_closure = {
             "is-obj": ["1.0.1"],
@@ -5985,6 +6295,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-plain-obj",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
         transitive_closure = {
             "is-plain-obj": ["1.1.0"],
@@ -5998,6 +6309,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-plain-obj",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==",
         transitive_closure = {
             "is-plain-obj": ["2.1.0"],
@@ -6011,6 +6323,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-plain-object",
         version = "2.0.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==",
         deps = {
             "isobject": "3.0.1",
@@ -6028,6 +6341,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-reference",
         version = "1.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
         deps = {
             "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
@@ -6045,6 +6359,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-string-blank",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-9H+ZBCVs3L9OYqv8nuUAzpcT9OTgMD1yAWrG7ihlnibdkbtB850heAmYWxHuXc4CHy4lKeK69tN+ny1K7gBIrw==",
         transitive_closure = {
             "is-string-blank": ["1.0.1"],
@@ -6058,6 +6373,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-svg-path",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Lj4vePmqpPR1ZnRctHv8ltSh1OrSxHkhUkd7wi+VQdcdP15/KvQFyk7LhNuM7ZW0EVbJz8kZLVmL9quLrfq4Kg==",
         transitive_closure = {
             "is-svg-path": ["1.0.2"],
@@ -6071,6 +6387,7 @@ def npm_repositories():
         link_packages = {},
         package = "is-unicode-supported",
         version = "0.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==",
         transitive_closure = {
             "is-unicode-supported": ["0.1.0"],
@@ -6084,6 +6401,7 @@ def npm_repositories():
         link_packages = {},
         package = "isarray",
         version = "0.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ==",
         transitive_closure = {
             "isarray": ["0.0.1"],
@@ -6097,6 +6415,7 @@ def npm_repositories():
         link_packages = {},
         package = "isarray",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==",
         transitive_closure = {
             "isarray": ["1.0.0"],
@@ -6110,6 +6429,7 @@ def npm_repositories():
         link_packages = {},
         package = "isarray",
         version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==",
         transitive_closure = {
             "isarray": ["2.0.5"],
@@ -6123,6 +6443,7 @@ def npm_repositories():
         link_packages = {},
         package = "isexe",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==",
         transitive_closure = {
             "isexe": ["2.0.0"],
@@ -6136,6 +6457,7 @@ def npm_repositories():
         link_packages = {},
         package = "isobject",
         version = "3.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==",
         transitive_closure = {
             "isobject": ["3.0.1"],
@@ -6149,6 +6471,7 @@ def npm_repositories():
         link_packages = {},
         package = "istanbul-lib-coverage",
         version = "3.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eOeJ5BHCmHYvQK7xt9GkdHuzuCGS1Y6g9Gvnx3Ym33fz/HpLRYxiS0wHNr+m/MBC8B647Xt608vCDEvhl9c6Mw==",
         transitive_closure = {
             "istanbul-lib-coverage": ["3.2.0"],
@@ -6162,6 +6485,7 @@ def npm_repositories():
         link_packages = {},
         package = "istanbul-lib-report",
         version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wcdi+uAKzfiGT2abPpKZ0hSU1rGQjUQnLvtY5MpQ7QCTahD3VODhcu4wcfY1YtkGaDD5yuydOLINXsfbus9ROw==",
         deps = {
             "istanbul-lib-coverage": "3.2.0",
@@ -6185,6 +6509,7 @@ def npm_repositories():
         link_packages = {},
         package = "istanbul-reports",
         version = "3.1.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-r1/DshN4KSE7xWEknZLLLLDn5CJybV3nw01VTkp6D5jzLuELlcbudfj/eSQFvrKsJuTVCGnePO7ho82Nw9zzfw==",
         deps = {
             "html-escaper": "2.0.2",
@@ -6209,6 +6534,7 @@ def npm_repositories():
         link_packages = {},
         package = "javascript-natural-sort",
         version = "0.7.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw==",
         transitive_closure = {
             "javascript-natural-sort": ["0.7.1"],
@@ -6222,6 +6548,7 @@ def npm_repositories():
         link_packages = {},
         package = "jest-worker",
         version = "27.5.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==",
         deps = {
             "@types/node": "registry.npmjs.org/@types/node/16.11.36",
@@ -6244,6 +6571,7 @@ def npm_repositories():
         link_packages = {},
         package = "js-tokens",
         version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==",
         transitive_closure = {
             "js-tokens": ["4.0.0"],
@@ -6257,6 +6585,7 @@ def npm_repositories():
         link_packages = {},
         package = "js-yaml",
         version = "4.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==",
         deps = {
             "argparse": "2.0.1",
@@ -6274,6 +6603,7 @@ def npm_repositories():
         link_packages = {},
         package = "json-parse-even-better-errors",
         version = "2.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==",
         transitive_closure = {
             "json-parse-even-better-errors": ["2.3.1"],
@@ -6287,6 +6617,7 @@ def npm_repositories():
         link_packages = {},
         package = "json-schema-traverse",
         version = "0.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==",
         transitive_closure = {
             "json-schema-traverse": ["0.4.1"],
@@ -6300,6 +6631,7 @@ def npm_repositories():
         link_packages = {},
         package = "kdbush",
         version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-hRkd6/XW4HTsA9vjVpY9tuXJYLSlelnkTmVFu4M9/7MIYQtFcHpbugAU7UbOfjOiVSVYl2fqgBuJ32JUmRo5Ew==",
         transitive_closure = {
             "kdbush": ["3.0.0"],
@@ -6313,6 +6645,7 @@ def npm_repositories():
         link_packages = {},
         package = "kind-of",
         version = "6.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==",
         transitive_closure = {
             "kind-of": ["6.0.3"],
@@ -6326,6 +6659,7 @@ def npm_repositories():
         link_packages = {},
         package = "kleur",
         version = "4.1.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==",
         transitive_closure = {
             "kleur": ["4.1.4"],
@@ -6339,6 +6673,7 @@ def npm_repositories():
         link_packages = {},
         package = "levn",
         version = "0.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0OO4y2iOHix2W6ujICbKIaEQXvFQHue65vUG3pb5EUomzPI90z9hsA1VsO/dbIIpC53J8gxM9Q4Oho0jrCM/yA==",
         deps = {
             "prelude-ls": "1.1.2",
@@ -6358,6 +6693,7 @@ def npm_repositories():
         link_packages = {},
         package = "loader-runner",
         version = "4.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==",
         transitive_closure = {
             "loader-runner": ["4.3.0"],
@@ -6371,6 +6707,7 @@ def npm_repositories():
         link_packages = {},
         package = "locate-path",
         version = "5.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==",
         deps = {
             "p-locate": "4.1.0",
@@ -6390,6 +6727,7 @@ def npm_repositories():
         link_packages = {},
         package = "locate-path",
         version = "6.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==",
         deps = {
             "p-locate": "5.0.0",
@@ -6409,6 +6747,7 @@ def npm_repositories():
         link_packages = {},
         package = "lodash.merge",
         version = "4.6.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==",
         transitive_closure = {
             "lodash.merge": ["4.6.2"],
@@ -6422,6 +6761,7 @@ def npm_repositories():
         link_packages = {},
         package = "lodash",
         version = "4.17.21",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         transitive_closure = {
             "lodash": ["4.17.21"],
@@ -6435,6 +6775,7 @@ def npm_repositories():
         link_packages = {},
         package = "log-symbols",
         version = "4.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==",
         deps = {
             "chalk": "4.1.2",
@@ -6459,6 +6800,7 @@ def npm_repositories():
         link_packages = {},
         package = "loose-envify",
         version = "1.4.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==",
         deps = {
             "js-tokens": "4.0.0",
@@ -6476,6 +6818,7 @@ def npm_repositories():
         link_packages = {},
         package = "magic-string",
         version = "0.25.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==",
         deps = {
             "sourcemap-codec": "1.4.8",
@@ -6493,6 +6836,7 @@ def npm_repositories():
         link_packages = {},
         package = "make-dir",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==",
         deps = {
             "pify": "4.0.1",
@@ -6512,6 +6856,7 @@ def npm_repositories():
         link_packages = {},
         package = "make-dir",
         version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==",
         deps = {
             "semver": "6.3.0",
@@ -6529,6 +6874,7 @@ def npm_repositories():
         link_packages = {},
         package = "map-limit",
         version = "0.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-pJpcfLPnIF/Sk3taPW21G/RQsEEirGaFpCW3oXRwH9dnFHPHNGjNyvh++rdmC2fNqEaTw2MhYJraoJWAHx8kEg==",
         deps = {
             "once": "1.3.3",
@@ -6547,6 +6893,7 @@ def npm_repositories():
         link_packages = {},
         package = "mapbox-gl",
         version = "1.10.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0aHt+lFUpYfvh0kMIqXqNXqoYMuhuAsMlw87TbhWrw78Tx2zfuPI0Lx31/YPUgJ+Ire0tzQ4JnuBL7acDNXmMg==",
         deps = {
             "@mapbox/geojson-rewind": "0.5.2",
@@ -6613,6 +6960,7 @@ def npm_repositories():
         link_packages = {},
         package = "math-log2",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-9W0yGtkaMAkf74XGYVy4Dqw3YUMnTNB2eeiw9aQbUl4A3KmuCEHTt2DgAB07ENzOYAjsYSAYufkAq0Zd+jU7zA==",
         transitive_closure = {
             "math-log2": ["1.0.1"],
@@ -6628,6 +6976,7 @@ def npm_repositories():
         },
         package = "mathjs",
         version = "10.6.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8iZp6uUKKBoCFoUHze9ydsrSji9/IOEzMhwURyoQXaLL1+ILEZnraw4KzZnUBt/XN6lPJPV+7JO94oil3AmosQ==",
         deps = {
             "@babel/runtime": "7.18.3",
@@ -6662,6 +7011,7 @@ def npm_repositories():
         link_packages = {},
         package = "md5",
         version = "2.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==",
         deps = {
             "charenc": "0.0.2",
@@ -6683,6 +7033,7 @@ def npm_repositories():
         link_packages = {},
         package = "merge-stream",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==",
         transitive_closure = {
             "merge-stream": ["2.0.0"],
@@ -6696,6 +7047,7 @@ def npm_repositories():
         link_packages = {},
         package = "mime-db",
         version = "1.52.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==",
         transitive_closure = {
             "mime-db": ["1.52.0"],
@@ -6709,6 +7061,7 @@ def npm_repositories():
         link_packages = {},
         package = "mime-types",
         version = "2.1.35",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==",
         deps = {
             "mime-db": "1.52.0",
@@ -6726,6 +7079,7 @@ def npm_repositories():
         link_packages = {},
         package = "minimatch",
         version = "3.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
         deps = {
             "brace-expansion": "1.1.11",
@@ -6745,6 +7099,7 @@ def npm_repositories():
         link_packages = {},
         package = "minimatch",
         version = "5.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nLDxIFRyhDblz3qMuq+SoRZED4+miJ/G+tdDrjkkkRnjAsBexeGpgjLEQ0blJy7rHhR2b93rhQY4SvyWu9v03g==",
         deps = {
             "brace-expansion": "2.0.1",
@@ -6763,6 +7118,7 @@ def npm_repositories():
         link_packages = {},
         package = "minimist",
         version = "0.0.10",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-iotkTvxc+TwOm5Ieim8VnSNvCDjCK9S8G3scJ50ZthspSxa7jx50jkhYduuAtAjvfDUwSgOwf8+If99AlOEhyw==",
         transitive_closure = {
             "minimist": ["0.0.10"],
@@ -6776,6 +7132,7 @@ def npm_repositories():
         link_packages = {},
         package = "minimist",
         version = "1.2.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==",
         transitive_closure = {
             "minimist": ["1.2.6"],
@@ -6789,6 +7146,7 @@ def npm_repositories():
         link_packages = {},
         package = "mkdirp",
         version = "0.5.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==",
         deps = {
             "minimist": "1.2.6",
@@ -6806,6 +7164,7 @@ def npm_repositories():
         link_packages = {},
         package = "mobx-react-lite",
         version = "3.4.0_mobx@6.3.0+react@17.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bRuZp3C0itgLKHu/VNxi66DN/XVkQG7xtoBVWxpvC5FhAqbOCP21+nPhULjnzEqd7xBMybp6KwytdUpZKEgpIQ==",
         deps = {
             "mobx": "6.3.0",
@@ -6830,6 +7189,7 @@ def npm_repositories():
         },
         package = "mobx-react",
         version = "7.3.0_mobx@6.3.0+react@17.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RGEcwZokopqyJE5JPwXKB9FWMSqFM9NJVO2QPI+z6laJTJeBHqvPicjnKgY5mvihxTeXB1+72TnooqUePeGV1g==",
         deps = {
             "mobx": "6.3.0",
@@ -6856,6 +7216,7 @@ def npm_repositories():
         },
         package = "mobx",
         version = "6.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Aa1+VXsg4WxqJMTQfWoYuJi5UD10VZhiobSmcs5kcmI3BIT0aVtn7DysvCeDADCzl7dnbX+0BTHUj/v7gLlZpQ==",
         transitive_closure = {
             "mobx": ["6.3.0"],
@@ -6871,6 +7232,7 @@ def npm_repositories():
         },
         package = "mocha-junit-reporter",
         version = "2.0.2_mocha@10.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vYwWq5hh3v1lG0gdQCBxwNipBfvDiAM1PHroQRNp96+2l72e9wEUTw+mzoK+O0SudgfQ7WvTQZ9Nh3qkAYAjfg==",
         deps = {
             "debug": "2.6.9",
@@ -6978,6 +7340,7 @@ def npm_repositories():
         },
         package = "mocha-multi-reporters",
         version = "1.5.1_ta7lpi5wbajlqvkh4rve5z6nji",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Yb4QJOaGLIcmB0VY7Wif5AjvLMUFAdV57D2TWEva1Y0kU/3LjKpeRVmlMIfuO1SVbauve459kgtIizADqxMWPg==",
         deps = {
             "debug": "4.3.4",
@@ -7083,6 +7446,7 @@ def npm_repositories():
         },
         package = "mocha",
         version = "10.0.0_th2rfume6p4m5jxelm27wrhnly",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0Wl+elVUD43Y0BqPZBzZt8Tnkw9CMUdNYnUsTfOM1vuhJVZL+kiesFYsqwBkEEuEixaiPe5ZQdqDgX2jddhmoA==",
         deps = {
             "@ungap/promise-all-settled": "1.1.2",
@@ -7205,6 +7569,7 @@ def npm_repositories():
         link_packages = {},
         package = "mouse-change",
         version = "1.4.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vpN0s+zLL2ykyyUDh+fayu9Xkor5v/zRD9jhSqjRS1cJTGS0+oakVZzNm5n19JvvEj0you+MXlYTpNxUDQUjkQ==",
         deps = {
             "mouse-event": "1.0.5",
@@ -7222,6 +7587,7 @@ def npm_repositories():
         link_packages = {},
         package = "mouse-event-offset",
         version = "3.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-s9sqOs5B1Ykox3Xo8b3Ss2IQju4UwlW6LSR+Q5FXWpprJ5fzMLefIIItr3PH8RwzfGy6gxs/4GAmiNuZScE25w==",
         transitive_closure = {
             "mouse-event-offset": ["3.0.2"],
@@ -7235,6 +7601,7 @@ def npm_repositories():
         link_packages = {},
         package = "mouse-event",
         version = "1.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ItUxtL2IkeSKSp9cyaX2JLUuKk2uMoxBg4bbOWVd29+CskYJR9BGsUqtXenNzKbnDshvupjUewDIYVrOB6NmGw==",
         transitive_closure = {
             "mouse-event": ["1.0.5"],
@@ -7248,6 +7615,7 @@ def npm_repositories():
         link_packages = {},
         package = "mouse-wheel",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+OfYBiUOCTWcTECES49neZwL5AoGkXE+lFjIvzwNCnYRlso+EnfvovcBxGoyQ0yQt806eSPjS675K0EwWknXmw==",
         deps = {
             "right-now": "1.0.0",
@@ -7270,6 +7638,7 @@ def npm_repositories():
         link_packages = {},
         package = "mri",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==",
         transitive_closure = {
             "mri": ["1.2.0"],
@@ -7283,6 +7652,7 @@ def npm_repositories():
         link_packages = {},
         package = "mrmime",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-hzzEagAgDyoU1Q6yg5uI+AorQgdvMCur3FcKf7NhMKWsaYg+RnbTyHRa/9IlLF9rf455MOCtcqqrQQ83pPP7Uw==",
         transitive_closure = {
             "mrmime": ["1.0.1"],
@@ -7296,6 +7666,7 @@ def npm_repositories():
         link_packages = {},
         package = "ms",
         version = "0.7.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lrKNzMWqQZgwJahtrtrM+9NgOoDUveDrVmm5aGXrf3BdtL0mq7X6IVzoZaw+TfNti29eHd1/8GI+h45K5cQ6/w==",
         transitive_closure = {
             "ms": ["0.7.3"],
@@ -7309,6 +7680,7 @@ def npm_repositories():
         link_packages = {},
         package = "ms",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==",
         transitive_closure = {
             "ms": ["2.0.0"],
@@ -7322,6 +7694,7 @@ def npm_repositories():
         link_packages = {},
         package = "ms",
         version = "2.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
         transitive_closure = {
             "ms": ["2.1.2"],
@@ -7337,6 +7710,7 @@ def npm_repositories():
         },
         package = "ms",
         version = "2.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
         transitive_closure = {
             "ms": ["2.1.3"],
@@ -7350,6 +7724,7 @@ def npm_repositories():
         link_packages = {},
         package = "mumath",
         version = "3.3.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VAFIOG6rsxoc7q/IaY3jdjmrsuX9f15KlRLYTHmixASBZkZEKC1IFqE2BC5CdhXmK6WLM1Re33z//AGmeRI6FA==",
         deps = {
             "almost-equal": "1.1.0",
@@ -7367,6 +7742,7 @@ def npm_repositories():
         link_packages = {},
         package = "murmurhash-js",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==",
         transitive_closure = {
             "murmurhash-js": ["1.0.0"],
@@ -7380,6 +7756,7 @@ def npm_repositories():
         link_packages = {},
         package = "nanoid",
         version = "3.3.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-p1sjXuopFs0xg+fPASzQ28agW1oHD7xDsd9Xkf3T15H3c/cifrFHVwrh74PdoklAPi+i7MdRsE47vm2r6JoB+w==",
         transitive_closure = {
             "nanoid": ["3.3.3"],
@@ -7393,6 +7770,7 @@ def npm_repositories():
         link_packages = {},
         package = "native-promise-only",
         version = "0.8.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-zkVhZUA3y8mbz652WrL5x0fB0ehrBkulWT3TomAQ9iDtyXZvzKeEA6GPxAItBYeNYl5yngKRX612qHOhvMkDeg==",
         transitive_closure = {
             "native-promise-only": ["0.8.1"],
@@ -7406,6 +7784,7 @@ def npm_repositories():
         link_packages = {},
         package = "needle",
         version = "2.9.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6R9fqJ5Zcmf+uYaFgdIHmLwNldn5HbK8L5ybn7Uz+ylX/rnOsSp1AHcvQSrCaFN+qNM1wpymHqD7mVasEOlHGQ==",
         deps = {
             "debug": "3.2.7",
@@ -7429,6 +7808,7 @@ def npm_repositories():
         link_packages = {},
         package = "neo-async",
         version = "2.6.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==",
         transitive_closure = {
             "neo-async": ["2.6.2"],
@@ -7442,6 +7822,7 @@ def npm_repositories():
         link_packages = {},
         package = "next-tick",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==",
         transitive_closure = {
             "next-tick": ["1.1.0"],
@@ -7455,6 +7836,7 @@ def npm_repositories():
         link_packages = {},
         package = "node-gyp-build",
         version = "3.7.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==",
         transitive_closure = {
             "node-gyp-build": ["3.7.0"],
@@ -7468,6 +7850,7 @@ def npm_repositories():
         link_packages = {},
         package = "node-releases",
         version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-U9h1NLROZTq9uE1SNffn6WuPDg8icmi3ns4rEl/oTfIle4iLjTliCzgTsbaIFMq/Xn078/lfY/BL0GWZ+psK4Q==",
         transitive_closure = {
             "node-releases": ["2.0.5"],
@@ -7481,6 +7864,7 @@ def npm_repositories():
         link_packages = {},
         package = "normalize-path",
         version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==",
         transitive_closure = {
             "normalize-path": ["3.0.0"],
@@ -7494,6 +7878,7 @@ def npm_repositories():
         link_packages = {},
         package = "normalize-svg-path",
         version = "0.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1/kmYej2iedi5+ROxkRESL/pI02pkg0OBnaR4hJkSIX6+ORzepwbuUXfrdZaPjysTsJInj0Rj5NuX027+dMBvA==",
         transitive_closure = {
             "normalize-svg-path": ["0.1.0"],
@@ -7507,6 +7892,7 @@ def npm_repositories():
         link_packages = {},
         package = "normalize-svg-path",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-r9KHKG2UUeB5LoTouwDzBy2VxXlHsiM6fyLQvnJa0S5hrhzqElH/CH7TUGhT1fVvIYBIKf3OpY4YJ4CK+iaqHg==",
         deps = {
             "svg-arc-to-cubic-bezier": "3.2.0",
@@ -7524,6 +7910,7 @@ def npm_repositories():
         link_packages = {},
         package = "number-is-integer",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Dq3iuiFBkrbmuQjGFFF3zckXNCQoSD37/SdSbgcBailUx6knDvDwb5CympBgcoWHy36sfS12u74MHYkXyHq6bg==",
         deps = {
             "is-finite": "1.1.0",
@@ -7541,6 +7928,7 @@ def npm_repositories():
         link_packages = {},
         package = "object-assign",
         version = "4.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==",
         transitive_closure = {
             "object-assign": ["4.1.1"],
@@ -7554,6 +7942,7 @@ def npm_repositories():
         link_packages = {},
         package = "object-keys",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==",
         transitive_closure = {
             "object-keys": ["1.1.1"],
@@ -7567,6 +7956,7 @@ def npm_repositories():
         link_packages = {},
         package = "once",
         version = "1.3.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6vaNInhu+CHxtONf3zw3vq4SP2DOQhjBvIa3rNcG0+P7eKWlYH6Peu7rHizSloRU2EwMz6GraLieis9Ac9+p1w==",
         deps = {
             "wrappy": "1.0.2",
@@ -7584,6 +7974,7 @@ def npm_repositories():
         link_packages = {},
         package = "once",
         version = "1.4.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==",
         deps = {
             "wrappy": "1.0.2",
@@ -7601,6 +7992,7 @@ def npm_repositories():
         link_packages = {},
         package = "opener",
         version = "1.5.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==",
         transitive_closure = {
             "opener": ["1.5.2"],
@@ -7614,6 +8006,7 @@ def npm_repositories():
         link_packages = {},
         package = "optimist",
         version = "0.6.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ubrZPyOU0AHpXkmwqfWolap+eHMwQ484AKivkf0ZGyysd6fUJZl7ow9iu5UNV1vCZv46HQ7EM83IC3NGJ820hg==",
         deps = {
             "minimist": "0.0.10",
@@ -7633,6 +8026,7 @@ def npm_repositories():
         link_packages = {},
         package = "optionator",
         version = "0.8.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA==",
         deps = {
             "deep-is": "0.1.4",
@@ -7660,6 +8054,7 @@ def npm_repositories():
         link_packages = {},
         package = "os-tmpdir",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==",
         transitive_closure = {
             "os-tmpdir": ["1.0.2"],
@@ -7673,6 +8068,7 @@ def npm_repositories():
         link_packages = {},
         package = "p-limit",
         version = "2.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==",
         deps = {
             "p-try": "2.2.0",
@@ -7690,6 +8086,7 @@ def npm_repositories():
         link_packages = {},
         package = "p-limit",
         version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==",
         deps = {
             "yocto-queue": "0.1.0",
@@ -7707,6 +8104,7 @@ def npm_repositories():
         link_packages = {},
         package = "p-locate",
         version = "4.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-R79ZZ/0wAxKGu3oYMlz8jy/kbhsNrS7SKZ7PxEHBgJ5+F2mtFW2fK2cOtBh1cHYkQsbzFV7I+EoRKe6Yt0oK7A==",
         deps = {
             "p-limit": "2.3.0",
@@ -7725,6 +8123,7 @@ def npm_repositories():
         link_packages = {},
         package = "p-locate",
         version = "5.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==",
         deps = {
             "p-limit": "3.1.0",
@@ -7743,6 +8142,7 @@ def npm_repositories():
         link_packages = {},
         package = "p-try",
         version = "2.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==",
         transitive_closure = {
             "p-try": ["2.2.0"],
@@ -7756,6 +8156,7 @@ def npm_repositories():
         link_packages = {},
         package = "parenthesis",
         version = "3.1.8",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-KF/U8tk54BgQewkJPvB4s/US3VQY68BRDpH638+7O/n58TpnwiwnOtGIOsT2/i+M78s61BBpeC83STB88d8sqw==",
         transitive_closure = {
             "parenthesis": ["3.1.8"],
@@ -7769,6 +8170,7 @@ def npm_repositories():
         link_packages = {},
         package = "parse-rect",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-4QZ6KYbnE6RTwg9E0HpLchUM9EZt6DnDxajFZZDSV4p/12ZJEvPO702DZpGvRYEPo00yKDys7jASi+/w7aO8LA==",
         deps = {
             "pick-by-alias": "1.2.0",
@@ -7786,6 +8188,7 @@ def npm_repositories():
         link_packages = {},
         package = "parse-svg-path",
         version = "0.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-JyPSBnkTJ0AI8GGJLfMXvKq42cj5c006fnLz6fXy6zfoVjJizi8BNTpu8on8ziI1cKy9d9DGNuY17Ce7wuejpQ==",
         transitive_closure = {
             "parse-svg-path": ["0.1.2"],
@@ -7799,6 +8202,7 @@ def npm_repositories():
         link_packages = {},
         package = "parse-unit",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-hrqldJHokR3Qj88EIlV/kAyAi/G5R2+R56TBANxNMy0uPlYcttx0jnMW6Yx5KsKPSbC3KddM/7qQm3+0wEXKxg==",
         transitive_closure = {
             "parse-unit": ["1.0.1"],
@@ -7812,6 +8216,7 @@ def npm_repositories():
         link_packages = {},
         package = "path-exists",
         version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==",
         transitive_closure = {
             "path-exists": ["4.0.0"],
@@ -7825,6 +8230,7 @@ def npm_repositories():
         link_packages = {},
         package = "path-is-absolute",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==",
         transitive_closure = {
             "path-is-absolute": ["1.0.1"],
@@ -7838,6 +8244,7 @@ def npm_repositories():
         link_packages = {},
         package = "path-key",
         version = "3.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==",
         transitive_closure = {
             "path-key": ["3.1.1"],
@@ -7851,6 +8258,7 @@ def npm_repositories():
         link_packages = {},
         package = "path-parse",
         version = "1.0.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==",
         transitive_closure = {
             "path-parse": ["1.0.7"],
@@ -7864,6 +8272,7 @@ def npm_repositories():
         link_packages = {},
         package = "pbf",
         version = "3.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ClrV7pNOn7rtmoQVF4TS1vyU0WhYRnP92fzbfF75jAIwpnzdJXf8iTd4CMEqO4yUenH6NDqLiwjqlh6QgZzgLQ==",
         deps = {
             "ieee754": "1.2.1",
@@ -7884,6 +8293,7 @@ def npm_repositories():
         link_packages = {},
         package = "performance-now",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==",
         transitive_closure = {
             "performance-now": ["2.1.0"],
@@ -7897,6 +8307,7 @@ def npm_repositories():
         link_packages = {},
         package = "pick-by-alias",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ESj2+eBxhGrcA1azgHs7lARG5+5iLakc/6nlfbpjcLl00HuuUOIuORhYXN4D1HfvMSKuVtFQjAlnwi1JHEeDIw==",
         transitive_closure = {
             "pick-by-alias": ["1.2.0"],
@@ -7910,6 +8321,7 @@ def npm_repositories():
         link_packages = {},
         package = "picocolors",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==",
         transitive_closure = {
             "picocolors": ["1.0.0"],
@@ -7923,6 +8335,7 @@ def npm_repositories():
         link_packages = {},
         package = "picomatch",
         version = "2.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==",
         transitive_closure = {
             "picomatch": ["2.3.1"],
@@ -7936,6 +8349,7 @@ def npm_repositories():
         link_packages = {},
         package = "pify",
         version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==",
         transitive_closure = {
             "pify": ["4.0.1"],
@@ -7949,6 +8363,7 @@ def npm_repositories():
         link_packages = {},
         package = "pkg-dir",
         version = "4.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==",
         deps = {
             "find-up": "4.1.0",
@@ -7973,6 +8388,7 @@ def npm_repositories():
         },
         package = "plotly.js",
         version = "2.12.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-XbZ3w3jSl+ihZPMXWwblmjinqbzdd+vT+3XKZpyffxmlMmTp/3vY1ewpQDuNyufUoiT0o0ekCqa80Qlzi7jwlA==",
         deps = {
             "@plotly/d3": "3.8.0",
@@ -8301,6 +8717,7 @@ def npm_repositories():
         link_packages = {},
         package = "polybooljs",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-mKjR5nolISvF+q2BtC1fi/llpxBPTQ3wLWN8+ldzdw2Hocpc8C72ZqnamCM4Z6z+68GVVjkeM01WJegQmZ8MEQ==",
         transitive_closure = {
             "polybooljs": ["1.2.0"],
@@ -8314,6 +8731,7 @@ def npm_repositories():
         link_packages = {},
         package = "potpack",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-choctRBIV9EMT9WGAZHn3V7t0Z2pMQyl0EZE6pFc/6ml3ssw7Dlf/oAOvFwjm1HVsqfQN8GfeFyJ+d8tRzqueQ==",
         transitive_closure = {
             "potpack": ["1.0.2"],
@@ -8327,6 +8745,7 @@ def npm_repositories():
         link_packages = {},
         package = "prelude-ls",
         version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==",
         transitive_closure = {
             "prelude-ls": ["1.1.2"],
@@ -8340,6 +8759,7 @@ def npm_repositories():
         link_packages = {},
         package = "probe-image-size",
         version = "7.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-HubhG4Rb2UH8YtV4ba0Vp5bQ7L78RTONYu/ujmCu5nBI8wGv24s4E9xSKBi0N1MowRpxk76pFCpJtW0KPzOK0w==",
         deps = {
             "lodash.merge": "4.6.2",
@@ -8366,6 +8786,7 @@ def npm_repositories():
         link_packages = {},
         package = "process-nextick-args",
         version = "2.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==",
         transitive_closure = {
             "process-nextick-args": ["2.0.1"],
@@ -8379,6 +8800,7 @@ def npm_repositories():
         link_packages = {},
         package = "protocol-buffers-schema",
         version = "3.6.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-TdDRD+/QNdrCGCE7v8340QyuXd4kIWIgapsE2+n/SaGiSSbomYl4TjHlvIoCWRpE7wFt02EpB35VVA2ImcBVqw==",
         transitive_closure = {
             "protocol-buffers-schema": ["3.6.0"],
@@ -8392,6 +8814,7 @@ def npm_repositories():
         link_packages = {},
         package = "punycode",
         version = "2.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==",
         transitive_closure = {
             "punycode": ["2.1.1"],
@@ -8405,6 +8828,7 @@ def npm_repositories():
         link_packages = {},
         package = "pxls",
         version = "2.3.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-pQkwgbLqWPcuES5iEmGa10OlCf5xG0blkIF3dg7PpRZShbTYcvAdfFfGL03SMrkaSUaa/V0UpN9HWg40O2AIIw==",
         deps = {
             "arr-flatten": "1.1.0",
@@ -8462,6 +8886,7 @@ def npm_repositories():
         link_packages = {},
         package = "quantize",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-25P7wI2UoDbIQsQp50ARkt+5pwPsOq7G/BqvT5xAbapnRoNWMN8/p55H9TXd5MuENiJnm5XICB2H2aDZGwts7w==",
         transitive_closure = {
             "quantize": ["1.0.2"],
@@ -8475,6 +8900,7 @@ def npm_repositories():
         link_packages = {},
         package = "quickselect",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==",
         transitive_closure = {
             "quickselect": ["2.0.0"],
@@ -8488,6 +8914,7 @@ def npm_repositories():
         link_packages = {},
         package = "raf",
         version = "3.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==",
         deps = {
             "performance-now": "2.1.0",
@@ -8505,6 +8932,7 @@ def npm_repositories():
         link_packages = {},
         package = "randombytes",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==",
         deps = {
             "safe-buffer": "5.2.1",
@@ -8524,6 +8952,7 @@ def npm_repositories():
         },
         package = "react",
         version = "17.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==",
         deps = {
             "loose-envify": "1.4.0",
@@ -8544,6 +8973,7 @@ def npm_repositories():
         link_packages = {},
         package = "readable-stream",
         version = "1.0.34",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ok1qVCJuRkNmvebYikljxJA/UEsKwLl2nI1OmaqAu4/UE+h0wKCHok4XkL/gvi39OacXvw59RJUOFUkDib2rHg==",
         deps = {
             "core-util-is": "1.0.3",
@@ -8567,6 +8997,7 @@ def npm_repositories():
         link_packages = {},
         package = "readable-stream",
         version = "2.3.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==",
         deps = {
             "core-util-is": "1.0.3",
@@ -8596,6 +9027,7 @@ def npm_repositories():
         link_packages = {},
         package = "readdirp",
         version = "3.6.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
         deps = {
             "picomatch": "2.3.1",
@@ -8613,6 +9045,7 @@ def npm_repositories():
         link_packages = {},
         package = "rechoir",
         version = "0.7.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/njmZ8s1wVeR6pjTZ+0nCnv8SpZNRMT2D1RLOJQESlYFDBvwpTA4KWJpZ+sBJ4+vhjILRcK7JIFdGCdxEAAitg==",
         deps = {
             "resolve": "1.22.0",
@@ -8635,6 +9068,7 @@ def npm_repositories():
         link_packages = {},
         package = "regenerator-runtime",
         version = "0.13.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==",
         transitive_closure = {
             "regenerator-runtime": ["0.13.9"],
@@ -8648,6 +9082,7 @@ def npm_repositories():
         link_packages = {},
         package = "regex-regex",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-FPbEhFTLpxKNgHKay3zMfkHzFK2ebViAlyvsz5euO4kwekH0T6fAL4Sdo2CgQ7Y1tGB5HqQm8SBq7pW5GegvVA==",
         transitive_closure = {
             "regex-regex": ["1.0.0"],
@@ -8661,6 +9096,7 @@ def npm_repositories():
         link_packages = {},
         package = "regl-error2d",
         version = "2.0.12",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-r7BUprZoPO9AbyqM5qlJesrSRkl+hZnVKWKsVp7YhOl/3RIpi4UDGASGJY0puQ96u5fBYw/OlqV24IGcgJ0McA==",
         deps = {
             "array-bounds": "1.0.1",
@@ -8701,6 +9137,7 @@ def npm_repositories():
         link_packages = {},
         package = "regl-line2d",
         version = "3.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-nmT7WWS/WxmXAQMkgaMKWXaVmwJ65KCrjbqHGOUjjqQi6shfT96YbBOvelXwO9hG7/hjvbzjtQ2UO0L3e7YaXQ==",
         deps = {
             "array-bounds": "1.0.1",
@@ -8822,6 +9259,7 @@ def npm_repositories():
         link_packages = {},
         package = "regl-scatter2d",
         version = "3.2.8",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bqrqJyeHkGBa9mEfuBnRd7FUtdtZ1l+gsM2C5Ugr1U3vJG5K3mdWdVWtOAllZ5FHHyWJV/vgjVvftgFUg6CDig==",
         deps = {
             "@plotly/point-cluster": "3.1.9",
@@ -8981,6 +9419,7 @@ def npm_repositories():
         link_packages = {},
         package = "regl-splom",
         version = "1.0.14",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OiLqjmPRYbd7kDlHC6/zDf6L8lxgDC65BhC8JirhP4ykrK4x22ZyS+BnY8EUinXKDeMgmpRwCvUmk7BK4Nweuw==",
         deps = {
             "array-bounds": "1.0.1",
@@ -9136,6 +9575,7 @@ def npm_repositories():
         link_packages = {},
         package = "regl",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-oWUce/aVoEvW5l2V0LK7O5KJMzUSKeiOwFuJehzpSFd43dO5spP9r+sSUfhKtsky4u6MCqWJaRL+abzExynfTg==",
         transitive_closure = {
             "regl": ["2.1.0"],
@@ -9149,6 +9589,7 @@ def npm_repositories():
         link_packages = {},
         package = "require-directory",
         version = "2.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==",
         transitive_closure = {
             "require-directory": ["2.1.1"],
@@ -9162,6 +9603,7 @@ def npm_repositories():
         link_packages = {},
         package = "resolve-cwd",
         version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OrZaX2Mb+rJCpH/6CpSqt9xFVpN++x01XnN2ie9g6P5/3xelLAkXWVADpdz1IHD/KFfEXyE6V0U01OQ3UO2rEg==",
         deps = {
             "resolve-from": "5.0.0",
@@ -9179,6 +9621,7 @@ def npm_repositories():
         link_packages = {},
         package = "resolve-from",
         version = "5.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==",
         transitive_closure = {
             "resolve-from": ["5.0.0"],
@@ -9192,6 +9635,7 @@ def npm_repositories():
         link_packages = {},
         package = "resolve-protobuf-schema",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kI5ffTiZWmJaS/huM8wZfEMer1eRd7oJQhDuxeCLe3t7N7mX3z94CN0xPxBQxFYQTSNz9T0i+v6inKqSdK8xrQ==",
         deps = {
             "protocol-buffers-schema": "3.6.0",
@@ -9209,6 +9653,7 @@ def npm_repositories():
         link_packages = {},
         package = "resolve",
         version = "0.6.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-UHBY3viPlJKf85YijDUcikKX6tmF4SokIDp518ZDVT92JNDcG5uKIthaT/owt3Sar0lwtOafsQuwrg22/v2Dwg==",
         transitive_closure = {
             "resolve": ["0.6.3"],
@@ -9222,6 +9667,7 @@ def npm_repositories():
         link_packages = {},
         package = "resolve",
         version = "1.22.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Hhtrw0nLeSrFQ7phPp4OOcVjLPIeMnRlr5mcnVuMe7M/7eBn98A3hmFRLoFo3DLZkivSYwhRUJTyPyWAk56WLw==",
         deps = {
             "is-core-module": "2.9.0",
@@ -9245,6 +9691,7 @@ def npm_repositories():
         link_packages = {},
         package = "right-now",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-DA8+YS+sMIVpbsuKgy+Z67L9Lxb1p05mNxRpDPNksPDEFir4vmBlUtuN9jkTGn9YMMdlBuK7XQgFiz6ws+yhSg==",
         transitive_closure = {
             "right-now": ["1.0.0"],
@@ -9258,6 +9705,7 @@ def npm_repositories():
         link_packages = {},
         package = "rimraf",
         version = "3.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==",
         deps = {
             "glob": "7.2.3",
@@ -9287,6 +9735,7 @@ def npm_repositories():
         },
         package = "rollup",
         version = "2.70.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EitogNZnfku65I1DD5Mxe8JYRUCy0hkK5X84IlDtUs+O6JRMpRciXTzyCUuX11b5L5pvjH+OmFXiQ3XjabcXgg==",
         deps = {
             "fsevents": "2.3.2",
@@ -9306,6 +9755,7 @@ def npm_repositories():
         },
         package = "rollup",
         version = "2.75.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==",
         deps = {
             "fsevents": "2.3.2",
@@ -9323,6 +9773,7 @@ def npm_repositories():
         link_packages = {},
         package = "rw",
         version = "1.3.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==",
         transitive_closure = {
             "rw": ["1.3.3"],
@@ -9336,6 +9787,7 @@ def npm_repositories():
         link_packages = {},
         package = "sade",
         version = "1.8.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==",
         deps = {
             "mri": "1.2.0",
@@ -9353,6 +9805,7 @@ def npm_repositories():
         link_packages = {},
         package = "safe-buffer",
         version = "5.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==",
         transitive_closure = {
             "safe-buffer": ["5.1.2"],
@@ -9366,6 +9819,7 @@ def npm_repositories():
         link_packages = {},
         package = "safe-buffer",
         version = "5.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==",
         transitive_closure = {
             "safe-buffer": ["5.2.1"],
@@ -9379,6 +9833,7 @@ def npm_repositories():
         link_packages = {},
         package = "safer-buffer",
         version = "2.1.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==",
         transitive_closure = {
             "safer-buffer": ["2.1.2"],
@@ -9392,6 +9847,7 @@ def npm_repositories():
         link_packages = {},
         package = "sax",
         version = "1.2.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==",
         transitive_closure = {
             "sax": ["1.2.4"],
@@ -9405,6 +9861,7 @@ def npm_repositories():
         link_packages = {},
         package = "schema-utils",
         version = "3.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Y5PQxS4ITlC+EahLuXaY86TXfR7Dc5lw294alXOq86JAHCihAIZfqv8nNCWvaEJvaC51uN9hbLGeV0cFBdH+Fw==",
         deps = {
             "@types/json-schema": "registry.npmjs.org/@types/json-schema/7.0.11",
@@ -9431,6 +9888,7 @@ def npm_repositories():
         link_packages = {},
         package = "seedrandom",
         version = "3.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==",
         transitive_closure = {
             "seedrandom": ["3.0.5"],
@@ -9446,6 +9904,7 @@ def npm_repositories():
         },
         package = "semver-first-satisfied",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GxUu9YDXEgirwz7KQAYTXzO00w4kfF85J6gkRhGWsrKH/UGkInyai/Xoc5EVwblmWDUlZ2rPoaDE4i0NVgnT0w==",
         deps = {
             "semver": "5.7.1",
@@ -9467,6 +9926,7 @@ def npm_repositories():
         link_packages = {},
         package = "semver",
         version = "5.7.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==",
         transitive_closure = {
             "semver": ["5.7.1"],
@@ -9480,6 +9940,7 @@ def npm_repositories():
         link_packages = {},
         package = "semver",
         version = "6.3.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==",
         transitive_closure = {
             "semver": ["6.3.0"],
@@ -9493,6 +9954,7 @@ def npm_repositories():
         link_packages = {},
         package = "serialize-javascript",
         version = "6.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Qr3TosvguFt8ePWqsvRfrKyQXIiW+nGbYpy8XK24NQHE83caxWt+mIymTT19DGFbNWNLfEwsrkSmN64lVWB9ag==",
         deps = {
             "randombytes": "2.1.0",
@@ -9511,6 +9973,7 @@ def npm_repositories():
         link_packages = {},
         package = "shallow-clone",
         version = "3.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/6KqX+GVUdqPuPPd2LxDDxzX6CAbjJehAAOKlNpqqUpAqPM6HeL8f+o3a+JsyGjn2lv0WY8UsTgUJjU9Ok55NA==",
         deps = {
             "kind-of": "6.0.3",
@@ -9528,6 +9991,7 @@ def npm_repositories():
         link_packages = {},
         package = "shallow-copy",
         version = "0.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha1-QV9CcC1z2BAzApLMXuhurhoRoXA=",
         transitive_closure = {
             "shallow-copy": ["0.0.1"],
@@ -9541,6 +10005,7 @@ def npm_repositories():
         link_packages = {},
         package = "shebang-command",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==",
         deps = {
             "shebang-regex": "3.0.0",
@@ -9558,6 +10023,7 @@ def npm_repositories():
         link_packages = {},
         package = "shebang-regex",
         version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==",
         transitive_closure = {
             "shebang-regex": ["3.0.0"],
@@ -9571,6 +10037,7 @@ def npm_repositories():
         link_packages = {},
         package = "signal-exit",
         version = "3.0.7",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==",
         transitive_closure = {
             "signal-exit": ["3.0.7"],
@@ -9584,6 +10051,7 @@ def npm_repositories():
         link_packages = {},
         package = "signum",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yodFGwcyt59XRh7w5W3jPcIQb3Bwi21suEfT7MAWnBX3iCdklJpgDgvGT9o04UonglZN5SNMfJFkHIR/jO8GHw==",
         transitive_closure = {
             "signum": ["1.0.0"],
@@ -9597,6 +10065,7 @@ def npm_repositories():
         link_packages = {},
         package = "sirv",
         version = "1.0.19",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-JuLThK3TnZG1TAKDwNIqNq6QA2afLOCcm+iE8D1Kj3GA40pSPsxQjjJl0J8X3tsR7T+CP1GavpzLwYkgVLWrZQ==",
         deps = {
             "@polka/url": "1.0.0-next.21",
@@ -9618,6 +10087,7 @@ def npm_repositories():
         link_packages = {},
         package = "source-map-support",
         version = "0.5.21",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==",
         deps = {
             "buffer-from": "1.1.2",
@@ -9637,6 +10107,7 @@ def npm_repositories():
         link_packages = {},
         package = "source-map",
         version = "0.6.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
         transitive_closure = {
             "source-map": ["0.6.1"],
@@ -9651,6 +10122,7 @@ def npm_repositories():
         link_packages = {},
         package = "sourcemap-codec",
         version = "1.4.8",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==",
         transitive_closure = {
             "sourcemap-codec": ["1.4.8"],
@@ -9664,6 +10136,7 @@ def npm_repositories():
         link_packages = {},
         package = "stack-trace",
         version = "0.0.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha1-qPbq7KkGdMMz58Q5U/J1tFFRBpU=",
         transitive_closure = {
             "stack-trace": ["0.0.9"],
@@ -9677,6 +10150,7 @@ def npm_repositories():
         link_packages = {},
         package = "static-eval",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-agtxZ/kWSsCkI5E4QifRwsaPs0P0JmZV6dkLz6ILYfFYQGn+5plctanRN+IC8dJRiFkyXHrwEE3W9Wmx67uDbw==",
         deps = {
             "escodegen": "1.14.3",
@@ -9705,6 +10179,7 @@ def npm_repositories():
         link_packages = {},
         package = "stream-parser",
         version = "0.3.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bJ/HgKq41nlKvlhccD5kaCr/P+Hu0wPNKPJOH7en+YrJu/9EgqUF+88w5Jb6KNcjOFMhfX4B2asfeAtIGuHObQ==",
         deps = {
             "debug": "2.6.9",
@@ -9723,6 +10198,7 @@ def npm_repositories():
         link_packages = {},
         package = "stream-shift",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==",
         transitive_closure = {
             "stream-shift": ["1.0.1"],
@@ -9736,6 +10212,7 @@ def npm_repositories():
         link_packages = {},
         package = "string-split-by",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-KaJKY+hfpzNyet/emP81PJA9hTVSfxNLS9SFTWxdCnnW1/zOOwiV248+EfoX7IQFcBaOp4G5YE6xTJMF+pLg6A==",
         deps = {
             "parenthesis": "3.1.8",
@@ -9753,6 +10230,7 @@ def npm_repositories():
         link_packages = {},
         package = "string-to-arraybuffer",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-DaGZidzi93dwjQen5I2osxR9ERS/R7B1PFyufNMnzhj+fmlDQAc1DSDIJVJhgI8Oq221efIMbABUBdPHDRt43Q==",
         deps = {
             "atob-lite": "2.0.0",
@@ -9772,6 +10250,7 @@ def npm_repositories():
         link_packages = {},
         package = "string-width",
         version = "4.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==",
         deps = {
             "emoji-regex": "8.0.0",
@@ -9794,6 +10273,7 @@ def npm_repositories():
         link_packages = {},
         package = "string_decoder",
         version = "0.10.31",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ev2QzSzWPYmy9GuqfIVildA4OdcGLeFZQrq5ys6RtiuF+RQQiZWr8TZNyAcuVXyQRYfEO+MsoB/1BuQVhOJuoQ==",
         transitive_closure = {
             "string_decoder": ["0.10.31"],
@@ -9807,6 +10287,7 @@ def npm_repositories():
         link_packages = {},
         package = "string_decoder",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==",
         deps = {
             "safe-buffer": "5.1.2",
@@ -9824,6 +10305,7 @@ def npm_repositories():
         link_packages = {},
         package = "strip-ansi",
         version = "6.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
         deps = {
             "ansi-regex": "5.0.1",
@@ -9841,6 +10323,7 @@ def npm_repositories():
         link_packages = {},
         package = "strip-json-comments",
         version = "3.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==",
         transitive_closure = {
             "strip-json-comments": ["3.1.1"],
@@ -9854,6 +10337,7 @@ def npm_repositories():
         link_packages = {},
         package = "strongly-connected-components",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-i0TFx4wPcO0FwX+4RkLJi1MxmcTv90jNZgxMu9XRnMXMeFUY1VJlIoXpZunPUvUUqbCT1pg5PEkFqqpcaElNaA==",
         transitive_closure = {
             "strongly-connected-components": ["1.0.1"],
@@ -9867,6 +10351,7 @@ def npm_repositories():
         link_packages = {},
         package = "supercluster",
         version = "7.1.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EulshI3pGUM66o6ZdH3ReiFcvHpM3vAigyK+vcxdjpJyEbIIrtbmBdY23mGgnI24uXiGFvrGq9Gkum/8U7vJWg==",
         deps = {
             "kdbush": "3.0.0",
@@ -9884,6 +10369,7 @@ def npm_repositories():
         link_packages = {},
         package = "superscript-text",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-gwu8l5MtRZ6koO0icVTlmN5pm7Dhh1+Xpe9O4x6ObMAsW+3jPbW14d1DsBq1F4wiI+WOFjXF35pslgec/G8yCQ==",
         transitive_closure = {
             "superscript-text": ["1.0.0"],
@@ -9897,6 +10383,7 @@ def npm_repositories():
         link_packages = {},
         package = "supports-color",
         version = "7.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
         deps = {
             "has-flag": "4.0.0",
@@ -9914,6 +10401,7 @@ def npm_repositories():
         link_packages = {},
         package = "supports-color",
         version = "8.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==",
         deps = {
             "has-flag": "4.0.0",
@@ -9931,6 +10419,7 @@ def npm_repositories():
         link_packages = {},
         package = "supports-preserve-symlinks-flag",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==",
         transitive_closure = {
             "supports-preserve-symlinks-flag": ["1.0.0"],
@@ -9944,6 +10433,7 @@ def npm_repositories():
         link_packages = {},
         package = "svg-arc-to-cubic-bezier",
         version = "3.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-djbJ/vZKZO+gPoSDThGNpKDO+o+bAeA4XQKovvkNCqnIS2t+S4qnLAGQhyyrulhCFRl1WWzAp0wUDV8PpTVU3g==",
         transitive_closure = {
             "svg-arc-to-cubic-bezier": ["3.2.0"],
@@ -9957,6 +10447,7 @@ def npm_repositories():
         link_packages = {},
         package = "svg-path-bounds",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-H4/uAgLWrppIC0kHsb2/dWUYSmb4GE5UqH06uqWBcg6LBjX2fu0A8+JrO2/FJPZiSsNOKZAhyFFgsLTdYUvSqQ==",
         deps = {
             "abs-svg-path": "0.1.1",
@@ -9981,6 +10472,7 @@ def npm_repositories():
         link_packages = {},
         package = "svg-path-sdf",
         version = "1.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vJJjVq/R5lSr2KLfVXVAStktfcfa1pNFjFOgyJnzZFXlO/fDZ5DmM8FpnSKKzLPfEYTVeXuVBTHF296TpxuJVg==",
         deps = {
             "bitmap-sdf": "1.0.4",
@@ -10009,6 +10501,7 @@ def npm_repositories():
         link_packages = {},
         package = "tapable",
         version = "2.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==",
         transitive_closure = {
             "tapable": ["2.2.1"],
@@ -10022,6 +10515,7 @@ def npm_repositories():
         link_packages = {},
         package = "terser-webpack-plugin",
         version = "5.3.3_webpack@5.73.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Fx60G5HNYknNTNQnzQ1VePRuu89ZVYWfjRAeT5rITuCY/1b08s49e5kSQwHDirKZWuoKOBRFS98EUUoZ9kLEwQ==",
         deps = {
             "@jridgewell/trace-mapping": "0.3.13",
@@ -10157,6 +10651,7 @@ def npm_repositories():
         link_packages = {},
         package = "terser",
         version = "5.14.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+ahUAE+iheqBTDxXhTisdA8hgvbEG1hHOQ9xmNjeUJSoi6DU/gMrKNcfZjHkyY6Alnuyc+ikYJaxxfHkT3+WuQ==",
         deps = {
             "@jridgewell/source-map": "0.3.2",
@@ -10187,6 +10682,7 @@ def npm_repositories():
         link_packages = {},
         package = "test-exclude",
         version = "6.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==",
         deps = {
             "@istanbuljs/schema": "0.1.3",
@@ -10217,6 +10713,7 @@ def npm_repositories():
         link_packages = {},
         package = "through2",
         version = "0.6.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RkK/CCESdTKQZHdmKICijdKKsCRVHs5KsLZ6pACAmF/1GPUQhonHSXWNERctxEp7RmvjdNbZTL5z9V7nSCXKcg==",
         deps = {
             "readable-stream": "1.0.34",
@@ -10240,6 +10737,7 @@ def npm_repositories():
         link_packages = {},
         package = "through2",
         version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==",
         deps = {
             "readable-stream": "2.3.7",
@@ -10266,6 +10764,7 @@ def npm_repositories():
         link_packages = {},
         package = "tiny-emitter",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==",
         transitive_closure = {
             "tiny-emitter": ["2.1.0"],
@@ -10279,6 +10778,7 @@ def npm_repositories():
         link_packages = {},
         package = "tinycolor2",
         version = "1.4.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==",
         transitive_closure = {
             "tinycolor2": ["1.4.2"],
@@ -10292,6 +10792,7 @@ def npm_repositories():
         link_packages = {},
         package = "tinyqueue",
         version = "2.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==",
         transitive_closure = {
             "tinyqueue": ["2.0.3"],
@@ -10305,6 +10806,7 @@ def npm_repositories():
         link_packages = {},
         package = "tmp",
         version = "0.0.33",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==",
         deps = {
             "os-tmpdir": "1.0.2",
@@ -10322,6 +10824,7 @@ def npm_repositories():
         link_packages = {},
         package = "to-array-buffer",
         version = "3.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-zN33mwi0gpL+7xW1ITLfJ48CEj6ZQW0ZAP0MU+2W3kEY0PAIncyuxmD4OqkUVhPAbTP7amq9j/iwvZKYS+lzSQ==",
         deps = {
             "flatten-vertex-data": "1.0.2",
@@ -10346,6 +10849,7 @@ def npm_repositories():
         link_packages = {},
         package = "to-float32",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-keDnAusn/vc+R3iEiSDw8TOF7gPiTLdK1ArvWtYbJQiVfmRg6i/CAvbKq3uIS0vWroAC7ZecN3DjQKw3aSklUg==",
         transitive_closure = {
             "to-float32": ["1.1.0"],
@@ -10359,6 +10863,7 @@ def npm_repositories():
         link_packages = {},
         package = "to-px",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2y3LjBeIZYL19e5gczp14/uRWFDtDUErJPVN3VU9a7SJO+RjGRtYR47aMN2bZgGlxvW4ZcEz2ddUPVHXcMfuXw==",
         deps = {
             "parse-unit": "1.0.1",
@@ -10376,6 +10881,7 @@ def npm_repositories():
         link_packages = {},
         package = "to-regex-range",
         version = "5.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==",
         deps = {
             "is-number": "7.0.0",
@@ -10393,6 +10899,7 @@ def npm_repositories():
         link_packages = {},
         package = "to-uint8",
         version = "1.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-o+ochsMlTZyucbww8It401FC2Rx+OP2RpDeYbA6h+y9HgedDl1UjdsJ9CmzKEG7AFP9es5PmJ4eDWeeeXihESg==",
         deps = {
             "arr-flatten": "1.1.0",
@@ -10423,6 +10930,7 @@ def npm_repositories():
         link_packages = {},
         package = "topojson-client",
         version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-605uxS6bcYxGXw9qi62XyrV6Q3xwbndjachmNxu8HWTtVPxZfEJN9fd/SZS1Q54Sn2y0TMyMxFj/cJINqGHrKw==",
         deps = {
             "commander": "2.20.3",
@@ -10440,6 +10948,7 @@ def npm_repositories():
         link_packages = {},
         package = "totalist",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==",
         transitive_closure = {
             "totalist": ["1.1.0"],
@@ -10453,6 +10962,7 @@ def npm_repositories():
         link_packages = {},
         package = "type-check",
         version = "0.3.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==",
         deps = {
             "prelude-ls": "1.1.2",
@@ -10470,6 +10980,7 @@ def npm_repositories():
         link_packages = {},
         package = "type-name",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kkgkuqR/jKdKO5oh/I2SMu2dGbLXoJq0zkdgbxaqYK+hr9S9edwVVGf+tMUFTx2gH9TN2+Zu9JZ/Njonb3cjhA==",
         transitive_closure = {
             "type-name": ["2.0.2"],
@@ -10483,6 +10994,7 @@ def npm_repositories():
         link_packages = {},
         package = "type",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+5nt5AAniqsCnu2cEQQdpzCAh33kVx8n0VoFidKpB1dVVLAN/F+bgVOqOJqOnEnrhp222clB5p3vUlD+1QAnfg==",
         transitive_closure = {
             "type": ["1.2.0"],
@@ -10496,6 +11008,7 @@ def npm_repositories():
         link_packages = {},
         package = "type",
         version = "2.6.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eiDBDOmkih5pMbo9OqsqPRGMljLodLcwd5XD5JbtNB0o89xZAwynY9EdCDsJU7LtcVCClu9DvM7/0Ep1hYX3EQ==",
         transitive_closure = {
             "type": ["2.6.0"],
@@ -10509,6 +11022,7 @@ def npm_repositories():
         link_packages = {},
         package = "typed-function",
         version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-bctQIOqx2iVbWGDGPWwIm18QScpu2XRmkC19D8rQGFsjKSgteq/o1hTZvIG/wuDq8fanpBDrLkLq+aEN/6y5XQ==",
         transitive_closure = {
             "typed-function": ["2.1.0"],
@@ -10522,6 +11036,7 @@ def npm_repositories():
         link_packages = {},
         package = "typedarray-pool",
         version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YTSQbzX43yvtpfRtIDAYygoYtgT+Rpjuxy9iOpczrjpXLgGoyG7aS5USJXV2d3nn8uHTeb9rXDvzS27zUg5KYQ==",
         deps = {
             "bit-twiddle": "1.0.2",
@@ -10541,6 +11056,7 @@ def npm_repositories():
         link_packages = {},
         package = "typedarray",
         version = "0.0.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==",
         transitive_closure = {
             "typedarray": ["0.0.6"],
@@ -10556,6 +11072,7 @@ def npm_repositories():
         },
         package = "typescript",
         version = "4.7.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Mamb1iX2FDUpcTRzltPxgWMKy3fhg0TN378ylbktPGPK/99KbDtMQ4W1hwgsbPAsG3a0xKa1vmw4VKZQbkvz5A==",
         transitive_closure = {
             "typescript": ["4.7.2"],
@@ -10569,6 +11086,7 @@ def npm_repositories():
         link_packages = {},
         package = "unquote",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-vRCqFv6UhXpWxZPyGDh/F3ZpNv8/qo7w6iufLpQg9aKnQ71qM4B5KiI7Mia9COcjEhrO9LueHpMYjYzsWH3OIg==",
         transitive_closure = {
             "unquote": ["1.1.1"],
@@ -10584,6 +11102,7 @@ def npm_repositories():
         },
         package = "unused",
         version = "0.2.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-u8P6WPj2iObTiHcXn60TYfVaB6wAmvP92Dd+vdV2UTi7pNnjliL6MkGEK23ahTydZyxb7KJQrblYS7Cn6av03Q==",
         deps = {
             "esprima": "1.0.0",
@@ -10605,6 +11124,7 @@ def npm_repositories():
         link_packages = {},
         package = "update-browserslist-db",
         version = "1.0.3_browserslist@4.21.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ufSazemeh9Gty0qiWtoRpJ9F5Q5W3xdIPm1UZQqYQv/q0Nyb9EMHUB2lu+O9x1re9WsorpMAUu4Y6Lxcs5n+XQ==",
         deps = {
             "browserslist": "4.21.0",
@@ -10629,6 +11149,7 @@ def npm_repositories():
         link_packages = {},
         package = "update-diff",
         version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rCiBPiHxZwT4+sBhEbChzpO5hYHjm91kScWgdHf4Qeafs6Ba7MBl+d9GlGv72bcTZQO0sLmtQS1pHSWoCLtN/A==",
         transitive_closure = {
             "update-diff": ["1.1.0"],
@@ -10642,6 +11163,7 @@ def npm_repositories():
         link_packages = {},
         package = "uri-js",
         version = "4.4.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==",
         deps = {
             "punycode": "2.1.1",
@@ -10659,6 +11181,7 @@ def npm_repositories():
         link_packages = {},
         package = "util-deprecate",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
         transitive_closure = {
             "util-deprecate": ["1.0.2"],
@@ -10672,6 +11195,7 @@ def npm_repositories():
         link_packages = {},
         package = "utils-copy-error",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-RbJcGPZ6Ru2HQk9SWkvbdWNPX58pt4MO5uXsOQRu4LEGWB3LglkRrmnE/Ph1qWg6ywQ0qj95wTz1OeqQ2l8DCA==",
         deps = {
             "object-keys": "1.1.1",
@@ -10706,6 +11230,7 @@ def npm_repositories():
         link_packages = {},
         package = "utils-copy",
         version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+NhJVV+PcxjdpkMrVTqXhQHPldlFGca5XR9YnGyNn7kQ0fMi+DqNLzdnhJ4TJ1HNy/HzB7c+FPg3y+4icY99ZA==",
         deps = {
             "const-pinf-float64": "1.0.0",
@@ -10747,6 +11272,7 @@ def npm_repositories():
         link_packages = {},
         package = "utils-indexof",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-76QBfRJpn4A0P5uTO1x00x+Yog36w2Pab0n+aT9UfUvVa4l+e8k3p7YwNpDvfQ6+aKGZdxZpxcNotNS4YjFcyg==",
         deps = {
             "validate.io-array-like": "1.0.2",
@@ -10768,6 +11294,7 @@ def npm_repositories():
         link_packages = {},
         package = "utils-regex-from-string",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-xKfdmEF19iUu9TKxFiohQUlQTuqYdV80/CxHiudVI37iEV/OA4HHlXZoc4qvuO1B74EcBVpErBreRO/dpdLeYA==",
         deps = {
             "regex-regex": "1.0.0",
@@ -10790,6 +11317,7 @@ def npm_repositories():
         },
         package = "uuid",
         version = "8.3.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==",
         transitive_closure = {
             "uuid": ["8.3.2"],
@@ -10805,6 +11333,7 @@ def npm_repositories():
         },
         package = "uvu",
         version = "0.5.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==",
         deps = {
             "dequal": "2.0.2",
@@ -10829,6 +11358,7 @@ def npm_repositories():
         link_packages = {},
         package = "v8-to-istanbul",
         version = "9.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-74Y4LqY74kLE6IFyIjPtkSTWzUZmj8tdHT9Ii/26dvQ6K9Dl2NbEfj0XgU2sHCtKgt5VupqhlO/5aWuqS+IY1w==",
         deps = {
             "@jridgewell/trace-mapping": "0.3.13",
@@ -10853,6 +11383,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-array-like",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rGLiN0cvY9OWzQcWP+RtqZR/MK9RUz3gKDTCcRLtEQ/BvlanMF5PyqtVIN+CgrIBCv/ypfme9v7r4yMJPYpbNA==",
         deps = {
             "const-max-uint32": "1.0.2",
@@ -10873,6 +11404,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-array",
         version = "1.0.6",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-DeOy7CnPEziggrOO5CZhVKJw6S3Yi7e9e65R1Nl/RTN1vTQKnzjfvks0/8kQ40FP/dsjRAOd4hxmJ7uLa6vxkg==",
         transitive_closure = {
             "validate.io-array": ["1.0.6"],
@@ -10886,6 +11418,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-buffer",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-6Tad+/QYOxWEXsesKYak1mHOzGdPYS4QeHFImWn7ECi4GR0x3vh7+6+1yoLKNXiklKuTFOxHLG3kZy9tPX0GvQ==",
         transitive_closure = {
             "validate.io-buffer": ["1.0.2"],
@@ -10899,6 +11432,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-integer-primitive",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-4ARGKA4FImVWJgrgttLYsYJmDGwxlhLfDCdq09gyVgohLKKRUfD3VAo1L2vTRCLt6hDhDtFKdZiuYUTWyBggwg==",
         deps = {
             "validate.io-number-primitive": "1.0.0",
@@ -10916,6 +11450,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-integer",
         version = "1.0.5",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-22izsYSLojN/P6bppBqhgUDjCkr5RY2jd+N2a3DCAUey8ydvrZ/OkGvFPR7qfOpwR2LC5p4Ngzxz36g5Vgr/hQ==",
         deps = {
             "validate.io-number": "1.0.3",
@@ -10933,6 +11468,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-matrix-like",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-86mqLUIkZCRAOVKZvpCB7sDCw1dKBjBkY+C6WO/wLo/jQx0sOqQZz3LLtDw0DCfuAKxRuhSmIpX3nzr0nWrbdw==",
         transitive_closure = {
             "validate.io-matrix-like": ["1.0.2"],
@@ -10946,6 +11482,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-ndarray-like",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-OV85AosxraPFSXJwzv/d7Cu5/dLiyLtsHmxtHTJcHW1N0uscd0eJ2df1Zk+HdID0eUctUllW/1YuQPUJFv1pTA==",
         transitive_closure = {
             "validate.io-ndarray-like": ["1.0.0"],
@@ -10959,6 +11496,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-nonnegative-integer",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-uOMekPwcl84yg8NR7zgIZCZ9pHCtd9CK1Ri51N+ZJLTe1HyLbmdFdy7ZmfkiHkMvB1pOxeQmd1/LBjKhUD1L3A==",
         deps = {
             "validate.io-integer": "1.0.5",
@@ -10977,6 +11515,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-number-primitive",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-8rlCe7N0TRTd50dwk4WNoMXNbX/4+RdtqE3TO6Bk0GJvAgbQlfL5DGr/Pl9ZLbWR6CutMjE2cu+yOoCnFWk+Qw==",
         transitive_closure = {
             "validate.io-number-primitive": ["1.0.0"],
@@ -10990,6 +11529,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-number",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-kRAyotcbNaSYoDnXvb4MHg/0a1egJdLwS6oJ38TJY7aw9n93Fl/3blIXdyYvPOp55CNxywooG/3BcrwNrBpcSg==",
         transitive_closure = {
             "validate.io-number": ["1.0.3"],
@@ -11003,6 +11543,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-positive-integer",
         version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-eg4LSdyqjICNUZWRilcQ5l+YayRlu6yi+GQsWw1bCmtG9yayOPmLa1fPymEHPPhbvWPAv3w0LLbCsf03pBHZkg==",
         deps = {
             "validate.io-integer": "1.0.5",
@@ -11021,6 +11562,7 @@ def npm_repositories():
         link_packages = {},
         package = "validate.io-string-primitive",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-TORbkLMdOFkEbPtfdx76FSVQGSAzyUEMxI+pBq5pfFm1ZzIesP+XiGc6eIK75aKu7RA7a8EcqUv5OrY5wfog5w==",
         transitive_closure = {
             "validate.io-string-primitive": ["1.0.1"],
@@ -11034,6 +11576,7 @@ def npm_repositories():
         link_packages = {},
         package = "vt-pbf",
         version = "3.1.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-2LzDFzt0mZKZ9IpVF2r69G9bXaP2Q2sArJCmcCgvfTdCCZzSyz4aCLoQyUilu37Ll56tCblIZrXFIjNUpGIlmA==",
         deps = {
             "@mapbox/point-geometry": "0.1.0",
@@ -11058,6 +11601,7 @@ def npm_repositories():
         link_packages = {},
         package = "watchpack",
         version = "2.4.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Lcvm7MGST/4fup+ifyKi2hjyIAwcdI4HRgtvTpIUxBRhB+RFtUh8XtDOxUfctVCnhVi+QQj49i91OyvzkJl6cg==",
         deps = {
             "glob-to-regexp": "0.4.1",
@@ -11077,6 +11621,7 @@ def npm_repositories():
         link_packages = {},
         package = "weak-map",
         version = "1.0.8",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-lNR9aAefbGPpHO7AEnY0hCFjz1eTkWCXYvkTRrTHs9qv8zJp+SkVYpzfLIFXQQiG3tVvbNFQgVg2bQS8YGgxyw==",
         transitive_closure = {
             "weak-map": ["1.0.8"],
@@ -11090,6 +11635,7 @@ def npm_repositories():
         link_packages = {},
         package = "webgl-context",
         version = "2.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-q/fGIivtqTT7PEoF07axFIlHNk/XCPaYpq64btnepopSWvKNFkoORlQYgqDigBIuGA1ExnFd/GnSUnBNEPQY7Q==",
         deps = {
             "get-canvas-context": "1.0.2",
@@ -11109,6 +11655,7 @@ def npm_repositories():
         },
         package = "webpack-bundle-analyzer",
         version = "4.5.0_bufferutil@4.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GUMZlM3SKwS8Z+CKeIFx7CVoHn3dXFcUAjT/dcZQQmfSZGvitPfMob2ipjai7ovFFqPvTqkEZ/leL4O0YOdAYQ==",
         deps = {
             "acorn": "8.7.1",
@@ -11155,6 +11702,7 @@ def npm_repositories():
         },
         package = "webpack-cli",
         version = "4.10.0_webpack@5.73.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-NLhDfH/h4O6UOy+0LSso42xvYypClINuMNBVVzX4vX98TmTaTUxwRbXdhucbFMd2qLaCTcLq/PdYrvi8onw90w==",
         deps = {
             "@discoveryjs/json-ext": "0.5.7",
@@ -11297,6 +11845,7 @@ def npm_repositories():
         link_packages = {},
         package = "webpack-merge",
         version = "5.8.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/SaI7xY0831XwP6kzuwhKWVKDP9t1QY1h65lAFLbZqMPIuYcD9QAW4u9STIbU9kaJbPBB/geU/gLr1wDjOhQ+Q==",
         deps = {
             "clone-deep": "4.0.1",
@@ -11320,6 +11869,7 @@ def npm_repositories():
         link_packages = {},
         package = "webpack-sources",
         version = "3.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==",
         transitive_closure = {
             "webpack-sources": ["3.2.3"],
@@ -11335,6 +11885,7 @@ def npm_repositories():
         },
         package = "webpack",
         version = "5.73.0_webpack-cli@4.10.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-svjudQRPPa0YiOYa2lM/Gacw0r6PvxptHj4FuEKQ2kX05ZLkjbVc5MnPs6its5j7IZljnIqSVo/OsY2X0IpHGA==",
         deps = {
             "@types/eslint-scope": "registry.npmjs.org/@types/eslint-scope/3.7.3",
@@ -11489,6 +12040,7 @@ def npm_repositories():
         link_packages = {},
         package = "which",
         version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==",
         deps = {
             "isexe": "2.0.0",
@@ -11506,6 +12058,7 @@ def npm_repositories():
         link_packages = {},
         package = "wildcard",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-JcKqAHLPxcdb9KM49dufGXn2x3ssnfjbcaQdLlfZsL9rH9wgDQjUtDxbo8NE0F6SFvydeu1VhZe7hZuHsB2/pw==",
         transitive_closure = {
             "wildcard": ["2.0.0"],
@@ -11519,6 +12072,7 @@ def npm_repositories():
         link_packages = {},
         package = "word-wrap",
         version = "1.2.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==",
         transitive_closure = {
             "word-wrap": ["1.2.3"],
@@ -11532,6 +12086,7 @@ def npm_repositories():
         link_packages = {},
         package = "wordwrap",
         version = "0.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-1tMA907+V4QmxV7dbRvb4/8MaRALK6q9Abid3ndMYnbyo8piisCmeONVqVSXqQA3KaP4SLt5b7ud6E2sqP8TFw==",
         transitive_closure = {
             "wordwrap": ["0.0.3"],
@@ -11545,6 +12100,7 @@ def npm_repositories():
         link_packages = {},
         package = "workerpool",
         version = "6.2.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==",
         transitive_closure = {
             "workerpool": ["6.2.1"],
@@ -11558,6 +12114,7 @@ def npm_repositories():
         link_packages = {},
         package = "world-calendars",
         version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-sAjLZkBnsbHkHWVhrsCU5Sa/EVuf9QqgvrN8zyJ2L/F9FR9Oc6CvVK0674+PGAtmmmYQMH98tCUSO4QLQv3/TQ==",
         deps = {
             "object-assign": "4.1.1",
@@ -11575,6 +12132,7 @@ def npm_repositories():
         link_packages = {},
         package = "wrap-ansi",
         version = "7.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==",
         deps = {
             "ansi-styles": "4.3.0",
@@ -11601,6 +12159,7 @@ def npm_repositories():
         link_packages = {},
         package = "wrappy",
         version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==",
         transitive_closure = {
             "wrappy": ["1.0.2"],
@@ -11614,6 +12173,7 @@ def npm_repositories():
         link_packages = {},
         package = "ws",
         version = "7.5.8_bufferutil@4.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-ri1Id1WinAX5Jqn9HejiGb8crfRio0Qgu8+MtL36rlTA6RLsMdWt1Az/19A2Qij6uSHUMphEFaTKa4WG+UNHNw==",
         deps = {
             "bufferutil": "4.0.1",
@@ -11632,6 +12192,7 @@ def npm_repositories():
         link_packages = {},
         package = "xml",
         version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-huCv9IH9Tcf95zuYCsQraZtWnJvBtLVE0QHMOs8bWyZAFZNDcYjsPq1nEx8jKA9y+Beo9v+7OBPRisQTjinQMw==",
         transitive_closure = {
             "xml": ["1.0.1"],
@@ -11645,6 +12206,7 @@ def npm_repositories():
         link_packages = {},
         package = "xtend",
         version = "2.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-SLt5uylT+4aoXxXuwtQp5ZnMMzhDb1Xkg4pEqc00WUJCQifPfV9Ub1VrNhp9kXkrjZD2I2Hl8WnjP37jzZLPZw==",
         transitive_closure = {
             "xtend": ["2.2.0"],
@@ -11658,6 +12220,7 @@ def npm_repositories():
         link_packages = {},
         package = "xtend",
         version = "4.0.2",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==",
         transitive_closure = {
             "xtend": ["4.0.2"],
@@ -11671,6 +12234,7 @@ def npm_repositories():
         link_packages = {},
         package = "y18n",
         version = "5.0.8",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==",
         transitive_closure = {
             "y18n": ["5.0.8"],
@@ -11684,6 +12248,7 @@ def npm_repositories():
         link_packages = {},
         package = "yargs-parser",
         version = "20.2.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-WOkpgNhPTlE73h4VFAFsOnomJVaovO8VqLDzy5saChRBFQFBoMYirowyW+Q9HB4HFF4Z7VZTiG3iSzJJA29yRA==",
         transitive_closure = {
             "yargs-parser": ["20.2.4"],
@@ -11697,6 +12262,7 @@ def npm_repositories():
         link_packages = {},
         package = "yargs-parser",
         version = "20.2.9",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==",
         transitive_closure = {
             "yargs-parser": ["20.2.9"],
@@ -11710,6 +12276,7 @@ def npm_repositories():
         link_packages = {},
         package = "yargs-unparser",
         version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7pRTIA9Qc1caZ0bZ6RYRGbHJthJWuakf+WmHK0rVeLkNrrGhfoabBNdue6kdINI6r4if7ocq9aD/n7xwKOdzOA==",
         deps = {
             "camelcase": "6.3.0",
@@ -11733,6 +12300,7 @@ def npm_repositories():
         link_packages = {},
         package = "yargs",
         version = "16.2.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==",
         deps = {
             "cliui": "7.0.4",
@@ -11770,6 +12338,7 @@ def npm_repositories():
         link_packages = {},
         package = "yocto-queue",
         version = "0.1.0",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==",
         transitive_closure = {
             "yocto-queue": ["0.1.0"],
@@ -11785,6 +12354,7 @@ def npm_repositories():
         },
         package = "debug",
         version = "github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53",
+        lifecycle_hooks_no_sandbox = True,
         url = "https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53",
         deps = {
             "ms": "0.7.3",
@@ -11802,6 +12372,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/eslint-scope",
         version = "registry.npmjs.org/@types/eslint-scope/3.7.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-PB3ldyrcnAicT35TWPs5IcwKD8S333HMaa2VVv4+wdvebJkjWuW/xESoB8IwRcog8HYVYamb1g/R31Qv5Bx03g==",
         url = "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.3.tgz",
         deps = {
@@ -11823,6 +12394,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/eslint",
         version = "registry.npmjs.org/@types/eslint/8.4.3",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-YP1S7YJRMPs+7KZKDb9G63n8YejIwW9BALq7a5j2+H4yl6iOv9CB29edho+cuFRrvmJbbaH2yiVChKLJVysDGw==",
         url = "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.4.3.tgz",
         deps = {
@@ -11843,6 +12415,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/estree",
         version = "registry.npmjs.org/@types/estree/0.0.39",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==",
         url = "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz",
         transitive_closure = {
@@ -11857,6 +12430,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/estree",
         version = "registry.npmjs.org/@types/estree/0.0.51",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==",
         url = "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz",
         transitive_closure = {
@@ -11871,6 +12445,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/istanbul-lib-coverage",
         version = "registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==",
         url = "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz",
         transitive_closure = {
@@ -11885,6 +12460,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/json-schema",
         version = "registry.npmjs.org/@types/json-schema/7.0.11",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==",
         url = "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz",
         transitive_closure = {
@@ -11901,6 +12477,7 @@ def npm_repositories():
         },
         package = "@types/node",
         version = "registry.npmjs.org/@types/node/16.11.36",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==",
         url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz",
         transitive_closure = {
@@ -11915,6 +12492,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/resolve",
         version = "registry.npmjs.org/@types/resolve/1.17.1",
+        lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==",
         url = "https://registry.yarnpkg.com/@types/resolve/-/resolve-1.17.1.tgz",
         deps = {

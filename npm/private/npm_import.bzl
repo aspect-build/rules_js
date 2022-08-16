@@ -619,6 +619,8 @@ def _impl_links(rctx):
     lifecycle_hooks_execution_requirements = {}
     for ec in rctx.attr.lifecycle_hooks_execution_requirements:
         lifecycle_hooks_execution_requirements[ec] = "1"
+    if rctx.attr.lifecycle_hooks_no_sandbox and "no-sandbox" not in lifecycle_hooks_execution_requirements:
+        lifecycle_hooks_execution_requirements["no-sandbox"] = "1"
 
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
@@ -661,6 +663,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
+    "lifecycle_hooks_no_sandbox": attr.bool(default = True),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
