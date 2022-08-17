@@ -471,11 +471,14 @@ bin = bin_factory("node_modules")
                 src = _PACKAGE_JSON_BZL_FILENAME,
             ))
 
+    rules_js_metadata = {}
     if rctx.attr.run_lifecycle_hooks:
-        _inject_run_lifecycle_hooks(rctx, pkg_json_path)
-
+        rules_js_metadata["run_lifecycle_hooks"] = "1"
     if rctx.attr.custom_postinstall:
-        _inject_custom_postinstall(rctx, pkg_json_path, rctx.attr.custom_postinstall)
+        rules_js_metadata["scripts"] = {}
+        rules_js_metadata["scripts"]["custom_postinstall"] = rctx.attr.custom_postinstall
+    rules_js_json_path = paths.join(_EXTRACT_TO_DIRNAME, "aspect_rules_js_metadata.json")
+    rctx.file(rules_js_json_path, json.encode_indent(rules_js_metadata, indent = "  "))
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(contents))
@@ -680,20 +683,6 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "link_workspace": attr.string(),
     "url": attr.string(),
 })
-
-def _inject_run_lifecycle_hooks(rctx, pkg_json_path):
-    package_json = json.decode(rctx.read(pkg_json_path))
-    package_json.setdefault("scripts", {})["_rules_js_run_lifecycle_hooks"] = "1"
-
-    # TODO: The order of fields in package.json is not preserved making it harder to read
-    rctx.file(pkg_json_path, json.encode_indent(package_json, indent = "  "))
-
-def _inject_custom_postinstall(rctx, pkg_json_path, custom_postinstall):
-    package_json = json.decode(rctx.read(pkg_json_path))
-    package_json.setdefault("scripts", {})["_rules_js_custom_postinstall"] = custom_postinstall
-
-    # TODO: The order of fields in package.json is not preserved making it harder to read
-    rctx.file(pkg_json_path, json.encode_indent(package_json, indent = "  "))
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
