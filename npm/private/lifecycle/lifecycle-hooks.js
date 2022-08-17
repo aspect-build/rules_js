@@ -46,7 +46,11 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
                 }
                 for (binName of Object.keys(bin)) {
                     binPath = normalizeBinPath(bin[binName])
-                    binBash = `#!/usr/bin/env bash\nexec node "${path.join(...segmentsUp, packageName, binPath)}" "$@"`
+                    binBash = `#!/usr/bin/env bash\nexec node "${path.join(
+                        ...segmentsUp,
+                        packageName,
+                        binPath
+                    )}" "$@"`
                     binEntryPath = path.join(nodeModulesPath, '.bin', binName)
                     await fs.promises.writeFile(binEntryPath, binBash)
                     await fs.promises.chmod(binEntryPath, '755') // executable
@@ -75,9 +79,7 @@ async function main(args) {
     //    .../node_modules/.aspect_rules_js/@scope+package@version/node_modules/@scope/package
     // Path to node_modules is one or two segments up from the output path depending on the packageName
     const segmentsUp = Array(packageName.split('/').length).fill('..')
-    const nodeModulesPath = path.resolve(
-        path.join(outputDir, ...segmentsUp)
-    )
+    const nodeModulesPath = path.resolve(path.join(outputDir, ...segmentsUp))
 
     // Create .bin entry point files for all packages in node_modules
     await makeBins(nodeModulesPath, '', segmentsUp)
@@ -110,22 +112,20 @@ async function main(args) {
         unsafePerm: true, // Don't run under a specific user/group
     }
 
-    const packageJson = JSON.parse(
-        await fs.promises.readFile(path.join(packageDir, 'package.json'))
+    const rulesJsJson = JSON.parse(
+        await fs.promises.readFile(
+            path.join(packageDir, 'aspect_rules_js_metadata.json')
+        )
     )
 
-    if (packageJson.scripts?._rules_js_run_lifecycle_hooks) {
+    if (rulesJsJson.run_lifecycle_hooks) {
         // Runs preinstall, install, and postinstall hooks
         await runPostinstallHooks(opts)
     }
 
-    if (packageJson.scripts?._rules_js_custom_postinstall) {
+    if (rulesJsJson.scripts?.custom_postinstall) {
         // Run user specified custom postinstall hook
-        await runLifecycleHook(
-            '_rules_js_custom_postinstall',
-            packageJson,
-            opts
-        )
+        await runLifecycleHook('custom_postinstall', rulesJsJson, opts)
     }
 }
 
