@@ -45,6 +45,7 @@ filegroup(
         ":node_modules/regl",
         ":node_modules/webpack-bundle-analyzer",
         ":node_modules/semver-first-satisfied",
+        ":node_modules/@figma/nodegit",
         # intentionally don't include node_modules/unused
     ],
 )

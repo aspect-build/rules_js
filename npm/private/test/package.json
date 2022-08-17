@@ -11,6 +11,7 @@
         "unused": "latest",
         "webpack-bundle-analyzer": "4.5.0",
         "semver-first-satisfied": "1.1.0",
+        "@figma/nodegit": "^0.28.0-figma.2",
         "typescript": "*"
     }
 }
