@@ -1225,6 +1225,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(link_209(name = "{}/esbuild".format(name)))
             link_targets.append(link_415(name = "{}/plotly.js".format(name)))
             link_targets.append(link_458(name = "{}/semver-first-satisfied".format(name)))
+            link_targets.append(link_516(name = "{}/typescript".format(name)))
             link_targets.append(link_518(name = "{}/unused".format(name)))
             link_targets.append(link_546(name = "{}/webpack-bundle-analyzer".format(name)))
             link_targets.append(link_569(name = "{}/debug".format(name)))

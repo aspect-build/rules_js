@@ -11069,6 +11069,7 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "": ["typescript"],
+            "npm/private/test": ["typescript"],
         },
         package = "typescript",
         version = "4.7.2",

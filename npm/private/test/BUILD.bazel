@@ -48,3 +48,19 @@ filegroup(
         # intentionally don't include node_modules/unused
     ],
 )
+
+sh_test(
+    name = "bin_test",
+    srcs = ["bin_test.sh"],
+    args = ["$(NODE_PATH)"],
+    data = [
+        ":node_modules/typescript",
+        "//:node_modules/typescript",
+        # This eager toolchain fetching could be cleaed up in the future
+        "@nodejs_darwin_amd64//:node_files",
+        "@nodejs_darwin_arm64//:node_files",
+        "@nodejs_linux_amd64//:node_files",
+        "@nodejs_linux_arm64//:node_files",
+    ],
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+)
