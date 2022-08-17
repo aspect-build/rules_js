@@ -155,7 +155,6 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
-            "examples/nodegit": ["@figma/nodegit"],
             "npm/private/test": ["@figma/nodegit"],
         },
         package = "@figma/nodegit",
@@ -3499,7 +3498,7 @@ def npm_repositories():
         package = "concat-map",
         version = "0.0.1",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==",
+        integrity = "sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=",
         transitive_closure = {
             "concat-map": ["0.0.1"],
         },

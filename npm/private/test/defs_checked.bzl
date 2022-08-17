@@ -737,11 +737,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     """
 
     root_package = ""
-    link_packages = ["", "examples/js_binary", "examples/macro", "examples/nodegit", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "npm/private/test"]
+    link_packages = ["", "examples/js_binary", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "npm/private/test"]
     is_root = native.package_name() == root_package
     link = native.package_name() in link_packages
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages ['', 'examples/js_binary', 'examples/macro', 'examples/nodegit', 'examples/npm_deps', 'examples/npm_package/libs/lib_a', 'examples/npm_package/packages/pkg_a', 'examples/npm_package/packages/pkg_b', 'examples/webpack_cli', 'js/private/coverage/bundle', 'npm/private/test']" % native.package_name()
+        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in the bazel package(s) corresponding to the root package '' and packages ['', 'examples/js_binary', 'examples/macro', 'examples/npm_deps', 'examples/npm_package/libs/lib_a', 'examples/npm_package/packages/pkg_a', 'examples/npm_package/packages/pkg_b', 'examples/webpack_cli', 'js/private/coverage/bundle', 'npm/private/test']" % native.package_name()
         fail(msg)
     link_targets = []
     scope_targets = {}
@@ -1479,9 +1479,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(link_529(name = "{}/react".format(name)))
             link_targets.append(link_552(name = "{}/rollup".format(name)))
             link_targets.append(link_650(name = "{}/uvu".format(name)))
-        if native.package_name() == "examples/nodegit":
-            link_targets.append(link_8(name = "{}/@figma/nodegit".format(name)))
-            scope_targets["@figma"] = scope_targets["@figma"] + [link_targets[-1]] if "@figma" in scope_targets else [link_targets[-1]]
         if native.package_name() == "npm/private/test":
             link_targets.append(link_8(name = "{}/@figma/nodegit".format(name)))
             scope_targets["@figma"] = scope_targets["@figma"] + [link_targets[-1]] if "@figma" in scope_targets else [link_targets[-1]]
