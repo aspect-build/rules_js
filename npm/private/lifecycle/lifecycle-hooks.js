@@ -24,7 +24,7 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
     )
     for (package of packages) {
         if (!scope && package.startsWith('@')) {
-            makeBins(nodeModulesPath, package, segmentsUp)
+            await makeBins(nodeModulesPath, package, segmentsUp)
             continue
         }
         const packageName = path.join(scope, package)
