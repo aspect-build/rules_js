@@ -179,7 +179,7 @@ def npm_link_imported_package_store(
         use_declare_symlink = select({{
             "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
             "//conditions:default": False,
-        }}),
+        }}),{maybe_bins}
     )
 
     # filegroup target that provides a single file which is
@@ -622,6 +622,9 @@ def _impl_links(rctx):
     if rctx.attr.lifecycle_hooks_no_sandbox and "no-sandbox" not in lifecycle_hooks_execution_requirements:
         lifecycle_hooks_execution_requirements["no-sandbox"] = "1"
 
+    maybe_bins = ("""
+        bins = %s,""" % starlark_codegen_utils.to_dict_attr(rctx.attr.bins, 3)) if len(rctx.attr.bins) > 0 else ""
+
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
@@ -642,6 +645,7 @@ def _impl_links(rctx):
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
         virtual_store_root = utils.virtual_store_root,
+        maybe_bins = maybe_bins,
     )]
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
@@ -658,6 +662,7 @@ _COMMON_ATTRS = {
 }
 
 _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
+    "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "transitive_closure": attr.string_list_dict(),
     "lifecycle_build_target": attr.bool(),

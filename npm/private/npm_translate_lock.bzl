@@ -6,203 +6,26 @@ load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-_DOC = """Repository rule to generate npm_import rules from pnpm lock file.
-
-The pnpm lockfile format includes all the information needed to define npm_import rules,
-including the integrity hash, as calculated by the package manager.
-
-For more details see, https://github.com/pnpm/pnpm/blob/main/packages/lockfile-types/src/index.ts.
-
-Instead of manually declaring the `npm_imports`, this helper generates an external repository
-containing a helper starlark module `repositories.bzl`, which supplies a loadable macro
-`npm_repositories`. This macro creates an `npm_import` for each package.
-
-The generated repository also contains BUILD files declaring targets for the packages
-listed as `dependencies` or `devDependencies` in `package.json`, so you can declare
-dependencies on those packages without having to repeat version information.
-
-Bazel will only fetch the packages which are required for the requested targets to be analyzed.
-Thus it is performant to convert a very large pnpm-lock.yaml file without concern for
-users needing to fetch many unnecessary packages.
-
-**Setup**
-
-In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
-
-```starlark
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
-
-# Read the pnpm-lock.yaml file to automate creation of remaining npm_import rules
-npm_translate_lock(
-    # Creates a new repository named "@npm_deps"
-    name = "npm_deps",
-    pnpm_lock = "//:pnpm-lock.yaml",
-    # Recommended attribute that also checks the .bazelignore file
-    verify_node_modules_ignored = "//:.bazelignore",
-)
-```
-
-Next, there are two choices, either load from the generated repo or check in the generated file.
-The tradeoffs are similar to
-[this rules_python thread](https://github.com/bazelbuild/rules_python/issues/608).
-
-1. Immediately load from the generated `repositories.bzl` file in `WORKSPACE`.
-This is similar to the
-[`pip_parse`](https://github.com/bazelbuild/rules_python/blob/main/docs/pip.md#pip_parse)
-rule in rules_python for example.
-It has the advantage of also creating aliases for simpler dependencies that don't require
-spelling out the version of the packages.
-However it causes Bazel to eagerly evaluate the `npm_translate_lock` rule for every build,
-even if the user didn't ask for anything JavaScript-related.
-
-```starlark
-# Following our example above, we named this "npm_deps"
-load("@npm_deps//:repositories.bzl", "npm_repositories")
-
-npm_repositories()
-```
-
-2. Check in the `repositories.bzl` file to version control, and load that instead.
-This makes it easier to ship a ruleset that has its own npm dependencies, as users don't
-have to install those dependencies. It also avoids eager-evaluation of `npm_translate_lock`
-for builds that don't need it.
-This is similar to the [`update-repos`](https://github.com/bazelbuild/bazel-gazelle#update-repos)
-approach from bazel-gazelle.
-
-In a BUILD file, use a rule like
-[write_source_files](https://github.com/aspect-build/bazel-lib/blob/main/docs/write_source_files.md)
-to copy the generated file to the repo and test that it stays updated:
-
-```starlark
-write_source_files(
-    name = "update_repos",
-    files = {
-        "repositories.bzl": "@npm_deps//:repositories.bzl",
-    },
-)
-```
-
-Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do so.
-"""
-
 _ATTRS = {
-    "pnpm_lock": attr.label(
-        doc = """The pnpm-lock.yaml file.
-        
-        Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.""",
-    ),
-    "package_json": attr.label(
-        doc = """The package.json file. From this file and the corresponding package-lock.json/yarn.lock file
-        (specified with the npm_package_lock/yarn_lock attributes),
-        a pnpm-lock.yaml file will be generated using `pnpm import`.
-
-        Note that *any* changes to the package.json file will invalidate the npm_translate_lock
-        repository rule, causing it to re-run on the next invocation of Bazel.
-        
-        Mandatory when using npm_package_lock or yarn_lock, otherwise must be unset.""",
-    ),
-    "npm_package_lock": attr.label(
-        doc = """The package-lock.json file written by `npm install`.
-        
-        When set, the `package_json` attribute must be set as well.
-        Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
-        """,
-    ),
-    "yarn_lock": attr.label(
-        doc = """The yarn.lock file written by `yarn install`.
-        
-        When set, the `package_json` attribute must be set as well.
-        Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
-        """,
-    ),
-    "patches": attr.string_list_dict(
-        doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
-        to a label list of patches to apply to the downloaded npm package. Paths in the patch
-        file must start with `extract_tmp/package` where `package` is the top-level folder in
-        the archive on npm. If the version is left out of the package name, the patch will be
-        applied to every version of the npm package.""",
-    ),
-    "patch_args": attr.string_list_dict(
-        doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
-        to a label list arguments to pass to the patch tool. Defaults to -p0, but -p1 will
-        usually be needed for patches generated by git. If patch args exists for a package
-        as well as a package version, then the version-specific args will be appended to the args for the package.""",
-    ),
-    "custom_postinstalls": attr.string_dict(
-        doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
-        to a custom postinstall script to apply to the downloaded npm package after its lifecycle scripts runs.
-        If the version is left out of the package name, the script will run on every version of the npm package. If
-        a custom postinstall scripts exists for a package as well as for a specific version, the script for the versioned package
-        will be appended with `&&` to the non-versioned package script.""",
-    ),
-    "prod": attr.bool(
-        doc = """If true, only install dependencies""",
-    ),
-    "public_hoist_packages": attr.string_list_dict(
-        doc = """A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
-        to a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree when linking.
-
-        This is similar to setting https://pnpm.io/npmrc#public-hoist-pattern in an .npmrc file outside of Bazel, however,
-        wild-cards are not yet supported and npm_translate_lock will fail if there are multiple versions of a package that
-        are to be hoisted.""",
-    ),
-    "dev": attr.bool(
-        doc = """If true, only install devDependencies""",
-    ),
-    "no_optional": attr.bool(
-        doc = """If true, optionalDependencies are not installed""",
-    ),
-    "lifecycle_hooks_exclude": attr.string_list(
-        doc = """A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
-        to not run lifecycle hooks on""",
-    ),
-    "run_lifecycle_hooks": attr.bool(
-        doc = """If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist""",
-        default = True,
-    ),
-    "lifecycle_hooks_envs": attr.string_list_dict(
-        doc = """Environment variables applied to the preinstall, install and postinstall lifecycle hooks on npm packages.
-        The environment variables can be defined per package by package name or globally using "*".
-        Variables are declared as key/value pairs of the form "key=value".
-        For example:
-        lifecycle_hooks_envs: {
-            "*": ["GLOBAL_KEY1=value1", "GLOBAL_KEY2=value2"],
-            "@foo/bar": ["PREBULT_BINARY=http://downloadurl"],
-        }
-        """,
-    ),
-    "lifecycle_hooks_execution_requirements": attr.string_list_dict(
-        doc = """Execution requirements applied to the preinstall, install and postinstall lifecycle hooks on npm packages.
-        The execution requirements can be defined per package by package name or globally using "*".
-        For example:
-        lifecycle_hooks_execution_requirements: {
-            "*": ["requires-network"],
-            "@foo/bar": ["no-sandbox"],
-        }
-        """,
-    ),
-    "lifecycle_hooks_no_sandbox": attr.bool(
-        doc = """If True, a "no-sandbox" execution requirement is added to all lifecycle hooks.
-
-        Equivalent to adding `"*": ["no-sandbox"]` to lifecycle_hooks_execution_requirements.
-
-        This defaults to True to limit the overhead of sandbox creation and copying the output
-        TreeArtifacts out of the sandbox.
-        """,
-        default = True,
-    ),
-    "verify_node_modules_ignored": attr.label(
-        doc = """node_modules folders in the source tree should be ignored by Bazel.
-
-        This points to a `.bazelignore` file to verify that all nested node_modules directories
-        pnpm will create are listed.
-
-        See https://github.com/bazelbuild/bazel/issues/8106
-        """,
-    ),
-    "warn_on_unqualified_tarball_url": attr.bool(
-        default = True,
-    ),
+    "pnpm_lock": attr.label(),
+    "package_json": attr.label(),
+    "npm_package_lock": attr.label(),
+    "yarn_lock": attr.label(),
+    "patches": attr.string_list_dict(),
+    "patch_args": attr.string_list_dict(),
+    "custom_postinstalls": attr.string_dict(),
+    "prod": attr.bool(),
+    "public_hoist_packages": attr.string_list_dict(),
+    "dev": attr.bool(),
+    "no_optional": attr.bool(),
+    "lifecycle_hooks_exclude": attr.string_list(),
+    "run_lifecycle_hooks": attr.bool(default = True),
+    "lifecycle_hooks_envs": attr.string_list_dict(),
+    "lifecycle_hooks_execution_requirements": attr.string_list_dict(),
+    "bins": attr.string_list_dict(),
+    "lifecycle_hooks_no_sandbox": attr.bool(default = True),
+    "verify_node_modules_ignored": attr.label(),
+    "warn_on_unqualified_tarball_url": attr.bool(default = True),
 }
 
 def _process_lockfile(rctx, pnpm_lock):
@@ -217,7 +40,7 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}
     )
 """
 
@@ -411,6 +234,15 @@ def _gen_npm_imports(lockfile, root_package, attr):
         lifecycle_hooks_env = _gather_values_from_matching_names(attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
         lifecycle_hooks_execution_requirements = _gather_values_from_matching_names(attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
 
+        bins = {}
+        for bin in _gather_values_from_matching_names(attr.bins, "*", name, friendly_name, unfriendly_name):
+            key_value = bin.split("=", 1)
+            if len(key_value) == 2:
+                bins[key_value[0]] = key_value[1]
+            else:
+                msg = "bins contains invalid key value pair '%s', required '=' separator not found" % bin
+                fail(msg)
+
         url = None
         if tarball:
             if _is_url(tarball):
@@ -462,6 +294,7 @@ To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
             transitive_closure = transitive_closure,
             url = url,
             version = version,
+            bins = bins,
         ))
 
     return result
@@ -864,6 +697,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
         maybe_lifecycle_hooks_execution_requirements = ("""
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_execution_requirements else ""
+        maybe_bins = ("""
+        bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -879,6 +714,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             maybe_transitive_closure = maybe_transitive_closure,
             maybe_url = maybe_url,
+            maybe_bins = maybe_bins,
             name = _import.name,
             package = _import.package,
             root_package = _import.root_package,
@@ -1012,7 +848,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         rctx.file(filename, "\n".join(contents))
 
 npm_translate_lock = struct(
-    doc = _DOC,
     implementation = _impl,
     attrs = _ATTRS,
     gen_npm_imports = _gen_npm_imports,

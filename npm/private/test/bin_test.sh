@@ -10,3 +10,7 @@ PATH="$PWD/../$node_path:$PATH"
 
 node ./node_modules/typescript/bin/tsc --version
 node ./npm/private/test/node_modules/typescript/bin/tsc --version
+
+# test bin entries
+./node_modules/.bin/tsc --version
+./npm/private/test/node_modules/.bin/tsc --version

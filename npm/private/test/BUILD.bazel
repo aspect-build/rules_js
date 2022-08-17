@@ -54,8 +54,11 @@ sh_test(
     srcs = ["bin_test.sh"],
     args = ["$(NODE_PATH)"],
     data = [
-        ":node_modules/typescript",
+        # Test that node_modules/.bin binaries work in both the root package
+        # and in subpackages. The relative paths in the two are different since the
+        # actual node entry is in the virtual store which is in the root package.
         "//:node_modules/typescript",
+        ":node_modules/typescript",
         # This eager toolchain fetching could be cleaed up in the future
         "@nodejs_darwin_amd64//:node_files",
         "@nodejs_darwin_arm64//:node_files",
