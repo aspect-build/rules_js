@@ -33,15 +33,26 @@ def gather_transitive_sources(sources, targets):
     Returns:
         Depset of transitive sources
     """
+    if type(sources) == "list":
+        sources = depset(sources)
     transitive_deps = [
         target[JsInfo].transitive_sources
         for target in targets
         if JsInfo in target
     ]
-    if type(sources) == "list":
-      return depset(sources, transitive = transitive_deps)
-    else:
-      return depset([], transitive = [sources] + transitive_deps)
+    return depset([], transitive = [sources] + transitive_deps)
+
+def gather_transitive_sources_legacy(sources, targets):
+    """Gathers transitive sources from a list of direct sources and targets
+
+    Args:
+        sources: list or depset of direct sources which should be included in `transitive_sources`
+        targets: list of targets to gather `transitive_sources` from `JsInfo`
+
+    Returns:
+        List of transitive sources
+    """
+    return gather_transitive_sources(sources, targets).to_list()
 
 def gather_transitive_declarations(declarations, targets):
     """Gathers transitive sources from a list of direct sources and targets
@@ -53,15 +64,26 @@ def gather_transitive_declarations(declarations, targets):
     Returns:
         Depset of transitive sources
     """
+    if type(declarations) == "list":
+        declarations = depset(declarations)
     transitive_deps = [
         target[JsInfo].transitive_declarations
         for target in targets
         if JsInfo in target
     ]
-    if type(declarations) == "list":
-      return depset(declarations, transitive = transitive_deps)
-    else:
-      return depset([], transitive = [declarations] + transitive_deps)
+    return depset([], transitive = [declarations] + transitive_deps)
+
+def gather_transitive_declarations_legacy(declarations, targets):
+    """Gathers transitive sources from a list of direct sources and targets
+
+    Args:
+        declarations: list or depset of direct sources which should be included in `transitive_declarations`
+        targets: List of targets to gather `transitive_declarations` from `JsInfo`
+
+    Returns:
+        List of transitive sources
+    """
+    return gather_transitive_declarations(declarations, targets).to_list()
 
 def gather_npm_linked_packages(srcs, deps):
     """Gathers npm linked packages from a list of srcs and deps targets
@@ -91,6 +113,22 @@ def gather_npm_linked_packages(srcs, deps):
     return struct(
         direct = depset([], transitive = npm_linked_packages),
         transitive = transitive_npm_linked_packages,
+    )
+
+def gather_npm_linked_packages_legacy(srcs, deps):
+    """Gathers npm linked packages from a list of srcs and deps targets
+
+    Args:
+        srcs: source targets; these typically come from the `srcs` and/or `data` attributes of a rule
+        deps: dep targets; these typically come from the `deps` attribute of a rule
+
+    Returns:
+        A `struct(direct, transitive)` of direct and transitive npm linked packages gathered
+    """
+    pkgs = gather_npm_linked_packages(srcs, deps)
+    return struct(
+        direct = pkgs.direct.to_list(),
+        transitive = pkgs.transitive.to_list(),
     )
 
 def gather_npm_package_stores(targets):
@@ -126,6 +164,21 @@ def gather_npm_package_stores(targets):
     return struct(
         direct = depset([], transitive = npm_package_stores),
         transitive = depset([], transitive = transitive_npm_package_stores),
+    )
+
+def gather_npm_package_stores_legacy(targets):
+    """Gathers NpmPackageStoreInfo providers from the list of targets
+
+    Args:
+        targets: the list of targets to gather from
+
+    Returns:
+        A `struct(direct, transitive)` of direct and transitive npm package stores gathered
+    """
+    pkgs = gather_npm_package_stores(targets)
+    return struct(
+        direct = pkgs.direct.to_list(),
+        transitive = pkgs.transitive.to_list(),
     )
 
 def gather_runfiles(ctx, sources, data, deps):
