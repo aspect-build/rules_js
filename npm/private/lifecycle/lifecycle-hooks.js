@@ -18,13 +18,13 @@ function normalizeBinPath(p) {
     return result
 }
 
-async function makeBins(nodeModulesPath, scope = '') {
+async function makeBins(nodeModulesPath, scope, segmentsUp) {
     const packages = await fs.promises.readdir(
         path.join(nodeModulesPath, scope)
     )
     for (package of packages) {
         if (!scope && package.startsWith('@')) {
-            makeBins(nodeModulesPath, package)
+            makeBins(nodeModulesPath, package, segmentsUp)
             continue
         }
         const packageName = path.join(scope, package)
@@ -46,8 +46,7 @@ async function makeBins(nodeModulesPath, scope = '') {
                 }
                 for (binName of Object.keys(bin)) {
                     binPath = normalizeBinPath(bin[binName])
-                    binBash = `#!/usr/bin/env bash
-        exec node "../${packageName}/${binPath}" "$@"`
+                    binBash = `#!/usr/bin/env bash\nexec node "${path.join(...segmentsUp, packageName, binPath)}" "$@"`
                     binEntryPath = path.join(nodeModulesPath, '.bin', binName)
                     await fs.promises.writeFile(binEntryPath, binBash)
                     await fs.promises.chmod(binEntryPath, '755') // executable
@@ -75,12 +74,13 @@ async function main(args) {
     //    .../node_modules/.aspect_rules_js/package@version/node_modules/package
     //    .../node_modules/.aspect_rules_js/@scope+package@version/node_modules/@scope/package
     // Path to node_modules is one or two segments up from the output path depending on the packageName
+    const segmentsUp = Array(packageName.split('/').length).fill('..')
     const nodeModulesPath = path.resolve(
-        path.join(outputDir, ...Array(packageName.split('/').length).fill('..'))
+        path.join(outputDir, ...segmentsUp)
     )
 
     // Create .bin entry point files for all packages in node_modules
-    await makeBins(nodeModulesPath)
+    await makeBins(nodeModulesPath, '', segmentsUp)
 
     // export interface RunLifecycleHookOptions {
     //     args?: string[];
