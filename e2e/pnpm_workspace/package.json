@@ -1,6 +1,7 @@
 {
     "private": true,
     "dependencies": {
+        "typescript": "4.7.4",
         "@aspect-test/a": "5.0.0"
     },
     "devDependencies": {
