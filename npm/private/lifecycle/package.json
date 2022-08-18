@@ -4,5 +4,9 @@
     "dependencies": {
         "@pnpm/lifecycle": "13.1.5",
         "@pnpm/logger": "4.0.0"
+    },
+    "devDependencies": {
+        "@vercel/ncc": "0.33.4",
+        "terser": "5.12.1"
     }
 }

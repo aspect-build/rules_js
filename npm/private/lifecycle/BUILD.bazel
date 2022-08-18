@@ -1,10 +1,62 @@
 "Private lifecycle files"
 
 load("//js:defs.bzl", "js_binary")
+load("@npm//npm/private/lifecycle:terser/package_json.bzl", terser = "bin")
+load("@npm//npm/private/lifecycle:@vercel/ncc/package_json.bzl", ncc = "bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+
+npm_link_all_packages(name = "node_modules")
 
 js_binary(
     name = "lifecycle-hooks",
     data = glob(["min/**"]),
     entry_point = "min/index.min.js",
     visibility = ["//visibility:public"],
+)
+
+# Bundle our program with its two dependencies, because they're large:
+# ┌─────────────────┬──────────────┬────────┐
+# │ name            │ children     │ size   │
+# ├─────────────────┼──────────────┼────────┤
+# │ @pnpm/lifecycle │ 277          │ 14.71M │
+# ├─────────────────┼──────────────┼────────┤
+# │ @pnpm/logger    │ 15           │ 0.56M  │
+# ├─────────────────┼──────────────┼────────┤
+# │ 2 modules       │ 202 children │ 11.73M │
+# └─────────────────┴──────────────┴────────┘
+# This avoids users having to fetch those packages just to run the postinstall hooks.
+ncc.ncc(
+    name = "bundle",
+    srcs = [
+        "lifecycle-hooks.js",
+        ":node_modules/@pnpm/lifecycle",
+    ],
+    args = [
+        "build",
+        "$(location lifecycle-hooks.js)",
+        "-o",
+        package_name() + "/gen",
+    ],
+    out_dirs = ["gen"],
+)
+
+terser.terser(
+    name = "minify",
+    srcs = ["bundle"],
+    args = [
+        package_name() + "/gen/index.js",
+        "-b",
+        # ascii_only avoids bad unicode conversions, fixing
+        # https://github.com/aspect-build/rules_js/issues/45
+        "ascii_only=true",
+    ],
+    stdout = "index.min.js",
+)
+
+write_source_files(
+    name = "write_minfied",
+    files = {
+        "min/index.min.js": ":minify",
+    },
 )

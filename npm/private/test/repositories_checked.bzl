@@ -87,6 +87,75 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_babel_code-frame__7.18.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@babel/code-frame",
+        version = "7.18.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-TDCmlK5eOvH+eH7cdAFlNXeVJqWIQ7gW9tY1GJIpUtFb6CmjVyq2VM3u71bOyR8CRihcCgMUYoDNyLXao3+70Q==",
+        deps = {
+            "@babel/highlight": "7.18.6",
+        },
+        transitive_closure = {
+            "@babel/code-frame": ["7.18.6"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_babel_helper-validator-identifier__7.18.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@babel/helper-validator-identifier",
+        version = "7.18.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-MmetCkz9ej86nJQV+sFCxoGGrUbU3q02kgLciwkrt9QqEB7cP39oKEY0PakknEO0Gu20SskMRi+AYZ3b1TpN9g==",
+        transitive_closure = {
+            "@babel/helper-validator-identifier": ["7.18.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_babel_highlight__7.18.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@babel/highlight",
+        version = "7.18.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-u7stbOuYjaPezCuLj29hNW1v64M2Md2qupEKP1fHc7WdOA3DgLh37suiSrZYY7haUB7iBeQZ9P1uiRF359do3g==",
+        deps = {
+            "@babel/helper-validator-identifier": "7.18.6",
+            "chalk": "2.4.2",
+            "js-tokens": "4.0.0",
+        },
+        transitive_closure = {
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_babel_runtime__7.18.3",
         root_package = "",
         link_workspace = "",
@@ -341,6 +410,20 @@ def npm_repositories():
             "universalify": ["0.1.2"],
         },
         run_lifecycle_hooks = True,
+    )
+
+    npm_import(
+        name = "npm__at_gar_promisify__1.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@gar/promisify",
+        version = "1.1.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==",
+        transitive_closure = {
+            "@gar/promisify": ["1.1.3"],
+        },
     )
 
     npm_import(
@@ -669,6 +752,118 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_nodelib_fs.scandir__2.1.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@nodelib/fs.scandir",
+        version = "2.1.5",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==",
+        deps = {
+            "@nodelib/fs.stat": "2.0.5",
+            "run-parallel": "1.2.0",
+        },
+        transitive_closure = {
+            "@nodelib/fs.scandir": ["2.1.5"],
+            "@nodelib/fs.stat": ["2.0.5"],
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_nodelib_fs.stat__2.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@nodelib/fs.stat",
+        version = "2.0.5",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-RkhPPp2zrqDAQA/2jNhnztcPAlv64XdhIp7a7454A5ovI7Bukxgt7MX7udwAu3zg1DcpPU0rz3VV1SeaqvY4+A==",
+        transitive_closure = {
+            "@nodelib/fs.stat": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_nodelib_fs.walk__1.2.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@nodelib/fs.walk",
+        version = "1.2.8",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==",
+        deps = {
+            "@nodelib/fs.scandir": "2.1.5",
+            "fastq": "1.13.0",
+        },
+        transitive_closure = {
+            "@nodelib/fs.walk": ["1.2.8"],
+            "@nodelib/fs.scandir": ["2.1.5"],
+            "fastq": ["1.13.0"],
+            "reusify": ["1.0.4"],
+            "@nodelib/fs.stat": ["2.0.5"],
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_npmcli_fs__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@npmcli/fs",
+        version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-8KG5RD0GVP4ydEzRn/I4BNDuxDtqVbOdm8675T49OIG/NGhaK0pjPX7ZcDlvKYbA+ulvVK3ztfcF4uBdOxuJbQ==",
+        deps = {
+            "@gar/promisify": "1.1.3",
+            "semver": "7.3.7",
+        },
+        transitive_closure = {
+            "@npmcli/fs": ["1.1.1"],
+            "@gar/promisify": ["1.1.3"],
+            "semver": ["7.3.7"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_npmcli_move-file__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@npmcli/move-file",
+        version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-1SUf/Cg2GzGDyaf15aR9St9TWlb+XvbZXWpDx8YKs7MLzMH/BCeopv+y9vzrzgkfykCGuWOlSu3mZhj2+FQcrg==",
+        deps = {
+            "mkdirp": "1.0.4",
+            "rimraf": "3.0.2",
+        },
+        transitive_closure = {
+            "@npmcli/move-file": ["1.1.2"],
+            "mkdirp": ["1.0.4"],
+            "rimraf": ["3.0.2"],
+            "glob": ["7.2.3"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_plotly_d3-sankey-circular__0.33.1",
         root_package = "",
         link_workspace = "",
@@ -780,6 +975,851 @@ def npm_repositories():
         integrity = "sha512-Mdk+vUACbQvjd0m/1JJjOOafmkp/EpmHjISsopEz5Av44CBq7rPC05HHNbYGKVyNUF2zmEoBS/TT0pd0SPFFyw==",
         transitive_closure = {
             "@plotly/regl": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_byline__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/byline",
+        version = "1.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-61tmh+k7hnKK6b2XbF4GvxmiaF3l2a+xQlZyeoOGBs7mXU3Ie8iCAeAnM0+r70KiqTrgWvBCjMeM+W3JarJqaQ==",
+        transitive_closure = {
+            "@pnpm/byline": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_constants__6.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/constants",
+        version = "6.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-L6AiU3OXv9kjKGTJN9j8n1TeJGDcLX9atQlZvAkthlvbXjvKc5SKNWESc/eXhr5nEfuMWhQhiKHDJCpYejmeCQ==",
+        transitive_closure = {
+            "@pnpm/constants": ["6.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_core-loggers__7.0.6__at_pnpm_logger_4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/core-loggers",
+        version = "7.0.6_@pnpm+logger@4.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-68r3T7gPi+Je/tMA7m8TAOjv/TTSCjjGI0nGUwsuK+aXIGn7eqCyknX1jk/kTrCWo+vsPMX26Pw0P5A0d1iYBA==",
+        deps = {
+            "@pnpm/logger": "4.0.0",
+            "@pnpm/types": "8.5.0",
+        },
+        transitive_closure = {
+            "@pnpm/core-loggers": ["7.0.6_@pnpm+logger@4.0.0"],
+            "@pnpm/logger": ["4.0.0"],
+            "@pnpm/types": ["8.5.0"],
+            "bole": ["4.0.1"],
+            "ndjson": ["2.0.0"],
+            "json-stringify-safe": ["5.0.1"],
+            "minimist": ["1.2.6"],
+            "readable-stream": ["3.6.0"],
+            "split2": ["3.2.2"],
+            "through2": ["4.0.2"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+            "fast-safe-stringify": ["2.1.1"],
+            "individual": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_directory-fetcher__3.0.10",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/directory-fetcher",
+        version = "3.0.10",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Pq3c1lUqgO4buk+BYjvlNB1EyfW8yuajSFgw8GdnHKFbjkdmQx3O4eTbgrcShUnIjrgNuHB4h39IRtxfTP0JvA==",
+        deps = {
+            "@pnpm/fetcher-base": "13.0.2",
+            "@pnpm/read-project-manifest": "3.0.9",
+            "@pnpm/resolver-base": "9.0.6",
+            "npm-packlist": "3.0.0",
+            "ramda": "/@pnpm/ramda/0.28.1",
+        },
+        transitive_closure = {
+            "@pnpm/directory-fetcher": ["3.0.10"],
+            "@pnpm/fetcher-base": ["13.0.2"],
+            "@pnpm/read-project-manifest": ["3.0.9"],
+            "@pnpm/resolver-base": ["9.0.6"],
+            "npm-packlist": ["3.0.0"],
+            "@pnpm/ramda": ["0.28.1"],
+            "glob": ["7.2.3"],
+            "ignore-walk": ["4.0.1"],
+            "npm-bundled": ["1.1.2"],
+            "npm-normalize-package-bin": ["1.0.1"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "@pnpm/types": ["8.5.0"],
+            "@pnpm/error": ["3.0.1"],
+            "@pnpm/graceful-fs": ["2.0.0"],
+            "@pnpm/write-project-manifest": ["3.0.7"],
+            "detect-indent": ["6.1.0"],
+            "fast-deep-equal": ["3.1.3"],
+            "is-windows": ["1.0.2"],
+            "json5": ["2.2.1"],
+            "parse-json": ["5.2.0"],
+            "read-yaml-file": ["2.1.0"],
+            "sort-keys": ["4.2.0"],
+            "strip-bom": ["4.0.0"],
+            "is-plain-obj": ["2.1.0"],
+            "js-yaml": ["4.1.0"],
+            "argparse": ["2.0.1"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+            "write-file-atomic": ["3.0.3"],
+            "write-yaml-file": ["4.2.0"],
+            "imurmurhash": ["0.1.4"],
+            "is-typedarray": ["1.0.0"],
+            "signal-exit": ["3.0.7"],
+            "typedarray-to-buffer": ["3.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "@pnpm/constants": ["6.1.0"],
+            "@types/ssri": ["registry.npmjs.org/@types/ssri/7.1.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_error__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/error",
+        version = "3.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-hMlbWbFcfcfolNfSjKjpeaZFow71kNg438LZ8rAd01swiVIYRUf/sRv8gGySru6AijYfz5UqslpIJRDbYBkgQA==",
+        deps = {
+            "@pnpm/constants": "6.1.0",
+        },
+        transitive_closure = {
+            "@pnpm/error": ["3.0.1"],
+            "@pnpm/constants": ["6.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_fetcher-base__13.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/fetcher-base",
+        version = "13.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-CSTyRirmbsvkiamOxvi50QbFrJ8/CS/rAeVQIvUDeZQQmniO1oa/lAsQ3bzmBRhEl5VuReyzFHOqDMT2o/q7Cg==",
+        deps = {
+            "@pnpm/resolver-base": "9.0.6",
+            "@pnpm/types": "8.5.0",
+            "@types/ssri": "registry.npmjs.org/@types/ssri/7.1.1",
+        },
+        transitive_closure = {
+            "@pnpm/fetcher-base": ["13.0.2"],
+            "@pnpm/resolver-base": ["9.0.6"],
+            "@pnpm/types": ["8.5.0"],
+            "@types/ssri": ["registry.npmjs.org/@types/ssri/7.1.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_graceful-fs__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/graceful-fs",
+        version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-ogUZCGf0/UILZt6d8PsO4gA4pXh7f0BumXeFkcCe4AQ65PXPKfAkHC0C30Lheh2EgFOpLZm3twDP1Eiww18gew==",
+        deps = {
+            "graceful-fs": "4.2.10",
+        },
+        transitive_closure = {
+            "@pnpm/graceful-fs": ["2.0.0"],
+            "graceful-fs": ["4.2.10"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_lifecycle__13.1.5__at_pnpm_logger_4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/lifecycle": ["@pnpm/lifecycle"],
+        },
+        package = "@pnpm/lifecycle",
+        version = "13.1.5_@pnpm+logger@4.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-qjVtS7+SYC+sGXCtMnyVt99r7pN1i8OGPXkt9PKjqrr9pU468sOkdV8DIz0PK32XXaVfs/meFut5v3hJjQ67bw==",
+        deps = {
+            "@pnpm/core-loggers": "7.0.6_@pnpm+logger@4.0.0",
+            "@pnpm/directory-fetcher": "3.0.10",
+            "@pnpm/logger": "4.0.0",
+            "@pnpm/npm-lifecycle": "2.0.0-1",
+            "@pnpm/read-package-json": "6.0.7",
+            "@pnpm/store-controller-types": "14.1.0",
+            "@pnpm/types": "8.5.0",
+            "path-exists": "4.0.0",
+            "run-groups": "3.0.1",
+        },
+        transitive_closure = {
+            "@pnpm/lifecycle": ["13.1.5_@pnpm+logger@4.0.0"],
+            "@pnpm/core-loggers": ["7.0.6_@pnpm+logger@4.0.0"],
+            "@pnpm/directory-fetcher": ["3.0.10"],
+            "@pnpm/logger": ["4.0.0"],
+            "@pnpm/npm-lifecycle": ["2.0.0-1"],
+            "@pnpm/read-package-json": ["6.0.7"],
+            "@pnpm/store-controller-types": ["14.1.0"],
+            "@pnpm/types": ["8.5.0"],
+            "path-exists": ["4.0.0"],
+            "run-groups": ["3.0.1"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+            "@pnpm/fetcher-base": ["13.0.2"],
+            "@pnpm/resolver-base": ["9.0.6"],
+            "@types/ssri": ["registry.npmjs.org/@types/ssri/7.1.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@pnpm/error": ["3.0.1"],
+            "load-json-file": ["6.2.0"],
+            "normalize-package-data": ["3.0.3"],
+            "hosted-git-info": ["4.1.0"],
+            "is-core-module": ["2.9.0"],
+            "semver": ["7.3.7"],
+            "validate-npm-package-license": ["3.0.4"],
+            "spdx-correct": ["3.1.1"],
+            "spdx-expression-parse": ["3.0.1"],
+            "spdx-exceptions": ["2.3.0"],
+            "spdx-license-ids": ["3.0.11"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "graceful-fs": ["4.2.10"],
+            "parse-json": ["5.2.0"],
+            "strip-bom": ["4.0.0"],
+            "type-fest": ["0.6.0"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["3.0.0", "2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["4.3.0", "3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["7.2.0", "5.5.0"],
+            "has-flag": ["4.0.0", "3.0.0"],
+            "color-convert": ["2.0.1", "1.9.3"],
+            "color-name": ["1.1.4", "1.1.3"],
+            "@pnpm/constants": ["6.1.0"],
+            "@pnpm/byline": ["1.0.0"],
+            "@yarnpkg/shell": ["3.2.0-rc.8"],
+            "node-gyp": ["8.4.1"],
+            "resolve-from": ["5.0.0"],
+            "slide": ["1.1.6"],
+            "uid-number": ["0.0.6"],
+            "umask": ["1.1.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "env-paths": ["2.2.1"],
+            "glob": ["7.2.3"],
+            "make-fetch-happen": ["9.1.0"],
+            "nopt": ["5.0.0"],
+            "npmlog": ["6.0.2"],
+            "rimraf": ["3.0.2"],
+            "tar": ["6.1.11"],
+            "chownr": ["2.0.0"],
+            "fs-minipass": ["2.1.0"],
+            "minipass": ["3.3.4"],
+            "minizlib": ["2.1.2"],
+            "mkdirp": ["1.0.4"],
+            "are-we-there-yet": ["3.0.1"],
+            "console-control-strings": ["1.1.0"],
+            "gauge": ["4.0.4"],
+            "set-blocking": ["2.0.0"],
+            "aproba": ["1.2.0"],
+            "color-support": ["1.1.3"],
+            "has-unicode": ["2.0.1"],
+            "signal-exit": ["3.0.7"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wide-align": ["1.1.5"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "delegates": ["1.0.0"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+            "abbrev": ["1.1.1"],
+            "agentkeepalive": ["4.2.1"],
+            "cacache": ["15.3.0"],
+            "http-cache-semantics": ["4.1.0"],
+            "http-proxy-agent": ["4.0.1"],
+            "https-proxy-agent": ["5.0.1"],
+            "is-lambda": ["1.0.1"],
+            "minipass-collect": ["1.0.2"],
+            "minipass-fetch": ["1.4.1"],
+            "minipass-flush": ["1.0.5"],
+            "minipass-pipeline": ["1.2.4"],
+            "negotiator": ["0.6.3"],
+            "promise-retry": ["2.0.1"],
+            "socks-proxy-agent": ["6.2.1"],
+            "ssri": ["8.0.1"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "socks": ["2.7.0"],
+            "ip": ["2.0.0"],
+            "smart-buffer": ["4.2.0"],
+            "ms": ["2.1.3", "2.1.2"],
+            "err-code": ["2.0.3"],
+            "retry": ["0.12.0"],
+            "minipass-sized": ["1.0.3"],
+            "encoding": ["0.1.13"],
+            "iconv-lite": ["0.6.3"],
+            "safer-buffer": ["2.1.2"],
+            "@tootallnate/once": ["1.1.2"],
+            "@npmcli/fs": ["1.1.1"],
+            "@npmcli/move-file": ["1.1.2"],
+            "infer-owner": ["1.0.4"],
+            "p-map": ["4.0.0"],
+            "promise-inflight": ["1.0.1"],
+            "unique-filename": ["1.1.1"],
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+            "@gar/promisify": ["1.1.3"],
+            "depd": ["1.1.2"],
+            "humanize-ms": ["1.2.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "@yarnpkg/fslib": ["2.7.0"],
+            "@yarnpkg/parsers": ["2.5.1"],
+            "clipanion": ["3.2.0-rc.11"],
+            "cross-spawn": ["7.0.3"],
+            "fast-glob": ["3.2.11"],
+            "micromatch": ["4.0.5"],
+            "stream-buffers": ["3.0.2"],
+            "tslib": ["1.14.1"],
+            "braces": ["3.0.2"],
+            "picomatch": ["2.3.1"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+            "@nodelib/fs.stat": ["2.0.5"],
+            "@nodelib/fs.walk": ["1.2.8"],
+            "glob-parent": ["5.1.2"],
+            "merge2": ["1.4.1"],
+            "is-glob": ["4.0.3"],
+            "is-extglob": ["2.1.1"],
+            "@nodelib/fs.scandir": ["2.1.5"],
+            "fastq": ["1.13.0"],
+            "reusify": ["1.0.4"],
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "typanion": ["3.9.0"],
+            "js-yaml": ["4.1.0", "3.14.1"],
+            "argparse": ["2.0.1", "1.0.10"],
+            "esprima": ["4.0.1"],
+            "sprintf-js": ["1.0.3"],
+            "@yarnpkg/libzip": ["2.2.4"],
+            "@types/emscripten": ["registry.npmjs.org/@types/emscripten/1.39.6"],
+            "bole": ["4.0.1"],
+            "ndjson": ["2.0.0"],
+            "json-stringify-safe": ["5.0.1"],
+            "minimist": ["1.2.6"],
+            "split2": ["3.2.2"],
+            "through2": ["4.0.2"],
+            "fast-safe-stringify": ["2.1.1"],
+            "individual": ["3.0.0"],
+            "@pnpm/read-project-manifest": ["3.0.9"],
+            "npm-packlist": ["3.0.0"],
+            "@pnpm/ramda": ["0.28.1"],
+            "ignore-walk": ["4.0.1"],
+            "npm-bundled": ["1.1.2"],
+            "npm-normalize-package-bin": ["1.0.1"],
+            "@pnpm/graceful-fs": ["2.0.0"],
+            "@pnpm/write-project-manifest": ["3.0.7"],
+            "detect-indent": ["6.1.0"],
+            "fast-deep-equal": ["3.1.3"],
+            "is-windows": ["1.0.2"],
+            "json5": ["2.2.1"],
+            "read-yaml-file": ["2.1.0"],
+            "sort-keys": ["4.2.0"],
+            "is-plain-obj": ["2.1.0"],
+            "write-file-atomic": ["3.0.3"],
+            "write-yaml-file": ["4.2.0"],
+            "is-typedarray": ["1.0.0"],
+            "typedarray-to-buffer": ["3.1.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_logger__4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/lifecycle": ["@pnpm/logger"],
+        },
+        package = "@pnpm/logger",
+        version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-SIShw+k556e7S7tLZFVSIHjCdiVog1qWzcKW2RbLEHPItdisAFVNIe34kYd9fMSswTlSRLS/qRjw3ZblzWmJ9Q==",
+        deps = {
+            "bole": "4.0.1",
+            "ndjson": "2.0.0",
+        },
+        transitive_closure = {
+            "@pnpm/logger": ["4.0.0"],
+            "bole": ["4.0.1"],
+            "ndjson": ["2.0.0"],
+            "json-stringify-safe": ["5.0.1"],
+            "minimist": ["1.2.6"],
+            "readable-stream": ["3.6.0"],
+            "split2": ["3.2.2"],
+            "through2": ["4.0.2"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+            "fast-safe-stringify": ["2.1.1"],
+            "individual": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_npm-lifecycle__2.0.0-1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/npm-lifecycle",
+        version = "2.0.0-1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-eUeRVUxnr9xP50ESMuRDrWYN/AQmaV2g/Wvs3ckHBx7XFJw8ljix66L7R1S1FoUqxNn0BeyPeIE9ANwn/syIAQ==",
+        deps = {
+            "@pnpm/byline": "1.0.0",
+            "@yarnpkg/shell": "3.2.0-rc.8",
+            "node-gyp": "8.4.1",
+            "resolve-from": "5.0.0",
+            "slide": "1.1.6",
+            "uid-number": "0.0.6",
+            "umask": "1.1.0",
+            "which": "2.0.2",
+        },
+        transitive_closure = {
+            "@pnpm/npm-lifecycle": ["2.0.0-1"],
+            "@pnpm/byline": ["1.0.0"],
+            "@yarnpkg/shell": ["3.2.0-rc.8"],
+            "node-gyp": ["8.4.1"],
+            "resolve-from": ["5.0.0"],
+            "slide": ["1.1.6"],
+            "uid-number": ["0.0.6"],
+            "umask": ["1.1.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "env-paths": ["2.2.1"],
+            "glob": ["7.2.3"],
+            "graceful-fs": ["4.2.10"],
+            "make-fetch-happen": ["9.1.0"],
+            "nopt": ["5.0.0"],
+            "npmlog": ["6.0.2"],
+            "rimraf": ["3.0.2"],
+            "semver": ["7.3.7"],
+            "tar": ["6.1.11"],
+            "chownr": ["2.0.0"],
+            "fs-minipass": ["2.1.0"],
+            "minipass": ["3.3.4"],
+            "minizlib": ["2.1.2"],
+            "mkdirp": ["1.0.4"],
+            "yallist": ["4.0.0"],
+            "lru-cache": ["6.0.0"],
+            "are-we-there-yet": ["3.0.1"],
+            "console-control-strings": ["1.1.0"],
+            "gauge": ["4.0.4"],
+            "set-blocking": ["2.0.0"],
+            "aproba": ["1.2.0"],
+            "color-support": ["1.1.3"],
+            "has-unicode": ["2.0.1"],
+            "signal-exit": ["3.0.7"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wide-align": ["1.1.5"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "delegates": ["1.0.0"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+            "abbrev": ["1.1.1"],
+            "agentkeepalive": ["4.2.1"],
+            "cacache": ["15.3.0"],
+            "http-cache-semantics": ["4.1.0"],
+            "http-proxy-agent": ["4.0.1"],
+            "https-proxy-agent": ["5.0.1"],
+            "is-lambda": ["1.0.1"],
+            "minipass-collect": ["1.0.2"],
+            "minipass-fetch": ["1.4.1"],
+            "minipass-flush": ["1.0.5"],
+            "minipass-pipeline": ["1.2.4"],
+            "negotiator": ["0.6.3"],
+            "promise-retry": ["2.0.1"],
+            "socks-proxy-agent": ["6.2.1"],
+            "ssri": ["8.0.1"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "socks": ["2.7.0"],
+            "ip": ["2.0.0"],
+            "smart-buffer": ["4.2.0"],
+            "ms": ["2.1.3", "2.1.2"],
+            "err-code": ["2.0.3"],
+            "retry": ["0.12.0"],
+            "minipass-sized": ["1.0.3"],
+            "encoding": ["0.1.13"],
+            "iconv-lite": ["0.6.3"],
+            "safer-buffer": ["2.1.2"],
+            "@tootallnate/once": ["1.1.2"],
+            "@npmcli/fs": ["1.1.1"],
+            "@npmcli/move-file": ["1.1.2"],
+            "infer-owner": ["1.0.4"],
+            "p-map": ["4.0.0"],
+            "promise-inflight": ["1.0.1"],
+            "unique-filename": ["1.1.1"],
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+            "@gar/promisify": ["1.1.3"],
+            "depd": ["1.1.2"],
+            "humanize-ms": ["1.2.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "@yarnpkg/fslib": ["2.7.0"],
+            "@yarnpkg/parsers": ["2.5.1"],
+            "chalk": ["3.0.0"],
+            "clipanion": ["3.2.0-rc.11"],
+            "cross-spawn": ["7.0.3"],
+            "fast-glob": ["3.2.11"],
+            "micromatch": ["4.0.5"],
+            "stream-buffers": ["3.0.2"],
+            "tslib": ["1.14.1"],
+            "braces": ["3.0.2"],
+            "picomatch": ["2.3.1"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+            "@nodelib/fs.stat": ["2.0.5"],
+            "@nodelib/fs.walk": ["1.2.8"],
+            "glob-parent": ["5.1.2"],
+            "merge2": ["1.4.1"],
+            "is-glob": ["4.0.3"],
+            "is-extglob": ["2.1.1"],
+            "@nodelib/fs.scandir": ["2.1.5"],
+            "fastq": ["1.13.0"],
+            "reusify": ["1.0.4"],
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "typanion": ["3.9.0"],
+            "ansi-styles": ["4.3.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "js-yaml": ["3.14.1"],
+            "argparse": ["1.0.10"],
+            "esprima": ["4.0.1"],
+            "sprintf-js": ["1.0.3"],
+            "@yarnpkg/libzip": ["2.2.4"],
+            "@types/emscripten": ["registry.npmjs.org/@types/emscripten/1.39.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_ramda__0.28.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/ramda",
+        version = "0.28.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-zcAG+lvU0fMziNeGXpPyCyCJYp5ZVrPElEE4t14jAmViaihohocZ+dDkcRIyAomox8pQsuZnv1EyHR+pOhmUWw==",
+        transitive_closure = {
+            "@pnpm/ramda": ["0.28.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_read-package-json__6.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/read-package-json",
+        version = "6.0.7",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-zS+aJWCRtuWYQa/AyE0OQZVFEv1S7NLMRFix3zQuP/YnahxChh0d/aRW/n2slKJ8tQDUltKsJNY823cMwTFzkw==",
+        deps = {
+            "@pnpm/error": "3.0.1",
+            "@pnpm/types": "8.5.0",
+            "load-json-file": "6.2.0",
+            "normalize-package-data": "3.0.3",
+        },
+        transitive_closure = {
+            "@pnpm/read-package-json": ["6.0.7"],
+            "@pnpm/error": ["3.0.1"],
+            "@pnpm/types": ["8.5.0"],
+            "load-json-file": ["6.2.0"],
+            "normalize-package-data": ["3.0.3"],
+            "hosted-git-info": ["4.1.0"],
+            "is-core-module": ["2.9.0"],
+            "semver": ["7.3.7"],
+            "validate-npm-package-license": ["3.0.4"],
+            "spdx-correct": ["3.1.1"],
+            "spdx-expression-parse": ["3.0.1"],
+            "spdx-exceptions": ["2.3.0"],
+            "spdx-license-ids": ["3.0.11"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+            "graceful-fs": ["4.2.10"],
+            "parse-json": ["5.2.0"],
+            "strip-bom": ["4.0.0"],
+            "type-fest": ["0.6.0"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+            "@pnpm/constants": ["6.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_read-project-manifest__3.0.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/read-project-manifest",
+        version = "3.0.9",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-27j40C48hA/tqsCiqk9ApJxp2g6WGrrj2RSs0NKhsSHynxAuA1tIvwatNISQbAiMjZiu1lfhzhq8m1QdblyNmA==",
+        deps = {
+            "@pnpm/error": "3.0.1",
+            "@pnpm/graceful-fs": "2.0.0",
+            "@pnpm/types": "8.5.0",
+            "@pnpm/write-project-manifest": "3.0.7",
+            "detect-indent": "6.1.0",
+            "fast-deep-equal": "3.1.3",
+            "is-windows": "1.0.2",
+            "json5": "2.2.1",
+            "parse-json": "5.2.0",
+            "read-yaml-file": "2.1.0",
+            "sort-keys": "4.2.0",
+            "strip-bom": "4.0.0",
+        },
+        transitive_closure = {
+            "@pnpm/read-project-manifest": ["3.0.9"],
+            "@pnpm/error": ["3.0.1"],
+            "@pnpm/graceful-fs": ["2.0.0"],
+            "@pnpm/types": ["8.5.0"],
+            "@pnpm/write-project-manifest": ["3.0.7"],
+            "detect-indent": ["6.1.0"],
+            "fast-deep-equal": ["3.1.3"],
+            "is-windows": ["1.0.2"],
+            "json5": ["2.2.1"],
+            "parse-json": ["5.2.0"],
+            "read-yaml-file": ["2.1.0"],
+            "sort-keys": ["4.2.0"],
+            "strip-bom": ["4.0.0"],
+            "is-plain-obj": ["2.1.0"],
+            "js-yaml": ["4.1.0"],
+            "argparse": ["2.0.1"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+            "write-file-atomic": ["3.0.3"],
+            "write-yaml-file": ["4.2.0"],
+            "imurmurhash": ["0.1.4"],
+            "is-typedarray": ["1.0.0"],
+            "signal-exit": ["3.0.7"],
+            "typedarray-to-buffer": ["3.1.5"],
+            "graceful-fs": ["4.2.10"],
+            "@pnpm/constants": ["6.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_resolver-base__9.0.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/resolver-base",
+        version = "9.0.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-CF9LdRdgK9pXjoC79Z0tw40pf6TYP6MiYGLA6/ZredPywU8zJ90Jp9Td3Z8ovN/qDjFyn0Tq4qJFjPMFPviV8w==",
+        deps = {
+            "@pnpm/types": "8.5.0",
+        },
+        transitive_closure = {
+            "@pnpm/resolver-base": ["9.0.6"],
+            "@pnpm/types": ["8.5.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_store-controller-types__14.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/store-controller-types",
+        version = "14.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-PW/Ehx6mZD8rvhMRY4GXUSAl4I4pf3ByIagIlCf4+YW6cLDXyN2OKZLTyCtqlB76rgWG17HKNYF1o/+ydnZ0lA==",
+        deps = {
+            "@pnpm/fetcher-base": "13.0.2",
+            "@pnpm/resolver-base": "9.0.6",
+            "@pnpm/types": "8.5.0",
+        },
+        transitive_closure = {
+            "@pnpm/store-controller-types": ["14.1.0"],
+            "@pnpm/fetcher-base": ["13.0.2"],
+            "@pnpm/resolver-base": ["9.0.6"],
+            "@pnpm/types": ["8.5.0"],
+            "@types/ssri": ["registry.npmjs.org/@types/ssri/7.1.1"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_types__8.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/types",
+        version = "8.5.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-PSKnhkwgiZtp9dcWZR9mPz2W9UopmADr9o8FTqazo5kjUSh2xQmDUSJOJ/ZWcfNziO64Ix/VbcxKIZeplhog1Q==",
+        transitive_closure = {
+            "@pnpm/types": ["8.5.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_pnpm_write-project-manifest__3.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@pnpm/write-project-manifest",
+        version = "3.0.7",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-rMgIWR52asESg1D7Cp/vBi3dBsv18iUWPvvtYNynrcOjRdE3NsH5CAdfZP/XN6HJF6CSY8rS9W4YC5Q3JGtxiw==",
+        deps = {
+            "@pnpm/types": "8.5.0",
+            "json5": "2.2.1",
+            "write-file-atomic": "3.0.3",
+            "write-yaml-file": "4.2.0",
+        },
+        transitive_closure = {
+            "@pnpm/write-project-manifest": ["3.0.7"],
+            "@pnpm/types": ["8.5.0"],
+            "json5": ["2.2.1"],
+            "write-file-atomic": ["3.0.3"],
+            "write-yaml-file": ["4.2.0"],
+            "js-yaml": ["4.1.0"],
+            "argparse": ["2.0.1"],
+            "imurmurhash": ["0.1.4"],
+            "is-typedarray": ["1.0.0"],
+            "signal-exit": ["3.0.7"],
+            "typedarray-to-buffer": ["3.1.5"],
         },
     )
 
@@ -1055,6 +2095,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_tootallnate_once__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@tootallnate/once",
+        version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==",
+        transitive_closure = {
+            "@tootallnate/once": ["1.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_turf_area__6.5.0",
         root_package = "",
         link_workspace = "",
@@ -1157,6 +2211,22 @@ def npm_repositories():
         integrity = "sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==",
         transitive_closure = {
             "@ungap/promise-all-settled": ["1.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_vercel_ncc__0.33.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/lifecycle": ["@vercel/ncc"],
+        },
+        package = "@vercel/ncc",
+        version = "0.33.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-ln18hs7dMffelP47tpkaR+V5Tj6coykNyxJrlcmCormPqRQjB/Gv4cu2FfBG+PMzIfdZp2CLDsrrB1NPU22Qhg==",
+        transitive_closure = {
+            "@vercel/ncc": ["0.33.4"],
         },
     )
 
@@ -1927,6 +2997,137 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_yarnpkg_fslib__2.7.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@yarnpkg/fslib",
+        version = "2.7.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-uLVuKd/i19v2c1OMg8H9sH8o5QAKlrLQYXdOk7ZFzUPDTmb8tHrSO1IKUijqItKAUi8RkrqsVgDHZmYFUEWMfQ==",
+        deps = {
+            "@yarnpkg/libzip": "2.2.4",
+            "tslib": "1.14.1",
+        },
+        transitive_closure = {
+            "@yarnpkg/fslib": ["2.7.0"],
+            "@yarnpkg/libzip": ["2.2.4"],
+            "tslib": ["1.14.1"],
+            "@types/emscripten": ["registry.npmjs.org/@types/emscripten/1.39.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_yarnpkg_libzip__2.2.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@yarnpkg/libzip",
+        version = "2.2.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-QP0vUP+w0d7Jlo7jqTnlRChSnIB/dOF7nJFLD/gsPvFIHsVWLQQuAiolOcXQUD2hezLD1mQd2qb0yOKqPYRcfQ==",
+        deps = {
+            "@types/emscripten": "registry.npmjs.org/@types/emscripten/1.39.6",
+            "tslib": "1.14.1",
+        },
+        transitive_closure = {
+            "@yarnpkg/libzip": ["2.2.4"],
+            "@types/emscripten": ["registry.npmjs.org/@types/emscripten/1.39.6"],
+            "tslib": ["1.14.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_yarnpkg_parsers__2.5.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@yarnpkg/parsers",
+        version = "2.5.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-KtYN6Ez3x753vPF9rETxNTPnPjeaHY11Exlpqb4eTII7WRlnGiZ5rvvQBau4R20Ik5KBv+vS3EJEcHyCunwzzw==",
+        deps = {
+            "js-yaml": "3.14.1",
+            "tslib": "1.14.1",
+        },
+        transitive_closure = {
+            "@yarnpkg/parsers": ["2.5.1"],
+            "js-yaml": ["3.14.1"],
+            "tslib": ["1.14.1"],
+            "argparse": ["1.0.10"],
+            "esprima": ["4.0.1"],
+            "sprintf-js": ["1.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_yarnpkg_shell__3.2.0-rc.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@yarnpkg/shell",
+        version = "3.2.0-rc.8",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-UEcdjx+0gUwa3N/fWfnlqae//b7cNc1Imla+W7jqc9XMoydk3CG5EISx+5KY2hjrhpaZ55bXUP9Z6q0mjo+KdA==",
+        deps = {
+            "@yarnpkg/fslib": "2.7.0",
+            "@yarnpkg/parsers": "2.5.1",
+            "chalk": "3.0.0",
+            "clipanion": "3.2.0-rc.11",
+            "cross-spawn": "7.0.3",
+            "fast-glob": "3.2.11",
+            "micromatch": "4.0.5",
+            "stream-buffers": "3.0.2",
+            "tslib": "1.14.1",
+        },
+        transitive_closure = {
+            "@yarnpkg/shell": ["3.2.0-rc.8"],
+            "@yarnpkg/fslib": ["2.7.0"],
+            "@yarnpkg/parsers": ["2.5.1"],
+            "chalk": ["3.0.0"],
+            "clipanion": ["3.2.0-rc.11"],
+            "cross-spawn": ["7.0.3"],
+            "fast-glob": ["3.2.11"],
+            "micromatch": ["4.0.5"],
+            "stream-buffers": ["3.0.2"],
+            "tslib": ["1.14.1"],
+            "braces": ["3.0.2"],
+            "picomatch": ["2.3.1"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+            "@nodelib/fs.stat": ["2.0.5"],
+            "@nodelib/fs.walk": ["1.2.8"],
+            "glob-parent": ["5.1.2"],
+            "merge2": ["1.4.1"],
+            "is-glob": ["4.0.3"],
+            "is-extglob": ["2.1.1"],
+            "@nodelib/fs.scandir": ["2.1.5"],
+            "fastq": ["1.13.0"],
+            "reusify": ["1.0.4"],
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
+            "path-key": ["3.1.1"],
+            "shebang-command": ["2.0.0"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "typanion": ["3.9.0"],
+            "ansi-styles": ["4.3.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "js-yaml": ["3.14.1"],
+            "argparse": ["1.0.10"],
+            "esprima": ["4.0.1"],
+            "sprintf-js": ["1.0.3"],
+            "@yarnpkg/libzip": ["2.2.4"],
+            "@types/emscripten": ["registry.npmjs.org/@types/emscripten/1.39.6"],
+        },
+    )
+
+    npm_import(
         name = "npm__abbrev__1.1.1",
         root_package = "",
         link_workspace = "",
@@ -2014,6 +3215,68 @@ def npm_repositories():
         integrity = "sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==",
         transitive_closure = {
             "acorn": ["8.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__agent-base__6.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "agent-base",
+        version = "6.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==",
+        deps = {
+            "debug": "4.3.4",
+        },
+        transitive_closure = {
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__agentkeepalive__4.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "agentkeepalive",
+        version = "4.2.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Zn4cw2NEqd+9fiSVWMscnjyQ1a8Yfoc5oBajLeo5w+YBHgDUcEBY2hS4YpTz6iN5f/2zQiktcuM6tS8x1p9dpA==",
+        deps = {
+            "debug": "4.3.4",
+            "depd": "1.1.2",
+            "humanize-ms": "1.2.1",
+        },
+        transitive_closure = {
+            "agentkeepalive": ["4.2.1"],
+            "debug": ["4.3.4"],
+            "depd": ["1.1.2"],
+            "humanize-ms": ["1.2.1"],
+            "ms": ["2.1.2", "2.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__aggregate-error__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "aggregate-error",
+        version = "3.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==",
+        deps = {
+            "clean-stack": "2.2.0",
+            "indent-string": "4.0.0",
+        },
+        transitive_closure = {
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
         },
     )
 
@@ -2122,6 +3385,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__ansi-styles__3.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ansi-styles",
+        version = "3.2.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==",
+        deps = {
+            "color-convert": "1.9.3",
+        },
+        transitive_closure = {
+            "ansi-styles": ["3.2.1"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__ansi-styles__4.3.0",
         root_package = "",
         link_workspace = "",
@@ -2198,6 +3480,48 @@ def npm_repositories():
             "safe-buffer": ["5.1.2"],
             "string_decoder": ["1.1.1"],
             "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__are-we-there-yet__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "are-we-there-yet",
+        version = "3.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-QZW4EDmGwlYur0Yyf/b2uGucHQMa8aFUP7eu9ddR73vvhFyt4V0Vl3QHPcTNJ8l6qYOBdxgXdnBXQrHilfRQBg==",
+        deps = {
+            "delegates": "1.0.0",
+            "readable-stream": "3.6.0",
+        },
+        transitive_closure = {
+            "are-we-there-yet": ["3.0.1"],
+            "delegates": ["1.0.0"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__argparse__1.0.10",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "argparse",
+        version = "1.0.10",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==",
+        deps = {
+            "sprintf-js": "1.0.3",
+        },
+        transitive_closure = {
+            "argparse": ["1.0.10"],
+            "sprintf-js": ["1.0.3"],
         },
     )
 
@@ -2532,6 +3856,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__bole__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "bole",
+        version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-42r0aSOJFJti2l6LasBHq2BuWJzohGs349olQnH/ETlJo87XnoWw7UT8pGE6UstjxzOKkwz7tjoFcmSr6L16vg==",
+        deps = {
+            "fast-safe-stringify": "2.1.1",
+            "individual": "3.0.0",
+        },
+        transitive_closure = {
+            "bole": ["4.0.1"],
+            "fast-safe-stringify": ["2.1.1"],
+            "individual": ["3.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__brace-expansion__1.1.11",
         root_package = "",
         link_workspace = "",
@@ -2817,6 +4161,77 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__cacache__15.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "cacache",
+        version = "15.3.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-VVdYzXEn+cnbXpFgWs5hTT7OScegHVmLhJIR8Ufqk3iFD6A6j5iSX1KuBTfNEv4tdJWE2PzA6IVFtcLC7fN9wQ==",
+        deps = {
+            "@npmcli/fs": "1.1.1",
+            "@npmcli/move-file": "1.1.2",
+            "chownr": "2.0.0",
+            "fs-minipass": "2.1.0",
+            "glob": "7.2.3",
+            "infer-owner": "1.0.4",
+            "lru-cache": "6.0.0",
+            "minipass": "3.3.4",
+            "minipass-collect": "1.0.2",
+            "minipass-flush": "1.0.5",
+            "minipass-pipeline": "1.2.4",
+            "mkdirp": "1.0.4",
+            "p-map": "4.0.0",
+            "promise-inflight": "1.0.1",
+            "rimraf": "3.0.2",
+            "ssri": "8.0.1",
+            "tar": "6.1.11",
+            "unique-filename": "1.1.1",
+        },
+        transitive_closure = {
+            "cacache": ["15.3.0"],
+            "@npmcli/fs": ["1.1.1"],
+            "@npmcli/move-file": ["1.1.2"],
+            "chownr": ["2.0.0"],
+            "fs-minipass": ["2.1.0"],
+            "glob": ["7.2.3"],
+            "infer-owner": ["1.0.4"],
+            "lru-cache": ["6.0.0"],
+            "minipass": ["3.3.4"],
+            "minipass-collect": ["1.0.2"],
+            "minipass-flush": ["1.0.5"],
+            "minipass-pipeline": ["1.2.4"],
+            "mkdirp": ["1.0.4"],
+            "p-map": ["4.0.0"],
+            "promise-inflight": ["1.0.1"],
+            "rimraf": ["3.0.2"],
+            "ssri": ["8.0.1"],
+            "tar": ["6.1.11"],
+            "unique-filename": ["1.1.1"],
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
+            "minizlib": ["2.1.2"],
+            "yallist": ["4.0.0"],
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "@gar/promisify": ["1.1.3"],
+            "semver": ["7.3.7"],
+        },
+    )
+
+    npm_import(
         name = "npm__cacheable-lookup__2.0.1",
         root_package = "",
         link_workspace = "",
@@ -2935,6 +4350,54 @@ def npm_repositories():
         integrity = "sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==",
         transitive_closure = {
             "caseless": ["0.12.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__chalk__2.4.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "chalk",
+        version = "2.4.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==",
+        deps = {
+            "ansi-styles": "3.2.1",
+            "escape-string-regexp": "1.0.5",
+            "supports-color": "5.5.0",
+        },
+        transitive_closure = {
+            "chalk": ["2.4.2"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__chalk__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "chalk",
+        version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-4D3B6Wf41KOYRFdszmDqMCGq5VV/uMAB273JILmO+3jAlh8X4qDtdtgCR3fxtbLEMzSx22QdhnDcJvu2u1fVwg==",
+        deps = {
+            "ansi-styles": "4.3.0",
+            "supports-color": "7.2.0",
+        },
+        transitive_closure = {
+            "chalk": ["3.0.0"],
+            "ansi-styles": ["4.3.0"],
+            "supports-color": ["7.2.0"],
+            "has-flag": ["4.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
         },
     )
 
@@ -3086,6 +4549,38 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__clean-stack__2.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "clean-stack",
+        version = "2.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==",
+        transitive_closure = {
+            "clean-stack": ["2.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__clipanion__3.2.0-rc.11",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "clipanion",
+        version = "3.2.0-rc.11",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-fugY+N5uPop31VDYhjTc31DwPjCCLx6kmvdlFTf8fztpOxwplopiZr1XSHSA2qNmfpcXlJZKJsXMkxvXmdzK7g==",
+        deps = {
+            "typanion": "3.9.0",
+        },
+        transitive_closure = {
+            "clipanion": ["3.2.0-rc.11"],
+            "typanion": ["3.9.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__cliui__7.0.4",
         root_package = "",
         link_workspace = "",
@@ -3190,6 +4685,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__color-convert__1.9.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-convert",
+        version = "1.9.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==",
+        deps = {
+            "color-name": "1.1.3",
+        },
+        transitive_closure = {
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__color-convert__2.0.1",
         root_package = "",
         link_workspace = "",
@@ -3222,6 +4735,20 @@ def npm_repositories():
         transitive_closure = {
             "color-id": ["1.1.0"],
             "clamp": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__color-name__1.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-name",
+        version = "1.1.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-72fSenhMw2HZMTVHeCA9KCmpEIbzWiQsjN+BHcBbS9vr1mtt+vJjPdksIBNUmKAW8TFUDPJK5SUU3QhE9NEXDw==",
+        transitive_closure = {
+            "color-name": ["1.1.3"],
         },
     )
 
@@ -3337,6 +4864,20 @@ def npm_repositories():
             "hsluv": ["0.0.3"],
             "mumath": ["3.3.4"],
             "almost-equal": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__color-support__1.1.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "color-support",
+        version = "1.1.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==",
+        transitive_closure = {
+            "color-support": ["1.1.3"],
         },
     )
 
@@ -4336,6 +5877,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__depd__1.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "depd",
+        version = "1.1.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==",
+        transitive_closure = {
+            "depd": ["1.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__dequal__2.0.2",
         root_package = "",
         link_workspace = "",
@@ -4346,6 +5901,20 @@ def npm_repositories():
         integrity = "sha512-q9K8BlJVxK7hQYqa6XISGmBZbtQQWVXSrRrWreHC94rMt1QL/Impruc+7p2CYSYuVIUr+YCt6hjrs1kkdJRTug==",
         transitive_closure = {
             "dequal": ["2.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__detect-indent__6.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "detect-indent",
+        version = "6.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==",
+        transitive_closure = {
+            "detect-indent": ["6.1.0"],
         },
     )
 
@@ -4608,6 +6177,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__encoding__0.1.13",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "encoding",
+        version = "0.1.13",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==",
+        deps = {
+            "iconv-lite": "0.6.3",
+        },
+        transitive_closure = {
+            "encoding": ["0.1.13"],
+            "iconv-lite": ["0.6.3"],
+            "safer-buffer": ["2.1.2"],
+        },
+        run_lifecycle_hooks = True,
+    )
+
+    npm_import(
         name = "npm__end-of-stream__1.4.4",
         root_package = "",
         link_workspace = "",
@@ -4671,6 +6260,38 @@ def npm_repositories():
         integrity = "sha512-/o+BXHmB7ocbHEAs6F2EnG0ogybVVUdkRunTT2glZU9XAaGmhqskrvKwqXuDfNjEO0LZKWdejEEpnq8aM0tOaw==",
         transitive_closure = {
             "envinfo": ["7.8.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__err-code__2.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "err-code",
+        version = "2.0.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==",
+        transitive_closure = {
+            "err-code": ["2.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__error-ex__1.3.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "error-ex",
+        version = "1.3.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==",
+        deps = {
+            "is-arrayish": "0.2.1",
+        },
+        transitive_closure = {
+            "error-ex": ["1.3.2"],
+            "is-arrayish": ["0.2.1"],
         },
     )
 
@@ -5178,6 +6799,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__escape-string-regexp__1.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "escape-string-regexp",
+        version = "1.0.5",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==",
+        transitive_closure = {
+            "escape-string-regexp": ["1.0.5"],
+        },
+    )
+
+    npm_import(
         name = "npm__escape-string-regexp__4.0.0",
         root_package = "",
         link_workspace = "",
@@ -5454,6 +7089,44 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__fast-glob__3.2.11",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-glob",
+        version = "3.2.11",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-xrO3+1bxSo3ZVHAnqzyuewYT6aMFHRAd4Kcs92MAonjwQZLsK9d0SF1IyQ3k5PoirxTW0Oe/RqFgMQ6TcNE5Ew==",
+        deps = {
+            "@nodelib/fs.stat": "2.0.5",
+            "@nodelib/fs.walk": "1.2.8",
+            "glob-parent": "5.1.2",
+            "merge2": "1.4.1",
+            "micromatch": "4.0.5",
+        },
+        transitive_closure = {
+            "fast-glob": ["3.2.11"],
+            "@nodelib/fs.stat": ["2.0.5"],
+            "@nodelib/fs.walk": ["1.2.8"],
+            "glob-parent": ["5.1.2"],
+            "merge2": ["1.4.1"],
+            "micromatch": ["4.0.5"],
+            "braces": ["3.0.2"],
+            "picomatch": ["2.3.1"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+            "is-glob": ["4.0.3"],
+            "is-extglob": ["2.1.1"],
+            "@nodelib/fs.scandir": ["2.1.5"],
+            "fastq": ["1.13.0"],
+            "reusify": ["1.0.4"],
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__fast-isnumeric__1.1.4",
         root_package = "",
         link_workspace = "",
@@ -5500,6 +7173,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__fast-safe-stringify__2.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-safe-stringify",
+        version = "2.1.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==",
+        transitive_closure = {
+            "fast-safe-stringify": ["2.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__fastest-levenshtein__1.0.12",
         root_package = "",
         link_workspace = "",
@@ -5510,6 +7197,24 @@ def npm_repositories():
         integrity = "sha512-On2N+BpYJ15xIC974QNVuYGMOlEVt4s0EOI3wwMqOmK1fdDY+FN/zltPV8vosq4ad4c/gJ1KHScUn/6AWIgiow==",
         transitive_closure = {
             "fastest-levenshtein": ["1.0.12"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fastq__1.13.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fastq",
+        version = "1.13.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-YpkpUnK8od0o1hmeSc7UUs/eB/vIPWJYjKck2QKIzAf71Vm1AAQ3EbuZB3g2JIy+pg+ERD0vqI79KyZiB2e2Nw==",
+        deps = {
+            "reusify": "1.0.4",
+        },
+        transitive_closure = {
+            "fastq": ["1.13.0"],
+            "reusify": ["1.0.4"],
         },
     )
 
@@ -5935,6 +7640,41 @@ def npm_repositories():
             "ansi-regex": ["2.1.1", "5.0.1"],
             "code-point-at": ["1.1.0"],
             "number-is-nan": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__gauge__4.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "gauge",
+        version = "4.0.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-f9m+BEN5jkg6a0fZjleidjN51VE1X+mPFQ2DJ0uv1V39oCLCbsGe6yjbBnp7eK7z/+GAon99a3nHuqbuuthyPg==",
+        deps = {
+            "aproba": "1.2.0",
+            "color-support": "1.1.3",
+            "console-control-strings": "1.1.0",
+            "has-unicode": "2.0.1",
+            "signal-exit": "3.0.7",
+            "string-width": "4.2.3",
+            "strip-ansi": "6.0.1",
+            "wide-align": "1.1.5",
+        },
+        transitive_closure = {
+            "gauge": ["4.0.4"],
+            "aproba": ["1.2.0"],
+            "color-support": ["1.1.3"],
+            "console-control-strings": ["1.1.0"],
+            "has-unicode": ["2.0.1"],
+            "signal-exit": ["3.0.7"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wide-align": ["1.1.5"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
         },
     )
 
@@ -6830,6 +8570,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__has-flag__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "has-flag",
+        version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==",
+        transitive_closure = {
+            "has-flag": ["3.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__has-flag__4.0.0",
         root_package = "",
         link_workspace = "",
@@ -6926,6 +8680,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__hosted-git-info__4.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "hosted-git-info",
+        version = "4.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-kyCuEOWjJqZuDbRHzL8V93NzQhwIB71oFWSyzVo+KPZI+pnQPPxucdkrOZvkLRnrf5URsQM+IJ09Dw29cRALIA==",
+        deps = {
+            "lru-cache": "6.0.0",
+        },
+        transitive_closure = {
+            "hosted-git-info": ["4.1.0"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__hsluv__0.0.3",
         root_package = "",
         link_workspace = "",
@@ -6968,6 +8741,29 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__http-proxy-agent__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "http-proxy-agent",
+        version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-k0zdNgqWTGA6aeIRVpvfVob4fL52dTfaehylg0Y4UvSySvOq/Y+BOyPrgpUrA7HylqvU8vIZGsRuXmspskV0Tg==",
+        deps = {
+            "@tootallnate/once": "1.1.2",
+            "agent-base": "6.0.2",
+            "debug": "4.3.4",
+        },
+        transitive_closure = {
+            "http-proxy-agent": ["4.0.1"],
+            "@tootallnate/once": ["1.1.2"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__http-signature__1.2.0",
         root_package = "",
         link_workspace = "",
@@ -7002,6 +8798,45 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__https-proxy-agent__5.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "https-proxy-agent",
+        version = "5.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==",
+        deps = {
+            "agent-base": "6.0.2",
+            "debug": "4.3.4",
+        },
+        transitive_closure = {
+            "https-proxy-agent": ["5.0.1"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__humanize-ms__1.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "humanize-ms",
+        version = "1.2.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==",
+        deps = {
+            "ms": "2.1.3",
+        },
+        transitive_closure = {
+            "humanize-ms": ["1.2.1"],
+            "ms": ["2.1.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__iconv-lite__0.4.24",
         root_package = "",
         link_workspace = "",
@@ -7015,6 +8850,24 @@ def npm_repositories():
         },
         transitive_closure = {
             "iconv-lite": ["0.4.24"],
+            "safer-buffer": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__iconv-lite__0.6.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "iconv-lite",
+        version = "0.6.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==",
+        deps = {
+            "safer-buffer": "2.1.2",
+        },
+        transitive_closure = {
+            "iconv-lite": ["0.6.3"],
             "safer-buffer": ["2.1.2"],
         },
     )
@@ -7047,6 +8900,27 @@ def npm_repositories():
         },
         transitive_closure = {
             "ignore-walk": ["3.0.4"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ignore-walk__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ignore-walk",
+        version = "4.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-rzDQLaW4jQbh2YrOFlJdCtX8qgJTehFRYiUB2r1osqTeDzV/3+Jh8fz1oAPzUThf3iku8Ds4IDqawI5d8mUiQw==",
+        deps = {
+            "minimatch": "3.1.2",
+        },
+        transitive_closure = {
+            "ignore-walk": ["4.0.1"],
             "minimatch": ["3.1.2"],
             "brace-expansion": ["1.1.11"],
             "balanced-match": ["1.0.2"],
@@ -7140,6 +9014,62 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__imurmurhash__0.1.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "imurmurhash",
+        version = "0.1.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==",
+        transitive_closure = {
+            "imurmurhash": ["0.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__indent-string__4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "indent-string",
+        version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==",
+        transitive_closure = {
+            "indent-string": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__individual__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "individual",
+        version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-rUY5vtT748NMRbEMrTNiFfy29BgGZwGXUi2NFUVMWQrogSLzlJvQV9eeMWi+g1aVaQ53tpyLAQtd5x/JH0Nh1g==",
+        transitive_closure = {
+            "individual": ["3.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__infer-owner__1.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "infer-owner",
+        version = "1.0.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-IClj+Xz94+d7irH5qRyfJonOdfTzuDaifE6ZPWfx0N0+/ATZCbuTPq2prFl526urkQd90WyUKIh1DfBQ2hMz9A==",
+        transitive_closure = {
+            "infer-owner": ["1.0.4"],
+        },
+    )
+
+    npm_import(
         name = "npm__inflight__1.0.6",
         root_package = "",
         link_workspace = "",
@@ -7223,6 +9153,34 @@ def npm_repositories():
         integrity = "sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==",
         transitive_closure = {
             "interpret": ["2.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ip__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ip",
+        version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==",
+        transitive_closure = {
+            "ip": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-arrayish__0.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-arrayish",
+        version = "0.2.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==",
+        transitive_closure = {
+            "is-arrayish": ["0.2.1"],
         },
     )
 
@@ -7472,6 +9430,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-lambda__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-lambda",
+        version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-z7CMFGNrENq5iFB9Bqo64Xk6Y9sg+epq1myIcdHaGnbMTYOxvzsEtdYqQUylB7LxfkvgrrjP32T6Ywciio9UIQ==",
+        transitive_closure = {
+            "is-lambda": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__is-mobile__2.2.2",
         root_package = "",
         link_workspace = "",
@@ -7658,6 +9630,20 @@ def npm_repositories():
         integrity = "sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==",
         transitive_closure = {
             "is-unicode-supported": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__is-windows__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-windows",
+        version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA==",
+        transitive_closure = {
+            "is-windows": ["1.0.2"],
         },
     )
 
@@ -7856,6 +9842,27 @@ def npm_repositories():
         integrity = "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==",
         transitive_closure = {
             "js-tokens": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__js-yaml__3.14.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "js-yaml",
+        version = "3.14.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==",
+        deps = {
+            "argparse": "1.0.10",
+            "esprima": "4.0.1",
+        },
+        transitive_closure = {
+            "js-yaml": ["3.14.1"],
+            "argparse": ["1.0.10"],
+            "esprima": ["4.0.1"],
+            "sprintf-js": ["1.0.3"],
         },
     )
 
@@ -8102,6 +10109,59 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__lines-and-columns__1.2.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "lines-and-columns",
+        version = "1.2.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==",
+        transitive_closure = {
+            "lines-and-columns": ["1.2.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__load-json-file__6.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "load-json-file",
+        version = "6.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-gUD/epcRms75Cw8RT1pUdHugZYM5ce64ucs2GEISABwkRsOQr0q2wm/MV2TKThycIe5e0ytRweW2RZxclogCdQ==",
+        deps = {
+            "graceful-fs": "4.2.10",
+            "parse-json": "5.2.0",
+            "strip-bom": "4.0.0",
+            "type-fest": "0.6.0",
+        },
+        transitive_closure = {
+            "load-json-file": ["6.2.0"],
+            "graceful-fs": ["4.2.10"],
+            "parse-json": ["5.2.0"],
+            "strip-bom": ["4.0.0"],
+            "type-fest": ["0.6.0"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__loader-runner__4.3.0",
         root_package = "",
         link_workspace = "",
@@ -8315,6 +10375,100 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__make-fetch-happen__9.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "make-fetch-happen",
+        version = "9.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-+zopwDy7DNknmwPQplem5lAZX/eCOzSvSNNcSKm5eVwTkOBzoktEfXsa9L23J/GIRhxRsaxzkPEhrJEpE2F4Gg==",
+        deps = {
+            "agentkeepalive": "4.2.1",
+            "cacache": "15.3.0",
+            "http-cache-semantics": "4.1.0",
+            "http-proxy-agent": "4.0.1",
+            "https-proxy-agent": "5.0.1",
+            "is-lambda": "1.0.1",
+            "lru-cache": "6.0.0",
+            "minipass": "3.3.4",
+            "minipass-collect": "1.0.2",
+            "minipass-fetch": "1.4.1",
+            "minipass-flush": "1.0.5",
+            "minipass-pipeline": "1.2.4",
+            "negotiator": "0.6.3",
+            "promise-retry": "2.0.1",
+            "socks-proxy-agent": "6.2.1",
+            "ssri": "8.0.1",
+        },
+        transitive_closure = {
+            "make-fetch-happen": ["9.1.0"],
+            "agentkeepalive": ["4.2.1"],
+            "cacache": ["15.3.0"],
+            "http-cache-semantics": ["4.1.0"],
+            "http-proxy-agent": ["4.0.1"],
+            "https-proxy-agent": ["5.0.1"],
+            "is-lambda": ["1.0.1"],
+            "lru-cache": ["6.0.0"],
+            "minipass": ["3.3.4"],
+            "minipass-collect": ["1.0.2"],
+            "minipass-fetch": ["1.4.1"],
+            "minipass-flush": ["1.0.5"],
+            "minipass-pipeline": ["1.2.4"],
+            "negotiator": ["0.6.3"],
+            "promise-retry": ["2.0.1"],
+            "socks-proxy-agent": ["6.2.1"],
+            "ssri": ["8.0.1"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "socks": ["2.7.0"],
+            "ip": ["2.0.0"],
+            "smart-buffer": ["4.2.0"],
+            "ms": ["2.1.3", "2.1.2"],
+            "err-code": ["2.0.3"],
+            "retry": ["0.12.0"],
+            "minipass-sized": ["1.0.3"],
+            "minizlib": ["2.1.2"],
+            "encoding": ["0.1.13"],
+            "iconv-lite": ["0.6.3"],
+            "safer-buffer": ["2.1.2"],
+            "yallist": ["4.0.0"],
+            "@tootallnate/once": ["1.1.2"],
+            "@npmcli/fs": ["1.1.1"],
+            "@npmcli/move-file": ["1.1.2"],
+            "chownr": ["2.0.0"],
+            "fs-minipass": ["2.1.0"],
+            "glob": ["7.2.3"],
+            "infer-owner": ["1.0.4"],
+            "mkdirp": ["1.0.4"],
+            "p-map": ["4.0.0"],
+            "promise-inflight": ["1.0.1"],
+            "rimraf": ["3.0.2"],
+            "tar": ["6.1.11"],
+            "unique-filename": ["1.1.1"],
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "@gar/promisify": ["1.1.3"],
+            "semver": ["7.3.7"],
+            "depd": ["1.1.2"],
+            "humanize-ms": ["1.2.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__map-limit__0.0.1",
         root_package = "",
         link_workspace = "",
@@ -8488,6 +10642,43 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__merge2__1.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "merge2",
+        version = "1.4.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==",
+        transitive_closure = {
+            "merge2": ["1.4.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__micromatch__4.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "micromatch",
+        version = "4.0.5",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==",
+        deps = {
+            "braces": "3.0.2",
+            "picomatch": "2.3.1",
+        },
+        transitive_closure = {
+            "micromatch": ["4.0.5"],
+            "braces": ["3.0.2"],
+            "picomatch": ["2.3.1"],
+            "fill-range": ["7.0.1"],
+            "to-regex-range": ["5.0.1"],
+            "is-number": ["7.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__mime-db__1.52.0",
         root_package = "",
         link_workspace = "",
@@ -8611,6 +10802,109 @@ def npm_repositories():
         integrity = "sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==",
         transitive_closure = {
             "minimist": ["1.2.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minipass-collect__1.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minipass-collect",
+        version = "1.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-6T6lH0H8OG9kITm/Jm6tdooIbogG9e0tLgpY6mphXSm/A9u8Nq1ryBG+Qspiub9LjWlBPsPS3tWQ/Botq4FdxA==",
+        deps = {
+            "minipass": "3.3.4",
+        },
+        transitive_closure = {
+            "minipass-collect": ["1.0.2"],
+            "minipass": ["3.3.4"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minipass-fetch__1.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minipass-fetch",
+        version = "1.4.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-CGH1eblLq26Y15+Azk7ey4xh0J/XfJfrCox5LDJiKqI2Q2iwOLOKrlmIaODiSQS8d18jalF6y2K2ePUm0CmShw==",
+        deps = {
+            "encoding": "0.1.13",
+            "minipass": "3.3.4",
+            "minipass-sized": "1.0.3",
+            "minizlib": "2.1.2",
+        },
+        transitive_closure = {
+            "minipass-fetch": ["1.4.1"],
+            "minipass": ["3.3.4"],
+            "minipass-sized": ["1.0.3"],
+            "minizlib": ["2.1.2"],
+            "encoding": ["0.1.13"],
+            "iconv-lite": ["0.6.3"],
+            "safer-buffer": ["2.1.2"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minipass-flush__1.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minipass-flush",
+        version = "1.0.5",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-JmQSYYpPUqX5Jyn1mXaRwOda1uQ8HP5KAT/oDSLCzt1BYRhQU0/hDtsB1ufZfEEzMZ9aAVmsBw8+FWsIXlClWw==",
+        deps = {
+            "minipass": "3.3.4",
+        },
+        transitive_closure = {
+            "minipass-flush": ["1.0.5"],
+            "minipass": ["3.3.4"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minipass-pipeline__1.2.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minipass-pipeline",
+        version = "1.2.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-xuIq7cIOt09RPRJ19gdi4b+RiNvDFYe5JH+ggNvBqGqpQXcru3PcRmOZuHBKWK1Txf9+cQ+HMVN4d6z46LZP7A==",
+        deps = {
+            "minipass": "3.3.4",
+        },
+        transitive_closure = {
+            "minipass-pipeline": ["1.2.4"],
+            "minipass": ["3.3.4"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minipass-sized__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minipass-sized",
+        version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-MbkQQ2CTiBMlA2Dm/5cY+9SWFEN8pzzOXi6rlM5Xxq0Yqbda5ZQy9sU75a673FE9ZK0Zsbr6Y5iP6u9nktfg2g==",
+        deps = {
+            "minipass": "3.3.4",
+        },
+        transitive_closure = {
+            "minipass-sized": ["1.0.3"],
+            "minipass": ["3.3.4"],
+            "yallist": ["4.0.0"],
         },
     )
 
@@ -9359,6 +11653,36 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__ndjson__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ndjson",
+        version = "2.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-nGl7LRGrzugTtaFcJMhLbpzJM6XdivmbkdlaGcrk/LXg2KL/YBC6z1g70xh0/al+oFuVFP8N8kiWRucmeEH/qQ==",
+        deps = {
+            "json-stringify-safe": "5.0.1",
+            "minimist": "1.2.6",
+            "readable-stream": "3.6.0",
+            "split2": "3.2.2",
+            "through2": "4.0.2",
+        },
+        transitive_closure = {
+            "ndjson": ["2.0.0"],
+            "json-stringify-safe": ["5.0.1"],
+            "minimist": ["1.2.6"],
+            "readable-stream": ["3.6.0"],
+            "split2": ["3.2.2"],
+            "through2": ["4.0.2"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__needle__2.9.1",
         root_package = "",
         link_workspace = "",
@@ -9379,6 +11703,20 @@ def npm_repositories():
             "sax": ["1.2.4"],
             "safer-buffer": ["2.1.2"],
             "ms": ["2.1.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__negotiator__0.6.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "negotiator",
+        version = "0.6.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==",
+        transitive_closure = {
+            "negotiator": ["0.6.3"],
         },
     )
 
@@ -9548,6 +11886,121 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__node-gyp__8.4.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "node-gyp",
+        version = "8.4.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-olTJRgUtAb/hOXG0E93wZDs5YiJlgbXxTwQAFHyNlRsXQnYzUaF2aGgujZbw+hR8aF4ZG/rST57bWMWD16jr9w==",
+        deps = {
+            "env-paths": "2.2.1",
+            "glob": "7.2.3",
+            "graceful-fs": "4.2.10",
+            "make-fetch-happen": "9.1.0",
+            "nopt": "5.0.0",
+            "npmlog": "6.0.2",
+            "rimraf": "3.0.2",
+            "semver": "7.3.7",
+            "tar": "6.1.11",
+            "which": "2.0.2",
+        },
+        transitive_closure = {
+            "node-gyp": ["8.4.1"],
+            "env-paths": ["2.2.1"],
+            "glob": ["7.2.3"],
+            "graceful-fs": ["4.2.10"],
+            "make-fetch-happen": ["9.1.0"],
+            "nopt": ["5.0.0"],
+            "npmlog": ["6.0.2"],
+            "rimraf": ["3.0.2"],
+            "semver": ["7.3.7"],
+            "tar": ["6.1.11"],
+            "which": ["2.0.2"],
+            "isexe": ["2.0.0"],
+            "chownr": ["2.0.0"],
+            "fs-minipass": ["2.1.0"],
+            "minipass": ["3.3.4"],
+            "minizlib": ["2.1.2"],
+            "mkdirp": ["1.0.4"],
+            "yallist": ["4.0.0"],
+            "lru-cache": ["6.0.0"],
+            "are-we-there-yet": ["3.0.1"],
+            "console-control-strings": ["1.1.0"],
+            "gauge": ["4.0.4"],
+            "set-blocking": ["2.0.0"],
+            "aproba": ["1.2.0"],
+            "color-support": ["1.1.3"],
+            "has-unicode": ["2.0.1"],
+            "signal-exit": ["3.0.7"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wide-align": ["1.1.5"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "delegates": ["1.0.0"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+            "abbrev": ["1.1.1"],
+            "agentkeepalive": ["4.2.1"],
+            "cacache": ["15.3.0"],
+            "http-cache-semantics": ["4.1.0"],
+            "http-proxy-agent": ["4.0.1"],
+            "https-proxy-agent": ["5.0.1"],
+            "is-lambda": ["1.0.1"],
+            "minipass-collect": ["1.0.2"],
+            "minipass-fetch": ["1.4.1"],
+            "minipass-flush": ["1.0.5"],
+            "minipass-pipeline": ["1.2.4"],
+            "negotiator": ["0.6.3"],
+            "promise-retry": ["2.0.1"],
+            "socks-proxy-agent": ["6.2.1"],
+            "ssri": ["8.0.1"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "socks": ["2.7.0"],
+            "ip": ["2.0.0"],
+            "smart-buffer": ["4.2.0"],
+            "ms": ["2.1.3", "2.1.2"],
+            "err-code": ["2.0.3"],
+            "retry": ["0.12.0"],
+            "minipass-sized": ["1.0.3"],
+            "encoding": ["0.1.13"],
+            "iconv-lite": ["0.6.3"],
+            "safer-buffer": ["2.1.2"],
+            "@tootallnate/once": ["1.1.2"],
+            "@npmcli/fs": ["1.1.1"],
+            "@npmcli/move-file": ["1.1.2"],
+            "infer-owner": ["1.0.4"],
+            "p-map": ["4.0.0"],
+            "promise-inflight": ["1.0.1"],
+            "unique-filename": ["1.1.1"],
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+            "@gar/promisify": ["1.1.3"],
+            "depd": ["1.1.2"],
+            "humanize-ms": ["1.2.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "minimatch": ["3.1.2"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__node-pre-gyp__0.13.0",
         root_package = "",
         link_workspace = "",
@@ -9694,6 +12147,38 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__normalize-package-data__3.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "normalize-package-data",
+        version = "3.0.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-p2W1sgqij3zMMyRC067Dg16bfzVH+w7hyegmpIvZ4JNjqtGOVAIvLmjBx3yP7YTe9vKJgkoNOPjwQGogDoMXFA==",
+        deps = {
+            "hosted-git-info": "4.1.0",
+            "is-core-module": "2.9.0",
+            "semver": "7.3.7",
+            "validate-npm-package-license": "3.0.4",
+        },
+        transitive_closure = {
+            "normalize-package-data": ["3.0.3"],
+            "hosted-git-info": ["4.1.0"],
+            "is-core-module": ["2.9.0"],
+            "semver": ["7.3.7"],
+            "validate-npm-package-license": ["3.0.4"],
+            "spdx-correct": ["3.1.1"],
+            "spdx-expression-parse": ["3.0.1"],
+            "spdx-exceptions": ["2.3.0"],
+            "spdx-license-ids": ["3.0.11"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+            "has": ["1.0.3"],
+            "function-bind": ["1.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__normalize-path__3.0.0",
         root_package = "",
         link_workspace = "",
@@ -9812,6 +12297,40 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__npm-packlist__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "npm-packlist",
+        version = "3.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-L/cbzmutAwII5glUcf2DBRNY/d0TFd4e/FnaZigJV6JD85RHZXJFGwCndjMWiiViiWSsWt3tiOLpI3ByTnIdFQ==",
+        deps = {
+            "glob": "7.2.3",
+            "ignore-walk": "4.0.1",
+            "npm-bundled": "1.1.2",
+            "npm-normalize-package-bin": "1.0.1",
+        },
+        transitive_closure = {
+            "npm-packlist": ["3.0.0"],
+            "glob": ["7.2.3"],
+            "ignore-walk": ["4.0.1"],
+            "npm-bundled": ["1.1.2"],
+            "npm-normalize-package-bin": ["1.0.1"],
+            "minimatch": ["3.1.2"],
+            "brace-expansion": ["1.1.11"],
+            "balanced-match": ["1.0.2"],
+            "concat-map": ["0.0.1"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "path-is-absolute": ["1.0.1"],
+            "wrappy": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__npmlog__4.1.2",
         root_package = "",
         link_workspace = "",
@@ -9853,6 +12372,46 @@ def npm_repositories():
             "safe-buffer": ["5.1.2"],
             "string_decoder": ["1.1.1"],
             "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__npmlog__6.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "npmlog",
+        version = "6.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-/vBvz5Jfr9dT/aFWd0FIRf+T/Q2WBsLENygUaFUqstqsycmZAP/t5BvFJTK0viFmSUxiUKTUplWy5vt+rvKIxg==",
+        deps = {
+            "are-we-there-yet": "3.0.1",
+            "console-control-strings": "1.1.0",
+            "gauge": "4.0.4",
+            "set-blocking": "2.0.0",
+        },
+        transitive_closure = {
+            "npmlog": ["6.0.2"],
+            "are-we-there-yet": ["3.0.1"],
+            "console-control-strings": ["1.1.0"],
+            "gauge": ["4.0.4"],
+            "set-blocking": ["2.0.0"],
+            "aproba": ["1.2.0"],
+            "color-support": ["1.1.3"],
+            "has-unicode": ["2.0.1"],
+            "signal-exit": ["3.0.7"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wide-align": ["1.1.5"],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "delegates": ["1.0.0"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
         },
     )
 
@@ -9988,7 +12547,7 @@ def npm_repositories():
         package = "optimist",
         version = "0.6.0",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-ubrZPyOU0AHpXkmwqfWolap+eHMwQ484AKivkf0ZGyysd6fUJZl7ow9iu5UNV1vCZv46HQ7EM83IC3NGJ820hg==",
+        integrity = "sha1-aUJIJvNAX3nxQub8PZrljU27kgA=",
         deps = {
             "minimist": "0.0.10",
             "wordwrap": "0.0.3",
@@ -10198,6 +12757,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__p-map__4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "p-map",
+        version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==",
+        deps = {
+            "aggregate-error": "3.1.0",
+        },
+        transitive_closure = {
+            "p-map": ["4.0.0"],
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__p-timeout__3.2.0",
         root_package = "",
         link_workspace = "",
@@ -10240,6 +12819,41 @@ def npm_repositories():
         integrity = "sha512-KF/U8tk54BgQewkJPvB4s/US3VQY68BRDpH638+7O/n58TpnwiwnOtGIOsT2/i+M78s61BBpeC83STB88d8sqw==",
         transitive_closure = {
             "parenthesis": ["3.1.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__parse-json__5.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "parse-json",
+        version = "5.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-ayCKvm/phCGxOkYRSCM82iDwct8/EonSEgCSxWxD7ve6jHggsFl4fZVQBPRNgQoKiuV/odhFrGzQXZwbifC8Rg==",
+        deps = {
+            "@babel/code-frame": "7.18.6",
+            "error-ex": "1.3.2",
+            "json-parse-even-better-errors": "2.3.1",
+            "lines-and-columns": "1.2.4",
+        },
+        transitive_closure = {
+            "parse-json": ["5.2.0"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.18.6"],
+            "chalk": ["2.4.2"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
+            "color-convert": ["1.9.3"],
+            "color-name": ["1.1.3"],
         },
     )
 
@@ -10874,6 +13488,40 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__promise-inflight__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "promise-inflight",
+        version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==",
+        transitive_closure = {
+            "promise-inflight": ["1.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__promise-retry__2.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "promise-retry",
+        version = "2.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-y+WKFlBR8BGXnsNlIHFGPZmyDf3DFMoLhaflAnyZgV6rG6xu+JwesTo2Q9R6XwYmtmwAFCkAk3e35jEdoeh/3g==",
+        deps = {
+            "err-code": "2.0.3",
+            "retry": "0.12.0",
+        },
+        transitive_closure = {
+            "promise-retry": ["2.0.1"],
+            "err-code": ["2.0.3"],
+            "retry": ["0.12.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__protocol-buffers-schema__3.6.0",
         root_package = "",
         link_workspace = "",
@@ -11044,6 +13692,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__queue-microtask__1.2.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "queue-microtask",
+        version = "1.2.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==",
+        transitive_closure = {
+            "queue-microtask": ["1.2.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__quickselect__2.0.0",
         root_package = "",
         link_workspace = "",
@@ -11155,6 +13817,27 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__read-yaml-file__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "read-yaml-file",
+        version = "2.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-UkRNRIwnhG+y7hpqnycCL/xbTk7+ia9VuVTC0S+zVbwd65DI9eUpRMfsWIGrCWxTU/mi+JW8cHQCrv+zfCbEPQ==",
+        deps = {
+            "js-yaml": "4.1.0",
+            "strip-bom": "4.0.0",
+        },
+        transitive_closure = {
+            "read-yaml-file": ["2.1.0"],
+            "js-yaml": ["4.1.0"],
+            "strip-bom": ["4.0.0"],
+            "argparse": ["2.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__readable-stream__1.0.34",
         root_package = "",
         link_workspace = "",
@@ -11205,6 +13888,29 @@ def npm_repositories():
             "safe-buffer": ["5.1.2"],
             "string_decoder": ["1.1.1"],
             "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__readable-stream__3.6.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "readable-stream",
+        version = "3.6.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA==",
+        deps = {
+            "inherits": "2.0.4",
+            "string_decoder": "1.1.1",
+            "util-deprecate": "1.0.2",
+        },
+        transitive_closure = {
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
         },
     )
 
@@ -11973,6 +14679,34 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__retry__0.12.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "retry",
+        version = "0.12.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==",
+        transitive_closure = {
+            "retry": ["0.12.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__reusify__1.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "reusify",
+        version = "1.0.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==",
+        transitive_closure = {
+            "reusify": ["1.0.4"],
+        },
+    )
+
+    npm_import(
         name = "npm__right-now__1.0.0",
         root_package = "",
         link_workspace = "",
@@ -12079,6 +14813,43 @@ def npm_repositories():
         transitive_closure = {
             "rollup": ["2.75.7"],
             "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__run-groups__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "run-groups",
+        version = "3.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-2hIL01Osd6FWsQVhVGqJ7drNikmTaUg2A/VBR98+LuhQ1jV1Xlh43BQH4gJiNaOzfHJTasD0pw5YviIfdVVY4g==",
+        deps = {
+            "p-limit": "3.1.0",
+        },
+        transitive_closure = {
+            "run-groups": ["3.0.1"],
+            "p-limit": ["3.1.0"],
+            "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__run-parallel__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "run-parallel",
+        version = "1.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==",
+        deps = {
+            "queue-microtask": "1.2.3",
+        },
+        transitive_closure = {
+            "run-parallel": ["1.2.0"],
+            "queue-microtask": ["1.2.3"],
         },
     )
 
@@ -12430,6 +15201,97 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__slide__1.1.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "slide",
+        version = "1.1.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-NwrtjCg+lZoqhFU8fOwl4ay2ei8PaqCBOUV3/ektPY9trO1yQ1oXEfmHAhKArUVUr/hOHvy5f6AdP17dCM0zMw==",
+        transitive_closure = {
+            "slide": ["1.1.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__smart-buffer__4.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "smart-buffer",
+        version = "4.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==",
+        transitive_closure = {
+            "smart-buffer": ["4.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__socks-proxy-agent__6.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "socks-proxy-agent",
+        version = "6.2.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-a6KW9G+6B3nWZ1yB8G7pJwL3ggLy1uTzKAgCb7ttblwqdz9fMGJUuTy3uFzEP48FAs9FLILlmzDlE2JJhVQaXQ==",
+        deps = {
+            "agent-base": "6.0.2",
+            "debug": "4.3.4",
+            "socks": "2.7.0",
+        },
+        transitive_closure = {
+            "socks-proxy-agent": ["6.2.1"],
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "socks": ["2.7.0"],
+            "ip": ["2.0.0"],
+            "smart-buffer": ["4.2.0"],
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__socks__2.7.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "socks",
+        version = "2.7.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-scnOe9y4VuiNUULJN72GrM26BNOjVsfPXI+j+98PkyEfsIXroa5ofyjT+FzGvn/xHs73U2JtoBYAVx9Hl4quSA==",
+        deps = {
+            "ip": "2.0.0",
+            "smart-buffer": "4.2.0",
+        },
+        transitive_closure = {
+            "socks": ["2.7.0"],
+            "ip": ["2.0.0"],
+            "smart-buffer": ["4.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__sort-keys__4.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "sort-keys",
+        version = "4.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-aUYIEU/UviqPgc8mHR6IW1EGxkAXpeRETYcrzg8cLAvUPZcpAlleSXHV2mY7G12GphSH6Gzv+4MMVSSkbdteHg==",
+        deps = {
+            "is-plain-obj": "2.1.0",
+        },
+        transitive_closure = {
+            "sort-keys": ["4.2.0"],
+            "is-plain-obj": ["2.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__source-map-support__0.5.21",
         root_package = "",
         link_workspace = "",
@@ -12465,6 +15327,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__source-map__0.7.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "source-map",
+        version = "0.7.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==",
+        transitive_closure = {
+            "source-map": ["0.7.4"],
+        },
+    )
+
+    npm_import(
         name = "npm__sourcemap-codec__1.4.8",
         root_package = "",
         link_workspace = "",
@@ -12475,6 +15351,111 @@ def npm_repositories():
         integrity = "sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==",
         transitive_closure = {
             "sourcemap-codec": ["1.4.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__spdx-correct__3.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "spdx-correct",
+        version = "3.1.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-cOYcUWwhCuHCXi49RhFRCyJEK3iPj1Ziz9DpViV3tbZOwXD49QzIN3MpOLJNxh2qwq2lJJZaKMVw9qNi4jTC0w==",
+        deps = {
+            "spdx-expression-parse": "3.0.1",
+            "spdx-license-ids": "3.0.11",
+        },
+        transitive_closure = {
+            "spdx-correct": ["3.1.1"],
+            "spdx-expression-parse": ["3.0.1"],
+            "spdx-license-ids": ["3.0.11"],
+            "spdx-exceptions": ["2.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__spdx-exceptions__2.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "spdx-exceptions",
+        version = "2.3.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-/tTrYOC7PPI1nUAgx34hUpqXuyJG+DTHJTnIULG4rDygi4xu/tfgmq1e1cIRwRzwZgo4NLySi+ricLkZkw4i5A==",
+        transitive_closure = {
+            "spdx-exceptions": ["2.3.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__spdx-expression-parse__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "spdx-expression-parse",
+        version = "3.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==",
+        deps = {
+            "spdx-exceptions": "2.3.0",
+            "spdx-license-ids": "3.0.11",
+        },
+        transitive_closure = {
+            "spdx-expression-parse": ["3.0.1"],
+            "spdx-exceptions": ["2.3.0"],
+            "spdx-license-ids": ["3.0.11"],
+        },
+    )
+
+    npm_import(
+        name = "npm__spdx-license-ids__3.0.11",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "spdx-license-ids",
+        version = "3.0.11",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Ctl2BrFiM0X3MANYgj3CkygxhRmr9mi6xhejbdO960nF6EDJApTYpn0BQnDKlnNBULKiCN1n3w9EBkHK8ZWg+g==",
+        transitive_closure = {
+            "spdx-license-ids": ["3.0.11"],
+        },
+    )
+
+    npm_import(
+        name = "npm__split2__3.2.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "split2",
+        version = "3.2.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-9NThjpgZnifTkJpzTZ7Eue85S49QwpNhZTq6GRJwObb6jnLFNGB7Qm73V5HewTROPyxD0C29xqmaI68bQtV+hg==",
+        deps = {
+            "readable-stream": "3.6.0",
+        },
+        transitive_closure = {
+            "split2": ["3.2.2"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__sprintf-js__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "sprintf-js",
+        version = "1.0.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==",
+        transitive_closure = {
+            "sprintf-js": ["1.0.3"],
         },
     )
 
@@ -12509,6 +15490,25 @@ def npm_repositories():
             "jsbn": ["0.1.1"],
             "safer-buffer": ["2.1.2"],
             "tweetnacl": ["0.14.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ssri__8.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ssri",
+        version = "8.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-97qShzy1AiyxvPNIkLWoGua7xoQzzPjQ0HAH4B0rWKo7SZ6USuPcrUiAFrws0UH8RrbWmgq3LMTObhPIHbbBeQ==",
+        deps = {
+            "minipass": "3.3.4",
+        },
+        transitive_closure = {
+            "ssri": ["8.0.1"],
+            "minipass": ["3.3.4"],
+            "yallist": ["4.0.0"],
         },
     )
 
@@ -12552,6 +15552,20 @@ def npm_repositories():
             "prelude-ls": ["1.1.2"],
             "type-check": ["0.3.2"],
             "word-wrap": ["1.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__stream-buffers__3.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "stream-buffers",
+        version = "3.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-DQi1h8VEBA/lURbSwFtEHnSTb9s2/pwLEaFuNhXwy1Dx3Sa0lOuYT2yNUr4/j2fs8oCAMANtrZ5OrPZtyVs3MQ==",
+        transitive_closure = {
+            "stream-buffers": ["3.0.2"],
         },
     )
 
@@ -12742,6 +15756,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__strip-bom__4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "strip-bom",
+        version = "4.0.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-3xurFv5tEgii33Zi8Jtp55wEIILR9eh34FAW00PZf+JnSsTmV/ioewSgQl97JHvgjoRGwPShsWm+IdrxB35d0w==",
+        transitive_closure = {
+            "strip-bom": ["4.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__strip-json-comments__2.0.1",
         root_package = "",
         link_workspace = "",
@@ -12812,6 +15840,24 @@ def npm_repositories():
         integrity = "sha512-gwu8l5MtRZ6koO0icVTlmN5pm7Dhh1+Xpe9O4x6ObMAsW+3jPbW14d1DsBq1F4wiI+WOFjXF35pslgec/G8yCQ==",
         transitive_closure = {
             "superscript-text": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__supports-color__5.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "supports-color",
+        version = "5.5.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==",
+        deps = {
+            "has-flag": "3.0.0",
+        },
+        transitive_closure = {
+            "supports-color": ["5.5.0"],
+            "has-flag": ["3.0.0"],
         },
     )
 
@@ -13227,6 +16273,33 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__terser__5.12.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/lifecycle": ["terser"],
+        },
+        package = "terser",
+        version = "5.12.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-NXbs+7nisos5E+yXwAD+y7zrcTkMqb0dEJxIGtSKPdCBzopf7ni4odPul2aechpV7EXNvOudYOX2bb5tln1jbQ==",
+        deps = {
+            "acorn": "8.7.1",
+            "commander": "2.20.3",
+            "source-map": "0.7.4",
+            "source-map-support": "0.5.21",
+        },
+        transitive_closure = {
+            "terser": ["5.12.1"],
+            "acorn": ["8.7.1"],
+            "commander": ["2.20.3"],
+            "source-map": ["0.6.1", "0.7.4"],
+            "source-map-support": ["0.5.21"],
+            "buffer-from": ["1.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__terser__5.14.1",
         root_package = "",
         link_workspace = "",
@@ -13336,6 +16409,28 @@ def npm_repositories():
             "safe-buffer": ["5.1.2"],
             "string_decoder": ["1.1.1"],
             "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__through2__4.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "through2",
+        version = "4.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==",
+        deps = {
+            "readable-stream": "3.6.0",
+        },
+        transitive_closure = {
+            "through2": ["4.0.2"],
+            "readable-stream": ["3.6.0"],
+            "inherits": ["2.0.4"],
+            "string_decoder": ["1.1.1"],
+            "util-deprecate": ["1.0.2"],
+            "safe-buffer": ["5.1.2"],
         },
     )
 
@@ -13586,6 +16681,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__tslib__1.14.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tslib",
+        version = "1.14.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==",
+        transitive_closure = {
+            "tslib": ["1.14.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__tunnel-agent__0.6.0",
         root_package = "",
         link_workspace = "",
@@ -13618,6 +16727,20 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__typanion__3.9.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "typanion",
+        version = "3.9.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-7yPk67IIquhKQcUXOBM27vDuGmZf6oJbEmzgVfDniHCkT6+z4JnKY85nKqbstoec8Kp7hD06TP3Kc98ij43PIg==",
+        transitive_closure = {
+            "typanion": ["3.9.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__type-check__0.3.2",
         root_package = "",
         link_workspace = "",
@@ -13646,6 +16769,20 @@ def npm_repositories():
         integrity = "sha512-EUV9jo4sffrwlg8s0zDhP0T2WD3pru5Xi0+HTE3zTUmBaZNhfkite9PdSJwdXLwPVW0jnAHT56pZHIOYckPEiw==",
         transitive_closure = {
             "type-fest": ["0.10.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__type-fest__0.6.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "type-fest",
+        version = "0.6.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-q+MB8nYR1KDLrgr4G5yemftpMC7/QLqVndBmEEdqzmNj5dcFOO4Oo8qlwZE3ULT3+Zim1F8Kq4cBnikNhlCMlg==",
+        transitive_closure = {
+            "type-fest": ["0.6.0"],
         },
     )
 
@@ -13726,6 +16863,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__typedarray-to-buffer__3.1.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "typedarray-to-buffer",
+        version = "3.1.5",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==",
+        deps = {
+            "is-typedarray": "1.0.0",
+        },
+        transitive_closure = {
+            "typedarray-to-buffer": ["3.1.5"],
+            "is-typedarray": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__typedarray__0.0.6",
         root_package = "",
         link_workspace = "",
@@ -13757,6 +16912,71 @@ def npm_repositories():
         bins = {
             "tsc": "./bin/tsc",
             "tsserver": "./bin/tsserver",
+        },
+    )
+
+    npm_import(
+        name = "npm__uid-number__0.0.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "uid-number",
+        version = "0.0.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-c461FXIljswCuscZn67xq9PpszkPT6RjheWFQTgCyabJrTUozElanb0YEqv2UGgk247YpcJkFBuSGNvBlpXM9w==",
+        transitive_closure = {
+            "uid-number": ["0.0.6"],
+        },
+    )
+
+    npm_import(
+        name = "npm__umask__1.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "umask",
+        version = "1.1.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-lE/rxOhmiScJu9L6RTNVgB/zZbF+vGC0/p6D3xnkAePI2o0sMyFG966iR5Ki50OI/0mNi2yaRnxfLsPmEZF/JA==",
+        transitive_closure = {
+            "umask": ["1.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__unique-filename__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "unique-filename",
+        version = "1.1.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-Vmp0jIp2ln35UTXuryvjzkjGdRyf9b2lTXuSYUiPmzRcl3FDtYqAwOnTJkAngD9SWhnoJzDbTKwaOrZ+STtxNQ==",
+        deps = {
+            "unique-slug": "2.0.2",
+        },
+        transitive_closure = {
+            "unique-filename": ["1.1.1"],
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__unique-slug__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "unique-slug",
+        version = "2.0.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-zoWr9ObaxALD3DOPfjPSqxt4fnZiWblxHIgeWqW8x7UqDzEtHEQLzji2cuJYQFCU6KmoJikOYAZlrTHHebjx2w==",
+        deps = {
+            "imurmurhash": "0.1.4",
+        },
+        transitive_closure = {
+            "unique-slug": ["2.0.2"],
+            "imurmurhash": ["0.1.4"],
         },
     )
 
@@ -14082,6 +17302,28 @@ def npm_repositories():
             "safe-buffer": ["5.1.2"],
             "@jridgewell/resolve-uri": ["3.0.7"],
             "@jridgewell/sourcemap-codec": ["1.4.13"],
+        },
+    )
+
+    npm_import(
+        name = "npm__validate-npm-package-license__3.0.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "validate-npm-package-license",
+        version = "3.0.4",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==",
+        deps = {
+            "spdx-correct": "3.1.1",
+            "spdx-expression-parse": "3.0.1",
+        },
+        transitive_closure = {
+            "validate-npm-package-license": ["3.0.4"],
+            "spdx-correct": ["3.1.1"],
+            "spdx-expression-parse": ["3.0.1"],
+            "spdx-exceptions": ["2.3.0"],
+            "spdx-license-ids": ["3.0.11"],
         },
     )
 
@@ -14920,6 +18162,55 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__write-file-atomic__3.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "write-file-atomic",
+        version = "3.0.3",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-AvHcyZ5JnSfq3ioSyjrBkH9yW4m7Ayk8/9My/DD9onKeu/94fwrMocemO2QAJFAlnnDN+ZDS+ZjAR5ua1/PV/Q==",
+        deps = {
+            "imurmurhash": "0.1.4",
+            "is-typedarray": "1.0.0",
+            "signal-exit": "3.0.7",
+            "typedarray-to-buffer": "3.1.5",
+        },
+        transitive_closure = {
+            "write-file-atomic": ["3.0.3"],
+            "imurmurhash": ["0.1.4"],
+            "is-typedarray": ["1.0.0"],
+            "signal-exit": ["3.0.7"],
+            "typedarray-to-buffer": ["3.1.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__write-yaml-file__4.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "write-yaml-file",
+        version = "4.2.0",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-LwyucHy0uhWqbrOkh9cBluZBeNVxzHjDaE9mwepZG3n3ZlbM4v3ndrFw51zW/NXYFFqP+QWZ72ihtLWTh05e4Q==",
+        deps = {
+            "js-yaml": "4.1.0",
+            "write-file-atomic": "3.0.3",
+        },
+        transitive_closure = {
+            "write-yaml-file": ["4.2.0"],
+            "js-yaml": ["4.1.0"],
+            "write-file-atomic": ["3.0.3"],
+            "imurmurhash": ["0.1.4"],
+            "is-typedarray": ["1.0.0"],
+            "signal-exit": ["3.0.7"],
+            "typedarray-to-buffer": ["3.1.5"],
+            "argparse": ["2.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__ws__7.5.8__bufferutil_4.0.1",
         root_package = "",
         link_workspace = "",
@@ -15172,6 +18463,21 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_types_emscripten__registry.npmjs.org_at_types_emscripten_1.39.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/emscripten",
+        version = "registry.npmjs.org/@types/emscripten/1.39.6",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-H90aoynNhhkQP6DRweEjJp5vfUVdIj7tdPLsu7pq89vODD/lcugKfZOsfgwpvM6XUewEp2N5dCg1Uf3Qe55Dcg==",
+        url = "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.6.tgz",
+        transitive_closure = {
+            "@types/emscripten": ["registry.npmjs.org/@types/emscripten/1.39.6"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_eslint-scope__registry.npmjs.org_at_types_eslint-scope_3.7.3",
         root_package = "",
         link_workspace = "",
@@ -15374,6 +18680,25 @@ def npm_repositories():
         },
         transitive_closure = {
             "@types/responselike": ["registry.npmjs.org/@types/responselike/1.0.0"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_ssri__registry.npmjs.org_at_types_ssri_7.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/ssri",
+        version = "registry.npmjs.org/@types/ssri/7.1.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-DPP/jkDaqGiyU75MyMURxLWyYLwKSjnAuGe9ZCsLp9QZOpXmDfuevk769F0BS86TmRuD5krnp06qw9nSoNO+0g==",
+        url = "https://registry.yarnpkg.com/@types/ssri/-/ssri-7.1.1.tgz",
+        deps = {
+            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+        },
+        transitive_closure = {
+            "@types/ssri": ["registry.npmjs.org/@types/ssri/7.1.1"],
             "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
         },
     )
