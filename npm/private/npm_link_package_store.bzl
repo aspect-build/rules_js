@@ -5,7 +5,6 @@ load(":utils.bzl", "utils")
 load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load("//js:providers.bzl", "JsInfo", "js_info")
-load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
@@ -95,7 +94,10 @@ def _impl(ctx):
     files = utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)
 
     for bin_name, bin_path in ctx.attr.bins.items():
-        path_to_root = relative_file(store_info.root_package, ctx.label.package + "/file")
+        if ctx.label.package:
+            path_to_root = "/".join([".."] * len(ctx.label.package.split("/")))
+        else:
+            path_to_root = "."
         bin_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name))
         bin_path = paths.normalize(paths.join("../..", path_to_root, virtual_store_directory.short_path, bin_path))
         ctx.actions.write(
