@@ -432,11 +432,14 @@ def _impl(rctx):
         else:
             fail("rules_js internal validation error, please file an issue")
 
-        rctx.execute([
+        result = rctx.execute([
             rctx.path(Label("@nodejs_host//:bin/node")),
             rctx.path(Label("@pnpm//:package/bin/pnpm.cjs")),
             "import",
         ])
+        if result.return_code:
+            msg = "pnpm import exited with status %s: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.return_code, result.stdout, result.stderr)
+            fail(msg)
 
         lockfile = _process_lockfile(rctx, "pnpm-lock.yaml")
 
