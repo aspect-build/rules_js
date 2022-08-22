@@ -2,6 +2,36 @@
 # Included with a --bazelrc option in the call to bazel
 build --announce_rc
 test --test_output=errors
-build --disk_cache=~/.cache/bazel
 build --repository_cache=~/.cache/bazel-repo
 test --test_env=XDG_CACHE_HOME
+
+# When no remote cache, use a local one
+build:local --disk_cache=~/.cache/bazel
+
+# Generic remote cache
+build --remote_local_fallback
+build --remote_download_toplevel
+build --remote_timeout=3600
+build --remote_upload_local_results
+## Fixes builds hanging on CI that get the TCP connection closed without sending RST packets.
+build --grpc_keepalive_time=30s
+
+# Generic remote build execution
+build:rbe --extra_execution_platforms=@aspect_rules_js//platforms:x86_64_linux_remote
+build:rbe --genrule_strategy=remote
+build:rbe --host_platform=@aspect_rules_js//platforms:x86_64_linux_remote
+build:rbe --jobs=32
+
+# EngFlow remote cache
+build:rbe --bes_backend=grpcs://tourmaline.cluster.engflow.com
+build:rbe --bes_results_url=https://tourmaline.cluster.engflow.com/invocation/
+build:rbe --remote_cache=grpcs://tourmaline.cluster.engflow.com
+
+# EngFlow remote build execution
+build:rbe --remote_executor=grpcs://tourmaline.cluster.engflow.com
+
+# TODO: remove workaround for failure
+build:rbe --modify_execution_info=GoCompilePkg=+no-remote-exec
+
+# These files are written during CI setup, using secrets registered with the CI platforms
+build:rbe --tls_client_certificate=engflow.crt --tls_client_key=engflow.key

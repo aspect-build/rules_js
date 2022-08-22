@@ -18,6 +18,9 @@ jobs:
 
         strategy:
             matrix:
+                config:
+                    - 'local'
+                    - 'rbe'
                 folder:
                     - '.'
                     # Broken by the bazel 5.3.0 upgrade
@@ -42,11 +45,23 @@ jobs:
                       ~/.cache/bazel-repo
                   key: bazel-cache-${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', '**/*.js') }}
                   restore-keys: bazel-cache-
+            - name: Write engflow credentials
+              if: ${{ matrix.config == 'rbe' }}
+              working-directory: ${{ matrix.folder }}
+              run: |
+                  touch engflow.crt engflow.key
+                  chmod 0600 engflow.crt engflow.key
+                  echo "$ENGFLOW_CLIENT_CRT" > engflow.crt
+                  echo "$ENGFLOW_PRIVATE_KEY" > engflow.key
+                  echo "USE_BAZEL_VERSION=aspect-build/6.0.0-aspect1" >> $GITHUB_ENV
+              env:
+                  ENGFLOW_CLIENT_CRT: ${{ secrets.ENGFLOW_CLIENT_CRT }}
+                  ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
             - name: bazel test //...
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
+                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }}  //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused

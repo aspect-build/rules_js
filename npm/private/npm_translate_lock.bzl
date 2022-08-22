@@ -394,8 +394,10 @@ def _validate_attrs(rctx):
         fail("npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count))
 
 def _label_str(label):
-    return "@{}//{}:{}".format(
-        label.workspace_name,
+    return "//{}:{}".format(
+        # Ideally we would print the workspace_name, but starting in Bazel 6, it's empty for the
+        # local workspace and there's no other way to determine it.
+        # label.workspace_name,
         label.package,
         label.name,
     )

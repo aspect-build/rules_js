@@ -67,6 +67,13 @@ npm_translate_lock(
         "@aspect-test/c": "echo moo > cow.txt",
         "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
     },
+    lifecycle_hooks_execution_requirements = {
+        "@figma/nodegit": [
+            # Workaround Engflow not honoring requires-network on build actions
+            "no-remote-exec",
+            "requires-network",
+        ],
+    },
     patch_args = {
         "@gregmagolan/test-a": ["-p1"],
     },
