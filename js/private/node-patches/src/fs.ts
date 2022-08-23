@@ -496,7 +496,8 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     }
 
     function nextHop(loc: string, cb: (next: string | false) => void): void {
-        let nested = []
+        let nested: string[] = []
+        let escapedHop: string | false = false
         const oneHop = (maybe, cb: (next: string | false) => void) => {
             origReadlink(maybe, (err: Error, str: string) => {
                 if (err) {
@@ -513,7 +514,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                         dirname == '/'
                     ) {
                         // not a link
-                        return cb(false)
+                        return cb(escapedHop)
                     }
                     maybe = dirname
                     return oneHop(maybe, cb)
@@ -521,42 +522,79 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 if (!path.isAbsolute(str)) {
                     str = path.resolve(path.dirname(maybe), str)
                 }
-                return cb(path.join(str, ...nested.reverse()))
+                str = path.join(str, ...nested.reverse())
+                if (isEscape(loc, str)) {
+                    if (!escapedHop) {
+                        escapedHop = str
+                    }
+                    nested.push(path.basename(maybe))
+                    const dirname = path.dirname(maybe)
+                    if (
+                        !dirname ||
+                        dirname == maybe ||
+                        dirname == '.' ||
+                        dirname == '/'
+                    ) {
+                        // not a link
+                        return cb(escapedHop)
+                    }
+                    maybe = dirname
+                    return oneHop(maybe, cb)
+                } else {
+                    return cb(str)
+                }
             })
         }
         oneHop(loc, cb)
     }
 
     function nextHopSync(loc: string): string | false {
-        let readlink
-        let nested = []
+        let readlink: string
+        let nested: string[] = []
         let maybe = loc
+        let escapedHop: string | false = false
+        function _tryParent(): boolean {
+            nested.push(path.basename(maybe))
+            const dirname = path.dirname(maybe)
+            if (
+                !dirname ||
+                dirname == maybe ||
+                dirname == '.' ||
+                dirname == '/'
+            ) {
+                // not a link
+                return false
+            }
+            maybe = dirname
+            return true
+        }
         for (;;) {
             try {
                 readlink = origReadlinkSync(maybe)
+                if (!path.isAbsolute(readlink)) {
+                    readlink = path.resolve(path.dirname(maybe), readlink)
+                }
+                readlink = path.join(readlink, ...nested.reverse())
+                if (isEscape(loc, readlink)) {
+                    if (!escapedHop) {
+                        escapedHop = readlink
+                    }
+                    if (!_tryParent()) {
+                        return escapedHop
+                    }
+                    continue
+                }
+                return readlink
             } catch (err) {
                 if (err.code === 'ENOENT') {
                     // file does not exist
                     return undefined
                 }
-                nested.push(path.basename(maybe))
-                const dirname = path.dirname(maybe)
-                if (
-                    !dirname ||
-                    dirname == maybe ||
-                    dirname == '.' ||
-                    dirname == '/'
-                ) {
-                    // not a link
-                    return false
+                if (!_tryParent()) {
+                    return escapedHop
                 }
-                maybe = dirname
                 continue
             }
-            if (!path.isAbsolute(readlink)) {
-                readlink = path.resolve(path.dirname(maybe), readlink)
-            }
-            return path.join(readlink, ...nested.reverse())
         }
     }
 
