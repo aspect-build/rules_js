@@ -461,6 +461,7 @@ const patcher = (fs = _fs, roots) => {
     }
     function nextHop(loc, cb) {
         let nested = [];
+        let escapedHop = false;
         const oneHop = (maybe, cb) => {
             origReadlink(maybe, (err, str) => {
                 if (err) {
@@ -475,7 +476,7 @@ const patcher = (fs = _fs, roots) => {
                         dirname == '.' ||
                         dirname == '/') {
                         // not a link
-                        return cb(false);
+                        return cb(escapedHop);
                     }
                     maybe = dirname;
                     return oneHop(maybe, cb);
@@ -483,7 +484,26 @@ const patcher = (fs = _fs, roots) => {
                 if (!path.isAbsolute(str)) {
                     str = path.resolve(path.dirname(maybe), str);
                 }
-                return cb(path.join(str, ...nested.reverse()));
+                str = path.join(str, ...nested.reverse());
+                if (isEscape(loc, str)) {
+                    if (!escapedHop) {
+                        escapedHop = str;
+                    }
+                    nested.push(path.basename(maybe));
+                    const dirname = path.dirname(maybe);
+                    if (!dirname ||
+                        dirname == maybe ||
+                        dirname == '.' ||
+                        dirname == '/') {
+                        // not a link
+                        return cb(escapedHop);
+                    }
+                    maybe = dirname;
+                    return oneHop(maybe, cb);
+                }
+                else {
+                    return cb(str);
+                }
             });
         };
         oneHop(loc, cb);
@@ -492,31 +512,48 @@ const patcher = (fs = _fs, roots) => {
         let readlink;
         let nested = [];
         let maybe = loc;
+        let escapedHop = false;
+        function _tryParent() {
+            nested.push(path.basename(maybe));
+            const dirname = path.dirname(maybe);
+            if (!dirname ||
+                dirname == maybe ||
+                dirname == '.' ||
+                dirname == '/') {
+                // not a link
+                return false;
+            }
+            maybe = dirname;
+            return true;
+        }
         for (;;) {
             try {
                 readlink = origReadlinkSync(maybe);
+                if (!path.isAbsolute(readlink)) {
+                    readlink = path.resolve(path.dirname(maybe), readlink);
+                }
+                readlink = path.join(readlink, ...nested.reverse());
+                if (isEscape(loc, readlink)) {
+                    if (!escapedHop) {
+                        escapedHop = readlink;
+                    }
+                    if (!_tryParent()) {
+                        return escapedHop;
+                    }
+                    continue;
+                }
+                return readlink;
             }
             catch (err) {
                 if (err.code === 'ENOENT') {
                     // file does not exist
                     return undefined;
                 }
-                nested.push(path.basename(maybe));
-                const dirname = path.dirname(maybe);
-                if (!dirname ||
-                    dirname == maybe ||
-                    dirname == '.' ||
-                    dirname == '/') {
-                    // not a link
-                    return false;
+                if (!_tryParent()) {
+                    return escapedHop;
                 }
-                maybe = dirname;
                 continue;
             }
-            if (!path.isAbsolute(readlink)) {
-                readlink = path.resolve(path.dirname(maybe), readlink);
-            }
-            return path.join(readlink, ...nested.reverse());
         }
     }
     function guardedReadLink(start, cb) {
