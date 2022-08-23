@@ -29,6 +29,10 @@ nodejs_register_toolchains(
     node_version = "16.13.1",
 )
 
+load("@aspect_bazel_lib//lib:repositories.bzl", "register_jq_toolchains")
+
+register_jq_toolchains()
+
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
 register_unittest_toolchains()

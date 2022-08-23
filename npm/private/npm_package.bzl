@@ -9,6 +9,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 """
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_action", "copy_to_directory_lib")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
@@ -27,6 +28,9 @@ package and subpackages from being included.
 
 The default `exclude_srcs_patterns`, of `["node_modules/**", "**/node_modules/**"]`, prevents
 `node_modules` files from being included.
+
+To stamp the current git tag as the "version" in the package.json file, see
+[stamped_package_json](#stamped_package_json)
 """
 
 # Pull in all copy_to_directory attributes except for exclude_prefixes
@@ -191,3 +195,41 @@ npm_package = rule(
     attrs = npm_package_lib.attrs,
     provides = npm_package_lib.provides,
 )
+
+def stamped_package_json(name, stamp_var, **kwargs):
+    """Convenience wrapper to set the "version" property in package.json with the git tag.
+
+    In unstamped builds (typically those without `--stamp`) the version will be set to `0.0.0`.
+    This ensures that actions which use the package.json file can get cache hits.
+
+    For more information on stamping, read https://github.com/aspect-build/bazel-lib/blob/main/docs/stamping.md.
+
+    Using this rule requires that you register the jq toolchain in your WORKSPACE:
+
+    ```starlark
+    load("@aspect_bazel_lib//lib:repositories.bzl", "register_jq_toolchains")
+
+    register_jq_toolchains()
+    ```
+
+    Args:
+        name: name of the resulting `jq` target, must be "package"
+        stamp_var: a key from the bazel-out/stable-status.txt or bazel-out/volatile-status.txt files
+        **kwargs: additional attributes passed to the jq rule, see https://github.com/aspect-build/bazel-lib/blob/main/docs/jq.md
+    """
+    if name != "package":
+        fail("""stamped_package_json should always be named "package" so that the default output is named "package.json".
+        This is required since Bazel doesn't allow a predeclared output to have the same name as an input file.""")
+
+    jq(
+        name = name,
+        srcs = ["package.json"],
+        filter = "|".join([
+            # Don't directly reference $STAMP as it's only set when stamping
+            # This 'as' syntax results in $stamp being null in unstamped builds.
+            "$ARGS.named.STAMP as $stamp",
+            # Provide a default using the "alternative operator" in case $stamp is null.
+            ".version = ($stamp.{} // \"0.0.0\")".format(stamp_var),
+        ]),
+        **kwargs
+    )
