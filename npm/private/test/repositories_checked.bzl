@@ -15327,9 +15327,7 @@ def npm_repositories():
         name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.36",
         root_package = "",
         link_workspace = "",
-        link_packages = {
-            "": ["@types/node"],
-        },
+        link_packages = {},
         package = "@types/node",
         version = "registry.npmjs.org/@types/node/16.11.36",
         lifecycle_hooks_no_sandbox = True,
@@ -15337,6 +15335,23 @@ def npm_repositories():
         url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz",
         transitive_closure = {
             "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.54",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["@types/node"],
+        },
+        package = "@types/node",
+        version = "registry.npmjs.org/@types/node/16.11.54",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-ryOpwe15+BtTUxKFfzABjaI/EtXLPBSBEW4B6D5ygWNcORLVKG/1/FC3WwAr5d7t6lCnlVPRsCY0NH680QT+Pg==",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.54.tgz",
+        transitive_closure = {
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
         },
     )
 

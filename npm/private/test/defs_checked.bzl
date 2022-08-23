@@ -710,9 +710,10 @@ load("@npm__at_types_istanbul-lib-coverage__registry.npmjs.org_at_types_istanbul
 load("@npm__at_types_json-buffer__registry.npmjs.org_at_types_json-buffer_3.0.0__links//:defs.bzl", store_703 = "npm_imported_package_store")
 load("@npm__at_types_json-schema__registry.npmjs.org_at_types_json-schema_7.0.11__links//:defs.bzl", store_704 = "npm_imported_package_store")
 load("@npm__at_types_keyv__registry.npmjs.org_at_types_keyv_3.1.4__links//:defs.bzl", store_705 = "npm_imported_package_store")
-load("@npm__at_types_node__registry.npmjs.org_at_types_node_16.11.36__links//:defs.bzl", link_706 = "npm_link_imported_package_store", store_706 = "npm_imported_package_store")
-load("@npm__at_types_resolve__registry.npmjs.org_at_types_resolve_1.17.1__links//:defs.bzl", store_707 = "npm_imported_package_store")
-load("@npm__at_types_responselike__registry.npmjs.org_at_types_responselike_1.0.0__links//:defs.bzl", store_708 = "npm_imported_package_store")
+load("@npm__at_types_node__registry.npmjs.org_at_types_node_16.11.36__links//:defs.bzl", store_706 = "npm_imported_package_store")
+load("@npm__at_types_node__registry.npmjs.org_at_types_node_16.11.54__links//:defs.bzl", link_707 = "npm_link_imported_package_store", store_707 = "npm_imported_package_store")
+load("@npm__at_types_resolve__registry.npmjs.org_at_types_resolve_1.17.1__links//:defs.bzl", store_708 = "npm_imported_package_store")
+load("@npm__at_types_responselike__registry.npmjs.org_at_types_responselike_1.0.0__links//:defs.bzl", store_709 = "npm_imported_package_store")
 
 def npm_link_all_packages(name = "node_modules", imported_links = []):
     """Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in //:pnpm-lock.yaml
@@ -1460,8 +1461,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_704(name = "{}/@types/json-schema".format(name))
         store_705(name = "{}/@types/keyv".format(name))
         store_706(name = "{}/@types/node".format(name))
-        store_707(name = "{}/@types/resolve".format(name))
-        store_708(name = "{}/@types/responselike".format(name))
+        store_707(name = "{}/@types/node".format(name))
+        store_708(name = "{}/@types/resolve".format(name))
+        store_709(name = "{}/@types/responselike".format(name))
     if link:
         if native.package_name() == "examples/npm_deps":
             link_targets.append(link_0(name = "{}/@aspect-test/a".format(name)))
@@ -1513,7 +1515,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         if native.package_name() == "":
             link_targets.append(link_345(name = "{}/inline-fixtures".format(name)))
             link_targets.append(link_636(name = "{}/typescript".format(name)))
-            link_targets.append(link_706(name = "{}/@types/node".format(name)))
+            link_targets.append(link_707(name = "{}/@types/node".format(name)))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
         if native.package_name() == "examples/webpack_cli":
             link_targets.append(link_418(name = "{}/mathjs".format(name)))
