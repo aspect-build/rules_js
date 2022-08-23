@@ -6,7 +6,12 @@ load(":npm_repositories.bzl", "npm_repositories")
 def repositories():
     npm_translate_lock(
         name = "rules_foo_npm",
+        # Since this rule set is meant to be consumed as an external repository, the lock file must be a fully
+        # qualified label that includes the workspace name.
         pnpm_lock = "@rules_foo//foo:pnpm-lock.yaml",
+        # Since this rule set is meant to be consumed as an external repository, link_workspace must be set when using
+        # Bazel 5.3.0 or later and must match the workspace name of the lock file.
+        link_workspace = "rules_foo",
     )
 
     # The following comes from inlining the result of the npm_translate_lock call.
