@@ -10,11 +10,11 @@ importers:
 
   .:
     specifiers:
-      '@types/node': 16.11.36
+      '@types/node': 16.11.54
       inline-fixtures: 1.1.0
       typescript: 4.7.2
     devDependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.36
+      '@types/node': registry.npmjs.org/@types/node/16.11.54
       inline-fixtures: 1.1.0
       typescript: 4.7.2
 
@@ -4861,6 +4861,12 @@ packages:
     resolution: {integrity: sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.11.36.tgz}
     name: '@types/node'
     version: 16.11.36
+
+  registry.npmjs.org/@types/node/16.11.54:
+    resolution: {integrity: sha512-ryOpwe15+BtTUxKFfzABjaI/EtXLPBSBEW4B6D5ygWNcORLVKG/1/FC3WwAr5d7t6lCnlVPRsCY0NH680QT+Pg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.11.54.tgz}
+    name: '@types/node'
+    version: 16.11.54
+    dev: true
 
   registry.npmjs.org/@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.17.1.tgz}
