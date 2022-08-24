@@ -7,6 +7,7 @@ Stuck?
 -   See the [Frequently asked questions](./faq.md)
 -   Ask in `#javascript` on <http://slack.bazel.build>
 -   Check for [known issues](https://github.com/aspect-build/rules_js/issues)
+-   Attend our [office hours](https://calendly.com/aspect-build/rules_js-office-hours)
 -   Pay for support, provided by <https://aspect.dev>.
 
 ## Installation
