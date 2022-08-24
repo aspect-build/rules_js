@@ -18,6 +18,7 @@ bzl_library(
         ":npm_package_info",
         "//js:providers",
         "@aspect_bazel_lib//lib:copy_to_directory",
+        "@aspect_bazel_lib//lib:jq",
         "@bazel_skylib//lib:dicts",
     ],
 )
