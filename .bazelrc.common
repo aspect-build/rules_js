@@ -21,6 +21,7 @@ startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 #          and developer mode is enabled.
 build --enable_runfiles
 
+build --incompatible_allow_tags_propagation
 common --enable_platform_specific_config
 
 # Turn off legacy external runfiles on all platforms except Windows.
@@ -44,4 +45,4 @@ build:openbsd --nolegacy_external_runfiles
 build --incompatible_strict_action_env
 
 # TODO: enable once this is supported in Bazel
-# build --experimental_allow_unresolved_symlinks
+build:rbe --experimental_allow_unresolved_symlinks

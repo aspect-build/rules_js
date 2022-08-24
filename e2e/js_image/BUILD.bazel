@@ -24,7 +24,10 @@ js_image_layer(
     name = "layers",
     binary = ":main",
     root = "/app",
-    tags = [],
+    # FIXME: fails with
+    # File "/mnt/engflow/worker/work/0/exec/bazel-out/k8-opt-exec-41DC9EB7-ST-f4b2833703dd/bin/layers.build_tar.runfiles/rules_pkg/pkg/private/tar/tar_writer.py", line 241, in add_file
+    # IsADirectoryError: [Errno 21] Is a directory: 'bazel-out/k8-fastbuild-ST-4a519fd6d3e4/bin/node_modules/.aspect_rules_js/ansi-styles@4.3.0/node_modules/color-convert'
+    tags = ["no-remote-exec"],
     visibility = ["//visibility:__pkg__"],
 )
 
@@ -57,6 +60,8 @@ container_test(
     name = "image_test",
     configs = [":smoketest.yaml"],
     image = ":image",
+    # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
+    tags = ["no-remote-exec"],
 )
 
 bzl_library(

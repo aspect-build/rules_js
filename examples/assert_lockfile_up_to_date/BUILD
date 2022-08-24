@@ -16,9 +16,9 @@ js_test(
         # The script overrides the cache dir to point to the output tree but pnpm
         # will complain on Windows if it can't resolve a path to the default one.
         # The env var APPDATA just needs to exist but not be undefined.
-        "APPDATA": "unused"
-
-    }
+        "APPDATA": "unused",
+    },
+    tags = ["requires-network"],
 )
 
 js_binary(
@@ -29,8 +29,8 @@ js_binary(
         # The script overrides the cache dir to point to the output tree but pnpm
         # will complain on Windows if it can't resolve a path to the default one.
         # The env var APPDATA just needs to exist but not be undefined.
-        "APPDATA": "unused"
-    }
+        "APPDATA": "unused",
+    },
 )
 
 js_run_binary(
@@ -45,6 +45,9 @@ js_run_binary(
     chdir = package_name(),
     tags = [
         "manual",
+        # FIXME: engflow doesn't check requires-network for actions
+        "no-remote-exec",
+        "requires-network",
     ],
     tool = ":update_lockfile_js",
 )
@@ -74,4 +77,5 @@ js_test(
     ],
     entry_point = "assert_lockfile_frozen.js",
     expected_exit_code = 1,
+    tags = ["requires-network"],
 )
