@@ -40,7 +40,9 @@ def gather_transitive_sources(sources, targets):
         for item in target[JsInfo].transitive_sources
     ]
     transitive_sources = [file for file in transitive_sources if file]
-    return transitive_sources
+
+    # pass list through a depset to remove duplicates
+    return depset(transitive_sources).to_list()
 
 def gather_transitive_declarations(declarations, targets):
     """Gathers transitive sources from a list of direct sources and targets
@@ -59,7 +61,9 @@ def gather_transitive_declarations(declarations, targets):
         for item in target[JsInfo].transitive_declarations
     ]
     transitive_declarations = [file for file in transitive_declarations if file]
-    return transitive_declarations
+
+    # pass list through a depset to remove duplicates
+    return depset(transitive_declarations).to_list()
 
 def gather_npm_linked_packages(srcs, deps):
     """Gathers npm linked packages from a list of srcs and deps targets
@@ -91,8 +95,9 @@ def gather_npm_linked_packages(srcs, deps):
     transitive_npm_linked_packages = [package for package in transitive_npm_linked_packages if package]
 
     return struct(
-        direct = npm_linked_packages,
-        transitive = transitive_npm_linked_packages,
+        # pass lists through depsets to remove duplicates
+        direct = depset(npm_linked_packages).to_list(),
+        transitive = depset(transitive_npm_linked_packages).to_list(),
     )
 
 def gather_npm_package_stores(targets):
@@ -128,16 +133,17 @@ def gather_npm_package_stores(targets):
         if JsInfo in target:
             if hasattr(target[JsInfo], "npm_linked_packages"):
                 for package in target[JsInfo].npm_linked_packages:
-                    if package.store_info and package.store_info not in npm_package_stores:
+                    if package.store_info:
                         npm_package_stores.append(package.store_info)
             if hasattr(target[JsInfo], "transitive_npm_linked_packages"):
                 for package in target[JsInfo].transitive_npm_linked_packages:
-                    if package.store_info and package.store_info not in transitive_npm_package_stores:
+                    if package.store_info:
                         transitive_npm_package_stores.append(package.store_info)
 
     return struct(
-        direct = npm_package_stores,
-        transitive = transitive_npm_package_stores,
+        # pass lists through depsets to remove duplicates
+        direct = depset(npm_package_stores).to_list(),
+        transitive = depset(transitive_npm_package_stores).to_list(),
     )
 
 def gather_runfiles(ctx, sources, data, deps):

@@ -4,7 +4,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
 load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
-load("//js:providers.bzl", "JsInfo", "js_info")
+load("//js:providers.bzl", "JsInfo", "js_info_complete")
 
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
@@ -109,28 +109,31 @@ def _impl(ctx):
 
     transitive_files = files + store_info.transitive_files
 
+    files_depset = depset(files)
+
     npm_linked_package_info = NpmLinkedPackageInfo(
         label = ctx.label,
         link_package = ctx.label.package,
         package = store_info.package,
         version = store_info.version,
         store_info = store_info,
-        files = files,
-        transitive_files = transitive_files,
+        # pass lists through depsets to remove duplicates
+        files = files_depset.to_list(),
+        transitive_files = depset(transitive_files).to_list(),
     )
 
     providers = [
         DefaultInfo(
             # Only provide direct files in DefaultInfo files
-            files = depset(files),
+            files = files_depset,
             # Include all transitives in runfiles so that this target can be used in the data
             # of a generic binary target such as sh_binary
             runfiles = ctx.runfiles(transitive_files),
         ),
-        js_info(
+        js_info_complete(JsInfo(
             npm_linked_packages = [npm_linked_package_info],
             transitive_npm_linked_packages = [npm_linked_package_info],
-        ),
+        )),
     ]
     if OutputGroupInfo in ctx.attr.src:
         providers.append(ctx.attr.src[OutputGroupInfo])

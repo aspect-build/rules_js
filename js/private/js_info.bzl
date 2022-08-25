@@ -14,6 +14,26 @@ JsInfo = provider(
     },
 )
 
+def js_info_complete(js_info_partial):
+    """Construct a complete JsInfo from a partial JsInfo
+
+    Args:
+        js_info_partial: A partial JsInfo with some but not necessarily all fields populated
+
+    Returns:
+        A JsInfo provider
+    """
+    return JsInfo(
+        declarations = getattr(js_info_partial, "declarations", []),
+        npm_linked_packages = getattr(js_info_partial, "npm_linked_packages", []),
+        npm_package_stores = getattr(js_info_partial, "npm_package_stores", []),
+        sources = getattr(js_info_partial, "sources", []),
+        transitive_declarations = getattr(js_info_partial, "transitive_declarations", []),
+        transitive_npm_linked_packages = getattr(js_info_partial, "transitive_npm_linked_packages", []),
+        transitive_npm_package_stores = getattr(js_info_partial, "transitive_npm_package_stores", []),
+        transitive_sources = getattr(js_info_partial, "transitive_sources", []),
+    )
+
 def js_info(
         declarations = [],
         npm_linked_packages = [],
@@ -24,6 +44,8 @@ def js_info(
         transitive_npm_package_stores = [],
         transitive_sources = []):
     """Construct a JsInfo
+
+    Lists are passed through depsets to remove duplicates.
 
     Args:
         declarations: See JsInfo documentation
@@ -39,12 +61,13 @@ def js_info(
         A JsInfo provider
     """
     return JsInfo(
-        declarations = declarations,
-        npm_linked_packages = npm_linked_packages,
-        npm_package_stores = npm_package_stores,
-        sources = sources,
-        transitive_declarations = transitive_declarations,
-        transitive_npm_linked_packages = transitive_npm_linked_packages,
-        transitive_npm_package_stores = transitive_npm_package_stores,
-        transitive_sources = transitive_sources,
+        # pass lists through depsets to remove duplicates
+        declarations = depset(declarations).to_list(),
+        npm_linked_packages = depset(npm_linked_packages).to_list(),
+        npm_package_stores = depset(npm_package_stores).to_list(),
+        sources = depset(sources).to_list(),
+        transitive_declarations = depset(transitive_declarations).to_list(),
+        transitive_npm_linked_packages = depset(transitive_npm_linked_packages).to_list(),
+        transitive_npm_package_stores = depset(transitive_npm_package_stores).to_list(),
+        transitive_sources = depset(transitive_sources).to_list(),
     )

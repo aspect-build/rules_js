@@ -43,7 +43,7 @@ def gather_files_from_js_providers(
         include_transitive_sources,
         include_declarations,
         include_npm_linked_packages):
-    """Gathers a list of depsets from JsInfo and NpmPackageStoreInfo providers.
+    """Gathers files from JsInfo and NpmPackageStoreInfo providers.
 
     Args:
         targets: list of target to gather from
@@ -95,4 +95,6 @@ def gather_files_from_js_providers(
             if NpmPackageStoreInfo in target
             for item in target[NpmPackageStoreInfo].transitive_files
         ])
-    return files
+
+    # pass list through a depset to remove duplicates
+    return depset(files).to_list()

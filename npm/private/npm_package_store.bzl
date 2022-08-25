@@ -261,9 +261,11 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         for item in npm_package_store.transitive_files
     ])
 
+    files_depset = depset(files)
+
     providers = [
         DefaultInfo(
-            files = depset(files),
+            files = files_depset,
         ),
         NpmPackageStoreInfo(
             root_package = ctx.label.package,
@@ -271,8 +273,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             version = version,
             ref_deps = direct_ref_deps,
             virtual_store_directory = virtual_store_directory,
-            files = files,
-            transitive_files = transitive_files,
+            # pass lists through depsets to remove duplicates
+            files = files_depset.to_list(),
+            transitive_files = depset(transitive_files).to_list(),
         ),
     ]
     if virtual_store_directory:
