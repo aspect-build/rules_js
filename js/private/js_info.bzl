@@ -1,5 +1,7 @@
 "JsInfo provider"
 
+load("@bazel_skylib//lib:sets.bzl", "sets")
+
 JsInfo = provider(
     doc = "Encapsulates information provided by rules in rules_js and derivative rule sets",
     fields = {
@@ -62,12 +64,12 @@ def js_info(
     """
     return JsInfo(
         # pass lists through depsets to remove duplicates
-        declarations = depset(declarations).to_list(),
-        npm_linked_packages = depset(npm_linked_packages).to_list(),
-        npm_package_stores = depset(npm_package_stores).to_list(),
-        sources = depset(sources).to_list(),
-        transitive_declarations = depset(transitive_declarations).to_list(),
-        transitive_npm_linked_packages = depset(transitive_npm_linked_packages).to_list(),
-        transitive_npm_package_stores = depset(transitive_npm_package_stores).to_list(),
-        transitive_sources = depset(transitive_sources).to_list(),
+        declarations = sets.to_list(sets.make(declarations)),
+        npm_linked_packages = sets.to_list(sets.make(npm_linked_packages)),
+        npm_package_stores = sets.to_list(sets.make(npm_package_stores)),
+        sources = sets.to_list(sets.make(sources)),
+        transitive_declarations = sets.to_list(sets.make(transitive_declarations)),
+        transitive_npm_linked_packages = sets.to_list(sets.make(transitive_npm_linked_packages)),
+        transitive_npm_package_stores = sets.to_list(sets.make(transitive_npm_package_stores)),
+        transitive_sources = sets.to_list(sets.make(transitive_sources)),
     )

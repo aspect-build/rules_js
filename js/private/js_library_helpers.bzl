@@ -3,6 +3,7 @@
 
 load(":js_binary_helpers.bzl", "gather_files_from_js_providers")
 load(":js_info.bzl", "JsInfo")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 
 # This attribute is exposed in //js:libs.bzl so that downstream build rules can use it
 JS_LIBRARY_DATA_ATTR = attr.label_list(
@@ -42,7 +43,7 @@ def gather_transitive_sources(sources, targets):
     transitive_sources = [file for file in transitive_sources if file]
 
     # pass list through a depset to remove duplicates
-    return depset(transitive_sources).to_list()
+    return sets.to_list(sets.make(transitive_sources))
 
 def gather_transitive_declarations(declarations, targets):
     """Gathers transitive sources from a list of direct sources and targets
@@ -63,7 +64,7 @@ def gather_transitive_declarations(declarations, targets):
     transitive_declarations = [file for file in transitive_declarations if file]
 
     # pass list through a depset to remove duplicates
-    return depset(transitive_declarations).to_list()
+    return sets.to_list(sets.make(transitive_declarations))
 
 def gather_npm_linked_packages(srcs, deps):
     """Gathers npm linked packages from a list of srcs and deps targets
@@ -96,8 +97,8 @@ def gather_npm_linked_packages(srcs, deps):
 
     return struct(
         # pass lists through depsets to remove duplicates
-        direct = depset(npm_linked_packages).to_list(),
-        transitive = depset(transitive_npm_linked_packages).to_list(),
+        direct = sets.to_list(sets.make(npm_linked_packages)),
+        transitive = sets.to_list(sets.make(transitive_npm_linked_packages)),
     )
 
 def gather_npm_package_stores(targets):
@@ -142,8 +143,8 @@ def gather_npm_package_stores(targets):
 
     return struct(
         # pass lists through depsets to remove duplicates
-        direct = depset(npm_package_stores).to_list(),
-        transitive = depset(transitive_npm_package_stores).to_list(),
+        direct = sets.to_list(sets.make(npm_package_stores)),
+        transitive = sets.to_list(sets.make(transitive_npm_package_stores)),
     )
 
 def gather_runfiles(ctx, sources, data, deps):

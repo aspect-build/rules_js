@@ -5,6 +5,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
@@ -275,7 +276,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             virtual_store_directory = virtual_store_directory,
             # pass lists through depsets to remove duplicates
             files = files_depset.to_list(),
-            transitive_files = depset(transitive_files).to_list(),
+            transitive_files = sets.to_list(sets.make(transitive_files)),
         ),
     ]
     if virtual_store_directory:

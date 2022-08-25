@@ -5,6 +5,7 @@ load(":utils.bzl", "utils")
 load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load("//js:providers.bzl", "JsInfo", "js_info_complete")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
@@ -119,7 +120,7 @@ def _impl(ctx):
         store_info = store_info,
         # pass lists through depsets to remove duplicates
         files = files_depset.to_list(),
-        transitive_files = depset(transitive_files).to_list(),
+        transitive_files = sets.to_list(sets.make(transitive_files)),
     )
 
     providers = [

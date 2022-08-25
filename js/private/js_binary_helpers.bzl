@@ -3,6 +3,7 @@
 
 load(":js_info.bzl", "JsInfo")
 load("//npm:providers.bzl", "NpmPackageStoreInfo")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 
 LOG_LEVELS = {
     "fatal": 1,
@@ -97,4 +98,4 @@ def gather_files_from_js_providers(
         ])
 
     # pass list through a depset to remove duplicates
-    return depset(files).to_list()
+    return sets.to_list(sets.make(files))

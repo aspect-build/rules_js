@@ -13,6 +13,7 @@ load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 
 _DOC = """A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
@@ -180,7 +181,7 @@ def _impl(ctx):
             version = ctx.attr.version,
             directory = dst,
             # pass list through a depset to remove duplicates
-            npm_package_stores = depset(npm_package_stores).to_list(),
+            npm_package_stores = sets.to_list(sets.make(npm_package_stores)),
         ),
     ]
 
