@@ -13745,7 +13745,6 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
-            "": ["typescript"],
             "npm/private/test": ["typescript"],
         },
         package = "typescript",
@@ -13754,6 +13753,26 @@ def npm_repositories():
         integrity = "sha512-Mamb1iX2FDUpcTRzltPxgWMKy3fhg0TN378ylbktPGPK/99KbDtMQ4W1hwgsbPAsG3a0xKa1vmw4VKZQbkvz5A==",
         transitive_closure = {
             "typescript": ["4.7.2"],
+        },
+        bins = {
+            "tsc": "./bin/tsc",
+            "tsserver": "./bin/tsserver",
+        },
+    )
+
+    npm_import(
+        name = "npm__typescript__4.8.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["typescript"],
+        },
+        package = "typescript",
+        version = "4.8.2",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw==",
+        transitive_closure = {
+            "typescript": ["4.8.2"],
         },
         bins = {
             "tsc": "./bin/tsc",
