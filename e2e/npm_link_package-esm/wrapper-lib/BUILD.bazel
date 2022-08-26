@@ -1,0 +1,22 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+# A named package depending on another named apckage and a js_library()
+
+js_library(
+    name = "js",
+    srcs = ["index.mjs"],
+    data = [
+        "package.json",
+        "//lib",
+        "//wrapper-lib/subdir",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+npm_package(
+    name = "wrapper-lib",
+    srcs = [":js"],
+    package = "@e2e/wrapper-lib",
+    visibility = ["//visibility:public"],
+)

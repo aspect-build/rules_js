@@ -1,0 +1,20 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@rules_foo_npm//foo:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+npm_link_package(
+    name = "node_modules/@e2e/lib",
+    src = "//lib",
+    visibility = ["//visibility:public"],
+)
+
+npm_link_package(
+    name = "node_modules/@e2e/wrapper-lib",
+    src = "//wrapper-lib",
+)
+
+aspect_test_a_bin.bin_a_test(
+    name = "aspect_test_a_bin_test",
+)
