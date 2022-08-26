@@ -1,0 +1,10 @@
+{
+    "name": "@e2e/wrapper-lib",
+    "private": true,
+    "type": "module",
+    "exports": {
+      ".": {
+        "import": "./index.mjs"
+      }
+    }
+}

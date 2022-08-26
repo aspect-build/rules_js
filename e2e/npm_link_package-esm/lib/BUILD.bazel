@@ -1,0 +1,11 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+npm_package(
+    name = "lib",
+    srcs = [
+        "index.mjs",
+        "package.json",
+    ],
+    package = "@e2e/lib",
+    visibility = ["//visibility:public"],
+)

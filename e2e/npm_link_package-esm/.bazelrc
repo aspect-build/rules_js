@@ -1,0 +1,3 @@
+# import common bazelrc shared with e2e workspaces
+import %workspace%/../../.bazelrc.common
+build --sandbox_default_allow_network=false
