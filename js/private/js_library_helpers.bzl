@@ -13,9 +13,9 @@ JS_LIBRARY_DATA_ATTR = attr.label_list(
     a runtime dependency on this target.
 
     If this list contains linked npm packages, npm package store targets or other targets that provide `JsInfo`,
-    `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from the `npm_package_store_deps` 
-    field of these and for linked npm package targets, from the underlying npm_package_store target(s) that back the
-    links via `npm_linked_packages` and `transitive_npm_linked_packages`.
+    `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from the
+    `npm_package_store_deps` field of these. For linked npm package targets, the underlying npm_package_store
+    target(s) that back the links is used.
 
     Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies when linking a downstream
     `npm_package` target with `npm_link_package`.

@@ -6,6 +6,11 @@ npm_package(
         "index.js",
         "package.json",
     ],
+    data = [
+        # uvu is a runtime dependency of this package and should be linked into its direct dependencies
+        # by the downstream npm_link_package
+        "//:node_modules/uvu",
+    ],
     package = "@e2e/lib",
     visibility = ["//visibility:public"],
 )
