@@ -26,12 +26,12 @@ def _declarations_test_impl(ctx):
     target_under_test = analysistest.target_under_test(env)
 
     # declarations should only have the source declarations
-    declarations = target_under_test[JsInfo].declarations
+    declarations = target_under_test[JsInfo].declarations.to_list()
     asserts.equals(env, 1, len(declarations))
     asserts.true(env, declarations[0].path.find("/importing.d.ts") != -1)
 
     # declarations should only have the source declarations
-    transitive_declarations = target_under_test[JsInfo].transitive_declarations
+    transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
     asserts.equals(env, 1, len(transitive_declarations))
     asserts.true(env, transitive_declarations[0].path.find("/importing.d.ts") != -1)
 
@@ -45,11 +45,11 @@ def _declarations_empty_srcs_test_impl(ctx):
     target_under_test = analysistest.target_under_test(env)
 
     # declarations should only have the source declarations, in this case 0
-    declarations = target_under_test[JsInfo].declarations
+    declarations = target_under_test[JsInfo].declarations.to_list()
     asserts.equals(env, 0, len(declarations))
 
     # transitive_declarations should contain additional indirect deps
-    transitive_declarations = target_under_test[JsInfo].transitive_declarations
+    transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
     asserts.true(env, len(transitive_declarations) > len(declarations))
 
     # types OutputGroupInfo should be the same as direct declarations

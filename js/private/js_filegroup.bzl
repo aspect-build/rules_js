@@ -8,13 +8,12 @@ This helper rule is used by the `js_run_binary` macro.
 """
 
 def _impl(ctx):
-    files = _gather_files_from_js_providers(
+    return DefaultInfo(files = _gather_files_from_js_providers(
         targets = ctx.attr.srcs,
         include_transitive_sources = ctx.attr.include_transitive_sources,
         include_declarations = ctx.attr.include_declarations,
         include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
-    )
-    return DefaultInfo(files = depset(files))
+    ))
 
 js_filegroup = rule(
     doc = _DOC,

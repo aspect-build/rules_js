@@ -107,7 +107,9 @@ def _impl(ctx):
         )
         files.append(bin_file)
 
-    transitive_files = files + store_info.transitive_files
+    files_depset = depset(files)
+
+    transitive_files_depset = depset(files, transitive = [store_info.transitive_files])
 
     npm_linked_package_info = NpmLinkedPackageInfo(
         label = ctx.label,
@@ -115,21 +117,24 @@ def _impl(ctx):
         package = store_info.package,
         version = store_info.version,
         store_info = store_info,
-        files = files,
-        transitive_files = transitive_files,
+        files = files_depset,
+        transitive_files = transitive_files_depset,
     )
 
     providers = [
         DefaultInfo(
             # Only provide direct files in DefaultInfo files
-            files = depset(files),
+            files = files_depset,
             # Include all transitives in runfiles so that this target can be used in the data
             # of a generic binary target such as sh_binary
-            runfiles = ctx.runfiles(transitive_files),
+            runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
         ),
         js_info(
-            npm_linked_packages = [npm_linked_package_info],
-            transitive_npm_linked_packages = [npm_linked_package_info],
+            npm_linked_package_files = files_depset,
+            npm_linked_packages = depset([npm_linked_package_info]),
+            npm_package_store_deps = depset([store_info]),
+            transitive_npm_linked_package_files = transitive_files_depset,
+            transitive_npm_linked_packages = depset([npm_linked_package_info]),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
