@@ -2,7 +2,8 @@
     "name": "simple",
     "dependencies": {
         "@aspect-test/a": "5.0.0",
-        "sharp": "0.30.7"
+        "sharp": "0.30.7",
+        "uvu": "0.5.3"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2"

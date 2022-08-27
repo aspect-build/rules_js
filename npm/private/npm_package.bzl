@@ -11,6 +11,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_action", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("//js:libs.bzl", "js_lib_helpers")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
@@ -117,6 +118,18 @@ If unset, a npm_link_package that references this npm_package must define the pa
         https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md#copy_to_directory.
         """,
     ),
+    "data": attr.label_list(
+        doc = """Runtime / linktime npm dependencies of this npm package.
+
+        `NpmPackageStoreInfo` providers are gathered from `JsInfo` of the targets specified. Targets can be linked npm
+        packages, npm package store targets or other targets that provide `JsInfo`. This is done directly from the
+        `npm_package_store_deps` field of these. For linked npm package targets, the underlying npm_package_store
+        target(s) that back the links is used.
+
+        Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies of this npm package when
+        linking with `npm_link_package`.
+        """,
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 })
 
@@ -147,6 +160,9 @@ def _impl(ctx):
         for target in ctx.attr.srcs
         if JsInfo in target and hasattr(target[JsInfo], "npm_package_store_deps")
     ]
+    npm_package_store_deps.append(js_lib_helpers.gather_npm_package_store_deps(
+        targets = ctx.attr.data,
+    ))
 
     copy_to_directory_action(
         ctx,
