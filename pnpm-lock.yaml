@@ -12,11 +12,11 @@ importers:
     specifiers:
       '@types/node': 16.11.54
       inline-fixtures: 1.1.0
-      typescript: 4.7.2
+      typescript: 4.8.2
     devDependencies:
       '@types/node': registry.npmjs.org/@types/node/16.11.54
       inline-fixtures: 1.1.0
-      typescript: 4.7.2
+      typescript: 4.8.2
 
   examples/js_binary:
     specifiers:
@@ -4316,6 +4316,12 @@ packages:
 
   /typescript/4.7.2:
     resolution: {integrity: sha512-Mamb1iX2FDUpcTRzltPxgWMKy3fhg0TN378ylbktPGPK/99KbDtMQ4W1hwgsbPAsG3a0xKa1vmw4VKZQbkvz5A==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
+  /typescript/4.8.2:
+    resolution: {integrity: sha512-C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
