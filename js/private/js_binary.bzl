@@ -348,15 +348,14 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [])
     files.extend(ctx.files._runfiles_lib)
     files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
 
-    files.extend(gather_files_from_js_providers(
-        targets = ctx.attr.data,
-        include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_declarations = ctx.attr.include_declarations,
-        include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
-    ))
-
     runfiles = ctx.runfiles(
         files = files,
+        transitive_files = gather_files_from_js_providers(
+            targets = ctx.attr.data,
+            include_transitive_sources = ctx.attr.include_transitive_sources,
+            include_declarations = ctx.attr.include_declarations,
+            include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
+        ),
     ).merge_all([
         target[DefaultInfo].default_runfiles
         for target in ctx.attr.data

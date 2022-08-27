@@ -43,7 +43,7 @@ def gather_files_from_js_providers(
         include_transitive_sources,
         include_declarations,
         include_npm_linked_packages):
-    """Gathers a list of depsets from JsInfo and NpmPackageStoreInfo providers.
+    """Gathers files from JsInfo and NpmPackageStoreInfo providers.
 
     Args:
         targets: list of target to gather from
@@ -52,47 +52,34 @@ def gather_files_from_js_providers(
         include_npm_linked_packages: see js_filegroup documentation
 
     Returns:
-        A list of files
+        A depset of files
     """
-    files = [
-        item
+    files_depsets = [
+        target[JsInfo].sources
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "sources")
-        for item in target[JsInfo].sources
     ]
     if include_transitive_sources:
-        files.extend([
-            item
+        files_depsets.extend([
+            target[JsInfo].transitive_sources
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-            for item in target[JsInfo].transitive_sources
         ])
     if include_declarations:
-        files.extend([
-            item
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "declarations")
-            for item in target[JsInfo].declarations
-        ])
-        files.extend([
-            item
+        files_depsets.extend([
+            target[JsInfo].transitive_declarations
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
-            for item in target[JsInfo].transitive_declarations
         ])
     if include_npm_linked_packages:
-        for target in targets:
-            if JsInfo in target:
-                if hasattr(target[JsInfo], "npm_linked_packages"):
-                    for package in target[JsInfo].npm_linked_packages:
-                        files.extend(package.transitive_files)
-                if hasattr(target[JsInfo], "transitive_npm_linked_packages"):
-                    for package in target[JsInfo].transitive_npm_linked_packages:
-                        files.extend(package.transitive_files)
-        files.extend([
-            item
+        files_depsets.extend([
+            target[JsInfo].transitive_npm_linked_package_files
             for target in targets
-            if NpmPackageStoreInfo in target
-            for item in target[NpmPackageStoreInfo].transitive_files
+            if JsInfo in target and hasattr(target[JsInfo], "transitive_npm_linked_package_files")
         ])
-    return files
+        files_depsets.extend([
+            target[NpmPackageStoreInfo].transitive_files
+            for target in targets
+            if NpmPackageStoreInfo in target and hasattr(target[NpmPackageStoreInfo], "transitive_files")
+        ])
+    return depset([], transitive = files_depsets)

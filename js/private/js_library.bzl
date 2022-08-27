@@ -25,7 +25,7 @@ js_library(
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_library_helpers.bzl", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_stores", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_library_helpers.bzl", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
@@ -86,7 +86,7 @@ def _gather_sources_and_declarations(ctx, targets, files, is_windows = False):
         is_windows: If true, an cmd.exe actions are created when copying files to the output tree so there is no bash dependency
 
     Returns:
-        Sources & declaration files lists in the sequence (sources, declarations)
+        Sources & declaration files depsets in the sequence (sources, declarations)
     """
     sources = []
     declarations = []
@@ -143,23 +143,19 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
         else:
             sources.append(file)
 
-    # sources
-    sources.extend([
-        item
+    # sources as depset
+    sources = depset(sources, transitive = [
+        target[JsInfo].sources
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "sources")
-        for item in target[JsInfo].sources
     ])
-    sources = [file for file in sources if file]
 
-    # declarations
-    declarations.extend([
-        item
+    # declarations as depset
+    declarations = depset(declarations, transitive = [
+        target[JsInfo].declarations
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "declarations")
-        for item in target[JsInfo].declarations
     ])
-    declarations = [file for file in declarations if file]
 
     return (sources, declarations)
 
@@ -188,7 +184,7 @@ def _js_library_impl(ctx):
         deps = ctx.attr.deps,
     )
 
-    npm_package_stores = gather_npm_package_stores(
+    npm_package_store_deps = gather_npm_package_store_deps(
         targets = ctx.attr.data,
     )
 
@@ -202,20 +198,21 @@ def _js_library_impl(ctx):
     return [
         js_info(
             declarations = declarations,
+            npm_linked_package_files = npm_linked_packages.direct_files,
             npm_linked_packages = npm_linked_packages.direct,
-            npm_package_stores = npm_package_stores.direct,
+            npm_package_store_deps = npm_package_store_deps,
             sources = sources,
             transitive_declarations = transitive_declarations,
+            transitive_npm_linked_package_files = npm_linked_packages.transitive_files,
             transitive_npm_linked_packages = npm_linked_packages.transitive,
-            transitive_npm_package_stores = npm_package_stores.transitive,
             transitive_sources = transitive_sources,
         ),
         DefaultInfo(
-            files = depset(sources),
+            files = sources,
             runfiles = runfiles,
         ),
         OutputGroupInfo(
-            types = depset(declarations),
+            types = declarations,
         ),
     ]
 

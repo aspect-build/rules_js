@@ -125,38 +125,34 @@ def _impl(ctx):
 
     dst = ctx.actions.declare_directory(ctx.attr.out if ctx.attr.out else ctx.attr.name)
 
-    # include all transitive sources and declarations in the package
-    additional_files = [
-        item
+    additional_files = depset([], transitive = [
+        # include all transitive sources
+        target[JsInfo].transitive_sources
         for target in ctx.attr.srcs
         if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-        for item in target[JsInfo].transitive_sources
     ] + [
-        item
+        # include all transitive declarations
+        target[JsInfo].transitive_declarations
         for target in ctx.attr.srcs
         if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
-        for item in target[JsInfo].transitive_declarations
-    ]
-
-    # include runfiles from srcs
-    for target in ctx.attr.srcs:
-        for file in target[DefaultInfo].default_runfiles.files.to_list():
-            additional_files.append(file)
-
-    # forward all transitive npm_package_stores
-    npm_package_stores = [
-        item
+    ] + [
+        # include runfiles from srcs
+        target[DefaultInfo].default_runfiles.files
         for target in ctx.attr.srcs
-        if JsInfo in target
-        if hasattr(target[JsInfo], "transitive_npm_package_stores")
-        for item in target[JsInfo].transitive_npm_package_stores
+    ])
+
+    # forward all npm_package_store_deps
+    npm_package_store_deps = [
+        target[JsInfo].npm_package_store_deps
+        for target in ctx.attr.srcs
+        if JsInfo in target and hasattr(target[JsInfo], "npm_package_store_deps")
     ]
 
     copy_to_directory_action(
         ctx,
         srcs = ctx.attr.srcs,
         dst = dst,
-        additional_files = additional_files,
+        additional_files = additional_files.to_list(),
         root_paths = ctx.attr.root_paths,
         include_external_repositories = ctx.attr.include_external_repositories,
         include_srcs_packages = ctx.attr.include_srcs_packages,
@@ -179,7 +175,7 @@ def _impl(ctx):
             package = ctx.attr.package,
             version = ctx.attr.version,
             directory = dst,
-            npm_package_stores = npm_package_stores,
+            npm_package_store_deps = depset([], transitive = npm_package_store_deps),
         ),
     ]
 
