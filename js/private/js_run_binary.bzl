@@ -47,6 +47,7 @@ def js_run_binary(
 
     Args:
         name: Target name
+
         tool: The tool to run in the action.
 
             Should be a js_binary rule. Use Aspect bazel-lib's run_binary
@@ -75,17 +76,16 @@ def js_run_binary(
 
             Subject to `$(location)` and make variable expansion.
 
-        chdir: Working directory to run the binary or test in, relative to the workspace.
+        chdir: Working directory to run the build action in.
 
             This overrides the chdir value if set on the js_binary tool target.
 
-            By default, Bazel always runs in the workspace root.
+            By default, js_binary tools run in the root of the output tree. For more context on why, please read the
+            aspect_rules_js README
+            https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs.
 
-            To run in the directory containing the js_run_binary under the source tree, use
+            To run in the directory containing the js_run_binary in the output tree, use
             `chdir = package_name()` (or if you're in a macro, use `native.package_name()`).
-
-            To run in the output directory where the js_run_binary writes outputs, use
-            `chdir = "$(RULEDIR)"`
 
             WARNING: this will affect other paths passed to the program, either as arguments or in configuration files,
             which are workspace-relative.
