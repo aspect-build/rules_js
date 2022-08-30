@@ -337,15 +337,15 @@ if [ "${JS_BINARY__CHDIR:-}" ]; then
 fi
 
 # Gather node options
-NODE_OPTIONS=()
-NODE_OPTIONS+=("--preserve-symlinks-main")
+JS_BINARY__NODE_OPTIONS=()
+JS_BINARY__NODE_OPTIONS+=("--preserve-symlinks-main")
 
 ARGS=()
 ALL_ARGS=( "$@")
 for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     case "$ARG" in
         # Let users pass through arguments to node itself
-        --node_options=*) NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
+        --node_options=*) JS_BINARY__NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
         # Remaining argv is collected to pass to the program
         *) ARGS+=( "$ARG" )
     esac
@@ -411,19 +411,19 @@ fi
 # ==============================================================================
 
 if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-    logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
+    logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
 set +e
 
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
+    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
 elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
+    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
 elif [ "${STDERR_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
+    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
 else
-    "$JS_BINARY__NODE_WRAPPER" ${NODE_OPTIONS[@]+"${NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
+    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 fi
 
 # ==============================================================================
