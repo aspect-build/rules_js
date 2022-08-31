@@ -252,6 +252,28 @@ diff_test(
     file2 = "out6",
 )
 
+js_binary(
+    name = "bin6_alt",
+    entry_point = "case6.js",
+    env = {
+        "NODE_ENV": "production",
+        "NODE_OPTIONS": "--title=myapp --throw-deprecation",
+    },
+)
+
+js_run_binary(
+    name = "run6_alt",
+    outs = ["out6_alt"],
+    args = ["../../../$@"],
+    tool = ":bin6_alt",
+)
+
+diff_test(
+    name = "test6_alt",
+    file1 = "expected6",
+    file2 = "out6_alt",
+)
+
 #######################################
 # Use case 7
 # capture stdout, stderr & exit code

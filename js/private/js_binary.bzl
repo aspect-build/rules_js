@@ -105,9 +105,15 @@ _ATTRS = {
         Subject to `$(location)` and make variable expansion.""",
     ),
     "node_options": attr.string_list(
-        doc = """Options to pass to the node.
+        doc = """Options to pass to the node invocation on the command line.
 
         https://nodejs.org/api/cli.html
+
+        These options are passed directly to the node invocation on the command line.
+        Options passed here will take precendence over options passed via
+        the NODE_OPTIONS environment variable. Options passed here are not added
+        to the NODE_OPTIONS environment variable so will not be automatically
+        picked up by child processes that inherit that enviroment variable.
         """,
     ),
     "expected_exit_code": attr.int(
@@ -212,7 +218,7 @@ _ATTRS = {
 
 _ENV_SET = """export {var}=\"{value}\""""
 _ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
-_NODE_OPTION = """NODE_OPTIONS+=(\"{value}\")"""
+_NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 
 # Do the opposite of _to_manifest_path in
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
