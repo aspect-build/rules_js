@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 overrides:
+  jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
   semver-max: file:../../../npm/private/test/vendored/semver-max
   is-odd: file:../../../../../npm/private/test/vendored/is-odd
 
@@ -114,6 +115,8 @@ importers:
       bufferutil: 4.0.1
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
+      inline-fixtures: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662
+      json-stable-stringify: 1.0.1
       plotly.js: 2.12.1
       regl: npm:@plotly/regl@2.1.2
       semver-first-satisfied: 1.1.0
@@ -126,6 +129,8 @@ importers:
       bufferutil: 4.0.1
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
+      inline-fixtures: '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662'
+      json-stable-stringify: 1.0.1
       plotly.js: 2.12.1
       regl: /@plotly/regl/2.1.2
       semver-first-satisfied: 1.1.0
@@ -2629,6 +2634,12 @@ packages:
     resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
     dev: true
 
+  /json-stable-stringify/1.0.1:
+    resolution: {integrity: sha512-i/J297TW6xyj7sDFa7AmBPkQvLIxWr2kKPWI26tXydnZrzVAocNqn5DMNT1Mzk0vit1V5UkRM7C1KdVNp7Lmcg==}
+    dependencies:
+      jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
+    dev: true
+
   /json-stringify-safe/5.0.1:
     resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
     dev: true
@@ -4759,6 +4770,22 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz':
+    resolution: {tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
+    name: '@foo/jsonify'
+    version: 0.0.0
+    dev: true
+
+  '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662':
+    resolution: {tarball: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662}
+    name: inline-fixtures
+    version: 1.1.0
+    engines: {node: '>= 8.0.0'}
+    dependencies:
+      make-dir: 2.1.0
+      tmp: 0.0.33
+    dev: true
 
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}

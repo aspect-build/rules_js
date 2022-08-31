@@ -46,6 +46,9 @@ filegroup(
         ":node_modules/webpack-bundle-analyzer",
         ":node_modules/semver-first-satisfied",
         ":node_modules/@figma/nodegit",
+        ":node_modules/typescript",
+        ":node_modules/inline-fixtures",
+        ":node_modules/json-stable-stringify",
         # intentionally don't include node_modules/unused
     ],
 )

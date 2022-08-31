@@ -55,7 +55,7 @@ _FP_STORE_TMPL = \
     """
     if is_root:
         _npm_package_store(
-            name = "{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
+            name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
             src = "{npm_package_target}",
             package = "{package}",
             version = "0.0.0",
@@ -75,7 +75,7 @@ _FP_DIRECT_TMPL = \
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{{}}/{name}".format(name),
-                src = "//{root_package}:{virtual_store_root}/{{}}/{package}/0.0.0".format(name),
+                src = "//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
                 use_declare_symlink = select({{
@@ -548,25 +548,22 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
                 if raw_version.startswith("link:") or raw_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                         root_package = root_package,
-                        package = raw_package,
-                        version = "0.0.0",
+                        virtual_store_name = utils.virtual_store_name(raw_package, "0.0.0"),
                         virtual_store_root = utils.virtual_store_root,
                     )
                 elif raw_version.startswith("/"):
                     store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                         root_package = root_package,
-                        package = store_package,
-                        version = store_version,
+                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
                         virtual_store_root = utils.virtual_store_root,
                     )
                 else:
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                         root_package = root_package,
-                        package = raw_package,
-                        version = raw_version,
+                        virtual_store_name = utils.virtual_store_name(raw_package, raw_version),
                         virtual_store_root = utils.virtual_store_root,
                     )
                 if dep_store_target not in transitive_deps:
@@ -610,25 +607,22 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
                         raw_deps = importers.get(dep_importer).get("dependencies")
                     for raw_package, raw_version in raw_deps.items():
                         if raw_version.startswith("link:") or raw_version.startswith("file:"):
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                                 root_package = root_package,
-                                package = raw_package,
-                                version = "0.0.0",
+                                virtual_store_name = utils.virtual_store_name(raw_package, "0.0.0"),
                                 virtual_store_root = utils.virtual_store_root,
                             )
                         elif raw_version.startswith("/"):
                             store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                                 root_package = root_package,
-                                package = store_package,
-                                version = store_version,
+                                virtual_store_name = utils.virtual_store_name(store_package, store_version),
                                 virtual_store_root = utils.virtual_store_root,
                             )
                         else:
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(name)""".format(
+                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                                 root_package = root_package,
-                                package = raw_package,
-                                version = raw_version,
+                                virtual_store_name = utils.virtual_store_name(raw_package, raw_version),
                                 virtual_store_root = utils.virtual_store_root,
                             )
                         if dep_store_target not in transitive_deps:
@@ -832,6 +826,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
+            virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
             virtual_store_root = utils.virtual_store_root,
         ))
 
@@ -839,9 +834,9 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             bazel_name = fp_bazel_name,
             link_packages = fp_link_packages.keys(),
             name = fp_package,
-            package = fp_package,
             package_directory_output_group = utils.package_directory_output_group,
             root_package = root_package,
+            virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
             virtual_store_root = utils.virtual_store_root,
         ))
 
