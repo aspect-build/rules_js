@@ -692,9 +692,16 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         ) => {
             nextHop(loc, (next) => {
                 if (!next) {
-                    // we're no longer hopping but we haven't escaped;
-                    // something funky happened in the filesystem; throw ENOENT
-                    return cb(enoent('realpath', start))
+                    // we're no longer hopping but we haven't escaped
+                    return fs.exists(loc, (e) => {
+                        if (e) {
+                            // we hit a real file within the guard and can go no further
+                            return cb(null, loc)
+                        } else {
+                            // something funky happened in the filesystem
+                            return cb(enoent('realpath', start))
+                        }
+                    })
                 }
                 if (
                     escapedRoot
@@ -748,12 +755,17 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         escapedRoot: string = undefined
     ): string {
         start = String(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = start, next: string | false; ; loc = next) {
+        for (let loc = start, next: string | false; ; loc = next as string) {
             next = nextHopSync(loc)
             if (!next) {
-                // we're no longer hopping but we haven't escaped;
-                // something funky happened in the filesystem; throw ENOENT
-                throw enoent('realpath', start)
+                // we're no longer hopping but we haven't escaped
+                if (fs.existsSync(loc)) {
+                    // we hit a real file within the guard and can go no further
+                    return loc
+                } else {
+                    // something funky happened in the filesystem; throw ENOENT
+                    throw enoent('realpath', start)
+                }
             }
             if (
                 escapedRoot
