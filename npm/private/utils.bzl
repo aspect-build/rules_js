@@ -5,16 +5,16 @@ load(":yaml.bzl", _parse_yaml = "parse")
 
 def _bazel_name(name, version = None):
     "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
-    escaped_name = name.replace("@", "at_").replace("/", "_")
+    escaped_name = name.replace("@", "at_").replace("/", "_").replace("#", "_")
     if not version:
         return escaped_name
     version_segments = version.split("_")
-    escaped_version = version_segments[0].replace("@", "at_").replace("/", "_")
+    escaped_version = version_segments[0].replace("@", "at_").replace("/", "_").replace("#", "_")
     peer_version = "_".join(version_segments[1:])
     if peer_version.startswith("@"):
         peer_version = "at_" + peer_version[1:]
     if peer_version:
-        escaped_version = "%s__%s" % (escaped_version, peer_version.replace("/", "_").replace("@", "_").replace("+", "_"))
+        escaped_version = "%s__%s" % (escaped_version, peer_version.replace("/", "_").replace("@", "_").replace("#", "_").replace("+", "_"))
     return "%s__%s" % (escaped_name, escaped_version)
 
 def _strip_peer_dep_version(version):
@@ -80,9 +80,14 @@ def _friendly_name(name, version):
 
 def _virtual_store_name(name, version):
     "Make a virtual store name for a given package and version"
-    escaped_name = name.replace("/", "+")
-    escaped_version = version.replace("/", "+")
-    return "%s@%s" % (escaped_name, escaped_version)
+    if version.startswith("@"):
+        # Special case where the package name should _not_ be included in the virtual store name.
+        # See https://github.com/aspect-build/rules_js/issues/423 for more context.
+        return version.replace("/", "+")
+    else:
+        escaped_name = name.replace("/", "+")
+        escaped_version = version.replace("/", "+")
+        return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_file):
     files = []

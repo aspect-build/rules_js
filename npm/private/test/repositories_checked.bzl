@@ -7949,6 +7949,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__json-stable-stringify__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["json-stable-stringify"],
+        },
+        package = "json-stable-stringify",
+        version = "1.0.1",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-i/J297TW6xyj7sDFa7AmBPkQvLIxWr2kKPWI26tXydnZrzVAocNqn5DMNT1Mzk0vit1V5UkRM7C1KdVNp7Lmcg==",
+        deps = {
+            "jsonify": "@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
+        },
+        transitive_closure = {
+            "json-stable-stringify": ["1.0.1"],
+            "jsonify": ["@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"],
+        },
+    )
+
+    npm_import(
         name = "npm__json-stringify-safe__5.0.1",
         root_package = "",
         link_workspace = "",
@@ -15143,6 +15163,45 @@ def npm_repositories():
         integrity = "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==",
         transitive_closure = {
             "yocto-queue": ["0.1.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@foo/jsonify",
+        version = "@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
+        lifecycle_hooks_no_sandbox = True,
+        url = "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
+        transitive_closure = {
+            "@foo/jsonify": ["@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"],
+        },
+    )
+
+    npm_import(
+        name = "npm__inline-fixtures__at_registry.yarnpkg.com_inline-fixtures_-_inline-fixtures-1.1.0.tgz_5f9edf644ac02a1322012dbbb9f0a4739831d662",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["inline-fixtures"],
+        },
+        package = "inline-fixtures",
+        version = "@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
+        lifecycle_hooks_no_sandbox = True,
+        url = "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
+        deps = {
+            "make-dir": "2.1.0",
+            "tmp": "0.0.33",
+        },
+        transitive_closure = {
+            "inline-fixtures": ["@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662"],
+            "make-dir": ["2.1.0"],
+            "tmp": ["0.0.33"],
+            "os-tmpdir": ["1.0.2"],
+            "pify": ["4.0.1"],
+            "semver": ["5.7.1"],
         },
     )
 

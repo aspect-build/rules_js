@@ -33,7 +33,7 @@ def npm_imported_package_store(
     ref_deps = {ref_deps}
 
     has_lifecycle_build_target = {has_lifecycle_build_target}
-    store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
+    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
 
     # reference target used to avoid circular deps
     _npm_package_store(
@@ -167,7 +167,7 @@ def npm_link_imported_package_store(
         fail(msg)
 
     link_root_name = name[:-len("/{{}}".format(link_alias))]
-    store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
+    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
 
     # terminal package store target to link
     _npm_link_package_store(
@@ -247,7 +247,7 @@ def npm_link_imported_package(
 
 _BIN_MACRO_TMPL = """
 def _{bin_name}_internal(name, link_root_name, **kwargs):
-    store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
+    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
@@ -266,7 +266,7 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
     )
 
 def _{bin_name}_test_internal(name, link_root_name, **kwargs):
-    store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
+    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
@@ -280,7 +280,7 @@ def _{bin_name}_test_internal(name, link_root_name, **kwargs):
     )
 
 def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
-    store_target_name = "{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)
+    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
@@ -412,6 +412,8 @@ def _impl(rctx):
     ))
 
     if bins:
+        virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+
         for link_package in rctx.attr.link_packages.keys():
             bin_bzl = generated_by_lines + [
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
@@ -429,6 +431,7 @@ def _impl(rctx):
                         package = rctx.attr.package,
                         root_package = rctx.attr.root_package,
                         version = rctx.attr.version,
+                        virtual_store_name = virtual_store_name,
                         virtual_store_root = utils.virtual_store_root,
                     ),
                 )
@@ -502,10 +505,9 @@ def _impl_links(rctx):
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
-            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)""".format(
+            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                 root_package = rctx.attr.root_package,
-                package = dep_name,
-                version = "0.0.0",
+                virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
                 virtual_store_root = utils.virtual_store_root,
             )
         else:
@@ -514,9 +516,8 @@ def _impl_links(rctx):
             else:
                 store_package = dep_name
                 store_version = dep_version
-            dep_store_target = """":{virtual_store_root}/{{}}/{package}/{version}/ref".format(link_root_name)""".format(
-                package = store_package,
-                version = store_version,
+            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
+                virtual_store_name = utils.virtual_store_name(store_package, store_version),
                 virtual_store_root = utils.virtual_store_root,
             )
         ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
@@ -529,10 +530,9 @@ def _impl_links(rctx):
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
                 if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)""".format(
+                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                         root_package = rctx.attr.root_package,
-                        package = dep_name,
-                        version = "0.0.0",
+                        virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
                         virtual_store_root = utils.virtual_store_root,
                     )
                     lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
@@ -543,15 +543,13 @@ def _impl_links(rctx):
                     else:
                         store_package = dep_name
                         store_version = dep_version
-                    dep_store_target_pkg = """":{virtual_store_root}/{{}}/{package}/{version}/pkg".format(link_root_name)""".format(
-                        package = store_package,
-                        version = store_version,
+                    dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
+                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
                         virtual_store_root = utils.virtual_store_root,
                     )
                     if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
-                        dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{package}/{version}/pkg_pre_lc_lite".format(link_root_name)""".format(
-                            package = store_package,
-                            version = store_version,
+                        dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
+                            virtual_store_name = utils.virtual_store_name(store_package, store_version),
                             virtual_store_root = utils.virtual_store_root,
                         )
 
@@ -565,10 +563,9 @@ def _impl_links(rctx):
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
             if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{package}/{version}".format(link_root_name)""".format(
+                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                     root_package = rctx.attr.root_package,
-                    package = dep_name,
-                    version = "0.0.0",
+                    virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
                     virtual_store_root = utils.virtual_store_root,
                 )
             else:
@@ -577,9 +574,8 @@ def _impl_links(rctx):
                 else:
                     store_package = dep_name
                     store_version = dep_version
-                dep_store_target = """":{virtual_store_root}/{{}}/{package}/{version}/pkg".format(link_root_name)""".format(
-                    package = store_package,
-                    version = store_version,
+                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
+                    virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
             lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
@@ -628,6 +624,8 @@ def _impl_links(rctx):
     maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(rctx.attr.bins, 3)) if len(rctx.attr.bins) > 0 else ""
 
+    virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
         deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
@@ -647,6 +645,7 @@ def _impl_links(rctx):
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
+        virtual_store_name = virtual_store_name,
         virtual_store_root = utils.virtual_store_root,
         maybe_bins = maybe_bins,
     )]
