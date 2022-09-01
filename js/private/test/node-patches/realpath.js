@@ -210,6 +210,95 @@ describe('testing realpath', async () => {
         )
     })
 
+    await it('can resolve a real file and directory in root', async () => {
+        await withFixtures(
+            {
+                a: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                // on mac, inside of bazel, the fixtures dir returned here is not realpath-ed.
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir)])
+                const filePath = path.join(
+                    fs.realpathSync(fixturesDir),
+                    'a',
+                    'file'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(filePath),
+                    filePath,
+                    'SYNC: should resolve the a real file within the root'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(filePath),
+                    filePath,
+                    'SYNC.native: should resolve the a real file within the root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(filePath),
+                    filePath,
+                    'CB: should resolve the a real file within the root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(filePath),
+                    filePath,
+                    'CB: should resolve the a real file within the root'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(filePath),
+                    filePath,
+                    'Promise: should resolve the a real file within the root'
+                )
+
+                const directoryPath = path.join(
+                    fs.realpathSync(fixturesDir),
+                    'a'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(directoryPath),
+                    directoryPath,
+                    'SYNC: should resolve the a real directory within the root'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(directoryPath),
+                    directoryPath,
+                    'SYNC.native: should resolve the a real directory within the root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(directoryPath),
+                    directoryPath,
+                    'CB: should resolve the a real directory within the root'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(
+                        directoryPath
+                    ),
+                    directoryPath,
+                    'CB: should resolve the a real directory within the root'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(directoryPath),
+                    directoryPath,
+                    'Promise: should resolve the a real directory within the root'
+                )
+            }
+        )
+    })
+
     await it("doesn't resolve as symlink outside of root", async () => {
         await withFixtures(
             {
@@ -528,6 +617,148 @@ describe('testing realpath', async () => {
         )
     })
 
+    await it('can resolve a nested escaping symlinking within a escaping parent directory symlink', async () => {
+        await withFixtures(
+            {
+                sandbox: {
+                    node_modules: {},
+                    virtual_store: { pkg: {} },
+                },
+                execroot: {
+                    node_modules: {},
+                    virtual_store: {
+                        pkg: {
+                            file: 'contents',
+                        },
+                    },
+                },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                // create symlink from execroot/node_modules/pkg to execroot/virtual_store/pkg
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'virtual_store', 'pkg'),
+                    path.join(fixturesDir, 'execroot', 'node_modules', 'pkg')
+                )
+
+                // create sandbox (with relative symlinks in place)
+                fs.symlinkSync(
+                    path.join(
+                        fixturesDir,
+                        'execroot',
+                        'virtual_store',
+                        'pkg',
+                        'file'
+                    ),
+                    path.join(
+                        fixturesDir,
+                        'sandbox',
+                        'virtual_store',
+                        'pkg',
+                        'file'
+                    )
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'execroot', 'node_modules', 'pkg'),
+                    path.join(fixturesDir, 'sandbox', 'node_modules', 'pkg')
+                )
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+
+                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const linkPath = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'node_modules',
+                    'pkg',
+                    'file'
+                )
+                const filePath = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'virtual_store',
+                    'pkg',
+                    'file'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(linkPath),
+                    filePath,
+                    'SYNC: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(linkPath),
+                    filePath,
+                    'SYNC.native: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(linkPath),
+                    filePath,
+                    'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    filePath,
+                    'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(linkPath),
+                    filePath,
+                    'Promise: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                const linkPath2 = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'node_modules',
+                    'pkg'
+                )
+                const filePath2 = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'virtual_store',
+                    'pkg'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(linkPath2),
+                    filePath2,
+                    'SYNC: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(linkPath2),
+                    filePath2,
+                    'SYNC.native: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(linkPath2),
+                    filePath2,
+                    'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(linkPath2),
+                    filePath2,
+                    'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(linkPath2),
+                    filePath2,
+                    'Promise: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+            }
+        )
+    })
+
     await it('can resolve a nested escaping symlinking within a non-escaping parent directory symlink', async () => {
         await withFixtures(
             {
@@ -621,6 +852,49 @@ describe('testing realpath', async () => {
                 assert.deepStrictEqual(
                     await patchedFs.promises.realpath(linkPath),
                     filePath,
+                    'Promise: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                const linkPath2 = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'node_modules',
+                    'pkg'
+                )
+                const filePath2 = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'virtual_store',
+                    'pkg'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync(linkPath2),
+                    filePath2,
+                    'SYNC: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.realpathSync.native(linkPath2),
+                    filePath2,
+                    'SYNC.native: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath)(linkPath2),
+                    filePath2,
+                    'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(patchedFs.realpath.native)(linkPath2),
+                    filePath2,
+                    'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
+                )
+
+                assert.deepStrictEqual(
+                    await patchedFs.promises.realpath(linkPath2),
+                    filePath2,
                     'Promise: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
             }

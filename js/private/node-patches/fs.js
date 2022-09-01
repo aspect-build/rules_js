@@ -632,9 +632,17 @@ const patcher = (fs = _fs, roots) => {
         const oneHop = (loc, cb) => {
             nextHop(loc, (next) => {
                 if (!next) {
-                    // we're no longer hopping but we haven't escaped;
-                    // something funky happened in the filesystem; throw ENOENT
-                    return cb(enoent('realpath', start));
+                    // we're no longer hopping but we haven't escaped
+                    return fs.exists(loc, (e) => {
+                        if (e) {
+                            // we hit a real file within the guard and can go no further
+                            return cb(null, loc);
+                        }
+                        else {
+                            // something funky happened in the filesystem
+                            return cb(enoent('realpath', start));
+                        }
+                    });
                 }
                 if (escapedRoot
                     ? isEscape(loc, next, [escapedRoot])
@@ -683,9 +691,15 @@ const patcher = (fs = _fs, roots) => {
         for (let loc = start, next;; loc = next) {
             next = nextHopSync(loc);
             if (!next) {
-                // we're no longer hopping but we haven't escaped;
-                // something funky happened in the filesystem; throw ENOENT
-                throw enoent('realpath', start);
+                // we're no longer hopping but we haven't escaped
+                if (fs.existsSync(loc)) {
+                    // we hit a real file within the guard and can go no further
+                    return loc;
+                }
+                else {
+                    // something funky happened in the filesystem; throw ENOENT
+                    throw enoent('realpath', start);
+                }
             }
             if (escapedRoot
                 ? isEscape(loc, next, [escapedRoot])
