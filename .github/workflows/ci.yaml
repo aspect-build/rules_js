@@ -5,26 +5,39 @@ on:
     # Triggers the workflow on push or pull request events but only for the main branch
     push:
         branches: [main]
-    pull_request_target:
+    pull_request:
         branches: [main]
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
-# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
-permissions:
-  contents: read
-
 jobs:
+    # Dynamically generate a bit of JSON depending on whether our action has access to repository secrets.
+    # When running on a pull_request from a fork, the author is untrusted so the secret will be absent.
+    # Insanely complex for how simple this requirement is... inspired from
+    # https://stackoverflow.com/questions/65384420/how-to-make-a-github-action-matrix-element-conditional
+    matrix-prep:
+        runs-on: ubuntu-latest
+        env:
+            ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
+        steps:
+            - id: local
+              run: echo "::set-output name=config::local"
+            - id: maybe-rbe
+              if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
+              run: echo "::set-output name=config::rbe"
+        outputs:
+            # Will look like '["local", "rbe"]'
+            configs: ${{ toJSON(steps.*.outputs.config) }}
+
     test:
         # The type of runner that the job will run on
         runs-on: ubuntu-latest
+        needs: matrix-prep
 
         strategy:
             matrix:
-                config:
-                    - 'local'
-                    - 'rbe'
+                config: ${{ fromJSON(needs.matrix-prep.outputs.configs) }}
                 folder:
                     - '.'
                     # Broken by the bazel 5.3.0 upgrade
