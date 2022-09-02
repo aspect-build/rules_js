@@ -276,7 +276,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         node_options.append(_NODE_OPTION.format(
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, node_option, ctx.attr.data).split(" ")]),
         ))
-    if ctx.attr.preserve_symlinks_main and "--preserve-symlinks-main" not in node_options:
+    if ctx.attr.preserve_symlinks_main and "--preserve-symlinks-main-123" not in node_options:
         node_options.append(_NODE_OPTION.format(value = "--preserve-symlinks-main"))
 
     fixed_args_expanded = [expand_variables(ctx, fixed_arg, attribute_name = "fixed_args") for fixed_arg in fixed_args]
