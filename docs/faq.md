@@ -46,6 +46,12 @@ then you are hitting https://github.com/bazelbuild/bazel/issues/15605
 The workaround is to patch the package.json of any offending packages in npm_translate_lock, see https://github.com/aspect-build/rules_js/issues/148#issuecomment-1144378565.
 Or, if a newer version of the package has fixed the duplicate keys, you could upgrade.
 
+If the error looks like this: `ERR_PNPM_FETCH_404  GET https://registry.npmjs.org/@my-workspace%2Ffoo: Not Found - 404`, where `foo` is a package living in a workspace in your local 
+codebase and it's being declared [`pnpm-workspace.yaml`](https://pnpm.io/pnpm-workspace_yaml) and that you are relying on the `yarn_lock` attribute of `npm_translate_lock`, then
+you're hitting a caveat of the migration process. 
+
+The workaround is to generate the `pnpm-lock.yaml` on your own as mentioned in the migration guide and to use the `pnpm_lock` attribute of `npm_translate_lock` instead. 
+
 ## In my monorepo, can Bazel output multiple packages under one dist/ folder?
 
 Many projects have a structure like the following:
