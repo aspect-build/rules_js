@@ -62,6 +62,10 @@ rather than `npm` or `yarn` when changing dependency versions or adding new depe
 If needed, you might have both the pnpm lockfile and your legacy one checked into the repo during a migration window.
 You'll have to avoid version skew between the two files during that time.
 
+Please note that using the `yarn_lock` attributes of `npm_translate_lock` has caveat of not supporting the [`pnpm-workspace.yaml`](https://pnpm.io/pnpm-workspace_yaml) which is needed by 
+`pnpm` to declare workspaces. Therefore, if your project need this, the only option is to migrate to `pnpm` immediately and use solely the 
+`pnpm_lock` attribute of `npm_translate_lock`.
+
 ## Test whether pnpm is working
 
 A few packages have bugs which rely on "hoisting" behavior in yarn or npm, where undeclared dependencies can be loaded because they happen to be installed in an ancestor folder under `node_modules`.
