@@ -34,9 +34,11 @@ Yes, but it's a bit clumsy right now.
 
 First, make sure you fetched it: `bazel fetch @pnpm//:*`
 
-Then run `bazel run @nodejs_host//:node $(bazel info output_base)/external/pnpm/package/bin/pnpm.cjs`
+Then run `bazel run -- @nodejs_host//:node $(bazel info output_base)/external/pnpm/package/bin/pnpm.cjs`
 
-You can use this recipe to make sure your developers run the exact same pnpm and node versions.
+You can use this recipe to make sure your developers run the exact same pnpm and node versions that Bazel does.
+
+Alternatively, if you don't care that the pnpm version matches, you could use a shorter command like `bazel run -- @nodejs_host//:npx_bin pnpm@latest` to just use the latest pnpm version.
 
 ## Why can't Bazel fetch an npm package?
 
