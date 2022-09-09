@@ -852,36 +852,36 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__22.0.0__rollup_2.75.7",
+        name = "npm__at_rollup_plugin-commonjs__22.0.0__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "22.0.0_rollup@2.75.7",
+        version = "22.0.0_rollup@2.79.0",
         lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==",
         deps = {
-            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "@rollup/pluginutils": "3.1.0_rollup@2.79.0",
             "commondir": "1.0.1",
             "estree-walker": "2.0.2",
             "glob": "7.2.3",
             "is-reference": "1.2.1",
             "magic-string": "0.25.9",
             "resolve": "1.22.0",
-            "rollup": "2.75.7",
+            "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["22.0.0_rollup@2.75.7"],
-            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@rollup/plugin-commonjs": ["22.0.0_rollup@2.79.0"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
             "commondir": ["1.0.1"],
             "estree-walker": ["1.0.1", "2.0.2"],
             "glob": ["7.2.3"],
             "is-reference": ["1.2.1"],
             "magic-string": ["0.25.9"],
             "resolve": ["1.22.0"],
-            "rollup": ["2.75.7"],
+            "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
             "is-core-module": ["2.9.0"],
             "path-parse": ["1.0.7"],
@@ -905,24 +905,24 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__4.1.0__rollup_2.75.7",
+        name = "npm__at_rollup_plugin-json__4.1.0__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-json"],
         },
         package = "@rollup/plugin-json",
-        version = "4.1.0_rollup@2.75.7",
+        version = "4.1.0_rollup@2.79.0",
         lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==",
         deps = {
-            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
-            "rollup": "2.75.7",
+            "@rollup/pluginutils": "3.1.0_rollup@2.79.0",
+            "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/plugin-json": ["4.1.0_rollup@2.75.7"],
-            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
-            "rollup": ["2.75.7"],
+            "@rollup/plugin-json": ["4.1.0_rollup@2.79.0"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
+            "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
             "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
             "estree-walker": ["1.0.1"],
@@ -931,34 +931,34 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__13.3.0__rollup_2.75.7",
+        name = "npm__at_rollup_plugin-node-resolve__13.3.0__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
         },
         package = "@rollup/plugin-node-resolve",
-        version = "13.3.0_rollup@2.75.7",
+        version = "13.3.0_rollup@2.79.0",
         lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-Lus8rbUo1eEcnS4yTFKLZrVumLPY+YayBdWXgFSHYhTT2iJbMhoaaBL3xl5NCdeRytErGr8tZ0L71BMRmnlwSw==",
         deps = {
-            "@rollup/pluginutils": "3.1.0_rollup@2.75.7",
+            "@rollup/pluginutils": "3.1.0_rollup@2.79.0",
             "@types/resolve": "registry.npmjs.org/@types/resolve/1.17.1",
             "deepmerge": "4.2.2",
             "is-builtin-module": "3.1.0",
             "is-module": "1.0.0",
             "resolve": "1.22.0",
-            "rollup": "2.75.7",
+            "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["13.3.0_rollup@2.75.7"],
-            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@rollup/plugin-node-resolve": ["13.3.0_rollup@2.79.0"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
             "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
             "deepmerge": ["4.2.2"],
             "is-builtin-module": ["3.1.0"],
             "is-module": ["1.0.0"],
             "resolve": ["1.22.0"],
-            "rollup": ["2.75.7"],
+            "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
             "is-core-module": ["2.9.0"],
             "path-parse": ["1.0.7"],
@@ -999,26 +999,26 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.75.7",
+        name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@rollup/pluginutils",
-        version = "3.1.0_rollup@2.75.7",
+        version = "3.1.0_rollup@2.79.0",
         lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==",
         deps = {
             "@types/estree": "registry.npmjs.org/@types/estree/0.0.39",
             "estree-walker": "1.0.1",
             "picomatch": "2.3.1",
-            "rollup": "2.75.7",
+            "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/pluginutils": ["3.1.0_rollup@2.75.7"],
+            "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
             "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
             "estree-walker": ["1.0.1"],
             "picomatch": ["2.3.1"],
-            "rollup": ["2.75.7"],
+            "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -12084,21 +12084,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__rollup__2.75.7",
+        name = "npm__rollup__2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["rollup"],
         },
         package = "rollup",
-        version = "2.75.7",
+        version = "2.79.0",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==",
+        integrity = "sha512-x4KsrCgwQ7ZJPcFA/SUu6QVcYlO7uRLfLAy0DSA4NS2eG8japdbpM50ToH7z4iObodRYOJ0soneF0iaQRJ6zhA==",
         deps = {
             "fsevents": "2.3.2",
         },
         transitive_closure = {
-            "rollup": ["2.75.7"],
+            "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
         },
     )
