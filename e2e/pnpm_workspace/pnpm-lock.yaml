@@ -51,10 +51,12 @@ importers:
       '@aspect-test/e': 1.0.0
       '@lib/b': workspace:*
       vendored-a: file:../../vendored/a
+      vendored-b: file:../../vendored/b
     dependencies:
       '@aspect-test/e': 1.0.0
       '@lib/b': link:../b
       vendored-a: file:vendored/a
+      vendored-b: file:vendored/b_@lib+b@lib+b
 
   lib/b:
     specifiers:
@@ -189,4 +191,15 @@ packages:
     version: 1.0.0
     dependencies:
       '@aspect-test/f': 1.0.0
+    dev: false
+
+  file:vendored/b_@lib+b@lib+b:
+    resolution: {directory: vendored/b, type: directory}
+    id: file:vendored/b
+    name: vendored-b
+    version: 1.0.0
+    peerDependencies:
+      '@lib/b': workspace:*
+    dependencies:
+      '@lib/b': link:lib/b
     dev: false
