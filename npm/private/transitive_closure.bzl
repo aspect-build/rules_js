@@ -40,7 +40,12 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
             if version in transitive_closure[name]:
                 continue
             transitive_closure[name].insert(0, version)
-            package_info = packages[package_key]
+            if package_key.startswith("link:"):
+                # we don't need to drill down through first-party links for the transitive closure since there are no cycles
+                # allowed in first-party links
+                continue
+            else:
+                package_info = packages[package_key]
             stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"]))
 
 def _gather_package_info(package_path, package_snapshot):
@@ -71,6 +76,7 @@ def _gather_package_info(package_path, package_snapshot):
 
     if "resolution" not in package_snapshot:
         fail("package %s has no resolution field" % package_path)
+    id = package_snapshot["id"] if "id" in package_snapshot else None
     resolution = package_snapshot["resolution"]
     integrity = resolution["integrity"] if "integrity" in resolution else None
     tarball = resolution["tarball"] if "tarball" in resolution else None
@@ -81,6 +87,7 @@ def _gather_package_info(package_path, package_snapshot):
 
     return package_key, {
         "name": name,
+        "id": id,
         "version": version,
         "friendly_version": friendly_version,
         "integrity": integrity,
