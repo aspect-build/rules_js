@@ -558,7 +558,7 @@ load("@npm__right-now__1.0.0__links//:defs.bzl", store_550 = "npm_imported_packa
 load("@npm__rimraf__2.7.1__links//:defs.bzl", store_551 = "npm_imported_package_store")
 load("@npm__rimraf__3.0.2__links//:defs.bzl", store_552 = "npm_imported_package_store")
 load("@npm__rollup__2.70.2__links//:defs.bzl", link_553 = "npm_link_imported_package_store", store_553 = "npm_imported_package_store")
-load("@npm__rollup__2.75.7__links//:defs.bzl", link_554 = "npm_link_imported_package_store", store_554 = "npm_imported_package_store")
+load("@npm__rollup__2.79.0__links//:defs.bzl", link_554 = "npm_link_imported_package_store", store_554 = "npm_imported_package_store")
 load("@npm__rw__1.3.3__links//:defs.bzl", store_555 = "npm_imported_package_store")
 load("@npm__sade__1.8.1__links//:defs.bzl", store_556 = "npm_imported_package_store")
 load("@npm__safe-buffer__5.1.2__links//:defs.bzl", store_557 = "npm_imported_package_store")
