@@ -13781,18 +13781,18 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__typescript__4.8.2",
+        name = "npm__typescript__4.8.3",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "": ["typescript"],
         },
         package = "typescript",
-        version = "4.8.2",
+        version = "4.8.3",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw==",
+        integrity = "sha512-goMHfm00nWPa8UvR/CPSvykqf6dVV8x/dp0c5mFTMTIu0u0FlGWRioyy7Nn0PGAdHxpJZnuO/ut+PpQ8UiHAig==",
         transitive_closure = {
-            "typescript": ["4.8.2"],
+            "typescript": ["4.8.3"],
         },
         bins = {
             "tsc": "./bin/tsc",
