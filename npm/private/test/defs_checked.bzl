@@ -642,7 +642,7 @@ load("@npm__typed-function__2.1.0__links//:defs.bzl", store_634 = "npm_imported_
 load("@npm__typedarray-pool__1.2.0__links//:defs.bzl", store_635 = "npm_imported_package_store")
 load("@npm__typedarray__0.0.6__links//:defs.bzl", store_636 = "npm_imported_package_store")
 load("@npm__typescript__4.7.2__links//:defs.bzl", link_637 = "npm_link_imported_package_store", store_637 = "npm_imported_package_store")
-load("@npm__typescript__4.8.2__links//:defs.bzl", link_638 = "npm_link_imported_package_store", store_638 = "npm_imported_package_store")
+load("@npm__typescript__4.8.3__links//:defs.bzl", link_638 = "npm_link_imported_package_store", store_638 = "npm_imported_package_store")
 load("@npm__universalify__0.1.2__links//:defs.bzl", store_639 = "npm_imported_package_store")
 load("@npm__unquote__1.1.1__links//:defs.bzl", store_640 = "npm_imported_package_store")
 load("@npm__unused__0.2.2__links//:defs.bzl", link_641 = "npm_link_imported_package_store", store_641 = "npm_imported_package_store")
