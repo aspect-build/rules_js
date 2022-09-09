@@ -543,7 +543,10 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
         version = package_info.get("version")
         deps = package_info.get("dependencies")
         if version.startswith("file:"):
-            dep_path = _link_package(root_package, version[len("file:"):])
+            if version in packages and packages[version]["id"]:
+                dep_path = _link_package(root_package, packages[version]["id"][len("file:"):])
+            else:
+                dep_path = _link_package(root_package, version[len("file:"):])
             dep_key = "{}+{}".format(name, version)
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
@@ -589,7 +592,10 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
         link_package = _link_package(root_package, import_path)
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("file:"):
-                dep_path = _link_package(root_package, dep_version[len("file:"):])
+                if dep_version in packages and packages[dep_version]["id"]:
+                    dep_path = _link_package(root_package, packages[dep_version]["id"][len("file:"):])
+                else:
+                    dep_path = _link_package(root_package, dep_version[len("file:"):])
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
                     fail("Expected to file: referenced package {} in first-party links".format(dep_key))
