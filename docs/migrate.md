@@ -35,6 +35,18 @@ Alternatively, you can skip the install. All commands in this guide will use `np
 
 `rules_js` uses the `pnpm` lockfile to declare dependency versions as well as a deterministic layout for the `node_modules` tree.
 
+The `node_modules` tree laid out by `rules_js` should be bug-for-bug compatible with the `node_modules` tree that
+pnpm lays out with [hoisting](https://pnpm.io/npmrc#hoist) disabled (`hoist=false` set in your `.npmrc`).
+
+We recommend adding `hoist=false` to your `.npmrc` so that your `node_modules` tree outside of Bazel is similar to the
+`node_modules` tree that `rules_js` creates:
+
+```
+echo "hoist=false" >> .npmrc
+```
+
+See `npm_translate_lock` documentation for more information on pnpm hoisting.
+
 You can use the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock` to keep using those package managers.
 When you do, we automatically run `pnpm import` on that lockfile to create the pnpm-lock.yaml that rules_js requires.
 This has the downside that hoisting behavior may result in different results when
@@ -62,8 +74,8 @@ rather than `npm` or `yarn` when changing dependency versions or adding new depe
 If needed, you might have both the pnpm lockfile and your legacy one checked into the repo during a migration window.
 You'll have to avoid version skew between the two files during that time.
 
-Please note that using the `yarn_lock` attributes of `npm_translate_lock` has caveat of not supporting the [`pnpm-workspace.yaml`](https://pnpm.io/pnpm-workspace_yaml) which is needed by 
-`pnpm` to declare workspaces. Therefore, if your project need this, the only option is to migrate to `pnpm` immediately and use solely the 
+Please note that using the `yarn_lock` attributes of `npm_translate_lock` has caveat of not supporting the [`pnpm-workspace.yaml`](https://pnpm.io/pnpm-workspace_yaml) which is needed by
+`pnpm` to declare workspaces. Therefore, if your project need this, the only option is to migrate to `pnpm` immediately and use solely the
 `pnpm_lock` attribute of `npm_translate_lock`.
 
 ## Test whether pnpm is working
