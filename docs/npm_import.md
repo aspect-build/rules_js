@@ -190,6 +190,35 @@ Bazel will only fetch the packages which are required for the requested targets 
 Thus it is performant to convert a very large pnpm-lock.yaml file without concern for
 users needing to fetch many unnecessary packages.
 
+**Compatabilty with pnpm***
+
+The `node_modules` tree laid out by `rules_js` should be bug-for-bug compatible with the `node_modules` tree that
+pnpm lays out with [hoisting](https://pnpm.io/npmrc#hoist) disabled (`hoist=false` set in your `.npmrc`).
+
+We recommend adding `hoist=false` to your `.npmrc`:
+
+```
+echo "hoist=false" >> .npmrc
+```
+
+This will prevent pnpm from creating the hidden `node_modules/.pnpm/node_modules` folder with hoisted
+dependencies which allow for packages to depend on "phantom" undeclared dependencies. In most cases,
+if you hit import/require runtime failures in 3rd party npm packages when using `rules_js`, the failure
+will be reproducible with pnpm outside of Bazel when hoisting is disabled.
+
+`rules_js` does not and will not support pnpm "phantom" [hoisting](https://pnpm.io/npmrc#hoist) which allows for
+packages to depend on undeclared dependencies. All dependencies between packages must be declared under
+`rules_js` in order to support lazy fetching and lazy linking of npm dependencies.
+
+If a 3rd party npm package is relying on "phantom" dependencies to work, the recommended fix for `rules_js` is to
+use [pnpm.packageExtensions](https://pnpm.io/package_json#pnpmpackageextensions) in your `package.json` to add the
+missing `dependencies` or `peerDependencies`. For example,
+https://github.com/aspect-build/rules_js/blob/a8c192eed0e553acb7000beee00c60d60a32ed82/package.json#L12.
+
+NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
+For now, you can emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute
+of `npm_translate_lock`.
+
 **Setup**
 
 In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
@@ -249,7 +278,7 @@ write_source_files(
 
 Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do so.
 
-This macro creates a "pnpm" repository. rules_js currently only uses this repository
+This macro creates a "pnpm" repository. `rules_js` currently only uses this repository
 when npm_package_lock or yarn_lock are used rather than pnpm_lock.
 Set pnpm_version to None to inhibit this repository creation.
 
