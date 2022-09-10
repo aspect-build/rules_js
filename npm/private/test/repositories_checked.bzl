@@ -852,16 +852,16 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__22.0.0__rollup_2.79.0",
+        name = "npm__at_rollup_plugin-commonjs__22.0.2__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "22.0.0_rollup@2.79.0",
+        version = "22.0.2_rollup@2.79.0",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==",
+        integrity = "sha512-//NdP6iIwPbMTcazYsiBMbJW7gfmpHom33u1beiIoHDEM0Q9clvtQB1T0efvMqHeKsGohiHo97BCPCkBXdscwg==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup@2.79.0",
             "commondir": "1.0.1",
@@ -873,7 +873,7 @@ def npm_repositories():
             "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["22.0.0_rollup@2.79.0"],
+            "@rollup/plugin-commonjs": ["22.0.2_rollup@2.79.0"],
             "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
             "commondir": ["1.0.1"],
             "estree-walker": ["1.0.1", "2.0.2"],

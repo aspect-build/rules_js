@@ -38,7 +38,7 @@ load("@npm__at_plotly_point-cluster__3.1.9__links//:defs.bzl", store_30 = "npm_i
 load("@npm__at_plotly_regl__2.1.2__links//:defs.bzl", link_31 = "npm_link_imported_package_store", store_31 = "npm_imported_package_store")
 load("@npm__at_polka_url__1.0.0-next.21__links//:defs.bzl", store_32 = "npm_imported_package_store")
 load("@npm__at_rollup_plugin-commonjs__21.1.0__rollup_2.70.2__links//:defs.bzl", link_33 = "npm_link_imported_package_store", store_33 = "npm_imported_package_store")
-load("@npm__at_rollup_plugin-commonjs__22.0.0__rollup_2.79.0__links//:defs.bzl", link_34 = "npm_link_imported_package_store", store_34 = "npm_imported_package_store")
+load("@npm__at_rollup_plugin-commonjs__22.0.2__rollup_2.79.0__links//:defs.bzl", link_34 = "npm_link_imported_package_store", store_34 = "npm_imported_package_store")
 load("@npm__at_rollup_plugin-json__4.1.0__rollup_2.79.0__links//:defs.bzl", link_35 = "npm_link_imported_package_store", store_35 = "npm_imported_package_store")
 load("@npm__at_rollup_plugin-node-resolve__14.1.0__rollup_2.79.0__links//:defs.bzl", link_36 = "npm_link_imported_package_store", store_36 = "npm_imported_package_store")
 load("@npm__at_rollup_pluginutils__3.1.0__rollup_2.70.2__links//:defs.bzl", store_37 = "npm_imported_package_store")
