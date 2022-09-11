@@ -1,6 +1,7 @@
 {
     "private": true,
     "dependencies": {
-        "lodash": "latest"
+        "karma-typescript": "5.5.3",
+        "lodash": "4.17.21"
     }
 }

@@ -11,6 +11,7 @@ _ATTRS = {
     "package_json": attr.label(),
     "npm_package_lock": attr.label(),
     "yarn_lock": attr.label(),
+    "npmrc": attr.label(),
     "patches": attr.string_list_dict(),
     "patch_args": attr.string_list_dict(),
     "custom_postinstalls": attr.string_dict(),
@@ -441,6 +442,13 @@ def _impl(rctx):
             )
         else:
             fail("rules_js internal validation error, please file an issue")
+
+        if rctx.attr.npmrc:
+            rctx.file(
+                ".npmrc",
+                content = rctx.read(rctx.attr.npmrc),
+                executable = False,
+            )
 
         result = rctx.execute([
             rctx.path(Label("@nodejs_host//:bin/node")),
