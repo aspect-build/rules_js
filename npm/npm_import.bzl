@@ -43,6 +43,7 @@ def npm_translate_lock(
         package_json = None,
         npm_package_lock = None,
         yarn_lock = None,
+        npmrc = None,
         patches = {},
         patch_args = {},
         custom_postinstalls = {},
@@ -199,6 +200,10 @@ def npm_translate_lock(
             When set, the `package_json` attribute must be set as well.
             Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
 
+        npmrc: Available to pnpm when running pnpm import when npm_package_lock or yarn_lock is set.
+
+            In a future release, pnpm settings such as public-hoist-patterns will be used.
+
         patches: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list of patches to apply to the downloaded npm package. Paths in the patch
             file must start with `extract_tmp/package` where `package` is the top-level folder in
@@ -334,6 +339,7 @@ def npm_translate_lock(
         package_json = package_json,
         npm_package_lock = npm_package_lock,
         yarn_lock = yarn_lock,
+        npmrc = npmrc,
         patches = patches,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,

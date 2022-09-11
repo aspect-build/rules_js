@@ -16,13 +16,13 @@ nodejs_register_toolchains(
 
 load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
-# Validate that we can use a package-lock.json file in place of pnpm-lock.yaml
+# Validate that we can use a yarn.lock file in place of pnpm-lock.yaml
 npm_translate_lock(
     name = "npm",
-    npm_package_lock = "//:package-lock.json",
     npmrc = "//:.npmrc",
     package_json = "//:package.json",
     verify_node_modules_ignored = "//:.bazelignore",
+    yarn_lock = "//:yarn.lock",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
