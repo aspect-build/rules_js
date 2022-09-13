@@ -97,7 +97,7 @@ importers:
     specifiers:
       '@rollup/plugin-commonjs': 22.0.0
       '@rollup/plugin-json': 4.1.0
-      '@rollup/plugin-node-resolve': 13.3.0
+      '@rollup/plugin-node-resolve': 14.1.0
       c8: 7.11.3
       rollup: 2.79.0
     dependencies:
@@ -105,7 +105,7 @@ importers:
     devDependencies:
       '@rollup/plugin-commonjs': 22.0.0_rollup@2.79.0
       '@rollup/plugin-json': 4.1.0_rollup@2.79.0
-      '@rollup/plugin-node-resolve': 13.3.0_rollup@2.79.0
+      '@rollup/plugin-node-resolve': 14.1.0_rollup@2.79.0
       rollup: 2.79.0
 
   npm/private/test:
@@ -399,11 +399,11 @@ packages:
       rollup: 2.79.0
     dev: true
 
-  /@rollup/plugin-node-resolve/13.3.0_rollup@2.79.0:
-    resolution: {integrity: sha512-Lus8rbUo1eEcnS4yTFKLZrVumLPY+YayBdWXgFSHYhTT2iJbMhoaaBL3xl5NCdeRytErGr8tZ0L71BMRmnlwSw==}
+  /@rollup/plugin-node-resolve/14.1.0_rollup@2.79.0:
+    resolution: {integrity: sha512-5G2niJroNCz/1zqwXtk0t9+twOSDlG00k1Wfd7bkbbXmwg8H8dvgHdIWAun53Ps/rckfvOC7scDBjuGFg5OaWw==}
     engines: {node: '>= 10.0.0'}
     peerDependencies:
-      rollup: ^2.42.0
+      rollup: ^2.78.0
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.79.0
       '@types/resolve': registry.npmjs.org/@types/resolve/1.17.1
@@ -2599,7 +2599,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.36
+      '@types/node': registry.npmjs.org/@types/node/16.11.54
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: false
@@ -4825,7 +4825,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics/4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv/3.1.4
-      '@types/node': registry.npmjs.org/@types/node/16.11.36
+      '@types/node': registry.npmjs.org/@types/node/16.11.54
       '@types/responselike': registry.npmjs.org/@types/responselike/1.0.0
     dev: true
 
@@ -4887,26 +4887,20 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.36
+      '@types/node': registry.npmjs.org/@types/node/16.11.54
     dev: true
-
-  registry.npmjs.org/@types/node/16.11.36:
-    resolution: {integrity: sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.11.36.tgz}
-    name: '@types/node'
-    version: 16.11.36
 
   registry.npmjs.org/@types/node/16.11.54:
     resolution: {integrity: sha512-ryOpwe15+BtTUxKFfzABjaI/EtXLPBSBEW4B6D5ygWNcORLVKG/1/FC3WwAr5d7t6lCnlVPRsCY0NH680QT+Pg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.11.54.tgz}
     name: '@types/node'
     version: 16.11.54
-    dev: true
 
   registry.npmjs.org/@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.17.1.tgz}
     name: '@types/resolve'
     version: 1.17.1
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.36
+      '@types/node': registry.npmjs.org/@types/node/16.11.54
     dev: true
 
   registry.npmjs.org/@types/responselike/1.0.0:
@@ -4914,5 +4908,5 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.36
+      '@types/node': registry.npmjs.org/@types/node/16.11.54
     dev: true
