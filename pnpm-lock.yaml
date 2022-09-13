@@ -11,11 +11,11 @@ importers:
 
   .:
     specifiers:
-      '@types/node': 16.11.54
+      '@types/node': 16.11.59
       inline-fixtures: 1.1.0
       typescript: 4.8.3
     devDependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.54
+      '@types/node': registry.npmjs.org/@types/node/16.11.59
       inline-fixtures: 1.1.0
       typescript: 4.8.3
 
@@ -2599,7 +2599,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.54
+      '@types/node': registry.npmjs.org/@types/node/16.11.59
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: false
@@ -4825,7 +4825,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics/4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv/3.1.4
-      '@types/node': registry.npmjs.org/@types/node/16.11.54
+      '@types/node': registry.npmjs.org/@types/node/16.11.59
       '@types/responselike': registry.npmjs.org/@types/responselike/1.0.0
     dev: true
 
@@ -4887,20 +4887,20 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.54
+      '@types/node': registry.npmjs.org/@types/node/16.11.59
     dev: true
 
-  registry.npmjs.org/@types/node/16.11.54:
-    resolution: {integrity: sha512-ryOpwe15+BtTUxKFfzABjaI/EtXLPBSBEW4B6D5ygWNcORLVKG/1/FC3WwAr5d7t6lCnlVPRsCY0NH680QT+Pg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.11.54.tgz}
+  registry.npmjs.org/@types/node/16.11.59:
+    resolution: {integrity: sha512-6u+36Dj3aDzhfBVUf/mfmc92OEdzQ2kx2jcXGdigfl70E/neV21ZHE6UCz4MDzTRcVqGAM27fk+DLXvyDsn3Jw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.11.59.tgz}
     name: '@types/node'
-    version: 16.11.54
+    version: 16.11.59
 
   registry.npmjs.org/@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.17.1.tgz}
     name: '@types/resolve'
     version: 1.17.1
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.54
+      '@types/node': registry.npmjs.org/@types/node/16.11.59
     dev: true
 
   registry.npmjs.org/@types/responselike/1.0.0:
@@ -4908,5 +4908,5 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.11.54
+      '@types/node': registry.npmjs.org/@types/node/16.11.59
     dev: true

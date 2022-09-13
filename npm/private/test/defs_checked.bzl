@@ -714,7 +714,7 @@ load("@npm__at_types_istanbul-lib-coverage__registry.npmjs.org_at_types_istanbul
 load("@npm__at_types_json-buffer__registry.npmjs.org_at_types_json-buffer_3.0.0__links//:defs.bzl", store_707 = "npm_imported_package_store")
 load("@npm__at_types_json-schema__registry.npmjs.org_at_types_json-schema_7.0.11__links//:defs.bzl", store_708 = "npm_imported_package_store")
 load("@npm__at_types_keyv__registry.npmjs.org_at_types_keyv_3.1.4__links//:defs.bzl", store_709 = "npm_imported_package_store")
-load("@npm__at_types_node__registry.npmjs.org_at_types_node_16.11.54__links//:defs.bzl", link_710 = "npm_link_imported_package_store", store_710 = "npm_imported_package_store")
+load("@npm__at_types_node__registry.npmjs.org_at_types_node_16.11.59__links//:defs.bzl", link_710 = "npm_link_imported_package_store", store_710 = "npm_imported_package_store")
 load("@npm__at_types_resolve__registry.npmjs.org_at_types_resolve_1.17.1__links//:defs.bzl", store_711 = "npm_imported_package_store")
 load("@npm__at_types_responselike__registry.npmjs.org_at_types_responselike_1.0.0__links//:defs.bzl", store_712 = "npm_imported_package_store")
 
