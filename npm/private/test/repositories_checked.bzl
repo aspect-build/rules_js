@@ -334,7 +334,7 @@ def npm_repositories():
             "compress-brotli": ["1.3.8"],
             "json-buffer": ["3.0.1"],
             "@types/json-buffer": ["registry.npmjs.org/@types/json-buffer/3.0.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "@types/http-cache-semantics": ["registry.npmjs.org/@types/http-cache-semantics/4.0.1"],
             "defer-to-connect": ["2.0.1"],
             "jsonfile": ["4.0.0"],
@@ -931,16 +931,16 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__13.3.0__rollup_2.79.0",
+        name = "npm__at_rollup_plugin-node-resolve__14.1.0__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
         },
         package = "@rollup/plugin-node-resolve",
-        version = "13.3.0_rollup@2.79.0",
+        version = "14.1.0_rollup@2.79.0",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-Lus8rbUo1eEcnS4yTFKLZrVumLPY+YayBdWXgFSHYhTT2iJbMhoaaBL3xl5NCdeRytErGr8tZ0L71BMRmnlwSw==",
+        integrity = "sha512-5G2niJroNCz/1zqwXtk0t9+twOSDlG00k1Wfd7bkbbXmwg8H8dvgHdIWAun53Ps/rckfvOC7scDBjuGFg5OaWw==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup@2.79.0",
             "@types/resolve": "registry.npmjs.org/@types/resolve/1.17.1",
@@ -951,7 +951,7 @@ def npm_repositories():
             "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["13.3.0_rollup@2.79.0"],
+            "@rollup/plugin-node-resolve": ["14.1.0_rollup@2.79.0"],
             "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
             "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
             "deepmerge": ["4.2.2"],
@@ -966,7 +966,7 @@ def npm_repositories():
             "has": ["1.0.3"],
             "function-bind": ["1.1.1"],
             "builtin-modules": ["3.3.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39"],
             "estree-walker": ["1.0.1"],
             "picomatch": ["2.3.1"],
@@ -1596,7 +1596,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.13"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -1708,7 +1708,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.13"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -1838,7 +1838,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.13"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -2837,7 +2837,7 @@ def npm_repositories():
             "compress-brotli": ["1.3.8"],
             "json-buffer": ["3.0.1"],
             "@types/json-buffer": ["registry.npmjs.org/@types/json-buffer/3.0.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
         },
     )
 
@@ -6739,7 +6739,7 @@ def npm_repositories():
             "compress-brotli": ["1.3.8"],
             "json-buffer": ["3.0.1"],
             "@types/json-buffer": ["registry.npmjs.org/@types/json-buffer/3.0.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "@types/http-cache-semantics": ["registry.npmjs.org/@types/http-cache-semantics/4.0.1"],
             "defer-to-connect": ["2.0.1"],
         },
@@ -7833,13 +7833,13 @@ def npm_repositories():
         lifecycle_hooks_no_sandbox = True,
         integrity = "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+            "@types/node": "registry.npmjs.org/@types/node/16.11.54",
             "merge-stream": "2.0.0",
             "supports-color": "8.1.1",
         },
         transitive_closure = {
             "jest-worker": ["27.5.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -13239,7 +13239,7 @@ def npm_repositories():
             "json-schema-traverse": ["0.4.1"],
             "uri-js": ["4.4.1"],
             "punycode": ["2.1.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -14548,7 +14548,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.13"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -14764,7 +14764,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.13"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -15238,14 +15238,14 @@ def npm_repositories():
         deps = {
             "@types/http-cache-semantics": "registry.npmjs.org/@types/http-cache-semantics/4.0.1",
             "@types/keyv": "registry.npmjs.org/@types/keyv/3.1.4",
-            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+            "@types/node": "registry.npmjs.org/@types/node/16.11.54",
             "@types/responselike": "registry.npmjs.org/@types/responselike/1.0.0",
         },
         transitive_closure = {
             "@types/cacheable-request": ["registry.npmjs.org/@types/cacheable-request/6.0.2"],
             "@types/http-cache-semantics": ["registry.npmjs.org/@types/http-cache-semantics/4.0.1"],
             "@types/keyv": ["registry.npmjs.org/@types/keyv/3.1.4"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
             "@types/responselike": ["registry.npmjs.org/@types/responselike/1.0.0"],
         },
     )
@@ -15394,26 +15394,11 @@ def npm_repositories():
         integrity = "sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==",
         url = "https://registry.yarnpkg.com/@types/keyv/-/keyv-3.1.4.tgz",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+            "@types/node": "registry.npmjs.org/@types/node/16.11.54",
         },
         transitive_closure = {
             "@types/keyv": ["registry.npmjs.org/@types/keyv/3.1.4"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.36",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/node",
-        version = "registry.npmjs.org/@types/node/16.11.36",
-        lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz",
-        transitive_closure = {
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
         },
     )
 
@@ -15445,11 +15430,11 @@ def npm_repositories():
         integrity = "sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==",
         url = "https://registry.yarnpkg.com/@types/resolve/-/resolve-1.17.1.tgz",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+            "@types/node": "registry.npmjs.org/@types/node/16.11.54",
         },
         transitive_closure = {
             "@types/resolve": ["registry.npmjs.org/@types/resolve/1.17.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
         },
     )
 
@@ -15464,10 +15449,10 @@ def npm_repositories():
         integrity = "sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==",
         url = "https://registry.yarnpkg.com/@types/responselike/-/responselike-1.0.0.tgz",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/16.11.36",
+            "@types/node": "registry.npmjs.org/@types/node/16.11.54",
         },
         transitive_closure = {
             "@types/responselike": ["registry.npmjs.org/@types/responselike/1.0.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.36"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.11.54"],
         },
     )
