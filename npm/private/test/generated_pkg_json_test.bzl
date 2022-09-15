@@ -3,23 +3,25 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 """
 
 load(":package_json_checked.bzl", rollup_bin = "bin")
-load("@bazel_skylib//lib:unittest.bzl", "asserts", "loadingtest")
+load("@bazel_skylib//lib:unittest.bzl", "loadingtest")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
+
+_TEST_TARGET_PREFIX="__rollup"
 
 def _get_functions_under_test_and_their_args():
     return {
         "rollup": {
-            "name": "__rollup-target",
+            "name": _TEST_TARGET_PREFIX + "-target",
             "outs": ["foo.js"],
             "srcs": [":empty.js"],
             "chdir": native.package_name(),
             "args": ["empty.js", "--format", "cjs", "--file", "foo.js"],
         },
         "rollup_test": {
-            "name": "__rollup-test",
+            "name": _TEST_TARGET_PREFIX + "-test",
         },
         "rollup_binary": {
-            "name": "__rollup-binary",
+            "name": _TEST_TARGET_PREFIX + "-binary",
         },
     }
 
@@ -44,7 +46,7 @@ def test_intermediate_targets_tagged_manual(env):
     """Ensure all targets besides the final output target are tagged manual"""
 
     existing_rules = native.existing_rules()
-    relevant_targets = [t for t in existing_rules.keys() if t.startswith("__rollup")]
+    relevant_targets = [t for t in existing_rules.keys() if t.startswith(_TEST_TARGET_PREFIX)]
 
     expected_not_manual = _target_names_used_for_test()
     generated_targets = sets.to_list(sets.difference(
