@@ -35,9 +35,8 @@ def rules_js_dev_dependencies():
     # see https://github.com/bazelbuild/bazel-skylib/issues/250
     http_archive(
         name = "bazel_skylib",
-        sha256 = "07b4117379dde7ab382345c3b0f5edfc6b7cff6c93756eac63da121e0bbcc5de",
-        strip_prefix = "bazel-skylib-1.1.1",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/archive/refs/tags/1.1.1.tar.gz"],
+        sha256 = "af87959afe497dc8dfd4c6cb66e1279cb98ccc84284619ebfec27d9c09a903de",
+        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.2.0/bazel-skylib-1.2.0.tar.gz"],
     )
 
     http_archive(

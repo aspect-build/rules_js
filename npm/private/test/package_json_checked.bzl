@@ -9,11 +9,13 @@ def _rollup_internal(name, link_root_name, **kwargs):
         name = "%s__entry_point" % name,
         directory = "@//:{}/dir".format(store_target_name),
         path = "dist/bin/rollup",
+        tags = ["manual"],
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
         data = ["@//:{}".format(store_target_name)],
+        tags = ["manual"],
     )
     _js_run_binary(
         name = name,
@@ -28,6 +30,7 @@ def _rollup_test_internal(name, link_root_name, **kwargs):
         name = "%s__entry_point" % name,
         directory = "@//:{}/dir".format(store_target_name),
         path = "dist/bin/rollup",
+        tags = ["manual"],
     )
     _js_test(
         name = name,
@@ -42,6 +45,7 @@ def _rollup_binary_internal(name, link_root_name, **kwargs):
         name = "%s__entry_point" % name,
         directory = "@//:{}/dir".format(store_target_name),
         path = "dist/bin/rollup",
+        tags = ["manual"],
     )
     _js_binary(
         name = name,
