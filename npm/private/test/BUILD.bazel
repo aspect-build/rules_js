@@ -74,6 +74,3 @@ sh_test(
     ],
     toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
 )
-
-
-
