@@ -6,6 +6,7 @@ load(":yaml_tests.bzl", "yaml_tests")
 load(":utils_tests.bzl", "utils_tests")
 load(":ini_test.bzl", "ini_tests")
 load(":pkg_glob_tests.bzl", "pkg_glob_tests")
+load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 
 # gazelle:exclude *_checked.bzl
 
@@ -23,6 +24,8 @@ transitive_closure_tests(name = "test_transitive_closure")
 translate_lock_tests(name = "test_translate_lock")
 
 yaml_tests(name = "test_yaml")
+
+generated_pkg_json_test(name = "test_generated_pkg_json")
 
 write_source_files(
     name = "write_npm_translate_lock",

@@ -200,7 +200,8 @@ def js_run_binary(
             include_transitive_sources = include_transitive_sources,
             include_declarations = include_declarations,
             include_npm_linked_packages = include_npm_linked_packages,
-            tags = kwargs.get("tags"),
+            # Always tag the target manual since we should only build it when the final target is built.
+            tags = kwargs.get("tags", []) + ["manual"],
         )
         extra_srcs.append(":{}".format(js_filegroup_name))
 
@@ -210,7 +211,8 @@ def js_run_binary(
         _copy_to_bin(
             name = copy_to_bin_name,
             srcs = srcs,
-            tags = kwargs.get("tags"),
+            # Always tag the target manual since we should only build it when the final target is built.
+            tags = kwargs.get("tags", []) + ["manual"],
         )
         extra_srcs.append(":{}".format(copy_to_bin_name))
 
