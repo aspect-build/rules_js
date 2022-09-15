@@ -7,7 +7,6 @@ npm_link_all_packages(name = "node_modules")
 npm_link_package(
     name = "node_modules/@e2e/lib",
     src = "//lib",
-    visibility = ["//visibility:public"],
 )
 
 npm_link_package(

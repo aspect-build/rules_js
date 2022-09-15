@@ -4,7 +4,7 @@ js_binary(
     name = "main",
     args = ["foo"],
     node_options = [
-        "--experimental-json-modules",
+        "--experimental-json-modules",  # Required for importing .json from .mjs
     ],
     data = [
         "//:node_modules/@aspect-test/a",
@@ -22,7 +22,7 @@ js_test(
     name = "test",
     args = ["foo"],
     node_options = [
-        "--experimental-json-modules",
+        "--experimental-json-modules",  # Required for importing .json from .mjs
     ],
     data = [
         "//:node_modules/@aspect-test/a",
