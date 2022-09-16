@@ -319,6 +319,10 @@ def npm_translate_lock(
             package = "pnpm",
             root_package = "",
             version = pnpm_version,
+            extra_build_content = [
+                """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
+                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs")""",
+            ],
         )
 
     # convert bins to a string_list_dict to satisfy attr type in repository rule
@@ -373,6 +377,7 @@ def npm_import(
         package,
         version,
         deps = {},
+        extra_build_content = "",
         transitive_closure = {},
         root_package = "",
         link_workspace = "",
@@ -472,12 +477,14 @@ def npm_import(
 
     1. Make a file containing a rewrite rule like
 
-        rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2
+        `rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2`
 
     1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
 
     1. Point bazel to the config with a line in .bazelrc like
     common --experimental_downloader_config=.bazel_downloader_config
+
+    Read more about the downloader config: <https://blog.aspect.dev/configuring-bazels-downloader>
 
     [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 
@@ -555,6 +562,10 @@ def npm_import(
         custom_postinstall: Custom string postinstall script to run on the installed npm package. Runs after any
             existing lifecycle hooks if `run_lifecycle_hooks` is True.
 
+        extra_build_content: Additional content to append on the generated BUILD file at the root of
+            the created repository, either as a string or a list of lines similar to
+            <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
+
         bins: Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
 
             This is typically derived from the "bin" attribute in the package.json
@@ -589,6 +600,9 @@ def npm_import(
         patches = patches,
         custom_postinstall = custom_postinstall,
         run_lifecycle_hooks = run_lifecycle_hooks,
+        extra_build_content = (
+            extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
+        ),
     )
 
     # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated

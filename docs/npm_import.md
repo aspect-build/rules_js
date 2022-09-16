@@ -32,8 +32,8 @@ Advanced users may want to directly fetch a package from npm rather than start f
 ## npm_import
 
 <pre>
-npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-transitive_closure">transitive_closure</a>, <a href="#npm_import-root_package">root_package</a>, <a href="#npm_import-link_workspace">link_workspace</a>,
-           <a href="#npm_import-link_packages">link_packages</a>, <a href="#npm_import-run_lifecycle_hooks">run_lifecycle_hooks</a>, <a href="#npm_import-lifecycle_hooks_execution_requirements">lifecycle_hooks_execution_requirements</a>,
+npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-package">package</a>, <a href="#npm_import-version">version</a>, <a href="#npm_import-deps">deps</a>, <a href="#npm_import-extra_build_content">extra_build_content</a>, <a href="#npm_import-transitive_closure">transitive_closure</a>, <a href="#npm_import-root_package">root_package</a>,
+           <a href="#npm_import-link_workspace">link_workspace</a>, <a href="#npm_import-link_packages">link_packages</a>, <a href="#npm_import-run_lifecycle_hooks">run_lifecycle_hooks</a>, <a href="#npm_import-lifecycle_hooks_execution_requirements">lifecycle_hooks_execution_requirements</a>,
            <a href="#npm_import-lifecycle_hooks_env">lifecycle_hooks_env</a>, <a href="#npm_import-lifecycle_hooks_no_sandbox">lifecycle_hooks_no_sandbox</a>, <a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-url">url</a>, <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>,
            <a href="#npm_import-custom_postinstall">custom_postinstall</a>, <a href="#npm_import-bins">bins</a>)
 </pre>
@@ -123,12 +123,14 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 
 1. Make a file containing a rewrite rule like
 
-    rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2
+    `rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2`
 
 1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
 
 1. Point bazel to the config with a line in .bazelrc like
 common --experimental_downloader_config=.bazel_downloader_config
+
+Read more about the downloader config: <https://blog.aspect.dev/configuring-bazels-downloader>
 
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 
@@ -142,6 +144,7 @@ common --experimental_downloader_config=.bazel_downloader_config
 | <a id="npm_import-package"></a>package |  Name of the npm package, such as <code>acorn</code> or <code>@types/node</code>   |  none |
 | <a id="npm_import-version"></a>version |  Version of the npm package, such as <code>8.4.0</code>   |  none |
 | <a id="npm_import-deps"></a>deps |  A dict other npm packages this one depends on where the key is the package name and value is the version   |  <code>{}</code> |
+| <a id="npm_import-extra_build_content"></a>extra_build_content |  Additional content to append on the generated BUILD file at the root of the created repository, either as a string or a list of lines similar to &lt;https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md&gt;.   |  <code>""</code> |
 | <a id="npm_import-transitive_closure"></a>transitive_closure |  A dict all npm packages this one depends on directly or transitively where the key is the package name and value is a list of version(s) depended on in the closure.   |  <code>{}</code> |
 | <a id="npm_import-root_package"></a>root_package |  The root package where the node_modules virtual store is linked to. Typically this is the package that the pnpm-lock.yaml file is located when using <code>npm_translate_lock</code>.   |  <code>""</code> |
 | <a id="npm_import-link_workspace"></a>link_workspace |  The workspace name where links will be created for this package.<br><br>This is typically set in rule sets and libraries that are to be consumed as external repositories so links are created in the external repository and not the user workspace.<br><br>Can be left unspecified if the link workspace is the user workspace.   |  <code>""</code> |

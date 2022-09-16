@@ -415,6 +415,9 @@ def _impl(rctx):
         version = rctx.attr.version,
     ))
 
+    if rctx.attr.extra_build_content:
+        rctx_files["BUILD.bazel"].append("\n" + rctx.attr.extra_build_content)
+
     if bins:
         virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
 
@@ -678,6 +681,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
+    "extra_build_content": attr.string(),
     "integrity": attr.string(),
     "patch_args": attr.string_list(default = ["-p0"]),
     "patches": attr.label_list(),
