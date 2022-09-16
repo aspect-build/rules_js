@@ -64,8 +64,8 @@ If you're ready to switch your repo to pnpm, then you'll use the `pnpm_lock` att
    you could just run `npx pnpm install --lockfile-only` which generates a new lockfile.
 
 > To make those commands shorter, we rely on the `npx` binary already on your machine.
-> However you could use the Bazel-managed one from rules_nodejs instead, like so:
-> `bazel run -- @nodejs_host//:npx_bin pnpm@latest i --lockfile-only`
+> However you could use the Bazel-managed node and pnpm instead, like so:
+> `bazel run -- @pnpm//:pnpm i --lockfile-only`
 
 The new `pnpm-lock.yaml` file needs to be updated by engineers on the team as well,
 so when you're ready to switch over to rules_js, you'll have to train them to run `pnpm`
