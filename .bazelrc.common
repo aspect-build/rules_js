@@ -22,19 +22,10 @@ startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 build --enable_runfiles
 
 build --incompatible_allow_tags_propagation
-common --enable_platform_specific_config
 
 # Turn off legacy external runfiles on all platforms except Windows.
 # This prevents accidentally depending on this feature, which Bazel will remove.
-# Skylib's diff_test implementation for Windows depends on legacy external
-# runfiles so we cannot disable it fully. TODO: disable for all platforms and
-# remove the platform-specific config once the following fix is released:
-# https://github.com/bazelbuild/bazel-skylib/commit/872e9b06e18ae8ba2897cb65b9aaa172aa6279f3
-
-build:linux --nolegacy_external_runfiles
-build:macos --nolegacy_external_runfiles
-build:freebsd --nolegacy_external_runfiles
-build:openbsd --nolegacy_external_runfiles
+build --nolegacy_external_runfiles
 
 # Turn on --incompatible_strict_action_env which was on by default
 # in Bazel 0.21.0 but turned off again in 0.22.0. Follow
