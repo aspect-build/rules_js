@@ -1,0 +1,14 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:mocha/package_json.bzl", mocha_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+mocha_bin.mocha_test(
+    name = "test",
+    args = ["test.js"],
+    data = [
+        # package.json is required for node to pickup the "type": "module" field
+        "package.json",
+        ":test.js",
+    ],
+)
