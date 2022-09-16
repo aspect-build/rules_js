@@ -38,8 +38,6 @@ Then run `bazel run -- @nodejs_host//:node $(bazel info output_base)/external/pn
 
 You can use this recipe to make sure your developers run the exact same pnpm and node versions that Bazel does.
 
-Alternatively, if you don't care that the pnpm version matches, you could use a shorter command like `bazel run -- @nodejs_host//:npx_bin pnpm@latest` to just use the latest pnpm version.
-
 ## Why can't Bazel fetch an npm package?
 
 If the error looks like this: `failed to fetch. no such package '@npm__foo__1.2.3//': at offset 773, object has duplicate key`
