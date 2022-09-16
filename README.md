@@ -10,7 +10,7 @@ accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 
 <https://blog.aspect.dev/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 
-Known issues to be addressed for the [1.1 release](https://github.com/aspect-build/rules_js/milestone/2) include:
+Known issues to be addressed for the [1.3 release](https://github.com/aspect-build/rules_js/milestone/2) include:
 
 -   Remote Execution (RBE) requires our fork of Bazel for now. Follow https://github.com/aspect-build/rules_js/issues/308
 -   Building docker containers works, per [this example](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image) however it requires some Starlark code which ought to be in our public API, see https://github.com/aspect-build/rules_js/issues/304
