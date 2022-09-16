@@ -99,13 +99,23 @@ def _make_symlink(ctx, symlink_path, target_file):
         )
         files.append(target_file)
     else:
-        symlink = ctx.actions.declare_file(symlink_path)
+        if _is_at_least_bazel_6() and target_file.is_directory:
+            # BREAKING CHANGE in Bazel 6 requires you to use declare_directory if your target_file
+            # in ctx.actions.symlink is a directory artifact
+            symlink = ctx.actions.declare_directory(symlink_path)
+        else:
+            symlink = ctx.actions.declare_file(symlink_path)
         ctx.actions.symlink(
             output = symlink,
             target_file = target_file,
         )
     files.append(symlink)
     return files
+
+def _is_at_least_bazel_6():
+    # Hacky way to check if the we're using at least Bazel 6. Would be nice if there was a ctx.bazel_version instead.
+    # native.bazel_version only works in repository rules.
+    return "apple_binary" not in dir(native)
 
 utils = struct(
     bazel_name = _bazel_name,
