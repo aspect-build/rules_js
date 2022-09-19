@@ -40,9 +40,7 @@ jobs:
                 config: ${{ fromJSON(needs.matrix-prep.outputs.configs) }}
                 folder:
                     - '.'
-                    # Broken by the bazel 5.3.0 upgrade
-                    # TODO: figure out and re-enable
-                    # - 'e2e/bzlmod'
+                    - 'e2e/bzlmod'
                     - 'e2e/npm_link_package'
                     - 'e2e/npm_link_package-esm'
                     - 'e2e/pnpm_workspace'
