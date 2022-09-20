@@ -30,7 +30,7 @@ Try running Bazel with `--experimental_check_output_files=false` so that your ed
 
 ## Can I use bazel-managed pnpm?
 
-Yes, just run `bazel run -- @pnpm//:pnpm` followed by the usual arguments to pnpm.
+Yes, just run `bazel run -- @pnpm//:pnpm --dir $PWD` followed by the usual arguments to pnpm.
 
 Document this as a good practice so that all developers run the exact same pnpm and node versions that Bazel does.
 
