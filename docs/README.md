@@ -200,6 +200,14 @@ typescript_bin.tsc(
 > Bazel doesn't download the typescript package when loading this file, so you can safely write this
 > even in a BUILD.bazel file that includes unrelated rules.
 
+Each bin exposes three rules, one for each Bazel command ("verb"):
+
+| Use          | With          | To              |
+| ------------ | ------------- | --------------- |
+| `foo`        | `bazel build` | produce outputs |
+| `foo_binary` | `bazel run`   | side-effects    |
+| `foo_test`   | `bazel test`  | assert exit `0` |
+
 To inspect what's in the `@npm` workspace, start with a `bazel query` like the following:
 
 ```shell
@@ -227,14 +235,6 @@ bzl_library(
 ```
 
 This shows us that the label `@npm//:typescript/package_json.bzl` can be used to load the "bin" symbol. You can also follow the location on disk to find that file.
-
-Each bin exposes three rules, one for each Bazel command ("verb"):
-
-| Use          | With          | To              |
-| ------------ | ------------- | --------------- |
-| `foo`        | `bazel build` | produce outputs |
-| `foo_binary` | `bazel run`   | side-effects    |
-| `foo_test`   | `bazel test`  | assert exit `0` |
 
 ### Macros
 
