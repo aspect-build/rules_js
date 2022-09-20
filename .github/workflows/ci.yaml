@@ -73,7 +73,7 @@ jobs:
                   chmod 0600 engflow.crt engflow.key
                   echo "$ENGFLOW_CLIENT_CRT" > engflow.crt
                   echo "$ENGFLOW_PRIVATE_KEY" > engflow.key
-                  echo "USE_BAZEL_VERSION=aspect-build/6.0.0-aspect1" >> $GITHUB_ENV
+                  echo "USE_BAZEL_VERSION=last_green" >> $GITHUB_ENV
               env:
                   ENGFLOW_CLIENT_CRT: ${{ secrets.ENGFLOW_CLIENT_CRT }}
                   ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
