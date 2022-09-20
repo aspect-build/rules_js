@@ -266,8 +266,9 @@ def js_run_binary(
         # buildifier: disable=print
         print("""\
 WARNING: {name} is not configured to produce outputs.
-        
-If this is a generated bin from package_json.bzl, consider using the *_binary variant instead.
+
+If this is a generated bin from package_json.bzl, consider using the *_binary or *_test variant instead.
+See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-published-to-npm
 """.format(
             name = to_label(name),
         ))
