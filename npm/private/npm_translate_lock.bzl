@@ -266,7 +266,7 @@ def _gen_npm_imports(lockfile, root_package, attr):
 
 ====================================================================================================
 WARNING: The pnpm lockfile package entry for {} ({})
-does not contain a fully qualified tarball URL or a registry setting to indiciate which registry to
+does not contain a fully qualified tarball URL or a registry setting to indicate which registry to
 use. Prefixing tarball url `{}`
 with the default npm registry url `https://registry.npmjs.org/`.
 
