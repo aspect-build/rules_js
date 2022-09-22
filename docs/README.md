@@ -357,3 +357,41 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 [bazel macros]: https://bazel.build/rules/macros
 [gazelle]: https://github.com/bazelbuild/bazel-gazelle
 [stardoc]: https://github.com/bazelbuild/stardoc
+
+### Debugging
+
+Add the options in the "Support for debugging Node.js tests" section from https://github.com/aspect-build/rules_js/blob/main/.bazelrc.common to your project’s .bazelrc file to add the `--config=debug` settings for debugging Node.js programs.
+
+In this repository, for example, we can debug the `//examples/js_binary:test_test` `js_test` target with,
+
+```
+$ bazel run //examples/js_binary:test_test --config=debug
+Starting local Bazel server and connecting to it...
+INFO: Analyzed target //examples/js_binary:test_test (65 packages loaded, 1023 targets configured).
+INFO: Found 1 target...
+Target //examples/js_binary:test_test up-to-date:
+  bazel-bin/examples/js_binary/test_test.sh
+INFO: Elapsed time: 6.774s, Critical Path: 0.08s
+INFO: 6 processes: 4 internal, 2 local.
+INFO: Build completed successfully, 6 total actions
+INFO: Build completed successfully, 6 total actions
+exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //examples/js_binary:test_test
+-----------------------------------------------------------------------------
+Debugger listening on ws://127.0.0.1:9229/76b4bb42-7d4e-41f6-a7fe-92b57db356ad
+For help, see: https://nodejs.org/en/docs/inspector
+```
+
+#### Debugging with Chrome DevTools
+
+At this point you can connect to this Node.js debugging session with a debugging tool.
+To use Chrome, open a new tab and enter the URL `chrome://inspect/`. You should see the
+session listed there and you can connect to it and debug in Chrome DevTools.
+See [Debugging Node.js with Chrome DevTools](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27)
+to understand the basics of using the DevTools with Node.
+
+#### Debugging with Visual Studio Code
+
+In this repository, we have added a VSCode the `.vscode/launch.json` configuration file
+so you can launch into a debugging session directly from the
+[Run & Debug](https://code.visualstudio.com/docs/editor/debugging) window.
