@@ -1,6 +1,11 @@
 {
-  "extends": [
-    "config:base",
-    ":preserveSemverRanges"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+    "extends": ["config:base", ":preserveSemverRanges", "schedule:weekly"],
+
+    "packageRules": [
+        {
+            "stabilityDays": 3
+        }
+    ]
 }
