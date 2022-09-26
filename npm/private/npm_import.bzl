@@ -355,6 +355,7 @@ def _impl(rctx):
         output = _TARBALL_FILENAME,
         url = download_url,
         integrity = rctx.attr.integrity,
+        auth = _get_npm_auth(rctx, download_url),
     )
 
     mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
@@ -690,6 +691,22 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "link_workspace": attr.string(),
     "url": attr.string(),
 })
+
+def _get_npm_auth(rctx, download_url):
+    # Read token from ~/.npmrc, //registry.npmjs.org/:_authToken=
+    if "HOME" in rctx.os.environ.keys() and rctx.os.environ["HOME"]:
+        npmrc_path = rctx.os.environ["HOME"] + "/.npmrc"
+        npmrc = rctx.read(npmrc_path).splitlines()
+        for line in npmrc:
+            if "//registry.npmjs.org/:_authToken=" in line and "=" in line:
+                return {
+                    download_url: {
+                        "type": "pattern",
+                        "pattern": "Bearer <password>",
+                        "password": line.split("=")[1],
+                    },
+                }
+    return {}
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
