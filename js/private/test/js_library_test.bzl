@@ -19,6 +19,12 @@ def _js_library_test_suite_data():
         content = ["export const dir: string;"],
         tags = ["manual"],
     )
+    write_file(
+        name = "data_json",
+        out = "data.json",
+        content = ["{\"name\": \"data\"}"],
+        tags = ["manual"],
+    )
 
 # Tests
 def _declarations_test_impl(ctx):
@@ -27,13 +33,15 @@ def _declarations_test_impl(ctx):
 
     # declarations should only have the source declarations
     declarations = target_under_test[JsInfo].declarations.to_list()
-    asserts.equals(env, 1, len(declarations))
+    asserts.equals(env, 2, len(declarations))
     asserts.true(env, declarations[0].path.find("/importing.d.ts") != -1)
+    asserts.true(env, declarations[1].path.find("/data.json") != -1)
 
     # declarations should only have the source declarations
     transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
-    asserts.equals(env, 1, len(transitive_declarations))
+    asserts.equals(env, 2, len(transitive_declarations))
     asserts.true(env, transitive_declarations[0].path.find("/importing.d.ts") != -1)
+    asserts.true(env, transitive_declarations[1].path.find("/data.json") != -1)
 
     # types OutputGroupInfo should be the same as direct declarations
     asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
@@ -72,7 +80,7 @@ def js_library_test_suite(name):
     # Declarations in srcs + deps
     js_library(
         name = "transitive_type_deps",
-        srcs = ["importing.js", "importing.d.ts"],
+        srcs = ["importing.js", "importing.d.ts", "data.json"],
         deps = [
             "//:node_modules/@types/node",
         ],
