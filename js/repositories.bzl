@@ -28,8 +28,9 @@ def rules_js_dependencies():
 
     http_archive(
         name = "rules_nodejs",
-        sha256 = "404fb7ee034671eb30cc04c59d217adf0a8bd04b311ece17e052fc7ecb60ac32",
-        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.5.4/rules_nodejs-core-5.5.4.tar.gz"],
+        strip_prefix = "rules_nodejs-144cbed47f78d9f0b870fc84b06f20d427178b78",
+        #sha256 = "404fb7ee034671eb30cc04c59d217adf0a8bd04b311ece17e052fc7ecb60ac32",
+        urls = ["https://github.com/bazelbuild/rules_nodejs/archive/144cbed47f78d9f0b870fc84b06f20d427178b78.tar.gz"],
     )
 
     http_archive(
