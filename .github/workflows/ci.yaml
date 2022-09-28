@@ -85,3 +85,13 @@ jobs:
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }}  //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
+
+            - name: bazel coverage //...
+              env:
+                  # Bazelisk will download bazel to here
+                  XDG_CACHE_HOME: ~/.cache/bazel-repo
+              working-directory: ${{ matrix.folder }}
+              # Coverage does not work properly with RBE. See: bazelbuild/bazel#4685
+              if: ${{ matrix.config == 'local' }}
+              run: |
+                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} --instrument_test_targets //...

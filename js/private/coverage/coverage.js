@@ -10983,6 +10983,18 @@ var report = function (opts) {
 
 var Report = report;
 
+// bazel will create the COVERAGE_OUTPUT_FILE whilst setting up the sandbox.
+// therefore, should be doing a file size check rather than presence.
+try {
+    const stats = require$$0__default$1["default"].statSync(process.env.COVERAGE_OUTPUT_FILE);
+    if (stats.size != 0) {
+        // early exit here does not affect the outcome of the tests.
+        // bazel will only execute _lcov_merger when tests pass.
+        process.exit(0);
+    }
+    // in case file doesn't exist or some other error is thrown, just ignore it.
+} catch {}
+
 const include = require$$0__default$1["default"]
     .readFileSync(process.env.COVERAGE_MANIFEST)
     .toString('utf8')
