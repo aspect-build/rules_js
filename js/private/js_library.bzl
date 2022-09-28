@@ -136,7 +136,8 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
             file.path.endswith(".d.cts.map")
         ):
             declarations.append(file)
-        elif file.path.endswith("/package.json"):
+        elif file.path.endswith(".json"):
+            # Any .json can produce types: https://www.typescriptlang.org/tsconfig/#resolveJsonModule
             # package.json may be required to resolve declarations with the "typings" key
             declarations.append(file)
             sources.append(file)
