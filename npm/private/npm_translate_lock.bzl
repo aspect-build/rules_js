@@ -42,7 +42,7 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npmrc}
     )
 """
 
@@ -408,6 +408,7 @@ def _impl(rctx):
     root_package = None
     link_workspace = None
     lockfile_description = None
+    npmrc = rctx.attr.npmrc
 
     _validate_attrs(rctx)
 
@@ -708,6 +709,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     # check all links and fail if there are duplicates which can happen with public hoisting
     _check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
+    maybe_npmrc = ("""
+        npmrc = "%s",""" % npmrc) if npmrc else ""
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
@@ -753,6 +756,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             package = _import.package,
             root_package = _import.root_package,
             version = _import.version,
+            maybe_npmrc = maybe_npmrc,
         ))
 
         if _import.link_packages:

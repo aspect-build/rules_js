@@ -690,20 +690,31 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "custom_postinstall": attr.string(),
     "link_workspace": attr.string(),
     "url": attr.string(),
+    "npmrc": attr.label(),
 })
 
 def _get_npm_auth(rctx, download_url):
-    # Read token from ~/.npmrc, //registry.npmjs.org/:_authToken=
-    if "HOME" in rctx.os.environ.keys() and rctx.os.environ["HOME"]:
-        npmrc_path = rctx.os.environ["HOME"] + "/.npmrc"
+    # Read token from npmrc label
+    if rctx.attr.npmrc:
+        npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = rctx.read(npmrc_path).splitlines()
         for line in npmrc:
             if "//registry.npmjs.org/:_authToken=" in line and "=" in line:
+                # Parse environment variable from config
+                token = line.split("=")[1]
+
+                # A token can be reference to an environment variable
+                if token.startswith("$"):
+                    # ${NPM_TOKEN} -> NPM_TOKEN
+                    # $NPM_TOKEN -> NPM_TOKEN
+                    token = token.removeprefix("$").removeprefix("{").removesuffix("}")
+                    if token in rctx.os.environ.keys() and rctx.os.environ[token]:
+                        token = rctx.os.environ[token]
                 return {
                     download_url: {
                         "type": "pattern",
                         "pattern": "Bearer <password>",
-                        "password": line.split("=")[1],
+                        "password": token,
                     },
                 }
     return {}

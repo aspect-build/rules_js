@@ -391,6 +391,7 @@ def npm_import(
         patch_args = ["-p0"],
         patches = [],
         custom_postinstall = "",
+        npmrc = None,
         bins = {}):
     """Import a single npm package into Bazel.
 
@@ -562,6 +563,8 @@ def npm_import(
         custom_postinstall: Custom string postinstall script to run on the installed npm package. Runs after any
             existing lifecycle hooks if `run_lifecycle_hooks` is True.
 
+        npmrc: Auth related configuration
+
         extra_build_content: Additional content to append on the generated BUILD file at the root of
             the created repository, either as a string or a list of lines similar to
             <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
@@ -599,6 +602,7 @@ def npm_import(
         patch_args = patch_args,
         patches = patches,
         custom_postinstall = custom_postinstall,
+        npmrc = npmrc,
         run_lifecycle_hooks = run_lifecycle_hooks,
         extra_build_content = (
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
