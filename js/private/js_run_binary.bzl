@@ -217,7 +217,7 @@ def js_run_binary(
         extra_srcs.append(":{}".format(copy_to_bin_name))
 
     # Automatically add common and useful make variables to the environment for js_run_binary build targets
-    extra_env = {
+    fixed_env = {
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
         "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
@@ -228,35 +228,35 @@ def js_run_binary(
 
     # Configure working directory to `chdir` is set
     if chdir:
-        extra_env["JS_BINARY__CHDIR"] = chdir
+        fixed_env["JS_BINARY__CHDIR"] = chdir
 
     # Configure capturing stdout, stderr and/or the exit code
     extra_outs = []
     if stdout:
-        extra_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = "$(execpath {})".format(stdout)
+        fixed_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = "$(execpath {})".format(stdout)
         extra_outs.append(stdout)
     if stderr:
-        extra_env["JS_BINARY__STDERR_OUTPUT_FILE"] = "$(execpath {})".format(stderr)
+        fixed_env["JS_BINARY__STDERR_OUTPUT_FILE"] = "$(execpath {})".format(stderr)
         extra_outs.append(stderr)
     if exit_code_out:
-        extra_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = "$(execpath {})".format(exit_code_out)
+        fixed_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = "$(execpath {})".format(exit_code_out)
         extra_outs.append(exit_code_out)
 
     # Configure silent on success
     if silent_on_success:
-        extra_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
+        fixed_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
 
     # Disable node patches if requested
     if patch_node_fs:
-        extra_env["JS_BINARY__PATCH_NODE_FS"] = "1"
+        fixed_env["JS_BINARY__PATCH_NODE_FS"] = "1"
     else:
         # Set explicitly to "0" so disable overrides any enable in the js_binary
-        extra_env["JS_BINARY__PATCH_NODE_FS"] = "0"
+        fixed_env["JS_BINARY__PATCH_NODE_FS"] = "0"
 
     # Configure log_level if specified
     if log_level:
         for log_level_env in _envs_for_log_level(log_level):
-            extra_env[log_level_env] = "1"
+            fixed_env[log_level_env] = "1"
 
     if not stdout and not stderr and not exit_code_out and (len(outs) + len(out_dirs) < 1):
         # run_binary will produce the actual error, but we want to give an additional JS-specific
@@ -276,7 +276,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     _run_binary(
         name = name,
         tool = tool,
-        env = dicts.add(extra_env, env),
+        env = dicts.add(fixed_env, env),
         srcs = srcs + extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
