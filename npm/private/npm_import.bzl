@@ -355,7 +355,13 @@ def _impl(rctx):
         output = _TARBALL_FILENAME,
         url = download_url,
         integrity = rctx.attr.integrity,
-        auth = _get_npm_auth(rctx, download_url),
+        auth = {
+            download_url: {
+                "type": "pattern",
+                "pattern": "Bearer <password>",
+                "password": rctx.attr.npm_auth,
+            },
+        } if rctx.attr.npm_auth else {},
     )
 
     mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
@@ -690,34 +696,8 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "custom_postinstall": attr.string(),
     "link_workspace": attr.string(),
     "url": attr.string(),
-    "npmrc": attr.label(),
+    "npm_auth": attr.string(),
 })
-
-def _get_npm_auth(rctx, download_url):
-    # Read token from npmrc label
-    if rctx.attr.npmrc:
-        npmrc_path = rctx.path(rctx.attr.npmrc)
-        npmrc = rctx.read(npmrc_path).splitlines()
-        for line in npmrc:
-            if "//registry.npmjs.org/:_authToken=" in line and "=" in line:
-                # Parse environment variable from config
-                token = line.split("=")[1]
-
-                # A token can be reference to an environment variable
-                if token.startswith("$"):
-                    # ${NPM_TOKEN} -> NPM_TOKEN
-                    # $NPM_TOKEN -> NPM_TOKEN
-                    token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-                    if token in rctx.os.environ.keys() and rctx.os.environ[token]:
-                        token = rctx.os.environ[token]
-                return {
-                    download_url: {
-                        "type": "pattern",
-                        "pattern": "Bearer <password>",
-                        "password": token,
-                    },
-                }
-    return {}
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin

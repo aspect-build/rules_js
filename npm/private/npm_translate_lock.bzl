@@ -2,6 +2,7 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load(":ini.bzl", "parse_ini")
 load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
@@ -42,7 +43,7 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npmrc}
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -130,6 +131,27 @@ def _gather_values_from_matching_names(keyed_lists, *names):
             else:
                 result.append(v)
     return result
+
+def _get_npm_auth(rctx):
+    _NPM_TOKEN_KEY = "//registry.npmjs.org/:_authtoken"
+    token = None
+
+    # Read token from npmrc label
+    if rctx.attr.npmrc:
+        npmrc_path = rctx.path(rctx.attr.npmrc)
+        npmrc = parse_ini(rctx.read(npmrc_path))
+        if _NPM_TOKEN_KEY in npmrc:
+            # Parse environment variable from config
+            token = npmrc[_NPM_TOKEN_KEY]
+
+            # A token can be a reference to an environment variable
+            if token.startswith("$"):
+                # ${NPM_TOKEN} -> NPM_TOKEN
+                # $NPM_TOKEN -> NPM_TOKEN
+                token = token.removeprefix("$").removeprefix("{").removesuffix("}")
+                if token in rctx.os.environ.keys() and rctx.os.environ[token]:
+                    token = rctx.os.environ[token]
+    return token
 
 def _gen_npm_imports(lockfile, root_package, attr):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
@@ -408,7 +430,7 @@ def _impl(rctx):
     root_package = None
     link_workspace = None
     lockfile_description = None
-    npmrc = rctx.attr.npmrc
+    npm_auth = _get_npm_auth(rctx)
 
     _validate_attrs(rctx)
 
@@ -709,8 +731,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     # check all links and fail if there are duplicates which can happen with public hoisting
     _check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
-    maybe_npmrc = ("""
-        npmrc = "%s",""" % npmrc) if npmrc else ""
+    maybe_npm_auth = ("""
+        npm_auth = "%s",""" % npm_auth) if npm_auth else ""
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
@@ -756,7 +778,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             package = _import.package,
             root_package = _import.root_package,
             version = _import.version,
-            maybe_npmrc = maybe_npmrc,
+            maybe_npm_auth = maybe_npm_auth,
         ))
 
         if _import.link_packages:
