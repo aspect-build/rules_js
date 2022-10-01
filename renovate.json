@@ -1,12 +1,22 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-    "extends": ["config:base", ":preserveSemverRanges", "schedule:weekly"],
+    "extends": [
+        "config:base",
+        ":preserveSemverRanges",
+        ":rebaseStalePrs",
+        "schedule:weekly",
+        "group:allNonMajor",
+        "workarounds:all"
+    ],
+
+    "labels": ["cleanup", "prioritize"],
+    "dependencyDashboard": true,
 
     "packageRules": [
         {
-            "matchDatasources": ["npm"],
-            "stabilityDays": 3
+            "matchPackagePatterns": ["*"],
+            "stabilityDays": 5
         }
     ]
 }
