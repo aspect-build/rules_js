@@ -202,6 +202,8 @@ def npm_translate_lock(
 
         npmrc: Available to pnpm when running pnpm import when npm_package_lock or yarn_lock is set.
 
+            When set, this attribute will also be used to parse the npm auth token (if any) and use
+            it in npm_import, providing authentication with private npm registries.
             In a future release, pnpm settings such as public-hoist-patterns will be used.
 
         patches: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
