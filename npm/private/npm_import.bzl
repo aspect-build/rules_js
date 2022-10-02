@@ -350,18 +350,19 @@ def _impl(rctx):
         package_name_no_scope,
         utils.strip_peer_dep_version(rctx.attr.version),
     )
+    auth = {
+        download_url: {
+            "type": "pattern",
+            "pattern": "Bearer <password>",
+            "password": rctx.attr.npm_auth,
+        },
+    } if rctx.attr.npm_auth else {}
 
     rctx.download(
         output = _TARBALL_FILENAME,
         url = download_url,
         integrity = rctx.attr.integrity,
-        auth = {
-            download_url: {
-                "type": "pattern",
-                "pattern": "Bearer <password>",
-                "password": rctx.attr.npm_auth,
-            },
-        } if rctx.attr.npm_auth else {},
+        auth = auth,
     )
 
     mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
