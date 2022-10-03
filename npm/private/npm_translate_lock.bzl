@@ -151,6 +151,13 @@ def _get_npm_auth(rctx):
                 token = token.removeprefix("$").removeprefix("{").removesuffix("}")
                 if token in rctx.os.environ.keys() and rctx.os.environ[token]:
                     token = rctx.os.environ[token]
+                else:
+                    print("""\
+WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
+""".format(
+                        npmrc = npmrc_path,
+                        token = token,
+                    ))
     return token
 
 def _gen_npm_imports(lockfile, root_package, attr):
