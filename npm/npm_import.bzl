@@ -202,6 +202,8 @@ def npm_translate_lock(
 
         npmrc: Available to pnpm when running pnpm import when npm_package_lock or yarn_lock is set.
 
+            When set, this attribute will also be used to parse the npm auth token (if any) and use
+            it in npm_import, providing authentication with private npm registries.
             In a future release, pnpm settings such as public-hoist-patterns will be used.
 
         patches: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
@@ -391,6 +393,7 @@ def npm_import(
         patch_args = ["-p0"],
         patches = [],
         custom_postinstall = "",
+        npm_auth = "",
         bins = {}):
     """Import a single npm package into Bazel.
 
@@ -562,6 +565,8 @@ def npm_import(
         custom_postinstall: Custom string postinstall script to run on the installed npm package. Runs after any
             existing lifecycle hooks if `run_lifecycle_hooks` is True.
 
+        npm_auth: Auth token to authenticate with npm.
+
         extra_build_content: Additional content to append on the generated BUILD file at the root of
             the created repository, either as a string or a list of lines similar to
             <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
@@ -599,6 +604,7 @@ def npm_import(
         patch_args = patch_args,
         patches = patches,
         custom_postinstall = custom_postinstall,
+        npm_auth = npm_auth,
         run_lifecycle_hooks = run_lifecycle_hooks,
         extra_build_content = (
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
