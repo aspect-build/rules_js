@@ -394,6 +394,7 @@ def _impl(rctx):
 
     pkg_json_path = paths.join(_EXTRACT_TO_DIRNAME, "package.json")
 
+    # TODO: occasionally fails due to short reads: https://github.com/aspect-build/rules_js/issues/483
     pkg_json = json.decode(rctx.read(pkg_json_path))
 
     bins = _get_bin_entries(pkg_json, rctx.attr.package)
