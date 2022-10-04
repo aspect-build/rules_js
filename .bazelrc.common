@@ -2,6 +2,39 @@
 # Take care to document any settings that you expect users to apply.
 # Settings that apply only to CI are in .github/workflows/ci.bazelrc
 
+# ======================================================================================================================
+# Support for debugging Node.js tests
+# Use `--config=debug` to enable these settings
+
+# Use bazel run with `--config=debug` to turn on the NodeJS inspector agent.
+# The node process will break before user code starts and wait for the debugger to connect.
+# Pass the --inspect-brk option to all tests which enables the node inspector agent.
+# See https://nodejs.org/de/docs/guides/debugging-getting-started/#command-line-options for more details.
+run:debug -- --node_options=--inspect-brk
+
+# Stream stdout/stderr output from each test in real-time.
+# See https://docs.bazel.build/versions/master/user-manual.html#flag--test_output for more details.
+test:debug --test_output=streamed
+
+# Run one test at a time.
+test:debug --test_strategy=exclusive
+
+# Prevent long running tests from timing out.
+# See https://docs.bazel.build/versions/master/user-manual.html#flag--test_timeout for more details.
+test:debug --test_timeout=9999
+
+# Always run tests even if they have cached results.
+test:debug --nocache_test_results
+
+# Changes the build output of certain rules such as terser. May not be desirable in all cases.
+# Rules may change their build outputs if the compilation mode is set to dbg. For example,
+# minifiers such as terser may make their output more human readable when this is set. Node.js rules that change their
+# behavior based on compilation mode will pass ctx.var["COMPILATION_MODE"] to `js_binary` executables via
+# the actions.run env attribute.
+# See https://docs.bazel.build/versions/master/user-manual.html#flag--compilation_mode for more details.
+build:debug --compilation_mode=dbg
+# ======================================================================================================================
+
 # Allow the Bazel server to check directory sources for changes.
 # Recommended when using copy_directory, see
 # https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_directory.md
