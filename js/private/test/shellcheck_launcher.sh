@@ -314,7 +314,20 @@ if [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
     exit 1
 fi
 
-export JS_BINARY__NODE_WRAPPER="$RUNFILES/aspect_rules_js/js/private/test/shellcheck_launcher_node_wrapper/node"
+npm=
+if [ "$npm" ]; then
+    export JS_BINARY__NPM_BINARY="$RUNFILES/aspect_rules_js/"
+    if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
+        logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
+        exit 1
+    fi
+    if [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
+        logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
+        exit 1
+    fi
+fi
+
+export JS_BINARY__NODE_WRAPPER="$RUNFILES/aspect_rules_js/js/private/test/shellcheck_launcher_node_bin/node"
 if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
     exit 1
@@ -393,6 +406,9 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     logf_debug "binary target WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
     logf_debug "binary target BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
     logf_debug "binary target node binary %s" "${JS_BINARY__NODE_BINARY:-}"
+    if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
+        logf_debug "binary target npm binary %s" "${JS_BINARY__NPM_BINARY:-}"
+    fi
 fi
 
 # Info logs

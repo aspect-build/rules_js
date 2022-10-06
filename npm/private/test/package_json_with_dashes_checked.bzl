@@ -15,6 +15,7 @@ def _webpack_bundle_analyzer_internal(name, link_root_name, **kwargs):
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
         data = ["@//:{}".format(store_target_name)],
+        include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )
     _js_run_binary(
