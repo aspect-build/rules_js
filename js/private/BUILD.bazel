@@ -12,6 +12,8 @@ exports_files([
     "js_binary.sh.tpl",
     "node_wrapper.bat",
     "node_wrapper.sh",
+    "npm_wrapper.bat",
+    "npm_wrapper.sh",
 ])
 
 config_setting(

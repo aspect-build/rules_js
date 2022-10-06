@@ -258,6 +258,7 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
         data = ["@{link_workspace}//{root_package}:{{}}".format(store_target_name)],
+        include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )
     _js_run_binary(

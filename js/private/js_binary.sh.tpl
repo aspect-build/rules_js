@@ -296,6 +296,19 @@ if [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
     exit 1
 fi
 
+npm={{npm}}
+if [ "$npm" ]; then
+    export JS_BINARY__NPM_BINARY="$RUNFILES/{{workspace_name}}/{{npm}}"
+    if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
+        logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
+        exit 1
+    fi
+    if [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
+        logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
+        exit 1
+    fi
+fi
+
 export JS_BINARY__NODE_WRAPPER="$RUNFILES/{{workspace_name}}/{{node_wrapper}}"
 if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
@@ -375,6 +388,9 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     logf_debug "binary target WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
     logf_debug "binary target BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
     logf_debug "binary target node binary %s" "${JS_BINARY__NODE_BINARY:-}"
+    if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
+        logf_debug "binary target npm binary %s" "${JS_BINARY__NPM_BINARY:-}"
+    fi
 fi
 
 # Info logs

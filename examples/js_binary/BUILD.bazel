@@ -492,3 +492,13 @@ diff_test(
     file1 = "//examples:expected_one_ast.json",
     file2 = ":run11_local",
 )
+
+################################
+# Use case 12
+# js_test that requires npm from the Node.js toolchain available on the PATH
+
+js_test(
+    name = "npm_version_test",
+    entry_point = "npm_version_test.js",
+    include_npm = True,
+)

@@ -193,6 +193,16 @@ _ATTRS = {
         """,
         default = True,
     ),
+    "include_npm": attr.bool(
+        doc = """When True, npm is included in the runfiles of the target.
+
+        An npm binary is also added on the PATH so tools can spawn npm processes. This is a bash script
+        on Linux and MacOS and a batch script on Windows.
+        
+        A minimum of rules_nodejs version 5.7.0 is required which contains the Node.js toolchain changes
+        to use npm.
+        """,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -203,6 +213,14 @@ _ATTRS = {
     ),
     "_node_wrapper_bat": attr.label(
         default = Label("//js/private:node_wrapper.bat"),
+        allow_single_file = True,
+    ),
+    "_npm_wrapper_sh": attr.label(
+        default = Label("//js/private:npm_wrapper.sh"),
+        allow_single_file = True,
+    ),
+    "_npm_wrapper_bat": attr.label(
+        default = Label("//js/private:npm_wrapper.bat"),
         allow_single_file = True,
     ),
     "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
@@ -282,8 +300,9 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
 
     fixed_args_expanded = [expand_variables(ctx, fixed_arg, attribute_name = "fixed_args") for fixed_arg in fixed_args]
 
+    toolchain_files = []
     if is_windows:
-        node_wrapper = ctx.actions.declare_file("%s_node_wrapper/node.bat" % ctx.label.name)
+        node_wrapper = ctx.actions.declare_file("%s_node_bin/node.bat" % ctx.label.name)
         ctx.actions.expand_template(
             template = ctx.file._node_wrapper_bat,
             output = node_wrapper,
@@ -291,13 +310,35 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             is_executable = True,
         )
     else:
-        node_wrapper = ctx.actions.declare_file("%s_node_wrapper/node" % ctx.label.name)
+        node_wrapper = ctx.actions.declare_file("%s_node_bin/node" % ctx.label.name)
         ctx.actions.expand_template(
             template = ctx.file._node_wrapper_sh,
             output = node_wrapper,
             substitutions = {},
             is_executable = True,
         )
+    toolchain_files.append(node_wrapper)
+
+    npm_path = ""
+    if ctx.attr.include_npm:
+        npm_path = _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_path)
+        if is_windows:
+            npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
+            ctx.actions.expand_template(
+                template = ctx.file._npm_wrapper_bat,
+                output = npm_wrapper,
+                substitutions = {},
+                is_executable = True,
+            )
+        else:
+            npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm" % ctx.label.name)
+            ctx.actions.expand_template(
+                template = ctx.file._npm_wrapper_sh,
+                output = npm_wrapper,
+                substitutions = {},
+                is_executable = True,
+            )
+        toolchain_files.append(npm_wrapper)
 
     launcher_subst = {
         "{{entry_point_path}}": entry_point_path,
@@ -309,6 +350,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{node_patches}}": ctx.file._node_patches.short_path,
         "{{node_wrapper}}": node_wrapper.short_path,
         "{{node}}": _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path),
+        "{{npm}}": npm_path,
         "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
         "{{workspace_name}}": ctx.workspace_name,
     }
@@ -321,13 +363,16 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         is_executable = True,
     )
 
-    return launcher, node_wrapper
+    return launcher, toolchain_files
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
     if is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")
+
+    if ctx.attr.include_npm and not hasattr(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo, "npm_files"):
+        fail("include_npm requires a minumum @rules_nodejs version of 5.7.0")
 
     if DirectoryPathInfo in ctx.attr.entry_point:
         entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
@@ -341,10 +386,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, node_wrapper = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
+    bash_launcher, toolchain_files = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    files = [bash_launcher, node_wrapper]
+    files = [bash_launcher] + toolchain_files
     if ctx.attr.copy_data_to_bin:
         files.append(copy_file_to_bin_action(ctx, entry_point, is_windows = is_windows))
         files.extend(copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows))
@@ -354,6 +399,8 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     files.extend(ctx.files._runfiles_lib)
     files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+    if ctx.attr.include_npm:
+        files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_files)
 
     runfiles = ctx.runfiles(
         files = files,
