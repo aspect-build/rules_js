@@ -133,32 +133,47 @@ def _gather_values_from_matching_names(keyed_lists, *names):
     return result
 
 def _get_npm_auth(rctx):
-    _NPM_TOKEN_KEY = "//registry.npmjs.org/:_authtoken"
-    token = None
+    _NPM_TOKEN_KEY = ":_authtoken"
+    _NPM_PKG_SCOPE_KEY = ":registry"
+
+    tokens = {}
+    scopes = {}
 
     # Read token from npmrc label
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = parse_ini(rctx.read(npmrc_path))
-        if _NPM_TOKEN_KEY in npmrc:
-            # Parse environment variable from config
-            token = npmrc[_NPM_TOKEN_KEY]
+        for (k, v) in npmrc.items():
+            if k.find(_NPM_TOKEN_KEY) != -1:
+                registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_TOKEN_KEY))
+                token = v
 
-            # A token can be a reference to an environment variable
-            if token.startswith("$"):
-                # ${NPM_TOKEN} -> NPM_TOKEN
-                # $NPM_TOKEN -> NPM_TOKEN
-                token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-                if token in rctx.os.environ.keys() and rctx.os.environ[token]:
-                    token = rctx.os.environ[token]
-                else:
-                    print("""\
+                # A token can be a reference to an environment variable
+                if token.startswith("$"):
+                    # ${NPM_TOKEN} -> NPM_TOKEN
+                    # $NPM_TOKEN -> NPM_TOKEN
+                    token = token.removeprefix("$").removeprefix("{").removesuffix("}")
+                    if token in rctx.os.environ.keys() and rctx.os.environ[token]:
+                        token = rctx.os.environ[token]
+                    else:
+                        print("""\
 WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
 """.format(
-                        npmrc = npmrc_path,
-                        token = token,
-                    ))
-    return token
+                            npmrc = npmrc_path,
+                            token = token,
+                        ))
+                tokens[registry] = token
+
+            if k.find(_NPM_PKG_SCOPE_KEY) != -1:
+                scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
+                registry = v.split("//")[-1]
+                scopes[scope] = registry
+
+    auth = {}
+    for (scope, registry) in scopes.items():
+        if registry in tokens:
+            auth[scope] = tokens[registry]
+    return auth
 
 def _gen_npm_imports(lockfile, root_package, attr):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
@@ -738,8 +753,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     # check all links and fail if there are duplicates which can happen with public hoisting
     _check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
-    maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_auth) if npm_auth else ""
+    maybe_npm_auth = ""
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
@@ -765,6 +779,11 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_execution_requirements else ""
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
+
+        if _import.package.startswith("@"):
+            scope = _import.package.split("/")[0]
+            maybe_npm_auth = ("""
+        npm_auth = "%s",""" % npm_auth[scope]) if scope in npm_auth else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
