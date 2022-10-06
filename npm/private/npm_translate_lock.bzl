@@ -133,6 +133,43 @@ def _gather_values_from_matching_names(keyed_lists, *names):
     return result
 
 def _get_npm_auth(rctx):
+    """Parses npm tokens from `.npmrc`.
+
+    - creates a tokens dict: {registry: token}
+    - creates a scopes dict: {scope: registry}
+    - merges scopes + tokens in a new dict: {scope: token}
+
+    For example:
+
+        Given the following `.npmrc`:
+
+        ```
+        @myorg:registry=https://somewhere-else.com/myorg
+        @another:registry=https://somewhere-else.com/another
+        ; would apply only to @myorg
+        //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+        ; would apply only to @another
+        //somewhere-else.com/another/:_authToken=MYTOKEN2
+        ```
+
+        `_get_npm_auth(rctx)` creates the following dicts:
+
+        ```starlark
+        tokens = {
+            "somewhere-else.com/myorg": "MYTOKEN1",
+            "somewhere-else.com/another": "MYTOKEN2",
+        }
+        scopes = {
+            "@myorg": "somewhere-else.com/myorg",
+            "@another": "somewhere-else.com/another",
+        }
+        auth = {
+            "@myorg": "MYTOKEN1",
+            "@another": "MYTOKEN2",
+        }
+        ```
+    """
+
     _NPM_TOKEN_KEY = ":_authtoken"
     _NPM_PKG_SCOPE_KEY = ":registry"
 
@@ -145,6 +182,9 @@ def _get_npm_auth(rctx):
         npmrc = parse_ini(rctx.read(npmrc_path))
         for (k, v) in npmrc.items():
             if k.find(_NPM_TOKEN_KEY) != -1:
+                # //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+                # registry: somewhere-else.com/myorg
+                # token: MYTOKEN1
                 registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_TOKEN_KEY))
                 token = v
 
@@ -165,8 +205,11 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
                 tokens[registry] = token
 
             if k.find(_NPM_PKG_SCOPE_KEY) != -1:
+                # @myorg:registry=https://somewhere-else.com/myorg
+                # scope: @myorg
+                # registry: somewhere-else.com/myorg
                 scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
-                registry = v.split("//")[-1]
+                registry = v.split("//", 1)[-1]
                 scopes[scope] = registry
 
     auth = {}
@@ -781,7 +824,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
 
         if _import.package.startswith("@"):
-            scope = _import.package.split("/")[0]
+            scope = _import.package.split("/", 1)[0]
             maybe_npm_auth = ("""
         npm_auth = "%s",""" % npm_auth[scope]) if scope in npm_auth else ""
 
