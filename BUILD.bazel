@@ -23,6 +23,17 @@ npm_link_package(
     src = "//examples/npm_package/packages/pkg_b",
 )
 
+# Manually linked pkg-c with additional use cases.
+npm_link_package(
+    name = "node_modules/@mycorp/pkg-c1",
+    src = "//examples/npm_package/packages/pkg_c:pkg_c1",
+)
+
+npm_link_package(
+    name = "node_modules/@mycorp/pkg-c2",
+    src = "//examples/npm_package/packages/pkg_c:pkg_c2",
+)
+
 gazelle_binary(
     name = "gazelle_bin",
     languages = ["@bazel_skylib//gazelle/bzl"],

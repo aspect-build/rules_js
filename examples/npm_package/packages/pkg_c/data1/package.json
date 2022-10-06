@@ -1,0 +1,5 @@
+{
+    "name": "@mycorp/pkg-c1",
+    "private": true,
+    "dependencies": {}
+}

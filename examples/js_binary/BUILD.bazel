@@ -502,3 +502,93 @@ js_test(
     entry_point = "npm_version_test.js",
     include_npm = True,
 )
+
+
+####################################################
+# Use case 13
+# npm_package() with root_paths[], linked and consumed
+# https://github.com/aspect-build/rules_js/issues/471
+
+write_file(
+    name = "write13",
+    out = "case13.js",
+    content = [
+        """require('fs').writeFileSync(
+            process.argv[2],
+            JSON.stringify(require(process.argv[3]))
+        )""",
+    ],
+)
+
+js_binary(
+    name = "bin13",
+    data = [
+        "//:node_modules/@mycorp/pkg-c1",
+        "//:node_modules/@mycorp/pkg-c2",
+    ],
+    entry_point = "case13.js",
+)
+
+write_file(
+    name = "expected13-1-out",
+    out = "expected13-1-out.json",
+    content = [
+        """{"name":"c1"}""",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+js_run_binary(
+    name = "run13-1",
+    args = [
+        "out13-dist-1/out13-1",
+        "@mycorp/pkg-c1",
+    ],
+    chdir = package_name(),
+    out_dirs = ["out13-dist-1"],
+    tool = ":bin13",
+)
+
+directory_path(
+    name = "out13-1",
+    directory = ":run13-1",
+    path = "out13-1",
+)
+
+diff_test(
+    name = "test13-1",
+    file1 = ":expected13-1-out.json",
+    file2 = ":out13-1",
+)
+
+write_file(
+    name = "expected13-2-out",
+    out = "expected13-2-out.json",
+    content = [
+        """{"name":"c2"}""",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+js_run_binary(
+    name = "run13-2",
+    args = [
+        "out13-dist-2/out13-2",
+        "@mycorp/pkg-c2",
+    ],
+    chdir = package_name(),
+    out_dirs = ["out13-dist-2"],
+    tool = ":bin13",
+)
+
+directory_path(
+    name = "out13-2",
+    directory = ":run13-2",
+    path = "out13-2",
+)
+
+diff_test(
+    name = "test13-2",
+    file1 = ":expected13-2-out.json",
+    file2 = ":out13-2",
+)

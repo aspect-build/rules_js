@@ -1,0 +1,37 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+# The terminal npm_package target for this package. This target is linked
+# manually in the root of the pnpm workspace with `npm_link_package`.
+# This npm_package uses root_paths[] to pull some files into the root package
+# to test cases such as https://github.com/aspect-build/rules_js/issues/471.
+npm_package(
+    name = "pkg_c1",
+    srcs = [
+        "data1/package.json",
+        "data1/pkg-c.json",
+        "src/index.js",
+    ],
+    package = "@mycorp/pkg-c1",
+    root_paths = [
+        package_name(),
+        package_name() + "/src",
+        package_name() + "/data1",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+npm_package(
+    name = "pkg_c2",
+    srcs = [
+        "data2/package.json",
+        "data2/pkg-c.json",
+        "src/index.js",
+    ],
+    package = "@mycorp/pkg-c2",
+    root_paths = [
+        package_name(),
+        package_name() + "/src",
+        package_name() + "/data2",
+    ],
+    visibility = ["//visibility:public"],
+)
