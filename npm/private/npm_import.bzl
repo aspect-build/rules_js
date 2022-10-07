@@ -346,7 +346,8 @@ _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 def _impl(rctx):
     # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
     package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
-    download_url = rctx.attr.url if rctx.attr.url else "https://registry.npmjs.org/{0}/-/{1}-{2}.tgz".format(
+    download_url = rctx.attr.url if rctx.attr.url else "{0}{1}/-/{2}-{3}.tgz".format(
+        utils.npm_registry_url,
         rctx.attr.package,
         package_name_no_scope,
         utils.strip_peer_dep_version(rctx.attr.version),

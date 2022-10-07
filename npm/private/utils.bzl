@@ -133,4 +133,6 @@ utils = struct(
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked package
     package_directory_output_group = "package_directory",
+    # Default npm registry URL
+    npm_registry_url = "https://registry.npmjs.org/",
 )
