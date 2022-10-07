@@ -117,6 +117,17 @@ def _is_at_least_bazel_6():
     # native.bazel_version only works in repository rules.
     return "apple_binary" not in dir(native)
 
+def _npm_registry_download_url(package, version):
+    "Make a registry download URL for a given package and version"
+
+    package_name_no_scope = package.rsplit("/", 1)[-1]
+    return "{0}{1}/-/{2}-{3}.tgz".format(
+        utils.npm_registry_url,
+        package,
+        package_name_no_scope,
+        _strip_peer_dep_version(version),
+    )
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -135,4 +146,5 @@ utils = struct(
     package_directory_output_group = "package_directory",
     # Default npm registry URL
     npm_registry_url = "https://registry.npmjs.org/",
+    npm_registry_download_url = _npm_registry_download_url,
 )

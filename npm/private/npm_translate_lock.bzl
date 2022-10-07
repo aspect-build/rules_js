@@ -43,7 +43,8 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        url = "{url}",
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -767,10 +768,10 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
+        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version)
+
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
-        maybe_url = """
-        url = "%s",""" % _import.url if _import.url else ""
         maybe_deps = ("""
         deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
         maybe_transitive_closure = ("""
@@ -790,10 +791,16 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
 
-        _registry_url = _import.url if _import.url else utils.npm_registry_url
-        _registry = _registry_url.split("//", 1)[-1].removesuffix("/")
+        _registry = url.split("//", 1)[-1]
+        npm_token = None
+        match_len = 0
+        for (auth_registry, auth_token) in npm_auth.items():
+            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                npm_token = auth_token
+                match_len = len(auth_registry)
+
         maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_auth[_registry]) if _registry in npm_auth else ""
+        npm_auth = "%s",""" % npm_token) if npm_token else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -808,7 +815,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
             lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             maybe_transitive_closure = maybe_transitive_closure,
-            maybe_url = maybe_url,
+            url = url,
             maybe_bins = maybe_bins,
             name = _import.name,
             package = _import.package,
