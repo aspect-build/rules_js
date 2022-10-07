@@ -133,58 +133,61 @@ def _gather_values_from_matching_names(keyed_lists, *names):
                 result.append(v)
     return result
 
-def _get_npm_auth(rctx):
+def get_npm_auth(npmrc, npmrc_path, environ):
     """Parses npm tokens from `.npmrc` and creates a tokens dict {registry: token}.
 
-    For example:
+    Given the following `.npmrc`:
 
-        Given the following `.npmrc`:
+    ```
+    //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+    //somewhere-else.com/another/:_authToken=MYTOKEN2
+    ```
 
-        ```
-        //somewhere-else.com/myorg/:_authToken=MYTOKEN1
-        //somewhere-else.com/another/:_authToken=MYTOKEN2
-        ```
+    `get_npm_auth(rctx)` creates the following dict:
 
-        `_get_npm_auth(rctx)` creates the following dict:
+    ```starlark
+    tokens = {
+        "somewhere-else.com/myorg": "MYTOKEN1",
+        "somewhere-else.com/another": "MYTOKEN2",
+    }
+    ```
 
-        ```starlark
-        tokens = {
-            "somewhere-else.com/myorg": "MYTOKEN1",
-            "somewhere-else.com/another": "MYTOKEN2",
-        }
-        ```
+    Args:
+        npmrc: The `.npmrc` file.
+        npmrc_path: The file path to `.npmrc`.
+        environ: A map of environment variables with their values.
+
+    Returns:
+        A map of registries with their npm tokens.
+
     """
 
     _NPM_TOKEN_KEY = ":_authtoken"
     tokens = {}
 
-    # Read token from npmrc label
-    if rctx.attr.npmrc:
-        npmrc_path = rctx.path(rctx.attr.npmrc)
-        npmrc = parse_ini(rctx.read(npmrc_path))
-        for (k, v) in npmrc.items():
-            if k.find(_NPM_TOKEN_KEY) != -1:
-                # //somewhere-else.com/myorg/:_authToken=MYTOKEN1
-                # registry: somewhere-else.com/myorg
-                # token: MYTOKEN1
-                registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_TOKEN_KEY))
-                token = v
+    for (k, v) in npmrc.items():
+        if k.find(_NPM_TOKEN_KEY) != -1:
+            # //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+            # registry: somewhere-else.com/myorg
+            # token: MYTOKEN1
+            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_TOKEN_KEY))
+            token = v
 
-                # A token can be a reference to an environment variable
-                if token.startswith("$"):
-                    # ${NPM_TOKEN} -> NPM_TOKEN
-                    # $NPM_TOKEN -> NPM_TOKEN
-                    token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-                    if token in rctx.os.environ.keys() and rctx.os.environ[token]:
-                        token = rctx.os.environ[token]
-                    else:
-                        print("""\
+            # A token can be a reference to an environment variable
+            if token.startswith("$"):
+                # ${NPM_TOKEN} -> NPM_TOKEN
+                # $NPM_TOKEN -> NPM_TOKEN
+                token = token.removeprefix("$").removeprefix("{").removesuffix("}")
+                if token in environ.keys() and environ[token]:
+                    token = environ[token]
+                else:
+                    print("""\
 WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
 """.format(
-                            npmrc = npmrc_path,
-                            token = token,
-                        ))
-                tokens[registry] = token
+                        npmrc = npmrc_path,
+                        token = token,
+                    ))
+            tokens[registry] = token
     return tokens
 
 def _gen_npm_imports(lockfile, root_package, attr):
@@ -464,7 +467,13 @@ def _impl(rctx):
     root_package = None
     link_workspace = None
     lockfile_description = None
-    npm_auth = _get_npm_auth(rctx)
+    npm_auth = {}
+
+    # Read tokens from npmrc label
+    if rctx.attr.npmrc:
+        npmrc_path = rctx.path(rctx.attr.npmrc)
+        npmrc = parse_ini(rctx.read(npmrc_path))
+        npm_auth = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
     _validate_attrs(rctx)
 
