@@ -47,6 +47,7 @@ jobs:
                     - 'e2e/npm_link_package-esm'
                     - 'e2e/pnpm_workspace'
                     - 'e2e/pnpm_workspace_rerooted'
+                    - 'e2e/npm_translate_lock_auth'
                     - 'e2e/npm_translate_package_lock'
                     - 'e2e/npm_translate_yarn_lock'
                     - 'e2e/package_json_module'
@@ -81,7 +82,11 @@ jobs:
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
               working-directory: ${{ matrix.folder }}
+              # Don't run e2e/npm_translate_lock_auth unless there is an auth token secret; this won't
+              # be set on forks
+              if: ${{ matrix.folder != 'e2e/npm_translate_lock_auth' || env.ASPECT_NPM_AUTH_TOKEN != ''}}
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }}  //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
@@ -90,6 +95,7 @@ jobs:
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
               working-directory: ${{ matrix.folder }}
               # Coverage does not work properly with RBE. See: bazelbuild/bazel#4685
               if: ${{ matrix.config == 'local' }}
