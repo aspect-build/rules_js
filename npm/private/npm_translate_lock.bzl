@@ -133,48 +133,29 @@ def _gather_values_from_matching_names(keyed_lists, *names):
     return result
 
 def _get_npm_auth(rctx):
-    """Parses npm tokens from `.npmrc`.
-
-    - creates a tokens dict: {registry: token}
-    - creates a scopes dict: {scope: registry}
-    - merges scopes + tokens in a new dict: {scope: token}
+    """Parses npm tokens from `.npmrc` and creates a tokens dict {registry: token}.
 
     For example:
 
         Given the following `.npmrc`:
 
         ```
-        @myorg:registry=https://somewhere-else.com/myorg
-        @another:registry=https://somewhere-else.com/another
-        ; would apply only to @myorg
         //somewhere-else.com/myorg/:_authToken=MYTOKEN1
-        ; would apply only to @another
         //somewhere-else.com/another/:_authToken=MYTOKEN2
         ```
 
-        `_get_npm_auth(rctx)` creates the following dicts:
+        `_get_npm_auth(rctx)` creates the following dict:
 
         ```starlark
         tokens = {
             "somewhere-else.com/myorg": "MYTOKEN1",
             "somewhere-else.com/another": "MYTOKEN2",
         }
-        scopes = {
-            "@myorg": "somewhere-else.com/myorg",
-            "@another": "somewhere-else.com/another",
-        }
-        auth = {
-            "@myorg": "MYTOKEN1",
-            "@another": "MYTOKEN2",
-        }
         ```
     """
 
     _NPM_TOKEN_KEY = ":_authtoken"
-    _NPM_PKG_SCOPE_KEY = ":registry"
-
     tokens = {}
-    scopes = {}
 
     # Read token from npmrc label
     if rctx.attr.npmrc:
@@ -203,20 +184,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
                             token = token,
                         ))
                 tokens[registry] = token
-
-            if k.find(_NPM_PKG_SCOPE_KEY) != -1:
-                # @myorg:registry=https://somewhere-else.com/myorg
-                # scope: @myorg
-                # registry: somewhere-else.com/myorg
-                scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
-                registry = v.split("//", 1)[-1]
-                scopes[scope] = registry
-
-    auth = {}
-    for (scope, registry) in scopes.items():
-        if registry in tokens:
-            auth[scope] = tokens[registry]
-    return auth
+    return tokens
 
 def _gen_npm_imports(lockfile, root_package, attr):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
@@ -335,8 +303,8 @@ def _gen_npm_imports(lockfile, root_package, attr):
         url = None
         if tarball:
             if _is_url(tarball):
-                if registry and tarball.startswith("https://registry.npmjs.org/"):
-                    url = registry + tarball[len("https://registry.npmjs.org/"):]
+                if registry and tarball.startswith(utils.npm_registry_url):
+                    url = registry + tarball[len(utils.npm_registry_url):]
                 else:
                     url = tarball
             else:
@@ -345,7 +313,7 @@ def _gen_npm_imports(lockfile, root_package, attr):
                 # that as the prefix. If there isn't then prefix with the default npm registry value and
                 # suggest upgrading to a newer version pnpm.
                 if not registry:
-                    registry = "https://registry.npmjs.org/"
+                    registry = utils.npm_registry_url
 
                     # buildifier: disable=print
                     if attr.warn_on_unqualified_tarball_url:
@@ -355,7 +323,7 @@ def _gen_npm_imports(lockfile, root_package, attr):
 WARNING: The pnpm lockfile package entry for {} ({})
 does not contain a fully qualified tarball URL or a registry setting to indicate which registry to
 use. Prefixing tarball url `{}`
-with the default npm registry url `https://registry.npmjs.org/`.
+with the default npm registry url `{}`.
 
 If you are using an older version of pnpm such as 6.x, upgrading to 7.x or newer and
 re-generating the lockfile should generate a fully qualified tarball URL for this package.
@@ -364,7 +332,7 @@ To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
 `npm_translate_lock` repository rule.
 ====================================================================================================
 
-""".format(name, version, tarball))
+""".format(name, version, tarball, utils.npm_registry_url))
                 url = registry + tarball
 
         result.append(struct(
@@ -796,7 +764,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     # check all links and fail if there are duplicates which can happen with public hoisting
     _check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
-    maybe_npm_auth = ""
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
@@ -823,10 +790,10 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
 
-        if _import.package.startswith("@"):
-            scope = _import.package.split("/", 1)[0]
-            maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_auth[scope]) if scope in npm_auth else ""
+        _registry_url = _import.url if _import.url else utils.npm_registry_url
+        _registry = _registry_url.split("//", 1)[-1].removesuffix("/")
+        maybe_npm_auth = ("""
+        npm_auth = "%s",""" % npm_auth[_registry]) if _registry in npm_auth else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
