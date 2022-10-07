@@ -1,0 +1,16 @@
+lockfileVersion: 5.4
+
+importers:
+
+  .:
+    specifiers:
+      '@aspect-priv-npm/a': 1.0.0
+    dependencies:
+      '@aspect-priv-npm/a': 1.0.0
+
+packages:
+
+  /@aspect-priv-npm/a/1.0.0:
+    resolution: {integrity: sha512-M2Bt2VHhbKAtn94EVNtigQncBPo0tHCjM/6k1JV79GOLbVxtFSpwzLEyuivvjc+kyL8b2nAimlfEPhOI3G3OEA==}
+    hasBin: true
+    dev: false

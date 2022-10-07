@@ -1,0 +1,6 @@
+{
+    "private": true,
+    "dependencies": {
+        "@aspect-priv-npm/a": "1.0.0"
+    }
+}
