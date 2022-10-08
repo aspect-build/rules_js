@@ -32,7 +32,7 @@ def _pnpm_name(name, version):
 
 def _parse_pnpm_name(pnpmName):
     # Parse a name/version or @scope/name/version string and return
-    # a [name, version] list
+    # a (name, version) tuple
     segments = pnpmName.rsplit("/", 1)
     if len(segments) != 2:
         fail("unexpected pnpm versioned name " + pnpmName)
@@ -118,7 +118,7 @@ def _is_at_least_bazel_6():
     return "apple_binary" not in dir(native)
 
 def _parse_package_name(package):
-    # Parse a @scope/name string and return a [scope, name] list
+    # Parse a @scope/name string and return a (scope, name) tuple
     segments = package.split("/", 1)
     if len(segments) == 2 and segments[0].startswith("@"):
         return (segments[0], segments[1])
@@ -128,10 +128,10 @@ def _npm_registry_download_url(package, version, registries = {}):
     "Make a registry download URL for a given package and version"
 
     (package_scope, package_name_no_scope) = _parse_package_name(package)
-    url = "https://{}".format(registries[package_scope]) if package_scope in registries else utils.npm_registry_url
+    registry = "https://{}".format(registries[package_scope]) if package_scope in registries else utils.npm_registry_url
 
-    return "{0}{1}/-/{2}-{3}.tgz".format(
-        url,
+    return "{0}/{1}/-/{2}-{3}.tgz".format(
+        registry.removesuffix("/"),
         package,
         package_name_no_scope,
         _strip_peer_dep_version(version),

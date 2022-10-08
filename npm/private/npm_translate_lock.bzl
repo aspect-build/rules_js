@@ -171,7 +171,7 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         environ: A map of environment variables with their values.
 
     Returns:
-        A list with a tokens dict and a registries dict.
+        A tuple with a tokens dict and a registries dict.
     """
 
     _NPM_TOKEN_KEY = ":_authtoken"
@@ -338,7 +338,7 @@ def _gen_npm_imports(lockfile, root_package, attr, registries = {}):
                 if not registry:
                     (scope, _) = utils.parse_package_name(name)
                     registry = "https://{}".format(registries[scope]) if scope in registries else utils.npm_registry_url
-                url = registry + tarball
+                url = "{0}/{1}".format(registry.removesuffix("/"), tarball)
 
         result.append(struct(
             custom_postinstall = custom_postinstall,
