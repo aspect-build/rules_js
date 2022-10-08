@@ -264,7 +264,7 @@ def js_run_binary(
         # by the users BUILD file (e.g. for "typescript_bin.tsc(outs = [])" we'd wish to say
         # "try using tsc_binary instead")
         # buildifier: disable=print
-        print("""\
+        print("""
 WARNING: {name} is not configured to produce outputs.
 
 If this is a generated bin from package_json.bzl, consider using the *_binary or *_test variant instead.
