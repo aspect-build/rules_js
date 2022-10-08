@@ -1,0 +1,7 @@
+{
+    "private": true,
+    "dependencies": {
+        "@aspect-build/a": "1.0.0",
+        "@aspect-priv-npm/a": "1.0.0"
+    }
+}
