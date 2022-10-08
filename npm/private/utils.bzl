@@ -32,7 +32,7 @@ def _pnpm_name(name, version):
 
 def _parse_pnpm_name(pnpmName):
     # Parse a name/version or @scope/name/version string and return
-    # a [name, version] list
+    # a (name, version) tuple
     segments = pnpmName.rsplit("/", 1)
     if len(segments) != 2:
         fail("unexpected pnpm versioned name " + pnpmName)
@@ -117,6 +117,26 @@ def _is_at_least_bazel_6():
     # native.bazel_version only works in repository rules.
     return "apple_binary" not in dir(native)
 
+def _parse_package_name(package):
+    # Parse a @scope/name string and return a (scope, name) tuple
+    segments = package.split("/", 1)
+    if len(segments) == 2 and segments[0].startswith("@"):
+        return (segments[0], segments[1])
+    return ("", segments[0])
+
+def _npm_registry_download_url(package, version, registries = {}):
+    "Make a registry download URL for a given package and version"
+
+    (package_scope, package_name_no_scope) = _parse_package_name(package)
+    registry = "https://{}".format(registries[package_scope]) if package_scope in registries else utils.npm_registry_url
+
+    return "{0}/{1}/-/{2}-{3}.tgz".format(
+        registry.removesuffix("/"),
+        package,
+        package_name_no_scope,
+        _strip_peer_dep_version(version),
+    )
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -133,4 +153,8 @@ utils = struct(
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked package
     package_directory_output_group = "package_directory",
+    # Default npm registry URL
+    npm_registry_url = "https://registry.npmjs.org/",
+    npm_registry_download_url = _npm_registry_download_url,
+    parse_package_name = _parse_package_name,
 )

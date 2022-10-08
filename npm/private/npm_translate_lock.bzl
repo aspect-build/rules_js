@@ -43,7 +43,8 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_url}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        url = "{url}",
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -132,25 +133,67 @@ def _gather_values_from_matching_names(keyed_lists, *names):
                 result.append(v)
     return result
 
-def _get_npm_auth(rctx):
-    _NPM_TOKEN_KEY = "//registry.npmjs.org/:_authtoken"
-    token = None
+def get_npm_auth(npmrc, npmrc_path, environ):
+    """Parses npm tokens, registries and scopes from `.npmrc`.
 
-    # Read token from npmrc label
-    if rctx.attr.npmrc:
-        npmrc_path = rctx.path(rctx.attr.npmrc)
-        npmrc = parse_ini(rctx.read(npmrc_path))
-        if _NPM_TOKEN_KEY in npmrc:
-            # Parse environment variable from config
-            token = npmrc[_NPM_TOKEN_KEY]
+    - creates a token by registry dict: {registry: token}
+    - creates a registry by scope dict: {scope: registry}
+
+    For example:
+        Given the following `.npmrc`:
+
+        ```
+        @myorg:registry=https://somewhere-else.com/myorg
+        @another:registry=https://somewhere-else.com/another
+        ; would apply only to @myorg
+        //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+        ; would apply only to @another
+        //somewhere-else.com/another/:_authToken=MYTOKEN2
+        ```
+
+        `get_npm_auth(rctx)` creates the following dict:
+
+        ```starlark
+        tokens = {
+            "somewhere-else.com/myorg": "MYTOKEN1",
+            "somewhere-else.com/another": "MYTOKEN2",
+        }
+        registries = {
+                "@myorg": "somewhere-else.com/myorg",
+                "@another": "somewhere-else.com/another",
+        }
+        auth = (tokens, registries)
+        ```
+
+    Args:
+        npmrc: The `.npmrc` file.
+        npmrc_path: The file path to `.npmrc`.
+        environ: A map of environment variables with their values.
+
+    Returns:
+        A tuple with a tokens dict and a registries dict.
+    """
+
+    _NPM_TOKEN_KEY = ":_authtoken"
+    _NPM_PKG_SCOPE_KEY = ":registry"
+    tokens = {}
+    registries = {}
+
+    for (k, v) in npmrc.items():
+        if k.find(_NPM_TOKEN_KEY) != -1:
+            # //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+            # registry: somewhere-else.com/myorg
+            # token: MYTOKEN1
+            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_TOKEN_KEY))
+            token = v
 
             # A token can be a reference to an environment variable
             if token.startswith("$"):
                 # ${NPM_TOKEN} -> NPM_TOKEN
                 # $NPM_TOKEN -> NPM_TOKEN
                 token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-                if token in rctx.os.environ.keys() and rctx.os.environ[token]:
-                    token = rctx.os.environ[token]
+                if token in environ.keys() and environ[token]:
+                    token = environ[token]
                 else:
                     print("""\
 WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
@@ -158,9 +201,19 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
                         npmrc = npmrc_path,
                         token = token,
                     ))
-    return token
+            tokens[registry] = token
 
-def _gen_npm_imports(lockfile, root_package, attr):
+        if k.find(_NPM_PKG_SCOPE_KEY) != -1:
+            # @myorg:registry=https://somewhere-else.com/myorg
+            # scope: @myorg
+            # registry: somewhere-else.com/myorg
+            scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
+            registry = v.split("//", 1)[-1]
+            registries[scope] = registry
+
+    return (tokens, registries)
+
+def _gen_npm_imports(lockfile, root_package, attr, registries = {}):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
@@ -277,37 +330,15 @@ def _gen_npm_imports(lockfile, root_package, attr):
         url = None
         if tarball:
             if _is_url(tarball):
-                if registry and tarball.startswith("https://registry.npmjs.org/"):
-                    url = registry + tarball[len("https://registry.npmjs.org/"):]
+                if registry and tarball.startswith(utils.npm_registry_url):
+                    url = registry + tarball[len(utils.npm_registry_url):]
                 else:
                     url = tarball
             else:
-                # pnpm 6.x may omit the registry component from the tarball value when it is configured
-                # via an .npmrc registry setting for the package. If there is a registry value, then use
-                # that as the prefix. If there isn't then prefix with the default npm registry value and
-                # suggest upgrading to a newer version pnpm.
                 if not registry:
-                    registry = "https://registry.npmjs.org/"
-
-                    # buildifier: disable=print
-                    if attr.warn_on_unqualified_tarball_url:
-                        print("""
-
-====================================================================================================
-WARNING: The pnpm lockfile package entry for {} ({})
-does not contain a fully qualified tarball URL or a registry setting to indicate which registry to
-use. Prefixing tarball url `{}`
-with the default npm registry url `https://registry.npmjs.org/`.
-
-If you are using an older version of pnpm such as 6.x, upgrading to 7.x or newer and
-re-generating the lockfile should generate a fully qualified tarball URL for this package.
-
-To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
-`npm_translate_lock` repository rule.
-====================================================================================================
-
-""".format(name, version, tarball))
-                url = registry + tarball
+                    (scope, _) = utils.parse_package_name(name)
+                    registry = "https://{}".format(registries[scope]) if scope in registries else utils.npm_registry_url
+                url = "{0}/{1}".format(registry.removesuffix("/"), tarball)
 
         result.append(struct(
             custom_postinstall = custom_postinstall,
@@ -437,7 +468,14 @@ def _impl(rctx):
     root_package = None
     link_workspace = None
     lockfile_description = None
-    npm_auth = _get_npm_auth(rctx)
+    npm_tokens = {}
+    npm_registries = {}
+
+    # Read tokens from npmrc label
+    if rctx.attr.npmrc:
+        npmrc_path = rctx.path(rctx.attr.npmrc)
+        npmrc = parse_ini(rctx.read(npmrc_path))
+        (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
     _validate_attrs(rctx)
 
@@ -561,7 +599,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr)
+    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries)
 
     fp_links = {}
     rctx_files = {
@@ -738,15 +776,13 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     # check all links and fail if there are duplicates which can happen with public hoisting
     _check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
-    maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_auth) if npm_auth else ""
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
+        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version, npm_registries)
+
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
-        maybe_url = """
-        url = "%s",""" % _import.url if _import.url else ""
         maybe_deps = ("""
         deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
         maybe_transitive_closure = ("""
@@ -766,6 +802,17 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
 
+        _registry = url.split("//", 1)[-1]
+        npm_token = None
+        match_len = 0
+        for (auth_registry, auth_token) in npm_tokens.items():
+            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                npm_token = auth_token
+                match_len = len(auth_registry)
+
+        maybe_npm_auth = ("""
+        npm_auth = "%s",""" % npm_token) if npm_token else ""
+
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
@@ -779,7 +826,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
             lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             maybe_transitive_closure = maybe_transitive_closure,
-            maybe_url = maybe_url,
+            url = url,
             maybe_bins = maybe_bins,
             name = _import.name,
             package = _import.package,
