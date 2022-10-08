@@ -117,12 +117,15 @@ def _is_at_least_bazel_6():
     # native.bazel_version only works in repository rules.
     return "apple_binary" not in dir(native)
 
-def _npm_registry_download_url(package, version):
+def _npm_registry_download_url(package, version, registries = {}):
     "Make a registry download URL for a given package and version"
 
-    package_name_no_scope = package.rsplit("/", 1)[-1]
+    segments = package.rsplit("/", 1)
+    (package_scope, package_name_no_scope) = (segments[0], segments[-1])
+    url = "https://{}".format(registries[package_scope]) if package_scope in registries else utils.npm_registry_url
+
     return "{0}{1}/-/{2}-{3}.tgz".format(
-        utils.npm_registry_url,
+        url,
         package,
         package_name_no_scope,
         _strip_peer_dep_version(version),

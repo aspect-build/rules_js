@@ -134,23 +134,36 @@ def _gather_values_from_matching_names(keyed_lists, *names):
     return result
 
 def get_npm_auth(npmrc, npmrc_path, environ):
-    """Parses npm tokens from `.npmrc` and creates a tokens dict {registry: token}.
+    """Parses npm tokens, registries and scopes from `.npmrc`.
 
-    Given the following `.npmrc`:
+    - creates a token by registry dict: {registry: token}
+    - creates a registry by scope dict: {scope: registry}
 
-    ```
-    //somewhere-else.com/myorg/:_authToken=MYTOKEN1
-    //somewhere-else.com/another/:_authToken=MYTOKEN2
-    ```
+    For example:
+        Given the following `.npmrc`:
 
-    `get_npm_auth(rctx)` creates the following dict:
+        ```
+        @myorg:registry=https://somewhere-else.com/myorg
+        @another:registry=https://somewhere-else.com/another
+        ; would apply only to @myorg
+        //somewhere-else.com/myorg/:_authToken=MYTOKEN1
+        ; would apply only to @another
+        //somewhere-else.com/another/:_authToken=MYTOKEN2
+        ```
 
-    ```starlark
-    tokens = {
-        "somewhere-else.com/myorg": "MYTOKEN1",
-        "somewhere-else.com/another": "MYTOKEN2",
-    }
-    ```
+        `get_npm_auth(rctx)` creates the following dict:
+
+        ```starlark
+        tokens = {
+            "somewhere-else.com/myorg": "MYTOKEN1",
+            "somewhere-else.com/another": "MYTOKEN2",
+        }
+        registries = {
+                "@myorg": "somewhere-else.com/myorg",
+                "@another": "somewhere-else.com/another",
+        }
+        auth = (tokens, registries)
+        ```
 
     Args:
         npmrc: The `.npmrc` file.
@@ -158,12 +171,13 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         environ: A map of environment variables with their values.
 
     Returns:
-        A map of registries with their npm tokens.
-
+        A tuple with a tokens dict and a registries dict.
     """
 
     _NPM_TOKEN_KEY = ":_authtoken"
+    _NPM_PKG_SCOPE_KEY = ":registry"
     tokens = {}
+    registries = {}
 
     for (k, v) in npmrc.items():
         if k.find(_NPM_TOKEN_KEY) != -1:
@@ -188,7 +202,16 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
                         token = token,
                     ))
             tokens[registry] = token
-    return tokens
+
+        if k.find(_NPM_PKG_SCOPE_KEY) != -1:
+            # @myorg:registry=https://somewhere-else.com/myorg
+            # scope: @myorg
+            # registry: somewhere-else.com/myorg
+            scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
+            registry = v.split("//", 1)[-1]
+            registries[scope] = registry
+
+    return (tokens, registries)
 
 def _gen_npm_imports(lockfile, root_package, attr):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
@@ -467,13 +490,14 @@ def _impl(rctx):
     root_package = None
     link_workspace = None
     lockfile_description = None
-    npm_auth = {}
+    npm_tokens = {}
+    npm_registries = {}
 
     # Read tokens from npmrc label
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = parse_ini(rctx.read(npmrc_path))
-        npm_auth = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
+        (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
     _validate_attrs(rctx)
 
@@ -777,7 +801,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version)
+        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version, npm_registries)
 
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
@@ -803,7 +827,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         _registry = url.split("//", 1)[-1]
         npm_token = None
         match_len = 0
-        for (auth_registry, auth_token) in npm_auth.items():
+        for (auth_registry, auth_token) in npm_tokens.items():
             if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
                 npm_token = auth_token
                 match_len = len(auth_registry)
