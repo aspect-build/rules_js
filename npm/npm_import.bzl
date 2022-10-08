@@ -58,7 +58,9 @@ def npm_translate_lock(
         bins = {},
         lifecycle_hooks_no_sandbox = True,
         verify_node_modules_ignored = None,
-        warn_on_unqualified_tarball_url = True,
+        # TODO(2.0): remove warn_on_unqualified_tarball_url
+        # buildifier: disable=unused-variable
+        warn_on_unqualified_tarball_url = None,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION):
     """Repository rule to generate npm_import rules from pnpm lock file or from a package.json and yarn/npm lock file.
@@ -301,7 +303,7 @@ def npm_translate_lock(
 
             See https://github.com/bazelbuild/bazel/issues/8106
 
-        warn_on_unqualified_tarball_url: Warn if an unqualified tarball url is encountered
+        warn_on_unqualified_tarball_url: Deprecated. Will be removed in next major release.
 
         link_workspace: The workspace name where links will be created for the packages in this lock file.
 
@@ -360,7 +362,6 @@ def npm_translate_lock(
         bins = bins_string_list_dict,
         lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
         verify_node_modules_ignored = verify_node_modules_ignored,
-        warn_on_unqualified_tarball_url = warn_on_unqualified_tarball_url,
         link_workspace = link_workspace,
     )
 

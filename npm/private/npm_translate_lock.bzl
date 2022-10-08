@@ -27,7 +27,6 @@ _ATTRS = {
     "bins": attr.string_list_dict(),
     "lifecycle_hooks_no_sandbox": attr.bool(default = True),
     "verify_node_modules_ignored": attr.label(),
-    "warn_on_unqualified_tarball_url": attr.bool(default = True),
     "link_workspace": attr.string(),
 }
 
@@ -195,7 +194,8 @@ def get_npm_auth(npmrc, npmrc_path, environ):
                 if token in environ.keys() and environ[token]:
                     token = environ[token]
                 else:
-                    print("""\
+                    # buildifier: disable=print
+                    print("""
 WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
 """.format(
                         npmrc = npmrc_path,

@@ -97,7 +97,6 @@ npm_translate_lock(
         "ms@2.1.3": ["examples/npm_deps"],
     },
     verify_node_modules_ignored = "//:.bazelignore",
-    warn_on_unqualified_tarball_url = False,
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
