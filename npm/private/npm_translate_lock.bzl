@@ -171,7 +171,7 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         environ: A map of environment variables with their values.
 
     Returns:
-        A tuple with a tokens dict and a registries dict.
+        A list with a tokens dict and a registries dict.
     """
 
     _NPM_TOKEN_KEY = ":_authtoken"
@@ -213,7 +213,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
 
     return (tokens, registries)
 
-def _gen_npm_imports(lockfile, root_package, attr):
+def _gen_npm_imports(lockfile, root_package, attr, registries = {}):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
@@ -335,31 +335,9 @@ def _gen_npm_imports(lockfile, root_package, attr):
                 else:
                     url = tarball
             else:
-                # pnpm 6.x may omit the registry component from the tarball value when it is configured
-                # via an .npmrc registry setting for the package. If there is a registry value, then use
-                # that as the prefix. If there isn't then prefix with the default npm registry value and
-                # suggest upgrading to a newer version pnpm.
                 if not registry:
-                    registry = utils.npm_registry_url
-
-                    # buildifier: disable=print
-                    if attr.warn_on_unqualified_tarball_url:
-                        print("""
-
-====================================================================================================
-WARNING: The pnpm lockfile package entry for {} ({})
-does not contain a fully qualified tarball URL or a registry setting to indicate which registry to
-use. Prefixing tarball url `{}`
-with the default npm registry url `{}`.
-
-If you are using an older version of pnpm such as 6.x, upgrading to 7.x or newer and
-re-generating the lockfile should generate a fully qualified tarball URL for this package.
-
-To disable this warning, set `warn_on_unqualified_tarball_url` to False in your
-`npm_translate_lock` repository rule.
-====================================================================================================
-
-""".format(name, version, tarball, utils.npm_registry_url))
+                    (scope, _) = utils.parse_package_name(name)
+                    registry = "https://{}".format(registries[scope]) if scope in registries else utils.npm_registry_url
                 url = registry + tarball
 
         result.append(struct(
@@ -621,7 +599,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr)
+    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries)
 
     fp_links = {}
     rctx_files = {
