@@ -8,12 +8,11 @@ local_repository(
     path = "../..",
 )
 
-# TODO: something in @aspect_bazel_lib 1.11.2 broke this e2e test
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "8ea64f13c6db68356355d6a97dced3d149e9cd7ba3ecb4112960586e914e466d",
-    strip_prefix = "bazel-lib-1.11.1",
-    url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.11.1.tar.gz",
+    sha256 = "0154b46f350c7941919eaa30a4f2284a0128ac13c706901a5c768a829af49e11",
+    strip_prefix = "bazel-lib-1.13.0",
+    url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.13.0.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")

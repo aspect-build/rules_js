@@ -4,4 +4,4 @@ commandTests:
     - name: 'smoke'
       command: 'bash'
       args: ['/app/main.sh']
-      expectedOutput: ['.*WORKSPACE.*__main__', ".*TARGET.*@\\/\\/:main"]
+      expectedOutput: ['.*WORKSPACE.*__main__', '.*main.*', '.*ARCH.*']
