@@ -95,7 +95,7 @@ importers:
 
   js/private/coverage/bundle:
     specifiers:
-      '@rollup/plugin-commonjs': 22.0.2
+      '@rollup/plugin-commonjs': 23.0.0
       '@rollup/plugin-json': 4.1.0
       '@rollup/plugin-node-resolve': 14.1.0
       c8: 7.11.3
@@ -103,7 +103,7 @@ importers:
     dependencies:
       c8: 7.11.3
     devDependencies:
-      '@rollup/plugin-commonjs': 22.0.2_rollup@2.79.0
+      '@rollup/plugin-commonjs': 23.0.0_rollup@2.79.0
       '@rollup/plugin-json': 4.1.0_rollup@2.79.0
       '@rollup/plugin-node-resolve': 14.1.0_rollup@2.79.0
       rollup: 2.79.0
@@ -374,19 +374,21 @@ packages:
       rollup: 2.70.2
     dev: true
 
-  /@rollup/plugin-commonjs/22.0.2_rollup@2.79.0:
-    resolution: {integrity: sha512-//NdP6iIwPbMTcazYsiBMbJW7gfmpHom33u1beiIoHDEM0Q9clvtQB1T0efvMqHeKsGohiHo97BCPCkBXdscwg==}
-    engines: {node: '>= 12.0.0'}
+  /@rollup/plugin-commonjs/23.0.0_rollup@2.79.0:
+    resolution: {integrity: sha512-JbrTRyDNtLQj/rhl7RFUuYXwQ2fac+33oLDAu2k++WD95zweyo28UAomLVA0JMGx4vmCa7Nw4T6k/1F6lelExg==}
+    engines: {node: '>=14.0.0'}
     peerDependencies:
-      rollup: ^2.68.0
+      rollup: ^2.68.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
     dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.79.0
+      '@rollup/pluginutils': 4.2.1
       commondir: 1.0.1
       estree-walker: 2.0.2
-      glob: 7.2.3
+      glob: 8.0.3
       is-reference: 1.2.1
-      magic-string: 0.25.9
-      resolve: 1.22.0
+      magic-string: 0.26.7
       rollup: 2.79.0
     dev: true
 
@@ -436,6 +438,14 @@ packages:
       estree-walker: 1.0.1
       picomatch: 2.3.1
       rollup: 2.79.0
+    dev: true
+
+  /@rollup/pluginutils/4.2.1:
+    resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
+    engines: {node: '>= 8.0.0'}
+    dependencies:
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
     dev: true
 
   /@sindresorhus/is/2.1.1:
@@ -2123,6 +2133,17 @@ packages:
       once: 1.4.0
       path-is-absolute: 1.0.1
 
+  /glob/8.0.3:
+    resolution: {integrity: sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      fs.realpath: 1.0.0
+      inflight: 1.0.6
+      inherits: 2.0.4
+      minimatch: 5.0.1
+      once: 1.4.0
+    dev: true
+
   /glsl-inject-defines/1.0.3:
     resolution: {integrity: sha512-W49jIhuDtF6w+7wCMcClk27a2hq8znvHtlGnrYkSWEr8tHe9eA2dcnohlcAmxLYBSpSSdzOkRdyPTrx9fw49+A==}
     dependencies:
@@ -2750,6 +2771,13 @@ packages:
 
   /magic-string/0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
+    dependencies:
+      sourcemap-codec: 1.4.8
+    dev: true
+
+  /magic-string/0.26.7:
+    resolution: {integrity: sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==}
+    engines: {node: '>=12'}
     dependencies:
       sourcemap-codec: 1.4.8
     dev: true
