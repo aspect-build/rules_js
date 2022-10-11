@@ -886,55 +886,46 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__22.0.2__rollup_2.79.0",
+        name = "npm__at_rollup_plugin-commonjs__23.0.0__rollup_2.79.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "22.0.2_rollup@2.79.0",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-22.0.2.tgz",
+        version = "23.0.0_rollup@2.79.0",
+        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.0.tgz",
         lifecycle_hooks_no_sandbox = True,
-        integrity = "sha512-//NdP6iIwPbMTcazYsiBMbJW7gfmpHom33u1beiIoHDEM0Q9clvtQB1T0efvMqHeKsGohiHo97BCPCkBXdscwg==",
+        integrity = "sha512-JbrTRyDNtLQj/rhl7RFUuYXwQ2fac+33oLDAu2k++WD95zweyo28UAomLVA0JMGx4vmCa7Nw4T6k/1F6lelExg==",
         deps = {
-            "@rollup/pluginutils": "3.1.0_rollup@2.79.0",
+            "@rollup/pluginutils": "4.2.1",
             "commondir": "1.0.1",
             "estree-walker": "2.0.2",
-            "glob": "7.2.3",
+            "glob": "8.0.3",
             "is-reference": "1.2.1",
-            "magic-string": "0.25.9",
-            "resolve": "1.22.0",
+            "magic-string": "0.26.7",
             "rollup": "2.79.0",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["22.0.2_rollup@2.79.0"],
-            "@rollup/pluginutils": ["3.1.0_rollup@2.79.0"],
+            "@rollup/plugin-commonjs": ["23.0.0_rollup@2.79.0"],
+            "@rollup/pluginutils": ["4.2.1"],
             "commondir": ["1.0.1"],
-            "estree-walker": ["1.0.1", "2.0.2"],
-            "glob": ["7.2.3"],
+            "estree-walker": ["2.0.2"],
+            "glob": ["8.0.3"],
             "is-reference": ["1.2.1"],
-            "magic-string": ["0.25.9"],
-            "resolve": ["1.22.0"],
+            "magic-string": ["0.26.7"],
             "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
-            "is-core-module": ["2.9.0"],
-            "path-parse": ["1.0.7"],
-            "supports-preserve-symlinks-flag": ["1.0.0"],
-            "has": ["1.0.3"],
-            "function-bind": ["1.1.1"],
             "sourcemap-codec": ["1.4.8"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.39", "registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
             "fs.realpath": ["1.0.0"],
             "inflight": ["1.0.6"],
             "inherits": ["2.0.4"],
-            "minimatch": ["3.1.2"],
+            "minimatch": ["5.0.1"],
             "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
             "wrappy": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
+            "brace-expansion": ["2.0.1"],
             "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
             "picomatch": ["2.3.1"],
         },
     )
@@ -1059,6 +1050,27 @@ def npm_repositories():
             "picomatch": ["2.3.1"],
             "rollup": ["2.79.0"],
             "fsevents": ["2.3.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_rollup_pluginutils__4.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@rollup/pluginutils",
+        version = "4.2.1",
+        url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-4.2.1.tgz",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==",
+        deps = {
+            "estree-walker": "2.0.2",
+            "picomatch": "2.3.1",
+        },
+        transitive_closure = {
+            "@rollup/pluginutils": ["4.2.1"],
+            "estree-walker": ["2.0.2"],
+            "picomatch": ["2.3.1"],
         },
     )
 
@@ -6579,6 +6591,36 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__glob__8.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glob",
+        version = "8.0.3",
+        url = "https://registry.npmjs.org/glob/-/glob-8.0.3.tgz",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==",
+        deps = {
+            "fs.realpath": "1.0.0",
+            "inflight": "1.0.6",
+            "inherits": "2.0.4",
+            "minimatch": "5.0.1",
+            "once": "1.4.0",
+        },
+        transitive_closure = {
+            "glob": ["8.0.3"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "minimatch": ["5.0.1"],
+            "once": ["1.4.0"],
+            "wrappy": ["1.0.2"],
+            "brace-expansion": ["2.0.1"],
+            "balanced-match": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__glsl-inject-defines__1.0.3",
         root_package = "",
         link_workspace = "",
@@ -8707,6 +8749,25 @@ def npm_repositories():
         },
         transitive_closure = {
             "magic-string": ["0.25.9"],
+            "sourcemap-codec": ["1.4.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__magic-string__0.26.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "magic-string",
+        version = "0.26.7",
+        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz",
+        lifecycle_hooks_no_sandbox = True,
+        integrity = "sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==",
+        deps = {
+            "sourcemap-codec": "1.4.8",
+        },
+        transitive_closure = {
+            "magic-string": ["0.26.7"],
             "sourcemap-codec": ["1.4.8"],
         },
     )
