@@ -74,6 +74,23 @@ js_test(<a href="#js_test-name">name</a>, <a href="#js_test-chdir">chdir</a>, <a
 
 Identical to js_binary, but usable under `bazel test`.
 
+Bazel will set environment variables when a test target is run under `bazel test` and `bazel run`
+that a test runner can use.
+
+A runner can write arbitrary outputs files it wants Bazel to pickup and save with the test logs to
+`TEST_UNDECLARED_OUTPUTS_DIR`. These get zipped up and saved along with the test logs.
+
+JUnit XML reports can be written to `XML_OUTPUT_FILE` for Bazel to consume.
+
+`TEST_TMPDIR` is an absolute path to a private writeable directory that the test runner can use for
+creating temporary files.
+
+LCOV coverage reports can be written to `COVERAGE_OUTPUT_FILE` when running under `bazel coverage`
+or if the `--coverage` flag is set.
+
+See the Bazel [Test encyclopedia](https://bazel.build/reference/test-encyclopedia) for details on
+the contract between Bazel and a test runner.
+
 **ATTRIBUTES**
 
 
