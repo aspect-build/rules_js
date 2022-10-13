@@ -6,6 +6,8 @@
         ":preserveSemverRanges",
         ":rebaseStalePrs",
         "schedule:weekly",
+        "group:recommended",
+        "group:monorepos",
         "group:allNonMajor",
         "workarounds:all"
     ],
@@ -16,7 +18,7 @@
     "packageRules": [
         {
             "matchPackagePatterns": ["*"],
-            "stabilityDays": 5
+            "stabilityDays": 3
         }
     ]
 }
