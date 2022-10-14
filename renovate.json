@@ -8,7 +8,6 @@
         "schedule:weekly",
         "group:recommended",
         "group:monorepos",
-        "group:allNonMajor",
         "workarounds:all"
     ],
 
@@ -19,6 +18,12 @@
         {
             "matchPackagePatterns": ["*"],
             "stabilityDays": 3
+        },
+        {
+            "matchPackagePatterns": ["*"],
+            "matchUpdateTypes": ["patch"],
+            "groupName": "all patch updates",
+            "groupSlug": "all-patch"
         }
     ]
 }
