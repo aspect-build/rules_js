@@ -20,7 +20,7 @@
             "stabilityDays": 3
         },
         {
-            "matchPackagePatterns": ["^rollup-", "^@rollup/", "*-rollup-"],
+            "matchPackagePatterns": ["^rollup-", "^@rollup/", ".*-rollup-"],
             "groupName": "rollup",
             "groupSlug": "rollup"
         },
