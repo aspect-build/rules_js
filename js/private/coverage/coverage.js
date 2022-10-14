@@ -10719,7 +10719,7 @@ class Report$1 {
       reports.create(_reporter, {
         skipEmpty: false,
         skipFull: this.skipFull,
-        maxCols: 100
+        maxCols: process.stdout.columns || 100
       }).execute(context);
     }
   }

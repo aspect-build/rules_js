@@ -120,7 +120,7 @@ load("@npm__buffer-fill__1.0.0__links//:defs.bzl", store_112 = "npm_imported_pac
 load("@npm__buffer-from__1.1.2__links//:defs.bzl", store_113 = "npm_imported_package_store")
 load("@npm__bufferutil__4.0.1__links//:defs.bzl", link_114 = "npm_link_imported_package_store", store_114 = "npm_imported_package_store")
 load("@npm__builtin-modules__3.3.0__links//:defs.bzl", store_115 = "npm_imported_package_store")
-load("@npm__c8__7.11.3__links//:defs.bzl", link_116 = "npm_link_imported_package_store", store_116 = "npm_imported_package_store")
+load("@npm__c8__7.12.0__links//:defs.bzl", link_116 = "npm_link_imported_package_store", store_116 = "npm_imported_package_store")
 load("@npm__cacheable-lookup__2.0.1__links//:defs.bzl", store_117 = "npm_imported_package_store")
 load("@npm__cacheable-request__7.0.2__links//:defs.bzl", store_118 = "npm_imported_package_store")
 load("@npm__camelcase__6.3.0__links//:defs.bzl", store_119 = "npm_imported_package_store")
