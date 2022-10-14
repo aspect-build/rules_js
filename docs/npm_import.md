@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock", "npm_import")
 These use Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
 
-See <https://blog.aspect.dev/configuring-bazels-downloader> for more info about how it works
+See &lt;https://blog.aspect.dev/configuring-bazels-downloader&gt; for more info about how it works
 and how to configure it.
 
 [`npm_translate_lock`](#npm_translate_lock) is the primary user-facing API.
@@ -59,9 +59,9 @@ npm_import(
 )
 ```
 
-> This is similar to Bazel rules in other ecosystems named "_import" like
-> `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
-> `go_repository` is also a model for this rule.
+&gt; This is similar to Bazel rules in other ecosystems named "_import" like
+&gt; `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
+&gt; `go_repository` is also a model for this rule.
 
 The name of this repository should contain the version number, so that multiple versions of the same
 package don't collide.
@@ -130,7 +130,7 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 1. Point bazel to the config with a line in .bazelrc like
 common --experimental_downloader_config=.bazel_downloader_config
 
-Read more about the downloader config: <https://blog.aspect.dev/configuring-bazels-downloader>
+Read more about the downloader config: &lt;https://blog.aspect.dev/configuring-bazels-downloader&gt;
 
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 
@@ -202,7 +202,7 @@ pnpm lays out with [hoisting](https://pnpm.io/npmrc#hoist) disabled (`hoist=fals
 We recommend adding `hoist=false` to your `.npmrc`:
 
 ```
-echo "hoist=false" >> .npmrc
+echo "hoist=false" &gt;&gt; .npmrc
 ```
 
 This will prevent pnpm from creating the hidden `node_modules/.pnpm/node_modules` folder with hoisted
