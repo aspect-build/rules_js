@@ -30,6 +30,19 @@
             "groupSlug": "rollup"
         },
         {
+            "groupName": "Aspect rules",
+            "groupSlug": "aspect_rules",
+            "matchManagers": ["bazel"],
+            "matchPackageNames": ["^aspect_"],
+            "matchUpdateTypes": ["patch", "minor"]
+        },
+        {
+            "groupName": "Bazel rules",
+            "groupSlug": "bazel_rules",
+            "matchManagers": ["bazel"],
+            "matchUpdateTypes": ["patch", "minor"]
+        },
+        {
             "matchPackagePatterns": ["*"],
             "matchUpdateTypes": ["patch"],
             "groupName": "all patch updates",
