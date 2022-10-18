@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "dependencies": {
+        "debug": "^4.3.4",
+        "is-odd": "^3.0.1",
+        "semver": "^7.3.8"
+    },
+    "devDependencies": {
+        "@types/node": "^18.11.0",
+        "@types/semver": "^7.3.12"
+    }
+}

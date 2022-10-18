@@ -124,11 +124,11 @@ def _parse_package_name(package):
         return (segments[0], segments[1])
     return ("", segments[0])
 
-def _npm_registry_download_url(package, version, registries = {}):
+def _npm_registry_download_url(package, version, registries, default_registry):
     "Make a registry download URL for a given package and version"
 
     (package_scope, package_name_no_scope) = _parse_package_name(package)
-    registry = "https://{}".format(registries[package_scope]) if package_scope in registries else utils.npm_registry_url
+    registry = "https://{}".format(registries[package_scope]) if package_scope in registries else default_registry
 
     return "{0}/{1}/-/{2}-{3}.tgz".format(
         registry.removesuffix("/"),
@@ -153,8 +153,6 @@ utils = struct(
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked package
     package_directory_output_group = "package_directory",
-    # Default npm registry URL
-    npm_registry_url = "https://registry.npmjs.org/",
     npm_registry_download_url = _npm_registry_download_url,
     parse_package_name = _parse_package_name,
 )
