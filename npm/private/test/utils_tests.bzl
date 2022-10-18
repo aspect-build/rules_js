@@ -71,17 +71,22 @@ def test_npm_registry_download_url(ctx):
     asserts.equals(
         env,
         "https://registry.npmjs.org/y/-/y-1.2.3.tgz",
-        utils.npm_registry_download_url("y", "1.2.3"),
+        utils.npm_registry_download_url("y", "1.2.3", {}, "https://registry.npmjs.org/"),
     )
     asserts.equals(
         env,
         "https://registry.npmjs.org/@scope/y/-/y-1.2.3.tgz",
-        utils.npm_registry_download_url("@scope/y", "1.2.3"),
+        utils.npm_registry_download_url("@scope/y", "1.2.3", {}, "https://registry.npmjs.org/"),
     )
     asserts.equals(
         env,
         "https://npm.pkg.github.com/@scope/y/-/y-1.2.3.tgz",
-        utils.npm_registry_download_url("@scope/y", "1.2.3", {"@scope": "npm.pkg.github.com/"}),
+        utils.npm_registry_download_url("@scope/y", "1.2.3", {"@scope": "npm.pkg.github.com/"}, "https://registry.npmjs.org/"),
+    )
+    asserts.equals(
+        env,
+        "https://npm.pkg.github.com/@scope/y/-/y-1.2.3.tgz",
+        utils.npm_registry_download_url("@scope/y", "1.2.3", {}, "https://npm.pkg.github.com/"),
     )
     return unittest.end(env)
 

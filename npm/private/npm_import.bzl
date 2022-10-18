@@ -4,6 +4,7 @@ load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
+load(":npm_translate_lock.bzl", "DEFAULT_REGISTRY")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 _LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
@@ -346,7 +347,7 @@ _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 def _impl(rctx):
     # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
     package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
-    download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version)
+    download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, DEFAULT_REGISTRY)
 
     auth = {
         download_url: {

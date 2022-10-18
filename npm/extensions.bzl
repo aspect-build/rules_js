@@ -3,7 +3,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 """
 
 load("//npm/private:utils.bzl", "utils")
-load("//npm/private:npm_translate_lock.bzl", npm_translate_lock_lib = "npm_translate_lock")
+load("//npm/private:npm_translate_lock.bzl", "DEFAULT_REGISTRY", npm_translate_lock_lib = "npm_translate_lock")
 load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
@@ -13,7 +13,7 @@ def _extension_impl(module_ctx):
         for attr in mod.tags.npm_translate_lock:
             lockfile = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             trans = translate_to_transitive_closure(lockfile, attr.prod, attr.dev, attr.no_optional)
-            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr.pnpm_lock.package, attr)
+            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr.pnpm_lock.package, attr, DEFAULT_REGISTRY)
             for i in imports:
                 npm_import(
                     name = i.name,

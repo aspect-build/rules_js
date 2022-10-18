@@ -7,6 +7,8 @@ load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
+DEFAULT_REGISTRY = "https://registry.npmjs.org/"
+
 _ATTRS = {
     "pnpm_lock": attr.label(),
     "package_json": attr.label(),
@@ -213,7 +215,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
 
     return (tokens, registries)
 
-def _gen_npm_imports(lockfile, root_package, attr, registries = {}):
+def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
@@ -330,14 +332,14 @@ def _gen_npm_imports(lockfile, root_package, attr, registries = {}):
         url = None
         if tarball:
             if _is_url(tarball):
-                if registry and tarball.startswith(utils.npm_registry_url):
-                    url = registry + tarball[len(utils.npm_registry_url):]
+                if registry and tarball.startswith(default_registry):
+                    url = registry + tarball[len(default_registry):]
                 else:
                     url = tarball
             else:
                 if not registry:
                     (scope, _) = utils.parse_package_name(name)
-                    registry = "https://{}".format(registries[scope]) if scope in registries else utils.npm_registry_url
+                    registry = "https://{}".format(registries[scope]) if scope in registries else default_registry
                 url = "{0}/{1}".format(registry.removesuffix("/"), tarball)
 
         result.append(struct(
@@ -470,12 +472,16 @@ def _impl(rctx):
     lockfile_description = None
     npm_tokens = {}
     npm_registries = {}
+    default_registry = DEFAULT_REGISTRY
 
     # Read tokens from npmrc label
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = parse_ini(rctx.read(npmrc_path))
         (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
+
+        if "registry" in npmrc:
+            default_registry = npmrc["registry"]
 
     _validate_attrs(rctx)
 
@@ -599,7 +605,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
     defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries)
+    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries, default_registry)
 
     fp_links = {}
     rctx_files = {
@@ -779,7 +785,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version, npm_registries)
+        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version, npm_registries, default_registry)
 
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
