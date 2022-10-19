@@ -4,13 +4,13 @@ importers:
 
   .:
     specifiers:
-      '@aspect-test/a': 5.0.0
+      '@aspect-test/a': 5.0.2
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.2
-      typescript: 4.8.3
+      typescript: 4.8.4
     dependencies:
-      '@aspect-test/a': 5.0.0
-      typescript: 4.8.3
+      '@aspect-test/a': 5.0.2
+      typescript: 4.8.4
     optionalDependencies:
       '@aspect-test/c': 2.0.2
     devDependencies:
@@ -18,11 +18,11 @@ importers:
 
   app/a:
     specifiers:
-      '@aspect-test/a': 5.0.0
+      '@aspect-test/a': 5.0.2
       '@aspect-test/g': 1.0.0
       '@lib/a': workspace:*
     dependencies:
-      '@aspect-test/a': 5.0.0
+      '@aspect-test/a': 5.0.2
       '@aspect-test/g': 1.0.0
       '@lib/a': link:../../lib/a
 
@@ -38,11 +38,11 @@ importers:
 
   app/c:
     specifiers:
-      '@aspect-test/a': 5.0.0
+      '@aspect-test/a': 5.0.2
       '@aspect-test/g': 1.0.0
       '@lib/c': file:../../lib/c
     dependencies:
-      '@aspect-test/a': 5.0.0
+      '@aspect-test/a': 5.0.2
       '@aspect-test/g': 1.0.0
       '@lib/c': file:lib/c
 
@@ -72,15 +72,6 @@ importers:
 
 packages:
 
-  /@aspect-test/a/5.0.0:
-    resolution: {integrity: sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==}
-    hasBin: true
-    dependencies:
-      '@aspect-test/b': 5.0.0
-      '@aspect-test/c': 1.0.0
-      '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
-    dev: false
-
   /@aspect-test/a/5.0.2:
     resolution: {integrity: sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==}
     hasBin: true
@@ -88,16 +79,6 @@ packages:
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
-    dev: true
-
-  /@aspect-test/b/5.0.0:
-    resolution: {integrity: sha512-MyIW6gHL3ds0BmDTOktorHLJUya5eZLGZlOxsKN2M9c3DWp+p1pBrA6KLQX1iq9BciryhpKwl82IAxP4jG52kw==}
-    hasBin: true
-    dependencies:
-      '@aspect-test/a': 5.0.0
-      '@aspect-test/c': 2.0.0
-      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
-    dev: false
 
   /@aspect-test/b/5.0.2:
     resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
@@ -106,42 +87,11 @@ packages:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
-    dev: true
-
-  /@aspect-test/c/1.0.0:
-    resolution: {integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==}
-    hasBin: true
-    requiresBuild: true
-    dev: false
-
-  /@aspect-test/c/2.0.0:
-    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
-    hasBin: true
-    requiresBuild: true
-    dev: false
 
   /@aspect-test/c/2.0.2:
     resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
     requiresBuild: true
-
-  /@aspect-test/d/2.0.0_@aspect-test+c@1.0.0:
-    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
-    hasBin: true
-    peerDependencies:
-      '@aspect-test/c': x.x.x
-    dependencies:
-      '@aspect-test/c': 1.0.0
-    dev: false
-
-  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
-    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
-    hasBin: true
-    peerDependencies:
-      '@aspect-test/c': x.x.x
-    dependencies:
-      '@aspect-test/c': 2.0.0
-    dev: false
 
   /@aspect-test/d/2.0.0_@aspect-test+c@2.0.2:
     resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
@@ -150,7 +100,6 @@ packages:
       '@aspect-test/c': x.x.x
     dependencies:
       '@aspect-test/c': 2.0.2
-    dev: true
 
   /@aspect-test/e/1.0.0:
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
@@ -172,8 +121,8 @@ packages:
     hasBin: true
     dev: false
 
-  /typescript/4.8.3:
-    resolution: {integrity: sha512-goMHfm00nWPa8UvR/CPSvykqf6dVV8x/dp0c5mFTMTIu0u0FlGWRioyy7Nn0PGAdHxpJZnuO/ut+PpQ8UiHAig==}
+  /typescript/4.8.4:
+    resolution: {integrity: sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: false
