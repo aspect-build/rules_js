@@ -15935,6 +15935,22 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_blockprotocol_type-system-web__at_gitpkg.vercel.app_blockprotocol_blockprotocol_packages__2540blockprotocol_type-system-web_6526c0e",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["@blockprotocol/type-system-web"],
+        },
+        package = "@blockprotocol/type-system-web",
+        version = "@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e",
+        url = "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
+        lifecycle_hooks_no_sandbox = True,
+        transitive_closure = {
+            "@blockprotocol/type-system-web": ["@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e"],
+        },
+    )
+
+    npm_import(
         name = "npm__inline-fixtures__at_registry.yarnpkg.com_inline-fixtures_-_inline-fixtures-1.1.0.tgz_5f9edf644ac02a1322012dbbb9f0a4739831d662",
         root_package = "",
         link_workspace = "",

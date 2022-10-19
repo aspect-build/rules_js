@@ -110,6 +110,7 @@ importers:
 
   npm/private/test:
     specifiers:
+      '@blockprotocol/type-system-web': https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e
       '@figma/nodegit': ^0.28.0-figma.2
       '@plotly/regl': 2.1.2
       bufferutil: 4.0.1
@@ -124,6 +125,7 @@ importers:
       unused: latest
       webpack-bundle-analyzer: 4.5.0
     devDependencies:
+      '@blockprotocol/type-system-web': '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e'
       '@figma/nodegit': 0.28.0-figma.2
       '@plotly/regl': 2.1.2
       bufferutil: 4.0.1
@@ -4807,6 +4809,12 @@ packages:
     resolution: {tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
     name: '@foo/jsonify'
     version: 0.0.0
+    dev: true
+
+  '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e':
+    resolution: {tarball: https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e}
+    name: '@blockprotocol/type-system-web'
+    version: 0.0.1
     dev: true
 
   '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662':

@@ -3,18 +3,28 @@
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load(":yaml.bzl", _parse_yaml = "parse")
 
+def _sanitize_string(string):
+    # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
+    result = ""
+    for i in range(0, len(string)):
+        c = string[i]
+        if c == "@" and (not result or result[-1] == "_"):
+            result += "at"
+        if not c.isalnum() and c != "-" and c != "_" and c != ".":
+            c = "_"
+        result += c
+    return result
+
 def _bazel_name(name, version = None):
     "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
-    escaped_name = name.replace("@", "at_").replace("/", "_").replace("#", "_")
+    escaped_name = _sanitize_string(name)
     if not version:
         return escaped_name
     version_segments = version.split("_")
-    escaped_version = version_segments[0].replace("@", "at_").replace("/", "_").replace("#", "_")
+    escaped_version = _sanitize_string(version_segments[0])
     peer_version = "_".join(version_segments[1:])
-    if peer_version.startswith("@"):
-        peer_version = "at_" + peer_version[1:]
     if peer_version:
-        escaped_version = "%s__%s" % (escaped_version, peer_version.replace("/", "_").replace("@", "_").replace("#", "_").replace("+", "_"))
+        escaped_version = "%s__%s" % (escaped_version, _sanitize_string(peer_version))
     return "%s__%s" % (escaped_name, escaped_version)
 
 def _strip_peer_dep_version(version):

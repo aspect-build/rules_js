@@ -55,6 +55,7 @@ filegroup(
         ":node_modules/typescript",
         ":node_modules/inline-fixtures",
         ":node_modules/json-stable-stringify",
+        ":node_modules/@blockprotocol/type-system-web",
         # intentionally don't include node_modules/unused
     ],
 )
