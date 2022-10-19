@@ -231,6 +231,9 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     RUNFILES="$PWD/$RUNFILES"
 fi
 export RUNFILES
+# TODO(2.0): remove RUNFILES and export only JS_BINARY__RUNFILES
+JS_BINARY__RUNFILES="$RUNFILES"
+export JS_BINARY__RUNFILES
 
 # ==============================================================================
 # Prepare to run main program
@@ -256,11 +259,11 @@ if [[ "$PWD" == *"/bazel-out/"* ]]; then
         printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
         exit 1
     fi
-    execroot="${PWD:0:$index}"
+    JS_BINARY__EXECROOT="${PWD:0:$index}"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
-    execroot="$PWD"
+    JS_BINARY__EXECROOT="$PWD"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
         logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
 run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
@@ -279,6 +282,8 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
     logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
     cd "$BAZEL_BINDIR"
 fi
+export JS_BINARY__EXECROOT
+export BAZEL_BINDIR
 
 entry_point="$RUNFILES/{{workspace_name}}/{{entry_point_path}}"
 if [ ! -f "$entry_point" ]; then
@@ -347,7 +352,7 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
 done
 
 # Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper
-export JS_BINARY__FS_PATCH_ROOTS="$execroot:$RUNFILES"
+export JS_BINARY__FS_PATCH_ROOTS="$JS_BINARY__EXECROOT:$RUNFILES"
 
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
@@ -362,7 +367,7 @@ export PATH
 # Debug logs
 if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     if [ "${BAZEL_BINDIR:-}" ]; then
-        logf_debug "BAZEL_BINDIR %s" "${BAZEL_BINDIR:-}"
+        logf_debug "BAZEL_BINDIR! %s" "${BAZEL_BINDIR:-}"
     fi
     if [ "${BAZEL_TARGET_CPU:-}" ]; then
         logf_debug "BAZEL_TARGET_CPU %s" "${BAZEL_TARGET_CPU:-}"
@@ -400,7 +405,7 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     fi
     logf_info "binary target %s" "${JS_BINARY__TARGET:-}"
     logf_info "RUNFILES %s" "$RUNFILES"
-    logf_info "execroot %s" "$execroot"
+    logf_info "EXECROOT %s" "$JS_BINARY__EXECROOT"
     logf_info "PWD %s" "$PWD"
 fi
 
