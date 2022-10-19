@@ -19,12 +19,12 @@ def test_bazel_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "at_scope_pkgat_21.1.0_rollupat_2.70.2_at_scope_yat_1.1.1",
+        "at_scope_pkg_21.1.0_rollup_2.70.2_at_scope_y_1.1.1",
         utils.bazel_name("@scope/pkg@21.1.0_rollup@2.70.2_@scope/y@1.1.1"),
     )
     asserts.equals(
         env,
-        "at_scope_pkgat_21.1.0",
+        "at_scope_pkg_21.1.0",
         utils.bazel_name("@scope/pkg@21.1.0"),
     )
     return unittest.end(env)
