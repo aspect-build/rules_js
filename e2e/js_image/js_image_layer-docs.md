@@ -19,9 +19,9 @@ runfiles(<a href="#runfiles-name">name</a>, <a href="#runfiles-binary">binary</a
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="runfiles-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="runfiles-binary"></a>binary |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
-| <a id="runfiles-exclude"></a>exclude |  -   | String | optional | "" |
-| <a id="runfiles-include"></a>include |  -   | String | optional | "" |
-| <a id="runfiles-root"></a>root |  -   | String | optional | "" |
+| <a id="runfiles-exclude"></a>exclude |  -   | String | optional | <code>""</code> |
+| <a id="runfiles-include"></a>include |  -   | String | optional | <code>""</code> |
+| <a id="runfiles-root"></a>root |  -   | String | optional | <code>""</code> |
 
 
 <a id="js_image_layer"></a>
@@ -32,12 +32,12 @@ runfiles(<a href="#runfiles-name">name</a>, <a href="#runfiles-binary">binary</a
 js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-root">root</a>, <a href="#js_image_layer-kwargs">kwargs</a>)
 </pre>
 
-Creates two tar files `:<name>/app.tar` and `:<name>/node_modules.tar`
+Creates two tar files `:&lt;name&gt;/app.tar` and `:&lt;name&gt;/node_modules.tar`
 
 Final directory tree will look like below
 
-/{root of js_image_layer}/{package_name() if any}/{name of js_binary}.sh -> entrypoint
-/{root of js_image_layer}/{package_name() if any}/{name of js_binary}.sh.runfiles -> runfiles directory (almost identical to one bazel lays out)
+/{root of js_image_layer}/{package_name() if any}/{name of js_binary}.sh -&gt; entrypoint
+/{root of js_image_layer}/{package_name() if any}/{name of js_binary}.sh.runfiles -&gt; runfiles directory (almost identical to one bazel lays out)
 
 
 **PARAMETERS**
