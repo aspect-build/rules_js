@@ -16,6 +16,11 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
+    name = "js_run_devserver",
+    bzl_library_target = "//js/private:js_run_devserver",
+)
+
+stardoc_with_diff_test(
     name = "js_filegroup",
     bzl_library_target = "//js/private:js_filegroup",
 )

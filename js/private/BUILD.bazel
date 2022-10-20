@@ -1,5 +1,6 @@
 "Internal implementation details"
 
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("//js:defs.bzl", "js_binary")
 
@@ -116,6 +117,20 @@ bzl_library(
 )
 
 bzl_library(
+    name = "js_run_devserver",
+    srcs = ["js_run_devserver.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
+    deps = [
+        ":js_binary",
+        ":js_binary_helpers",
+        "@bazel_skylib//lib:dicts",
+    ],
+)
+
+bzl_library(
     name = "js_info",
     srcs = ["js_info.bzl"],
     visibility = ["//js:__subpackages__"],
@@ -132,5 +147,11 @@ js_binary(
     entry_point = "expand_template.js",
     # meant to run out of the execroot
     env = {"BAZEL_BINDIR": "."},
+    visibility = ["//visibility:public"],
+)
+
+copy_to_bin(
+    name = "js_devserver_entrypoint",
+    srcs = ["js_run_devserver.js"],
     visibility = ["//visibility:public"],
 )

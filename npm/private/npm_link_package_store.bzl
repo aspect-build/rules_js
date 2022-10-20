@@ -94,12 +94,8 @@ def _impl(ctx):
     files = utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)
 
     for bin_name, bin_path in ctx.attr.bins.items():
-        if ctx.label.package:
-            path_to_root = "/".join([".."] * len(ctx.label.package.split("/")))
-        else:
-            path_to_root = "."
         bin_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name))
-        bin_path = paths.normalize(paths.join("../..", path_to_root, virtual_store_directory.short_path, bin_path))
+        bin_path = paths.normalize(paths.join("..", package, bin_path))
         ctx.actions.write(
             bin_file,
             _BIN_TMPL.format(bin_path = bin_path),

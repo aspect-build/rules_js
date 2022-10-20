@@ -1,0 +1,43 @@
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
+
+http_server_bin.http_server_binary(
+    name = "http_server",
+)
+
+# Simple js_run_devserver rule that syncs two html files and takes an http-server js_binary
+# as the tool
+js_run_devserver(
+    name = "serve",
+    args = ["."],
+    chdir = package_name(),
+    data = [
+        "index.html",
+        "other.html",
+    ],
+    log_level = "debug",
+    tool = ":http_server",
+)
+
+copy_to_directory(
+    name = "http_root",
+    srcs = [
+        "index.html",
+        "other.html",
+    ],
+)
+
+# Variation of a js_run_devserver target that syncs a tree artifact (:http_root) and the http-server
+# node_modules link and takes a command to run http-server from its node_modules/.bin/http-server
+# entry point
+js_run_devserver(
+    name = "serve_alt",
+    args = ["http_root"],
+    chdir = package_name(),
+    command = "../node_modules/.bin/http-server",
+    data = [
+        ":http_root",
+        "//:node_modules/http-server",
+    ],
+)

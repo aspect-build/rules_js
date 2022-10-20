@@ -15,6 +15,7 @@ bzl_library(
         "//js/private:js_binary",
         "//js/private:js_library",
         "//js/private:js_run_binary",
+        "//js/private:js_run_devserver",
     ],
 )
 
