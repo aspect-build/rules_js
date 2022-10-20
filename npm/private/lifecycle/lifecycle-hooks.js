@@ -151,12 +151,11 @@ async function main(args) {
 // Copy contents of a package dir to a destination dir (without copying the package dir itself)
 async function copyPackageContents(packageDir, destDir) {
     const contents = await fs.promises.readdir(packageDir)
-    contents.forEach(async (file) => {
-        await copyRecursive(
-            path.join(packageDir, file),
-            path.join(destDir, file)
+    await Promise.all(
+        contents.map((file) =>
+            copyRecursive(path.join(packageDir, file), path.join(destDir, file))
         )
-    })
+    )
 }
 
 // Recursively copy files and folders
@@ -165,12 +164,11 @@ async function copyRecursive(src, dest) {
     if (stats.isDirectory()) {
         await mkdirp(dest)
         const contents = await fs.promises.readdir(src)
-        contents.forEach(async (fileName) => {
-            await copyRecursive(
-                path.join(src, fileName),
-                path.join(dest, fileName)
+        await Promise.all(
+            contents.map((file) =>
+                copyRecursive(path.join(src, file), path.join(dest, file))
             )
-        })
+        )
     } else {
         await fs.promises.copyFile(src, dest)
     }
