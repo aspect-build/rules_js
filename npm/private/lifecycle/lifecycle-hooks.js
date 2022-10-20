@@ -34,26 +34,15 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
             'package.json'
         )
         if (fs.existsSync(packageJsonPath)) {
-            let packageJson = ''
-
-            // Catch invalid JSON errors and retry or throw a more detailed Error.
-            // See: https://github.com/aspect-build/rules_js/issues/483
-            const json = await fs.promises.readFile(packageJsonPath)
+            let packageJsonStr = await fs.promises.readFile(packageJsonPath)
+            let packageJson
             try {
-                packageJson = JSON.parse(json)
+                packageJson = JSON.parse(packageJsonStr)
             } catch (e) {
-                console.error(
-                    `Error parsing ${packageName}/package.json: ${e}\n\n""""\n${json}\n""""\nRetrying...`
+                // Catch and throw a more detailed error message.
+                throw new Error(
+                    `Error parsing ${packageName}/package.json: ${e}\n\n""""\n${packageJsonStr}\n""""`
                 )
-
-                const json2 = await fs.promises.readFile(packageJsonPath)
-                try {
-                    packageJson = JSON.parse(json2)
-                } catch (e2) {
-                    throw new Error(
-                        `Error parsing ${packageName}/package.json: ${e2}\n\n""""\n${json2}\n""""`
-                    )
-                }
             }
 
             // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
