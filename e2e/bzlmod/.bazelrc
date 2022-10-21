@@ -2,4 +2,3 @@
 import %workspace%/../../.bazelrc.common
 
 common --experimental_enable_bzlmod
-common --registry=https://raw.githubusercontent.com/aspect-build/bazel-central-registry/main/
