@@ -13,7 +13,11 @@ def _extension_impl(module_ctx):
         for attr in mod.tags.npm_translate_lock:
             lockfile = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             trans = translate_to_transitive_closure(lockfile, attr.prod, attr.dev, attr.no_optional)
-            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr.pnpm_lock.package, attr, DEFAULT_REGISTRY)
+
+            # TODO: this feature introduced in https://github.com/aspect-build/rules_js/pull/503
+            # but not added to bzlmod. For now, not supported here.
+            registries = {}
+            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr.pnpm_lock.package, attr, registries, DEFAULT_REGISTRY)
             for i in imports:
                 npm_import(
                     name = i.name,
@@ -29,12 +33,15 @@ def _extension_impl(module_ctx):
                     run_lifecycle_hooks = i.run_lifecycle_hooks,
                     transitive_closure = i.transitive_closure,
                     url = i.url,
+                    npm_translate_lock_repo = "npm",
+                    bzlmod = True,
                 )
             npm_translate_lock(
                 name = "npm",
                 pnpm_lock = attr.pnpm_lock,
+                bzlmod = True,
             )
-        for i in mod.tags.npm_package:
+        for i in mod.tags.npm_import:
             npm_import(
                 name = i.name,
                 package = i.package,
@@ -48,12 +55,13 @@ def _extension_impl(module_ctx):
                 link_workspace = i.link_workspace,
                 url = i.url,
                 root_package = i.root_package,
+                bzlmod = True,
             )
 
 npm = module_extension(
     implementation = _extension_impl,
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = dict({"name": attr.string()}, **npm_translate_lock_lib.attrs)),
-        "npm_package": tag_class(attrs = dict({"name": attr.string()}, **npm_import_lib.attrs)),
+        "npm_import": tag_class(attrs = dict({"name": attr.string()}, **npm_import_lib.attrs)),
     },
 )

@@ -605,7 +605,16 @@ def _impl_links(rctx):
     if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
         npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
-    npm_package_target = "@{}//:source_directory".format(npm_import_sources_repo_name)
+    if rctx.attr.npm_translate_lock_repo:
+        npm_package_target = "@{}//:{}_source_directory".format(
+            rctx.attr.npm_translate_lock_repo,
+            npm_import_sources_repo_name,
+        )
+    else:
+        npm_package_target = "{}@{}//:source_directory".format(
+            "@" if rctx.attr.bzlmod else "",
+            npm_import_sources_repo_name,
+        )
     npm_package_target_lc = "@{}//:pkg".format(npm_import_sources_repo_name)
 
     link_packages = {}
@@ -685,6 +694,8 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "lifecycle_hooks_no_sandbox": attr.bool(default = True),
+    "npm_translate_lock_repo": attr.string(),
+    "bzlmod": attr.bool(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {

@@ -20,7 +20,7 @@ npm.npm_translate_lock(
 
 use_repo(npm, "npm")
 
-npm.npm_package(
+npm.npm_import(
     name = "npm_meaning-of-life",
     package = "meaning-of-life",
     version = "1.0.0",
