@@ -30,6 +30,7 @@ _ATTRS = {
     "lifecycle_hooks_no_sandbox": attr.bool(default = True),
     "verify_node_modules_ignored": attr.label(),
     "link_workspace": attr.string(),
+    "bzlmod": attr.bool(),
 }
 
 def _process_lockfile(rctx, pnpm_lock):
@@ -45,7 +46,8 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_bzlmod}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -807,6 +809,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_execution_requirements else ""
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
+        maybe_bzlmod = ("""
+        bzlmod = True,""") if rctx.attr.bzlmod else ""
 
         _registry = url.split("//", 1)[-1]
         npm_token = None
@@ -820,41 +824,58 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         npm_auth = "%s",""" % npm_token) if npm_token else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
+            lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
+            maybe_bins = maybe_bins,
+            maybe_bzlmod = maybe_bzlmod,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
             maybe_integrity = maybe_integrity,
+            maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
+            maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
+            maybe_npm_auth = maybe_npm_auth,
             maybe_patch_args = maybe_patch_args,
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
-            maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
-            maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
-            lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             maybe_transitive_closure = maybe_transitive_closure,
-            url = url,
-            maybe_bins = maybe_bins,
             name = _import.name,
+            npm_translate_lock_repo = rctx.name,
             package = _import.package,
             root_package = _import.root_package,
+            url = url,
             version = _import.version,
-            maybe_npm_auth = maybe_npm_auth,
+        ))
+
+        rctx_files["BUILD.bazel"].append("""alias(
+    name = "{name}",
+    actual = "{actual}",
+    visibility = ["//visibility:public"],
+)
+""".format(
+            name = "{}_source_directory".format(_import.name),
+            actual = "{}@{}//:source_directory".format(
+                "@" if rctx.attr.bzlmod else "",
+                _import.name,
+            ),
         ))
 
         if _import.link_packages:
             defs_bzl_header.append(
-                """load("@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
+                """load("{bzlmod}@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
                     i = i,
                     repo_name = _import.name,
                     links_repo_suffix = utils.links_repo_suffix,
+                    bzlmod = "@" if rctx.attr.bzlmod else "",
                 ),
             )
         else:
             defs_bzl_header.append(
-                """load("@{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
+                """load("{bzlmod}@{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
                     i = i,
                     repo_name = _import.name,
                     links_repo_suffix = utils.links_repo_suffix,
+                    bzlmod = "@" if rctx.attr.bzlmod else "",
                 ),
             )
 

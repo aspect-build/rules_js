@@ -62,7 +62,8 @@ def npm_translate_lock(
         # buildifier: disable=unused-variable
         warn_on_unqualified_tarball_url = None,
         link_workspace = None,
-        pnpm_version = LATEST_PNPM_VERSION):
+        pnpm_version = LATEST_PNPM_VERSION,
+        **kwargs):
     """Repository rule to generate npm_import rules from pnpm lock file or from a package.json and yarn/npm lock file.
 
     The pnpm lockfile format includes all the information needed to define npm_import rules,
@@ -315,7 +316,13 @@ def npm_translate_lock(
             Can be left unspecified if the link workspace is the user workspace.
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
+
+        **kwargs: Internal use only
     """
+    bzlmod = kwargs.pop("bzlmod", False)
+    if len(kwargs):
+        fail("Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0]))
+
     if pnpm_version != None and not native.existing_rule("pnpm"):
         npm_import(
             name = "pnpm",
@@ -363,6 +370,7 @@ def npm_translate_lock(
         lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
         verify_node_modules_ignored = verify_node_modules_ignored,
         link_workspace = link_workspace,
+        bzlmod = bzlmod,
     )
 
 _npm_import_links = repository_rule(
@@ -395,7 +403,8 @@ def npm_import(
         patches = [],
         custom_postinstall = "",
         npm_auth = "",
-        bins = {}):
+        bins = {},
+        **kwargs):
     """Import a single npm package into Bazel.
 
     Normally you'd want to use `npm_translate_lock` to import all your packages at once.
@@ -589,7 +598,13 @@ def npm_import(
             In the future, this field may be automatically populated by npm_translate_lock
             from information in the pnpm lock file. That feature is currently blocked on
             https://github.com/pnpm/pnpm/issues/5131.
+
+        **kwargs: Internal use only
     """
+    bzlmod = kwargs.pop("bzlmod", False)
+    npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
+    if len(kwargs):
+        fail("Invalid npm_import parameter '{}'".format(kwargs.keys()[0]))
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
@@ -627,4 +642,6 @@ def npm_import(
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
         bins = bins,
+        npm_translate_lock_repo = npm_translate_lock_repo,
+        bzlmod = bzlmod,
     )
