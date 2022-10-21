@@ -125,7 +125,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             // there are no hops so lets report the stats of the real file;
             // we can't use origRealPathSync here since that function calls lstat internally
             // which can result in an infinite loop
-            return origLstatSync(unguardedRealPathSync(args[0]), args.slice(1))
+            return origLstatSync(
+                unguardedRealPathSync(args[0]),
+                ...args.slice(1)
+            )
         } catch (err) {
             if (err.code === 'ENOENT') {
                 // broken link so there is nothing more to do
