@@ -10,6 +10,13 @@ local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
+archive_override(
+    module_name = "aspect_bazel_lib",
+    integrity = "sha256-wV4722Jpc3KMN173jFj97ifJua/+pcnbV8eOr9qDlb8=",
+    patches = ["aspect-bazel-lib.patch"],
+    strip_prefix = "bazel-lib-1.13.1",
+    urls = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.13.1.tar.gz",
+)
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 

@@ -1,0 +1,16 @@
+diff lib/private/utils.bzl lib/private/utils.bzl
+index 25d150e..eb2dea5 100644
+--- lib/private/utils.bzl
++++ lib/private/utils.bzl
+@@ -84,8 +84,9 @@ def _is_external_label(param):
+     # Seems like a bug in Bazel that the workspace_root for a label like
+     # @@//js/private/node-patches:fs.js is "external"
+     # See https://github.com/bazelbuild/bazel/issues/16528
+-    if str(param).startswith("@@//"):
+-        return False
++    #if str(param).startswith("@@//"):
++    #    return False
++    print("16528 repro", param, _to_label(param), _to_label(param).workspace_root)
+     return len(_to_label(param).workspace_root) > 0
+ 
+ # Path to the root of the workspace
