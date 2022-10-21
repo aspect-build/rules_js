@@ -2,7 +2,7 @@
 
 # Simple binary that call coverage.js with node toolchain
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
+load("//js/private:bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _ATTRS = {
     "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
@@ -13,11 +13,12 @@ _ATTRS = {
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-def _to_manifest_path(ctx, file):
-    if file.short_path.startswith("../"):
-        return file.short_path[3:]
-    else:
-        return ctx.workspace_name + "/" + file.short_path
+# Do the opposite of _to_manifest_path in
+# https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
+# to get back to the short_path.
+# TODO: fix toolchain so we don't have to do this
+def _target_tool_short_path(path):
+    return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
 def _impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -29,9 +30,10 @@ def _impl(ctx):
         template = ctx.file._launcher_template,
         output = bash_launcher,
         substitutions = {
-            "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
-            "{{entry_point}}": _to_manifest_path(ctx, ctx.file.entry_point),
-            "{{node}}": node_bin.target_tool_path[len("external/"):],
+            "{{entry_point_path}}": ctx.file.entry_point.short_path,
+            "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
+            "{{node}}": _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path),
+            "{{workspace_name}}": ctx.workspace_name,
         },
         is_executable = True,
     )

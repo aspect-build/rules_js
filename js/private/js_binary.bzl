@@ -15,13 +15,13 @@ js_binary(
 ```
 """
 
-load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_binary_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
+load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _DOC = """Execute a program in the node.js runtime.
 
@@ -223,7 +223,6 @@ _ATTRS = {
         default = Label("//js/private:npm_wrapper.bat"),
         allow_single_file = True,
     ),
-    "_runfiles_lib": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
@@ -344,6 +343,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args_expanded),
+        "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
@@ -351,7 +351,6 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{node_wrapper}}": node_wrapper.short_path,
         "{{node}}": _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path),
         "{{npm}}": npm_path,
-        "{{rlocation_function}}": BASH_RLOCATION_FUNCTION,
         "{{workspace_name}}": ctx.workspace_name,
     }
 
@@ -397,7 +396,6 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         files.append(entry_point)
         files.extend(ctx.files.data)
     files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
-    files.extend(ctx.files._runfiles_lib)
     files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
     if ctx.attr.include_npm:
         files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_files)
