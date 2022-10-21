@@ -61,6 +61,7 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
+        ":bash",
         ":js_binary_helpers",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:directory_path",
@@ -117,6 +118,12 @@ bzl_library(
 bzl_library(
     name = "js_info",
     srcs = ["js_info.bzl"],
+    visibility = ["//js:__subpackages__"],
+)
+
+bzl_library(
+    name = "bash",
+    srcs = ["bash.bzl"],
     visibility = ["//js:__subpackages__"],
 )
 

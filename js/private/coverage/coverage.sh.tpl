@@ -1,9 +1,46 @@
 #!/usr/bin/env bash
-{{rlocation_function}}
 
 set -o pipefail -o errexit -o nounset
 
-node="$(rlocation {{node}})"
-entry_point="$(rlocation {{entry_point}})"
+function logf_stderr {
+    local format_string="$1\n"
+    shift
+    # shellcheck disable=SC2059
+    printf "$format_string" "$@" >&2
+}
+
+function logf_fatal {
+    printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >&2
+    logf_stderr "$@"
+}
+
+# ==============================================================================
+# Initialize RUNFILES environment variable
+# ==============================================================================
+{{initialize_runfiles}}
+
+# ==============================================================================
+# Prepare to run coverage program
+# ==============================================================================
+
+entry_point="$RUNFILES/{{workspace_name}}/{{entry_point_path}}"
+if [ ! -f "$entry_point" ]; then
+    printf "FATAL: the entry_point '%s' not found in runfiles" "$entry_point"
+    exit 1
+fi
+
+node="$RUNFILES/{{workspace_name}}/{{node}}"
+if [ ! -f "$node" ]; then
+    logf_fatal "node binary '%s' not found in runfiles" "$node"
+    exit 1
+fi
+if [ ! -x "$node" ]; then
+    logf_fatal "node binary '%s' is not executable" "$node"
+    exit 1
+fi
+
+# ==============================================================================
+# Run the coverage program
+# ==============================================================================
 
 "$node" "$entry_point"

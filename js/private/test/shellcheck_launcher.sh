@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
 
-# shellcheck disable=SC1090
-{
-
-# --- begin runfiles.bash initialization v2 ---
-set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
-source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
-source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
-source "$0.runfiles/$f" 2>/dev/null || \
-source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
-source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
-{ echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
-# --- end runfiles.bash initialization v2 ---
-
-}
-
 set -o pipefail -o errexit -o nounset
 
 export JS_BINARY__BINDIR="bazel-out/k8-fastbuild/bin"
@@ -141,7 +126,7 @@ trap _exit EXIT
 # ==============================================================================
 
 # It helps to determine if we are running on a Windows environment (excludes WSL as it acts like Unix)
-function is_windows {
+function _is_windows {
     case "$(uname -s)" in
         CYGWIN*)    local IS_WINDOWS=1 ;;
         MINGW*)     local IS_WINDOWS=1 ;;
@@ -157,7 +142,7 @@ function is_windows {
 #
 # Example:
 # C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
-function normalize_windows_path {
+function _normalize_windows_path {
     # Apply the followings paths transformations to normalize paths on Windows
     # -process driver letter
     # -convert path separator
@@ -191,9 +176,9 @@ if [ "${TEST_SRCDIR:-}" ]; then
     # Case 4, bazel has identified runfiles for us.
     RUNFILES="$TEST_SRCDIR"
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
-    if [ "$(is_windows)" -eq "1" ]; then
+    if [ "$(_is_windows)" -eq "1" ]; then
         # If Windows, normalize the path
-        NORMALIZED_RUNFILES_MANIFEST_FILE=$(normalize_windows_path "$RUNFILES_MANIFEST_FILE")
+        NORMALIZED_RUNFILES_MANIFEST_FILE=$(_normalize_windows_path "$RUNFILES_MANIFEST_FILE")
     else
         NORMALIZED_RUNFILES_MANIFEST_FILE="$RUNFILES_MANIFEST_FILE"
     fi
@@ -249,6 +234,7 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     RUNFILES="$PWD/$RUNFILES"
 fi
 export RUNFILES
+
 
 # ==============================================================================
 # Prepare to run main program
