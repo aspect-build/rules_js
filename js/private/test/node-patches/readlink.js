@@ -226,4 +226,19 @@ describe('testing readlink', async () => {
             }
         )
     })
+
+    await it('includes parent calls in stack traces', async function readlinkStackTest1() {
+        let err
+        try {
+            fs.readlinkSync(null)
+        } catch (e) {
+            err = e
+        } finally {
+            if (!err) assert.fail('readlinkSync should fail on invalid path')
+            if (!err.stack.includes('readlinkStackTest1'))
+                assert.fail(
+                    `readlinkSync error stack should contain calling method: ${err.stack}`
+                )
+        }
+    })
 })

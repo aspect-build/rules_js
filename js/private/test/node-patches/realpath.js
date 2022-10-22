@@ -900,4 +900,19 @@ describe('testing realpath', async () => {
             }
         )
     })
+
+    await it('includes parent calls in stack traces', async function realpathStackTest1() {
+        let err
+        try {
+            fs.realpathSync(null)
+        } catch (e) {
+            err = e
+        } finally {
+            if (!err) assert.fail('realpathSync should fail on invalid path')
+            if (!err.stack.includes('realpathStackTest1'))
+                assert.fail(
+                    `realpathSync error stack should contain calling method: ${err.stack}`
+                )
+        }
+    })
 })

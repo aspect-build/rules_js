@@ -216,4 +216,19 @@ describe('testing readdir', async () => {
             }
         )
     })
+
+    await it('includes parent calls in stack traces', async function readdirStackTest1() {
+        let err
+        try {
+            fs.readdirSync('/foo/bar' + Date.now())
+        } catch (e) {
+            err = e
+        } finally {
+            if (!err) assert.fail('readdirSync should fail on invalid path')
+            if (!err.stack.includes('readdirStackTest1'))
+                assert.fail(
+                    `readdirSync error stack should contain calling method: ${err.stack}`
+                )
+        }
+    })
 })

@@ -43,6 +43,61 @@ const util = require("util");
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
 const _fs = require('fs');
+/**
+ * Reduce the information in Errors to both hide the origin and improve performance.
+ * Any nested calls may be effected and also hidden.
+ *
+ * May potentially:
+ * - hide the function from stack traces
+ * - prevent errors thrown within the function from calculating stack traces
+ *
+ * TODO: currently can not hide computing of the stack trace within handleErrorFromBinding:
+ * - https://github.com/nodejs/node/blob/1b971883e0c86f37468e421ffe5f39b585782ad6/lib/internal/fs/utils.js#L340-L356
+ */
+function hideStackFrames(fn) {
+    const HiddenErrorProps = {
+        stackTraceLimit: {
+            // Minimize stack trace size similar to:
+            // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L508-L517
+            value: 0,
+            // Prevent setting an Infinite stackTraceLimit:
+            // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L193-L202
+            // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L470-L482
+            writable: false,
+        },
+        // Override stack construction with noop:
+        // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L135-L151
+        prepareStackTrace: {
+            value: () => '',
+            writable: true,
+        },
+    };
+    const UndefinedProp = {
+        value: undefined,
+        writable: true,
+    };
+    const defineProps = Object.defineProperties;
+    const getProp = Object.getOwnPropertyDescriptor;
+    // Prevent recording this function in the stack using '__node_internal_'
+    // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L398-L404
+    return function __node_internal_hideStackFrames() {
+        // Use `globalThis` like node:
+        // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L138-L142
+        const E = globalThis.Error;
+        const stackTraceLimit = getProp(E, 'stackTraceLimit') || UndefinedProp;
+        const prepareStackTrace = getProp(E, 'prepareStackTrace') || UndefinedProp;
+        defineProps(E, HiddenErrorProps);
+        try {
+            return fn.apply(this, arguments);
+        }
+        finally {
+            defineProps(E, {
+                stackTraceLimit,
+                prepareStackTrace,
+            });
+        }
+    };
+}
 const patcher = (fs = _fs, roots) => {
     fs = fs || _fs;
     roots = roots || [];
@@ -105,7 +160,7 @@ const patcher = (fs = _fs, roots) => {
         };
         origLstat(...args);
     };
-    fs.lstatSync = (...args) => {
+    fs.lstatSync = hideStackFrames((...args) => {
         const stats = origLstatSync(...args);
         if (!stats.isSymbolicLink()) {
             // the file is not a symbolic link so there is nothing more to do
@@ -130,7 +185,7 @@ const patcher = (fs = _fs, roots) => {
             }
             throw err;
         }
-    };
+    });
     // =========================================================================
     // fs.realpath
     // =========================================================================
@@ -174,22 +229,22 @@ const patcher = (fs = _fs, roots) => {
         };
         origRealpathNative(...args);
     };
-    fs.realpathSync = (...args) => {
+    fs.realpathSync = hideStackFrames((...args) => {
         const str = origRealpathSync(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
             return guardedRealPathSync(args[0], escapedRoot);
         }
         return str;
-    };
-    fs.realpathSync.native = (...args) => {
+    });
+    fs.realpathSync.native = hideStackFrames((...args) => {
         const str = origRealpathSyncNative(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
             return guardedRealPathSync(args[0], escapedRoot);
         }
         return str;
-    };
+    });
     // =========================================================================
     // fs.readlink
     // =========================================================================
@@ -239,7 +294,7 @@ const patcher = (fs = _fs, roots) => {
         };
         origReadlink(...args);
     };
-    fs.readlinkSync = (...args) => {
+    fs.readlinkSync = hideStackFrames((...args) => {
         const resolved = path.resolve(args[0]);
         const str = path.resolve(path.dirname(resolved), origReadlinkSync(...args));
         const escapedRoot = isEscape(resolved, str);
@@ -263,7 +318,7 @@ const patcher = (fs = _fs, roots) => {
             throw einval('readlink', args[0]);
         }
         return str;
-    };
+    });
     // =========================================================================
     // fs.readdir
     // =========================================================================
@@ -295,14 +350,14 @@ const patcher = (fs = _fs, roots) => {
         };
         origReaddir(...args);
     };
-    fs.readdirSync = (...args) => {
+    fs.readdirSync = hideStackFrames((...args) => {
         const res = origReaddirSync(...args);
         const p = path.resolve(args[0]);
         res.forEach((v) => {
             handleDirentSync(p, v);
         });
         return res;
-    };
+    });
     // =========================================================================
     // fs.opendir
     // =========================================================================
