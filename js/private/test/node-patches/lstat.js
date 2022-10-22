@@ -210,4 +210,19 @@ describe('testing lstat', async () => {
             }
         )
     })
+
+    await it('includes parent calls in stack traces', async function lstatStackTest1() {
+        let err
+        try {
+            fs.lstatSync(null)
+        } catch (e) {
+            err = e
+        } finally {
+            if (!err) assert.fail('lstat should fail on invalid path')
+            if (!err.stack.includes('lstatStackTest1'))
+                assert.fail(
+                    `lstat error stack should contain calling method: ${err.stack}`
+                )
+        }
+    })
 })
