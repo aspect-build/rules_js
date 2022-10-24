@@ -1,0 +1,100 @@
+load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+write_file(
+    name = "write_one",
+    out = "one.js",
+    content = ["1"],
+)
+
+js_binary(
+    name = "one",
+    entry_point = "one.js",
+)
+
+js_run_binary(
+    name = "capture_stderr",
+    log_level = "debug",
+    silent_on_success = False,
+    stderr = "stderr",
+    tool = ":one",
+)
+
+assert_contains(
+    name = "BAZEL_BINDIR_change_directory_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: changing directory to BAZEL_BINDIR",
+)
+
+assert_contains(
+    name = "BAZEL_BINDIR_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_BINDIR bazel-out/",
+)
+
+assert_contains(
+    name = "BAZEL_BUILD_FILE_PATH_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
+)
+
+assert_contains(
+    name = "BAZEL_PACKAGE_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_PACKAGE js/private/test/js_binary_sh",
+)
+
+assert_contains(
+    name = "BAZEL_TARGET_test",
+    actual = ":stderr",
+    expected = "INFO: aspect_rules_js[js_binary]: BAZEL_TARGET //js/private/test/js_binary_sh:capture_stderr",
+)
+
+assert_contains(
+    name = "BAZEL_TARGET_NAME_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_TARGET_NAME capture_stderr",
+)
+
+assert_contains(
+    name = "BAZEL_WORKSPACE_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_WORKSPACE aspect_rules_js",
+)
+
+assert_contains(
+    name = "js_binary_BAZEL_BINDIR_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary BINDIR bazel-out/",
+)
+
+assert_contains(
+    name = "js_binary_BAZEL_BUILD_FILE_PATH_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
+)
+
+assert_contains(
+    name = "js_binary_BAZEL_PACKAGE_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary PACKAGE js/private/test/js_binary_sh",
+)
+
+assert_contains(
+    name = "js_binary_BAZEL_TARGET_test",
+    actual = ":stderr",
+    expected = "INFO: aspect_rules_js[js_binary]: js_binary TARGET //js/private/test/js_binary_sh:one",
+)
+
+assert_contains(
+    name = "js_binary_BAZEL_TARGET_NAME_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary TARGET_NAME one",
+)
+
+assert_contains(
+    name = "js_binary_BAZEL_WORKSPACE_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary WORKSPACE aspect_rules_js",
+)
