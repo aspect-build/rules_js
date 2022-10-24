@@ -5,7 +5,9 @@ set -o pipefail -o errexit -o nounset
 export JS_BINARY__BINDIR="bazel-out/k8-fastbuild/bin"
 export JS_BINARY__BUILD_FILE_PATH="js/private/test/BUILD.bazel"
 export JS_BINARY__COMPILATION_MODE="fastbuild"
+export JS_BINARY__PACKAGE="js/private/test"
 export JS_BINARY__TARGET_CPU="k8"
+export JS_BINARY__TARGET_NAME="shellcheck_launcher"
 export JS_BINARY__TARGET="//js/private/test:shellcheck_launcher"
 export JS_BINARY__WORKSPACE="aspect_rules_js"
 if [[ -z "${JS_BINARY__PATCH_NODE_FS:-}" ]]; then export JS_BINARY__PATCH_NODE_FS="1"; fi
@@ -233,8 +235,12 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
     RUNFILES="$PWD/$RUNFILES"
 fi
-export RUNFILES
 
+
+# TODO(2.0): export only JS_BINARY__RUNFILES
+export RUNFILES
+JS_BINARY__RUNFILES="$RUNFILES"
+export JS_BINARY__RUNFILES
 
 # ==============================================================================
 # Prepare to run main program
@@ -260,11 +266,11 @@ if [[ "$PWD" == *"/bazel-out/"* ]]; then
         printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
         exit 1
     fi
-    execroot="${PWD:0:$index}"
+    JS_BINARY__EXECROOT="${PWD:0:$index}"
 else
     # We are in execroot or in some other context all together such as a nodejs_image or a manually
     # run js_binary.
-    execroot="$PWD"
+    JS_BINARY__EXECROOT="$PWD"
     if [ -z "${BAZEL_BINDIR:-}" ]; then
         logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
 run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
@@ -283,14 +289,15 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
     logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
     cd "$BAZEL_BINDIR"
 fi
+export JS_BINARY__EXECROOT
 
-entry_point="$RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
+entry_point="$JS_BINARY__RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
 if [ ! -f "$entry_point" ]; then
     logf_fatal "the entry_point '%s' not found in runfiles" "$entry_point"
     exit 1
 fi
 
-export JS_BINARY__NODE_BINARY="$RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
+export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
 if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
     exit 1
@@ -302,7 +309,7 @@ fi
 
 npm=
 if [ "$npm" ]; then
-    export JS_BINARY__NPM_BINARY="$RUNFILES/aspect_rules_js/"
+    export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/"
     if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
         logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
         exit 1
@@ -313,7 +320,7 @@ if [ "$npm" ]; then
     fi
 fi
 
-export JS_BINARY__NODE_WRAPPER="$RUNFILES/aspect_rules_js/js/private/test/shellcheck_launcher_node_bin/node"
+export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/aspect_rules_js/js/private/test/shellcheck_launcher_node_bin/node"
 if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
     exit 1
@@ -323,7 +330,7 @@ if [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
     exit 1
 fi
 
-export JS_BINARY__NODE_PATCHES="$RUNFILES/aspect_rules_js/js/private/node-patches/register.js"
+export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/aspect_rules_js/js/private/node-patches/register.js"
 if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
     logf_fatal "node patches '%s' not found in runfiles" "$JS_BINARY__NODE_PATCHES"
     exit 1
@@ -351,7 +358,7 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
 done
 
 # Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper
-export JS_BINARY__FS_PATCH_ROOTS="$execroot:$RUNFILES"
+export JS_BINARY__FS_PATCH_ROOTS="$JS_BINARY__EXECROOT:$JS_BINARY__RUNFILES"
 
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
@@ -368,33 +375,41 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     if [ "${BAZEL_BINDIR:-}" ]; then
         logf_debug "BAZEL_BINDIR %s" "${BAZEL_BINDIR:-}"
     fi
-    if [ "${BAZEL_TARGET_CPU:-}" ]; then
-        logf_debug "BAZEL_TARGET_CPU %s" "${BAZEL_TARGET_CPU:-}"
+    if [ "${BAZEL_BUILD_FILE_PATH:-}" ]; then
+        logf_debug "BAZEL_BUILD_FILE_PATH %s" "${BAZEL_BUILD_FILE_PATH:-}"
     fi
     if [ "${BAZEL_COMPILATION_MODE:-}" ]; then
         logf_debug "BAZEL_COMPILATION_MODE %s" "${BAZEL_COMPILATION_MODE:-}"
     fi
-    if [ "${BAZEL_WORKSPACE:-}" ]; then
-        logf_debug "BAZEL_WORKSPACE %s" "${BAZEL_WORKSPACE:-}"
-    fi
-    if [ "${BAZEL_BUILD_FILE_PATH:-}" ]; then
-        logf_debug "BAZEL_BUILD_FILE_PATH %s" "${BAZEL_BUILD_FILE_PATH:-}"
-    fi
     if [ "${BAZEL_INFO_FILE:-}" ]; then
         logf_debug "BAZEL_INFO_FILE %s" "${BAZEL_INFO_FILE:-}"
+    fi
+    if [ "${BAZEL_PACKAGE:-}" ]; then
+        logf_debug "BAZEL_PACKAGE %s" "${BAZEL_PACKAGE:-}"
+    fi
+    if [ "${BAZEL_TARGET_CPU:-}" ]; then
+        logf_debug "BAZEL_TARGET_CPU %s" "${BAZEL_TARGET_CPU:-}"
+    fi
+    if [ "${BAZEL_TARGET_NAME:-}" ]; then
+        logf_debug "BAZEL_TARGET_NAME %s" "${BAZEL_TARGET_NAME:-}"
     fi
     if [ "${BAZEL_VERSION_FILE:-}" ]; then
         logf_debug "BAZEL_VERSION_FILE %s" "${BAZEL_VERSION_FILE:-}"
     fi
-    logf_debug "binary target BINDIR %s" "${JS_BINARY__BINDIR:-}"
-    logf_debug "binary target TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
-    logf_debug "binary target COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
-    logf_debug "binary target WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
-    logf_debug "binary target BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
-    logf_debug "binary target node binary %s" "${JS_BINARY__NODE_BINARY:-}"
-    if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
-        logf_debug "binary target npm binary %s" "${JS_BINARY__NPM_BINARY:-}"
+    if [ "${BAZEL_WORKSPACE:-}" ]; then
+        logf_debug "BAZEL_WORKSPACE %s" "${BAZEL_WORKSPACE:-}"
     fi
+    logf_debug "js_binary BINDIR %s" "${JS_BINARY__BINDIR:-}"
+    logf_debug "js_binary BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
+    logf_debug "js_binary COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
+    logf_debug "js_binary NODE_BINARY %s" "${JS_BINARY__NODE_BINARY:-}"
+    if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
+        logf_debug "js_binary NPM_BINARY %s" "${JS_BINARY__NPM_BINARY:-}"
+    fi
+    logf_debug "js_binary PACKAGE %s" "${JS_BINARY__PACKAGE:-}"
+    logf_debug "js_binary TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
+    logf_debug "js_binary TARGET_NAME %s" "${JS_BINARY__TARGET_NAME:-}"
+    logf_debug "js_binary WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
 fi
 
 # Info logs
@@ -402,9 +417,9 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     if [ "${BAZEL_TARGET:-}" ]; then
         logf_info "BAZEL_TARGET %s" "${BAZEL_TARGET:-}"
     fi
-    logf_info "binary target %s" "${JS_BINARY__TARGET:-}"
-    logf_info "RUNFILES %s" "$RUNFILES"
-    logf_info "execroot %s" "$execroot"
+    logf_info "js_binary TARGET %s" "${JS_BINARY__TARGET:-}"
+    logf_info "js_binary RUNFILES %s" "$JS_BINARY__RUNFILES"
+    logf_info "js_binary EXECROOT %s" "$JS_BINARY__EXECROOT"
     logf_info "PWD %s" "$PWD"
 fi
 

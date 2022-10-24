@@ -221,7 +221,9 @@ def js_run_binary(
         "BAZEL_BINDIR": "$(BINDIR)",
         "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
         "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
+        "BAZEL_PACKAGE": native.package_name(),
         "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
+        "BAZEL_TARGET_NAME": name,
         "BAZEL_TARGET": "$(TARGET)",
         "BAZEL_WORKSPACE": "$(WORKSPACE)",
     }
