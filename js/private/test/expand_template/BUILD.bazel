@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
 load("//js/private:expand_template.bzl", "expand_template")
 
 expand_template(
@@ -10,9 +11,9 @@ expand_template(
         "{{VERSION}}": "v{{BUILD_SCM_VERSION}}",
     },
     substitutions = {
-        "{{WORKSPACE}}": "$(WORKSPACE)",
-        "{{VERSION}}": "v0.0.0",
         "{{TMPL_PATH}}": "$(rootpath a.tmpl)",
+        "{{VERSION}}": "v0.0.0",
+        "{{WORKSPACE}}": "$(WORKSPACE)",
     },
     template = "a.tmpl",
 )
@@ -32,9 +33,9 @@ expand_template(
         "{{VERSION}}": "v{{BUILD_SCM_VERSION}}",
     },
     substitutions = {
-        "{{WORKSPACE}}": "$(WORKSPACE)",
-        "{{VERSION}}": "v0.0.0",
         "{{TMPL_PATH}}": "$(rootpath a.tmpl)",
+        "{{VERSION}}": "v0.0.0",
+        "{{WORKSPACE}}": "$(WORKSPACE)",
     },
     template = "a.tmpl",
 )
@@ -43,4 +44,11 @@ diff_test(
     name = "a_test",
     file1 = ":a",
     file2 = "a_expected",
+)
+
+# This test requires that DefaultInfo be returned with the proper outputs.
+assert_contains(
+    name = "default_info_test",
+    actual = ":a_tmpl_stamp",
+    expected = "WORKSPACE:",
 )

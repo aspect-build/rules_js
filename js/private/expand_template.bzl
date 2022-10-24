@@ -49,6 +49,10 @@ def _impl(ctx):
             is_executable = ctx.attr.is_executable,
         )
 
+    all_outs = [ctx.outputs.out]
+    runfiles = ctx.runfiles(files = all_outs)
+    return [DefaultInfo(files = depset(all_outs), runfiles = runfiles)]
+
 expand_template_lib = struct(
     doc = """Template expansion with stamp var support.
 
@@ -65,18 +69,16 @@ If stamp attribute is True, stamp variable substitutions are supported with {{ST
 """,
     implementation = _impl,
     attrs = dict({
-        "template": attr.label(
-            doc = "The template file to expand.",
-            mandatory = True,
-            allow_single_file = True,
+        "data": attr.label_list(
+            doc = "List of targets for additional lookup information.",
+            allow_files = True,
         ),
-        "substitutions": attr.string_dict(
-            doc = """Mapping of strings to substitutions.
-            
-            Subtitutions can contain $(execpath :target) and $(rootpath :target)
-            expansions, $(MAKEVAR) expansions and {{STAMP_VAR}} expansions when
-            stamping is enabled for the target.
-            """,
+        "is_executable": attr.bool(
+            doc = "Whether to mark the output file as executable.",
+        ),
+        "out": attr.output(
+            doc = "Where to write the expanded file.",
+            mandatory = True,
         ),
         "stamp_substitutions": attr.string_dict(
             doc = """Mapping of strings to substitutions.
@@ -89,16 +91,18 @@ If stamp attribute is True, stamp variable substitutions are supported with {{ST
             stamping is enabled for the target.
             """,
         ),
-        "out": attr.output(
-            doc = "Where to write the expanded file.",
+        "substitutions": attr.string_dict(
+            doc = """Mapping of strings to substitutions.
+            
+            Subtitutions can contain $(execpath :target) and $(rootpath :target)
+            expansions, $(MAKEVAR) expansions and {{STAMP_VAR}} expansions when
+            stamping is enabled for the target.
+            """,
+        ),
+        "template": attr.label(
+            doc = "The template file to expand.",
             mandatory = True,
-        ),
-        "is_executable": attr.bool(
-            doc = "Whether to mark the output file as executable.",
-        ),
-        "data": attr.label_list(
-            doc = "List of targets for additional lookup information.",
-            allow_files = True,
+            allow_single_file = True,
         ),
         "_expand_template_binary": attr.label(
             executable = True,
