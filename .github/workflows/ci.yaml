@@ -12,51 +12,85 @@ on:
     workflow_dispatch:
 
 jobs:
-    # Dynamically generate a bit of JSON depending on whether our action has access to repository secrets.
-    # When running on a pull_request from a fork, the author is untrusted so the secret will be absent.
-    # Insanely complex for how simple this requirement is... inspired from
+    # matrix-prep-* steps dynamically generate a bit of JSON depending on whether our action has
+    # access to repository secrets. When running on a pull_request from a fork, the author is
+    # untrusted so the secret will be absent. Insanely complex for how simple this requirement is...
+    # inspired from
     # https://stackoverflow.com/questions/65384420/how-to-make-a-github-action-matrix-element-conditional
-    matrix-prep:
+
+    matrix-prep-config:
+        # Prepares the 'config' axis of the test matrix
         runs-on: ubuntu-latest
         env:
             ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
         steps:
             - id: local
               run: echo "::set-output name=config::local"
-            - id: maybe-rbe
-              if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
+            - id: rbe
               run: echo "::set-output name=config::rbe"
+              # Don't run RBE if there is now EngFlow creds which is the case on forks.
+              if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
         outputs:
             # Will look like '["local", "rbe"]'
             configs: ${{ toJSON(steps.*.outputs.config) }}
 
-    test:
-        # The type of runner that the job will run on
+    matrix-prep-folder:
+        # Prepares the 'folder' axis of the test matrix
         runs-on: ubuntu-latest
-        needs: matrix-prep
+        env:
+            ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+        steps:
+            - id: root
+              run: echo "::set-output name=folder::."
+            - id: bzlmod
+              run: echo "::set-output name=folder::e2e/bzlmod"
+            - id: js_image
+              run: echo "::set-output name=folder::e2e/js_image"
+            - id: js_run_devserver
+              run: echo "::set-output name=folder::e2e/js_run_devserver"
+            - id: npm_link_package-esm
+              run: echo "::set-output name=folder::e2e/npm_link_package-esm"
+            - id: npm_link_package
+              run: echo "::set-output name=folder::e2e/npm_link_package"
+            - id: npm_translate_lock_auth
+              run: echo "::set-output name=folder::e2e/npm_translate_lock_auth"
+              # Don't run e2e/npm_translate_lock_auth if there is no auth token secret which is the case on forks.
+              if: ${{ env.ASPECT_NPM_AUTH_TOKEN != '' }}
+            - id: npm_translate_lock
+              run: echo "::set-output name=folder::e2e/npm_translate_lock"
+            - id: npm_translate_package_lock
+              run: echo "::set-output name=folder::e2e/npm_translate_package_lock"
+            - id: npm_translate_yarn_lock
+              run: echo "::set-output name=folder::e2e/npm_translate_yarn_lock"
+            - id: package_json_module
+              run: echo "::set-output name=folder::e2e/package_json_module"
+            - id: pnpm_workspace_rerooted
+              run: echo "::set-output name=folder::e2e/pnpm_workspace_rerooted"
+            - id: pnpm_workspace
+              run: echo "::set-output name=folder::e2e/pnpm_workspace"
+            - id: rules_foo
+              run: echo "::set-output name=folder::e2e/rules_foo"
+        outputs:
+            # Will look like '[".", "e2e/bzlmod", ...]'
+            folders: ${{ toJSON(steps.*.outputs.folder) }}
+
+    test:
+        runs-on: ubuntu-latest
+
+        needs:
+            - matrix-prep-config
+            - matrix-prep-folder
 
         strategy:
             matrix:
-                config: ${{ fromJSON(needs.matrix-prep.outputs.configs) }}
-                folder:
-                    - '.'
-                    - 'e2e/bzlmod'
-                    - 'e2e/npm_link_package'
-                    - 'e2e/npm_link_package-esm'
-                    - 'e2e/pnpm_workspace'
-                    - 'e2e/pnpm_workspace_rerooted'
-                    - 'e2e/npm_translate_lock'
-                    - 'e2e/npm_translate_lock_auth'
-                    - 'e2e/npm_translate_package_lock'
-                    - 'e2e/npm_translate_yarn_lock'
-                    - 'e2e/package_json_module'
-                    - 'e2e/rules_foo'
-                    - 'e2e/js_image'
+                config: ${{ fromJSON(needs.matrix-prep-config.outputs.configs) }}
+                folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folders) }}
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v3
+
             - name: Mount bazel caches
               uses: actions/cache@v3
               with:
@@ -65,8 +99,10 @@ jobs:
                       ~/.cache/bazel-repo
                   key: bazel-cache-${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', '**/*.js') }}
                   restore-keys: bazel-cache-
-            - name: Write engflow credentials
-              if: ${{ matrix.config == 'rbe' }}
+
+            - name: Write EngFlow credentials
+              # Writes EngFlow credential files for RBE configurations
+              if: matrix.config == 'rbe'
               working-directory: ${{ matrix.folder }}
               run: |
                   touch engflow.crt engflow.key
@@ -77,28 +113,47 @@ jobs:
               env:
                   ENGFLOW_CLIENT_CRT: ${{ secrets.ENGFLOW_CLIENT_CRT }}
                   ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
-            - name: bazel test //...
+
+            - name: Check for test.sh
+              # Checks for the existence of test.sh in the folder. Downstream steps can use
+              # steps.has_test_sh.outputs.files_exists as a conditional.
+              id: has_test_sh
+              uses: andstor/file-existence-action@v1
+              with:
+                  files: '${{ matrix.folder }}/test.sh'
+
+            - name: ./test.sh
+              # Run if there is a test.sh file in the folder.
+              if: steps.has_test_sh.outputs.files_exists == 'true'
+              working-directory: ${{ matrix.folder }}
+              shell: bash
+              run: ./test.sh
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+
+            - name: bazel test //...
+              # Don't run if there is a test.sh file in the folder.
+              if: steps.has_test_sh.outputs.files_exists != 'true'
               working-directory: ${{ matrix.folder }}
-              # Don't run e2e/npm_translate_lock_auth unless there is an auth token secret; this won't
-              # be set on forks
-              if: ${{ matrix.folder != 'e2e/npm_translate_lock_auth' || env.ASPECT_NPM_AUTH_TOKEN != ''}}
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }}  //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
-
-            - name: bazel coverage //...
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+
+            - name: bazel coverage //...
+              # Don't run if there is a test.sh file in the folder.
+              # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
+              if: steps.has_test_sh.outputs.files_exists != 'true' && matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
-              # Coverage does not work properly with RBE. See: bazelbuild/bazel#4685
-              if: ${{ matrix.config == 'local' }}
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} --instrument_test_targets //...
+              env:
+                  # Bazelisk will download bazel to here
+                  XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
