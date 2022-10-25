@@ -1,2 +1,1 @@
-6.0.0-pre.20220922.1
-# Bazel 5.3.0 has bzlmod bugs so we use 6.0 prerelease
+../../.bazelversion
