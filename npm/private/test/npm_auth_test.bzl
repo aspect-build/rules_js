@@ -182,7 +182,7 @@ def _pkg_scope_test_impl(ctx):
         (
             {},
             {
-                "@scope1": "registry1",
+                "@scope1": "https://registry1",
             },
         ),
         get_npm_auth(
@@ -199,8 +199,8 @@ def _pkg_scope_test_impl(ctx):
         (
             {},
             {
-                "@scope1": "registry1",
-                "@scope2": "registry2",
+                "@scope1": "https://registry1",
+                "@scope2": "https://registry2",
             },
         ),
         get_npm_auth(
@@ -218,8 +218,50 @@ def _pkg_scope_test_impl(ctx):
         (
             {},
             {
-                "@scope1": "registry/scope1",
-                "@scope2": "registry/scope2",
+                "@scope1": "https://registry/scope1",
+                "@scope2": "https://registry/scope2",
+            },
+        ),
+        get_npm_auth(
+            {
+                "@scope1:registry": "https://registry/scope1",
+                "@scope2:registry": "https://registry/scope2",
+            },
+            "",
+            {},
+        ),
+    )
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "@scope1": "http://registry/scope1",
+                "@scope2": "https://registry/scope2",
+                "@scope3": "//registry/scope3",
+                "@scope4": "https://registry4.com",
+            },
+        ),
+        get_npm_auth(
+            {
+                "@scope1:registry": "http://registry/scope1",
+                "@scope2:registry": "https://registry/scope2",
+                "@scope3:registry": "//registry/scope3",
+                "@scope4:registry": "registry4.com",
+            },
+            "",
+            {},
+        ),
+    )
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "@scope1": "https://registry/scope1",
+                "@scope2": "https://registry/scope2",
             },
         ),
         get_npm_auth(

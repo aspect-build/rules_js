@@ -7,7 +7,8 @@ load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-DEFAULT_REGISTRY = "https://registry.npmjs.org/"
+DEFAULT_REGISTRY_PROTOCOL = "https"
+DEFAULT_REGISTRY = "%s://registry.npmjs.org/" % DEFAULT_REGISTRY_PROTOCOL
 
 _ATTRS = {
     "pnpm_lock": attr.label(),
@@ -212,10 +213,13 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             # scope: @myorg
             # registry: somewhere-else.com/myorg
             scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
-            registry = v.split("//", 1)[-1]
+            registry = _to_registry_url(v)
             registries[scope] = registry
 
     return (tokens, registries)
+
+def _to_registry_url(url):
+    return "%s://%s" % (DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
 
 def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
@@ -340,8 +344,7 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
                     url = tarball
             else:
                 if not registry:
-                    (scope, _) = utils.parse_package_name(name)
-                    registry = "https://{}".format(registries[scope]) if scope in registries else default_registry
+                    registry = utils.npm_registry_url(name, registries, default_registry)
                 url = "{0}/{1}".format(registry.removesuffix("/"), tarball)
 
         result.append(struct(
@@ -483,7 +486,7 @@ def _impl(rctx):
         (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
         if "registry" in npmrc:
-            default_registry = npmrc["registry"]
+            default_registry = _to_registry_url(npmrc["registry"])
 
     _validate_attrs(rctx)
 
