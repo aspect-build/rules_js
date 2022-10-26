@@ -10,7 +10,7 @@ build:local --disk_cache=~/.cache/bazel
 
 # Generic remote cache
 build --remote_local_fallback
-build --remote_download_toplevel
+# build --remote_download_toplevel # BREAKS BUILD in Bazel 6.0.0rc1
 build --remote_timeout=3600
 build --remote_upload_local_results
 ## Fixes builds hanging on CI that get the TCP connection closed without sending RST packets.

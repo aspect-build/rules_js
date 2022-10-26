@@ -28,11 +28,24 @@ jobs:
               run: echo "::set-output name=config::local"
             - id: rbe
               run: echo "::set-output name=config::rbe"
-              # Don't run RBE if there is now EngFlow creds which is the case on forks.
+              # Don't run RBE if there are no EngFlow creds which is the case on forks
               if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
         outputs:
             # Will look like '["local", "rbe"]'
             configs: ${{ toJSON(steps.*.outputs.config) }}
+
+    matrix-prep-bazelversion:
+        # Prepares the 'bazelversion' axis of the test matrix
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - id: bazel_6
+              run: echo "::set-output name=bazelversion::$(head -n 1 .bazelversion)"
+            - id: bazel_5
+              run: echo "::set-output name=bazelversion::5.3.2"
+        outputs:
+            # Will look like '["6.0.0rc1", "5.3.2"]'
+            bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
 
     matrix-prep-folder:
         # Prepares the 'folder' axis of the test matrix
@@ -79,12 +92,22 @@ jobs:
 
         needs:
             - matrix-prep-config
+            - matrix-prep-bazelversion
             - matrix-prep-folder
 
         strategy:
+            fail-fast: false
             matrix:
                 config: ${{ fromJSON(needs.matrix-prep-config.outputs.configs) }}
+                bazelversion: ${{ fromJSON(needs.matrix-prep-bazelversion.outputs.bazelversions) }}
                 folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folders) }}
+                exclude:
+                    # Don't test RBE with Bazel 5 (not supported)
+                    - config: rbe
+                      bazelversion: 5.3.2
+                    # Don't test bzlmod with Bazel 5 (not supported)
+                    - bazelversion: 5.3.2
+                      folder: e2e/bzlmod
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
@@ -100,6 +123,10 @@ jobs:
                   key: bazel-cache-${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', '**/*.js') }}
                   restore-keys: bazel-cache-
 
+            - name: Configure Bazel version
+              working-directory: ${{ matrix.folder }}
+              run: echo "USE_BAZEL_VERSION=${{ matrix.bazelversion }}" >> $GITHUB_ENV
+
             - name: Write EngFlow credentials
               # Writes EngFlow credential files for RBE configurations
               if: matrix.config == 'rbe'
@@ -109,7 +136,6 @@ jobs:
                   chmod 0600 engflow.crt engflow.key
                   echo "$ENGFLOW_CLIENT_CRT" > engflow.crt
                   echo "$ENGFLOW_PRIVATE_KEY" > engflow.key
-                  echo "USE_BAZEL_VERSION=6.0.0-pre.20220922.1" >> $GITHUB_ENV
               env:
                   ENGFLOW_CLIENT_CRT: ${{ secrets.ENGFLOW_CLIENT_CRT }}
                   ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
@@ -148,6 +174,7 @@ jobs:
             - name: bazel coverage //...
               # Don't run if there is a test.sh file in the folder.
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
+              # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               if: steps.has_test_sh.outputs.files_exists != 'true' && matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
               run: |
