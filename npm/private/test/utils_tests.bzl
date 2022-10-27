@@ -66,6 +66,41 @@ def test_parse_package_name(ctx):
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
+def test_npm_registry_url(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(
+        env,
+        "https://default",
+        utils.npm_registry_url("a", {}, "https://default"),
+    )
+    asserts.equals(
+        env,
+        "http://default",
+        utils.npm_registry_url("a", {}, "http://default"),
+    )
+    asserts.equals(
+        env,
+        "//default",
+        utils.npm_registry_url("a", {}, "//default"),
+    )
+    asserts.equals(
+        env,
+        "https://default",
+        utils.npm_registry_url("@a/b", {}, "https://default"),
+    )
+    asserts.equals(
+        env,
+        "https://default",
+        utils.npm_registry_url("@a/b", {"@ab": "not me"}, "https://default"),
+    )
+    asserts.equals(
+        env,
+        "https://scoped-registry",
+        utils.npm_registry_url("@a/b", {"@a": "https://scoped-registry"}, "https://default"),
+    )
+    return unittest.end(env)
+
+# buildifier: disable=function-docstring
 def test_npm_registry_download_url(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
@@ -75,13 +110,23 @@ def test_npm_registry_download_url(ctx):
     )
     asserts.equals(
         env,
+        "http://registry.npmjs.org/y/-/y-1.2.3.tgz",
+        utils.npm_registry_download_url("y", "1.2.3", {}, "http://registry.npmjs.org/"),
+    )
+    asserts.equals(
+        env,
         "https://registry.npmjs.org/@scope/y/-/y-1.2.3.tgz",
         utils.npm_registry_download_url("@scope/y", "1.2.3", {}, "https://registry.npmjs.org/"),
     )
     asserts.equals(
         env,
+        "https://registry.npmjs.org/@scope/y/-/y-1.2.3.tgz",
+        utils.npm_registry_download_url("@scope/y", "1.2.3", {"@scopyy": "foobar"}, "https://registry.npmjs.org/"),
+    )
+    asserts.equals(
+        env,
         "https://npm.pkg.github.com/@scope/y/-/y-1.2.3.tgz",
-        utils.npm_registry_download_url("@scope/y", "1.2.3", {"@scope": "npm.pkg.github.com/"}, "https://registry.npmjs.org/"),
+        utils.npm_registry_download_url("@scope/y", "1.2.3", {"@scope": "https://npm.pkg.github.com/"}, "https://registry.npmjs.org/"),
     )
     asserts.equals(
         env,
@@ -98,6 +143,7 @@ t4_test = unittest.make(test_virtual_store_name)
 t5_test = unittest.make(test_version_supported)
 t6_test = unittest.make(test_parse_package_name)
 t7_test = unittest.make(test_npm_registry_download_url)
+t8_test = unittest.make(test_npm_registry_url)
 
 def utils_tests(name):
     unittest.suite(
@@ -110,4 +156,5 @@ def utils_tests(name):
         t5_test,
         t6_test,
         t7_test,
+        t8_test,
     )
