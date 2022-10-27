@@ -126,6 +126,9 @@ def _impl(ctx):
             runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
         ),
         js_info(
+            # assume a directory contains declarations since we can't know that it doesn't
+            declarations = files_depset,
+            transitive_declarations = transitive_files_depset,
             npm_linked_package_files = files_depset,
             npm_linked_packages = depset([npm_linked_package_info]),
             npm_package_store_deps = depset([store_info]),
