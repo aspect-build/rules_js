@@ -37,11 +37,17 @@ def _declarations_test_impl(ctx):
     asserts.true(env, declarations[0].path.find("/importing.d.ts") != -1)
     asserts.true(env, declarations[1].path.find("/data.json") != -1)
 
-    # declarations should only have the source declarations
+    # transitive_declarations should have the source declarations and transitive declarations
     transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
-    asserts.equals(env, 2, len(transitive_declarations))
+
+    # the transitive count might be 3 or 4 depending on the type of symlink created.
+    # See utils.make_symlink()
+    asserts.true(env, len(transitive_declarations) == 3 or len(transitive_declarations) == 4)
     asserts.true(env, transitive_declarations[0].path.find("/importing.d.ts") != -1)
     asserts.true(env, transitive_declarations[1].path.find("/data.json") != -1)
+    asserts.true(env, transitive_declarations[2].path.find("/@types/node") != -1)
+    if len(transitive_declarations) == 4:
+        asserts.true(env, transitive_declarations[3].path.find("/@types/node") != -1)
 
     # types OutputGroupInfo should be the same as direct declarations
     asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
