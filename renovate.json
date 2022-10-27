@@ -20,21 +20,21 @@
             "stabilityDays": 3
         },
         {
-            "matchPackagePatterns": [
-                "^rollup$",
-                "^rollup-",
-                "^@rollup/",
-                ".*-rollup-"
-            ],
-            "groupName": "rollup",
-            "groupSlug": "rollup"
+            "matchPackagePatterns": ["*"],
+            "matchUpdateTypes": ["patch"],
+            "groupName": "all patch updates",
+            "groupSlug": "all-patch"
         },
         {
-            "groupName": "Aspect rules",
-            "groupSlug": "aspect_rules",
-            "matchManagers": ["bazel"],
-            "matchPackageNames": ["^aspect_"],
-            "matchUpdateTypes": ["patch", "minor"]
+            "groupName": "rollup",
+            "groupSlug": "rollup",
+            "matchPackageNames": ["rollup"],
+            "matchPackagePatterns": ["^rollup-", "^@rollup/", "-rollup-"]
+        },
+        {
+            "gorupName": "Webpack",
+            "groupSlug": "webpack",
+            "matchPackagePatterns": ["^webpack-", "^@webpack-cli/", "-webpack-"]
         },
         {
             "groupName": "Bazel rules",
@@ -43,10 +43,11 @@
             "matchUpdateTypes": ["patch", "minor"]
         },
         {
-            "matchPackagePatterns": ["*"],
-            "matchUpdateTypes": ["patch"],
-            "groupName": "all patch updates",
-            "groupSlug": "all-patch"
+            "groupName": "Aspect rules",
+            "groupSlug": "aspect_rules",
+            "matchManagers": ["bazel"],
+            "matchPackagePatterns": ["^aspect_"],
+            "matchUpdateTypes": ["patch", "minor"]
         }
     ]
 }
