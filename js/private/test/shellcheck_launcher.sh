@@ -128,27 +128,26 @@ trap _exit EXIT
 # ==============================================================================
 
 # It helps to determine if we are running on a Windows environment (excludes WSL as it acts like Unix)
-function _is_windows {
-    case "$(uname -s)" in
-        CYGWIN*)    local IS_WINDOWS=1 ;;
-        MINGW*)     local IS_WINDOWS=1 ;;
-        MSYS_NT*)   local IS_WINDOWS=1 ;;
-        *)          local IS_WINDOWS=0 ;;
-    esac
-
-    echo $IS_WINDOWS
-    return
-}
+case "$(uname -s)" in
+    CYGWIN*)    _IS_WINDOWS=1 ;;
+    MINGW*)     _IS_WINDOWS=1 ;;
+    MSYS_NT*)   _IS_WINDOWS=1 ;;
+    *)          _IS_WINDOWS=0 ;;
+esac
 
 # It helps to normalizes paths when running on Windows.
 #
 # Example:
 # C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
-function _normalize_windows_path {
-    # Apply the followings paths transformations to normalize paths on Windows
-    # -process driver letter
-    # -convert path separator
-    sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<< "$1"
+function _normalize_path {
+    if [ "$_IS_WINDOWS" -eq "1" ]; then
+        # Apply the followings paths transformations to normalize paths on Windows
+        # -process driver letter
+        # -convert path separator
+        sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<< "$1"
+    else
+        echo "$1"
+    fi
     return
 }
 
@@ -176,22 +175,17 @@ function _normalize_windows_path {
 # Case 6a is handled like case 3.
 if [ "${TEST_SRCDIR:-}" ]; then
     # Case 4, bazel has identified runfiles for us.
-    RUNFILES="$TEST_SRCDIR"
+    RUNFILES=$(_normalize_path "$TEST_SRCDIR")
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
-    if [ "$(_is_windows)" -eq "1" ]; then
-        # If Windows, normalize the path
-        NORMALIZED_RUNFILES_MANIFEST_FILE=$(_normalize_windows_path "$RUNFILES_MANIFEST_FILE")
-    else
-        NORMALIZED_RUNFILES_MANIFEST_FILE="$RUNFILES_MANIFEST_FILE"
-    fi
-    if [[ "${NORMALIZED_RUNFILES_MANIFEST_FILE}" == *.runfiles_manifest ]]; then
+    RUNFILES=$(_normalize_path "$RUNFILES_MANIFEST_FILE")
+    if [[ "${RUNFILES}" == *.runfiles_manifest ]]; then
         # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
         # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
         # runfiles directory and named my_binary.runfiles_manifest
-        RUNFILES=${NORMALIZED_RUNFILES_MANIFEST_FILE%_manifest}
-    elif [[ "${NORMALIZED_RUNFILES_MANIFEST_FILE}" == */MANIFEST ]]; then
+        RUNFILES=${RUNFILES%_manifest}
+    elif [[ "${RUNFILES}" == */MANIFEST ]]; then
         # Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
-        RUNFILES=${NORMALIZED_RUNFILES_MANIFEST_FILE%/MANIFEST}
+        RUNFILES=${RUNFILES%/MANIFEST}
     else
         logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
         exit 1
@@ -229,6 +223,8 @@ else
         logf_fatal "RUNFILES environment variable is not set"
         exit 1
     fi
+
+    RUNFILES=$(_normalize_path "$RUNFILES")
 fi
 if [ "${RUNFILES:0:1}" != "/" ]; then
     # Ensure RUNFILES set above is an absolute path. It may be a path relative
@@ -302,7 +298,7 @@ if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
     exit 1
 fi
-if [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
+if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' is not executable" "$JS_BINARY__NODE_BINARY"
     exit 1
 fi
@@ -314,7 +310,7 @@ if [ "$npm" ]; then
         logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
-    if [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
+    if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
@@ -325,7 +321,7 @@ if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi
-if [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
+if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' is not executable" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi

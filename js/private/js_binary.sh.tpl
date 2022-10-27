@@ -183,7 +183,7 @@ if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
     exit 1
 fi
-if [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
+if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' is not executable" "$JS_BINARY__NODE_BINARY"
     exit 1
 fi
@@ -195,7 +195,7 @@ if [ "$npm" ]; then
         logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
-    if [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
+    if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
@@ -206,7 +206,7 @@ if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi
-if [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
+if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' is not executable" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi
