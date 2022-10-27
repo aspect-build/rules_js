@@ -32,7 +32,7 @@
             "matchPackagePatterns": ["^rollup-", "^@rollup/", "-rollup-"]
         },
         {
-            "gorupName": "Webpack",
+            "groupName": "Webpack",
             "groupSlug": "webpack",
             "matchPackagePatterns": ["^webpack-", "^@webpack-cli/", "-webpack-"]
         },
