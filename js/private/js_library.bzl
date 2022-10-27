@@ -214,6 +214,7 @@ def _js_library_impl(ctx):
         ),
         OutputGroupInfo(
             types = declarations,
+            runfiles = runfiles.files,
         ),
     ]
 
