@@ -25,9 +25,9 @@ jobs:
             ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
         steps:
             - id: local
-              run: echo "::set-output name=config::local"
+              run: echo "config=local" >> $GITHUB_OUTPUT
             - id: rbe
-              run: echo "::set-output name=config::rbe"
+              run: echo "config=rbe" >> $GITHUB_OUTPUT
               # Don't run RBE if there are no EngFlow creds which is the case on forks
               if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
         outputs:
@@ -40,9 +40,9 @@ jobs:
         steps:
             - uses: actions/checkout@v3
             - id: bazel_6
-              run: echo "::set-output name=bazelversion::$(head -n 1 .bazelversion)"
+              run: echo "bazelversion=$(head -n 1 .bazelversion)" >> $GITHUB_OUTPUT
             - id: bazel_5
-              run: echo "::set-output name=bazelversion::5.3.2"
+              run: echo "bazelversion=5.3.2" >> $GITHUB_OUTPUT
         outputs:
             # Will look like '["6.0.0rc1", "5.3.2"]'
             bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
@@ -54,35 +54,35 @@ jobs:
             ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
         steps:
             - id: root
-              run: echo "::set-output name=folder::."
+              run: echo "folder=." >> $GITHUB_OUTPUT
             - id: bzlmod
-              run: echo "::set-output name=folder::e2e/bzlmod"
+              run: echo "folder=e2e/bzlmod" >> $GITHUB_OUTPUT
             - id: js_image
-              run: echo "::set-output name=folder::e2e/js_image"
+              run: echo "folder=e2e/js_image" >> $GITHUB_OUTPUT
             - id: js_run_devserver
-              run: echo "::set-output name=folder::e2e/js_run_devserver"
+              run: echo "folder=e2e/js_run_devserver" >> $GITHUB_OUTPUT
             - id: npm_link_package-esm
-              run: echo "::set-output name=folder::e2e/npm_link_package-esm"
+              run: echo "folder=e2e/npm_link_package-esm" >> $GITHUB_OUTPUT
             - id: npm_link_package
-              run: echo "::set-output name=folder::e2e/npm_link_package"
+              run: echo "folder=e2e/npm_link_package" >> $GITHUB_OUTPUT
             - id: npm_translate_lock_auth
-              run: echo "::set-output name=folder::e2e/npm_translate_lock_auth"
+              run: echo "folder=e2e/npm_translate_lock_auth" >> $GITHUB_OUTPUT
               # Don't run e2e/npm_translate_lock_auth if there is no auth token secret which is the case on forks.
               if: ${{ env.ASPECT_NPM_AUTH_TOKEN != '' }}
             - id: npm_translate_lock
-              run: echo "::set-output name=folder::e2e/npm_translate_lock"
+              run: echo "folder=e2e/npm_translate_lock" >> $GITHUB_OUTPUT
             - id: npm_translate_package_lock
-              run: echo "::set-output name=folder::e2e/npm_translate_package_lock"
+              run: echo "folder=e2e/npm_translate_package_lock" >> $GITHUB_OUTPUT
             - id: npm_translate_yarn_lock
-              run: echo "::set-output name=folder::e2e/npm_translate_yarn_lock"
+              run: echo "folder=e2e/npm_translate_yarn_lock" >> $GITHUB_OUTPUT
             - id: package_json_module
-              run: echo "::set-output name=folder::e2e/package_json_module"
+              run: echo "folder=e2e/package_json_module" >> $GITHUB_OUTPUT
             - id: pnpm_workspace_rerooted
-              run: echo "::set-output name=folder::e2e/pnpm_workspace_rerooted"
+              run: echo "folder=e2e/pnpm_workspace_rerooted" >> $GITHUB_OUTPUT
             - id: pnpm_workspace
-              run: echo "::set-output name=folder::e2e/pnpm_workspace"
+              run: echo "folder=e2e/pnpm_workspace" >> $GITHUB_OUTPUT
             - id: rules_foo
-              run: echo "::set-output name=folder::e2e/rules_foo"
+              run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
         outputs:
             # Will look like '[".", "e2e/bzlmod", ...]'
             folders: ${{ toJSON(steps.*.outputs.folder) }}
