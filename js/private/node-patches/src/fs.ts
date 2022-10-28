@@ -168,7 +168,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origLstat(...args)
     }
 
-    fs.lstatSync = hideStackFrames((...args: any[]) => {
+    fs.lstatSync = hideStackFrames(function _lstatSync(...args: any[]) {
         const stats = origLstatSync(...args)
 
         if (!stats.isSymbolicLink()) {
@@ -258,7 +258,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origRealpathNative(...args)
     }
 
-    fs.realpathSync = hideStackFrames((...args: any[]) => {
+    fs.realpathSync = hideStackFrames(function _realpathSync(...args: any[]) {
         const str = origRealpathSync(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
@@ -267,7 +267,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         return str
     })
 
-    fs.realpathSync.native = hideStackFrames((...args: any[]) => {
+    fs.realpathSync.native = hideStackFrames(function _native_realpathSync(
+        ...args: any[]
+    ) {
         const str = origRealpathSyncNative(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
@@ -331,7 +333,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origReadlink(...args)
     }
 
-    fs.readlinkSync = hideStackFrames((...args: any[]) => {
+    fs.readlinkSync = hideStackFrames(function _readlinkSync(...args: any[]) {
         const resolved = path.resolve(args[0])
 
         const str = path.resolve(
@@ -399,7 +401,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origReaddir(...args)
     }
 
-    fs.readdirSync = hideStackFrames((...args: any[]) => {
+    fs.readdirSync = hideStackFrames(function _readdirSync(...args: any[]) {
         const res = origReaddirSync(...args)
         const p = path.resolve(args[0])
         res.forEach((v: Dirent | any) => {
