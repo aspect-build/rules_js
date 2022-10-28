@@ -160,7 +160,7 @@ const patcher = (fs = _fs, roots) => {
         };
         origLstat(...args);
     };
-    fs.lstatSync = hideStackFrames((...args) => {
+    fs.lstatSync = hideStackFrames(function _lstatSync(...args) {
         const stats = origLstatSync(...args);
         if (!stats.isSymbolicLink()) {
             // the file is not a symbolic link so there is nothing more to do
@@ -229,7 +229,7 @@ const patcher = (fs = _fs, roots) => {
         };
         origRealpathNative(...args);
     };
-    fs.realpathSync = hideStackFrames((...args) => {
+    fs.realpathSync = hideStackFrames(function _realpathSync(...args) {
         const str = origRealpathSync(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
@@ -237,7 +237,7 @@ const patcher = (fs = _fs, roots) => {
         }
         return str;
     });
-    fs.realpathSync.native = hideStackFrames((...args) => {
+    fs.realpathSync.native = hideStackFrames(function _native_realpathSync(...args) {
         const str = origRealpathSyncNative(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
@@ -294,7 +294,7 @@ const patcher = (fs = _fs, roots) => {
         };
         origReadlink(...args);
     };
-    fs.readlinkSync = hideStackFrames((...args) => {
+    fs.readlinkSync = hideStackFrames(function _readlinkSync(...args) {
         const resolved = path.resolve(args[0]);
         const str = path.resolve(path.dirname(resolved), origReadlinkSync(...args));
         const escapedRoot = isEscape(resolved, str);
@@ -350,7 +350,7 @@ const patcher = (fs = _fs, roots) => {
         };
         origReaddir(...args);
     };
-    fs.readdirSync = hideStackFrames((...args) => {
+    fs.readdirSync = hideStackFrames(function _readdirSync(...args) {
         const res = origReaddirSync(...args);
         const p = path.resolve(args[0]);
         res.forEach((v) => {
