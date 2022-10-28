@@ -4,6 +4,7 @@ js_binary examples
 Simple examples of running JS programs in node with js_binary, js_run_binary, and js_test.
 """
 
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
@@ -69,7 +70,7 @@ diff_test(
     file2 = "out2",
 )
 
-# Also test with local (no sandbox) exection by setting execution_requirements "local" to "1".
+# Also test with local (no sandbox) execution by setting execution_requirements "local" to "1".
 # Bazel sets different environment variables in this case such as RUNFILES_MANIFEST_FILE.
 # This case tests for regression of the fix in https://github.com/aspect-build/rules_js/pull/323.
 js_run_binary(
@@ -93,6 +94,41 @@ diff_test(
     name = "test_js_binary_under_js_run_binary_local",
     file1 = "//examples:expected_one_ast.json",
     file2 = "out2_local",
+)
+
+# Also test with copy_data_to_bin disabled
+copy_to_bin(
+    name = "require_acorn_js",
+    srcs = ["require_acorn.js"],
+)
+
+js_binary(
+    name = "bin_no_copy_data_to_bin",
+    copy_data_to_bin = False,
+    # Reference the location where the acorn npm module was linked in the root Bazel package
+    data = ["//:node_modules/acorn"],
+    entry_point = ":require_acorn_js",
+)
+
+js_run_binary(
+    name = "run2_no_copy_data_to_bin",
+    srcs = [],
+    outs = ["out2_no_copy_data_to_bin"],
+    # Uncomment the setting below to see debug output even on a
+    # successful run of the build action.
+    # silent_on_success = False,
+    allow_execroot_entry_point_with_no_copy_data_to_bin = True,
+    args = ["out2_no_copy_data_to_bin"],
+    chdir = package_name(),
+    # Request that the rules_js launcher prints extra information
+    log_level = "debug",
+    tool = ":bin_no_copy_data_to_bin",
+)
+
+diff_test(
+    name = "test_js_binary_under_js_run_binary_no_copy_data_to_bin",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = "out2_no_copy_data_to_bin",
 )
 
 ################################
@@ -502,7 +538,6 @@ js_test(
     entry_point = "npm_version_test.js",
     include_npm = True,
 )
-
 
 ####################################################
 # Use case 13

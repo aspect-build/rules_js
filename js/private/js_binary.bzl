@@ -179,17 +179,19 @@ _ATTRS = {
         default = True,
     ),
     "copy_data_to_bin": attr.bool(
-        doc = """When True, data files and the entry_point file are copied to the Bazel output tree before being passed
+        doc = """When True, `data` files and the `entry_point` file are copied to the Bazel output tree before being passed
         as inputs to runfiles.
 
-        Ideally, the default for this would be False as it is optimal, but there is a yet unresloved issue of ESM imports
-        skirting the node fs patches and escaping the sandbox: https://github.com/aspect-build/rules_js/issues/362.
-        This is hit in some test popular runners such as mocha, which use native `import()` statements
-        (https://github.com/aspect-build/rules_js/pull/353). 
+        Defaults to True so that a `js_binary` with the default value is compatible with `js_run_binary` with
+        `use_execroot_entry_point` set to True, the default there.
 
-        A default of True will prevent program such as mocha from following symlinks into the source tree. They will
-        escape the sandbox but they will end up in the output tree where node_modules and other inputs required will be
-        available. With this in mind, the default will remain true until issue #362 is resolved.
+        Setting this to False is more optimal in terms of inputs, but there is a yet unresolved issue of ESM imports
+        skirting the node fs patches and escaping the sandbox: https://github.com/aspect-build/rules_js/issues/362.
+        This is hit in some popular test runners such as mocha, which use native `import()` statements
+        (https://github.com/aspect-build/rules_js/pull/353). When set to False, a program such as mocha that uses ESM
+        imports may escape the execroot by following symlinks into the source tree. When set to True, such a program
+        would escape the sandbox but will end up in the output tree where `node_modules` and other inputs required
+        will be available.
         """,
         default = True,
     ),
@@ -279,6 +281,10 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             var = "JS_BINARY__EXPECTED_EXIT_CODE",
             value = str(ctx.attr.expected_exit_code),
         ))
+
+    if ctx.attr.copy_data_to_bin:
+        # Set an environment variable to flag that we have copied js_binary data to bin
+        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", value = "1"))
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override

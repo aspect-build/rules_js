@@ -16,6 +16,7 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_binary_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_filegroup.bzl", _js_filegroup = "js_filegroup")
+load(":js_library.bzl", _js_library = "js_library")
 
 def js_run_binary(
         name,
@@ -30,6 +31,7 @@ def js_run_binary(
         stderr = None,
         exit_code_out = None,
         silent_on_success = True,
+        use_execroot_entry_point = True,
         copy_srcs_to_bin = True,
         include_transitive_sources = True,
         include_declarations = False,
@@ -40,6 +42,7 @@ def js_run_binary(
         execution_requirements = None,
         stamp = 0,
         patch_node_fs = True,
+        allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         **kwargs):
     """Wrapper around @aspect_bazel_lib `run_binary` that adds convienence attributes for using a `js_binary` tool.
 
@@ -50,7 +53,7 @@ def js_run_binary(
 
         tool: The tool to run in the action.
 
-            Should be a js_binary rule. Use Aspect bazel-lib's run_binary
+            Should be a `js_binary` rule. Use Aspect bazel-lib's run_binary
             (https://github.com/aspect-build/bazel-lib/blob/main/lib/run_binary.bzl)
             for other *_binary rule types.
 
@@ -78,9 +81,9 @@ def js_run_binary(
 
         chdir: Working directory to run the build action in.
 
-            This overrides the chdir value if set on the js_binary tool target.
+            This overrides the chdir value if set on the `js_binary` tool target.
 
-            By default, js_binary tools run in the root of the output tree. For more context on why, please read the
+            By default, `js_binary` tools run in the root of the output tree. For more context on why, please read the
             aspect_rules_js README
             https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs.
 
@@ -106,6 +109,21 @@ def js_run_binary(
         silent_on_success: produce no output on stdout nor stderr when program exits with status code 0.
 
             This makes node binaries match the expected bazel paradigm.
+
+        use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
+            instead of the copy that is in runfiles.
+
+            Runfiles of `tool` are all hoisted to `srcs` of the underlying `run_binary` so they are included as execroot
+            inputs to the action.
+
+            Using the entry point script that is in the execroot output tree means that there will be no conflicting
+            runfiles `node_modules` in the node_modules resolution path which can confuse npm packages such as next and
+            react that don't like being resolved in multiple node_modules trees. This more closely emulates the
+            environment that tools such as Next.js see when they are run outside of Bazel.
+
+            When True, the `js_binary` tool must have `copy_data_to_bin` set to True (the default) so that all data files
+            needed by the binary are available in the execroot output tree. This requirement can be turned off with by
+            setting `allow_execroot_entry_point_with_no_copy_data_to_bin` to True.
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
@@ -177,6 +195,11 @@ def js_run_binary(
 
             When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
             which can lead to non-hermetic behavior.
+
+        allow_execroot_entry_point_with_no_copy_data_to_bin: Turn off validation that the `js_binary` tool
+            has `copy_data_to_bin` set to True when `use_execroot_entry_point` is set to True.
+
+            See `use_execroot_entry_point` doc for more info.
 
         **kwargs: Additional arguments
     """
@@ -274,6 +297,31 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
 """.format(
             name = to_label(name),
         ))
+
+    # Configure run from execroot
+    if use_execroot_entry_point:
+        fixed_env["JS_BINARY__USE_EXECROOT_ENTRY_POINT"] = "1"
+
+        # hoist all runfiles to srcs when running from execroot
+        js_runfiles_lib_name = "{}_runfiles_lib".format(name)
+        _js_library(
+            name = js_runfiles_lib_name,
+            srcs = [tool],
+            # Always tag the target manual since we should only build it when the final target is built.
+            tags = kwargs.get("tags", []) + ["manual"],
+        )
+        js_runfiles_name = "{}_runfiles".format(name)
+        native.filegroup(
+            name = js_runfiles_name,
+            output_group = "runfiles",
+            srcs = [":{}".format(js_runfiles_lib_name)],
+            # Always tag the target manual since we should only build it when the final target is built.
+            tags = kwargs.get("tags", []) + ["manual"],
+        )
+        extra_srcs.append(":{}".format(js_runfiles_name))
+
+    if allow_execroot_entry_point_with_no_copy_data_to_bin:
+        fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
     _run_binary(
         name = name,

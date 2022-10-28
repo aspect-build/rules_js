@@ -110,6 +110,7 @@ bzl_library(
     deps = [
         ":js_binary_helpers",
         ":js_filegroup",
+        ":js_library",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:run_binary",
         "@bazel_skylib//lib:dicts",

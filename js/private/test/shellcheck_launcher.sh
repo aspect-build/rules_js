@@ -11,6 +11,7 @@ export JS_BINARY__TARGET_NAME="shellcheck_launcher"
 export JS_BINARY__TARGET="//js/private/test:shellcheck_launcher"
 export JS_BINARY__WORKSPACE="aspect_rules_js"
 if [[ -z "${JS_BINARY__PATCH_NODE_FS:-}" ]]; then export JS_BINARY__PATCH_NODE_FS="1"; fi
+export JS_BINARY__COPY_DATA_TO_BIN="1"
 if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; fi
 if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
 
@@ -287,9 +288,26 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
 fi
 export JS_BINARY__EXECROOT
 
-entry_point="$JS_BINARY__RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
+    if [ -z "${BAZEL_BINDIR:-}" ]; then
+        logf_fatal "Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
+        exit 1
+    fi
+    if [ -z "${JS_BINARY__COPY_DATA_TO_BIN:-}" ] && [ -z "${JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN:-}" ]; then
+        logf_fatal "Expected js_binary copy_data_to_bin to be True when js_run_binary use_execroot_entry_point is True. \
+To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
+        exit 1
+    fi
+    entry_point="js/private/test/shellcheck.js"
+    if [[ "$entry_point" == ../* ]]; then
+        entry_point="external/${entry_point:3}"
+    fi
+    entry_point="$JS_BINARY__EXECROOT/$BAZEL_BINDIR/$entry_point"
+else
+    entry_point="$JS_BINARY__RUNFILES/aspect_rules_js/js/private/test/shellcheck.js"
+fi
 if [ ! -f "$entry_point" ]; then
-    logf_fatal "the entry_point '%s' not found in runfiles" "$entry_point"
+    logf_fatal "the entry_point '%s' not found" "$entry_point"
     exit 1
 fi
 
@@ -369,43 +387,44 @@ export PATH
 # Debug logs
 if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     if [ "${BAZEL_BINDIR:-}" ]; then
-        logf_debug "BAZEL_BINDIR %s" "${BAZEL_BINDIR:-}"
+        logf_debug "BAZEL_BINDIR %s" "$BAZEL_BINDIR"
     fi
     if [ "${BAZEL_BUILD_FILE_PATH:-}" ]; then
-        logf_debug "BAZEL_BUILD_FILE_PATH %s" "${BAZEL_BUILD_FILE_PATH:-}"
+        logf_debug "BAZEL_BUILD_FILE_PATH %s" "$BAZEL_BUILD_FILE_PATH"
     fi
     if [ "${BAZEL_COMPILATION_MODE:-}" ]; then
-        logf_debug "BAZEL_COMPILATION_MODE %s" "${BAZEL_COMPILATION_MODE:-}"
+        logf_debug "BAZEL_COMPILATION_MODE %s" "$BAZEL_COMPILATION_MODE"
     fi
     if [ "${BAZEL_INFO_FILE:-}" ]; then
-        logf_debug "BAZEL_INFO_FILE %s" "${BAZEL_INFO_FILE:-}"
+        logf_debug "BAZEL_INFO_FILE %s" "$BAZEL_INFO_FILE"
     fi
     if [ "${BAZEL_PACKAGE:-}" ]; then
-        logf_debug "BAZEL_PACKAGE %s" "${BAZEL_PACKAGE:-}"
+        logf_debug "BAZEL_PACKAGE %s" "$BAZEL_PACKAGE"
     fi
     if [ "${BAZEL_TARGET_CPU:-}" ]; then
-        logf_debug "BAZEL_TARGET_CPU %s" "${BAZEL_TARGET_CPU:-}"
+        logf_debug "BAZEL_TARGET_CPU %s" "$BAZEL_TARGET_CPU"
     fi
     if [ "${BAZEL_TARGET_NAME:-}" ]; then
-        logf_debug "BAZEL_TARGET_NAME %s" "${BAZEL_TARGET_NAME:-}"
+        logf_debug "BAZEL_TARGET_NAME %s" "$BAZEL_TARGET_NAME"
     fi
     if [ "${BAZEL_VERSION_FILE:-}" ]; then
-        logf_debug "BAZEL_VERSION_FILE %s" "${BAZEL_VERSION_FILE:-}"
+        logf_debug "BAZEL_VERSION_FILE %s" "$BAZEL_VERSION_FILE"
     fi
     if [ "${BAZEL_WORKSPACE:-}" ]; then
-        logf_debug "BAZEL_WORKSPACE %s" "${BAZEL_WORKSPACE:-}"
+        logf_debug "BAZEL_WORKSPACE %s" "$BAZEL_WORKSPACE"
     fi
     logf_debug "js_binary BINDIR %s" "${JS_BINARY__BINDIR:-}"
     logf_debug "js_binary BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
     logf_debug "js_binary COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
     logf_debug "js_binary NODE_BINARY %s" "${JS_BINARY__NODE_BINARY:-}"
     if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
-        logf_debug "js_binary NPM_BINARY %s" "${JS_BINARY__NPM_BINARY:-}"
+        logf_debug "js_binary NPM_BINARY %s" "$JS_BINARY__NPM_BINARY"
     fi
     logf_debug "js_binary PACKAGE %s" "${JS_BINARY__PACKAGE:-}"
     logf_debug "js_binary TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
     logf_debug "js_binary TARGET_NAME %s" "${JS_BINARY__TARGET_NAME:-}"
     logf_debug "js_binary WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
+    logf_debug "js_binary entry point %s" "$entry_point"
 fi
 
 # Info logs
