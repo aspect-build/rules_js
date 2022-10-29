@@ -32,7 +32,7 @@ Larger examples can be found in our [bazel-examples]() repository including:
 
 * [Next.js](https://github.com/aspect-build/bazel-examples/tree/main/next.js) / [rules_ts](https://github.com/aspect-build/rules_ts)
 * [Angular (cli/architect)](https://github.com/aspect-build/bazel-examples/tree/main/angular)
-* [Angular (ngc)]() / [rules_ts](https://github.com/aspect-build/bazel-examples/tree/main/angular-ngc)
+* [Angular (ngc)](https://github.com/aspect-build/bazel-examples/tree/main/angular-ngc) / [rules_ts](https://github.com/aspect-build/rules_ts)
 * [React (create-react-app)](https://github.com/aspect-build/bazel-examples/tree/main/react-cra)
 * [Vue](https://github.com/aspect-build/bazel-examples/tree/main/vue)
 * [Jest](https://github.com/aspect-build/bazel-examples/tree/main/jest) / [rules_jest](https://github.com/aspect-build/rules_jest)
