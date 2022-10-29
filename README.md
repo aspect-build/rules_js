@@ -22,20 +22,35 @@ rules_js is just a part of what Aspect provides:
 -   _Need help?_ This ruleset has support provided by https://aspect.dev.
 -   See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
 
+## Examples
+
+Basic usage examples can be found under the [examples](https://github.com/aspect-build/rules_js/tree/main/examples) folder.
+
+The [e2e]() folder also has a few useful examples such as [js_image](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image) for containerizing a js_binary and [js_run_devserver](https://github.com/aspect-build/rules_js/tree/main/e2e/js_run_devserver), a generic rule for running a devserver in watch mode with [ibazel](https://github.com/bazelbuild/bazel-watcher).
+
+Larger examples can be found in our [bazel-examples]() repository including:
+
+* [Next.js](https://github.com/aspect-build/bazel-examples/tree/main/next.js) / [rules_ts](https://github.com/aspect-build/rules_ts)
+* [Angular (cli/architect)](https://github.com/aspect-build/bazel-examples/tree/main/angular)
+* [Angular (ngc)]() / [rules_ts](https://github.com/aspect-build/bazel-examples/tree/main/angular-ngc)
+* [React (create-react-app)](https://github.com/aspect-build/bazel-examples/tree/main/react-cra)
+* [Vue](https://github.com/aspect-build/bazel-examples/tree/main/vue)
+* [Jest](https://github.com/aspect-build/bazel-examples/tree/main/jest) / [rules_jest](https://github.com/aspect-build/rules_jest)
+* [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nextjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
+
 ## Deriviate Rule Sets
 
 We also maintain a number of deriviate rule sets for Node.js that are based off of rules_js:
 
--   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for [esbuild](https://esbuild.github.io) JS bundler
--   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
--   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
 -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
+-   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
+-   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
+-   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for [esbuild](https://esbuild.github.io) JS bundler
 -   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for [Webpack](https://webpack.js.org)
 -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for [Rollup](https://rollupjs.org) - a JavaScript bundler
--   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
 -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
+-   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
 -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
--   [rules_deno](https://github.com/aspect-build/rules_deno) - Bazel rules for [Deno](http://deno.land)
 
 ## Installation
 
