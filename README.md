@@ -36,7 +36,7 @@ Larger examples can be found in our [bazel-examples]() repository including:
 * [React (create-react-app)](https://github.com/aspect-build/bazel-examples/tree/main/react-cra)
 * [Vue](https://github.com/aspect-build/bazel-examples/tree/main/vue)
 * [Jest](https://github.com/aspect-build/bazel-examples/tree/main/jest) / [rules_jest](https://github.com/aspect-build/rules_jest)
-* [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nextjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
+* [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nestjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
 
 ## Deriviate Rule Sets
 
