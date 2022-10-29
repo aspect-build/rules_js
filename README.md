@@ -22,6 +22,21 @@ rules_js is just a part of what Aspect provides:
 -   _Need help?_ This ruleset has support provided by https://aspect.dev.
 -   See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
 
+## Deriviate Rule Sets
+
+We also maintain a number of deriviate rule sets for Node.js that are based off of rules_js:
+
+-   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for [esbuild](https://esbuild.github.io) JS bundler
+-   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
+-   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
+-   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
+-   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for [Webpack](https://webpack.js.org)
+-   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for [Rollup](https://rollupjs.org) - a JavaScript bundler
+-   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
+-   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
+-   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
+-   [rules_deno](https://github.com/aspect-build/rules_deno) - Bazel rules for [Deno](http://deno.land)
+
 ## Installation
 
 From the release you wish to use:
