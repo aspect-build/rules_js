@@ -1,1 +1,3 @@
-fixedReleaser: jbedard
+fixedReleaser:
+    login: jbedard
+    email: jason@aspect.dev
