@@ -10,6 +10,8 @@ accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
 
 <https://blog.aspect.dev/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 
+Google does not fund development of rules_js. If your company benefits, please consider donating to continue development and maintenance work: <https://opencollective.com/aspect-build/projects/rules_js>
+
 Known issues:
 
 -   Remote Execution (RBE) requires the latest version of Bazel, 6.0. Run `echo 6.0.0rc1 > .bazelversion` or set environment `USE_BAZEL_VERSION=6.0.0rc1`.
@@ -20,7 +22,30 @@ Known issues:
 rules_js is just a part of what Aspect provides:
 
 -   _Need help?_ This ruleset has support provided by https://aspect.dev.
--   See our other Bazel rules, especially those built for rules_js, such as rules_ts for TypeScript: https://github.com/aspect-build
+-   See our other Bazel rules, especially those built for rules_js:
+    -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
+    -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
+    -   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
+    -   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for [esbuild](https://esbuild.github.io) JS bundler
+    -   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for [Webpack](https://webpack.js.org)
+    -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for [Rollup](https://rollupjs.org) - a JavaScript bundler
+    -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
+    -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
+    -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
+
+## Installation
+
+From the release you wish to use:
+<https://github.com/aspect-build/rules_js/releases>
+copy the WORKSPACE snippet into your `WORKSPACE` file.
+
+## Usage
+
+See the documentation in the [docs](docs/) folder.
+
+> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
+
+Read our [migration guide](docs/migrate.md) to adopt rules_js in an existing project.
 
 ## Examples
 
@@ -37,34 +62,6 @@ Larger examples can be found in our [bazel-examples]() repository including:
 * [Vue](https://github.com/aspect-build/bazel-examples/tree/main/vue)
 * [Jest](https://github.com/aspect-build/bazel-examples/tree/main/jest) / [rules_jest](https://github.com/aspect-build/rules_jest)
 * [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nestjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
-
-## Deriviate Rule Sets
-
-We also maintain a number of deriviate rule sets for Node.js that are based off of rules_js:
-
--   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
--   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
--   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
--   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for [esbuild](https://esbuild.github.io) JS bundler
--   [rules_webpack](https://github.com/aspect-build/rules_webpack) - Bazel rules for [Webpack](https://webpack.js.org)
--   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for [Rollup](https://rollupjs.org) - a JavaScript bundler
--   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
--   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
--   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
-
-## Installation
-
-From the release you wish to use:
-<https://github.com/aspect-build/rules_js/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
-
-## Usage
-
-See the documentation in the [docs](docs/) folder and the example usages in the [examples](examples/) folder.
-
-> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
-
-Read our [migration guide](docs/migrate.md) to adopt rules_js in an existing project.
 
 ## Relationship to rules_nodejs
 
