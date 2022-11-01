@@ -90,6 +90,8 @@ function hideStackFrames<T extends Function>(fn: T): T {
     } as any
 }
 
+const HOP_NON_LINK = Symbol.for('HOP NON LINK')
+
 export const patcher = (fs: any = _fs, roots: string[]) => {
     fs = fs || _fs
     roots = roots || []
@@ -615,13 +617,55 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         oneHop(loc, cb)
     }
 
+    const hopLinkCache = new Map<string, string | typeof HOP_NON_LINK>()
+    function readHopLinkSync(p: string) {
+        if (hopLinkCache.has(p)) {
+            return hopLinkCache.get(p)
+        }
+
+        let link: string | typeof HOP_NON_LINK
+
+        try {
+            if (origLstatSync(p).isSymbolicLink()) {
+                link = origReadlinkSync(p) as string
+                if (!path.isAbsolute(link)) {
+                    link = path.resolve(path.dirname(p), link)
+                }
+            } else {
+                link = HOP_NON_LINK
+            }
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                // file does not exist
+                return undefined
+            }
+
+            link = HOP_NON_LINK
+        }
+
+        hopLinkCache.set(p, link)
+        return link
+    }
+
     function nextHopSync(loc: string): string | false {
-        let readlink: string
         let nested: string[] = []
         let maybe = loc
         let escapedHop: string | false = false
-        function _tryParent(): boolean {
-            nested.push(path.basename(maybe))
+
+        for (;;) {
+            let link = readHopLinkSync(maybe)
+
+            if (link !== HOP_NON_LINK) {
+                link = path.join(link, ...nested.reverse())
+
+                if (!isEscape(loc, link)) {
+                    return link
+                }
+                if (!escapedHop) {
+                    escapedHop = link
+                }
+            }
+
             const dirname = path.dirname(maybe)
             if (
                 !dirname ||
@@ -630,38 +674,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 dirname == '/'
             ) {
                 // not a link
-                return false
+                return escapedHop
             }
+
+            nested.push(path.basename(maybe))
             maybe = dirname
-            return true
-        }
-        for (;;) {
-            try {
-                readlink = origReadlinkSync(maybe)
-                if (!path.isAbsolute(readlink)) {
-                    readlink = path.resolve(path.dirname(maybe), readlink)
-                }
-                readlink = path.join(readlink, ...nested.reverse())
-                if (isEscape(loc, readlink)) {
-                    if (!escapedHop) {
-                        escapedHop = readlink
-                    }
-                    if (!_tryParent()) {
-                        return escapedHop
-                    }
-                    continue
-                }
-                return readlink
-            } catch (err) {
-                if (err.code === 'ENOENT') {
-                    // file does not exist
-                    return undefined
-                }
-                if (!_tryParent()) {
-                    return escapedHop
-                }
-                continue
-            }
         }
     }
 
