@@ -1,5 +1,6 @@
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@com_github_ash2k_bazel_tools//multirun:def.bzl", "command", "multirun")
 load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
 
 http_server_bin.http_server_binary(
@@ -9,8 +10,7 @@ http_server_bin.http_server_binary(
 # Simple js_run_devserver rule that syncs two html files and takes an http-server js_binary
 # as the tool
 js_run_devserver(
-    name = "serve",
-    args = ["."],
+    name = "devserver",
     chdir = package_name(),
     data = [
         "index.html",
@@ -18,6 +18,14 @@ js_run_devserver(
     ],
     log_level = "debug",
     tool = ":http_server",
+)
+
+# Use command to bake-in the arguments into the runnable binary so that the target
+# can be used with `multirun` below.
+command(
+    name = "serve",
+    arguments = ["."],
+    command = ":devserver",
 )
 
 copy_to_directory(
@@ -32,12 +40,31 @@ copy_to_directory(
 # node_modules link and takes a command to run http-server from its node_modules/.bin/http-server
 # entry point
 js_run_devserver(
-    name = "serve_alt",
-    args = ["http_root"],
+    name = "devserver_alt",
     chdir = package_name(),
     command = "../node_modules/.bin/http-server",
     data = [
         ":http_root",
         "//:node_modules/http-server",
     ],
+)
+
+# Use command to bake-in the arguments into the runnable binary so that the target
+# can be used with `multirun` below.
+command(
+    name = "serve_alt",
+    arguments = ["http_root"],
+    command = ":devserver_alt",
+)
+
+# Example of using multi-run to run two binaries at the same time.
+# See https://github.com/ash2k/bazel-tools/tree/master/multirun.
+# This can be used with ibazel: ibazel run //src:serve_all
+multirun(
+    name = "serve_all",
+    commands = [
+        ":serve",
+        ":serve_alt",
+    ],
+    jobs = 0,
 )
