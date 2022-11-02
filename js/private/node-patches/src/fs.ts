@@ -28,68 +28,6 @@ type Dirent = any
 // es modules
 const _fs = require('fs')
 
-/**
- * Reduce the information in Errors to both hide the origin and improve performance.
- * Any nested calls may be effected and also hidden.
- *
- * May potentially:
- * - hide the function from stack traces
- * - prevent errors thrown within the function from calculating stack traces
- *
- * TODO: currently can not hide computing of the stack trace within handleErrorFromBinding:
- * - https://github.com/nodejs/node/blob/1b971883e0c86f37468e421ffe5f39b585782ad6/lib/internal/fs/utils.js#L340-L356
- */
-function hideStackFrames<T extends Function>(fn: T): T {
-    const HiddenErrorProps = {
-        stackTraceLimit: {
-            // Minimize stack trace size similar to:
-            // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L508-L517
-            value: 0,
-
-            // Prevent setting an Infinite stackTraceLimit:
-            // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L193-L202
-            // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L470-L482
-            writable: false,
-        },
-
-        // Override stack construction with noop:
-        // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L135-L151
-        prepareStackTrace: {
-            value: () => '',
-            writable: true,
-        },
-    }
-
-    const UndefinedProp = {
-        value: undefined,
-        writable: true,
-    }
-
-    const defineProps = Object.defineProperties
-    const getProp = Object.getOwnPropertyDescriptor
-
-    // Prevent recording this function in the stack using '__node_internal_'
-    // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L398-L404
-    return function __node_internal_hideStackFrames() {
-        // Use `globalThis` like node:
-        // https://github.com/nodejs/node/blob/30187baf2042dee683c5cc759e7ffad7c5a92169/lib/internal/errors.js#L138-L142
-        const E = globalThis.Error
-        const stackTraceLimit = getProp(E, 'stackTraceLimit') || UndefinedProp
-        const prepareStackTrace =
-            getProp(E, 'prepareStackTrace') || UndefinedProp
-
-        defineProps(E, HiddenErrorProps)
-        try {
-            return fn.apply(this, arguments)
-        } finally {
-            defineProps(E, {
-                stackTraceLimit,
-                prepareStackTrace,
-            })
-        }
-    } as any
-}
-
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
 
 export const patcher = (fs: any = _fs, roots: string[]) => {
@@ -170,7 +108,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origLstat(...args)
     }
 
-    fs.lstatSync = hideStackFrames(function _lstatSync(...args: any[]) {
+    fs.lstatSync = function lstatSync(...args: any[]) {
         const stats = origLstatSync(...args)
 
         if (!stats.isSymbolicLink()) {
@@ -200,7 +138,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             }
             throw err
         }
-    })
+    }
 
     // =========================================================================
     // fs.realpath
@@ -260,25 +198,23 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origRealpathNative(...args)
     }
 
-    fs.realpathSync = hideStackFrames(function _realpathSync(...args: any[]) {
+    fs.realpathSync = function realpathSync(...args: any[]) {
         const str = origRealpathSync(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
             return guardedRealPathSync(args[0], escapedRoot)
         }
         return str
-    })
+    }
 
-    fs.realpathSync.native = hideStackFrames(function _native_realpathSync(
-        ...args: any[]
-    ) {
+    fs.realpathSync.native = function native_realpathSync(...args: any[]) {
         const str = origRealpathSyncNative(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
             return guardedRealPathSync(args[0], escapedRoot)
         }
         return str
-    })
+    }
 
     // =========================================================================
     // fs.readlink
@@ -335,7 +271,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origReadlink(...args)
     }
 
-    fs.readlinkSync = hideStackFrames(function _readlinkSync(...args: any[]) {
+    fs.readlinkSync = function readlinkSync(...args: any[]) {
         const resolved = path.resolve(args[0])
 
         const str = path.resolve(
@@ -366,7 +302,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             throw einval('readlink', args[0])
         }
         return str
-    })
+    }
 
     // =========================================================================
     // fs.readdir
@@ -403,14 +339,14 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origReaddir(...args)
     }
 
-    fs.readdirSync = hideStackFrames(function _readdirSync(...args: any[]) {
+    fs.readdirSync = function readdirSync(...args: any[]) {
         const res = origReaddirSync(...args)
         const p = path.resolve(args[0])
         res.forEach((v: Dirent | any) => {
             handleDirentSync(p, v)
         })
         return res
-    })
+    }
 
     // =========================================================================
     // fs.opendir
