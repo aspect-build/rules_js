@@ -3,9 +3,6 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 js_binary(
     name = "main",
     args = ["foo"],
-    node_options = [
-        "--experimental-json-modules",  # Required for importing .json from .mjs
-    ],
     data = [
         "//:node_modules/@aspect-test/a",
         "//:node_modules/@aspect-test/b",
@@ -13,17 +10,17 @@ js_binary(
         "//:node_modules/@e2e/lib",
         "//:node_modules/@e2e/wrapper-lib",
         "//:node_modules/sharp",
-        "@rules_foo//foo:node_modules/@aspect-test/a",
+        "@foo//:node_modules/@aspect-test/a",
     ],
     entry_point = "main.mjs",
+    node_options = [
+        "--experimental-json-modules",  # Required for importing .json from .mjs
+    ],
 )
 
 js_test(
     name = "test",
     args = ["foo"],
-    node_options = [
-        "--experimental-json-modules",  # Required for importing .json from .mjs
-    ],
     data = [
         "//:node_modules/@aspect-test/a",
         "//:node_modules/@aspect-test/b",
@@ -31,8 +28,11 @@ js_test(
         "//:node_modules/@e2e/lib",
         "//:node_modules/@e2e/wrapper-lib",
         "//:node_modules/sharp",
-        "@rules_foo//foo:node_modules/@aspect-test/a",
+        "@foo//:node_modules/@aspect-test/a",
     ],
     entry_point = "main.mjs",
     log_level = "info",
+    node_options = [
+        "--experimental-json-modules",  # Required for importing .json from .mjs
+    ],
 )

@@ -9,6 +9,9 @@ load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_REGISTRY = "%s://registry.npmjs.org/" % DEFAULT_REGISTRY_PROTOCOL
+DEFAULT_ROOT_PACKAGE = "."
+DEFAULT_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
+DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 
 _ATTRS = {
     "pnpm_lock": attr.label(),
@@ -32,6 +35,10 @@ _ATTRS = {
     "verify_node_modules_ignored": attr.label(),
     "link_workspace": attr.string(),
     "bzlmod": attr.bool(),
+    "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
+    "additional_file_contents": attr.string_list_dict(),
+    "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
+    "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
 }
 
 def _process_lockfile(rctx, pnpm_lock):
@@ -103,16 +110,14 @@ _FP_DIRECT_TMPL = \
             )"""
 
 _BZL_LIBRARY_TMPL = \
-    """
-bzl_library(
-    name = "{name}",
+    """bzl_library(
+    name = "{name}_bzl_library",
     srcs = ["{src}"],
     deps = ["{dep}"],
     visibility = ["//visibility:public"],
-)"""
+)
+"""
 
-_DEFS_BZL_FILENAME = "defs.bzl"
-_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _link_package(root_package, import_path, rel_path = "."):
@@ -454,7 +459,7 @@ def _validate_attrs(rctx):
         count += 1
 
         # don't allow a pnpm lock file that isn't in the root directory of a bazel package
-        if paths.dirname(rctx.attr.pnpm_lock.name):
+        if rctx.attr.root_package == DEFAULT_ROOT_PACKAGE and paths.dirname(rctx.attr.pnpm_lock.name):
             fail("pnpm-lock.yaml file must be at the root of a bazel package")
         if rctx.attr.package_json:
             fail("The package_json attribute should not be used with pnpm_lock.")
@@ -493,8 +498,9 @@ def _impl(rctx):
     if rctx.attr.pnpm_lock != None:
         lockfile = _process_lockfile(rctx, rctx.attr.pnpm_lock)
 
-        # root package is the directory of the pnpm_lock file
-        root_package = rctx.attr.pnpm_lock.package
+        # root package is the directory of the pnpm_lock file unless
+        # overridden by the root_package attribute
+        root_package = rctx.attr.root_package if rctx.attr.root_package != DEFAULT_ROOT_PACKAGE else rctx.attr.pnpm_lock.package
         link_workspace = rctx.attr.pnpm_lock.workspace_name
 
         lockfile_description = _label_str(rctx.attr.pnpm_lock)
@@ -550,16 +556,9 @@ def _impl(rctx):
         )
 
     # in Bazel 5.3.0, the lock file workspace_name will now be empty if it is the local workspace;
-    # we use rctx.attr.link_workspace instead to handle the explicit link workspace name case (e2e/rules_foo for example);
+    # we use rctx.attr.link_workspace instead to handle the explicit link workspace name case (e2e/rules_foo for example)
     # check that there isn't conflicting link workspaces if both are set
-    if link_workspace and rctx.attr.link_workspace and link_workspace != rctx.attr.link_workspace:
-        msg = "lock file workspace_name '{}' and link_workspace '{}' are both set but do not match".format(
-            link_workspace,
-            rctx.attr.link_workspace,
-        )
-        fail(msg)
-
-    if not link_workspace:
+    if rctx.attr.link_workspace:
         link_workspace = rctx.attr.link_workspace
 
     generated_by_lines = [
@@ -567,7 +566,7 @@ def _impl(rctx):
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-    repositories_bzl = generated_by_lines + [
+    repositories_bzl = [
         """load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")""",
         "",
         "def npm_repositories():",
@@ -607,19 +606,19 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
 
     link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
 
-    defs_bzl_header = generated_by_lines + ["""# buildifier: disable=bzl-visibility
+    defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
     npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries, default_registry)
 
     fp_links = {}
     rctx_files = {
-        "BUILD.bazel": generated_by_lines + [
+        "BUILD.bazel": [
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
             "",
             "exports_files({})".format(starlark_codegen_utils.to_list_attr([
-                _DEFS_BZL_FILENAME,
-                _REPOSITORIES_BZL_FILENAME,
+                rctx.attr.defs_bzl_filename,
+                rctx.attr.repositories_bzl_filename,
             ])),
         ],
     }
@@ -780,7 +779,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             root_package = root_package,
             link_packages = str(link_packages),
             link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
-            defs_bzl_file = "@{}//:{}".format(rctx.name, _DEFS_BZL_FILENAME),
+            defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
         ),
     ]
 
@@ -905,13 +904,13 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             if pkgs[i].get("hasBin"):
                 build_file_path = paths.normalize(paths.join(link_package, "BUILD.bazel"))
                 if build_file_path not in rctx_files.keys():
-                    rctx_files[build_file_path] = generated_by_lines + [
+                    rctx_files[build_file_path] = [
                         """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
                     ]
                 rctx_files[build_file_path].append(_BZL_LIBRARY_TMPL.format(
                     name = _import.package,
                     src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
-                    dep = "@{repo_name}//{link_package}:{package_name}".format(
+                    dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
                         repo_name = _import.name,
                         link_package = link_package,
                         package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
@@ -987,10 +986,27 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         visibility = ["//visibility:public"],
     )""")
 
-    rctx.file(_DEFS_BZL_FILENAME, "\n".join(defs_bzl_header + [""] + defs_bzl_body + [""]))
-    rctx.file(_REPOSITORIES_BZL_FILENAME, "\n".join(repositories_bzl))
+    rctx_files[rctx.attr.defs_bzl_filename] = ["\n".join(defs_bzl_header + [""] + defs_bzl_body + [""])]
+    rctx_files[rctx.attr.repositories_bzl_filename] = ["\n".join(repositories_bzl)]
+
+    for filename, contents in rctx.attr.additional_file_contents.items():
+        if not filename in rctx_files.keys():
+            rctx_files[filename] = contents
+        elif filename.endswith(".bzl"):
+            # bzl files are special cased since all load statements must go at the top
+            load_statements = []
+            other_statements = []
+            for content in contents:
+                if content.startswith("load("):
+                    load_statements.append(content)
+                else:
+                    other_statements.append(content)
+            rctx_files[filename] = load_statements + rctx_files[filename] + other_statements
+        else:
+            rctx_files[filename].extend(contents)
+
     for filename, contents in rctx_files.items():
-        rctx.file(filename, "\n".join(contents))
+        rctx.file(filename, "\n".join(generated_by_lines + contents))
 
 npm_translate_lock = struct(
     implementation = _impl,

@@ -10,7 +10,7 @@ js_binary(
         "//:node_modules/@e2e/lib",
         "//:node_modules/@e2e/wrapper-lib",
         "//:node_modules/sharp",
-        "@rules_foo//foo:node_modules/@aspect-test/a",
+        "@foo//:node_modules/@aspect-test/a",
     ],
     entry_point = "main.js",
 )
@@ -25,7 +25,7 @@ js_test(
         "//:node_modules/@e2e/lib",
         "//:node_modules/@e2e/wrapper-lib",
         "//:node_modules/sharp",
-        "@rules_foo//foo:node_modules/@aspect-test/a",
+        "@foo//:node_modules/@aspect-test/a",
     ],
     entry_point = "main.js",
     log_level = "info",
