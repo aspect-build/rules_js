@@ -47,6 +47,10 @@ local_repository(
     path = "../rules_foo",
 )
 
-load("@rules_foo//:repositories.bzl", rules_foo_repositories = "repositories")
+load("@rules_foo//foo:repositories.bzl", "foo_repositories")
 
-rules_foo_repositories()
+foo_repositories(name = "foo")
+
+load("@foo//:npm_repositories.bzl", foo_npm_repositories = "npm_repositories")
+
+foo_npm_repositories()

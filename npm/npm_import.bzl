@@ -319,7 +319,14 @@ def npm_translate_lock(
 
         **kwargs: Internal use only
     """
+
+    # Gather undocumented attributes
     bzlmod = kwargs.pop("bzlmod", False)
+    root_package = kwargs.pop("root_package", None)
+    additional_file_contents = kwargs.pop("additional_file_contents", {})
+    repositories_bzl_filename = kwargs.pop("repositories_bzl_filename", None)
+    defs_bzl_filename = kwargs.pop("defs_bzl_filename", None)
+
     if len(kwargs):
         fail("Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0]))
 
@@ -371,6 +378,10 @@ def npm_translate_lock(
         verify_node_modules_ignored = verify_node_modules_ignored,
         link_workspace = link_workspace,
         bzlmod = bzlmod,
+        root_package = root_package,
+        additional_file_contents = additional_file_contents,
+        repositories_bzl_filename = repositories_bzl_filename,
+        defs_bzl_filename = defs_bzl_filename,
     )
 
 _npm_import_links = repository_rule(

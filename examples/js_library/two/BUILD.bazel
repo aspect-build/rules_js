@@ -28,7 +28,7 @@ bzl_library(
     srcs = ["tsc.bzl"],
     deps = [
         # this is a bzl_library target, exposing the package_json.bzl file we depend on
-        "@npm//:typescript",
+        "@npm//:typescript_bzl_library",
     ],
 )
 

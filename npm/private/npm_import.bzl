@@ -330,7 +330,7 @@ _npm_package_internal(
 _BZL_LIBRARY_TMPL = \
     """
 bzl_library(
-    name = "{name}",
+    name = "{name}_bzl_library",
     srcs = ["{src}"],
     deps = [
         "@aspect_bazel_lib//lib:directory_path",

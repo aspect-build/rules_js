@@ -1,21 +1,22 @@
-load("@rules_foo_npm//:defs.bzl", "npm_link_all_packages")
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
+load("@foo//:@aspect-test/a/package_json.bzl", "bin")
+load("@foo//:npm_link_all_packages.bzl", "js_run_binary")
 
-npm_link_all_packages(name = "node_modules")
+bin.bin_a_binary(name = "main")
 
-js_binary(
-    name = "main",
-    data = [
-        "@rules_foo//foo:node_modules/@aspect-test/a",
-    ],
-    entry_point = "main.js",
+bin.bin_a_test(
+    name = "test",
+    log_level = "info",
 )
 
-js_test(
-    name = "test",
-    data = [
-        "@rules_foo//foo:node_modules/@aspect-test/a",
-    ],
-    entry_point = "main.js",
-    log_level = "info",
+js_run_binary(
+    name = "run_main",
+    stdout = "run_main_stdout",
+    tool = ":main",
+)
+
+assert_contains(
+    name = "run_main_test",
+    actual = ":run_main_stdout",
+    expected = "@aspect-test/a@5.0.2",
 )

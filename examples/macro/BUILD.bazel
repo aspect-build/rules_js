@@ -18,7 +18,7 @@ bzl_library(
     deps = [
         "@aspect_bazel_lib//lib:copy_to_bin",
         # this is a bzl_library target, exposing the package_json.bzl file we depend on
-        "@npm//examples/macro:mocha",
+        "@npm//examples/macro:mocha_bzl_library",
     ],
 )
 
