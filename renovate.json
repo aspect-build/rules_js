@@ -16,38 +16,42 @@
 
     "packageRules": [
         {
-            "matchPackagePatterns": ["*"],
+            "matchPackagePatterns": ["npm"],
             "stabilityDays": 3
         },
         {
-            "matchPackagePatterns": ["*"],
-            "matchUpdateTypes": ["patch"],
             "groupName": "all patch updates",
-            "groupSlug": "all-patch"
+            "matchPackagePatterns": ["*"],
+            "matchUpdateTypes": ["patch"]
+        },
+        {
+            "groupName": "Bazel",
+            "matchManagers": ["bazel"],
+            "matchUpdateTypes": ["patch", "minor"]
+        },
+        {
+            "groupName": "Aspect",
+            "matchSourceUrlPrefixes": ["https://github.com/aspect-build/"],
+            "matchUpdateTypes": ["patch", "minor"],
+            "schedule": null
+        },
+        {
+            "groupName": "@types",
+            "matchUpdateTypes": ["major"],
+            "matchPackagePatterns": ["^@types/"],
+            "extends": ["schedule:monthly"]
         },
         {
             "groupName": "rollup",
-            "groupSlug": "rollup",
-            "matchPackageNames": ["rollup"],
-            "matchPackagePatterns": ["^rollup-", "^@rollup/", "-rollup-"]
+            "matchUpdateTypes": ["major"],
+            "matchPackagePatterns": ["rollup"],
+            "extends": ["schedule:monthly"]
         },
         {
             "groupName": "Webpack",
-            "groupSlug": "webpack",
-            "matchPackagePatterns": ["^webpack-", "^@webpack-cli/", "-webpack-"]
-        },
-        {
-            "groupName": "Bazel rules",
-            "groupSlug": "bazel_rules",
-            "matchManagers": ["bazel"],
-            "matchUpdateTypes": ["patch", "minor"]
-        },
-        {
-            "groupName": "Aspect rules",
-            "groupSlug": "aspect_rules",
-            "matchManagers": ["bazel"],
-            "matchPackagePatterns": ["^aspect_"],
-            "matchUpdateTypes": ["patch", "minor"]
+            "matchUpdateTypes": ["major"],
+            "matchPackagePatterns": ["webpack"],
+            "extends": ["schedule:monthly"]
         }
     ]
 }
