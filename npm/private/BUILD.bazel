@@ -78,6 +78,7 @@ bzl_library(
         ":starlark_codegen_utils",
         ":utils",
         "@aspect_bazel_lib//lib:repo_utils",
+        "@aspect_bazel_lib//lib:utils",
     ],
 )
 
@@ -90,6 +91,7 @@ bzl_library(
         ":starlark_codegen_utils",
         ":transitive_closure",
         ":utils",
+        "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
     ],

@@ -1,6 +1,7 @@
 "Repository rules for importing packages from npm"
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
@@ -517,6 +518,8 @@ def _impl_links(rctx):
     lc_deps = {}
     deps = {}
 
+    bzlmod_supported = is_bazel_6_or_greater()
+
     for (dep_name, dep_version) in rctx.attr.deps.items():
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
             dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
@@ -611,8 +614,8 @@ def _impl_links(rctx):
             npm_import_sources_repo_name,
         )
     else:
-        npm_package_target = "{}@{}//:source_directory".format(
-            "@" if rctx.attr.bzlmod else "",
+        npm_package_target = "{}{}//:source_directory".format(
+            "@@" if bzlmod_supported else "@",
             npm_import_sources_repo_name,
         )
     npm_package_target_lc = "@{}//:pkg".format(npm_import_sources_repo_name)
@@ -695,7 +698,6 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "lifecycle_hooks_no_sandbox": attr.bool(default = True),
     "npm_translate_lock_repo": attr.string(),
-    "bzlmod": attr.bool(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {

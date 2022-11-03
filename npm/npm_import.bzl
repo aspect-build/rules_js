@@ -321,7 +321,6 @@ def npm_translate_lock(
     """
 
     # Gather undocumented attributes
-    bzlmod = kwargs.pop("bzlmod", False)
     root_package = kwargs.pop("root_package", None)
     additional_file_contents = kwargs.pop("additional_file_contents", {})
     repositories_bzl_filename = kwargs.pop("repositories_bzl_filename", None)
@@ -377,7 +376,6 @@ def npm_translate_lock(
         lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
         verify_node_modules_ignored = verify_node_modules_ignored,
         link_workspace = link_workspace,
-        bzlmod = bzlmod,
         root_package = root_package,
         additional_file_contents = additional_file_contents,
         repositories_bzl_filename = repositories_bzl_filename,
@@ -612,7 +610,6 @@ def npm_import(
 
         **kwargs: Internal use only
     """
-    bzlmod = kwargs.pop("bzlmod", False)
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     if len(kwargs):
         fail("Invalid npm_import parameter '{}'".format(kwargs.keys()[0]))
@@ -654,5 +651,4 @@ def npm_import(
         lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
         bins = bins,
         npm_translate_lock_repo = npm_translate_lock_repo,
-        bzlmod = bzlmod,
     )
