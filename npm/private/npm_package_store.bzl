@@ -234,19 +234,19 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                     transitive_files.append(virtual_store_directory)
             for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
                 dep_ref_dep_virtual_store_name = utils.virtual_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
-                if dep_ref_dep_virtual_store_name == virtual_store_name:
-                    # ignore reference back to self in dyadic circular deps
-                    pass
-                else:
-                    if not dep_ref_dep_virtual_store_name in deps_map:
-                        fail("Expecting {} to be in deps".format(dep_ref_dep_virtual_store_name))
-                    actual_dep = deps_map[dep_ref_dep_virtual_store_name]
-                    dep_ref_def_virtual_store_directory = actual_dep[NpmPackageStoreInfo].virtual_store_directory
-                    if dep_ref_def_virtual_store_directory:
-                        for dep_ref_dep_alias in dep_ref_dep_aliases:
-                            # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                            dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
-                            transitive_files.extend(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
+                if not dep_ref_dep_virtual_store_name in deps_map:
+                    # This can happen in lifecycle npm package targets. We have no choice but to
+                    # ignore reference back to self in dyadic circular deps in this case since a
+                    # transitive dep on this npm package is impossible in an action that is
+                    # outputting the virtual store tree artifact that circular dep would point to.
+                    continue
+                actual_dep = deps_map[dep_ref_dep_virtual_store_name]
+                dep_ref_def_virtual_store_directory = actual_dep[NpmPackageStoreInfo].virtual_store_directory
+                if dep_ref_def_virtual_store_directory:
+                    for dep_ref_dep_alias in dep_ref_dep_aliases:
+                        # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                        dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
+                        transitive_files.extend(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
 
     files = [virtual_store_directory] if virtual_store_directory else []
 
