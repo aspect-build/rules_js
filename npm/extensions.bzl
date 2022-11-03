@@ -34,12 +34,10 @@ def _extension_impl(module_ctx):
                     transitive_closure = i.transitive_closure,
                     url = i.url,
                     npm_translate_lock_repo = "npm",
-                    bzlmod = True,
                 )
             npm_translate_lock(
                 name = "npm",
                 pnpm_lock = attr.pnpm_lock,
-                bzlmod = True,
             )
         for i in mod.tags.npm_import:
             npm_import(
@@ -55,7 +53,6 @@ def _extension_impl(module_ctx):
                 link_workspace = i.link_workspace,
                 url = i.url,
                 root_package = i.root_package,
-                bzlmod = True,
             )
 
 npm = module_extension(
