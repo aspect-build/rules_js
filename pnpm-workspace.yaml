@@ -1,6 +1,7 @@
 packages:
     - 'examples/js_binary'
     - 'examples/macro'
+    - 'examples/build_with_node_gyp'
     - 'examples/npm_deps'
     - 'examples/npm_package/libs/lib_a'
     - 'examples/npm_package/packages/pkg_a'

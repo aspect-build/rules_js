@@ -1,0 +1,6 @@
+{
+    "private": true,
+    "devDependencies": {
+        "ffi-napi": "4.0.3"
+    }
+}
