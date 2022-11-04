@@ -39,6 +39,7 @@ _ATTRS = {
     "additional_file_contents": attr.string_list_dict(),
     "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
+    "generate_bzl_library_targets": attr.bool(),
 }
 
 def _process_lockfile(rctx, pnpm_lock):
@@ -55,7 +56,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -813,6 +814,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_execution_requirements else ""
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
+        maybe_generate_bzl_library_targets = ("""
+        generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
 
         _registry = url.split("//", 1)[-1]
         npm_token = None
@@ -832,6 +835,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_bins = maybe_bins,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
+            maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
             maybe_integrity = maybe_integrity,
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
@@ -901,20 +905,20 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         pkgs = lockfile.get("packages").values()
         for link_package in _import.link_packages.keys():
             if pkgs[i].get("hasBin"):
-                build_file_path = paths.normalize(paths.join(link_package, "BUILD.bazel"))
-                if build_file_path not in rctx_files.keys():
-                    rctx_files[build_file_path] = [
-                        """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
-                    ]
-                rctx_files[build_file_path].append(_BZL_LIBRARY_TMPL.format(
-                    name = _import.package,
-                    src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
-                    dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
-                        repo_name = _import.name,
-                        link_package = link_package,
-                        package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
-                    ),
-                ))
+                build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
+                if build_file not in rctx_files:
+                    rctx_files[build_file] = []
+                if rctx.attr.generate_bzl_library_targets:
+                    rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
+                    rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
+                        name = _import.package,
+                        src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
+                        dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
+                            repo_name = _import.name,
+                            link_package = link_package,
+                            package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
+                        ),
+                    ))
                 package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
                 repo_package_json_bzl = "@{repo_name}//{link_package}:{package_json_bzl}".format(
                     repo_name = _import.name,

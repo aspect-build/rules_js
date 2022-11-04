@@ -479,15 +479,14 @@ bin = bin_factory("node_modules")
 
             build_file = paths.join(link_package, "BUILD.bazel")
             if build_file not in rctx_files:
-                rctx_files[build_file] = generated_by_lines[:] + [
-                    """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
-                    "",
-                    """exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME),
-                ]
-            rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                name = link_package.split("/")[-1] or package_name_no_scope,
-                src = _PACKAGE_JSON_BZL_FILENAME,
-            ))
+                rctx_files[build_file] = generated_by_lines[:]
+            if rctx.attr.generate_bzl_library_targets:
+                rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
+                rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
+                    name = link_package.split("/")[-1] or package_name_no_scope,
+                    src = _PACKAGE_JSON_BZL_FILENAME,
+                ))
+            rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
 
     rules_js_metadata = {}
     if rctx.attr.run_lifecycle_hooks:
@@ -710,6 +709,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "link_workspace": attr.string(),
     "url": attr.string(),
     "npm_auth": attr.string(),
+    "generate_bzl_library_targets": attr.bool(),
 })
 
 def _get_bin_entries(pkg_json, package):
