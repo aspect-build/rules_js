@@ -73,6 +73,7 @@ npm_translate_lock(
         "@aspect-test/c": "echo moo > cow.txt",
         "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
     },
+    generate_bzl_library_targets = True,
     lifecycle_hooks_execution_requirements = {
         "@figma/nodegit": [
             # Workaround Engflow not honoring requires-network on build actions

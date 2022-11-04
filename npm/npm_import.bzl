@@ -325,6 +325,7 @@ def npm_translate_lock(
     additional_file_contents = kwargs.pop("additional_file_contents", {})
     repositories_bzl_filename = kwargs.pop("repositories_bzl_filename", None)
     defs_bzl_filename = kwargs.pop("defs_bzl_filename", None)
+    generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
 
     if len(kwargs):
         fail("Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0]))
@@ -380,6 +381,7 @@ def npm_translate_lock(
         additional_file_contents = additional_file_contents,
         repositories_bzl_filename = repositories_bzl_filename,
         defs_bzl_filename = defs_bzl_filename,
+        generate_bzl_library_targets = generate_bzl_library_targets,
     )
 
 _npm_import_links = repository_rule(
@@ -611,6 +613,7 @@ def npm_import(
         **kwargs: Internal use only
     """
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
+    generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
         fail("Invalid npm_import parameter '{}'".format(kwargs.keys()[0]))
 
@@ -633,6 +636,7 @@ def npm_import(
         extra_build_content = (
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
         ),
+        generate_bzl_library_targets = generate_bzl_library_targets,
     )
 
     # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated
