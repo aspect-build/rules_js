@@ -311,22 +311,42 @@ if [ ! -f "$entry_point" ]; then
     exit 1
 fi
 
-export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
-if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
-    logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
-    exit 1
+node="$(_normalize_path "../nodejs_linux_amd64/bin/nodejs/bin/node")"
+if [ "${node:0:1}" = "/" ]; then
+    # A user may specify an absolute path to node using target_tool_path in node_toolchain
+    export JS_BINARY__NODE_BINARY="$node"
+    if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
+        logf_fatal "node binary '%s' not found" "$JS_BINARY__NODE_BINARY"
+        exit 1
+    fi
+else
+    export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node"
+    if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
+        logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
+        exit 1
+    fi
 fi
 if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' is not executable" "$JS_BINARY__NODE_BINARY"
     exit 1
 fi
 
-npm=
+npm=""
 if [ "$npm" ]; then
-    export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/"
-    if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
-        logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
-        exit 1
+    npm="$(_normalize_path "$npm")"
+    if [ "${npm:0:1}" = "/" ]; then
+        # A user may specify an absolute path to npm using npm_path in node_toolchain
+        export JS_BINARY__NPM_BINARY="$npm"
+        if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
+            logf_fatal "npm binary '%s' not found" "$JS_BINARY__NPM_BINARY"
+            exit 1
+        fi
+    else
+        export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/"
+        if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
+            logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
+            exit 1
+        fi
     fi
     if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
