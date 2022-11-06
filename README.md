@@ -1,4 +1,4 @@
-# Bazel rules for JavaScript
+# Bazel rules for JavaScripT
 
 This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
 accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
