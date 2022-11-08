@@ -2,6 +2,7 @@
 
 load(":js_binary.bzl", "js_binary_lib")
 load(":js_binary_helpers.bzl", _gather_files_from_js_providers = "gather_files_from_js_providers")
+load(":js_library_helpers.bzl", _gather_npm_linked_packages = "gather_npm_linked_packages")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
 _DOC = """Runs a devserver via binary target or command.
@@ -67,8 +68,10 @@ and run in watch mode using [ibazel](https://github.com/bazelbuild/bazel-watcher
 The devserver specified by either `tool` or `command` is run in a custom sandbox that is more
 compatible with devserver watch modes in Node.js tools such as Webpack and Next.js.
 
-The custom sandbox is populated with the default outputs of all targets in `data`.
-rules_js npm package link targets such as `//:node_modules/next` are supported.
+The custom sandbox is populated with the default outputs of all targets in `data`
+as well as transitive npm links.
+
+rules_js npm package link targets such as `//:node_modules/next` are handled efficiently.
 Since these targets are symlinks in the output tree, they are recreated as symlinks
 in the custom sandbox and do not incur a fully copy of the underlying npm packages.
 
@@ -113,8 +116,18 @@ def _impl(ctx):
     if ctx.attr.tool and ctx.attr.command:
         fail("Only one of tool or command may be specified")
 
+    # The .to_list() calls here are intentional and cannot be avoided; they should be small sets of
+    # files as they only include direct npm links (node_modules/foo) and the virtual store tree
+    # artifacts those symlinks point to (node_modules/.aspect_rules_js/foo@1.2.3/node_modules/foo)
+    transitive_npm_links_files = []
+    transitive_npm_links = depset(transitive = [p.files for p in _gather_npm_linked_packages(srcs = [], deps = ctx.attr.data).transitive.to_list()])
+    for f in transitive_npm_links.to_list():
+        # don't include the virtual store tree artifact; only the node_module link is needed
+        if not "/.aspect_rules_js/" in f.path:
+            transitive_npm_links_files.append(f)
+
     config = {
-        "data_files": [f.short_path for f in ctx.files.data],
+        "data_files": [f.short_path for f in ctx.files.data + transitive_npm_links_files],
     }
     if ctx.attr.tool:
         config["tool"] = ctx.executable.tool.short_path

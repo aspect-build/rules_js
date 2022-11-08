@@ -5,9 +5,11 @@ importers:
   .:
     specifiers:
       '@bazel/ibazel': 0.16.2
+      chalk: 4.1.2
       http-server: 14.1.1
     devDependencies:
       '@bazel/ibazel': 0.16.2
+      chalk: 4.1.2
       http-server: 14.1.1
 
 packages:
