@@ -127,6 +127,7 @@ bzl_library(
     deps = [
         ":js_binary",
         ":js_binary_helpers",
+        ":js_library_helpers",
         "@bazel_skylib//lib:dicts",
     ],
 )

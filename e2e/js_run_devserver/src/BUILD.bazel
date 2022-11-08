@@ -1,5 +1,5 @@
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_devserver")
 load("@com_github_ash2k_bazel_tools//multirun:def.bzl", "command", "multirun")
 load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
 
@@ -61,10 +61,34 @@ command(
 # See https://github.com/ash2k/bazel-tools/tree/master/multirun.
 # This can be used with ibazel: ibazel run //src:serve_all
 multirun(
-    name = "serve_all",
+    name = "serve_multi",
     commands = [
         ":serve",
         ":serve_alt",
     ],
     jobs = 0,
+)
+
+# Intentionally a js_library and not a js_binary to test that transitive npm are
+# include in js_run_devserver. See https://github.com/aspect-build/rules_webpack/issues/66.
+js_library(
+    name = "simple",
+    srcs = [
+        "simple.js",
+    ],
+    deps = [
+        "//:node_modules/chalk",
+    ],
+)
+
+# Another example but this time using a simple custom http-server js_binary
+js_run_devserver(
+    name = "serve_simple",
+    chdir = package_name(),
+    command = "./simple.js",
+    data = [
+        "index.html",
+        "other.html",
+        ":simple",
+    ],
 )
