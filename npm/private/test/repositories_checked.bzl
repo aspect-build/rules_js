@@ -954,21 +954,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-commonjs__23.0.2__rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "23.0.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.0.tgz",
+        version = "23.0.2_rollup@2.79.1",
+        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.2.tgz",
         lifecycle_hooks_no_sandbox = True,
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-JbrTRyDNtLQj/rhl7RFUuYXwQ2fac+33oLDAu2k++WD95zweyo28UAomLVA0JMGx4vmCa7Nw4T6k/1F6lelExg==",
+        integrity = "sha512-e9ThuiRf93YlVxc4qNIurvv+Hp9dnD+4PjOqQs5vAYfcZ3+AXSrcdzXnVjWxcGQOa6KGJFcRZyUI3ktWLavFjg==",
         deps = {
-            "@rollup/pluginutils": "4.2.1",
+            "@rollup/pluginutils": "5.0.2_rollup@2.79.1",
             "commondir": "1.0.1",
             "estree-walker": "2.0.2",
             "glob": "8.0.3",
@@ -977,8 +977,8 @@ def npm_repositories():
             "rollup": "2.79.1",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.0_rollup@2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
+            "@rollup/plugin-commonjs": ["23.0.2_rollup@2.79.1"],
+            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
             "commondir": ["1.0.1"],
             "estree-walker": ["2.0.2"],
             "glob": ["8.0.3"],
@@ -987,7 +987,7 @@ def npm_repositories():
             "rollup": ["2.79.1"],
             "fsevents": ["2.3.2"],
             "sourcemap-codec": ["1.4.8"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "fs.realpath": ["1.0.0"],
             "inflight": ["1.0.6"],
             "inherits": ["2.0.4"],
@@ -1001,49 +1001,50 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-json__5.0.1__rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-json"],
         },
         package = "@rollup/plugin-json",
-        version = "5.0.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.0.tgz",
+        version = "5.0.1_rollup@2.79.1",
+        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.1.tgz",
         lifecycle_hooks_no_sandbox = True,
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-LsWDA5wJs/ggzakVuKQhZo7HPRcQZgBa3jWIVxQSFxaRToUGNi8ZBh3+k/gQ+1eInVYJgn4WBRCUkmoDrmmGzw==",
+        integrity = "sha512-QCwhZZLvM8nRcTHyR1vOgyTMiAnjiNj1ebD/BMRvbO1oc/z14lZH6PfxXeegee2B6mky/u9fia4fxRM4TqrUaw==",
         deps = {
-            "@rollup/pluginutils": "4.2.1",
+            "@rollup/pluginutils": "5.0.2_rollup@2.79.1",
             "rollup": "2.79.1",
         },
         transitive_closure = {
-            "@rollup/plugin-json": ["5.0.0_rollup@2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
+            "@rollup/plugin-json": ["5.0.1_rollup@2.79.1"],
+            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
             "rollup": ["2.79.1"],
             "fsevents": ["2.3.2"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "estree-walker": ["2.0.2"],
             "picomatch": ["2.3.1"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-node-resolve__15.0.1__rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
         },
         package = "@rollup/plugin-node-resolve",
-        version = "15.0.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.0.0.tgz",
+        version = "15.0.1_rollup@2.79.1",
+        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.0.1.tgz",
         lifecycle_hooks_no_sandbox = True,
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-iwJbzfTzlzDDQcGmkS7EkCKwe2kSkdBrjX87Fy/KrNjr6UNnLpod0t6X66e502LRe5JJCA4FFqrEscWPnZAkig==",
+        integrity = "sha512-ReY88T7JhJjeRVbfCyNj+NXAG3IIsVMsX9b5/9jC98dRP8/yxlZdz7mHZbHk5zHr24wZZICS5AcXsFZAXYUQEg==",
         deps = {
-            "@rollup/pluginutils": "4.2.1",
+            "@rollup/pluginutils": "5.0.2_rollup@2.79.1",
             "@types/resolve": "registry.npmjs.org/@types/resolve/1.20.2",
             "deepmerge": "4.2.2",
             "is-builtin-module": "3.2.0",
@@ -1052,8 +1053,8 @@ def npm_repositories():
             "rollup": "2.79.1",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["15.0.0_rollup@2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
+            "@rollup/plugin-node-resolve": ["15.0.1_rollup@2.79.1"],
+            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
             "@types/resolve": ["registry.npmjs.org/@types/resolve/1.20.2"],
             "deepmerge": ["4.2.2"],
             "is-builtin-module": ["3.2.0"],
@@ -1067,6 +1068,7 @@ def npm_repositories():
             "has": ["1.0.3"],
             "function-bind": ["1.1.1"],
             "builtin-modules": ["3.3.0"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "estree-walker": ["2.0.2"],
             "picomatch": ["2.3.1"],
         },
@@ -1101,25 +1103,30 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__4.2.1",
+        name = "npm__at_rollup_pluginutils__5.0.2__rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@rollup/pluginutils",
-        version = "4.2.1",
-        url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-4.2.1.tgz",
+        version = "5.0.2_rollup@2.79.1",
+        url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-5.0.2.tgz",
         lifecycle_hooks_no_sandbox = True,
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==",
+        integrity = "sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==",
         deps = {
+            "@types/estree": "registry.npmjs.org/@types/estree/1.0.0",
             "estree-walker": "2.0.2",
             "picomatch": "2.3.1",
+            "rollup": "2.79.1",
         },
         transitive_closure = {
-            "@rollup/pluginutils": ["4.2.1"],
+            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "estree-walker": ["2.0.2"],
             "picomatch": ["2.3.1"],
+            "rollup": ["2.79.1"],
+            "fsevents": ["2.3.2"],
         },
     )
 
@@ -1732,7 +1739,7 @@ def npm_repositories():
             "shebang-regex": ["3.0.0"],
             "envinfo": ["7.8.1"],
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/wasm-edit": ["1.11.1"],
             "@webassemblyjs/wasm-parser": ["1.11.1"],
@@ -1847,7 +1854,7 @@ def npm_repositories():
             "shallow-clone": ["3.0.1"],
             "isobject": ["3.0.1"],
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/wasm-edit": ["1.11.1"],
             "@webassemblyjs/wasm-parser": ["1.11.1"],
@@ -1980,7 +1987,7 @@ def npm_repositories():
             "shallow-clone": ["3.0.1"],
             "isobject": ["3.0.1"],
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/wasm-edit": ["1.11.1"],
             "@webassemblyjs/wasm-parser": ["1.11.1"],
@@ -15027,7 +15034,7 @@ def npm_repositories():
             "terser": ["5.14.1"],
             "webpack": ["5.73.0_webpack-cli@4.10.0"],
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/wasm-edit": ["1.11.1"],
             "@webassemblyjs/wasm-parser": ["1.11.1"],
@@ -16594,7 +16601,7 @@ def npm_repositories():
             "shallow-clone": ["3.0.1"],
             "isobject": ["3.0.1"],
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/wasm-edit": ["1.11.1"],
             "@webassemblyjs/wasm-parser": ["1.11.1"],
@@ -16779,7 +16786,7 @@ def npm_repositories():
         transitive_closure = {
             "webpack": ["5.73.0_webpack-cli@4.10.0"],
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0", "registry.npmjs.org/@types/estree/0.0.51"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/wasm-edit": ["1.11.1"],
             "@webassemblyjs/wasm-parser": ["1.11.1"],
@@ -17444,12 +17451,12 @@ def npm_repositories():
         integrity = "sha512-PB3ldyrcnAicT35TWPs5IcwKD8S333HMaa2VVv4+wdvebJkjWuW/xESoB8IwRcog8HYVYamb1g/R31Qv5Bx03g==",
         deps = {
             "@types/eslint": "registry.npmjs.org/@types/eslint/8.4.3",
-            "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
+            "@types/estree": "registry.npmjs.org/@types/estree/1.0.0",
         },
         transitive_closure = {
             "@types/eslint-scope": ["registry.npmjs.org/@types/eslint-scope/3.7.3"],
             "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
         },
     )
@@ -17467,12 +17474,12 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-YP1S7YJRMPs+7KZKDb9G63n8YejIwW9BALq7a5j2+H4yl6iOv9CB29edho+cuFRrvmJbbaH2yiVChKLJVysDGw==",
         deps = {
-            "@types/estree": "registry.npmjs.org/@types/estree/0.0.51",
+            "@types/estree": "registry.npmjs.org/@types/estree/1.0.0",
             "@types/json-schema": "registry.npmjs.org/@types/json-schema/7.0.11",
         },
         transitive_closure = {
             "@types/eslint": ["registry.npmjs.org/@types/eslint/8.4.3"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "@types/json-schema": ["registry.npmjs.org/@types/json-schema/7.0.11"],
         },
     )
@@ -17508,6 +17515,23 @@ def npm_repositories():
         integrity = "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==",
         transitive_closure = {
             "@types/estree": ["registry.npmjs.org/@types/estree/0.0.51"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_estree__registry.npmjs.org_at_types_estree_1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/estree",
+        version = "registry.npmjs.org/@types/estree/1.0.0",
+        url = "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.0.tgz",
+        lifecycle_hooks_no_sandbox = True,
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==",
+        transitive_closure = {
+            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
         },
     )
 
