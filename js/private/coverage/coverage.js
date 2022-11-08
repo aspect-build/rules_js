@@ -11,19 +11,6 @@ var require$$1$1 = require('url');
 var require$$0$3 = require('buffer');
 var require$$12 = require('module');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var require$$0__default = /*#__PURE__*/_interopDefaultLegacy(require$$0);
-var require$$2__default = /*#__PURE__*/_interopDefaultLegacy(require$$2);
-var require$$0__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$0$1);
-var require$$3__default = /*#__PURE__*/_interopDefaultLegacy(require$$3);
-var require$$5__default = /*#__PURE__*/_interopDefaultLegacy(require$$5);
-var require$$0__default$2 = /*#__PURE__*/_interopDefaultLegacy(require$$0$2);
-var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1);
-var require$$1__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$1$1);
-var require$$0__default$3 = /*#__PURE__*/_interopDefaultLegacy(require$$0$3);
-var require$$12__default = /*#__PURE__*/_interopDefaultLegacy(require$$12);
-
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function getAugmentedNamespace(n) {
@@ -70,9 +57,9 @@ var old$1 = {};
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var pathModule = require$$0__default["default"];
+var pathModule = require$$0;
 var isWindows = process.platform === 'win32';
-var fs$5 = require$$0__default$1["default"];
+var fs$5 = require$$0$1;
 
 // JavaScript implementation of realpath, ported from node pre-v6
 
@@ -360,7 +347,7 @@ realpath.realpathSync = realpathSync;
 realpath.monkeypatch = monkeypatch;
 realpath.unmonkeypatch = unmonkeypatch;
 
-var fs$4 = require$$0__default$1["default"];
+var fs$4 = require$$0$1;
 var origRealpath = fs$4.realpath;
 var origRealpathSync = fs$4.realpathSync;
 
@@ -1727,8 +1714,8 @@ function ownProp (obj, field) {
   return Object.prototype.hasOwnProperty.call(obj, field)
 }
 
-var fs$3 = require$$0__default$1["default"];
-var path$4 = require$$0__default["default"];
+var fs$3 = require$$0$1;
+var path$4 = require$$0;
 var minimatch$1 = minimatch_1;
 var isAbsolute$2 = pathIsAbsolute.exports;
 var Minimatch = minimatch$1.Minimatch;
@@ -1967,8 +1954,8 @@ function requireSync () {
 	var minimatch = minimatch_1;
 	minimatch.Minimatch;
 	requireGlob().Glob;
-	var path = require$$0__default["default"];
-	var assert = require$$5__default["default"];
+	var path = require$$0;
+	var assert = require$$5;
 	var isAbsolute = pathIsAbsolute.exports;
 	var common$1 = common;
 	var setopts = common$1.setopts;
@@ -2630,9 +2617,9 @@ function requireGlob () {
 	var minimatch = minimatch_1;
 	minimatch.Minimatch;
 	var inherits$1 = inherits.exports;
-	var EE = require$$3__default["default"].EventEmitter;
-	var path = require$$0__default["default"];
-	var assert = require$$5__default["default"];
+	var EE = require$$3.EventEmitter;
+	var path = require$$0;
+	var assert = require$$5;
 	var isAbsolute = pathIsAbsolute.exports;
 	var globSync = requireSync();
 	var common$1 = common;
@@ -3877,7 +3864,7 @@ function requireIsOutsideDirWin32 () {
 	if (hasRequiredIsOutsideDirWin32) return isOutsideDirWin32;
 	hasRequiredIsOutsideDirWin32 = 1;
 
-	const path = require$$0__default["default"];
+	const path = require$$0;
 	const minimatch = minimatch_1;
 
 	const dot = { dot: true };
@@ -3895,7 +3882,7 @@ function requireIsOutsideDirPosix () {
 	if (hasRequiredIsOutsideDirPosix) return isOutsideDirPosix;
 	hasRequiredIsOutsideDirPosix = 1;
 
-	const path = require$$0__default["default"];
+	const path = require$$0;
 
 	isOutsideDirPosix = function(dir, filename) {
 	    return /^\.\./.test(path.relative(dir, filename));
@@ -3912,8 +3899,8 @@ function requireIsOutsideDirPosix () {
 	}
 } (isOutsideDir$1));
 
-const path$3 = require$$0__default["default"];
-const { promisify: promisify$1 } = require$$2__default["default"];
+const path$3 = require$$0;
+const { promisify: promisify$1 } = require$$2;
 const glob = promisify$1(requireGlob());
 const minimatch = minimatch_1;
 const { defaults } = schema;
@@ -4143,7 +4130,7 @@ function assertValidSummary(obj) {
  * is an object that has 4 keys `total`, `covered`, `skipped` and `pct`.
  * `pct` is a percentage number (0-100).
  */
-class CoverageSummary$3 {
+let CoverageSummary$3 = class CoverageSummary {
     /**
      * @constructor
      * @param {Object|CoverageSummary} [obj=undefined] an optional data object or
@@ -4198,7 +4185,7 @@ class CoverageSummary$3 {
     isEmpty() {
         return this.lines.total === 0;
     }
-}
+};
 
 dataProperties$1(CoverageSummary$3, [
     'lines',
@@ -4307,7 +4294,7 @@ const mergeProp = (aHits, aMap, bHits, bMap, itemKey = keyFromLoc) => {
  * * `f` - hit count for functions
  * * `b` - hit count for branches
  */
-class FileCoverage$2 {
+let FileCoverage$2 = class FileCoverage {
     /**
      * @constructor
      * @param {Object|FileCoverage|String} pathOrObj is a string that initializes
@@ -4538,7 +4525,7 @@ class FileCoverage$2 {
         }
         return new CoverageSummary$2(ret);
     }
-}
+};
 
 // expose coverage data attributes
 dataProperties(FileCoverage$2, [
@@ -4587,7 +4574,7 @@ function loadMap(source) {
 }
 
 /** CoverageMap is a map of `FileCoverage` objects keyed by file paths. */
-class CoverageMap$1 {
+let CoverageMap$1 = class CoverageMap {
     /**
      * @constructor
      * @param {Object} [obj=undefined] obj A coverage map from which to initialize this
@@ -4685,7 +4672,7 @@ class CoverageMap$1 {
 
         return ret;
     }
-}
+};
 
 var coverageMap = {
     CoverageMap: CoverageMap$1
@@ -6358,9 +6345,9 @@ var semver$1 = {exports: {}};
 	}
 } (semver$1, semver$1.exports));
 
-const fs$2 = require$$0__default$1["default"];
-const path$2 = require$$0__default["default"];
-const {promisify} = require$$2__default["default"];
+const fs$2 = require$$0$1;
+const path$2 = require$$0;
+const {promisify} = require$$2;
 const semver = semver$1.exports;
 
 const useNativeRecursiveOption = semver.satisfies(process.version, '>=10.12.0');
@@ -6521,8 +6508,8 @@ var hasFlag$1 = (flag, argv = process.argv) => {
 	return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
 };
 
-const os = require$$0__default$2["default"];
-const tty = require$$1__default["default"];
+const os = require$$0$2;
+const tty = require$$1;
 const hasFlag = hasFlag$1;
 
 const {env} = process;
@@ -6660,8 +6647,8 @@ var supportsColor_1 = {
  Copyright 2012-2015, Yahoo Inc.
  Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
  */
-const path$1 = require$$0__default["default"];
-const fs$1 = require$$0__default$1["default"];
+const path$1 = require$$0;
+const fs$1 = require$$0$1;
 const mkdirp = makeDir$1.exports;
 const supportsColor = supportsColor_1;
 
@@ -6759,7 +6746,7 @@ class ConsoleWriter extends ContentWriter {
  * @param {String} baseDir the base directory under which files should be written
  * @constructor
  */
-class FileWriter$1 {
+let FileWriter$1 = class FileWriter {
     constructor(baseDir) {
         if (!baseDir) {
             throw new Error('baseDir must be specified');
@@ -6841,7 +6828,7 @@ class FileWriter$1 {
         mkdirp.sync(path$1.dirname(file));
         return new FileContentWriter(fs$1.openSync(file, 'w'));
     }
-}
+};
 
 var fileWriter = FileWriter$1;
 
@@ -6862,7 +6849,7 @@ function attrString(attrs) {
  * @param {ContentWriter} contentWriter the content writer that this utility wraps
  * @constructor
  */
-class XMLWriter$1 {
+let XMLWriter$1 = class XMLWriter {
     constructor(contentWriter) {
         this.cw = contentWriter;
         this.stack = [];
@@ -6931,7 +6918,7 @@ class XMLWriter$1 {
                 this.closeTag(name);
             });
     }
-}
+};
 
 var xmlWriter = XMLWriter$1;
 
@@ -7005,7 +6992,7 @@ class CompositeVisitor extends Visitor {
         });
     });
 
-class BaseNode$1 {
+let BaseNode$1 = class BaseNode {
     isRoot() {
         return !this.getParent();
     }
@@ -7032,13 +7019,13 @@ class BaseNode$1 {
             visitor.onSummaryEnd(this, state);
         }
     }
-}
+};
 
 /**
  * abstract base class for a coverage tree.
  * @constructor
  */
-class BaseTree$1 {
+let BaseTree$1 = class BaseTree {
     constructor(root) {
         this.root = root;
     }
@@ -7063,7 +7050,7 @@ class BaseTree$1 {
         this.getRoot().visit(visitor, state);
         visitor.onEnd(this.getRoot(), state);
     }
-}
+};
 
 var tree$1 = {
     BaseTree: BaseTree$1,
@@ -7092,7 +7079,7 @@ var watermarks$2 = {
  Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
  */
 
-const path = require$$0__default["default"];
+const path = require$$0;
 let parsePath$1 = path.parse;
 let SEP = path.sep;
 const origParser = parsePath$1;
@@ -7137,7 +7124,7 @@ function makeRelativeNormalizedPath(str, sep) {
     return dir;
 }
 
-class Path$1 {
+let Path$1 = class Path {
     constructor(strOrArray) {
         if (Array.isArray(strOrArray)) {
             this.v = strOrArray;
@@ -7227,7 +7214,7 @@ class Path$1 {
         const bstr = b.toString();
         return astr < bstr ? -1 : astr > bstr ? 1 : 0;
     }
-}
+};
 
 ['push', 'pop', 'shift', 'unshift', 'splice'].forEach(fn => {
     Object.defineProperty(Path$1.prototype, fn, {
@@ -7456,7 +7443,7 @@ function pkgSummaryPrefix(dirParents, commonParent) {
     return commonParent.name();
 }
 
-class SummarizerFactory$1 {
+let SummarizerFactory$1 = class SummarizerFactory {
     constructor(coverageMap, defaultSummarizer = 'pkg') {
         this._coverageMap = coverageMap;
         this._defaultSummarizer = defaultSummarizer;
@@ -7536,7 +7523,7 @@ class SummarizerFactory$1 {
 
         return this._nested;
     }
-}
+};
 
 var summarizerFactory = SummarizerFactory$1;
 
@@ -7544,7 +7531,7 @@ var summarizerFactory = SummarizerFactory$1;
  Copyright 2012-2015, Yahoo Inc.
  Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
  */
-const fs = require$$0__default$1["default"];
+const fs = require$$0$1;
 const FileWriter = fileWriter;
 const XMLWriter = xmlWriter;
 const tree = tree$1;
@@ -7581,7 +7568,7 @@ function normalizeWatermarks(specified = {}) {
  *  filesystem lookups based on path.
  * @constructor
  */
-class Context$1 {
+let Context$1 = class Context {
     constructor(opts) {
         this.dir = opts.dir || 'coverage';
         this.watermarks = normalizeWatermarks(opts.watermarks);
@@ -7658,7 +7645,7 @@ class Context$1 {
     getTree(name = 'defaultSummarizer') {
         return this._summarizerFactory[name];
     }
-}
+};
 
 Object.defineProperty(Context$1.prototype, 'writer', {
     enumerable: true,
@@ -7675,7 +7662,7 @@ var context = Context$1;
 // TODO: switch to class private field when targetting node.js 12
 const _summarizer = Symbol('ReportBase.#summarizer');
 
-class ReportBase$1 {
+let ReportBase$1 = class ReportBase {
     constructor(opts = {}) {
         this[_summarizer] = opts.summarizer;
     }
@@ -7683,7 +7670,7 @@ class ReportBase$1 {
     execute(context) {
         context.getTree(this[_summarizer]).visit(this, context);
     }
-}
+};
 
 var reportBase = ReportBase$1;
 
@@ -7766,7 +7753,7 @@ function requireLcovonly () {
 	        const branches = fc.b;
 	        const branchMap = fc.branchMap;
 	        const summary = node.getCoverageSummary();
-	        const path = require$$0__default["default"];
+	        const path = require$$0;
 
 	        writer.println('TN:');
 	        const fileName = path.relative(this.projectRoot, fc.path);
@@ -7862,9 +7849,9 @@ var istanbulReports = {
 // https://github.com/nodejs/node/blob/master/lib/internal/source_map/source_map_cache.js
 // we should to upstream and downstream fixes.
 
-const { readFileSync: readFileSync$1 } = require$$0__default$1["default"];
-const { fileURLToPath: fileURLToPath$2, pathToFileURL: pathToFileURL$1 } = require$$1__default$1["default"];
-const util$2 = require$$2__default["default"];
+const { readFileSync: readFileSync$1 } = require$$0$1;
+const { fileURLToPath: fileURLToPath$2, pathToFileURL: pathToFileURL$1 } = require$$1$1;
+const util$2 = require$$2;
 const debuglog$2 = util$2.debuglog('c8');
 
 /**
@@ -7944,7 +7931,7 @@ var safeBuffer = {exports: {}};
 /* eslint-disable node/no-deprecated-api */
 
 (function (module, exports) {
-	var buffer = require$$0__default$3["default"];
+	var buffer = require$$0$3;
 	var Buffer = buffer.Buffer;
 
 	// alternative to using Object.keys for old browsers
@@ -8008,8 +7995,8 @@ var safeBuffer = {exports: {}};
 } (safeBuffer, safeBuffer.exports));
 
 (function (exports) {
-	var fs = require$$0__default$1["default"];
-	var path = require$$0__default["default"];
+	var fs = require$$0$1;
+	var path = require$$0;
 	var SafeBuffer = safeBuffer.exports;
 
 	Object.defineProperty(exports, 'commentRegex', {
@@ -9567,12 +9554,12 @@ var require$$9 = {
 	files: files
 };
 
-const assert = require$$5__default["default"];
+const assert = require$$5;
 const convertSourceMap = convertSourceMap$1;
-const util$1 = require$$2__default["default"];
+const util$1 = require$$2;
 const debuglog$1 = util$1.debuglog('c8');
-const { dirname, isAbsolute: isAbsolute$1, join, resolve: resolve$1 } = require$$0__default["default"];
-const { fileURLToPath: fileURLToPath$1 } = require$$1__default$1["default"];
+const { dirname, isAbsolute: isAbsolute$1, join, resolve: resolve$1 } = require$$0;
+const { fileURLToPath: fileURLToPath$1 } = require$$1$1;
 const CovBranch = requireBranch();
 const CovFunction = require_function();
 const CovSource = requireSource();
@@ -9590,7 +9577,7 @@ const isNode8 = /^v8\./.test(process.version);
 
 // Injected when Node.js is loading script into isolate pre Node 10.16.x.
 // see: https://github.com/nodejs/node/pull/21573.
-const cjsWrapperLength = isOlderNode10 ? require$$12__default["default"].wrapper[0].length : 0;
+const cjsWrapperLength = isOlderNode10 ? require$$12.wrapper[0].length : 0;
 
 var v8ToIstanbul$1 = class V8ToIstanbul {
   constructor (scriptPath, wrapperLength, sources, excludePath) {
@@ -10647,17 +10634,17 @@ const Exclude = testExclude;
 const libCoverage = istanbulLibCoverage.exports;
 const libReport = istanbulLibReport;
 const reports = istanbulReports;
-const { readdirSync, readFileSync, statSync } = require$$0__default$1["default"];
-const { isAbsolute, resolve, extname } = require$$0__default["default"];
-const { pathToFileURL, fileURLToPath } = require$$1__default$1["default"];
+const { readdirSync, readFileSync, statSync } = require$$0$1;
+const { isAbsolute, resolve, extname } = require$$0;
+const { pathToFileURL, fileURLToPath } = require$$1$1;
 const getSourceMapFromFile = sourceMapFromFile_1;
 // TODO: switch back to @c88/v8-coverage once patch is landed.
 const v8toIstanbul = v8ToIstanbul;
 const isCjsEsmBridgeCov = isCjsEsmBridge;
-const util = require$$2__default["default"];
+const util = require$$2;
 const debuglog = util.debuglog('c8');
 
-class Report$1 {
+let Report$1 = class Report {
   constructor ({
     exclude,
     extension,
@@ -10975,7 +10962,7 @@ class Report$1 {
     this.shouldInstrumentCache.set(filename, result);
     return result
   }
-}
+};
 
 var report = function (opts) {
   return new Report$1(opts)
@@ -10986,7 +10973,7 @@ var Report = report;
 // bazel will create the COVERAGE_OUTPUT_FILE whilst setting up the sandbox.
 // therefore, should be doing a file size check rather than presence.
 try {
-    const stats = require$$0__default$1["default"].statSync(process.env.COVERAGE_OUTPUT_FILE);
+    const stats = require$$0$1.statSync(process.env.COVERAGE_OUTPUT_FILE);
     if (stats.size != 0) {
         // early exit here does not affect the outcome of the tests.
         // bazel will only execute _lcov_merger when tests pass.
@@ -10995,7 +10982,7 @@ try {
     // in case file doesn't exist or some other error is thrown, just ignore it.
 } catch {}
 
-const include = require$$0__default$1["default"]
+const include = require$$0$1
     .readFileSync(process.env.COVERAGE_MANIFEST)
     .toString('utf8')
     .split('\n')
@@ -11003,7 +10990,7 @@ const include = require$$0__default$1["default"]
 
 // TODO: can or should we instrument files from other repositories as well?
 // if so then the path.join call below will yield invalid paths since files will have external/wksp as their prefix.
-const pwd = require$$0__default["default"].join(process.env.RUNFILES_DIR, process.env.TEST_WORKSPACE);
+const pwd = require$$0.join(process.env.RUNFILES_DIR, process.env.TEST_WORKSPACE);
 process.chdir(pwd);
 
 new Report({
@@ -11018,8 +11005,8 @@ new Report({
 })
     .run()
     .then(() => {
-        require$$0__default$1["default"].renameSync(
-            require$$0__default["default"].join(process.env.COVERAGE_DIR, 'lcov.info'),
+        require$$0$1.renameSync(
+            require$$0.join(process.env.COVERAGE_DIR, 'lcov.info'),
             process.env.COVERAGE_OUTPUT_FILE
         );
     })
