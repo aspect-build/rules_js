@@ -11,6 +11,10 @@ http_server_bin.http_server_binary(
 # as the tool
 js_run_devserver(
     name = "devserver",
+    args = [
+        "-p",
+        "8080",
+    ],
     chdir = package_name(),
     data = [
         "index.html",
@@ -41,6 +45,10 @@ copy_to_directory(
 # entry point
 js_run_devserver(
     name = "devserver_alt",
+    args = [
+        "-p",
+        "8081",
+    ],
     chdir = package_name(),
     command = "../node_modules/.bin/http-server",
     data = [
