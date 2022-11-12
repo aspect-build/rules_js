@@ -241,6 +241,32 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
     if not importers:
         fail("expected importers in processed lockfile")
 
+    # make a lookup table of package to link name for each importer
+    importer_links = {}
+    for import_path, importer in importers.items():
+        dependencies = importer.get("dependencies")
+        if type(dependencies) != "dict":
+            fail("expected dict of dependencies in processed importer '%s'" % import_path)
+        links = {
+            "link_package": _link_package(root_package, import_path),
+        }
+        linked_packages = {}
+        for dep_package, dep_version in dependencies.items():
+            if dep_version.startswith("link:"):
+                continue
+            if dep_version[0].isdigit():
+                maybe_package = utils.pnpm_name(dep_package, dep_version)
+            elif dep_version.startswith("/"):
+                maybe_package = dep_version[1:]
+            else:
+                maybe_package = dep_version
+            if maybe_package not in linked_packages:
+                linked_packages[maybe_package] = [dep_package]
+            else:
+                linked_packages[maybe_package].append(dep_package)
+        links["packages"] = linked_packages
+        importer_links[import_path] = links
+
     result = []
     for package, package_info in packages.items():
         name = package_info.get("name")
@@ -291,28 +317,13 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
         if repo_name.startswith("aspect_rules_js.npm."):
             repo_name = repo_name[len("aspect_rules_js.npm."):]
 
+        # gather all of the importers (workspace packages) that this npm package should be linked at which names
         link_packages = {}
-
-        for import_path, importer in importers.items():
-            dependencies = importer.get("dependencies")
-            if type(dependencies) != "dict":
-                fail("expected dict of dependencies in processed importer '%s'" % import_path)
-            link_package = _link_package(root_package, import_path)
-            for dep_package, dep_version in dependencies.items():
-                if dep_version.startswith("link:"):
-                    continue
-                if dep_version[0].isdigit():
-                    maybe_package = utils.pnpm_name(dep_package, dep_version)
-                elif dep_version.startswith("/"):
-                    maybe_package = dep_version[1:]
-                else:
-                    maybe_package = dep_version
-                if package == maybe_package:
-                    # this package is a direct dependency at this import path
-                    if link_package not in link_packages:
-                        link_packages[link_package] = [dep_package]
-                    else:
-                        link_packages[link_package].append(dep_package)
+        for import_path, links in importer_links.items():
+            linked_packages = links["packages"]
+            link_names = linked_packages.get(package, [])
+            if link_names:
+                link_packages[links["link_package"]] = link_names
 
         # check if this package should be hoisted via public_hoist_packages
         public_hoist_packages = _gather_values_from_matching_names(attr.public_hoist_packages, name, friendly_name, unfriendly_name)
