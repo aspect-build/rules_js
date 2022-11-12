@@ -77,11 +77,14 @@ The devserver specified by either `tool` or `command` is run in a custom sandbox
 compatible with devserver watch modes in Node.js tools such as Webpack and Next.js.
 
 The custom sandbox is populated with the default outputs of all targets in `data`
-as well as transitive npm links.
+as well as transitive sources & npm links.
 
-rules_js npm package link targets such as `//:node_modules/next` are handled efficiently.
-Since these targets are symlinks in the output tree, they are recreated as symlinks
-in the custom sandbox and do not incur a fully copy of the underlying npm packages.
+An an optimization, virtual store files are explicitly excluded from the sandbox since the npm
+links will point to the virtual store in the execroot and Node.js will follow those links as it
+does within the execroot. As a result, rules_js npm package link targets such as
+`//:node_modules/next` are handled efficiently. Since these targets are symlinks in the output
+tree, they are recreated as symlinks in the custom sandbox and do not incur a fully copy of the
+underlying npm packages.
 
 Supports running with [ibazel](https://github.com/bazelbuild/bazel-watcher).
 Only `data` files that change on incremental builds are synchronized when running with ibazel.

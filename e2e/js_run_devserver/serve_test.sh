@@ -63,7 +63,7 @@ if ! curl http://localhost:8080/index.html --fail 2>/dev/null | grep "A second l
 fi
 
 echo "<div>A new file</div>" > src/new.html
-_sedi 's#"other.html",#"other.html", "new.html",#' src/BUILD.bazel
+_sedi 's#"other.html"#"other.html", "new.html"#' src/BUILD.bazel
 
 echo "Waiting 10 seconds for ibazel rebuild after change to src/BUILD.bazel..."
 sleep 10
