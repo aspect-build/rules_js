@@ -125,7 +125,10 @@ jobs:
 
             - name: Configure Bazel version
               working-directory: ${{ matrix.folder }}
-              run: echo "USE_BAZEL_VERSION=${{ matrix.bazelversion }}" >> $GITHUB_ENV
+              # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
+              # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
+              # then use .bazelversion to determine which Bazel version to use
+              run: echo "${{ matrix.bazelversion }}" > .bazelversion
 
             - name: Write EngFlow credentials
               # Writes EngFlow credential files for RBE configurations
@@ -177,7 +180,9 @@ jobs:
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               if: steps.has_test_sh.outputs.files_exists != 'true' && matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
+              # TODO: remove .bazeliskrc after coverage command is fixed in Aspect CLI
               run: |
+                  echo "USE_BAZEL_VERSION=${{ matrix.bazelversion }}" > .bazeliskrc
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} --instrument_test_targets //...
               env:
                   # Bazelisk will download bazel to here
