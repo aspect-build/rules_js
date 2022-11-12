@@ -180,9 +180,7 @@ jobs:
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               if: steps.has_test_sh.outputs.files_exists != 'true' && matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
-              # TODO: remove .bazeliskrc after coverage command is fixed in Aspect CLI
               run: |
-                  echo "USE_BAZEL_VERSION=${{ matrix.bazelversion }}" > .bazeliskrc
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} --instrument_test_targets //...
               env:
                   # Bazelisk will download bazel to here

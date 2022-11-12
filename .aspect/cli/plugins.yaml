@@ -1,0 +1,13 @@
+# Plugins fail on CI: https://github.com/aspect-build/rules_js/actions/runs/3451833892/jobs/5761331944
+# ```
+# Error: failed to run test command: rpc error: code = ResourceExhausted desc = grpc: received message larger than max (7366885 vs. 4194304)
+# Error: failed to run test command: rpc error: code = ResourceExhausted desc = grpc: received message larger than max (7366885 vs. 4194304)
+# Error: failed to run test command: rpc error: code = ResourceExhausted desc = grpc: received message larger than max (8031334 vs. 4194304)
+# Error: failed to run test command: rpc error: code = ResourceExhausted desc = grpc: received message larger than max (8031334 vs. 4194304)
+# ```
+# - name: plugin-aspect-pro
+#   from: https://static.aspect.build/aspect
+#   version: 4.2.2
+# - name: plugin-aspect-buildkite
+#   from: https://static.aspect.build/aspect
+#   version: 4.2.2
