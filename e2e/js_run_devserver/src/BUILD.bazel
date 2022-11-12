@@ -7,15 +7,25 @@ http_server_bin.http_server_binary(
     name = "http_server",
 )
 
+# A trivial graph of sources to include in js_run_devserver data to test
+# that transitive sources are include
+js_library(
+    name = "transitive_web_files",
+    srcs = ["other.html"],
+)
+
+js_library(
+    name = "web_files",
+    srcs = ["index.html"],
+    deps = [":transitive_web_files"],
+)
+
 # Simple js_run_devserver rule that syncs two html files and takes an http-server js_binary
 # as the tool
 js_run_devserver(
     name = "devserver",
     chdir = package_name(),
-    data = [
-        "index.html",
-        "other.html",
-    ],
+    data = [":web_files"],
     log_level = "debug",
     tool = ":http_server",
 )
@@ -47,6 +57,7 @@ js_run_devserver(
         ":http_root",
         "//:node_modules/http-server",
     ],
+    log_level = "debug",
 )
 
 # Use command to bake-in the arguments into the runnable binary so that the target
@@ -87,8 +98,8 @@ js_run_devserver(
     chdir = package_name(),
     command = "./simple.js",
     data = [
-        "index.html",
-        "other.html",
         ":simple",
+        ":web_files",
     ],
+    log_level = "debug",
 )
