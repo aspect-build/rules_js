@@ -24,6 +24,10 @@ js_library(
 # as the tool
 js_run_devserver(
     name = "devserver",
+    args = [
+        "-p",
+        "8080",
+    ],
     chdir = package_name(),
     data = [":web_files"],
     log_level = "debug",
@@ -51,6 +55,10 @@ copy_to_directory(
 # entry point
 js_run_devserver(
     name = "devserver_alt",
+    args = [
+        "-p",
+        "8081",
+    ],
     chdir = package_name(),
     command = "../node_modules/.bin/http-server",
     data = [
