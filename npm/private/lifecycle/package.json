@@ -3,6 +3,6 @@
     "private": true,
     "dependencies": {
         "@pnpm/lifecycle": "13.1.12",
-        "@pnpm/logger": "4.0.0"
+        "@pnpm/logger": "5.0.0"
     }
 }
