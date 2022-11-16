@@ -82,7 +82,7 @@ Please note that using the `yarn_lock` attributes of `npm_translate_lock` has ca
 
 A few packages have bugs which rely on "hoisting" behavior in yarn or npm, where undeclared dependencies can be loaded because they happen to be installed in an ancestor folder under `node_modules`.
 
-In many cases, updating your dependencies will fix issues since maintainers are constantly addressing pnpm bugs.
+In many cases, updating your dependencies will fix issues since maintainers are constantly addressing pnpm bugs. You can also check if the bug exists outside of Bazel by setting [`hoist=false`](https://pnpm.io/npmrc#hoist) in your `.npmrc` which the default pnpm's behavior of hoisting every package to a `node_modules` folder at the root of the virtual store (`node_modules/.pnpm/node_modules`) where packages can find undeclared "phantom" dependencies. `rules_js` doesn't support phantom dependencies as this would break the ability to lazy fetch & lazy link only what is needed for the target being built. Setting [`hoist=false`](https://pnpm.io/npmrc#hoist) in your `.npmrc` outside of Bazel more closely resembles how dependency resolution works in `rules_js` so you can ofter reproduce a dependency issue that way.
 
 Another pattern which may break is when a configuration file references an npm package, then a library reads that configuration and tries to require that package. For example, this [mocha json config file](https://github.com/aspect-build/rules_js/blob/main/examples/macro/mocha_reporters.json) references the `mocha-junit-reporter` package, so mocha will try to load that package despite not having a declared dependency on it.
 
