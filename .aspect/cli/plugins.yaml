@@ -1,6 +1,6 @@
 - name: plugin-aspect-pro
   from: https://static.aspect.build/aspect
-  version: 5.0.0
+  version: 5.0.1
 - name: plugin-aspect-buildkite
   from: https://static.aspect.build/aspect
-  version: 5.0.0
+  version: 5.0.1
