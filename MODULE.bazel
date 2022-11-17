@@ -2,7 +2,7 @@
 
 module(
     name = "aspect_rules_js",
-    version = "1.6.8",
+    version = "0.0.0",
     compatibility_level = 1,
 )
 
