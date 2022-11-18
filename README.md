@@ -14,7 +14,7 @@ Google does not fund development of rules_js. If your company benefits, please c
 
 Known issues:
 
--   Remote Execution (RBE) requires the latest version of Bazel, 6.0. Run `echo 6.0.0rc1 > .bazelversion` or set environment `USE_BAZEL_VERSION=6.0.0rc1`.
+-   Remote Execution (RBE) requires the latest version of Bazel, 6.0. Run `echo 6.0.0rc2 > .bazelversion` or set environment `USE_BAZEL_VERSION=6.0.0rc2`.
 -   Building docker containers works, per [this example](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image) however it requires some Starlark code which ought to be in our public API, see https://github.com/aspect-build/rules_js/issues/304
 -   No examples yet for stamping and publishing npm packages.
 -   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
@@ -55,13 +55,13 @@ The [e2e]() folder also has a few useful examples such as [js_image](https://git
 
 Larger examples can be found in our [bazel-examples]() repository including:
 
-* [Next.js](https://github.com/aspect-build/bazel-examples/tree/main/next.js) / [rules_ts](https://github.com/aspect-build/rules_ts)
-* [Angular (cli/architect)](https://github.com/aspect-build/bazel-examples/tree/main/angular)
-* [Angular (ngc)](https://github.com/aspect-build/bazel-examples/tree/main/angular-ngc) / [rules_ts](https://github.com/aspect-build/rules_ts)
-* [React (create-react-app)](https://github.com/aspect-build/bazel-examples/tree/main/react-cra)
-* [Vue](https://github.com/aspect-build/bazel-examples/tree/main/vue)
-* [Jest](https://github.com/aspect-build/bazel-examples/tree/main/jest) / [rules_jest](https://github.com/aspect-build/rules_jest)
-* [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nestjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
+-   [Next.js](https://github.com/aspect-build/bazel-examples/tree/main/next.js) / [rules_ts](https://github.com/aspect-build/rules_ts)
+-   [Angular (cli/architect)](https://github.com/aspect-build/bazel-examples/tree/main/angular)
+-   [Angular (ngc)](https://github.com/aspect-build/bazel-examples/tree/main/angular-ngc) / [rules_ts](https://github.com/aspect-build/rules_ts)
+-   [React (create-react-app)](https://github.com/aspect-build/bazel-examples/tree/main/react-cra)
+-   [Vue](https://github.com/aspect-build/bazel-examples/tree/main/vue)
+-   [Jest](https://github.com/aspect-build/bazel-examples/tree/main/jest) / [rules_jest](https://github.com/aspect-build/rules_jest)
+-   [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nestjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
 
 ## Relationship to rules_nodejs
 
