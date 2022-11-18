@@ -168,7 +168,7 @@ def _impl(ctx):
         ctx,
         srcs = ctx.attr.srcs,
         dst = dst,
-        additional_files = additional_files.to_list(),
+        additional_files = additional_files,
         root_paths = ctx.attr.root_paths,
         include_external_repositories = ctx.attr.include_external_repositories,
         include_srcs_packages = ctx.attr.include_srcs_packages,
