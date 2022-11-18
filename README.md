@@ -15,6 +15,7 @@ Google does not fund development of rules_js. If your company benefits, please c
 Known issues:
 
 -   Remote Execution (RBE) requires the latest version of Bazel, 6.0. Run `echo 6.0.0rc2 > .bazelversion` or set environment `USE_BAZEL_VERSION=6.0.0rc2`.
+-   With Bazel 6.0.0rc2 and `--remote_download_outputs` set to either `toplevel` or `minimal` there are issues with sandboxed execution and tree artifacts (which rules_js uses for the node_modules virtual store). We're currently investigating this issue. It may be a Bazel regression. For now it is recommended to not set `--remote_download_outputs` to either `toplevel` or `minimal` with Bazel 6.0.0rc1 & rc2.
 -   Building docker containers works, per [this example](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image) however it requires some Starlark code which ought to be in our public API, see https://github.com/aspect-build/rules_js/issues/304
 -   No examples yet for stamping and publishing npm packages.
 -   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
