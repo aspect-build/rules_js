@@ -384,6 +384,7 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
             url = url,
             version = version,
             bins = bins,
+            package_info = package_info,
         ))
 
     return result
@@ -926,9 +927,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                     links_bzl[link_package].append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                         package_scope = package_scope,
                     ))
-        pkgs = lockfile.get("packages").values()
         for link_package in _import.link_packages.keys():
-            if pkgs[i].get("hasBin"):
+            if _import.package_info.get("hasBin"):
                 build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
                 if build_file not in rctx_files:
                     rctx_files[build_file] = []
