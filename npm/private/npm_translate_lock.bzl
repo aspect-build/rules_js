@@ -40,6 +40,7 @@ _ATTRS = {
     "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
     "generate_bzl_library_targets": attr.bool(),
+    "data": attr.label_list(),
 }
 
 def _process_lockfile(rctx, pnpm_lock):
@@ -511,6 +512,13 @@ def _impl(rctx):
             default_registry = _to_registry_url(npmrc["registry"])
 
     _validate_attrs(rctx)
+
+    for f in rctx.attr.data:
+        rctx.file(
+            paths.normalize(paths.join(f.package, f.name)),
+            content = rctx.read(f),
+            executable = False,
+        )
 
     if rctx.attr.pnpm_lock != None:
         lockfile = _process_lockfile(rctx, rctx.attr.pnpm_lock)
