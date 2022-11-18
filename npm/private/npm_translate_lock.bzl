@@ -124,7 +124,8 @@ _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
     if link_package.startswith("../"):
-        fail("Invalid link_package outside of the WORKSPACE: {}".format(link_package))
+        msg = "Invalid link_package outside of the WORKSPACE: {}".format(link_package)
+        fail(msg)
     if link_package == ".":
         link_package = ""
     return link_package
@@ -246,7 +247,8 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
     for import_path, importer in importers.items():
         dependencies = importer.get("dependencies")
         if type(dependencies) != "dict":
-            fail("expected dict of dependencies in processed importer '%s'" % import_path)
+            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
+            fail(msg)
         links = {
             "link_package": _link_package(root_package, import_path),
         }
@@ -476,7 +478,8 @@ def _validate_attrs(rctx):
         if rctx.attr.package_json:
             fail("The package_json attribute should not be used with pnpm_lock.")
     if count != 1:
-        fail("npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count))
+        msg = "npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count)
+        fail(msg)
 
 def _label_str(label):
     return "//{}:{}".format(
@@ -688,7 +691,8 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
     for import_path, importer in importers.items():
         dependencies = importer.get("dependencies")
         if type(dependencies) != "dict":
-            fail("expected dict of dependencies in processed importer '%s'" % import_path)
+            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
+            fail(msg)
         link_package = _link_package(root_package, import_path)
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("file:"):
@@ -698,7 +702,8 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
                     dep_path = _link_package(root_package, dep_version[len("file:"):])
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
-                    fail("Expected to file: referenced package {} in first-party links".format(dep_key))
+                    msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
+                    fail(msg)
                 fp_links[dep_key]["link_packages"][link_package] = []
             elif dep_version.startswith("link:"):
                 dep_importer = paths.normalize(paths.join(import_path, dep_version[len("link:"):]))

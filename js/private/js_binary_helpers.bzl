@@ -23,7 +23,8 @@ def envs_for_log_level(log_level):
         logs for the given log level. Typically, they are each set to "1".
     """
     if log_level not in LOG_LEVELS.keys():
-        fail("log_level must be one of {} but got {}".format(LOG_LEVELS.keys(), log_level))
+        msg = "log_level must be one of {} but got {}".format(LOG_LEVELS.keys(), log_level)
+        fail(msg)
     envs = []
     log_level_numeric = LOG_LEVELS[log_level]
     if log_level_numeric >= LOG_LEVELS["fatal"]:
