@@ -21,8 +21,14 @@ This target can be used as the `src` attribute to `npm_link_package`.
 
 `npm_package` makes use of `copy_to_directory`
 (https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md) under the hood,
-adopting its API and its copy action using composition. However, unlike copy_to_directory,
-npm_package includes transitive_sources and transitive_declarations files from JsInfo providers in srcs.
+adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
+npm_package includes `transitive_sources` and `transitive_declarations` files from `JsInfo` providers in srcs
+by default. The behavior of including sources and declarations from `JsInfo` can be configured
+using the `include_sources`, `include_transitive_sources`, `include_declarations`, `include_transitive_declarations`
+attributes.
+
+`npm_package` also includes default runfiles from `srcs` by default which `copy_to_directory` does not. This behavior
+can be configured with the `include_runfiles` attribute.
 
 The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
 package and subpackages from being included.
@@ -130,6 +136,26 @@ If unset, a npm_link_package that references this npm_package must define the pa
         linking with `npm_link_package`.
         """,
     ),
+    "include_sources": attr.bool(
+        doc = """When True, `sources` from `JsInfo` providers in data targets are included in the list of available files to copy.""",
+        default = True,
+    ),
+    "include_transitive_sources": attr.bool(
+        doc = """When True, `transitive_sources` from `JsInfo` providers in data targets are included in the list of available files to copy.""",
+        default = True,
+    ),
+    "include_declarations": attr.bool(
+        doc = """When True, `declarations` from `JsInfo` providers in data targets are included in the list of available files to copy.""",
+        default = True,
+    ),
+    "include_transitive_declarations": attr.bool(
+        doc = """When True, `transitive_declarations` from `JsInfo` providers in data targets are included in the list of available files to copy.""",
+        default = True,
+    ),
+    "include_runfiles": attr.bool(
+        doc = """When True, default runfiles from `srcs` targets are included in the list of available files to copy.""",
+        default = True,
+    ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 })
 
@@ -138,21 +164,44 @@ def _impl(ctx):
 
     dst = ctx.actions.declare_directory(ctx.attr.out if ctx.attr.out else ctx.attr.name)
 
-    additional_files = depset([], transitive = [
-        # include all transitive sources
-        target[JsInfo].transitive_sources
-        for target in ctx.attr.srcs
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-    ] + [
-        # include all transitive declarations
-        target[JsInfo].transitive_declarations
-        for target in ctx.attr.srcs
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
-    ] + [
-        # include runfiles from srcs
-        target[DefaultInfo].default_runfiles.files
-        for target in ctx.attr.srcs
-    ])
+    additional_files_depsets = []
+
+    if ctx.attr.include_transitive_sources:
+        # include all transitive sources (this includes direct sources)
+        additional_files_depsets.extend([
+            target[JsInfo].transitive_sources
+            for target in ctx.attr.srcs
+            if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
+        ])
+    elif ctx.attr.include_sources:
+        # include only direct sources
+        additional_files_depsets.extend([
+            target[JsInfo].sources
+            for target in ctx.attr.srcs
+            if JsInfo in target and hasattr(target[JsInfo], "sources")
+        ])
+
+    if ctx.attr.include_transitive_declarations:
+        # include all transitive declarations (this includes direct declarations)
+        additional_files_depsets.extend([
+            target[JsInfo].transitive_declarations
+            for target in ctx.attr.srcs
+            if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
+        ])
+    elif ctx.attr.include_declarations:
+        # include only direct declarations
+        additional_files_depsets.extend([
+            target[JsInfo].declarations
+            for target in ctx.attr.srcs
+            if JsInfo in target and hasattr(target[JsInfo], "declarations")
+        ])
+
+    if ctx.attr.include_runfiles:
+        # include default runfiles from srcs
+        additional_files_depsets.extend([
+            target[DefaultInfo].default_runfiles.files
+            for target in ctx.attr.srcs
+        ])
 
     # forward all npm_package_store_deps
     npm_package_store_deps = [
@@ -168,7 +217,7 @@ def _impl(ctx):
         ctx,
         srcs = ctx.attr.srcs,
         dst = dst,
-        additional_files = additional_files,
+        additional_files = depset(transitive = additional_files_depsets),
         root_paths = ctx.attr.root_paths,
         include_external_repositories = ctx.attr.include_external_repositories,
         include_srcs_packages = ctx.attr.include_srcs_packages,
