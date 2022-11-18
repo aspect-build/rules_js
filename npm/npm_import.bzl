@@ -63,6 +63,7 @@ def npm_translate_lock(
         warn_on_unqualified_tarball_url = None,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
+        data = None,
         **kwargs):
     """Repository rule to generate npm_import rules from pnpm lock file or from a package.json and yarn/npm lock file.
 
@@ -184,9 +185,9 @@ def npm_translate_lock(
 
             Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
 
-        package_json: The package.json file. From this file and the corresponding package-lock.json/yarn.lock file
-            (specified with the npm_package_lock/yarn_lock attributes),
-            a pnpm-lock.yaml file will be generated using `pnpm import`.
+        package_json: The package.json file. From this file and the corresponding `package-lock.json`/`yarn.lock` file
+            (specified with the `npm_package_lock`/`yarn_lock` attributes),
+            a `pnpm-lock.yaml` file will be generated using `pnpm import`.
 
             Note that *any* changes to the package.json file will invalidate the npm_translate_lock
             repository rule, causing it to re-run on the next invocation of Bazel.
@@ -317,6 +318,15 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
+        data: Data files required by this repository rule.
+
+            When any of these files changes it causes the repository rule to re-run.
+
+            These files are also copied to the external repository before running `pnpm import` so they can be referenced
+            by `pnpm import` in the case that `npm_translate_lock` is configured to generate a `pnpm-lock.yaml` file from
+            a `yarn.lock` or `package-lock.json` file.
+            See `package_json` docstring for more info.
+
         **kwargs: Internal use only
     """
 
@@ -382,6 +392,7 @@ def npm_translate_lock(
         repositories_bzl_filename = repositories_bzl_filename,
         defs_bzl_filename = defs_bzl_filename,
         generate_bzl_library_targets = generate_bzl_library_targets,
+        data = data,
     )
 
 _npm_import_links = repository_rule(
