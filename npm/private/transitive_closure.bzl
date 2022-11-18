@@ -23,7 +23,8 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
         if not len(stack):
             break
         if i == iteration_max:
-            fail("gather_transitive_closure exhausted the iteration limit of %s - please report this issue" % iteration_max)
+            msg = "gather_transitive_closure exhausted the iteration limit of {} - please report this issue".format(iteration_max)
+            fail(msg)
         deps = stack.pop()
         for name in deps.keys():
             version = deps[name]
@@ -58,7 +59,8 @@ def _gather_package_info(package_path, package_snapshot):
     elif package_path.startswith("file:"):
         package = package_path
         if "name" not in package_snapshot:
-            fail("expected package %s to have a name field" % package_path)
+            msg = "expected package {} to have a name field".format(package_path)
+            fail(msg)
         name = package_snapshot["name"]
         version = package_path
         friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
@@ -66,23 +68,27 @@ def _gather_package_info(package_path, package_snapshot):
     else:
         package = package_path
         if "name" not in package_snapshot:
-            fail("expected package %s to have a name field" % package_path)
+            msg = "expected package {} to have a name field".format(package_path)
+            fail(msg)
         if "version" not in package_snapshot:
-            fail("expected package %s to have a version field" % package_path)
+            msg = "expected package {} to have a version field".format(package_path)
+            fail(msg)
         name = package_snapshot["name"]
         version = package_path
         friendly_version = package_snapshot["version"]
         package_key = package
 
     if "resolution" not in package_snapshot:
-        fail("package %s has no resolution field" % package_path)
+        msg = "package {} has no resolution field".format(package_path)
+        fail(msg)
     id = package_snapshot["id"] if "id" in package_snapshot else None
     resolution = package_snapshot["resolution"]
     integrity = resolution["integrity"] if "integrity" in resolution else None
     tarball = resolution["tarball"] if "tarball" in resolution else None
     directory = resolution["directory"] if "directory" in resolution else None
     if not integrity and not tarball and not directory:
-        fail("expected package %s to have an integrity, tarball or directory fields but found none" % package_path)
+        msg = "expected package {} to have an integrity, tarball or directory fields but found none".format(package_path)
+        fail(msg)
     registry = resolution["registry"] if "registry" in resolution else None
 
     return package_key, {

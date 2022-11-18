@@ -45,7 +45,8 @@ def _parse_pnpm_name(pnpmName):
     # a (name, version) tuple
     segments = pnpmName.rsplit("/", 1)
     if len(segments) != 2:
-        fail("unexpected pnpm versioned name " + pnpmName)
+        msg = "unexpected pnpm versioned name {}".format(pnpmName)
+        fail(msg)
     return (segments[0], segments[1])
 
 def _parse_pnpm_lock(lockfile_content):

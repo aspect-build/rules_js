@@ -328,7 +328,8 @@ def npm_translate_lock(
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
 
     if len(kwargs):
-        fail("Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0]))
+        msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
+        fail(msg)
 
     if pnpm_version != None and not native.existing_rule("pnpm"):
         npm_import(
@@ -615,7 +616,8 @@ def npm_import(
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
-        fail("Invalid npm_import parameter '{}'".format(kwargs.keys()[0]))
+        msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
+        fail(msg)
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
