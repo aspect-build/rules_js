@@ -11,6 +11,7 @@ npm_package(
         # by the downstream npm_link_package
         "//:node_modules/uvu",
     ],
+    include_runfiles = False,
     package = "@e2e/lib",
     visibility = ["//visibility:public"],
 )

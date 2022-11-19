@@ -9,7 +9,7 @@ JS_LIBRARY_DATA_ATTR = attr.label_list(
     doc = """Runtime dependencies to include in binaries/tests that depend on this target.
 
     The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the `data` attribute
-    are added to the runfiles of this taregt. Thery should appear in the '*.runfiles' area of any executable which has
+    are added to the runfiles of this target. They should appear in the '*.runfiles' area of any executable which has
     a runtime dependency on this target.
 
     If this list contains linked npm packages, npm package store targets or other targets that provide `JsInfo`,
@@ -35,12 +35,12 @@ def gather_transitive_sources(sources, targets):
     """
     if type(sources) == "list":
         sources = depset(sources)
-    transitive_deps = [
+    transitive = [
         target[JsInfo].transitive_sources
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
     ]
-    return depset([], transitive = [sources] + transitive_deps)
+    return depset([], transitive = [sources] + transitive)
 
 def gather_transitive_declarations(declarations, targets):
     """Gathers transitive sources from a list of direct sources and targets
@@ -54,12 +54,12 @@ def gather_transitive_declarations(declarations, targets):
     """
     if type(declarations) == "list":
         declarations = depset(declarations)
-    transitive_deps = [
+    transitive = [
         target[JsInfo].transitive_declarations
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
     ]
-    return depset([], transitive = [declarations] + transitive_deps)
+    return depset([], transitive = [declarations] + transitive)
 
 def gather_npm_linked_packages(srcs, deps):
     """Gathers npm linked packages from a list of srcs and deps targets
