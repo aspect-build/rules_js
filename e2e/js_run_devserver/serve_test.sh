@@ -32,7 +32,10 @@ while ! nc -z localhost 8080; do
   sleep 0.5 # wait before check again
 done
 
-echo "Devserver launched"
+echo "Waiting 5 seconds for devservers to settle..."
+sleep 5
+
+echo "Devserver ready"
 
 if ! curl http://localhost:8080/index.html --fail 2>/dev/null | grep "My first website"; then
   echo "ERROR: Expected http://localhost:8080/index.html to contain 'My first website'"
