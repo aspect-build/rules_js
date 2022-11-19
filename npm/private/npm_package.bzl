@@ -153,7 +153,18 @@ If unset, a npm_link_package that references this npm_package must define the pa
         default = True,
     ),
     "include_runfiles": attr.bool(
-        doc = """When True, default runfiles from `srcs` targets are included in the list of available files to copy.""",
+        doc = """When True, default runfiles from `srcs` targets are included in the list of available files to copy.
+
+This may be needed in a few cases:
+
+- to work-around issues with rules that don't provide everything needed in sources, transitive_sources, declarations & transitive_declarations
+- to depend on the runfiles targets that don't use JsInfo
+
+NB: The default value will be flipped to False in the next major release as runfiles are not needed in the general case
+and adding them to the list of files available to copy can add noticeable overhead to the analysis phase in a large
+repository with many npm_package targets.
+""",
+        # TODO(2.0): flip default to False
         default = True,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
