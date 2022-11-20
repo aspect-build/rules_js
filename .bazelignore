@@ -7,6 +7,7 @@ examples/npm_package/packages/pkg_b/node_modules/
 examples/webpack_cli/node_modules/
 examples/macro/node_modules/
 examples/npm_deps/node_modules/
+examples/build_with_node_gyp/node_modules/
 node_modules/
 npm/private/test/node_modules/
 js/private/coverage/bundle/node_modules

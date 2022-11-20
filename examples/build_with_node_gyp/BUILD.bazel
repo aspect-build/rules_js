@@ -1,0 +1,14 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+# Link all direct dependencies in /examples/npm_deps/package.json to
+# bazel-bin/examples/npm_deps/node_modules
+npm_link_all_packages(name = "node_modules")
+
+js_test(
+    name = "test_peer",
+    data = [
+        ":node_modules/ffi-napi"
+    ],
+    entry_point = "peer_test.js",
+)
