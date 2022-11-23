@@ -47,7 +47,7 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
                 continue
             else:
                 package_info = packages[package_key]
-            stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"]))
+            stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"]))
 
 def _gather_package_info(package_path, package_snapshot):
     if package_path.startswith("/"):
@@ -83,29 +83,19 @@ def _gather_package_info(package_path, package_snapshot):
         fail(msg)
     id = package_snapshot["id"] if "id" in package_snapshot else None
     resolution = package_snapshot["resolution"]
-    integrity = resolution["integrity"] if "integrity" in resolution else None
-    tarball = resolution["tarball"] if "tarball" in resolution else None
-    directory = resolution["directory"] if "directory" in resolution else None
-    if not integrity and not tarball and not directory:
-        msg = "expected package {} to have an integrity, tarball or directory fields but found none".format(package_path)
-        fail(msg)
-    registry = resolution["registry"] if "registry" in resolution else None
 
     return package_key, {
         "name": name,
         "id": id,
         "version": version,
         "friendly_version": friendly_version,
-        "integrity": integrity,
-        "tarball": tarball,
-        "directory": directory,
-        "registry": registry,
+        "resolution": resolution,
         "dependencies": package_snapshot.get("dependencies", {}),
-        "optionalDependencies": package_snapshot.get("optionalDependencies", {}),
+        "optional_dependencies": package_snapshot.get("optionalDependencies", {}),
         "dev": "dev" in package_snapshot.keys(),
         "optional": "optional" in package_snapshot.keys(),
-        "hasBin": "hasBin" in package_snapshot.keys(),
-        "requiresBuild": "requiresBuild" in package_snapshot.keys(),
+        "has_bin": "hasBin" in package_snapshot.keys(),
+        "requires_build": "requiresBuild" in package_snapshot.keys(),
     }
 
 def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_optional = False):
@@ -157,7 +147,7 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
         package_info = packages[package]
         transitive_closure = {}
         transitive_closure[package_info["name"]] = [package_info["version"]]
-        dependencies = package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optionalDependencies"])
+        dependencies = package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
 
         gather_transitive_closure(
             packages,
@@ -166,7 +156,7 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
             transitive_closure,
         )
 
-        package_info["transitiveClosure"] = transitive_closure
+        package_info["transitive_closure"] = transitive_closure
 
     return {
         "importers": importers,

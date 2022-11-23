@@ -276,18 +276,38 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
         version = package_info.get("version")
         friendly_version = package_info.get("friendly_version")
         deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optionalDependencies")
+        optional_deps = package_info.get("optional_dependencies")
         dev = package_info.get("dev")
         optional = package_info.get("optional")
-        requires_build = package_info.get("requiresBuild")
-        integrity = package_info.get("integrity")
-        tarball = package_info.get("tarball")
-        registry = package_info.get("registry")
-        transitive_closure = package_info.get("transitiveClosure")
+        requires_build = package_info.get("requires_build")
+        transitive_closure = package_info.get("transitive_closure")
+        resolution = package_info.get("resolution")
 
         if version.startswith("file:"):
             # this package is treated as a first-party dep
             continue
+
+        resolution_type = resolution.get("type", None)
+        if resolution_type == "directory":
+            # this package is treated as a first-party dep
+            continue
+
+        if resolution_type == "git":
+            # TODO: implement git resolutions
+            # repo = resolution["repo"] if "repo" in resolution else None
+            # commit = resolution["commit"] if "commit" in resolution else None
+            # buildifier: disable=print
+            print("""
+WARNING: git resolution in pnpm-lock.yaml package {} not yet supported
+""".format(package))
+            continue
+
+        integrity = resolution.get("integrity", None)
+        tarball = resolution.get("tarball", None)
+        registry = resolution.get("registry", None)
+        if not integrity and not tarball:
+            msg = "expected package {} to have an integrity or tarball field but found none".format(package)
+            fail(msg)
 
         if attr.prod and dev:
             # when prod attribute is set, skip devDependencies
@@ -928,7 +948,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                         package_scope = package_scope,
                     ))
         for link_package in _import.link_packages.keys():
-            if _import.package_info.get("hasBin"):
+            if _import.package_info.get("has_bin"):
                 build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
                 if build_file not in rctx_files:
                     rctx_files[build_file] = []
