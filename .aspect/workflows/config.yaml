@@ -1,54 +1,59 @@
 ---
 workspaces:
-  - .:
-      group:
-        icon: js
-        label: rules_js
-  - e2e/bzlmod:
-      group:
-        icon: bazel
-  - e2e/js_image:
-      group:
-        icon: docker
-  - e2e/js_image:
-      group:
-        icon: docker
-  - e2e/js_run_devserver:
-      group:
-        icon: js
-  - e2e/npm_link_package:
-      group:
-        icon: npm
-  - e2e/npm_link_package-esm:
-      group:
-        icon: npm
-  - e2e/npm_translate_lock:
-      group:
-        icon: npm
-  # Requires an auth token?
-  # - e2e/npm_translate_lock_auth:
-  #     group:
-  #       icon: npm
-  - e2e/npm_translate_package_lock:
-      group:
-        icon: npm
-  - e2e/npm_translate_yarn_lock:
-      group:
-        icon: yarn
-  - e2e/package_json_module:
-      group:
-        icon: npm
-  - e2e/pnpm_workspace:
-      group:
-        icon: pnpm
-  - e2e/pnpm_workspace_rerooted:
-      group:
-        icon: pnpm
-  - e2e/rules_foo
+    - .:
+          group:
+              icon: js
+              label: rules_js
+    - e2e/bzlmod:
+          group:
+              icon: bazel
+    - e2e/js_image:
+          group:
+              icon: docker
+    - e2e/js_image:
+          group:
+              icon: docker
+    - e2e/js_run_devserver:
+          group:
+              icon: js
+    - e2e/npm_link_package:
+          group:
+              icon: npm
+    - e2e/npm_link_package-esm:
+          group:
+              icon: npm
+    - e2e/npm_translate_lock:
+          group:
+              icon: npm
+    # Requires an auth token?
+    # - e2e/npm_translate_lock_auth:
+    #     group:
+    #       icon: npm
+    - e2e/npm_translate_package_lock:
+          group:
+              icon: npm
+    - e2e/npm_translate_yarn_lock:
+          group:
+              icon: yarn
+    - e2e/package_json_module:
+          group:
+              icon: npm
+    - e2e/pnpm_workspace:
+          group:
+              icon: pnpm
+    - e2e/pnpm_workspace_rerooted:
+          group:
+              icon: pnpm
+    - e2e/rules_foo:
+          group:
+              icon: js
+    - e2e/vendored_node:
+          group:
+              icon: js
 
 tasks:
-  test:
-    flags:
-      - --remote_default_exec_properties=cache-silo-key="74aed5f7"
-      - --remote_cache=grpc://remote-cache-9e85d2169ed596f9.elb.us-east-2.amazonaws.com:8980
-    archive_execution_log: false
+    test:
+        flags:
+            - --remote_default_exec_properties=cache-silo-key="74aed5f7"
+            - --remote_cache=grpc://remote-cache-9e85d2169ed596f9.elb.us-east-2.amazonaws.com:8980
+        archive_execution_log: false
