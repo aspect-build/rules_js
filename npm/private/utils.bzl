@@ -153,6 +153,9 @@ def _npm_registry_download_url(package, version, registries, default_registry):
         _strip_peer_dep_version(version),
     )
 
+def _is_git_repository_url(url):
+    return url.startswith("git+ssh://")
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -172,4 +175,5 @@ utils = struct(
     npm_registry_url = _npm_registry_url,
     npm_registry_download_url = _npm_registry_download_url,
     parse_package_name = _parse_package_name,
+    is_git_repository_url = _is_git_repository_url,
 )

@@ -4,6 +4,14 @@ load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load(
+    "@bazel_tools//tools/build_defs/repo:git_worker.bzl",
+    _git_add_origin = "add_origin",
+    _git_clean = "clean",
+    _git_fetch = "fetch",
+    _git_init = "init",
+    _git_reset = "reset",
+)
 load(":utils.bzl", "utils")
 load(":npm_translate_lock.bzl", "DEFAULT_REGISTRY")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
@@ -345,9 +353,27 @@ _EXTRACT_TO_DIRNAME = "package"
 _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
-def _impl(rctx):
-    # scoped packages contain a slash in the name, which doesn't appear in the later part of the URL
-    package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
+def _fetch_git_repository(rctx):
+    if not rctx.attr.commit:
+        fail("commit required if url is a git repository")
+
+    # Adapted from git_repo helper function used by git_repository in @bazel_tools//tools/build_defs/repo:git_worker.bzl:
+    # https://github.com/bazelbuild/bazel/blob/5bdd2b2ff8d6be4ecbffe82d975983129d459782/tools/build_defs/repo/git_worker.bzl#L34
+    git_repo = struct(
+        directory = rctx.path(_EXTRACT_TO_DIRNAME),
+        shallow = "--depth=1",
+        reset_ref = rctx.attr.commit,
+        fetch_ref = rctx.attr.commit,
+        remote = str(rctx.attr.url),
+    )
+    rctx.report_progress("Cloning %s of %s" % (git_repo.reset_ref, git_repo.remote))
+    _git_init(rctx, git_repo)
+    _git_add_origin(rctx, git_repo, rctx.attr.url)
+    _git_fetch(rctx, git_repo)
+    _git_reset(rctx, git_repo)
+    _git_clean(rctx, git_repo)
+
+def _download_and_extract_archive(rctx):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, DEFAULT_REGISTRY)
 
     auth = {
@@ -396,6 +422,12 @@ def _impl(rctx):
             msg = "chmod %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
             fail(msg)
 
+def _impl(rctx):
+    if utils.is_git_repository_url(rctx.attr.url):
+        _fetch_git_repository(rctx)
+    else:
+        _download_and_extract_archive(rctx)
+
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
@@ -428,6 +460,7 @@ def _impl(rctx):
 
     if bins:
         virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+        package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
 
         for link_package in rctx.attr.link_packages.keys():
             bin_bzl = generated_by_lines + [
@@ -708,6 +741,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "custom_postinstall": attr.string(),
     "link_workspace": attr.string(),
     "url": attr.string(),
+    "commit": attr.string(),
     "npm_auth": attr.string(),
     "generate_bzl_library_targets": attr.bool(),
 })
