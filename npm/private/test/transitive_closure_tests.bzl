@@ -15,25 +15,25 @@ TEST_PACKAGES = {
             "@aspect-test/c": "1.0.0",
             "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0",
         },
-        "optionalDependencies": {},
+        "optional_dependencies": {},
     },
     "@aspect-test/b/5.0.0": {
         "dependencies": {},
-        "optionalDependencies": {
+        "optional_dependencies": {
             "@aspect-test/c": "2.0.0",
         },
     },
     "@aspect-test/c/1.0.0": {
         "dependencies": {},
-        "optionalDependencies": {},
+        "optional_dependencies": {},
     },
     "@aspect-test/c/2.0.0": {
         "dependencies": {},
-        "optionalDependencies": {},
+        "optional_dependencies": {},
     },
     "@aspect-test/d/2.0.0_@aspect-test+c@1.0.0": {
         "dependencies": {},
-        "optionalDependencies": {},
+        "optional_dependencies": {},
     },
 }
 
