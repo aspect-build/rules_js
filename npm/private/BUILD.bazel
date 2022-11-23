@@ -79,6 +79,7 @@ bzl_library(
         ":utils",
         "@aspect_bazel_lib//lib:repo_utils",
         "@aspect_bazel_lib//lib:utils",
+        "@bazel_tools//tools/build_defs/repo:git_worker.bzl",
     ],
 )
 

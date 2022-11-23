@@ -57,7 +57,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -292,21 +292,18 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
             # this package is treated as a first-party dep
             continue
 
-        if resolution_type == "git":
-            # TODO: implement git resolutions
-            # repo = resolution["repo"] if "repo" in resolution else None
-            # commit = resolution["commit"] if "commit" in resolution else None
-            # buildifier: disable=print
-            print("""
-WARNING: git resolution in pnpm-lock.yaml package {} not yet supported
-""".format(package))
-            continue
-
         integrity = resolution.get("integrity", None)
         tarball = resolution.get("tarball", None)
         registry = resolution.get("registry", None)
-        if not integrity and not tarball:
-            msg = "expected package {} to have an integrity or tarball field but found none".format(package)
+        repo = resolution.get("repo", None)
+        commit = resolution.get("commit", None)
+
+        if resolution_type == "git":
+            if not repo or not commit:
+                msg = "expected package {} resolution to have repo and commit fields when resolution type is git".format(package)
+                fail(msg)
+        elif not integrity and not tarball:
+            msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package)
             fail(msg)
 
         if attr.prod and dev:
@@ -376,7 +373,9 @@ WARNING: git resolution in pnpm-lock.yaml package {} not yet supported
                 fail(msg)
 
         url = None
-        if tarball:
+        if resolution_type == "git":
+            url = repo
+        elif tarball:
             if _is_url(tarball):
                 if registry and tarball.startswith(default_registry):
                     url = registry + tarball[len(default_registry):]
@@ -402,6 +401,7 @@ WARNING: git resolution in pnpm-lock.yaml package {} not yet supported
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
             transitive_closure = transitive_closure,
             url = url,
+            commit = commit,
             version = version,
             bins = bins,
             package_info = package_info,
@@ -861,6 +861,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
         maybe_generate_bzl_library_targets = ("""
         generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
+        maybe_commit = """
+        commit = "%s",""" % _import.commit if _import.commit else ""
 
         _registry = url.split("//", 1)[-1]
         npm_token = None
@@ -878,6 +880,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
             maybe_bins = maybe_bins,
+            maybe_commit = maybe_commit,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
             maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
