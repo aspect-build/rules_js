@@ -6,31 +6,27 @@ npm_link_all_packages(
     name = "node_modules",
 )
 
-js_test(
-    name = "test",
-    data = [
-        ":node_modules/mathjs",
-        ":package.json",
-    ],
-    entry_point = "index.js",
-)
-
 js_library(
     name = "lib",
     srcs = [
+        "index.css.ts",
         "index.js",
         "package.json",
     ],
     deps = [
+        ":node_modules/@vanilla-extract/css",
+        ":node_modules/@vanilla-extract/webpack-plugin",
+        ":node_modules/css-loader",
         ":node_modules/mathjs",
+        ":node_modules/mini-css-extract-plugin",
     ],
 )
 
 bin.webpack_cli(
     name = "bundle",
     srcs = [
-        "webpack.config.js",
         ":lib",
+        ":webpack.config.js",
     ],
     outs = [
         "dist/main.js",
@@ -40,4 +36,9 @@ bin.webpack_cli(
     ],
     chdir = package_name(),
     log_level = "debug",
+)
+
+js_test(
+    name = "test",
+    entry_point = "dist/main.js",
 )

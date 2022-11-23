@@ -10,6 +10,7 @@ const {
     round,
     sqrt,
 } = require('mathjs')
+import { someStyle } from './index.css'
 
 // functions and constants
 round(e, 3) // 2.718
@@ -34,3 +35,5 @@ evaluate('det([-1, 2; 3, 1])') // -7
 
 // chaining
 chain(3).add(4).multiply(2).done() // 14
+
+console.log('someStyle className is ', someStyle)
