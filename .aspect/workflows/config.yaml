@@ -10,12 +10,10 @@ workspaces:
     - e2e/js_image:
           group:
               icon: docker
-    - e2e/js_image:
-          group:
-              icon: docker
-    - e2e/js_run_devserver:
-          group:
-              icon: js
+    # No test targets. Requires running test.sh.
+    # - e2e/js_run_devserver:
+    #       group:
+    #           icon: js
     - e2e/npm_link_package:
           group:
               icon: npm
@@ -50,6 +48,10 @@ workspaces:
     - e2e/vendored_node:
           group:
               icon: js
+    # No test targets. Requires running test.sh.
+    # - e2e/webpack_devserver:
+    #       group:
+    #           icon: js
 
 tasks:
     test:

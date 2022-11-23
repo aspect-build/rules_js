@@ -391,8 +391,13 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     esac
 done
 
-# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper
-export JS_BINARY__FS_PATCH_ROOTS="$JS_BINARY__EXECROOT:$JS_BINARY__RUNFILES"
+# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper.
+# Don't override JS_BINARY__FS_PATCH_ROOTS if already set by an outer js_binary incase a js_binary such
+# as js_run_deverser runs another js_binary tool.
+if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
+    JS_BINARY__FS_PATCH_ROOTS="$JS_BINARY__EXECROOT:$JS_BINARY__RUNFILES"
+fi
+export JS_BINARY__FS_PATCH_ROOTS
 
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
@@ -433,10 +438,14 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     if [ "${BAZEL_WORKSPACE:-}" ]; then
         logf_debug "BAZEL_WORKSPACE %s" "$BAZEL_WORKSPACE"
     fi
+    logf_debug "js_binary FS_PATCH_ROOTS %s" "${JS_BINARY__FS_PATCH_ROOTS:-}"
+    logf_debug "js_binary NODE_PATCHES %s" "${JS_BINARY__NODE_PATCHES:-}"
+    logf_debug "js_binary NODE_OPTIONS %s" "${JS_BINARY__NODE_OPTIONS:-}"
     logf_debug "js_binary BINDIR %s" "${JS_BINARY__BINDIR:-}"
     logf_debug "js_binary BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
     logf_debug "js_binary COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
     logf_debug "js_binary NODE_BINARY %s" "${JS_BINARY__NODE_BINARY:-}"
+    logf_debug "js_binary NODE_WRAPPER %s" "${JS_BINARY__NODE_WRAPPER:-}"
     if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
         logf_debug "js_binary NPM_BINARY %s" "$JS_BINARY__NPM_BINARY"
     fi
