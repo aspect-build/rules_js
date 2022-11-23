@@ -85,6 +85,8 @@ jobs:
               run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
             - id: vendored_node
               run: echo "folder=e2e/vendored_node" >> $GITHUB_OUTPUT
+            - id: webpack_devserver
+              run: echo "folder=e2e/webpack_devserver" >> $GITHUB_OUTPUT
         outputs:
             # Will look like [".", "e2e/bzlmod", ...]
             folders: ${{ toJSON(steps.*.outputs.folder) }}
