@@ -88,7 +88,7 @@ bzl_library(
     srcs = ["npm_translate_lock.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
-        ":ini",
+        ":npmrc",
         ":starlark_codegen_utils",
         ":transitive_closure",
         ":utils",
@@ -105,8 +105,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "ini",
-    srcs = ["ini.bzl"],
+    name = "npmrc",
+    srcs = ["npmrc.bzl"],
     visibility = ["//npm:__subpackages__"],
 )
 
