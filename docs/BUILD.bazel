@@ -40,4 +40,9 @@ stardoc_with_diff_test(
     bzl_library_target = "//npm:npm_import",
 )
 
+stardoc_with_diff_test(
+    name = "npm_translate_lock",
+    bzl_library_target = "//npm:npm_translate_lock",
+)
+
 update_docs(name = "update")

@@ -58,7 +58,8 @@ gazelle_dependencies()
 ############################################
 # Example npm dependencies
 
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
+load("@aspect_rules_js//npm:npm_translate_lock.bzl", "npm_translate_lock")
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")
 
 npm_translate_lock(
     name = "npm",

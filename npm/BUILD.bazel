@@ -40,13 +40,22 @@ bzl_library(
 )
 
 bzl_library(
+    name = "npm_translate_lock",
+    srcs = ["npm_translate_lock.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//npm/private:npm_import_macro",
+        "//npm/private:npm_translate_lock",
+        "//npm/private:versions",
+    ],
+)
+
+bzl_library(
     name = "npm_import",
     srcs = ["npm_import.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//npm/private:npm_import",
-        "//npm/private:npm_translate_lock",
-        "//npm/private:utils",
-        "//npm/private:versions",
+        ":npm_translate_lock",
+        "//npm/private:npm_import_macro",
     ],
 )
