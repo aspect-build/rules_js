@@ -1,14 +1,13 @@
-"""
-INI utils
+"""npmrc utils"""
 
-See https://en.wikipedia.org/wiki/INI_file
-"""
+def parse_npmrc(npmrc_content):
+    """Parse an `.npmrc` file in into key/value map.
 
-def parse_ini(init_content):
-    """Parse standard INI string into key/value map.
+    `.npmrc` files are in [INI](https://en.wikipedia.org/wiki/INI_file#Format) format but we don't
+    treat keys as [case insensitive](https://en.wikipedia.org/wiki/INI_file#Case_sensitivity) due
+    to https://github.com/aspect-build/rules_js/issues/622.
 
-    Duplicate keys override previous values.
-    Keys are converted to lowercase.
+    Duplicate case-sensitive keys override previous values.
 
     Supports:
     * basic key/value
@@ -20,18 +19,16 @@ def parse_ini(init_content):
     * number or boolean types (all values are strings)
     * comment characters (#, ;) within a value
 
-    https://en.wikipedia.org/wiki/INI_file#Format
-
     Args:
-        init_content: the INI content string
+        npmrc_content: the `.npmrc` content string
 
     Returns:
-        A dict() of key/value pairs of the INI properties
+        A dict() of key/value pairs of the `.npmrc` properties
     """
 
     props = []
 
-    for line in init_content.splitlines():
+    for line in npmrc_content.splitlines():
         line = line.strip()
 
         # Ignore sections
@@ -48,6 +45,6 @@ def parse_ini(init_content):
 
         [name, _, value] = line.strip().partition("=")
 
-        props.append([name.strip().lower(), value.strip()])
+        props.append([name.strip(), value.strip()])
 
     return dict(props)

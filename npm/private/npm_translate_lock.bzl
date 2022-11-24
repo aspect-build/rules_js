@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":ini.bzl", "parse_ini")
+load(":npmrc.bzl", "parse_npmrc")
 load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
@@ -526,7 +526,7 @@ def _impl(rctx):
     # Read tokens from npmrc label
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
-        npmrc = parse_ini(rctx.read(npmrc_path))
+        npmrc = parse_npmrc(rctx.read(npmrc_path))
         (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
         if "registry" in npmrc:
