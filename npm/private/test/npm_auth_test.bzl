@@ -11,7 +11,7 @@ def _no_npmrc_test_impl(ctx):
 
     asserts.equals(
         env,
-        ({}, {}),
+        ({}, {}, {}),
         get_npm_auth(
             {},
             "",
@@ -31,15 +31,14 @@ def _plain_text_token_test_impl(ctx):
                 "registry1": "TOKEN1",
             },
             {},
+            {},
         ),
         get_npm_auth(
             {
                 "//registry1/:_authtoken": "TOKEN1",
             },
             "",
-            {
-                "TOKEN1": "1234",
-            },
+            {},
         ),
     )
 
@@ -51,6 +50,7 @@ def _plain_text_token_test_impl(ctx):
                 "registry2": "TOKEN2",
             },
             {},
+            {},
         ),
         get_npm_auth(
             {
@@ -58,10 +58,40 @@ def _plain_text_token_test_impl(ctx):
                 "//registry2/:_authtoken": "TOKEN2",
             },
             "",
+            {},
+        ),
+    )
+
+    return unittest.end(env)
+
+def _plain_basic_auth_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {},
             {
-                "TOKEN1": "1234",
-                "TOKEN2": "5678",
+                "registry1": {
+                    "username": "username",
+                    "password": "hunter2",
+                },
+                "registry2": {
+                    "username": "someone",
+                    "password": "password",
+                },
             },
+        ),
+        get_npm_auth(
+            {
+                "//registry1/:username": "username",
+                "//registry1/:_password": "aHVudGVyMg==",
+                "//registry2/:username": "someone",
+                "//registry2/:_password": "cGFzc3dvcmQ=",
+            },
+            "",
+            {},
         ),
     )
 
@@ -77,6 +107,7 @@ def _env_var_token_test_impl(ctx):
                 "registry1": "TOKEN1",
             },
             {},
+            {},
         ),
         get_npm_auth(
             {
@@ -93,6 +124,7 @@ def _env_var_token_test_impl(ctx):
             {
                 "registry1": "1234",
             },
+            {},
             {},
         ),
         get_npm_auth(
@@ -112,6 +144,7 @@ def _env_var_token_test_impl(ctx):
             {
                 "registry1": "1234",
             },
+            {},
             {},
         ),
         get_npm_auth(
@@ -132,6 +165,7 @@ def _env_var_token_test_impl(ctx):
                 "registry1": "1234",
                 "registry2": "5678",
             },
+            {},
             {},
         ),
         get_npm_auth(
@@ -159,11 +193,19 @@ def _mixed_token_test_impl(ctx):
                 "registry2": "5678",
             },
             {},
+            {
+                "registry3": {
+                    "username": "username",
+                    "password": "hunter2",
+                },
+            },
         ),
         get_npm_auth(
             {
                 "//registry1/:_authtoken": "TOKEN1",
                 "//registry2/:_authtoken": "${%s}" % "TOKEN2",
+                "//registry3/:username": "username",
+                "//registry3/:_password": "aHVudGVyMg==",
             },
             "",
             {
@@ -184,6 +226,7 @@ def _pkg_scope_test_impl(ctx):
             {
                 "@scope1": "https://registry1",
             },
+            {},
         ),
         get_npm_auth(
             {
@@ -202,6 +245,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry1",
                 "@scope2": "https://registry2",
             },
+            {},
         ),
         get_npm_auth(
             {
@@ -221,6 +265,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry/scope1",
                 "@scope2": "https://registry/scope2",
             },
+            {},
         ),
         get_npm_auth(
             {
@@ -242,6 +287,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope3": "//registry/scope3",
                 "@scope4": "https://registry4.com",
             },
+            {},
         ),
         get_npm_auth(
             {
@@ -263,6 +309,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry/scope1",
                 "@scope2": "https://registry/scope2",
             },
+            {},
         ),
         get_npm_auth(
             {
@@ -277,6 +324,7 @@ def _pkg_scope_test_impl(ctx):
     return unittest.end(env)
 
 no_npmrc_test = unittest.make(_no_npmrc_test_impl)
+plain_basic_auth_test = unittest.make(_plain_basic_auth_test_impl)
 plain_text_token_test = unittest.make(_plain_text_token_test_impl)
 env_var_token_test = unittest.make(_env_var_token_test_impl)
 mixed_token_test = unittest.make(_mixed_token_test_impl)
@@ -287,6 +335,7 @@ def npm_auth_test_suite():
         "npm_auth_tests",
         partial.make(no_npmrc_test, timeout = "short"),
         partial.make(plain_text_token_test, timeout = "short"),
+        partial.make(plain_basic_auth_test, timeout = "short"),
         partial.make(env_var_token_test, timeout = "short"),
         partial.make(mixed_token_test, timeout = "short"),
         partial.make(pkg_scope_test, timeout = "short"),
