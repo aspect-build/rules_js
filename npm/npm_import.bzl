@@ -317,6 +317,10 @@ def npm_translate_lock(
             Can be left unspecified if the link workspace is the user workspace.
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
+            
+            If using bzlmod, you must include an additional use_repo statement in MODULE.bazel:
+
+            `use_repo(npm, "pnpm")`
 
         data: Data files required by this repository rule.
 
@@ -341,7 +345,7 @@ def npm_translate_lock(
         msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
 
-    if pnpm_version != None and not native.existing_rule("pnpm"):
+    if pnpm_version and not native.existing_rule("pnpm"):
         npm_import(
             name = "pnpm",
             integrity = PNPM_VERSIONS[pnpm_version],

@@ -14,6 +14,7 @@ DEFAULT_ROOT_PACKAGE = "."
 DEFAULT_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 
+# Note: remember to update npm/extensions.bzl when adding or changing attributes
 _ATTRS = {
     "pnpm_lock": attr.label(),
     "package_json": attr.label(),
@@ -145,7 +146,7 @@ def _gather_values_from_matching_names(keyed_lists, *names):
                 result.append(v)
     return result
 
-def get_npm_auth(npmrc, npmrc_path, environ):
+def _get_npm_auth(npmrc, npmrc_path, environ):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -229,7 +230,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
 def _to_registry_url(url):
     return "%s://%s" % (DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
 
-def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry):
+def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry, npm_tokens):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
@@ -386,12 +387,26 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
                     registry = utils.npm_registry_url(name, registries, default_registry)
                 url = "{0}/{1}".format(registry.removesuffix("/"), tarball)
 
+        if not url:
+            url = utils.npm_registry_download_url(name, version, registries, default_registry)
+
+        _registry = url.split("//", 1)[-1]
+        npm_token = None
+        match_len = 0
+        for (auth_registry, auth_token) in npm_tokens.items():
+            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                npm_token = auth_token
+                match_len = len(auth_registry)
+        npm_auth = ("""
+        npm_auth = "%s",""" % npm_token) if npm_token else ""
+
         result.append(struct(
             custom_postinstall = custom_postinstall,
             deps = deps,
             integrity = integrity,
             link_packages = link_packages,
             name = repo_name,
+            npm_auth = npm_auth,
             package = name,
             patch_args = patch_args,
             patches = patches,
@@ -527,7 +542,7 @@ def _impl(rctx):
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = parse_npmrc(rctx.read(npmrc_path))
-        (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
+        (npm_tokens, npm_registries) = _get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
         if "registry" in npmrc:
             default_registry = _to_registry_url(npmrc["registry"])
@@ -655,7 +670,7 @@ or disable this check by setting 'verify_node_modules_ignored = None' in `npm_tr
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries, default_registry)
+    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries, default_registry, npm_tokens)
 
     fp_links = {}
     rctx_files = {
@@ -837,8 +852,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version, npm_registries, default_registry)
-
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
         maybe_deps = ("""
@@ -863,17 +876,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
         maybe_commit = """
         commit = "%s",""" % _import.commit if _import.commit else ""
-
-        _registry = url.split("//", 1)[-1]
-        npm_token = None
-        match_len = 0
-        for (auth_registry, auth_token) in npm_tokens.items():
-            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                npm_token = auth_token
-                match_len = len(auth_registry)
-
-        maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_token) if npm_token else ""
+        maybe_npm_auth = _import.npm_auth if _import.npm_auth else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
@@ -896,7 +899,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             npm_translate_lock_repo = rctx.name,
             package = _import.package,
             root_package = _import.root_package,
-            url = url,
+            url = _import.url,
             version = _import.version,
         ))
 
@@ -1062,6 +1065,8 @@ npm_translate_lock = struct(
     implementation = _impl,
     attrs = _ATTRS,
     gen_npm_imports = _gen_npm_imports,
+    get_npm_auth = _get_npm_auth,
+    to_registry_url = _to_registry_url,
 )
 
 npm_translate_lock_testonly = struct(

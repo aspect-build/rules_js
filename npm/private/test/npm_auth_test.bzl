@@ -4,7 +4,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 
 load("@bazel_skylib//lib:partial.bzl", "partial")
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:npm_translate_lock.bzl", "get_npm_auth")
+load("//npm/private:npm_translate_lock.bzl", npm_translate_lock_lib = "npm_translate_lock")
 
 def _no_npmrc_test_impl(ctx):
     env = unittest.begin(ctx)
@@ -12,7 +12,7 @@ def _no_npmrc_test_impl(ctx):
     asserts.equals(
         env,
         ({}, {}),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {},
             "",
             {},
@@ -32,7 +32,7 @@ def _plain_text_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "TOKEN1",
             },
@@ -52,7 +52,7 @@ def _plain_text_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "TOKEN1",
                 "//registry2/:_authtoken": "TOKEN2",
@@ -78,7 +78,7 @@ def _env_var_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "$TOKEN1",
             },
@@ -95,7 +95,7 @@ def _env_var_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "$TOKEN1",
             },
@@ -114,7 +114,7 @@ def _env_var_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "${%s}" % "TOKEN1",
             },
@@ -134,7 +134,7 @@ def _env_var_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "${%s}" % "TOKEN1",
                 "//registry2/:_authtoken": "${%s}" % "TOKEN2",
@@ -160,7 +160,7 @@ def _mixed_token_test_impl(ctx):
             },
             {},
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "//registry1/:_authtoken": "TOKEN1",
                 "//registry2/:_authtoken": "${%s}" % "TOKEN2",
@@ -185,7 +185,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry1",
             },
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "@scope1:registry": "https://registry1",
             },
@@ -203,7 +203,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope2": "https://registry2",
             },
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "@scope1:registry": "https://registry1",
                 "@scope2:registry": "https://registry2",
@@ -222,7 +222,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope2": "https://registry/scope2",
             },
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "@scope1:registry": "https://registry/scope1",
                 "@scope2:registry": "https://registry/scope2",
@@ -243,7 +243,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope4": "https://registry4.com",
             },
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "@scope1:registry": "http://registry/scope1",
                 "@scope2:registry": "https://registry/scope2",
@@ -264,7 +264,7 @@ def _pkg_scope_test_impl(ctx):
                 "@scope2": "https://registry/scope2",
             },
         ),
-        get_npm_auth(
+        npm_translate_lock_lib.get_npm_auth(
             {
                 "@scope1:registry": "https://registry/scope1",
                 "@scope2:registry": "https://registry/scope2",

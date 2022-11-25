@@ -732,6 +732,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "npm_translate_lock_repo": attr.string(),
 })
 
+# Note: remember to update npm/extensions.bzl when adding or changing attributes
 _ATTRS = dicts.add(_COMMON_ATTRS, {
     "extra_build_content": attr.string(),
     "integrity": attr.string(),
