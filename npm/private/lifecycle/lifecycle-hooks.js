@@ -167,7 +167,21 @@ async function copyRecursive(src, dest) {
     try {
         await main(process.argv.slice(2))
     } catch (e) {
-        console.error(e)
+        // Note: use .log rather than .error. The former is deferred and the latter is immediate.
+        // The error is harder to spot and parse when it appears in the middle of the other logs.
+        if (e.code === "ELIFECYCLE" && !!e.pkgid && !!e.stage && !!e.script) {
+            console.log("===============================================================")
+            console.log(`Failure while running lifecycle hook for package '${e.pkgid}':\n`);
+            console.log(`  Script:  '${e.stage}'`);
+            console.log(`  Command: \`${e.script}\``);
+            console.log(`\nStack trace:\n`);
+            // First line of error is always the message, which is redundant with the above logging.
+            console.log(e.stack.replace(/^.*?\n/, ""));
+            console.log("===============================================================");
+        } else {
+            console.log(e);
+        }
+
         process.exit(1)
     }
 })()
