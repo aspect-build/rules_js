@@ -1,5 +1,6 @@
 "Convert pnpm lock file into starlark Bazel fetches"
 
+load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
@@ -258,8 +259,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             if registry not in basic_auth:
                 basic_auth[registry] = {"username": "", "password": ""}
 
-            # TODO: Base64 implementation in starlark is coming
-            basic_auth[registry]["password"] = v
+            basic_auth[registry]["password"] = base64.decode(v)
 
     return (tokens, registries, basic_auth)
 

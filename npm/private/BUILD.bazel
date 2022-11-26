@@ -92,6 +92,7 @@ bzl_library(
         ":starlark_codegen_utils",
         ":transitive_closure",
         ":utils",
+        "@aspect_bazel_lib//lib:base64",
         "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
