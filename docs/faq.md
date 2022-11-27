@@ -44,7 +44,7 @@ This defines the `@pnpm` repository so that you can create the lockfile with
 `bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only`, and then once the file exists you'll
 be able to add the `pnpm_translate_lock` to the `WORKSPACE` which requires the lockfile.
 
-Consider documenting this as a good practice for your team, so that all developers run the exact same pnpm and node versions that Bazel does.
+Consider documenting running pnpm through bazel as a good practice for your team, so that all developers run the exact same pnpm and node versions that Bazel does.
 
 ## Why can't Bazel fetch an npm package?
 
