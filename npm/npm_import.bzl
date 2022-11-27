@@ -37,6 +37,29 @@ _npm_translate_lock = repository_rule(
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
+def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
+    """Import https://npmjs.com/package/pnpm and provide a js_binary to run the tool.
+
+    Useful as a way to run exactly the same pnpm as Bazel does, for example with:
+    bazel run -- @pnpm//:pnpm --dir $PWD
+
+    Args:
+        name: name of the resulting external repository
+        pnpm_version: version of pnpm, see https://www.npmjs.com/package/pnpm?activeTab=versions
+    """
+    if not native.existing_rule(name):
+        npm_import(
+            name = name,
+            integrity = PNPM_VERSIONS[pnpm_version],
+            package = "pnpm",
+            root_package = "",
+            version = pnpm_version,
+            extra_build_content = [
+                """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
+                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs")""",
+            ],
+        )
+
 def npm_translate_lock(
         name,
         pnpm_lock = None,
@@ -341,18 +364,8 @@ def npm_translate_lock(
         msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
 
-    if pnpm_version != None and not native.existing_rule("pnpm"):
-        npm_import(
-            name = "pnpm",
-            integrity = PNPM_VERSIONS[pnpm_version],
-            package = "pnpm",
-            root_package = "",
-            version = pnpm_version,
-            extra_build_content = [
-                """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
-                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs")""",
-            ],
-        )
+    if pnpm_version != None:
+        pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
 
     # convert bins to a string_list_dict to satisfy attr type in repository rule
     bins_string_list_dict = {}
