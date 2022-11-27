@@ -41,5 +41,5 @@ http_archive(
 )
 EOF
 
-awk 'f;/--SNIP--/{f=1}' e2e/pnpm_workspace/WORKSPACE
+awk 'f;/--SNIP--/{f=1}' e2e/workspace/WORKSPACE
 echo "\`\`\`" 
