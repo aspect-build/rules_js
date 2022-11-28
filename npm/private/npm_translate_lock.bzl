@@ -561,28 +561,11 @@ def _impl(rctx):
 
     bzlmod_supported = is_bazel_6_or_greater()
 
-    if "HOME" in rctx.os.environ and not rctx.os.name.startswith("windows"):
-        npmrc_path = "%s/.npmrc" % (rctx.os.environ["HOME"])
-        if rctx.execute(["test", "-f", npmrc_path]).return_code == 0:
-            npmrc = parse_npmrc(rctx.read(npmrc_path))
-
-            (npm_tokens, _, npm_basic_auth) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
-
-    if "USERPROFILE" in rctx.os.environ and rctx.os.name.startswith("windows"):
-        npmrc_path = "%s/.npmrc" % (rctx.os.environ["USERPROFILE"])
-        if rctx.path(npmrc_path).exists:
-            npmrc = parse_npmrc(rctx.read(npmrc_path))
-
-            (npm_tokens, _, npm_basic_auth) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
-
     # Read tokens from npmrc label
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = parse_npmrc(rctx.read(npmrc_path))
-        (local_npm_tokens, npm_registries, local_npm_basic_auth) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
-
-        npm_tokens = dicts.add(npm_tokens, local_npm_tokens)
-        npm_basic_auth = dicts.add(npm_basic_auth, local_npm_basic_auth)
+        (npm_tokens, npm_registries, npm_basic_auth) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
         if "registry" in npmrc:
             default_registry = _to_registry_url(npmrc["registry"])
