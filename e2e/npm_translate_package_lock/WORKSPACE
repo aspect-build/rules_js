@@ -19,9 +19,11 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 # Validate that we can use a package-lock.json file in place of pnpm-lock.yaml
 npm_translate_lock(
     name = "npm",
+    data = ["//:package.json"],
     npm_package_lock = "//:package-lock.json",
     npmrc = "//:.npmrc",
-    package_json = "//:package.json",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
 

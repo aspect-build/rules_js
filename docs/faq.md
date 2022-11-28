@@ -19,10 +19,12 @@ See [example](https://github.com/aspect-build/rules_ts/blob/74d54bda208695d7e899
 
 ## Bazel isn't seeing my changes to package.json
 
-rules_js relies on what's in the `pnpm-lock.yaml` file.
-Make sure your changes are reflected there.
+rules_js relies on what's in the `pnpm-lock.yaml` file. Make sure your changes are reflected there.
 
-Want a Bazel test to assert the lockfile isn't stale? See our `examples/assert_lockfile_to_to_date`.
+Set `update_pnpm_lock` to True in your `npm_translate_lock` rule and Bazel will auto-update your
+`pnpm-lock.yaml` when any of its inputs change. When you do this, add all files required
+for pnpm to generate the `pnpm-lock.yaml` to the `data` attribute of `npm_translate_lock`. This will
+include the `pnpm-workspace.yaml` if it exists and all `package.json` files in your pnpm workspace.
 
 ## Can I edit files in `node_modules` for debugging?
 

@@ -92,6 +92,10 @@ jobs:
               run: echo "folder=e2e/pnpm_workspace" >> $GITHUB_OUTPUT
             - id: rules_foo
               run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
+            - id: update_pnpm_lock
+              run: echo "folder=e2e/update_pnpm_lock" >> $GITHUB_OUTPUT
+            - id: update_pnpm_lock_with_import
+              run: echo "folder=e2e/update_pnpm_lock_with_import" >> $GITHUB_OUTPUT
             - id: vendored_node
               run: echo "folder=e2e/vendored_node" >> $GITHUB_OUTPUT
             - id: webpack_devserver
@@ -180,6 +184,7 @@ jobs:
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
 
@@ -193,6 +198,7 @@ jobs:
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
 
@@ -205,3 +211,4 @@ jobs:
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1

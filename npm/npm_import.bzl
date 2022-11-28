@@ -28,12 +28,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import_links_lib = "npm_import_links")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
-load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock_lib = "npm_translate_lock")
-
-_npm_translate_lock = repository_rule(
-    implementation = _npm_translate_lock_lib.implementation,
-    attrs = _npm_translate_lock_lib.attrs,
-)
+load("//npm/private:npm_translate_lock_rule.bzl", _npm_translate_lock = "npm_translate_lock")
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
@@ -63,10 +58,11 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
 def npm_translate_lock(
         name,
         pnpm_lock = None,
-        package_json = None,
         npm_package_lock = None,
         yarn_lock = None,
+        update_pnpm_lock = None,
         npmrc = None,
+        data = [],
         patches = {},
         patch_args = {},
         custom_postinstalls = {},
@@ -81,12 +77,14 @@ def npm_translate_lock(
         bins = {},
         lifecycle_hooks_no_sandbox = True,
         verify_node_modules_ignored = None,
+        quiet = True,
         # TODO(2.0): remove warn_on_unqualified_tarball_url
         # buildifier: disable=unused-variable
         warn_on_unqualified_tarball_url = None,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
-        data = None,
+        # TODO(2.0): remove package_json
+        package_json = None,
         **kwargs):
     """Repository rule to generate npm_import rules from pnpm lock file or from a package.json and yarn/npm lock file.
 
@@ -204,34 +202,52 @@ def npm_translate_lock(
     Args:
         name: The repository rule name
 
-        pnpm_lock: The pnpm-lock.yaml file.
+        pnpm_lock: The `pnpm-lock.yaml` file.
 
-            Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
+        npm_package_lock: The `package-lock.json` file written by `npm install`.
 
-        package_json: The package.json file. From this file and the corresponding `package-lock.json`/`yarn.lock` file
-            (specified with the `npm_package_lock`/`yarn_lock` attributes),
-            a `pnpm-lock.yaml` file will be generated using `pnpm import`.
+            Only one of [npm_package_lock, yarn_lock] may be set.
 
-            Note that *any* changes to the package.json file will invalidate the npm_translate_lock
-            repository rule, causing it to re-run on the next invocation of Bazel.
+        yarn_lock: The `yarn.lock` file written by `yarn install`.
 
-            Mandatory when using npm_package_lock or yarn_lock, otherwise must be unset.
+            Only one of [npm_package_lock, yarn_lock] may be set.
 
-        npm_package_lock: The package-lock.json file written by `npm install`.
+        update_pnpm_lock: When True, the pnpm lock file wil be updated automatically when any of its inputs
+            have changed since the last update.
 
-            When set, the `package_json` attribute must be set as well.
-            Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
+            Defaults to False unless `npm_package_lock` or `yarn_lock` are set, in which case it defaults
+            to True.
 
-        yarn_lock: The yarn.lock file written by `yarn install`.
+            A `.aspect/rules/external_repository_action_cache/npm_translate_lock_<hash>` file will be created and used to determine
+            when the `pnpm-lock.yaml` file should be updated. This file should be checked into the source control
+            along with the `pnpm-lock.yaml` file.
 
-            When set, the `package_json` attribute must be set as well.
-            Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
+            When the `pnpm-lock.yaml` file needs updating, `npm_translate_lock` will run either
+            `pnpm install --lockfile-only` or `pnpm import`. The latter will be used if there
+            is a `npm_package_lock` or `yarn_lock` specified.
 
-        npmrc: Available to pnpm when running pnpm import when npm_package_lock or yarn_lock is set.
+            To update the `pnpm-lock.yaml` file manually either [install pnpm](https://pnpm.io/installation) and
+            run `pnpm install --lockfile-only` or `pnpm import` use the Bazel-managed pnpm by running
+            `bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only` or `bazel run -- @pnpm//:pnpm --dir $PWD import`
 
-            When set, this attribute will also be used to parse the npm auth token (if any) and use
-            it in npm_import, providing authentication with private npm registries.
+            If the ASPECT_RULES_JS_FROZEN_PNPM_LOCK environment variable is set and `update_pnpm_lock` is True, the build
+            will fail if the pnpm lock file needs updating. It is recommended to set this environment variable
+            on CI when `update_pnpm_lock` is True.
+
+        npmrc: The `.npmrc` file, if any, to use.
+
+            When set, the `.npmrc` file specified is parsed and npm auth tokens and basic authentication configuration
+            specified in the file are passed to the Bazel downloader for authentication with private npm registries.
+
             In a future release, pnpm settings such as public-hoist-patterns will be used.
+
+        data: Data files required by this repository rule when auto-updating the pnpm lock file.
+
+            Only needed with `update_pnpm_lock` is True.
+
+            This should include all `package.json` files in the pnpm workspace or required to run
+            `pnpm install --lockfile-only` or `pnpm import`. When `update_pnpm_lock` is True,
+            the pnpm lock file update may fail if there are required data files missing.
 
         patches: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list of patches to apply to the downloaded npm package. Paths in the patch
@@ -328,6 +344,8 @@ def npm_translate_lock(
 
             See https://github.com/bazelbuild/bazel/issues/8106
 
+        quiet: Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.
+
         warn_on_unqualified_tarball_url: Deprecated. Will be removed in next major release.
 
         link_workspace: The workspace name where links will be created for the packages in this lock file.
@@ -341,14 +359,9 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
-        data: Data files required by this repository rule.
+        package_json: Deprecated.
 
-            When any of these files changes it causes the repository rule to re-run.
-
-            These files are also copied to the external repository before running `pnpm import` so they can be referenced
-            by `pnpm import` in the case that `npm_translate_lock` is configured to generate a `pnpm-lock.yaml` file from
-            a `yarn.lock` or `package-lock.json` file.
-            See `package_json` docstring for more info.
+            Add all `package.json` files that are part of the workspace to `data` instead.
 
         **kwargs: Internal use only
     """
@@ -367,6 +380,14 @@ def npm_translate_lock(
     if pnpm_version != None:
         pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
 
+    if package_json:
+        data = data + [package_json]
+
+        # buildifier: disable=print
+        print("""
+WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is deprecated. Add all package.json files to the `data` attribute instead.
+""".format(name = name))
+
     # convert bins to a string_list_dict to satisfy attr type in repository rule
     bins_string_list_dict = {}
     if type(bins) != "dict":
@@ -379,12 +400,17 @@ def npm_translate_lock(
         for value_key, value_value in value.items():
             bins_string_list_dict[key].append("{}={}".format(value_key, value_value))
 
+    # Default update_pnpm_lock to True if npm_package_lock or yarn_lock is set to
+    # preserve pre-update_pnpm_lock `pnpm import` behavior.
+    if update_pnpm_lock == None and (npm_package_lock or yarn_lock):
+        update_pnpm_lock = True
+
     _npm_translate_lock(
         name = name,
         pnpm_lock = pnpm_lock,
-        package_json = package_json,
         npm_package_lock = npm_package_lock,
         yarn_lock = yarn_lock,
+        update_pnpm_lock = update_pnpm_lock,
         npmrc = npmrc,
         patches = patches,
         patch_args = patch_args,
@@ -407,6 +433,7 @@ def npm_translate_lock(
         defs_bzl_filename = defs_bzl_filename,
         generate_bzl_library_targets = generate_bzl_library_targets,
         data = data,
+        quiet = quiet,
     )
 
 _npm_import_links = repository_rule(

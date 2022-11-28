@@ -1,7 +1,14 @@
 "Utility functions for npm rules"
 
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//lib:types.bzl", "types")
 load(":yaml.bzl", _parse_yaml = "parse")
+
+INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
+DEFAULT_REGISTRY_PROTOCOL = "https"
 
 def _sanitize_string(string):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
@@ -49,16 +56,35 @@ def _parse_pnpm_name(pnpmName):
         fail(msg)
     return (segments[0], segments[1])
 
-def _parse_pnpm_lock(lockfile_content):
-    """Parse a pnpm lock file.
+def _parse_pnpm_lock(content):
+    """Parse the content of a pnpm-lock.yaml file.
 
     Args:
-        lockfile_content: yaml lockfile content
+        content: lockfile content
 
     Returns:
-        dict containing parsed lockfile
+        A tuple of (importers dict, packages dict)
     """
-    return _parse_yaml(lockfile_content)
+    parsed = _parse_yaml(content)
+
+    if not types.is_dict(parsed):
+        fail("lockfile should be a starlark dict")
+    if "lockfileVersion" not in parsed.keys():
+        fail("expected lockfileVersion key in lockfile")
+    _assert_lockfile_version(parsed["lockfileVersion"])
+
+    importers = parsed.get("importers", {
+        ".": {
+            "specifiers": parsed.get("specifiers", {}),
+            "dependencies": parsed.get("dependencies", {}),
+            "optionalDependencies": parsed.get("optionalDependencies", {}),
+            "devDependencies": parsed.get("devDependencies", {}),
+        },
+    })
+
+    packages = parsed.get("packages", {})
+
+    return importers, packages
 
 def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):
@@ -156,6 +182,115 @@ def _npm_registry_download_url(package, version, registries, default_registry):
 def _is_git_repository_url(url):
     return url.startswith("git+ssh://")
 
+def _to_registry_url(url):
+    return "{}://{}".format(DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
+
+def _default_registry():
+    return _to_registry_url("registry.npmjs.org/")
+
+def _hash(s):
+    result = str(hash(s))
+    if result.startswith("-"):
+        # Bazel's hash() resolves to a signed 32bit number [-2,147,483,648 to 2,147,483,647].
+        # Convert manually to a unique unsigned number here.
+        # -???,???,??x to 3,xxx,xxx,xxx
+        # -1,xxx,xxx,xxx to 4,xxx,xxx,xxx
+        # -2,xxx,xxx,xxx to 5,xxx,xxx,xxx
+        result = result[1:]
+        if len(result) <= 9:
+            padding = "0" * (9 - len(result))
+            result = "3" + padding + result
+        elif result[0] == "1":
+            result = "4" + result[1:]
+        elif result[0] == "2":
+            result = "5" + result[1:]
+        else:
+            fail(INTERNAL_ERROR_MSG)
+    return result
+
+def _dicts_match(a, b):
+    if len(a) != len(b):
+        return False
+    for key in a.keys():
+        if not key in b:
+            return False
+        if a[key] != b[key]:
+            return False
+    return True
+
+# Generate a consistent label string between Bazel versions.
+def _consistent_label_str(label):
+    return "//{}:{}".format(
+        # Starting in Bazel 6, the workspace name is empty for the local workspace and there's no other way to determine it.
+        # This behavior differs from Bazel 5 where the local workspace name was fully qualified in str(label).
+        label.package,
+        label.name,
+    )
+
+# Copies a file from the external repository to the same relative location in the source tree
+def _reverse_force_copy(rctx, label, dst = None):
+    if type(label) != "Label":
+        fail(INTERNAL_ERROR_MSG)
+    dst = dst if dst else str(rctx.path(label))
+    src = str(rctx.path(paths.join(label.package, label.name)))
+    if repo_utils.is_windows(rctx):
+        fail("Not yet implemented for Windows")
+        #         rctx.file("_reverse_force_copy.bat", content = """
+        # @REM needs a mkdir dirname(%2)
+        # xcopy /Y %1 %2
+        # """, executable = True)
+        #         result = rctx.execute(["cmd.exe", "/C", "_reverse_force_copy.bat", src.replace("/", "\\"), dst.replace("/", "\\")])
+
+    else:
+        rctx.file("_reverse_force_copy.sh", content = """#!/usr/bin/env bash
+set -o errexit -o nounset -o pipefail
+mkdir -p $(dirname $2)
+cp -f $1 $2
+""", executable = True)
+        result = rctx.execute(["./_reverse_force_copy.sh", src, dst])
+    if result.return_code != 0:
+        msg = """
+
+ERROR: failed to copy file from {src} to {dst}:
+STDOUT:
+{stdout}
+STDERR:
+{stderr}
+""".format(
+            src = src,
+            dst = dst,
+            stdout = result.stdout,
+            stderr = result.stderr,
+        )
+        fail(msg)
+
+# This uses `rctx.execute` to check if the file exists since `rctx.exists` does not exist.
+def _exists(rctx, p):
+    if type(p) == "Label":
+        fail("ERROR: dynamic labels not accepted since they should be converted paths at the top of the repository rule implementation to avoid restarts after rctx.execute() calls")
+    p = str(p)
+    if repo_utils.is_windows(rctx):
+        fail("Not yet implemented for Windows")
+        #         rctx.file("_exists.bat", content = """IF EXIST %1 (
+        #     EXIT /b 0
+        # ) ELSE (
+        #     EXIT /b 42
+        # )""", executable = True)
+        #         result = rctx.execute(["cmd.exe", "/C", "_exists.bat", str(p).replace("/", "\\")])
+
+    else:
+        rctx.file("_exists.sh", content = """#!/usr/bin/env bash
+set -o errexit -o nounset -o pipefail
+if [ ! -f $1 ]; then exit 42; fi
+""", executable = True)
+        result = rctx.execute(["./_exists.sh", str(p)])
+    if result.return_code == 0:  # file exists
+        return True
+    elif result.return_code == 42:  # file does not exist
+        return False
+    else:
+        fail(INTERNAL_ERROR_MSG)
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -176,4 +311,12 @@ utils = struct(
     npm_registry_download_url = _npm_registry_download_url,
     parse_package_name = _parse_package_name,
     is_git_repository_url = _is_git_repository_url,
+    to_registry_url = _to_registry_url,
+    default_registry = _default_registry,
+    hash = _hash,
+    dicts_match = _dicts_match,
+    consistent_label_str = _consistent_label_str,
+    bzlmod_supported = is_bazel_6_or_greater(),
+    reverse_force_copy = _reverse_force_copy,
+    exists = _exists,
 )

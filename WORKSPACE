@@ -73,6 +73,21 @@ npm_translate_lock(
         "@aspect-test/c": "echo moo > cow.txt",
         "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
     },
+    data = [
+        "//:package.json",
+        "//:pnpm-workspace.yaml",
+        "//examples/js_binary:package.json",
+        "//examples/macro:package.json",
+        "//examples/npm_deps:package.json",
+        "//examples/npm_package/libs/lib_a:package.json",
+        "//examples/npm_package/packages/pkg_a:package.json",
+        "//examples/npm_package/packages/pkg_b:package.json",
+        "//examples/webpack_cli:package.json",
+        "//js/private/coverage/bundle:package.json",
+        "//npm/private/test:package.json",
+        "//npm/private/test/vendored/is-odd:package.json",
+        "//npm/private/test/vendored/semver-max:package.json",
+    ],
     generate_bzl_library_targets = True,
     lifecycle_hooks_execution_requirements = {
         "@figma/nodegit": [
@@ -86,6 +101,7 @@ npm_translate_lock(
             "requires-network",
         ],
     },
+    npmrc = "//:.npmrc",
     patch_args = {
         "@gregmagolan/test-a": ["-p1"],
     },
@@ -102,6 +118,7 @@ npm_translate_lock(
         # other direct dependencies in the `examples/npm_deps/package.json`.
         "ms@2.1.3": ["examples/npm_deps"],
     },
+    update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
 

@@ -25,7 +25,19 @@ npm_translate_lock(
             "tsserver": "./bin/tsserver",
         },
     },
+    data = [
+        "//app/a:package.json",
+        "//app/b:package.json",
+        "//app/c:package.json",
+        "//lib/a:package.json",
+        "//lib/b:package.json",
+        "//lib/c:package.json",
+        "//root:package.json",
+        "//root:pnpm-workspace.yaml",
+        "//vendored/a:package.json",
+    ],
     pnpm_lock = "//root:pnpm-lock.yaml",
+    update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
 
