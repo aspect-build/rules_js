@@ -34,7 +34,7 @@ def _plain_text_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "TOKEN1",
+                "//registry1/:_authToken": "TOKEN1",
             },
             "",
             {
@@ -54,8 +54,8 @@ def _plain_text_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "TOKEN1",
-                "//registry2/:_authtoken": "TOKEN2",
+                "//registry1/:_authToken": "TOKEN1",
+                "//registry2/:_authToken": "TOKEN2",
             },
             "",
             {
@@ -80,7 +80,7 @@ def _env_var_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "$TOKEN1",
+                "//registry1/:_authToken": "$TOKEN1",
             },
             "",
             {},
@@ -97,7 +97,7 @@ def _env_var_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "$TOKEN1",
+                "//registry1/:_authToken": "$TOKEN1",
             },
             "",
             {
@@ -116,7 +116,7 @@ def _env_var_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "${%s}" % "TOKEN1",
+                "//registry1/:_authToken": "${%s}" % "TOKEN1",
             },
             "",
             {
@@ -136,8 +136,8 @@ def _env_var_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "${%s}" % "TOKEN1",
-                "//registry2/:_authtoken": "${%s}" % "TOKEN2",
+                "//registry1/:_authToken": "${%s}" % "TOKEN1",
+                "//registry2/:_authToken": "${%s}" % "TOKEN2",
             },
             "",
             {
@@ -162,8 +162,8 @@ def _mixed_token_test_impl(ctx):
         ),
         get_npm_auth(
             {
-                "//registry1/:_authtoken": "TOKEN1",
-                "//registry2/:_authtoken": "${%s}" % "TOKEN2",
+                "//registry1/:_authToken": "TOKEN1",
+                "//registry2/:_authToken": "${%s}" % "TOKEN2",
             },
             "",
             {
