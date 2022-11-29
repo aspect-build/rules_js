@@ -2,3 +2,4 @@
 exports.__esModule = true
 exports.one = void 0
 exports.one = 1
+const a = 'b'

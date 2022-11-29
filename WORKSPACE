@@ -68,6 +68,10 @@ npm_translate_lock(
             "tsc": "./bin/tsc",
             "tsserver": "./bin/tsserver",
         },
+        # FIXME: this doesn't actually work, should it?
+        "eslint": {
+            "eslint": "./bin/eslint",
+        },
     },
     custom_postinstalls = {
         "@aspect-test/c": "echo moo > cow.txt",

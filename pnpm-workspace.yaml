@@ -6,5 +6,6 @@ packages:
     - 'examples/npm_package/packages/pkg_a'
     - 'examples/npm_package/packages/pkg_b'
     - 'examples/webpack_cli'
+    - 'js/private/eslint'
     - 'js/private/coverage/bundle'
     - 'npm/private/test'

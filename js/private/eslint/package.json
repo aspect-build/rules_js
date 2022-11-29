@@ -1,0 +1,6 @@
+{
+    "private": true,
+    "dependencies": {
+        "eslint": "8.28.0"
+    }
+}

@@ -1,0 +1,22 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+
+npm_link_all_packages(
+    name = "node_modules",
+)
+
+directory_path(
+    name = "lint__entry_point",
+    directory = "//js/private/eslint:node_modules/eslint/dir",
+    path = "./bin/eslint.js",
+    tags = ["manual"],
+)
+
+js_binary(
+    name = "lint__js_binary",
+    data = ["//js/private/eslint:node_modules/eslint"],
+    entry_point = ":lint__entry_point",
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+)

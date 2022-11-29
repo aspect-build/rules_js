@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_imported_package")
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -42,4 +43,10 @@ gazelle_binary(
 gazelle(
     name = "gazelle",
     gazelle = "gazelle_bin",
+)
+
+copy_to_bin(
+    name = ".eslintrc",
+    srcs = [".eslintrc.yml"],
+    visibility = ["//:__subpackages__"],
 )

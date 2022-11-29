@@ -1,5 +1,8 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 
+# buildifier: disable=bzl-visibility
+load("@npm//js/private/eslint:eslint/package_json.bzl", "bin")
+
 js_library(
     name = "one",
     srcs = [
@@ -10,4 +13,32 @@ js_library(
         "package.json",
     ],
     visibility = ["//examples/js_library:__subpackages__"],
+)
+
+bin.eslint(
+    name = "lint",
+    srcs = [
+        "one.js",
+        "//:.eslintrc",
+    ],
+    args = [
+        "--config",
+        ".eslintrc.yml",
+        "$(execpath one.js)",
+    ],
+    exit_code_out = "exit_code",
+    stdout = "report",
+)
+
+bin.eslint_test(
+    name = "lint_as_test",
+    args = [
+        "--config",
+        ".eslintrc.yml",
+        "$(execpath one.js)",
+    ],
+    data = [
+        "one.js",
+        "//:.eslintrc",
+    ],
 )
