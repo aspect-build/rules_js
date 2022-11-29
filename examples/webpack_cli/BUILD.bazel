@@ -41,3 +41,25 @@ bin.webpack_cli(
     chdir = package_name(),
     log_level = "debug",
 )
+
+# note: rules_nodejs yarn_install'd output_dir = True is sufficient for outputting
+#
+# `bazel build //examples/webpack_cli:bundle_dir`
+bin.webpack_cli(
+    name = "bundle_dir",
+    srcs = [
+        "webpack.config.js",
+        ":lib",
+    ],
+
+    # Emits an `ls bazel-bin/examples/webpack_cli/bundle_dir`, but contents empty
+    output_dir = True,
+
+    # Emits an `ls bazel-bin/examples/webpack_cli/raytest`, but contents empty
+    out_dirs = ["raytest"],
+    args = [
+        "--config webpack.config.js",
+    ],
+    chdir = package_name(),
+    log_level = "debug",
+)
