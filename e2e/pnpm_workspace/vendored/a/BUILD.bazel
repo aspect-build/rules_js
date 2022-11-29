@@ -6,5 +6,6 @@ npm_package(
         "index.js",
         "package.json",
     ],
+    include_runfiles = False,
     visibility = ["//visibility:public"],
 )

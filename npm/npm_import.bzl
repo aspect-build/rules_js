@@ -37,6 +37,29 @@ _npm_translate_lock = repository_rule(
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
+def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
+    """Import https://npmjs.com/package/pnpm and provide a js_binary to run the tool.
+
+    Useful as a way to run exactly the same pnpm as Bazel does, for example with:
+    bazel run -- @pnpm//:pnpm --dir $PWD
+
+    Args:
+        name: name of the resulting external repository
+        pnpm_version: version of pnpm, see https://www.npmjs.com/package/pnpm?activeTab=versions
+    """
+    if not native.existing_rule(name):
+        npm_import(
+            name = name,
+            integrity = PNPM_VERSIONS[pnpm_version],
+            package = "pnpm",
+            root_package = "",
+            version = pnpm_version,
+            extra_build_content = [
+                """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
+                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs")""",
+            ],
+        )
+
 def npm_translate_lock(
         name,
         pnpm_lock = None,
@@ -63,6 +86,7 @@ def npm_translate_lock(
         warn_on_unqualified_tarball_url = None,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
+        data = None,
         **kwargs):
     """Repository rule to generate npm_import rules from pnpm lock file or from a package.json and yarn/npm lock file.
 
@@ -184,9 +208,9 @@ def npm_translate_lock(
 
             Exactly one of [pnpm_lock, npm_package_lock, yarn_lock] should be set.
 
-        package_json: The package.json file. From this file and the corresponding package-lock.json/yarn.lock file
-            (specified with the npm_package_lock/yarn_lock attributes),
-            a pnpm-lock.yaml file will be generated using `pnpm import`.
+        package_json: The package.json file. From this file and the corresponding `package-lock.json`/`yarn.lock` file
+            (specified with the `npm_package_lock`/`yarn_lock` attributes),
+            a `pnpm-lock.yaml` file will be generated using `pnpm import`.
 
             Note that *any* changes to the package.json file will invalidate the npm_translate_lock
             repository rule, causing it to re-run on the next invocation of Bazel.
@@ -317,6 +341,15 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
+        data: Data files required by this repository rule.
+
+            When any of these files changes it causes the repository rule to re-run.
+
+            These files are also copied to the external repository before running `pnpm import` so they can be referenced
+            by `pnpm import` in the case that `npm_translate_lock` is configured to generate a `pnpm-lock.yaml` file from
+            a `yarn.lock` or `package-lock.json` file.
+            See `package_json` docstring for more info.
+
         **kwargs: Internal use only
     """
 
@@ -328,20 +361,11 @@ def npm_translate_lock(
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
 
     if len(kwargs):
-        fail("Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0]))
+        msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
+        fail(msg)
 
-    if pnpm_version != None and not native.existing_rule("pnpm"):
-        npm_import(
-            name = "pnpm",
-            integrity = PNPM_VERSIONS[pnpm_version],
-            package = "pnpm",
-            root_package = "",
-            version = pnpm_version,
-            extra_build_content = [
-                """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
-                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs")""",
-            ],
-        )
+    if pnpm_version != None:
+        pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
 
     # convert bins to a string_list_dict to satisfy attr type in repository rule
     bins_string_list_dict = {}
@@ -382,6 +406,7 @@ def npm_translate_lock(
         repositories_bzl_filename = repositories_bzl_filename,
         defs_bzl_filename = defs_bzl_filename,
         generate_bzl_library_targets = generate_bzl_library_targets,
+        data = data,
     )
 
 _npm_import_links = repository_rule(
@@ -410,6 +435,7 @@ def npm_import(
         lifecycle_hooks_no_sandbox = True,
         integrity = "",
         url = "",
+        commit = "",
         patch_args = ["-p0"],
         patches = [],
         custom_postinstall = "",
@@ -578,6 +604,17 @@ def npm_import(
         url: Optional url for this package. If unset, a default npm registry url is generated from
             the package name and version.
 
+            May start with `git+ssh://` to indicate a git repository. For example,
+
+            ```
+            git+ssh://git@github.com/org/repo.git
+            ```
+
+            If url is configured as a git repository, the commit attribute must be set to the
+            desired commit.
+
+        commit: Specific commit to be checked out if url is a git repository.
+
         patch_args: Arguments to pass to the patch tool.
             `-p1` will usually be needed for patches generated by git.
 
@@ -615,7 +652,8 @@ def npm_import(
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
-        fail("Invalid npm_import parameter '{}'".format(kwargs.keys()[0]))
+        msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
+        fail(msg)
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
@@ -628,6 +666,7 @@ def npm_import(
         link_packages = link_packages,
         integrity = integrity,
         url = url,
+        commit = commit,
         patch_args = patch_args,
         patches = patches,
         custom_postinstall = custom_postinstall,

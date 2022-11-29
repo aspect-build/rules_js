@@ -80,6 +80,11 @@ npm_translate_lock(
             "no-remote-exec",
             "requires-network",
         ],
+        "esbuild": [
+            # Workaround Engflow not honoring requires-network on build actions
+            "no-remote-exec",
+            "requires-network",
+        ],
     },
     patch_args = {
         "@gregmagolan/test-a": ["-p1"],

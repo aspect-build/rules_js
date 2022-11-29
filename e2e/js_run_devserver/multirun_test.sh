@@ -25,21 +25,24 @@ function _exit {
 }
 trap _exit EXIT
 
-echo "Waiting for $1 devservers to launch on 8080..."
+echo "Waiting for $1 devserver to launch on 8080..."
 
 while ! nc -z localhost 8080; do
   echo "... waiting (8080)"
   sleep 0.5 # wait before check again
 done
 
-echo "Waiting for $1 devservers to launch on 8081..."
+echo "Waiting for $1 devserver to launch on 8081..."
 
 while ! nc -z localhost 8081; do
   echo "... waiting (8081)"
   sleep 0.5 # wait before check again
 done
 
-echo "Devservers launched"
+echo "Waiting 5 seconds for devservers to settle..."
+sleep 5
+
+echo "Devservers ready"
 
 if ! curl http://localhost:8080/index.html --fail 2>/dev/null | grep "My first website"; then
   echo "ERROR: Expected http://localhost:8080/index.html to contain 'My first website'"

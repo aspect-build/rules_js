@@ -32,7 +32,19 @@ Try running Bazel with `--experimental_check_output_files=false` so that your ed
 
 Yes, just run `bazel run -- @pnpm//:pnpm --dir $PWD` followed by the usual arguments to pnpm.
 
-Document this as a good practice so that all developers run the exact same pnpm and node versions that Bazel does.
+If you're bootstrapping a new project, you'll need to add this to your WORKSPACE:
+
+```starlark
+load("@aspect_rules_js//npm:npm_import.bzl", "pnpm_repository")
+
+pnpm_repository(name = "pnpm")
+```
+
+This defines the `@pnpm` repository so that you can create the lockfile with
+`bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only`, and then once the file exists you'll
+be able to add the `pnpm_translate_lock` to the `WORKSPACE` which requires the lockfile.
+
+Consider documenting running pnpm through bazel as a good practice for your team, so that all developers run the exact same pnpm and node versions that Bazel does.
 
 ## Why can't Bazel fetch an npm package?
 

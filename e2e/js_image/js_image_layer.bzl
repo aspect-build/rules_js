@@ -193,7 +193,8 @@ def js_image_layer(name, binary, root = None, **kwargs):
         **kwargs: Passed to pkg_tar. See: https://github.com/bazelbuild/rules_pkg/blob/main/docs/0.7.0/reference.md#pkg_tar
     """
     if root != None and not root.startswith("/"):
-        fail("root path must start with '/' but got '{root}', expected '/{root}'".format(root = root))
+        msg = "root path must start with '/' but got '{root}', expected '/{root}'".format(root = root)
+        fail(msg)
 
     if kwargs.pop("package_dir", None):
         fail("use 'root' attribute instead of 'package_dir'.")

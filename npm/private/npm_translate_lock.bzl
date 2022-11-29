@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":ini.bzl", "parse_ini")
+load(":npmrc.bzl", "parse_npmrc")
 load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
@@ -40,6 +40,7 @@ _ATTRS = {
     "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
     "generate_bzl_library_targets": attr.bool(),
+    "data": attr.label_list(),
 }
 
 def _process_lockfile(rctx, pnpm_lock):
@@ -56,7 +57,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
     )
 """
 
@@ -124,7 +125,8 @@ _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
     if link_package.startswith("../"):
-        fail("Invalid link_package outside of the WORKSPACE: {}".format(link_package))
+        msg = "Invalid link_package outside of the WORKSPACE: {}".format(link_package)
+        fail(msg)
     if link_package == ".":
         link_package = ""
     return link_package
@@ -246,7 +248,8 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
     for import_path, importer in importers.items():
         dependencies = importer.get("dependencies")
         if type(dependencies) != "dict":
-            fail("expected dict of dependencies in processed importer '%s'" % import_path)
+            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
+            fail(msg)
         links = {
             "link_package": _link_package(root_package, import_path),
         }
@@ -273,18 +276,35 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
         version = package_info.get("version")
         friendly_version = package_info.get("friendly_version")
         deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optionalDependencies")
+        optional_deps = package_info.get("optional_dependencies")
         dev = package_info.get("dev")
         optional = package_info.get("optional")
-        requires_build = package_info.get("requiresBuild")
-        integrity = package_info.get("integrity")
-        tarball = package_info.get("tarball")
-        registry = package_info.get("registry")
-        transitive_closure = package_info.get("transitiveClosure")
+        requires_build = package_info.get("requires_build")
+        transitive_closure = package_info.get("transitive_closure")
+        resolution = package_info.get("resolution")
 
         if version.startswith("file:"):
             # this package is treated as a first-party dep
             continue
+
+        resolution_type = resolution.get("type", None)
+        if resolution_type == "directory":
+            # this package is treated as a first-party dep
+            continue
+
+        integrity = resolution.get("integrity", None)
+        tarball = resolution.get("tarball", None)
+        registry = resolution.get("registry", None)
+        repo = resolution.get("repo", None)
+        commit = resolution.get("commit", None)
+
+        if resolution_type == "git":
+            if not repo or not commit:
+                msg = "expected package {} resolution to have repo and commit fields when resolution type is git".format(package)
+                fail(msg)
+        elif not integrity and not tarball:
+            msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package)
+            fail(msg)
 
         if attr.prod and dev:
             # when prod attribute is set, skip devDependencies
@@ -353,7 +373,9 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
                 fail(msg)
 
         url = None
-        if tarball:
+        if resolution_type == "git":
+            url = repo
+        elif tarball:
             if _is_url(tarball):
                 if registry and tarball.startswith(default_registry):
                     url = registry + tarball[len(default_registry):]
@@ -379,8 +401,10 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
             transitive_closure = transitive_closure,
             url = url,
+            commit = commit,
             version = version,
             bins = bins,
+            package_info = package_info,
         ))
 
     return result
@@ -476,7 +500,8 @@ def _validate_attrs(rctx):
         if rctx.attr.package_json:
             fail("The package_json attribute should not be used with pnpm_lock.")
     if count != 1:
-        fail("npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count))
+        msg = "npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count)
+        fail(msg)
 
 def _label_str(label):
     return "//{}:{}".format(
@@ -501,13 +526,20 @@ def _impl(rctx):
     # Read tokens from npmrc label
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
-        npmrc = parse_ini(rctx.read(npmrc_path))
+        npmrc = parse_npmrc(rctx.read(npmrc_path))
         (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
         if "registry" in npmrc:
             default_registry = _to_registry_url(npmrc["registry"])
 
     _validate_attrs(rctx)
+
+    for f in rctx.attr.data:
+        rctx.file(
+            paths.normalize(paths.join(f.package, f.name)),
+            content = rctx.read(f),
+            executable = False,
+        )
 
     if rctx.attr.pnpm_lock != None:
         lockfile = _process_lockfile(rctx, rctx.attr.pnpm_lock)
@@ -688,7 +720,8 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
     for import_path, importer in importers.items():
         dependencies = importer.get("dependencies")
         if type(dependencies) != "dict":
-            fail("expected dict of dependencies in processed importer '%s'" % import_path)
+            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
+            fail(msg)
         link_package = _link_package(root_package, import_path)
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("file:"):
@@ -698,7 +731,8 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
                     dep_path = _link_package(root_package, dep_version[len("file:"):])
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
-                    fail("Expected to file: referenced package {} in first-party links".format(dep_key))
+                    msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
+                    fail(msg)
                 fp_links[dep_key]["link_packages"][link_package] = []
             elif dep_version.startswith("link:"):
                 dep_importer = paths.normalize(paths.join(import_path, dep_version[len("link:"):]))
@@ -827,6 +861,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
         maybe_generate_bzl_library_targets = ("""
         generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
+        maybe_commit = """
+        commit = "%s",""" % _import.commit if _import.commit else ""
 
         _registry = url.split("//", 1)[-1]
         npm_token = None
@@ -844,6 +880,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
             maybe_bins = maybe_bins,
+            maybe_commit = maybe_commit,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
             maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
@@ -913,9 +950,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                     links_bzl[link_package].append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                         package_scope = package_scope,
                     ))
-        pkgs = lockfile.get("packages").values()
         for link_package in _import.link_packages.keys():
-            if pkgs[i].get("hasBin"):
+            if _import.package_info.get("has_bin"):
                 build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
                 if build_file not in rctx_files:
                     rctx_files[build_file] = []

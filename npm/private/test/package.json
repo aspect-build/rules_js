@@ -15,6 +15,8 @@
         "typescript": "*",
         "inline-fixtures": "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
         "json-stable-stringify": "1.0.1",
-        "@blockprotocol/type-system-web": "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e"
+        "@blockprotocol/type-system-web": "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
+        "protoc-gen-grpc": "git+ssh://git@github.com:nigel-codaio/protoc-gen-grpc-ts#0982bb568e60dead9bcf19df5cdd9779626da0d5",
+        "handlebars-helpers/helper-date": "github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55"
     }
 }

@@ -24,6 +24,7 @@ js_library(
 npm_package(
     name = "pkg_b",
     srcs = [":lib"],
+    include_runfiles = False,
     package = "@mycorp/pkg-b",
     visibility = ["//visibility:public"],
 )

@@ -3,8 +3,6 @@ local_repository(
     path = "../..",
 )
 
-#---SNIP--- Below here is re-used in the workspace snippet published on releases
-
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()

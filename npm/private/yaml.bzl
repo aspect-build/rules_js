@@ -52,13 +52,14 @@ def parse(yaml):
         elif state["id"] == _STATE.PARSE_NEXT_FLOW:
             _handle_PARSE_NEXT_FLOW(state, input, stack, starlark)
         else:
-            fail("Unknown state %s" % state["id"])
+            msg = "Unknown state {}".format(state["id"])
+            fail(msg)
 
     return starlark["result"]
 
 def _handle_CONSUME_SPACE(state, input, stack, starlark):
     if input == EOF:
-        return;
+        return
 
     if input == "\n":
         # Reset the indentation
@@ -98,7 +99,7 @@ def _handle_CONSUME_SPACE(state, input, stack, starlark):
 
         # We are at the beginning of a multiline string
         stack.append(_new_PARSE_MULTILINE_STRING(
-            indent = state["indent"]
+            indent = state["indent"],
         ))
     else:
         # Reached the beginning of a value or key
@@ -181,8 +182,8 @@ def _handle_PARSE_NEXT(state, input, stack, starlark):
         state["buffer"] += input
 
 def _handle_PARSE_MULTILINE_STRING(state, input, stack, starlark):
-    # Consume the rest of the line after the multiline indicator
     if not state["consumed_first_newline"]:
+        # Consume the rest of the line after the multiline indicator
         if input == "+":
             state["keep"] = True
         elif input == "-":
@@ -192,9 +193,11 @@ def _handle_PARSE_MULTILINE_STRING(state, input, stack, starlark):
         elif input.isspace():
             pass
         else:
-            fail("Unexpected input '%s' after start of multiline string" % input)
-    # Establish the indent of the value
+            msg = "Unexpected input '{}' after start of multiline string".format(input)
+            fail(msg)
+
     elif state["value_indent"] == None:
+        # Establish the indent of the value
         if input == "\n" and state["buffer"] == "":
             state["value"] += "\n"
         elif input.isspace():
@@ -206,33 +209,36 @@ def _handle_PARSE_MULTILINE_STRING(state, input, stack, starlark):
             elif len(state["value_indent"]) <= len(state["indent"]):
                 fail("Value indent of multiline is not greater than the indent of the property")
             state["buffer"] += input
-    # Parse all lines of the string value
-    else:
-        if input == EOF:
-            state["value"] = _finalize_multiline_string(state["value"], state["keep"], state["strip"])
-            _set_result_value(starlark, stack, state["value"])
-        elif input == "\n":
-            state["buffer"] += input
-            if state["buffer"] == "\n":
-                state["value"] += "\n"
-            else:
-                state["value"] += state["buffer"][len(state["value_indent"]):]
-            state["buffer"] = ""
-        elif not input.isspace() and not state["buffer"].startswith(state["value_indent"]):
-            state["value"] = _finalize_multiline_string(state["value"], state["keep"], state["strip"])
-            _set_result_value(starlark, stack, state["value"])
 
-            stack.pop()
-            # Parse the next thing
-            stack.append(_new_PARSE_NEXT(
-                indent = state["buffer"],
-                buffer = input,
-            ))
+    elif input == EOF:
+        # Parse all lines of the string value
+        state["value"] = _finalize_multiline_string(state["value"], state["keep"], state["strip"])
+        _set_result_value(starlark, stack, state["value"])
+
+    elif input == "\n":
+        state["buffer"] += input
+        if state["buffer"] == "\n":
+            state["value"] += "\n"
         else:
-            state["buffer"] += input
+            state["value"] += state["buffer"][len(state["value_indent"]):]
+        state["buffer"] = ""
 
+    elif not input.isspace() and not state["buffer"].startswith(state["value_indent"]):
+        state["value"] = _finalize_multiline_string(state["value"], state["keep"], state["strip"])
+        _set_result_value(starlark, stack, state["value"])
 
-def _handle_CONSUME_SPACE_FLOW(state, input, stack, starlark):
+        stack.pop()
+
+        # Parse the next thing
+        stack.append(_new_PARSE_NEXT(
+            indent = state["buffer"],
+            buffer = input,
+        ))
+
+    else:
+        state["buffer"] += input
+
+def _handle_CONSUME_SPACE_FLOW(_, input, stack, starlark):
     if input.isspace():
         pass
     elif input == "[":
@@ -366,7 +372,7 @@ def _new_PARSE_NEXT(indent, buffer):
 def _new_PARSE_MULTILINE_STRING(indent):
     return {
         "id": _STATE.PARSE_MULTILINE_STRING,
-        "type": "literal", # In case we support "folded" (>) later
+        "type": "literal",  # In case we support "folded" (>) later
         "indent": indent,
         "value_indent": None,
         "buffer": "",
@@ -443,7 +449,8 @@ def _empty_value_for_state(state):
     elif state["id"] == _STATE.SEQUENCE:
         return []
     else:
-        fail("State %s has no empty type" % state["id"])
+        msg = "State {} has no empty type".format(state["id"])
+        fail(msg)
 
 def _peek(stack):
     return stack[-1]
@@ -485,7 +492,8 @@ def _to_bool(value):
         return True
     elif value == "false":
         return False
-    fail("Cannot convert scalar %s to a starlark boolean" % value)
+    msg = "Cannot convert scalar {} to a starlark boolean".format(value)
+    fail(msg)
 
 def _parse_key(key):
     if key.startswith("'"):

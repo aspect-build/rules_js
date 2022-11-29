@@ -31,7 +31,7 @@ jobs:
               # Don't run RBE if there are no EngFlow creds which is the case on forks
               if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
         outputs:
-            # Will look like '["local", "rbe"]'
+            # Will look like ["local", "rbe"]
             configs: ${{ toJSON(steps.*.outputs.config) }}
 
     matrix-prep-bazelversion:
@@ -44,7 +44,7 @@ jobs:
             - id: bazel_5
               run: echo "bazelversion=5.3.2" >> $GITHUB_OUTPUT
         outputs:
-            # Will look like '["6.0.0rc1", "5.3.2"]'
+            # Will look like ["<version from .bazelversion>", "5.3.2"]
             bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
 
     matrix-prep-folder:
@@ -83,8 +83,14 @@ jobs:
               run: echo "folder=e2e/pnpm_workspace" >> $GITHUB_OUTPUT
             - id: rules_foo
               run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
+            - id: vendored_node
+              run: echo "folder=e2e/vendored_node" >> $GITHUB_OUTPUT
+            - id: webpack_devserver
+              run: echo "folder=e2e/webpack_devserver" >> $GITHUB_OUTPUT
+            - id: workspace
+              run: echo "folder=e2e/workspace" >> $GITHUB_OUTPUT
         outputs:
-            # Will look like '[".", "e2e/bzlmod", ...]'
+            # Will look like [".", "e2e/bzlmod", ...]
             folders: ${{ toJSON(steps.*.outputs.folder) }}
 
     test:
