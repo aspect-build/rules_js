@@ -914,12 +914,11 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                 npm_token = auth_token
                 match_len = len(auth_registry)
 
-        if not npm_token:
-            for auth_registry, auth_info in npm_basic_auth.items():
-                if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                    npm_auth_username = auth_info["username"]
-                    npm_auth_password = auth_info["password"]
-                    match_len = len(auth_registry)
+        for auth_registry, auth_info in npm_basic_auth.items():
+            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                npm_auth_username = auth_info["username"]
+                npm_auth_password = auth_info["password"]
+                match_len = len(auth_registry)
 
         maybe_npm_auth = ("""
         npm_auth = "%s",""" % npm_token) if npm_token else ""
