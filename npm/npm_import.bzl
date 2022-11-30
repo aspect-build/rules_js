@@ -56,7 +56,7 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
             version = pnpm_version,
             extra_build_content = [
                 """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
-                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs")""",
+                """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ],
         )
 
