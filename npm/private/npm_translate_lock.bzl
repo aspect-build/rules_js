@@ -195,7 +195,7 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         environ: A map of environment variables with their values.
 
     Returns:
-        A tuple with a tokens dict and a registries dict.
+        A tuple (tokens, registries, basic_auth).
     """
 
     # _NPM_TOKEN_KEY is case-sensitive. Should be the same as pnpm's
