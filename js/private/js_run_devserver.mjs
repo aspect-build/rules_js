@@ -1,8 +1,8 @@
-const path = require('path')
-const perf_hooks = require('perf_hooks')
-const fs = require('fs')
-const os = require('os')
-const child_process = require('child_process')
+import * as path from 'node:path'
+import * as perf_hooks from 'node:perf_hooks'
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as child_process from 'node:child_process'
 
 // Globals
 const RUNFILES_ROOT = path.join(

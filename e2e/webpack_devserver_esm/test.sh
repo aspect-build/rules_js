@@ -6,4 +6,3 @@ set -o errexit -o nounset -o pipefail
 bazel run -- @pnpm//:pnpm --dir "$PWD" install
 
 ./serve_test.sh //:dev
-./serve_test.sh //:dev_cjs

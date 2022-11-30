@@ -153,6 +153,6 @@ js_binary(
 
 copy_to_bin(
     name = "js_devserver_entrypoint",
-    srcs = ["js_run_devserver.js"],
+    srcs = ["js_run_devserver.mjs"],
     visibility = ["//visibility:public"],
 )
