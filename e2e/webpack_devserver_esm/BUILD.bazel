@@ -13,30 +13,13 @@ js_run_devserver(
     args = [
         "serve",
         "--config",
-        "webpack.config.js",
+        "webpack.config.mjs",
     ],
     data = [
         "package.json",
         "src/index.html",
         "src/index.js",
-        "webpack.config.js",
-        ":node_modules",
-    ],
-    tool = "webpack_binary",
-)
-
-js_run_devserver(
-    name = "dev_cjs",
-    args = [
-        "serve",
-        "--config",
-        "webpack.config.cjs",
-    ],
-    data = [
-        "package.json",
-        "src/index.html",
-        "src/index.js",
-        "webpack.config.cjs",
+        "webpack.config.mjs",
         ":node_modules",
     ],
     tool = "webpack_binary",

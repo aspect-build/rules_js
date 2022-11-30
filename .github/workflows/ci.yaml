@@ -87,6 +87,8 @@ jobs:
               run: echo "folder=e2e/vendored_node" >> $GITHUB_OUTPUT
             - id: webpack_devserver
               run: echo "folder=e2e/webpack_devserver" >> $GITHUB_OUTPUT
+            - id: webpack_devserver_esm
+              run: echo "folder=e2e/webpack_devserver_esm" >> $GITHUB_OUTPUT
             - id: workspace
               run: echo "folder=e2e/workspace" >> $GITHUB_OUTPUT
         outputs:

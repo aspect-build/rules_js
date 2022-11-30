@@ -52,6 +52,9 @@ workspaces:
     # - e2e/webpack_devserver:
     #       group:
     #           icon: js
+    # - e2e/webpack_devserver_esm:
+    #       group:
+    #           icon: js
 
 tasks:
     test:
