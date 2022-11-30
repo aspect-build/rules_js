@@ -323,3 +323,26 @@ The user can create a "pnpm" repository before calling this in order to override
 | <a id="npm_translate_lock-kwargs"></a>kwargs |  Internal use only   |  none |
 
 
+<a id="pnpm_repository"></a>
+
+## pnpm_repository
+
+<pre>
+pnpm_repository(<a href="#pnpm_repository-name">name</a>, <a href="#pnpm_repository-pnpm_version">pnpm_version</a>)
+</pre>
+
+Import https://npmjs.com/package/pnpm and provide a js_binary to run the tool.
+
+Useful as a way to run exactly the same pnpm as Bazel does, for example with:
+bazel run -- @pnpm//:pnpm --dir $PWD
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :------------- | :------------- | :------------- |
+| <a id="pnpm_repository-name"></a>name |  name of the resulting external repository   |  none |
+| <a id="pnpm_repository-pnpm_version"></a>pnpm_version |  version of pnpm, see https://www.npmjs.com/package/pnpm?activeTab=versions   |  <code>"7.9.1"</code> |
+
+

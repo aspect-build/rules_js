@@ -198,7 +198,9 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         A tuple with a tokens dict and a registries dict.
     """
 
-    _NPM_TOKEN_KEY = ":_authtoken"
+    # _NPM_TOKEN_KEY is case-sensitive. Should be the same as pnpm's
+    # https://github.com/pnpm/pnpm/blob/4097af6b5c09d9de1a3570d531bb4bb89c093a04/network/auth-header/src/getAuthHeadersFromConfig.ts#L17
+    _NPM_TOKEN_KEY = ":_authToken"
     _NPM_USERNAME = ":username"
     _NPM_PASSWORD = ":_password"
     _NPM_PKG_SCOPE_KEY = ":registry"
