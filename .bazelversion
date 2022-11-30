@@ -1,7 +1,4 @@
-0d2b4d67eefa2e3cd3f8f2374fc8a2a9c766d268
-# NB: commit hash here is temporary until Bazel 6.0.0rc3 or 6.0.0 final are out (which ever is next).
-#     using last_green fails sometimes if the commit hash it resolves to doesn't yet have an bazel
-#     artifact available for download
+6.0.0rc3
 # The first line of this file is used by Bazelisk and Bazel to be sure
 # the right version of Bazel is used to build and test this repo.
 # This also defines which version is used on CI.
