@@ -440,6 +440,8 @@ def npm_import(
         patches = [],
         custom_postinstall = "",
         npm_auth = "",
+        npm_auth_username = "",
+        npm_auth_password = "",
         bins = {},
         **kwargs):
     """Import a single npm package into Bazel.
@@ -623,7 +625,11 @@ def npm_import(
         custom_postinstall: Custom string postinstall script to run on the installed npm package. Runs after any
             existing lifecycle hooks if `run_lifecycle_hooks` is True.
 
-        npm_auth: Auth token to authenticate with npm.
+        npm_auth: Auth token to authenticate with npm. When using Bearer authentication.
+
+        npm_auth_username: Auth username to authenticate with npm. When using Basic authentication.
+
+        npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
 
         extra_build_content: Additional content to append on the generated BUILD file at the root of
             the created repository, either as a string or a list of lines similar to
@@ -671,6 +677,8 @@ def npm_import(
         patches = patches,
         custom_postinstall = custom_postinstall,
         npm_auth = npm_auth,
+        npm_auth_username = npm_auth_username,
+        npm_auth_password = npm_auth_password,
         run_lifecycle_hooks = run_lifecycle_hooks,
         extra_build_content = (
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)

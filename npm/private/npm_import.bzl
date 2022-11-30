@@ -376,13 +376,33 @@ def _fetch_git_repository(rctx):
 def _download_and_extract_archive(rctx):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, DEFAULT_REGISTRY)
 
-    auth = {
-        download_url: {
-            "type": "pattern",
-            "pattern": "Bearer <password>",
-            "password": rctx.attr.npm_auth,
-        },
-    } if rctx.attr.npm_auth else {}
+    auth = {}
+
+    if rctx.attr.npm_auth and rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
+        fail("please ensuer either 'npm_auth', or 'npm_auth_username' and 'npm_auth_password'")
+
+    if rctx.attr.npm_auth_username or rctx.attr.npm_auth_password:
+        if not rctx.attr.npm_auth_username:
+            fail("'npm_auth_password' was provided without 'npm_auth_username'")
+        if not rctx.attr.npm_auth_password:
+            fail("'npm_auth_username' was provided without 'npm_auth_password'")
+
+    if rctx.attr.npm_auth:
+        auth = {
+            download_url: {
+                "type": "pattern",
+                "pattern": "Bearer <password>",
+                "password": rctx.attr.npm_auth,
+            },
+        }
+    elif rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
+        auth = {
+            download_url: {
+                "type": "basic",
+                "login": rctx.attr.npm_auth_username,
+                "password": rctx.attr.npm_auth_password,
+            },
+        }
 
     rctx.download(
         output = _TARBALL_FILENAME,
@@ -743,6 +763,8 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "url": attr.string(),
     "commit": attr.string(),
     "npm_auth": attr.string(),
+    "npm_auth_username": attr.string(),
+    "npm_auth_password": attr.string(),
     "generate_bzl_library_targets": attr.bool(),
 })
 

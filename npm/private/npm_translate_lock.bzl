@@ -1,5 +1,6 @@
 "Convert pnpm lock file into starlark Bazel fetches"
 
+load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
@@ -57,7 +58,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_username}{maybe_npm_auth_password}
     )
 """
 
@@ -157,13 +158,17 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         ```
         @myorg:registry=https://somewhere-else.com/myorg
         @another:registry=https://somewhere-else.com/another
+        @basic:registry=https://somewhere-else.com/basic
         ; would apply only to @myorg
         //somewhere-else.com/myorg/:_authToken=MYTOKEN1
         ; would apply only to @another
         //somewhere-else.com/another/:_authToken=MYTOKEN2
+        ; would apply only to @basic
+        //somewhere-else.com/basic/:username=someone
+        //somewhere-else.com/basic/:_password=aHVudGVyMg==
         ```
 
-        `get_npm_auth(rctx)` creates the following dict:
+        `get_npm_auth(npmrc, npmrc_path, environ)` creates the following dict:
 
         ```starlark
         tokens = {
@@ -173,8 +178,15 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         registries = {
                 "@myorg": "somewhere-else.com/myorg",
                 "@another": "somewhere-else.com/another",
+                "@basic": "somewhere-else.com/basic",
         }
-        auth = (tokens, registries)
+        basic_auth = {
+            "somewhere-else.com/basic": {
+                "username": "someone",
+                "password": "hunter2",
+            },
+        }
+        auth = (tokens, registries, basic_auth)
         ```
 
     Args:
@@ -183,15 +195,18 @@ def get_npm_auth(npmrc, npmrc_path, environ):
         environ: A map of environment variables with their values.
 
     Returns:
-        A tuple with a tokens dict and a registries dict.
+        A tuple (tokens, registries, basic_auth).
     """
 
     # _NPM_TOKEN_KEY is case-sensitive. Should be the same as pnpm's
     # https://github.com/pnpm/pnpm/blob/4097af6b5c09d9de1a3570d531bb4bb89c093a04/network/auth-header/src/getAuthHeadersFromConfig.ts#L17
     _NPM_TOKEN_KEY = ":_authToken"
+    _NPM_USERNAME = ":username"
+    _NPM_PASSWORD = ":_password"
     _NPM_PKG_SCOPE_KEY = ":registry"
     tokens = {}
     registries = {}
+    basic_auth = {}
 
     for (k, v) in npmrc.items():
         if k.find(_NPM_TOKEN_KEY) != -1:
@@ -226,7 +241,29 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             registry = _to_registry_url(v)
             registries[scope] = registry
 
-    return (tokens, registries)
+        if k.find(_NPM_USERNAME) != -1:
+            # //somewhere-else.com/myorg/:username=someone
+            # registry: somewhere-else.com/myorg
+            # username: someone
+            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_USERNAME))
+
+            if registry not in basic_auth:
+                basic_auth[registry] = {"username": "", "password": ""}
+
+            basic_auth[registry]["username"] = v
+
+        if k.find(_NPM_PASSWORD) != -1:
+            # //somewhere-else.com/myorg/:_password=aHVudGVyMg==
+            # registry: somewhere-else.com/myorg
+            # _password: aHVudGVyMg==
+            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_PASSWORD))
+
+            if registry not in basic_auth:
+                basic_auth[registry] = {"username": "", "password": ""}
+
+            basic_auth[registry]["password"] = base64.decode(v)
+
+    return (tokens, registries, basic_auth)
 
 def _to_registry_url(url):
     return "%s://%s" % (DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
@@ -521,6 +558,7 @@ def _impl(rctx):
     lockfile_description = None
     npm_tokens = {}
     npm_registries = {}
+    npm_basic_auth = {}
     default_registry = DEFAULT_REGISTRY
 
     bzlmod_supported = is_bazel_6_or_greater()
@@ -529,7 +567,7 @@ def _impl(rctx):
     if rctx.attr.npmrc:
         npmrc_path = rctx.path(rctx.attr.npmrc)
         npmrc = parse_npmrc(rctx.read(npmrc_path))
-        (npm_tokens, npm_registries) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
+        (npm_tokens, npm_registries, npm_basic_auth) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
 
         if "registry" in npmrc:
             default_registry = _to_registry_url(npmrc["registry"])
@@ -868,14 +906,26 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
         _registry = url.split("//", 1)[-1]
         npm_token = None
+        npm_auth_username = None
+        npm_auth_password = None
         match_len = 0
         for (auth_registry, auth_token) in npm_tokens.items():
             if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
                 npm_token = auth_token
                 match_len = len(auth_registry)
 
+        for auth_registry, auth_info in npm_basic_auth.items():
+            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                npm_auth_username = auth_info["username"]
+                npm_auth_password = auth_info["password"]
+                match_len = len(auth_registry)
+
         maybe_npm_auth = ("""
         npm_auth = "%s",""" % npm_token) if npm_token else ""
+        maybe_npm_auth_username = ("""
+        npm_auth_username = "%s",""" % npm_auth_username) if npm_auth_username else ""
+        maybe_npm_auth_password = ("""
+        npm_auth_password = "%s",""" % npm_auth_password) if npm_auth_password else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
@@ -890,6 +940,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
             maybe_npm_auth = maybe_npm_auth,
+            maybe_npm_auth_username = maybe_npm_auth_username,
+            maybe_npm_auth_password = maybe_npm_auth_password,
             maybe_patch_args = maybe_patch_args,
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
