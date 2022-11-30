@@ -18,6 +18,7 @@ function logf_fatal {
 # Initialize RUNFILES environment variable
 # ==============================================================================
 {{initialize_runfiles}}
+export RUNFILES
 
 # ==============================================================================
 # Prepare to run coverage program
