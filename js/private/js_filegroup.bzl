@@ -15,6 +15,8 @@ def _impl(ctx):
         include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
     ))
 
+# TODO(2.0): Add an include_direct_sources & include_direct_declarations & include_direct_npm_linked_packages and
+#            rename include_declarations to include_transitive declarations & include_npm_linked_packages to include_transitive_npm_linked_packages.
 js_filegroup = rule(
     doc = _DOC,
     implementation = _impl,
