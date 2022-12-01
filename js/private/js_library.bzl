@@ -49,8 +49,28 @@ _ATTRS = {
         This includes all your checked-in code and any generated source files.
 
         The transitive npm dependencies, transitive sources & runfiles of targets in the `srcs` attribute are added to the
-        runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
+        runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
         runtime dependency on this target.
+
+        Source files that are JSON files, declaration files or directory artifacts will be automatically provided as
+        "declarations" available to downstream rules for type checking. To explicitly provide source files as "declarations"
+        available to downstream rules for type checking that do not match these criteria, move those files to the `declarations`
+        attribute instead.
+        """,
+        allow_files = True,
+    ),
+    "declarations": attr.label_list(
+        doc = """Same as `srcs` except all files are also provided as "declarations" available to downstream rules for type checking.
+
+        For example, a js_library with only `.js` files that are intended to be imported as `.js` files by downstream type checking
+        rules such as `ts_project` would list those files in `declarations`:
+
+        ```
+        js_library(
+            name = "js_lib",
+            declarations = ["index.js"],
+        )
+        ```
         """,
         allow_files = True,
     ),
@@ -60,7 +80,7 @@ _ATTRS = {
         This may include other js_library targets or other targets that provide JsInfo
 
         The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
-        runfiles of this taregt. They should appear in the '*.runfiles' area of any executable which is output by or has a
+        runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
         runtime dependency on this target.
         """,
         providers = [JsInfo],
@@ -170,18 +190,28 @@ def _js_library_impl(ctx):
         is_windows = is_windows,
     )
 
+    additional_sources, additional_declarations = _gather_sources_and_declarations(
+        ctx = ctx,
+        targets = ctx.attr.declarations,
+        files = ctx.files.declarations,
+        is_windows = is_windows,
+    )
+
+    sources = depset(transitive = [sources, additional_sources])
+    declarations = depset(transitive = [declarations, additional_sources, additional_declarations])
+
     transitive_sources = gather_transitive_sources(
         sources = sources,
-        targets = ctx.attr.srcs + ctx.attr.deps,
+        targets = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
     )
 
     transitive_declarations = gather_transitive_declarations(
         declarations = declarations,
-        targets = ctx.attr.srcs + ctx.attr.deps,
+        targets = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
     )
 
     npm_linked_packages = gather_npm_linked_packages(
-        srcs = ctx.attr.srcs,
+        srcs = ctx.attr.srcs + ctx.attr.declarations,
         deps = ctx.attr.deps,
     )
 
@@ -193,7 +223,7 @@ def _js_library_impl(ctx):
         ctx = ctx,
         sources = transitive_sources,
         data = ctx.attr.data,
-        deps = ctx.attr.srcs + ctx.attr.deps,
+        deps = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
     )
 
     return [
