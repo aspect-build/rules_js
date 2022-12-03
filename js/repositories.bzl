@@ -6,16 +6,9 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 
 load("//js/private:maybe.bzl", http_archive = "maybe_http_archive")
 
-# WARNING: any changes in this function may be BREAKING CHANGES for users
-# because we'll fetch a dependency which may be different from one that
-# they were previously fetching later in their WORKSPACE setup, and now
-# ours took precedence. Such breakages are challenging for users, so any
-# changes in this function should be marked as BREAKING in the commit message
-# and released only in semver majors.
 def rules_js_dependencies():
     "Dependencies for users of aspect_rules_js"
 
-    # The minimal version of bazel_skylib we require
     http_archive(
         name = "bazel_skylib",
         sha256 = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506",
@@ -30,7 +23,7 @@ def rules_js_dependencies():
 
     http_archive(
         name = "aspect_bazel_lib",
-        sha256 = "dee6d20f7c250a3808d601044ea187e41369a544f53f440b3bdafe0a7f53e553",
-        strip_prefix = "bazel-lib-1.17.0",
-        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.17.0.tar.gz",
+        sha256 = "be236556c7b9c7b91cb370e837fdcec62b6e8893408cd4465ae883c9d7c67024",
+        strip_prefix = "bazel-lib-1.18.0",
+        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.18.0.tar.gz",
     )
