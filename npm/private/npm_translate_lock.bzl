@@ -416,14 +416,20 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
             url = repo
         elif tarball:
             if _is_url(tarball):
-                if registry and tarball.startswith(default_registry):
-                    url = registry + tarball[len(default_registry):]
+                # pnpm sometimes prefixes the `tarball` url with the default npm registry `https://registry.npmjs.org/`
+                # in pnpm-lock.yaml which we must replace with the desired registry in the `registry` field:
+                #   tarball: https://registry.npmjs.org/@types/cacheable-request/-/cacheable-request-6.0.2.tgz
+                #   registry: https://registry.yarnpkg.com/
+                if registry and tarball.startswith(DEFAULT_REGISTRY):
+                    url = registry + tarball[len(DEFAULT_REGISTRY):]
                 else:
                     url = tarball
             else:
                 if not registry:
                     registry = utils.npm_registry_url(name, registries, default_registry)
-                url = "{0}/{1}".format(registry.removesuffix("/"), tarball)
+                url = "{}/{}".format(registry.removesuffix("/"), tarball)
+        else:
+            url = utils.npm_registry_download_url(name, version, registries, default_registry)
 
         result.append(struct(
             custom_postinstall = custom_postinstall,
