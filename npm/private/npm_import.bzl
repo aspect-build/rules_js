@@ -377,15 +377,13 @@ def _download_and_extract_archive(rctx):
 
     auth = {}
 
-    if rctx.attr.npm_auth and rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
-        fail("please ensuer either 'npm_auth', or 'npm_auth_username' and 'npm_auth_password'")
-
     if rctx.attr.npm_auth_username or rctx.attr.npm_auth_password:
         if not rctx.attr.npm_auth_username:
             fail("'npm_auth_password' was provided without 'npm_auth_username'")
         if not rctx.attr.npm_auth_password:
             fail("'npm_auth_username' was provided without 'npm_auth_password'")
 
+    auth_count = 0
     if rctx.attr.npm_auth:
         auth = {
             download_url: {
@@ -394,7 +392,17 @@ def _download_and_extract_archive(rctx):
                 "password": rctx.attr.npm_auth,
             },
         }
-    elif rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
+        auth_count += 1
+    if rctx.attr.npm_auth_basic:
+        auth = {
+            download_url: {
+                "type": "pattern",
+                "pattern": "Basic <password>",
+                "password": rctx.attr.npm_auth_basic,
+            },
+        }
+        auth_count += 1
+    if rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
         auth = {
             download_url: {
                 "type": "basic",
@@ -402,6 +410,9 @@ def _download_and_extract_archive(rctx):
                 "password": rctx.attr.npm_auth_password,
             },
         }
+        auth_count += 1
+    if auth_count > 1:
+        fail("expected only one of 'npm_auth', `npm_auth_basic` or 'npm_auth_username' and 'npm_auth_password' to be set")
 
     rctx.download(
         output = _TARBALL_FILENAME,
@@ -762,6 +773,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "url": attr.string(),
     "commit": attr.string(),
     "npm_auth": attr.string(),
+    "npm_auth_basic": attr.string(),
     "npm_auth_username": attr.string(),
     "npm_auth_password": attr.string(),
     "generate_bzl_library_targets": attr.bool(),

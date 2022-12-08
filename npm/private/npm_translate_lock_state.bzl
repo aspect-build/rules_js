@@ -317,10 +317,9 @@ def _load_npmrc(priv, rctx, npmrc_path):
     if "registry" in contents:
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
 
-    (registries, tokens, basic_auth) = helpers.get_npm_auth(contents, npmrc_path, rctx.os.environ)
+    (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx.os.environ)
     priv["npm_registries"] = dicts.add(priv["npm_registries"], registries)
-    priv["npm_tokens"] = dicts.add(priv["npm_tokens"], tokens)
-    priv["npm_basic_auth"] = dicts.add(priv["npm_basic_auth"], basic_auth)
+    priv["npm_auth"] = dicts.add(priv["npm_auth"], auth)
 
 ################################################################################
 def _load_home_npmrc(priv, rctx):
@@ -366,11 +365,8 @@ def _packages(priv):
 def _npm_registries(priv):
     return priv["npm_registries"]
 
-def _npm_tokens(priv):
-    return priv["npm_tokens"]
-
-def _npm_basic_auth(priv):
-    return priv["npm_basic_auth"]
+def _npm_auth(priv):
+    return priv["npm_auth"]
 
 def _root_package(priv):
     return priv["root_package"]
@@ -387,8 +383,7 @@ def _new(rctx):
         "importers": {},
         "packages": {},
         "npm_registries": {},
-        "npm_tokens": {},
-        "npm_basic_auth": {},
+        "npm_auth": {},
         "root_package": None,
     }
 
@@ -402,8 +397,7 @@ def _new(rctx):
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
         npm_registries = lambda: _npm_registries(priv),
-        npm_tokens = lambda: _npm_tokens(priv),
-        npm_basic_auth = lambda: _npm_basic_auth(priv),
+        npm_auth = lambda: _npm_auth(priv),
         root_package = lambda: _root_package(priv),
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
         action_cache_miss = lambda: _action_cache_miss(priv, rctx, label_store),

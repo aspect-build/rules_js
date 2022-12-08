@@ -18,7 +18,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_username}{maybe_npm_auth_password}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
     )
 """
 
@@ -126,7 +126,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
         ; would apply only to @myorg
         //somewhere-else.com/myorg/:_authToken=MYTOKEN1
         ; would apply only to @another
-        //somewhere-else.com/another/:_authToken=MYTOKEN2
+        //somewhere-else.com/another/:_auth=dXNlcm5hbWU6cGFzc3dvcmQ===
         ; would apply only to @basic
         //somewhere-else.com/basic/:username=someone
         //somewhere-else.com/basic/:_password=aHVudGVyMg==
@@ -135,22 +135,23 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
         `get_npm_auth(npmrc, npmrc_path, environ)` creates the following dict:
 
         ```starlark
-        tokens = {
-            "somewhere-else.com/myorg": "MYTOKEN1",
-            "somewhere-else.com/another": "MYTOKEN2",
-        }
         registries = {
                 "@myorg": "somewhere-else.com/myorg",
                 "@another": "somewhere-else.com/another",
                 "@basic": "somewhere-else.com/basic",
         }
-        basic_auth = {
+        auth = {
+            "somewhere-else.com/myorg": {
+                "bearer": MYTOKEN1",
+            },
+            "somewhere-else.com/another": {
+                "basic": dXNlcm5hbWU6cGFzc3dvcmQ===",
+            },
             "somewhere-else.com/basic": {
                 "username": "someone",
                 "password": "hunter2",
             },
         }
-        auth = (tokens, registries, basic_auth)
         ```
 
     Args:
@@ -159,25 +160,25 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
         environ: A map of environment variables with their values.
 
     Returns:
-        A tuple (tokens, registries, basic_auth).
+        A tuple (registries, auth).
     """
 
-    # _NPM_TOKEN_KEY is case-sensitive. Should be the same as pnpm's
+    # _NPM_AUTH_TOKEN is case-sensitive. Should be the same as pnpm's
     # https://github.com/pnpm/pnpm/blob/4097af6b5c09d9de1a3570d531bb4bb89c093a04/network/auth-header/src/getAuthHeadersFromConfig.ts#L17
-    _NPM_TOKEN_KEY = ":_authToken"
-    _NPM_USERNAME = ":username"
-    _NPM_PASSWORD = ":_password"
+    _NPM_AUTH_TOKEN = "_authToken"
+    _NPM_AUTH = "_auth"
+    _NPM_USERNAME = "username"
+    _NPM_PASSWORD = "_password"
     _NPM_PKG_SCOPE_KEY = ":registry"
-    tokens = {}
     registries = {}
-    basic_auth = {}
+    auth = {}
 
     for (k, v) in npmrc.items():
-        if k.find(_NPM_TOKEN_KEY) != -1:
+        if k == _NPM_AUTH_TOKEN or k.endswith(":" + _NPM_AUTH_TOKEN):
             # //somewhere-else.com/myorg/:_authToken=MYTOKEN1
             # registry: somewhere-else.com/myorg
             # token: MYTOKEN1
-            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_TOKEN_KEY))
+            registry = k.removeprefix("//").removesuffix(_NPM_AUTH_TOKEN).removesuffix(":").removesuffix("/")
             token = v
 
             # A token can be a reference to an environment variable
@@ -195,9 +196,14 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
                         npmrc = npmrc_path,
                         token = token,
                     ))
-            tokens[registry] = token
 
-        if k.find(_NPM_PKG_SCOPE_KEY) != -1:
+            if registry not in auth:
+                auth[registry] = {}
+
+            auth[registry]["bearer"] = token
+
+        # global "registry" key is special cased elsewhere
+        if k.endswith(_NPM_PKG_SCOPE_KEY):
             # @myorg:registry=https://somewhere-else.com/myorg
             # scope: @myorg
             # registry: somewhere-else.com/myorg
@@ -205,29 +211,40 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             registry = utils.to_registry_url(v)
             registries[scope] = registry
 
-        if k.find(_NPM_USERNAME) != -1:
+        if k == _NPM_AUTH or k.endswith(":" + _NPM_AUTH):
             # //somewhere-else.com/myorg/:username=someone
             # registry: somewhere-else.com/myorg
             # username: someone
-            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_USERNAME))
+            registry = k.removeprefix("//").removesuffix(_NPM_AUTH).removesuffix(":").removesuffix("/")
 
-            if registry not in basic_auth:
-                basic_auth[registry] = {"username": "", "password": ""}
+            if registry not in auth:
+                auth[registry] = {}
 
-            basic_auth[registry]["username"] = v
+            auth[registry]["basic"] = v
 
-        if k.find(_NPM_PASSWORD) != -1:
+        if k == _NPM_USERNAME or k.endswith(":" + _NPM_USERNAME):
+            # //somewhere-else.com/myorg/:username=someone
+            # registry: somewhere-else.com/myorg
+            # username: someone
+            registry = k.removeprefix("//").removesuffix(_NPM_USERNAME).removesuffix(":").removesuffix("/")
+
+            if registry not in auth:
+                auth[registry] = {}
+
+            auth[registry]["username"] = v
+
+        if k == _NPM_PASSWORD or k.endswith(":" + _NPM_PASSWORD):
             # //somewhere-else.com/myorg/:_password=aHVudGVyMg==
             # registry: somewhere-else.com/myorg
             # _password: aHVudGVyMg==
-            registry = k.removeprefix("//").removesuffix("/{}".format(_NPM_PASSWORD))
+            registry = k.removeprefix("//").removesuffix(_NPM_PASSWORD).removesuffix(":").removesuffix("/")
 
-            if registry not in basic_auth:
-                basic_auth[registry] = {"username": "", "password": ""}
+            if registry not in auth:
+                auth[registry] = {}
 
-            basic_auth[registry]["password"] = base64.decode(v)
+            auth[registry]["password"] = base64.decode(v)
 
-    return (registries, tokens, basic_auth)
+    return (registries, auth)
 
 ################################################################################
 def _gen_npm_imports(importers, packages, root_package, attr, registries, default_registry):
@@ -505,7 +522,7 @@ or disable this check by setting `verify_node_modules_ignored = None` in `npm_tr
             ))
 
 ################################################################################
-def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_package, default_registry, npm_registries, npm_tokens, npm_basic_auth, link_workspace):
+def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_package, default_registry, npm_registries, npm_auth, link_workspace):
     generated_by_lines = [
         "\"\"\"@generated by npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\")\"\"\"".format(rctx.name, utils.consistent_label_str(pnpm_lock_label)),
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
@@ -733,23 +750,29 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         commit = "%s",""" % _import.commit if _import.commit else ""
 
         _registry = url.split("//", 1)[-1]
-        npm_token = None
+        npm_auth_bearer = None
+        npm_auth_basic = None
         npm_auth_username = None
         npm_auth_password = None
         match_len = 0
-        for (auth_registry, auth_token) in npm_tokens.items():
+        for auth_registry, auth_info in npm_auth.items():
+            if auth_registry == "" and match_len == 0:
+                # global auth applied to all registries; will be overridden by a registry scoped auth
+                npm_auth_bearer = auth_info.get("bearer")
+                npm_auth_basic = auth_info.get("basic")
+                npm_auth_username = auth_info.get("username")
+                npm_auth_password = auth_info.get("password")
             if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                npm_token = auth_token
-                match_len = len(auth_registry)
-
-        for auth_registry, auth_info in npm_basic_auth.items():
-            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                npm_auth_username = auth_info["username"]
-                npm_auth_password = auth_info["password"]
+                npm_auth_bearer = auth_info.get("bearer")
+                npm_auth_basic = auth_info.get("basic")
+                npm_auth_username = auth_info.get("username")
+                npm_auth_password = auth_info.get("password")
                 match_len = len(auth_registry)
 
         maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_token) if npm_token else ""
+        npm_auth = "%s",""" % npm_auth_bearer) if npm_auth_bearer else ""
+        maybe_npm_auth_basic = ("""
+        npm_auth_basic = "%s",""" % npm_auth_basic) if npm_auth_basic else ""
         maybe_npm_auth_username = ("""
         npm_auth_username = "%s",""" % npm_auth_username) if npm_auth_username else ""
         maybe_npm_auth_password = ("""
@@ -768,6 +791,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
             maybe_npm_auth = maybe_npm_auth,
+            maybe_npm_auth_basic = maybe_npm_auth_basic,
             maybe_npm_auth_username = maybe_npm_auth_username,
             maybe_npm_auth_password = maybe_npm_auth_password,
             maybe_patch_args = maybe_patch_args,
