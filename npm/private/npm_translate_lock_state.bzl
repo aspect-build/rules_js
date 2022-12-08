@@ -2,6 +2,7 @@
 and maintain"""
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load(":repository_label_store.bzl", "repository_label_store")
@@ -161,7 +162,10 @@ def _init_npmrc(priv, rctx, label_store):
         _maybe_npmrc(priv, rctx, label_store, "root_npmrc")
 
     if label_store.has("npmrc"):
-        _load_npmrc(priv, rctx, label_store)
+        _load_npmrc(priv, rctx, label_store.path("npmrc"))
+
+    if rctx.attr.use_home_npmrc:
+        _load_home_npmrc(priv, rctx)
 
 ################################################################################
 def _maybe_npmrc(priv, rctx, label_store, key):
@@ -308,17 +312,29 @@ def _copy_input_file(priv, rctx, label_store, key):
     )
 
 ################################################################################
-def _load_npmrc(priv, rctx, label_store):
-    npmrc_path = label_store.path("npmrc")
-
+def _load_npmrc(priv, rctx, npmrc_path):
     contents = parse_npmrc(rctx.read(npmrc_path))
     if "registry" in contents:
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
 
     (registries, tokens, basic_auth) = helpers.get_npm_auth(contents, npmrc_path, rctx.os.environ)
-    priv["npm_registries"] = registries
-    priv["npm_tokens"] = tokens
-    priv["npm_basic_auth"] = basic_auth
+    priv["npm_registries"] = dicts.add(priv["npm_registries"], registries)
+    priv["npm_tokens"] = dicts.add(priv["npm_tokens"], tokens)
+    priv["npm_basic_auth"] = dicts.add(priv["npm_basic_auth"], basic_auth)
+
+################################################################################
+def _load_home_npmrc(priv, rctx):
+    home_directory = utils.home_directory(rctx)
+    if not home_directory:
+        # buildifier: disable=print
+        print("""
+WARNING: Cannot determine home directory in order to load home `.npmrc` file in `npm_translate_lock(name = "{rctx_name}")`.
+""".format(rctx_name = rctx.name))
+        return
+
+    home_npmrc_path = "{}/.npmrc".format(home_directory)
+    if utils.exists(rctx, home_npmrc_path):
+        _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
 def _load_lockfile(priv, rctx, label_store):

@@ -62,6 +62,7 @@ def npm_translate_lock(
         yarn_lock = None,
         update_pnpm_lock = None,
         npmrc = None,
+        use_home_npmrc = None,
         data = [],
         patches = {},
         patch_args = {},
@@ -241,6 +242,17 @@ def npm_translate_lock(
 
             In a future release, pnpm settings such as public-hoist-patterns will be used.
 
+        use_home_npmrc: Use the `$HOME/.npmrc` file (or `$USERPROFILE/.npmrc` when on Windows) if it exists.
+
+            Settings from home `.npmrc` are merged with settings loaded from the `.npmrc` file specified
+            in the `npmrc` attribute, if any. Where there are conflicting settings, the home `.npmrc` values
+            will take precedence.
+
+            NB: the repository rule will not be invalidated by changes to the home `.npmrc` file since there
+            is no way to specify this file as an input to the repository rule. If changes are made to the home
+            `.npmrc` you can force the repository rule to re-run and pick up the changes by running:
+            `bazel sync --only {name}` where `name` is the name of the `npm_translate_lock` you want to re-run.
+
         data: Data files required by this repository rule when auto-updating the pnpm lock file.
 
             Only needed with `update_pnpm_lock` is True.
@@ -412,6 +424,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         yarn_lock = yarn_lock,
         update_pnpm_lock = update_pnpm_lock,
         npmrc = npmrc,
+        use_home_npmrc = use_home_npmrc,
         patches = patches,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,

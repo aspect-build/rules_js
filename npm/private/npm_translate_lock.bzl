@@ -40,6 +40,7 @@ _ATTRS = {
     "generate_bzl_library_targets": attr.bool(),
     "data": attr.label_list(),
     "quiet": attr.bool(default = True),
+    "use_home_npmrc": attr.bool(),
 }
 
 npm_translate_lock_lib = struct(
