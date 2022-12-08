@@ -94,8 +94,8 @@ bzl_library(
 )
 
 bzl_library(
-    name = "npm_translate_lock",
-    srcs = ["npm_translate_lock.bzl"],
+    name = "npm_translate_lock_generate",
+    srcs = ["npm_translate_lock_generate.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
         ":starlark_codegen_utils",
@@ -112,7 +112,7 @@ bzl_library(
     srcs = ["npm_translate_lock_state.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
-        ":npm_translate_lock",
+        ":npm_translate_lock_generate",
         ":npmrc",
         ":repository_label_store",
         ":utils",
@@ -125,11 +125,11 @@ bzl_library(
 )
 
 bzl_library(
-    name = "npm_translate_lock_rule",
-    srcs = ["npm_translate_lock_rule.bzl"],
+    name = "npm_translate_lock",
+    srcs = ["npm_translate_lock.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
-        ":npm_translate_lock",
+        ":npm_translate_lock_generate",
         ":npm_translate_lock_state",
         ":npmrc",
         ":transitive_closure",

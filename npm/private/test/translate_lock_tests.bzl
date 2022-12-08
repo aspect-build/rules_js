@@ -3,7 +3,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:npm_translate_lock.bzl", "helpers")
+load("//npm/private:npm_translate_lock_generate.bzl", "helpers")
 
 # buildifier: disable=function-docstring
 def test_verify_ignores_in_root(ctx):

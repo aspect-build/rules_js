@@ -5,7 +5,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load(":repository_label_store.bzl", "repository_label_store")
-load(":npm_translate_lock.bzl", "DEFAULT_ROOT_PACKAGE", "helpers")
+load(":npm_translate_lock_generate.bzl", "helpers")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 load(":npmrc.bzl", "parse_npmrc")
 
@@ -14,6 +14,7 @@ PACKAGE_JSON_FILENAME = "package.json"
 PNPM_LOCK_FILENAME = "pnpm-lock.yaml"
 PNPM_WORKSPACE_FILENAME = "pnpm-workspace.yaml"
 PNPM_LOCK_ACTION_CACHE_PREFIX = ".aspect/rules/external_repository_action_cache/npm_translate_lock_"
+DEFAULT_ROOT_PACKAGE = "."
 
 ################################################################################
 def _init(priv, rctx, label_store):

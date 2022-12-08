@@ -28,7 +28,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import_links_lib = "npm_import_links")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
-load("//npm/private:npm_translate_lock_rule.bzl", _npm_translate_lock = "npm_translate_lock")
+load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock = "npm_translate_lock")
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
