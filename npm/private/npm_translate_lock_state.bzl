@@ -332,7 +332,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 """.format(rctx_name = rctx.name))
         return
 
-    home_npmrc_path = "{}/.npmrc".format(home_directory)
+    home_npmrc_path = "{}/{}".format(home_directory, NPM_RC_FILENAME)
     if utils.exists(rctx, home_npmrc_path):
         _load_npmrc(priv, rctx, home_npmrc_path)
 
