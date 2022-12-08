@@ -3,13 +3,13 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:npm_translate_lock.bzl", t = "npm_translate_lock_testonly")
+load("//npm/private:npm_translate_lock.bzl", "helpers")
 
 # buildifier: disable=function-docstring
 def test_verify_ignores_in_root(ctx):
     env = unittest.begin(ctx)
     root_package = Label("//:pnpm-lock.yaml").package
-    actual = t.verify_node_modules_ignored(
+    actual = helpers.find_missing_bazel_ignores(
         root_package,
         [
             ".",
@@ -24,7 +24,7 @@ def test_verify_ignores_in_root(ctx):
     asserts.equals(env, expected, actual)
 
     nothing_missing = []
-    asserts.equals(env, nothing_missing, t.verify_node_modules_ignored(
+    asserts.equals(env, nothing_missing, helpers.find_missing_bazel_ignores(
         root_package,
         [
             ".",
@@ -43,7 +43,7 @@ dir/node_modules/
 def test_verify_ignores_in_subdir(ctx):
     env = unittest.begin(ctx)
     root_package = Label("//some/package:pnpm-lock.yaml").package
-    actual = t.verify_node_modules_ignored(
+    actual = helpers.find_missing_bazel_ignores(
         root_package,
         [
             ".",

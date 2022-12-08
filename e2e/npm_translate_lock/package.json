@@ -1,12 +1,15 @@
 {
     "private": true,
     "dependencies": {
-        "debug": "^4.3.4",
-        "is-odd": "^3.0.1",
-        "semver": "^7.3.8"
+        "debug": "4.3.4",
+        "is-odd": "3.0.1",
+        "semver": "7.3.8"
     },
     "devDependencies": {
-        "@types/node": "^18.11.0",
-        "@types/semver": "^7.3.12"
+        "@types/node": "18.11.11",
+        "@types/semver": "7.3.13",
+        "@rollup/plugin-commonjs": "23.0.4",
+        "@rollup/plugin-json": "5.0.2",
+        "@rollup/plugin-node-resolve": "15.0.1"
     }
 }

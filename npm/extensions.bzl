@@ -3,7 +3,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 """
 
 load("//npm/private:utils.bzl", "utils")
-load("//npm/private:npm_translate_lock.bzl", "DEFAULT_REGISTRY", npm_translate_lock_lib = "npm_translate_lock")
+load("//npm/private:npm_translate_lock.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
@@ -11,13 +11,22 @@ load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 def _extension_impl(module_ctx):
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            lockfile = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
-            trans = translate_to_transitive_closure(lockfile, attr.prod, attr.dev, attr.no_optional)
+            # npm_translate_lock MUST run before parse_pnpm_lock below since it may update
+            # the pnpm-lock.yaml file when update_pnpm_lock is True.
+            npm_translate_lock(
+                name = "npm",
+                pnpm_lock = attr.pnpm_lock,
+                # TODO: get this working with bzlmod
+                # update_pnpm_lock = attr.update_pnpm_lock,
+            )
 
-            # TODO: this feature introduced in https://github.com/aspect-build/rules_js/pull/503
+        for attr in mod.tags.npm_translate_lock:
+            # TODO: registries was introduced in https://github.com/aspect-build/rules_js/pull/503
             # but not added to bzlmod. For now, not supported here.
             registries = {}
-            imports = npm_translate_lock_lib.gen_npm_imports(trans, attr.pnpm_lock.package, attr, registries, DEFAULT_REGISTRY)
+            lock_importers, lock_packages = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
+            importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
+            imports = npm_translate_lock_helpers.gen_npm_imports(importers, packages, attr.pnpm_lock.package, attr, registries, utils.default_registry())
             for i in imports:
                 npm_import(
                     name = i.name,
@@ -35,10 +44,7 @@ def _extension_impl(module_ctx):
                     url = i.url,
                     npm_translate_lock_repo = "npm",
                 )
-            npm_translate_lock(
-                name = "npm",
-                pnpm_lock = attr.pnpm_lock,
-            )
+
         for i in mod.tags.npm_import:
             npm_import(
                 name = i.name,
@@ -58,7 +64,7 @@ def _extension_impl(module_ctx):
 npm = module_extension(
     implementation = _extension_impl,
     tag_classes = {
-        "npm_translate_lock": tag_class(attrs = dict({"name": attr.string()}, **npm_translate_lock_lib.attrs)),
+        "npm_translate_lock": tag_class(attrs = dict({"name": attr.string()}, **npm_translate_lock_helpers.attrs)),
         "npm_import": tag_class(attrs = dict({"name": attr.string()}, **npm_import_lib.attrs)),
     },
 )

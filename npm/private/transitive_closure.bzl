@@ -1,7 +1,6 @@
 "Helper utility for working with pnpm lockfile"
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load("@bazel_skylib//lib:types.bzl", "types")
 load(":utils.bzl", "utils")
 
 def gather_transitive_closure(packages, no_optional, direct_deps, transitive_closure):
@@ -98,11 +97,12 @@ def _gather_package_info(package_path, package_snapshot):
         "requires_build": "requiresBuild" in package_snapshot.keys(),
     }
 
-def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_optional = False):
+def translate_to_transitive_closure(lock_importers, lock_packages, prod = False, dev = False, no_optional = False):
     """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
 
     Args:
-        lockfile: a starlark dictionary representing the pnpm lockfile
+        lock_importers: lockfile importers dict
+        lock_packages: lockfile packages dict
         prod: If true, only install dependencies
         dev: If true, only install devDependencies
         no_optional: If true, optionalDependencies are not installed
@@ -110,24 +110,6 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
     Returns:
         Nested dictionary suitable for further processing in our repository rule
     """
-    if not types.is_dict(lockfile):
-        fail("lockfile should be a starlark dict")
-    if "lockfileVersion" not in lockfile.keys():
-        fail("expected lockfileVersion key in lockfile")
-    if "packages" not in lockfile.keys():
-        fail("expected packages key in lockfile")
-    utils.assert_lockfile_version(lockfile["lockfileVersion"])
-
-    lock_importers = lockfile.get("importers", {
-        ".": {
-            "specifiers": lockfile.get("specifiers", {}),
-            "dependencies": lockfile.get("dependencies", {}),
-            "optionalDependencies": lockfile.get("optionalDependencies", {}),
-            "devDependencies": lockfile.get("devDependencies", {}),
-        },
-    })
-    lock_packages = lockfile.get("packages")
-
     importers = {}
     for importPath in lock_importers.keys():
         lock_importer = lock_importers[importPath]
@@ -158,7 +140,4 @@ def translate_to_transitive_closure(lockfile, prod = False, dev = False, no_opti
 
         package_info["transitive_closure"] = transitive_closure
 
-    return {
-        "importers": importers,
-        "packages": packages,
-    }
+    return (importers, packages)

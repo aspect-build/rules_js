@@ -84,16 +84,56 @@ bzl_library(
 )
 
 bzl_library(
+    name = "repository_label_store",
+    srcs = ["repository_label_store.bzl"],
+    visibility = ["//npm:__subpackages__"],
+    deps = [
+        "@bazel_skylib//lib:partial",
+        "@bazel_skylib//lib:paths",
+    ],
+)
+
+bzl_library(
     name = "npm_translate_lock",
     srcs = ["npm_translate_lock.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
-        ":npmrc",
         ":starlark_codegen_utils",
-        ":transitive_closure",
         ":utils",
         "@aspect_bazel_lib//lib:base64",
-        "@aspect_bazel_lib//lib:utils",
+        "@bazel_skylib//lib:dicts",
+        "@bazel_skylib//lib:partial",
+        "@bazel_skylib//lib:paths",
+    ],
+)
+
+bzl_library(
+    name = "npm_translate_lock_state",
+    srcs = ["npm_translate_lock_state.bzl"],
+    visibility = ["//npm:__subpackages__"],
+    deps = [
+        ":npm_translate_lock",
+        ":npmrc",
+        ":repository_label_store",
+        ":utils",
+        "@aspect_bazel_lib//lib:base64",
+        "@aspect_bazel_lib//lib:repo_utils",
+        "@bazel_skylib//lib:dicts",
+        "@bazel_skylib//lib:partial",
+        "@bazel_skylib//lib:paths",
+    ],
+)
+
+bzl_library(
+    name = "npm_translate_lock_rule",
+    srcs = ["npm_translate_lock_rule.bzl"],
+    visibility = ["//npm:__subpackages__"],
+    deps = [
+        ":npm_translate_lock",
+        ":npm_translate_lock_state",
+        ":npmrc",
+        ":transitive_closure",
+        ":utils",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",
     ],
@@ -118,6 +158,9 @@ bzl_library(
     deps = [
         ":yaml",
         "@aspect_bazel_lib//lib:paths",
+        "@aspect_bazel_lib//lib:repo_utils",
+        "@aspect_bazel_lib//lib:utils",
+        "@bazel_skylib//lib:types",
     ],
 )
 
@@ -144,8 +187,8 @@ bzl_library(
     srcs = ["transitive_closure.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
+        "utils",
         "@bazel_skylib//lib:dicts",
-        "@bazel_skylib//lib:types",
     ],
 )
 

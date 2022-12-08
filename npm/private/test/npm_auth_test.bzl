@@ -4,7 +4,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 
 load("@bazel_skylib//lib:partial.bzl", "partial")
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:npm_translate_lock.bzl", "get_npm_auth")
+load("//npm/private:npm_translate_lock.bzl", "helpers")
 
 def _no_npmrc_test_impl(ctx):
     env = unittest.begin(ctx)
@@ -12,7 +12,7 @@ def _no_npmrc_test_impl(ctx):
     asserts.equals(
         env,
         ({}, {}, {}),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {},
             "",
             {},
@@ -27,13 +27,13 @@ def _plain_text_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "TOKEN1",
             },
             {},
-            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "TOKEN1",
             },
@@ -45,14 +45,14 @@ def _plain_text_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "TOKEN1",
                 "registry2": "TOKEN2",
             },
             {},
-            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "TOKEN1",
                 "//registry2/:_authToken": "TOKEN2",
@@ -83,7 +83,7 @@ def _plain_basic_auth_test_impl(ctx):
                 },
             },
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:username": "username",
                 "//registry1/:_password": "aHVudGVyMg==",
@@ -103,13 +103,13 @@ def _env_var_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "TOKEN1",
             },
             {},
-            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "$TOKEN1",
             },
@@ -121,13 +121,13 @@ def _env_var_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "1234",
             },
             {},
-            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "$TOKEN1",
             },
@@ -141,13 +141,13 @@ def _env_var_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "1234",
             },
             {},
-            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "${%s}" % "TOKEN1",
             },
@@ -161,14 +161,14 @@ def _env_var_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "1234",
                 "registry2": "5678",
             },
             {},
-            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "${%s}" % "TOKEN1",
                 "//registry2/:_authToken": "${%s}" % "TOKEN2",
@@ -188,11 +188,11 @@ def _mixed_token_test_impl(ctx):
     asserts.equals(
         env,
         (
+            {},
             {
                 "registry1": "TOKEN1",
                 "registry2": "5678",
             },
-            {},
             {
                 "registry3": {
                     "username": "username",
@@ -200,7 +200,7 @@ def _mixed_token_test_impl(ctx):
                 },
             },
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "//registry1/:_authToken": "TOKEN1",
                 "//registry2/:_authToken": "${%s}" % "TOKEN2",
@@ -222,13 +222,13 @@ def _pkg_scope_test_impl(ctx):
     asserts.equals(
         env,
         (
-            {},
             {
                 "@scope1": "https://registry1",
             },
             {},
+            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "@scope1:registry": "https://registry1",
             },
@@ -240,14 +240,14 @@ def _pkg_scope_test_impl(ctx):
     asserts.equals(
         env,
         (
-            {},
             {
                 "@scope1": "https://registry1",
                 "@scope2": "https://registry2",
             },
             {},
+            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "@scope1:registry": "https://registry1",
                 "@scope2:registry": "https://registry2",
@@ -260,14 +260,14 @@ def _pkg_scope_test_impl(ctx):
     asserts.equals(
         env,
         (
-            {},
             {
                 "@scope1": "https://registry/scope1",
                 "@scope2": "https://registry/scope2",
             },
             {},
+            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "@scope1:registry": "https://registry/scope1",
                 "@scope2:registry": "https://registry/scope2",
@@ -280,7 +280,6 @@ def _pkg_scope_test_impl(ctx):
     asserts.equals(
         env,
         (
-            {},
             {
                 "@scope1": "http://registry/scope1",
                 "@scope2": "https://registry/scope2",
@@ -288,8 +287,9 @@ def _pkg_scope_test_impl(ctx):
                 "@scope4": "https://registry4.com",
             },
             {},
+            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "@scope1:registry": "http://registry/scope1",
                 "@scope2:registry": "https://registry/scope2",
@@ -304,14 +304,14 @@ def _pkg_scope_test_impl(ctx):
     asserts.equals(
         env,
         (
-            {},
             {
                 "@scope1": "https://registry/scope1",
                 "@scope2": "https://registry/scope2",
             },
             {},
+            {},
         ),
-        get_npm_auth(
+        helpers.get_npm_auth(
             {
                 "@scope1:registry": "https://registry/scope1",
                 "@scope2:registry": "https://registry/scope2",

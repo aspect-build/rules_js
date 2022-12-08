@@ -13,7 +13,6 @@ load(
     _git_reset = "reset",
 )
 load(":utils.bzl", "utils")
-load(":npm_translate_lock.bzl", "DEFAULT_REGISTRY")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 _LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
@@ -374,7 +373,7 @@ def _fetch_git_repository(rctx):
     _git_clean(rctx, git_repo)
 
 def _download_and_extract_archive(rctx):
-    download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, DEFAULT_REGISTRY)
+    download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
     auth = {}
 
