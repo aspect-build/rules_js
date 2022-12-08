@@ -192,10 +192,13 @@ def _hash(s):
     result = str(hash(s))
     if result.startswith("-"):
         # Bazel's hash() resolves to a signed 32bit number [-2,147,483,648 to 2,147,483,647].
-        # Convert manually to a unique unsigned number here.
+        # Convert manually to a unique unsigned number here to keep the hash chars as [a-zA-Z0-9]
+        # since seeing a negative in a hash is surprising.
         # -???,???,??x to 3,xxx,xxx,xxx
         # -1,xxx,xxx,xxx to 4,xxx,xxx,xxx
         # -2,xxx,xxx,xxx to 5,xxx,xxx,xxx
+        # NB: There has been discussion of adding a sha256 hash function to Starlark but no work has
+        # been done to date. See https://github.com/bazelbuild/starlark/issues/36#issuecomment-1115352085.
         result = result[1:]
         if len(result) <= 9:
             padding = "0" * (9 - len(result))
