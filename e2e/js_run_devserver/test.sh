@@ -8,4 +8,5 @@ bazel run -- @pnpm//:pnpm --dir "$PWD" install
 ./serve_test.sh //src:serve
 ./serve_test.sh //src:serve_alt
 ./serve_test.sh //src:serve_simple
+./serve_test.sh //src:serve_simple_bin
 ./multirun_test.sh //src:serve_multi

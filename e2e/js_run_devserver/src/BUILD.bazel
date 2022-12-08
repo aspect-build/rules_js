@@ -1,5 +1,5 @@
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_devserver")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library", "js_run_devserver")
 load("@com_github_ash2k_bazel_tools//multirun:def.bzl", "command", "multirun")
 load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
 
@@ -100,7 +100,7 @@ js_library(
     ],
 )
 
-# Another example but this time using a simple custom http-server js_binary
+# Another example but this time using a simple custom http-server js_library
 js_run_devserver(
     name = "serve_simple",
     chdir = package_name(),
@@ -110,4 +110,24 @@ js_run_devserver(
         ":web_files",
     ],
     log_level = "debug",
+)
+
+# Now the js_binary variant
+js_binary(
+    name = "simple_bin",
+    data = [
+        "//:node_modules/chalk",
+    ],
+    entry_point = "simple.js",
+)
+
+# Another example but this time using a simple custom http-server js_binary
+js_run_devserver(
+    name = "serve_simple_bin",
+    chdir = package_name(),
+    data = [
+        ":web_files",
+    ],
+    log_level = "debug",
+    tool = ":simple_bin",
 )
