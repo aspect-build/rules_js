@@ -251,7 +251,7 @@ def npm_translate_lock(
             NB: the repository rule will not be invalidated by changes to the home `.npmrc` file since there
             is no way to specify this file as an input to the repository rule. If changes are made to the home
             `.npmrc` you can force the repository rule to re-run and pick up the changes by running:
-            `bazel sync --only {name}` where `name` is the name of the `npm_translate_lock` you want to re-run.
+            `bazel sync --only={name}` where `name` is the name of the `npm_translate_lock` you want to re-run.
 
         data: Data files required by this repository rule when auto-updating the pnpm lock file.
 
