@@ -45,7 +45,7 @@ if [ -z "$diff" ]; then
   exit 1
 fi
 
-action_cache_file=".aspect/rules/external_repository_action_cache/npm_translate_lock_NDg3NzUwNzA2NQ=="
+action_cache_file=".aspect/rules/external_repository_action_cache/npm_translate_lock_LTE4Nzc1MDcwNjU="
 diff="$(git diff "$action_cache_file")"
 if [ -z "$diff" ]; then
   echo "ERROR: expected 'git diff $action_cache_file' to not be empty"
