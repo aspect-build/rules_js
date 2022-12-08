@@ -3,7 +3,8 @@ See https://bazel.build/docs/bzlmod#extension-definition
 """
 
 load("//npm/private:utils.bzl", "utils")
-load("//npm/private:npm_translate_lock.bzl", npm_translate_lock_helpers = "helpers")
+load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
+load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
 load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
@@ -64,7 +65,7 @@ def _extension_impl(module_ctx):
 npm = module_extension(
     implementation = _extension_impl,
     tag_classes = {
-        "npm_translate_lock": tag_class(attrs = dict({"name": attr.string()}, **npm_translate_lock_helpers.attrs)),
+        "npm_translate_lock": tag_class(attrs = dict({"name": attr.string()}, **npm_translate_lock_lib.attrs)),
         "npm_import": tag_class(attrs = dict({"name": attr.string()}, **npm_import_lib.attrs)),
     },
 )
