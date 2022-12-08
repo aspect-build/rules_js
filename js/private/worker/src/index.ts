@@ -66,7 +66,11 @@ export async function enterWorkerLoop(implementation: ImplementationFunc) {
             })
             .catch((reason) => {
                 response.exit_code = 1
-                outputStream.write(String(reason))
+                if ('stack' in reason) {
+                    outputStream.write(String(reason.stack))
+                } else {
+                    outputStream.write(String(reason))
+                }
             })
             .finally(() => {
                 abortionMap.delete(request.request_id)
@@ -86,6 +90,6 @@ export async function enterWorkerLoop(implementation: ImplementationFunc) {
     }
 }
 
-export function shouldRunAsWorker(args: string[]): boolean {
+export function isPersistentWorker(args: string[]): boolean {
     return args.indexOf('--persistent_worker') !== -1
 }
