@@ -8,7 +8,7 @@ resolve the underlying issue in the future https://github.com/bazelbuild/bazel/i
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-########################################################################################################################
+################################################################################
 def _make_sibling_label(sibling_label, path):
     if path.startswith("./"):
         path = path[2:]
@@ -19,7 +19,7 @@ def _make_sibling_label(sibling_label, path):
     else:
         return Label("@{}//{}:{}".format(sibling_label.workspace_name, sibling_label.package, paths.join(dirname, path)))
 
-########################################################################################################################
+################################################################################
 def _seed_root(priv, rctx_path, label):
     if priv["root"] and label.workspace_name != priv["root"]["workspace"]:
         fail("cannot seed_root twice with different workspaces")
@@ -33,7 +33,7 @@ def _seed_root(priv, rctx_path, label):
         "path": "/".join(seed_root_path.split("/")[:-seed_root_depth]),
     }
 
-########################################################################################################################
+################################################################################
 def _add(priv, rctx_path, repo_root, key, label, seed_root = False):
     priv["labels"][key] = label
     priv["paths"][key] = str(rctx_path(label))
@@ -42,7 +42,7 @@ def _add(priv, rctx_path, repo_root, key, label, seed_root = False):
     if seed_root:
         _seed_root(priv, rctx_path, label)
 
-########################################################################################################################
+################################################################################
 def _add_sibling(priv, repo_root, sibling_key, key, path):
     if not _has(priv, sibling_key):
         fail("sibling_key not found '{}'".format(sibling_key))
@@ -52,7 +52,7 @@ def _add_sibling(priv, repo_root, sibling_key, key, path):
     priv["repository_paths"][key] = paths.join(repo_root, label.package, label.name)
     priv["relative_paths"][key] = paths.join(label.package, label.name)
 
-########################################################################################################################
+################################################################################
 def _add_root(priv, repo_root, key, path):
     if not priv["root"]:
         fail("root paths can only be added after repository_label_store root is seeded with seed_root")
@@ -66,27 +66,27 @@ def _add_root(priv, repo_root, key, path):
     priv["repository_paths"][key] = paths.join(repo_root, path)
     priv["relative_paths"][key] = path
 
-########################################################################################################################
+################################################################################
 def _has(priv, key):
     return key in priv["labels"]
 
-########################################################################################################################
+################################################################################
 def _label(priv, key):
     return priv["labels"][key]
 
-########################################################################################################################
+################################################################################
 def _path(priv, key):
     return priv["paths"][key]
 
-########################################################################################################################
+################################################################################
 def _repository_path(priv, key):
     return priv["repository_paths"][key]
 
-########################################################################################################################
+################################################################################
 def _relative_path(priv, key):
     return priv["relative_paths"][key]
 
-########################################################################################################################
+################################################################################
 def _new(rctx_path):
     priv = {
         "root": None,

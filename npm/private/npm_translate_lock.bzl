@@ -12,7 +12,7 @@ DEFAULT_ROOT_PACKAGE = "."
 DEFAULT_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 
-########################################################################################################################
+################################################################################
 _ATTRS = {
     "pnpm_lock": attr.label(),
     "npm_package_lock": attr.label(),
@@ -43,7 +43,7 @@ _ATTRS = {
     "quiet": attr.bool(default = True),
 }
 
-########################################################################################################################
+################################################################################
 _NPM_IMPORT_TMPL = \
     """    npm_import(
         name = "{name}",
@@ -119,7 +119,7 @@ _BZL_LIBRARY_TMPL = \
 
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
-########################################################################################################################
+################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
     if link_package.startswith("../"):
@@ -129,11 +129,11 @@ def _link_package(root_package, import_path, rel_path = "."):
         link_package = ""
     return link_package
 
-########################################################################################################################
+################################################################################
 def _is_url(url):
     return url.find("://") != -1
 
-########################################################################################################################
+################################################################################
 def _gather_values_from_matching_names(keyed_lists, *names):
     result = []
     for name in names:
@@ -145,7 +145,7 @@ def _gather_values_from_matching_names(keyed_lists, *names):
                 result.append(v)
     return result
 
-########################################################################################################################
+################################################################################
 def _get_npm_auth(npmrc, npmrc_path, environ):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
@@ -265,7 +265,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
 
     return (registries, tokens, basic_auth)
 
-########################################################################################################################
+################################################################################
 def _gen_npm_imports(importers, packages, root_package, attr, registries, default_registry):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
@@ -444,7 +444,7 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
 
     return result
 
-########################################################################################################################
+################################################################################
 def _normalize_bazelignore(lines):
     """Make bazelignore lines predictable
 
@@ -476,7 +476,7 @@ def _find_missing_bazel_ignores(root_package, importer_paths, bazelignore):
             missing_ignores.append(expected)
     return missing_ignores
 
-########################################################################################################################
+################################################################################
 def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
     if not public_hoist_packages:
         return
@@ -517,7 +517,7 @@ Check the public_hoist_packages attribute for duplicates.
                     )
                 fail(msg)
 
-########################################################################################################################
+################################################################################
 def _verify_node_modules_ignored(rctx, importers, root_package):
     if rctx.attr.verify_node_modules_ignored != None:
         missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
@@ -540,7 +540,7 @@ or disable this check by setting `verify_node_modules_ignored = None` in `npm_tr
                 repo = rctx.name,
             ))
 
-########################################################################################################################
+################################################################################
 def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_package, default_registry, npm_registries, npm_tokens, npm_basic_auth, link_workspace):
     generated_by_lines = [
         "\"\"\"@generated by npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\")\"\"\"".format(rctx.name, utils.consistent_label_str(pnpm_lock_label)),

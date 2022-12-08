@@ -8,7 +8,7 @@ load(":transitive_closure.bzl", "translate_to_transitive_closure")
 
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
 
-########################################################################################################################
+################################################################################
 def _impl(rctx):
     rctx.report_progress("Initializing")
 
@@ -59,7 +59,7 @@ npm_translate_lock = repository_rule(
     attrs = helpers.attrs,
 )
 
-########################################################################################################################
+################################################################################
 def _bootstrap_import(rctx, state):
     pnpm_lock_label = state.label_store.label("pnpm_lock")
     pnpm_lock_path = state.label_store.path("pnpm_lock")
@@ -127,7 +127,7 @@ INFO: Initial pnpm-lock.yaml file generated. Please add the generated pnpm-lock.
     )
     fail(msg)
 
-########################################################################################################################
+################################################################################
 def _update_pnpm_lock(rctx, state):
     pnpm_lock_label = state.label_store.label("pnpm_lock")
     pnpm_lock_relative_path = state.label_store.relative_path("pnpm_lock")
@@ -204,7 +204,7 @@ INFO: {} file has changed""".format(pnpm_lock_relative_path))
 
     return lockfile_changed
 
-########################################################################################################################
+################################################################################
 def _fail_if_frozen_pnpm_lock(rctx, state):
     if RULES_JS_FROZEN_PNPM_LOCK_ENV in rctx.os.environ.keys() and rctx.os.environ[RULES_JS_FROZEN_PNPM_LOCK_ENV]:
         fail("""
