@@ -1,0 +1,2 @@
+# import common bazelrc shared with e2e workspaces
+import %workspace%/../../.bazelrc.common

@@ -41,10 +41,19 @@ jobs:
             - uses: actions/checkout@v3
             - id: bazel_6
               run: echo "bazelversion=$(head -n 1 .bazelversion)" >> $GITHUB_OUTPUT
-            - id: bazel_5
+            - id: bazel_5_3
               run: echo "bazelversion=5.3.2" >> $GITHUB_OUTPUT
+            - id: bazel_5_1
+              run: echo "bazelversion=5.1.1" >> $GITHUB_OUTPUT
+            # 5.0.0 will not build due to bazel dependency:
+            # ```
+            # ERROR: Traceback (most recent call last):
+            #   File "/home/runner/.cache/bazel/_bazel_runner/8d53428c79e05e77d1e55522fa21a0fd/external/bazel_gazelle/internal/go_repository.bzl", line 17, column 56, in <toplevel>
+            #     load("@bazel_tools//tools/build_defs/repo:utils.bzl", "read_user_netrc", "use_netrc")
+            # Error: file '@bazel_tools//tools/build_defs/repo:utils.bzl' does not contain symbol 'read_user_netrc'
+            # ```
         outputs:
-            # Will look like ["<version from .bazelversion>", "5.3.2"]
+            # Will look like ["<version from .bazelversion>", "5.3.2", "5.0.0"]
             bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
 
     matrix-prep-folder:
@@ -113,8 +122,12 @@ jobs:
                     # Don't test RBE with Bazel 5 (not supported)
                     - config: rbe
                       bazelversion: 5.3.2
+                    - config: rbe
+                      bazelversion: 5.1.1
                     # Don't test bzlmod with Bazel 5 (not supported)
                     - bazelversion: 5.3.2
+                      folder: e2e/bzlmod
+                    - bazelversion: 5.1.1
                       folder: e2e/bzlmod
 
         # Steps represent a sequence of tasks that will be executed as part of the job
@@ -159,19 +172,7 @@ jobs:
               with:
                   files: '${{ matrix.folder }}/test.sh'
 
-            - name: ./test.sh
-              # Run if there is a test.sh file in the folder.
-              if: steps.has_test_sh.outputs.files_exists == 'true'
-              working-directory: ${{ matrix.folder }}
-              shell: bash
-              run: ./test.sh
-              env:
-                  # Bazelisk will download bazel to here
-                  XDG_CACHE_HOME: ~/.cache/bazel-repo
-
             - name: bazel test //...
-              # Don't run if there is a test.sh file in the folder.
-              if: steps.has_test_sh.outputs.files_exists != 'true'
               working-directory: ${{ matrix.folder }}
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }}  //...
@@ -183,10 +184,9 @@ jobs:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
 
             - name: bazel coverage //...
-              # Don't run if there is a test.sh file in the folder.
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
-              if: steps.has_test_sh.outputs.files_exists != 'true' && matrix.config == 'local'
+              if: matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
               run: |
                   bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} --instrument_test_targets //...
@@ -195,3 +195,13 @@ jobs:
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+
+            - name: ./test.sh
+              # Run if there is a test.sh file in the folder.
+              if: steps.has_test_sh.outputs.files_exists == 'true'
+              working-directory: ${{ matrix.folder }}
+              shell: bash
+              run: ./test.sh
+              env:
+                  # Bazelisk will download bazel to here
+                  XDG_CACHE_HOME: ~/.cache/bazel-repo
