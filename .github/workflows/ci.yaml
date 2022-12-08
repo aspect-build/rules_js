@@ -11,6 +11,11 @@ on:
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
+concurrency:
+    # Cancel previous actions from the same PR: https://stackoverflow.com/a/72408109
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
 jobs:
     # matrix-prep-* steps dynamically generate a bit of JSON depending on whether our action has
     # access to repository secrets. When running on a pull_request from a fork, the author is
