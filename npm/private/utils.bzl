@@ -278,6 +278,14 @@ if [ ! -f $1 ]; then exit 42; fi
     else:
         fail(INTERNAL_ERROR_MSG)
 
+# TODO: move this to aspect_bazel_lib
+def _home_directory(rctx):
+    if "HOME" in rctx.os.environ and not repo_utils.is_windows(rctx):
+        return rctx.os.environ["HOME"]
+    if "USERPROFILE" in rctx.os.environ and repo_utils.is_windows(rctx):
+        return rctx.os.environ["USERPROFILE"]
+    return None
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -306,4 +314,5 @@ utils = struct(
     bzlmod_supported = is_bazel_6_or_greater(),
     reverse_force_copy = _reverse_force_copy,
     exists = _exists,
+    home_directory = _home_directory,
 )
