@@ -280,9 +280,9 @@ if [ ! -f $1 ]; then exit 42; fi
 
 # TODO: move this to aspect_bazel_lib
 def _home_directory(rctx):
-    if "HOME" in rctx.os.environ and not rctx.os.name.startswith("windows"):
+    if "HOME" in rctx.os.environ and not repo_utils.is_windows(rctx):
         return rctx.os.environ["HOME"]
-    if "USERPROFILE" in rctx.os.environ and rctx.os.name.startswith("windows"):
+    if "USERPROFILE" in rctx.os.environ and repo_utils.is_windows(rctx):
         return rctx.os.environ["USERPROFILE"]
     return None
 
