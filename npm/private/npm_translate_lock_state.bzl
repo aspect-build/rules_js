@@ -18,23 +18,23 @@ PNPM_LOCK_ACTION_CACHE_PREFIX = ".aspect/rules/external_repository_action_cache/
 ########################################################################################################################
 def _init(priv, rctx, label_store):
     is_windows = repo_utils.is_windows(rctx)
-    if is_windows and _update_pnpm_lock(priv):
+    if is_windows and _should_update_pnpm_lock(priv):
         # buildifier: disable=print
         print("""
 WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}")` is not yet supported on Windows. This feature
          will be disabled for this build.
 """.format(rctx_name = rctx.name))
-        priv["update_pnpm_lock"] = False
+        priv["should_update_pnpm_lock"] = False
 
     _validate_attrs(rctx.attr, is_windows)
 
     _init_common_labels(rctx, label_store)
 
-    if _update_pnpm_lock(priv) or not rctx.attr.pnpm_lock:
+    if _should_update_pnpm_lock(priv) or not rctx.attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
         _init_pnpm_labels(label_store)
 
-    if _update_pnpm_lock(priv):
+    if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
         _init_update_labels(rctx, label_store)
 
@@ -45,7 +45,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if pnpm_lock_exists:
         _load_lockfile(priv, rctx, label_store)
 
-    if _update_pnpm_lock(priv):
+    if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
 
     _init_root_package(priv, rctx, label_store)
@@ -54,19 +54,19 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _copy_common_input_files(priv, rctx, label_store, pnpm_lock_exists)
 
-    if _update_pnpm_lock(priv):
+    if _should_update_pnpm_lock(priv):
         _copy_update_input_files(priv, rctx, label_store)
         _copy_unspecified_input_files(priv, rctx, label_store)
 
 def _reload_lockfile(priv, rctx, label_store):
     _load_lockfile(priv, rctx, label_store)
 
-    if _update_pnpm_lock(priv):
+    if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
 
     _init_root_package(priv, rctx, label_store)
 
-    if _update_pnpm_lock(priv):
+    if _should_update_pnpm_lock(priv):
         _copy_unspecified_input_files(priv, rctx, label_store)
 
 ########################################################################################################################
@@ -294,7 +294,7 @@ def _copy_input_file(priv, rctx, label_store, key):
     if not label_store.has(key):
         fail("key not found '{}'".format(key))
     contents = rctx.read(label_store.path(key))
-    if _update_pnpm_lock(priv):
+    if _should_update_pnpm_lock(priv):
         _set_input_hash(
             priv,
             label_store.relative_path(key),
@@ -331,8 +331,8 @@ def _has_workspaces(priv):
     return importer_paths and (len(importer_paths) > 1 or importer_paths[0] != ".")
 
 ########################################################################################################################
-def _update_pnpm_lock(priv):
-    return priv["update_pnpm_lock"]
+def _should_update_pnpm_lock(priv):
+    return priv["should_update_pnpm_lock"]
 
 def _default_registry(priv):
     return priv["default_registry"]
@@ -363,7 +363,7 @@ def _new(rctx):
     label_store = repository_label_store.new(rctx.path)
 
     priv = {
-        "update_pnpm_lock": rctx.attr.update_pnpm_lock,
+        "should_update_pnpm_lock": rctx.attr.update_pnpm_lock,
         "default_registry": utils.default_registry(),
         "input_hashes": {},
         "link_workspace": None,
@@ -379,7 +379,7 @@ def _new(rctx):
 
     return struct(
         label_store = label_store,  # pass-through access to the label store
-        update_pnpm_lock = lambda: _update_pnpm_lock(priv),
+        should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
         link_workspace = lambda: _link_workspace(priv),
         importers = lambda: _importers(priv),
