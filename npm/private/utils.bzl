@@ -189,27 +189,11 @@ def _default_registry():
     return _to_registry_url("registry.npmjs.org/")
 
 def _hash(s):
-    result = str(hash(s))
-    if result.startswith("-"):
-        # Bazel's hash() resolves to a signed 32bit number [-2,147,483,648 to 2,147,483,647].
-        # Convert manually to a unique unsigned number here to keep the hash chars as [a-zA-Z0-9]
-        # since seeing a negative in a hash is surprising.
-        # -???,???,??x to 3,xxx,xxx,xxx
-        # -1,xxx,xxx,xxx to 4,xxx,xxx,xxx
-        # -2,xxx,xxx,xxx to 5,xxx,xxx,xxx
-        # NB: There has been discussion of adding a sha256 hash function to Starlark but no work has
-        # been done to date. See https://github.com/bazelbuild/starlark/issues/36#issuecomment-1115352085.
-        result = result[1:]
-        if len(result) <= 9:
-            padding = "0" * (9 - len(result))
-            result = "3" + padding + result
-        elif result[0] == "1":
-            result = "4" + result[1:]
-        elif result[0] == "2":
-            result = "5" + result[1:]
-        else:
-            fail(INTERNAL_ERROR_MSG)
-    return result
+    # Bazel's hash() resolves to a 32-bit signed integer [-2,147,483,648 to 2,147,483,647].
+    # NB: There has been discussion of adding a sha256 built-in hash function to Starlark but no
+    # work has been done to date.
+    # See https://github.com/bazelbuild/starlark/issues/36#issuecomment-1115352085.
+    return str(hash(s))
 
 def _dicts_match(a, b):
     if len(a) != len(b):
