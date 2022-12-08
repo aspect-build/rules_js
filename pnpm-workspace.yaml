@@ -7,4 +7,5 @@ packages:
     - 'examples/npm_package/packages/pkg_b'
     - 'examples/webpack_cli'
     - 'js/private/coverage/bundle'
+    - 'js/private/worker/src'
     - 'npm/private/test'
