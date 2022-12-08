@@ -1,25 +1,23 @@
-"Convert pnpm lock file into starlark Bazel fetches"
+"""TODO: rename this file to `npm_translate_lock_generate.bzl` to isolate the starlark generation code.
+In this PR the name is let as `npm_translate_lock.bzl` to keep the diff clean.
+"""
 
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":npmrc.bzl", "parse_npmrc")
 load(":utils.bzl", "utils")
-load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-DEFAULT_REGISTRY_PROTOCOL = "https"
-DEFAULT_REGISTRY = "%s://registry.npmjs.org/" % DEFAULT_REGISTRY_PROTOCOL
 DEFAULT_ROOT_PACKAGE = "."
 DEFAULT_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 
+################################################################################
 _ATTRS = {
     "pnpm_lock": attr.label(),
-    "package_json": attr.label(),
     "npm_package_lock": attr.label(),
     "yarn_lock": attr.label(),
+    "update_pnpm_lock": attr.bool(),
     "npmrc": attr.label(),
     "patches": attr.string_list_dict(),
     "patch_args": attr.string_list_dict(),
@@ -42,12 +40,10 @@ _ATTRS = {
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
     "generate_bzl_library_targets": attr.bool(),
     "data": attr.label_list(),
+    "quiet": attr.bool(default = True),
 }
 
-def _process_lockfile(rctx, pnpm_lock):
-    lockfile = utils.parse_pnpm_lock(rctx.read(rctx.path(pnpm_lock)))
-    return translate_to_transitive_closure(lockfile, rctx.attr.prod, rctx.attr.dev, rctx.attr.no_optional)
-
+################################################################################
 _NPM_IMPORT_TMPL = \
     """    npm_import(
         name = "{name}",
@@ -123,6 +119,7 @@ _BZL_LIBRARY_TMPL = \
 
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
+################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
     if link_package.startswith("../"):
@@ -132,9 +129,11 @@ def _link_package(root_package, import_path, rel_path = "."):
         link_package = ""
     return link_package
 
+################################################################################
 def _is_url(url):
     return url.find("://") != -1
 
+################################################################################
 def _gather_values_from_matching_names(keyed_lists, *names):
     result = []
     for name in names:
@@ -146,7 +145,8 @@ def _gather_values_from_matching_names(keyed_lists, *names):
                 result.append(v)
     return result
 
-def get_npm_auth(npmrc, npmrc_path, environ):
+################################################################################
+def _get_npm_auth(npmrc, npmrc_path, environ):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -238,7 +238,7 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             # scope: @myorg
             # registry: somewhere-else.com/myorg
             scope = k.removesuffix(_NPM_PKG_SCOPE_KEY)
-            registry = _to_registry_url(v)
+            registry = utils.to_registry_url(v)
             registries[scope] = registry
 
         if k.find(_NPM_USERNAME) != -1:
@@ -263,24 +263,14 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
 
             basic_auth[registry]["password"] = base64.decode(v)
 
-    return (tokens, registries, basic_auth)
+    return (registries, tokens, basic_auth)
 
-def _to_registry_url(url):
-    return "%s://%s" % (DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
-
-def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry):
+################################################################################
+def _gen_npm_imports(importers, packages, root_package, attr, registries, default_registry):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
-
-    packages = lockfile.get("packages")
-    if not packages:
-        fail("expected packages in processed lockfile")
-
-    importers = lockfile.get("importers")
-    if not importers:
-        fail("expected importers in processed lockfile")
 
     # make a lookup table of package to link name for each importer
     importer_links = {}
@@ -372,7 +362,7 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
         custom_postinstalls = _gather_values_from_matching_names(attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
-        repo_name = "%s__%s" % (attr.name, utils.bazel_name(name, version))
+        repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
         if repo_name.startswith("aspect_rules_js.npm."):
             repo_name = repo_name[len("aspect_rules_js.npm."):]
 
@@ -408,7 +398,7 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
             if len(key_value) == 2:
                 bins[key_value[0]] = key_value[1]
             else:
-                msg = "bins contains invalid key value pair '%s', required '=' separator not found" % bin
+                msg = "bins contains invalid key value pair '{}', required '=' separator not found".format(bin)
                 fail(msg)
 
         url = None
@@ -420,8 +410,8 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
                 # in pnpm-lock.yaml which we must replace with the desired registry in the `registry` field:
                 #   tarball: https://registry.npmjs.org/@types/cacheable-request/-/cacheable-request-6.0.2.tgz
                 #   registry: https://registry.yarnpkg.com/
-                if registry and tarball.startswith(DEFAULT_REGISTRY):
-                    url = registry + tarball[len(DEFAULT_REGISTRY):]
+                if registry and tarball.startswith(utils.default_registry()):
+                    url = registry + tarball[len(utils.default_registry()):]
                 else:
                     url = tarball
             else:
@@ -454,6 +444,7 @@ def _gen_npm_imports(lockfile, root_package, attr, registries, default_registry)
 
     return result
 
+################################################################################
 def _normalize_bazelignore(lines):
     """Make bazelignore lines predictable
 
@@ -469,7 +460,7 @@ def _normalize_bazelignore(lines):
             result.append(line.rstrip("/"))
     return result
 
-def _verify_node_modules_ignored(root_package, importer_paths, bazelignore):
+def _find_missing_bazel_ignores(root_package, importer_paths, bazelignore):
     bazelignore = _normalize_bazelignore(bazelignore.split("\n"))
     missing_ignores = []
 
@@ -485,6 +476,7 @@ def _verify_node_modules_ignored(root_package, importer_paths, bazelignore):
             missing_ignores.append(expected)
     return missing_ignores
 
+################################################################################
 def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
     if not public_hoist_packages:
         return
@@ -501,184 +493,36 @@ def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
         for link_name, link_packages in link_names.items():
             if len(link_packages) > 1:
                 if link_name in public_hoist_packages:
-                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to '{}/node_modules/{}': {}
+                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to '{link_package}/node_modules/{link_name}': {link_packages}
 
-Trying selecting a specific version of '{}' to hoist in public_hoist_packages. For example '{}':
+Trying selecting a specific version of '{link_name}' to hoist in public_hoist_packages. For example '{link_packages_first}':
 
     public_hoist_packages = {{
-        "{}": ["{}"]
+        "{link_packages_first}": ["{link_package}"]
     }}
 """.format(
-                        link_package,
-                        link_name,
-                        link_packages,
-                        link_name,
-                        link_packages[0],
-                        link_packages[0],
-                        link_package,
+                        link_package = link_package,
+                        link_name = link_name,
+                        link_packages = link_packages,
+                        link_packages_first = link_packages[0],
                     )
                 else:
-                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to '{}/node_modules/{}': {}
+                    msg = """\n\nInvalid public hoist configuration with multiple packages to hoist to '{link_package}/node_modules/{link_name}': {link_packages}
 
 Check the public_hoist_packages attribute for duplicates.
 """.format(
-                        link_package,
-                        link_name,
-                        link_packages,
+                        link_package = link_package,
+                        link_name = link_name,
+                        link_packages = link_packages,
                     )
                 fail(msg)
 
-def _validate_attrs(rctx):
-    count = 0
-    if rctx.attr.yarn_lock:
-        count += 1
-    if rctx.attr.npm_package_lock:
-        count += 1
-    if count and not rctx.attr.package_json:
-        fail("npm_translate_lock with yarn_lock or npm_package_lock attribute also requires that the package_json attribute is set")
-    if rctx.attr.pnpm_lock:
-        count += 1
-
-        # don't allow a pnpm lock file that isn't in the root directory of a bazel package
-        if rctx.attr.root_package == DEFAULT_ROOT_PACKAGE and paths.dirname(rctx.attr.pnpm_lock.name):
-            fail("pnpm-lock.yaml file must be at the root of a bazel package")
-        if rctx.attr.package_json:
-            fail("The package_json attribute should not be used with pnpm_lock.")
-    if count != 1:
-        msg = "npm_translate_lock requires exactly one of [pnpm_lock, npm_package_lock, yarn_lock] attributes, but {} were set.".format(count)
-        fail(msg)
-
-def _label_str(label):
-    return "//{}:{}".format(
-        # Ideally we would print the workspace_name, but starting in Bazel 6, it's empty for the
-        # local workspace and there's no other way to determine it.
-        # label.workspace_name,
-        label.package,
-        label.name,
-    )
-
-def _impl(rctx):
-    lockfile = None
-    root_package = None
-    link_workspace = None
-    lockfile_description = None
-    npm_tokens = {}
-    npm_registries = {}
-    npm_basic_auth = {}
-    default_registry = DEFAULT_REGISTRY
-
-    bzlmod_supported = is_bazel_6_or_greater()
-
-    # Read tokens from npmrc label
-    if rctx.attr.npmrc:
-        npmrc_path = rctx.path(rctx.attr.npmrc)
-        npmrc = parse_npmrc(rctx.read(npmrc_path))
-        (npm_tokens, npm_registries, npm_basic_auth) = get_npm_auth(npmrc, npmrc_path, rctx.os.environ)
-
-        if "registry" in npmrc:
-            default_registry = _to_registry_url(npmrc["registry"])
-
-    _validate_attrs(rctx)
-
-    for f in rctx.attr.data:
-        rctx.file(
-            paths.normalize(paths.join(f.package, f.name)),
-            content = rctx.read(f),
-            executable = False,
-        )
-
-    if rctx.attr.pnpm_lock != None:
-        lockfile = _process_lockfile(rctx, rctx.attr.pnpm_lock)
-
-        # root package is the directory of the pnpm_lock file unless
-        # overridden by the root_package attribute
-        root_package = rctx.attr.root_package if rctx.attr.root_package != DEFAULT_ROOT_PACKAGE else rctx.attr.pnpm_lock.package
-        link_workspace = rctx.attr.pnpm_lock.workspace_name
-
-        lockfile_description = _label_str(rctx.attr.pnpm_lock)
-    else:
-        rctx.file(
-            "package.json",
-            content = rctx.read(rctx.attr.package_json),
-            executable = False,
-        )
-
-        if rctx.attr.npm_package_lock:
-            lock_attr = rctx.attr.npm_package_lock
-            rctx.file(
-                "package-lock.json",
-                content = rctx.read(rctx.attr.npm_package_lock),
-                executable = False,
-            )
-        elif rctx.attr.yarn_lock:
-            lock_attr = rctx.attr.yarn_lock
-            rctx.file(
-                "yarn.lock",
-                content = rctx.read(rctx.attr.yarn_lock),
-                executable = False,
-            )
-        else:
-            fail("rules_js internal validation error, please file an issue")
-
-        if rctx.attr.npmrc:
-            rctx.file(
-                ".npmrc",
-                content = rctx.read(rctx.attr.npmrc),
-                executable = False,
-            )
-
-        result = rctx.execute([
-            rctx.path(Label("@nodejs_host//:bin/node")),
-            rctx.path(Label("@pnpm//:package/bin/pnpm.cjs")),
-            "import",
-        ])
-        if result.return_code:
-            msg = "pnpm import exited with status %s: \nSTDOUT:\n%s\nSTDERR:\n%s" % (result.return_code, result.stdout, result.stderr)
-            fail(msg)
-
-        lockfile = _process_lockfile(rctx, "pnpm-lock.yaml")
-
-        # root package is the directory of the lockfile
-        root_package = lock_attr.package
-        link_workspace = lock_attr.workspace_name
-
-        lockfile_description = "{} and {}".format(
-            _label_str(rctx.attr.package_json),
-            _label_str(lock_attr),
-        )
-
-    # in Bazel 5.3.0, the lock file workspace_name will now be empty if it is the local workspace;
-    # we use rctx.attr.link_workspace instead to handle the explicit link workspace name case (e2e/rules_foo for example)
-    # check that there isn't conflicting link workspaces if both are set
-    if rctx.attr.link_workspace:
-        link_workspace = rctx.attr.link_workspace
-
-    generated_by_lines = [
-        "\"@generated by @aspect_rules_js//npm/private:npm_translate_lock.bzl from {}\"".format(lockfile_description),
-        "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
-    ]
-
-    repositories_bzl = [
-        """load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")""",
-        "",
-        "def npm_repositories():",
-        "    \"Generated npm_import repository rules corresponding to npm packages in {}\"".format(lockfile_description),
-    ]
-
-    packages = lockfile.get("packages")
-    if not packages:
-        fail("expected packages in processed lockfile")
-
-    importers = lockfile.get("importers")
-    if not importers:
-        fail("expected importers in processed lockfile")
-
-    importer_paths = importers.keys()
-
+################################################################################
+def _verify_node_modules_ignored(rctx, importers, root_package):
     if rctx.attr.verify_node_modules_ignored != None:
-        missing_ignores = _verify_node_modules_ignored(root_package, importer_paths, rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
+        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
         if missing_ignores:
-            fail("""\
+            fail("""
 
 ERROR: in verify_node_modules_ignored:
 pnpm install will create nested node_modules, but not all of them are ignored by Bazel.
@@ -689,19 +533,33 @@ Either add line(s) to {bazelignore}:
 
 {fixes}
 
-or disable this check by setting 'verify_node_modules_ignored = None' in `npm_translate_lock(name = "{repo}")`
+or disable this check by setting `verify_node_modules_ignored = None` in `npm_translate_lock(name = "{repo}")`
                 """.format(
                 fixes = "\n".join(missing_ignores),
                 bazelignore = rctx.attr.verify_node_modules_ignored,
                 repo = rctx.name,
             ))
 
-    link_packages = [_link_package(root_package, import_path) for import_path in importer_paths]
+################################################################################
+def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_package, default_registry, npm_registries, npm_tokens, npm_basic_auth, link_workspace):
+    generated_by_lines = [
+        "\"\"\"@generated by npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\")\"\"\"".format(rctx.name, utils.consistent_label_str(pnpm_lock_label)),
+        "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
+    ]
+
+    repositories_bzl = [
+        """load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")""",
+        "",
+        "def npm_repositories():",
+        "    \"Generated npm_import repository rules corresponding to npm packages in {}\"".format(utils.consistent_label_str(pnpm_lock_label)),
+    ]
+
+    link_packages = [_link_package(root_package, import_path) for import_path in importers.keys()]
 
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(lockfile, root_package, rctx.attr, npm_registries, default_registry)
+    npm_imports = _gen_npm_imports(importers, packages, root_package, rctx.attr, npm_registries, default_registry)
 
     fp_links = {}
     rctx_files = {
@@ -816,7 +674,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
                         else:
                             transitive_deps[dep_store_target].append(raw_package)
 
-                    # collapse link aliases lists into to acomma separated strings
+                    # collapse link aliases lists into to a comma separated strings
                     for dep_store_target in transitive_deps.keys():
                         transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
                     fp_links[dep_key] = {
@@ -832,7 +690,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
     defs_bzl_body = [
         """def npm_link_all_packages(name = "node_modules", imported_links = []):
-    \"\"\"Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {lockfile_description}
+    \"\"\"Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
 
     Args:
         name: name of catch all target to generate for all packages linked
@@ -869,11 +727,11 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         for _scope, _targets in new_scope_targets.items():
             scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
 """.format(
-            lockfile_description = lockfile_description,
-            root_package = root_package,
+            defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
             link_packages = str(link_packages),
             link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
-            defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
+            root_package = root_package,
+            pnpm_lock_label = pnpm_lock_label,
         ),
     ]
 
@@ -968,7 +826,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 """.format(
             name = "{}_source_directory".format(_import.name),
             actual = "{}{}//:source_directory".format(
-                "@@" if bzlmod_supported else "@",
+                "@@" if utils.bzlmod_supported else "@",
                 _import.name,
             ),
         ))
@@ -976,7 +834,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         if _import.link_packages:
             defs_bzl_header.append(
                 """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
-                    at = "@@" if bzlmod_supported else "@",
+                    at = "@@" if utils.bzlmod_supported else "@",
                     i = i,
                     links_repo_suffix = utils.links_repo_suffix,
                     repo_name = _import.name,
@@ -985,7 +843,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         else:
             defs_bzl_header.append(
                 """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
-                    at = "@@" if bzlmod_supported else "@",
+                    at = "@@" if utils.bzlmod_supported else "@",
                     i = i,
                     links_repo_suffix = utils.links_repo_suffix,
                     repo_name = _import.name,
@@ -1118,13 +976,11 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(generated_by_lines + contents))
 
-npm_translate_lock = struct(
-    implementation = _impl,
+helpers = struct(
     attrs = _ATTRS,
+    get_npm_auth = _get_npm_auth,
     gen_npm_imports = _gen_npm_imports,
-)
-
-npm_translate_lock_testonly = struct(
-    testonly_process_lockfile = _process_lockfile,
+    generate_repository_files = _generate_repository_files,
+    find_missing_bazel_ignores = _find_missing_bazel_ignores,
     verify_node_modules_ignored = _verify_node_modules_ignored,
 )
