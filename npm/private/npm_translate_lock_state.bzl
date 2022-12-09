@@ -100,7 +100,6 @@ def _init_common_labels(rctx, label_store):
     if attr.npmrc:
         label_store.add("npmrc", attr.npmrc)
     label_store.add_sibling("lock", "sibling_npmrc", NPM_RC_FILENAME)
-    label_store.add_root("root_npmrc", NPM_RC_FILENAME)
 
     # pnpm-workspace.yaml file
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
@@ -157,10 +156,6 @@ def _init_npmrc(priv, rctx, label_store):
     if not label_store.has("npmrc"):
         # check for a .npmrc next to the pnpm-lock.yaml file
         _maybe_npmrc(priv, rctx, label_store, "sibling_npmrc")
-
-    if not label_store.has("npmrc"):
-        # check for a .npmrc next to the pnpm-lock.yaml file
-        _maybe_npmrc(priv, rctx, label_store, "root_npmrc")
 
     if label_store.has("npmrc"):
         _load_npmrc(priv, rctx, label_store.path("npmrc"))
