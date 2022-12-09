@@ -43,6 +43,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     _init_link_workspace(priv, rctx, label_store)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
+    # TODO(windows): utils.exists is not yet support on Windows
     pnpm_lock_exists = is_windows or utils.exists(rctx, label_store.path("pnpm_lock"))
     if pnpm_lock_exists:
         _load_lockfile(priv, rctx, label_store)
@@ -169,6 +170,10 @@ def _init_npmrc(priv, rctx, label_store):
 
 ################################################################################
 def _maybe_npmrc(priv, rctx, label_store, key):
+    is_windows = repo_utils.is_windows(rctx)
+    if is_windows:
+        # TODO(windows): utils.exists is not yet support on Windows
+        return
     if utils.exists(rctx, label_store.path(key)):
         npmrc_label = label_store.label(key)
 
@@ -333,7 +338,10 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         return
 
     home_npmrc_path = "{}/{}".format(home_directory, NPM_RC_FILENAME)
-    if utils.exists(rctx, home_npmrc_path):
+
+    # TODO(windows): utils.exists is not yet support on Windows
+    is_windows = repo_utils.is_windows(rctx)
+    if is_windows or utils.exists(rctx, home_npmrc_path):
         _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
