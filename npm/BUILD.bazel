@@ -50,3 +50,11 @@ bzl_library(
         "//npm/private:versions",
     ],
 )
+
+sh_binary(
+    name = "update_translate_lock_data",
+    srcs = ["update_translate_lock_data.sh"],
+    # This is a js_binary target
+    data = ["@pnpm"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
