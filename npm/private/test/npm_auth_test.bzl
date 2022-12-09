@@ -11,7 +11,7 @@ def _no_npmrc_test_impl(ctx):
 
     asserts.equals(
         env,
-        ({}, {}, {}),
+        ({}, {}),
         helpers.get_npm_auth(
             {},
             "",
@@ -29,9 +29,10 @@ def _plain_text_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "TOKEN1",
+                "registry1": {
+                    "bearer": "TOKEN1",
+                },
             },
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -47,10 +48,13 @@ def _plain_text_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "TOKEN1",
-                "registry2": "TOKEN2",
+                "registry1": {
+                    "bearer": "TOKEN1",
+                },
+                "registry2": {
+                    "bearer": "TOKEN2",
+                },
             },
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -71,6 +75,33 @@ def _plain_basic_auth_test_impl(ctx):
         env,
         (
             {},
+            {
+                "registry1": {
+                    "basic": "dXNlcm5hbWU6aHVudGVyMg==",
+                },
+                "registry2": {
+                    "basic": "c29tZW9uZTpwYXNzd29yZA==",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:_auth": "dXNlcm5hbWU6aHVudGVyMg==",
+                "//registry2/:_auth": "c29tZW9uZTpwYXNzd29yZA==",
+            },
+            "",
+            {},
+        ),
+    )
+
+    return unittest.end(env)
+
+def _plain_username_password_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        (
             {},
             {
                 "registry1": {
@@ -105,9 +136,10 @@ def _env_var_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "TOKEN1",
+                "registry1": {
+                    "bearer": "TOKEN1",
+                },
             },
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -123,9 +155,10 @@ def _env_var_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "1234",
+                "registry1": {
+                    "bearer": "1234",
+                },
             },
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -143,9 +176,10 @@ def _env_var_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "1234",
+                "registry1": {
+                    "bearer": "1234",
+                },
             },
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -163,10 +197,13 @@ def _env_var_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "1234",
-                "registry2": "5678",
+                "registry1": {
+                    "bearer": "1234",
+                },
+                "registry2": {
+                    "bearer": "5678",
+                },
             },
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -190,13 +227,18 @@ def _mixed_token_test_impl(ctx):
         (
             {},
             {
-                "registry1": "TOKEN1",
-                "registry2": "5678",
-            },
-            {
+                "registry1": {
+                    "bearer": "TOKEN1",
+                },
+                "registry2": {
+                    "bearer": "5678",
+                },
                 "registry3": {
                     "username": "username",
                     "password": "hunter2",
+                },
+                "registry4": {
+                    "basic": "c29tZW9uZTpwYXNzd29yZA==",
                 },
             },
         ),
@@ -206,6 +248,7 @@ def _mixed_token_test_impl(ctx):
                 "//registry2/:_authToken": "${%s}" % "TOKEN2",
                 "//registry3/:username": "username",
                 "//registry3/:_password": "aHVudGVyMg==",
+                "//registry4/:_auth": "c29tZW9uZTpwYXNzd29yZA==",
             },
             "",
             {
@@ -226,7 +269,6 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry1",
             },
             {},
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -244,7 +286,6 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry1",
                 "@scope2": "https://registry2",
             },
-            {},
             {},
         ),
         helpers.get_npm_auth(
@@ -264,7 +305,6 @@ def _pkg_scope_test_impl(ctx):
                 "@scope1": "https://registry/scope1",
                 "@scope2": "https://registry/scope2",
             },
-            {},
             {},
         ),
         helpers.get_npm_auth(
@@ -287,7 +327,6 @@ def _pkg_scope_test_impl(ctx):
                 "@scope4": "https://registry4.com",
             },
             {},
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -309,7 +348,6 @@ def _pkg_scope_test_impl(ctx):
                 "@scope2": "https://registry/scope2",
             },
             {},
-            {},
         ),
         helpers.get_npm_auth(
             {
@@ -325,6 +363,7 @@ def _pkg_scope_test_impl(ctx):
 
 no_npmrc_test = unittest.make(_no_npmrc_test_impl)
 plain_basic_auth_test = unittest.make(_plain_basic_auth_test_impl)
+plain_username_password_test = unittest.make(_plain_username_password_test_impl)
 plain_text_token_test = unittest.make(_plain_text_token_test_impl)
 env_var_token_test = unittest.make(_env_var_token_test_impl)
 mixed_token_test = unittest.make(_mixed_token_test_impl)
@@ -336,6 +375,7 @@ def npm_auth_test_suite():
         partial.make(no_npmrc_test, timeout = "short"),
         partial.make(plain_text_token_test, timeout = "short"),
         partial.make(plain_basic_auth_test, timeout = "short"),
+        partial.make(plain_username_password_test, timeout = "short"),
         partial.make(env_var_token_test, timeout = "short"),
         partial.make(mixed_token_test, timeout = "short"),
         partial.make(pkg_scope_test, timeout = "short"),

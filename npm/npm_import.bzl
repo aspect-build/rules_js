@@ -484,6 +484,7 @@ def npm_import(
         patches = [],
         custom_postinstall = "",
         npm_auth = "",
+        npm_auth_basic = "",
         npm_auth_username = "",
         npm_auth_password = "",
         bins = {},
@@ -671,6 +672,10 @@ def npm_import(
 
         npm_auth: Auth token to authenticate with npm. When using Bearer authentication.
 
+        npm_auth_basic: Auth token to authenticate with npm. When using Basic authentication.
+
+            This is typically the base64 encoded string "username:password".
+
         npm_auth_username: Auth username to authenticate with npm. When using Basic authentication.
 
         npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
@@ -721,6 +726,7 @@ def npm_import(
         patches = patches,
         custom_postinstall = custom_postinstall,
         npm_auth = npm_auth,
+        npm_auth_basic = npm_auth_basic,
         npm_auth_username = npm_auth_username,
         npm_auth_password = npm_auth_password,
         run_lifecycle_hooks = run_lifecycle_hooks,

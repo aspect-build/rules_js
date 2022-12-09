@@ -88,8 +88,7 @@ def _impl(rctx):
         state.root_package(),
         state.default_registry(),
         state.npm_registries(),
-        state.npm_tokens(),
-        state.npm_basic_auth(),
+        state.npm_auth(),
         state.link_workspace(),
     )
 
