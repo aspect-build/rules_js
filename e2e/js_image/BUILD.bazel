@@ -60,8 +60,6 @@ container_test(
     name = "image_test",
     configs = [":smoketest.yaml"],
     image = ":image",
-    # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
-    tags = ["no-remote-exec"],
 )
 
 bzl_library(
