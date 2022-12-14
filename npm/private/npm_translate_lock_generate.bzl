@@ -17,8 +17,7 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
     )
 """
 
@@ -98,15 +97,24 @@ def _is_url(url):
     return url.find("://") != -1
 
 ################################################################################
-def _gather_values_from_matching_names(keyed_lists, *names):
+def _gather_values_from_matching_names(additive, keyed_lists, *names):
     result = []
     for name in names:
-        if name:
-            v = keyed_lists.get(name, [])
-            if type(v) == "list":
-                result.extend(v)
+        if name and name in keyed_lists:
+            v = keyed_lists[name]
+            if additive:
+                if type(v) == "list":
+                    result.extend(v)
+                elif type(v) == "string":
+                    result.append(v)
+                else:
+                    fail("expected value to be list or string")
+            elif type(v) == "list":
+                result = v
+            elif type(v) == "string":
+                result = [v]
             else:
-                result.append(v)
+                fail("expected value to be list or string")
     return result
 
 ################################################################################
@@ -326,11 +334,11 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
             unfriendly_name = None
 
         # gather patches & patch args
-        patches = _gather_values_from_matching_names(attr.patches, name, friendly_name, unfriendly_name)
-        patch_args = _gather_values_from_matching_names(attr.patch_args, name, friendly_name, unfriendly_name)
+        patches = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
+        patch_args = _gather_values_from_matching_names(False, attr.patch_args, name, friendly_name, unfriendly_name)
 
         # gather custom postinstalls
-        custom_postinstalls = _gather_values_from_matching_names(attr.custom_postinstalls, name, friendly_name, unfriendly_name)
+        custom_postinstalls = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
         repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
@@ -346,25 +354,20 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
                 link_packages[links["link_package"]] = link_names
 
         # check if this package should be hoisted via public_hoist_packages
-        public_hoist_packages = _gather_values_from_matching_names(attr.public_hoist_packages, name, friendly_name, unfriendly_name)
+        public_hoist_packages = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
         for public_hoist_package in public_hoist_packages:
             if public_hoist_package not in link_packages:
                 link_packages[public_hoist_package] = [name]
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        run_lifecycle_hooks = (
-            requires_build and
-            attr.run_lifecycle_hooks and
-            name not in attr.lifecycle_hooks_exclude and
-            friendly_name not in attr.lifecycle_hooks_exclude
-        )
-
-        lifecycle_hooks_env = _gather_values_from_matching_names(attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_execution_requirements = _gather_values_from_matching_names(attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks = _gather_values_from_matching_names(False, attr.lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks_env = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks_execution_requirements = _gather_values_from_matching_names(False, attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
+        run_lifecycle_hooks = requires_build and lifecycle_hooks
 
         bins = {}
-        for bin in _gather_values_from_matching_names(attr.bins, "*", name, friendly_name, unfriendly_name):
+        for bin in _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name, unfriendly_name):
             key_value = bin.split("=", 1)
             if len(key_value) == 2:
                 bins[key_value[0]] = key_value[1]
@@ -403,6 +406,7 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
             patches = patches,
             root_package = root_package,
             run_lifecycle_hooks = run_lifecycle_hooks,
+            lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
             transitive_closure = transitive_closure,
@@ -726,8 +730,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
         maybe_custom_postinstall = ("""
         custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
-        maybe_run_lifecycle_hooks = ("""
-        run_lifecycle_hooks = True,""") if _import.run_lifecycle_hooks else ""
+        maybe_lifecycle_hooks = ("""
+        lifecycle_hooks = %s,""" % _import.lifecycle_hooks) if _import.run_lifecycle_hooks and _import.lifecycle_hooks else ""
         maybe_lifecycle_hooks_env = ("""
         lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
         maybe_lifecycle_hooks_execution_requirements = ("""
@@ -769,7 +773,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         npm_auth_password = "%s",""" % npm_auth_password) if npm_auth_password else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
-            lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
             maybe_bins = maybe_bins,
@@ -778,15 +781,15 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_deps = maybe_deps,
             maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
             maybe_integrity = maybe_integrity,
+            maybe_lifecycle_hooks = maybe_lifecycle_hooks,
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
             maybe_npm_auth = maybe_npm_auth,
             maybe_npm_auth_basic = maybe_npm_auth_basic,
-            maybe_npm_auth_username = maybe_npm_auth_username,
             maybe_npm_auth_password = maybe_npm_auth_password,
+            maybe_npm_auth_username = maybe_npm_auth_username,
             maybe_patch_args = maybe_patch_args,
             maybe_patches = maybe_patches,
-            maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,
             maybe_transitive_closure = maybe_transitive_closure,
             name = _import.name,
             npm_translate_lock_repo = rctx.name,

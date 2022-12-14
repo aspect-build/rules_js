@@ -552,8 +552,8 @@ bin = bin_factory("node_modules")
             rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
 
     rules_js_metadata = {}
-    if rctx.attr.run_lifecycle_hooks:
-        rules_js_metadata["run_lifecycle_hooks"] = "1"
+    if rctx.attr.lifecycle_hooks:
+        rules_js_metadata["lifecycle_hooks"] = ",".join(rctx.attr.lifecycle_hooks)
     if rctx.attr.custom_postinstall:
         rules_js_metadata["scripts"] = {}
         rules_js_metadata["scripts"]["custom_postinstall"] = rctx.attr.custom_postinstall
@@ -767,7 +767,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "integrity": attr.string(),
     "patch_args": attr.string_list(default = ["-p0"]),
     "patches": attr.label_list(),
-    "run_lifecycle_hooks": attr.bool(),
+    "lifecycle_hooks": attr.string_list(),
     "custom_postinstall": attr.string(),
     "link_workspace": attr.string(),
     "url": attr.string(),

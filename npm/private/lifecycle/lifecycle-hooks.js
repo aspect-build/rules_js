@@ -79,10 +79,8 @@ async function checkBindingGyp(root, scripts) {
 
 // Like runPostinstallHooks from @pnpm/lifecycle at
 // https://github.com/pnpm/pnpm/blob/bc18d33fe00d9ed43f1562d4cc6d37f49d9c2c38/exec/lifecycle/src/index.ts#L20
-// but also runs prepare hook which is notably missing from that function and does not match what
-// pnpm does on its install:
-// https://github.com/pnpm/pnpm/blob/bc18d33fe00d9ed43f1562d4cc6d37f49d9c2c38/pkg-manager/core/src/install/index.ts#L1108
-async function runLifecycleHooks(opts) {
+// but also runs a customizable list of lifecycle hooks.
+async function runLifecycleHooks(opts, hooks) {
     const pkg = await safeReadPackageJsonFromDir(opts.pkgRoot)
     if (pkg == null) {
         return
@@ -91,24 +89,18 @@ async function runLifecycleHooks(opts) {
         pkg.scripts = {}
     }
 
-    if (!pkg.scripts.install) {
+    const runInstallScripts =
+        hooks.includes('preinstall') ||
+        hooks.includes('install') ||
+        hooks.includes('postinstall')
+    if (runInstallScripts && !pkg.scripts.install) {
         await checkBindingGyp(opts.pkgRoot, pkg.scripts)
     }
 
-    if (pkg.scripts.preinstall) {
-        await runLifecycleHook('preinstall', pkg, opts)
-    }
-
-    if (pkg.scripts.install) {
-        await runLifecycleHook('install', pkg, opts)
-    }
-
-    if (pkg.scripts.postinstall) {
-        await runLifecycleHook('postinstall', pkg, opts)
-    }
-
-    if (pkg.scripts.prepare) {
-        await runLifecycleHook('prepare', pkg, opts)
+    for (const hook of hooks) {
+        if (pkg.scripts[hook]) {
+            await runLifecycleHook(hook, pkg, opts)
+        }
     }
 }
 
@@ -170,9 +162,9 @@ async function main(args) {
         )
     )
 
-    if (rulesJsJson.run_lifecycle_hooks) {
-        // Runs preinstall, install, postinstall & prepare hooks
-        await runLifecycleHooks(opts)
+    if (rulesJsJson.lifecycle_hooks) {
+        // Runs configured lifecycle hooks
+        await runLifecycleHooks(opts, rulesJsJson.lifecycle_hooks.split(','))
     }
 
     if (rulesJsJson.scripts?.custom_postinstall) {
