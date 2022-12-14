@@ -2,21 +2,22 @@
     "private": true,
     "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
     "devDependencies": {
+        "@blockprotocol/type-system-web": "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
+        "@figma/nodegit": "^0.28.0-figma.2",
+        "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#763decf",
+        "@plotly/regl": "2.1.2",
         "bufferutil": "4.0.1",
         "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
         "esbuild": "0.14.38",
-        "plotly.js": "2.12.1",
-        "regl": "npm:@plotly/regl@2.1.2",
-        "@plotly/regl": "2.1.2",
-        "unused": "latest",
-        "webpack-bundle-analyzer": "4.5.0",
-        "semver-first-satisfied": "1.1.0",
-        "@figma/nodegit": "^0.28.0-figma.2",
-        "typescript": "*",
+        "handlebars-helpers/helper-date": "github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55",
         "inline-fixtures": "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
         "json-stable-stringify": "1.0.1",
-        "@blockprotocol/type-system-web": "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
-        "protoc-gen-grpc": "git+ssh://git@github.com:nigel-codaio/protoc-gen-grpc-ts#0982bb568e60dead9bcf19df5cdd9779626da0d5",
-        "handlebars-helpers/helper-date": "github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55"
+        "plotly.js": "2.12.1",
+        "protoc-gen-grpc": "git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f",
+        "regl": "npm:@plotly/regl@2.1.2",
+        "semver-first-satisfied": "1.1.0",
+        "typescript": "*",
+        "unused": "latest",
+        "webpack-bundle-analyzer": "4.5.0"
     }
 }

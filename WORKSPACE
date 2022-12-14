@@ -90,6 +90,11 @@ npm_translate_lock(
         "//npm/private/test/vendored/semver-max:package.json",
     ],
     generate_bzl_library_targets = True,
+    lifecycle_hooks_exclude = [
+        # 'install' hook fails as it assumes the following path to `node-pre-gyp`: ./node_modules/.bin/node-pre-gyp
+        # https://github.com/stultuss/protoc-gen-grpc-ts/blob/53d52a9d0e1fe3cbe930dec5581eca89b3dde807/package.json#L28
+        "protoc-gen-grpc@2.0.3",
+    ],
     lifecycle_hooks_execution_requirements = {
         "@figma/nodegit": [
             # Workaround Engflow not honoring requires-network on build actions

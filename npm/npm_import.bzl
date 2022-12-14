@@ -614,20 +614,27 @@ def npm_import(
             Defaults to {} which indicates that links may be created in any package as specified by
             the `direct` attribute of the generated npm_link_package.
 
-        run_lifecycle_hooks: If true, runs `preinstall`, `install` and `postinstall` lifecycle hooks declared in this
-            package.
+        run_lifecycle_hooks: If true, runs `preinstall`, `install`, `postinstall` and 'prepare' lifecycle hooks declared
+            in this package.
 
-        lifecycle_hooks_env: Environment variables applied to the `preinstall`, `install`, and `postinstall` lifecycle
-            hooks declared in this package.
+        lifecycle_hooks_env: Environment variables applied to the `preinstall`, `install`, `postinstall` and 'prepare'
+            lifecycle hooks declared in this package.
+
             Lifecycle hooks are defined by providing an array of "key=value" entries.
+
             For example:
 
+            ```
             lifecycle_hooks_env: [ "PREBULT_BINARY=https://downloadurl"],
+            ```
 
         lifecycle_hooks_execution_requirements: Execution requirements when running the lifecycle hooks.
+
             For example:
 
+            ```
             lifecycle_hooks_execution_requirements: [ "requires-network" ]
+            ```
 
         lifecycle_hooks_no_sandbox: If True, a "no-sandbox" execution requirement is added
             to the lifecycle hook if there is one.
