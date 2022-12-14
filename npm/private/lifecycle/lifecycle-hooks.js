@@ -1,7 +1,8 @@
 const fs = require('fs')
+const exists = require('path-exists')
 const path = require('path')
-const { runPostinstallHooks } = require('@pnpm/lifecycle')
-const runLifecycleHook = require('@pnpm/lifecycle').default
+const { safeReadPackageJsonFromDir } = require('@pnpm/read-package-json')
+const { runLifecycleHook } = require('@pnpm/lifecycle')
 
 async function mkdirp(p) {
     if (p && !fs.existsSync(p)) {
@@ -68,6 +69,49 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
     }
 }
 
+// Helper which is exported from @pnpm/lifecycle:
+// https://github.com/pnpm/pnpm/blob/bc18d33fe00d9ed43f1562d4cc6d37f49d9c2c38/exec/lifecycle/src/index.ts#L52
+async function checkBindingGyp(root, scripts) {
+    if (await exists(path.join(root, 'binding.gyp'))) {
+        scripts['install'] = 'node-gyp rebuild'
+    }
+}
+
+// Like runPostinstallHooks from @pnpm/lifecycle at
+// https://github.com/pnpm/pnpm/blob/bc18d33fe00d9ed43f1562d4cc6d37f49d9c2c38/exec/lifecycle/src/index.ts#L20
+// but also runs prepare hook which is notably missing from that function and does not match what
+// pnpm does on its install:
+// https://github.com/pnpm/pnpm/blob/bc18d33fe00d9ed43f1562d4cc6d37f49d9c2c38/pkg-manager/core/src/install/index.ts#L1108
+async function runLifecycleHooks(opts) {
+    const pkg = await safeReadPackageJsonFromDir(opts.pkgRoot)
+    if (pkg == null) {
+        return
+    }
+    if (pkg.scripts == null) {
+        pkg.scripts = {}
+    }
+
+    if (!pkg.scripts.install) {
+        await checkBindingGyp(opts.pkgRoot, pkg.scripts)
+    }
+
+    if (pkg.scripts.preinstall) {
+        await runLifecycleHook('preinstall', pkg, opts)
+    }
+
+    if (pkg.scripts.install) {
+        await runLifecycleHook('install', pkg, opts)
+    }
+
+    if (pkg.scripts.postinstall) {
+        await runLifecycleHook('postinstall', pkg, opts)
+    }
+
+    if (pkg.scripts.prepare) {
+        await runLifecycleHook('prepare', pkg, opts)
+    }
+}
+
 async function main(args) {
     if (args.length !== 3) {
         console.error(
@@ -127,8 +171,8 @@ async function main(args) {
     )
 
     if (rulesJsJson.run_lifecycle_hooks) {
-        // Runs preinstall, install, and postinstall hooks
-        await runPostinstallHooks(opts)
+        // Runs preinstall, install, postinstall & prepare hooks
+        await runLifecycleHooks(opts)
     }
 
     if (rulesJsJson.scripts?.custom_postinstall) {
@@ -169,17 +213,23 @@ async function copyRecursive(src, dest) {
     } catch (e) {
         // Note: use .log rather than .error. The former is deferred and the latter is immediate.
         // The error is harder to spot and parse when it appears in the middle of the other logs.
-        if (e.code === "ELIFECYCLE" && !!e.pkgid && !!e.stage && !!e.script) {
-            console.log("===============================================================")
-            console.log(`Failure while running lifecycle hook for package '${e.pkgid}':\n`);
-            console.log(`  Script:  '${e.stage}'`);
-            console.log(`  Command: \`${e.script}\``);
-            console.log(`\nStack trace:\n`);
+        if (e.code === 'ELIFECYCLE' && !!e.pkgid && !!e.stage && !!e.script) {
+            console.log(
+                '==============================================================='
+            )
+            console.log(
+                `Failure while running lifecycle hook for package '${e.pkgid}':\n`
+            )
+            console.log(`  Script:  '${e.stage}'`)
+            console.log(`  Command: \`${e.script}\``)
+            console.log(`\nStack trace:\n`)
             // First line of error is always the message, which is redundant with the above logging.
-            console.log(e.stack.replace(/^.*?\n/, ""));
-            console.log("===============================================================");
+            console.log(e.stack.replace(/^.*?\n/, ''))
+            console.log(
+                '==============================================================='
+            )
         } else {
-            console.log(e);
+            console.log(e)
         }
 
         process.exit(1)

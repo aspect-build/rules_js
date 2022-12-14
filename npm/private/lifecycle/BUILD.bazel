@@ -8,5 +8,6 @@ js_binary(
     # https://github.com/aspect-build/rules_js/issues/447
     data = glob(["min/**"]) + ["package.json"],
     entry_point = "min/index.min.js",
+    include_npm = True,
     visibility = ["//visibility:public"],
 )
