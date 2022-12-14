@@ -286,6 +286,24 @@ def _home_directory(rctx):
         return rctx.os.environ["USERPROFILE"]
     return None
 
+def _replace_npmrc_token_envvar(token, npmrc_path, environ):
+    # A token can be a reference to an environment variable
+    if token.startswith("$"):
+        # ${NPM_TOKEN} -> NPM_TOKEN
+        # $NPM_TOKEN -> NPM_TOKEN
+        token = token.removeprefix("$").removeprefix("{").removesuffix("}")
+        if token in environ.keys() and environ[token]:
+            token = environ[token]
+        else:
+            # buildifier: disable=print
+            print("""
+WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
+""".format(
+                npmrc = npmrc_path,
+                token = token,
+            ))
+    return token
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -315,4 +333,5 @@ utils = struct(
     reverse_force_copy = _reverse_force_copy,
     exists = _exists,
     home_directory = _home_directory,
+    replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
 )

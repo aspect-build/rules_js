@@ -179,23 +179,10 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
             # registry: somewhere-else.com/myorg
             # token: MYTOKEN1
             registry = k.removeprefix("//").removesuffix(_NPM_AUTH_TOKEN).removesuffix(":").removesuffix("/")
-            token = v
 
-            # A token can be a reference to an environment variable
-            if token.startswith("$"):
-                # ${NPM_TOKEN} -> NPM_TOKEN
-                # $NPM_TOKEN -> NPM_TOKEN
-                token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-                if token in environ.keys() and environ[token]:
-                    token = environ[token]
-                else:
-                    # buildifier: disable=print
-                    print("""
-WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{token}}}
-""".format(
-                        npmrc = npmrc_path,
-                        token = token,
-                    ))
+            # envvar replacement is supported for `_authToken`
+            # https://pnpm.io/npmrc#url_authtoken
+            token = utils.replace_npmrc_token_envvar(v, npmrc_path, environ)
 
             if registry not in auth:
                 auth[registry] = {}
@@ -217,10 +204,13 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             # username: someone
             registry = k.removeprefix("//").removesuffix(_NPM_AUTH).removesuffix(":").removesuffix("/")
 
+            # envvar replacement is supported for `_auth` as well
+            token = utils.replace_npmrc_token_envvar(v, npmrc_path, environ)
+
             if registry not in auth:
                 auth[registry] = {}
 
-            auth[registry]["basic"] = v
+            auth[registry]["basic"] = token
 
         if k == _NPM_USERNAME or k.endswith(":" + _NPM_USERNAME):
             # //somewhere-else.com/myorg/:username=someone
