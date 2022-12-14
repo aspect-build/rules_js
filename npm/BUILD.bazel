@@ -48,5 +48,6 @@ bzl_library(
         "//npm/private:npm_translate_lock",
         "//npm/private:utils",
         "//npm/private:versions",
+        "@bazel_skylib//lib:dicts",
     ],
 )
