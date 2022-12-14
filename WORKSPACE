@@ -92,12 +92,7 @@ npm_translate_lock(
     generate_bzl_library_targets = True,
     lifecycle_hooks = {
         # we fetch @kubernetes/client-node from source and it has a `prepare` lifecycle hook that needs to be run
-        "@kubernetes/client-node": [
-            "prepare",
-            "preinstall",
-            "install",
-            "postinstall",
-        ],
+        "@kubernetes/client-node": ["prepare"],
         # 'install' hook fails as it assumes the following path to `node-pre-gyp`: ./node_modules/.bin/node-pre-gyp
         # https://github.com/stultuss/protoc-gen-grpc-ts/blob/53d52a9d0e1fe3cbe930dec5581eca89b3dde807/package.json#L28
         "protoc-gen-grpc@2.0.3": [],
@@ -106,6 +101,16 @@ npm_translate_lock(
         "*": [
             "no-sandbox",
         ],
+        # If @kubernetes/client-node is not sandboxed, will fail with
+        # ```
+        # src/azure_auth.ts(97,43): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # src/azure_auth.ts(98,34): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # src/gcp_auth.ts(93,43): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # src/gcp_auth.ts(94,34): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # ```
+        # since a `jsonpath-plus@7.2.0` that is newer then the transitive dep `jsonpath-plus@0.19.0` is found outside of the sandbox that
+        # includes typings that don't match the 0.19.0 "any" usage.
+        "@kubernetes/client-node": [],
         "@figma/nodegit": [
             "no-sandbox",
             # Workaround Engflow not honoring requires-network on build actions

@@ -11550,6 +11550,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__jsonpath-plus__7.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["jsonpath-plus"],
+        },
+        package = "jsonpath-plus",
+        version = "7.2.0",
+        url = "https://registry.npmjs.org/jsonpath-plus/-/jsonpath-plus-7.2.0.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==",
+        transitive_closure = {
+            "jsonpath-plus": ["7.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__jsprim__1.4.2",
         root_package = "",
         link_workspace = "",
@@ -20804,8 +20822,8 @@ def npm_repositories():
             "isexe": ["2.0.0"],
             "shebang-regex": ["3.0.0"],
         },
-        lifecycle_hooks = ["prepare", "preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+        lifecycle_hooks = ["prepare"],
+        lifecycle_hooks_execution_requirements = [],
     )
 
     npm_import(

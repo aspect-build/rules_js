@@ -1,5 +1,6 @@
 load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_imported_package")
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_imported_package")
 load("//npm:defs.bzl", "npm_link_package")
@@ -13,6 +14,13 @@ npm_link_all_packages(
         npm_link_acorn,
         npm_link_pnpm,
     ],
+)
+
+# Ensure that jsonplus-plus is in the output tree for the @kubernetes/client-node sandboxed lifecycle
+# hook test case
+build_test(
+    name = "node_modules_test",
+    targets = [":node_modules"],
 )
 
 # Example of manually linking a first-party dependency. Its transitive npm dependencies
