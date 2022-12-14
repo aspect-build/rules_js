@@ -259,11 +259,15 @@ def npm_translate_lock(
 
         data: Data files required by this repository rule when auto-updating the pnpm lock file.
 
-            Only needed with `update_pnpm_lock` is True.
+            Only needed when `update_pnpm_lock` is True.
 
-            This should include all `package.json` files in the pnpm workspace or required to run
-            `pnpm install --lockfile-only` or `pnpm import`. When `update_pnpm_lock` is True,
-            the pnpm lock file update may fail if there are required data files missing.
+            This should include the `pnpm-workspace.yaml` file as well as all `package.json` files
+            in the pnpm workspace.
+            The pnpm lock file update will fail if `data` is missing any files required to run
+            `pnpm install --lockfile-only` or `pnpm import`.
+
+            To list all local `package.json` files that pnpm needs to read, you can run
+            `pnpm recursive ls --depth -1 --porcelain`.
 
         patches: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list of patches to apply to the downloaded npm package. Paths in the patch
