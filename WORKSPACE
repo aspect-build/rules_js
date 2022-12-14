@@ -107,6 +107,18 @@ npm_translate_lock(
             "requires-network",
         ],
     },
+    lifecycle_hooks_sandboxed = [
+        # If @kubernetes/client-node is not sandboxed, will fail with
+        # ```
+        # src/azure_auth.ts(97,43): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # src/azure_auth.ts(98,34): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # src/gcp_auth.ts(93,43): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # src/gcp_auth.ts(94,34): error TS2575: No overload expects 2 arguments, but overloads do exist that expect either 1 or 4 arguments.
+        # ```
+        # since a `jsonpath-plus@7.2.0` that is newer then the transitive dep `jsonpath-plus@0.19.0` is found outside of the sandbox that
+        # includes typings that don't match the 0.19.0 "any" usage.
+        "@kubernetes/client-node",
+    ],
     npmrc = "//:.npmrc",
     patch_args = {
         "@gregmagolan/test-a": ["-p1"],

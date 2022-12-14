@@ -71,19 +71,21 @@ def npm_translate_lock(
         public_hoist_packages = {},
         dev = False,
         no_optional = False,
-        lifecycle_hooks_exclude = [],
         run_lifecycle_hooks = True,
+        lifecycle_hooks_exclude = [],
         lifecycle_hooks_envs = {},
         lifecycle_hooks_execution_requirements = {},
+        lifecycle_hooks_sandboxed = None,
         bins = {},
-        lifecycle_hooks_no_sandbox = True,
         verify_node_modules_ignored = None,
         quiet = True,
+        link_workspace = None,
+        pnpm_version = LATEST_PNPM_VERSION,
         # TODO(2.0): remove warn_on_unqualified_tarball_url
         # buildifier: disable=unused-variable
         warn_on_unqualified_tarball_url = None,
-        link_workspace = None,
-        pnpm_version = LATEST_PNPM_VERSION,
+        # TODO(2.0): remove lifecycle_hooks_no_sandbox
+        lifecycle_hooks_no_sandbox = None,
         # TODO(2.0): remove package_json
         package_json = None,
         **kwargs):
@@ -282,7 +284,7 @@ def npm_translate_lock(
             a custom postinstall scripts exists for a package as well as for a specific version, the script for the versioned package
             will be appended with `&&` to the non-versioned package script.
 
-        prod: If true, only install dependencies.
+        prod: If True, only install `dependencies`.
 
         public_hoist_packages: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree when linking.
@@ -291,16 +293,18 @@ def npm_translate_lock(
             wild-cards are not yet supported and npm_translate_lock will fail if there are multiple versions of a package that
             are to be hoisted.
 
-        dev: If true, only install devDependencies
+        dev: If True, only install `devDependencies`
 
-        no_optional: If true, optionalDependencies are not installed
+        no_optional: If True, `optionalDependencies` are not installed
+
+        run_lifecycle_hooks: If True, runs `preinstall`, `install`, `postinstall` and `prepare` lifecycle hooks on npm packages if they exist
 
         lifecycle_hooks_exclude: A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to not run lifecycle hooks on
 
-        run_lifecycle_hooks: If true, runs preinstall, install and postinstall lifecycle hooks on npm packages if they exist
+        lifecycle_hooks_envs: Environment variables applied to the `preinstall`, `install`,`postinstall` and `prepare`
+            lifecycle hooks on npm packages.
 
-        lifecycle_hooks_envs: Environment variables applied to the preinstall, install and postinstall lifecycle hooks on npm packages.
             The environment variables can be defined per package by package name or globally using "*".
             Variables are declared as key/value pairs of the form "key=value".
 
@@ -313,8 +317,8 @@ def npm_translate_lock(
             }
             ```
 
-        lifecycle_hooks_execution_requirements: Execution requirements applied to the preinstall, install and postinstall
-            lifecycle hooks on npm packages.
+        lifecycle_hooks_execution_requirements: Execution requirements applied to the `preinstall`, `install`,
+            `postinstall` and `prepare` lifecycle hooks on npm packages.
 
             The execution requirements can be defined per package by package name or globally using "*".
 
@@ -323,9 +327,17 @@ def npm_translate_lock(
             ```
             lifecycle_hooks_execution_requirements: {
                 "*": ["requires-network"],
-                "@foo/bar": ["no-sandbox"],
+                "@foo/bar": ["no-remote-exec"],
             }
             ```
+
+        lifecycle_hooks_sandboxed: A list of npm packages for which lifecycle hooks, if they exist,
+            should run in the sandbox if run on a host that supports sandboxed execution or True to
+            run all lifecycle hooks that exist in the sandbox if run on a host that supports
+            sandboxed execution.
+
+            By default, lifecycle hooks are not run in the sandbox to limit the overhead of sandbox
+            creation and copying the output TreeArtifacts out of the sandbox.
 
         bins: Binary files to create in `node_modules/.bin` for packages in this lock file.
 
@@ -346,13 +358,6 @@ def npm_translate_lock(
             In the future, this field may be automatically populated from information in the pnpm lock
             file. That feature is currently blocked on https://github.com/pnpm/pnpm/issues/5131.
 
-        lifecycle_hooks_no_sandbox: If True, a "no-sandbox" execution requirement is added to all lifecycle hooks.
-
-            Equivalent to adding `"*": ["no-sandbox"]` to lifecycle_hooks_execution_requirements.
-
-            This defaults to True to limit the overhead of sandbox creation and copying the output
-            TreeArtifacts out of the sandbox.
-
         verify_node_modules_ignored: node_modules folders in the source tree should be ignored by Bazel.
 
             This points to a `.bazelignore` file to verify that all nested node_modules directories
@@ -361,8 +366,6 @@ def npm_translate_lock(
             See https://github.com/bazelbuild/bazel/issues/8106
 
         quiet: Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.
-
-        warn_on_unqualified_tarball_url: Deprecated. Will be removed in next major release.
 
         link_workspace: The workspace name where links will be created for the packages in this lock file.
 
@@ -374,6 +377,12 @@ def npm_translate_lock(
             Can be left unspecified if the link workspace is the user workspace.
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
+
+        warn_on_unqualified_tarball_url: Deprecated. Will be removed in next major release.
+
+        lifecycle_hooks_no_sandbox: Deprecated.
+
+            Use `lifecycle_hooks_sandboxed` instead.
 
         package_json: Deprecated.
 
@@ -421,6 +430,14 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
     if update_pnpm_lock == None and (npm_package_lock or yarn_lock):
         update_pnpm_lock = True
 
+    if lifecycle_hooks_sandboxed != None and lifecycle_hooks_no_sandbox != None:
+        fail("Expected only one of lifecycle_hooks_sandboxed and lifecycle_hooks_no_sandbox to be set")
+
+    if lifecycle_hooks_sandboxed == True or lifecycle_hooks_no_sandbox == False:
+        lifecycle_hooks_sandboxed = ["*"]
+    elif lifecycle_hooks_sandboxed == False or lifecycle_hooks_no_sandbox == True:
+        lifecycle_hooks_sandboxed = []
+
     _npm_translate_lock(
         name = name,
         pnpm_lock = pnpm_lock,
@@ -436,12 +453,12 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         public_hoist_packages = public_hoist_packages,
         dev = dev,
         no_optional = no_optional,
-        lifecycle_hooks_exclude = lifecycle_hooks_exclude,
         run_lifecycle_hooks = run_lifecycle_hooks,
+        lifecycle_hooks_exclude = lifecycle_hooks_exclude,
         lifecycle_hooks_envs = lifecycle_hooks_envs,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+        lifecycle_hooks_sandboxed = lifecycle_hooks_sandboxed,
         bins = bins_string_list_dict,
-        lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
         verify_node_modules_ignored = verify_node_modules_ignored,
         link_workspace = link_workspace,
         root_package = root_package,
@@ -476,7 +493,7 @@ def npm_import(
         run_lifecycle_hooks = False,
         lifecycle_hooks_execution_requirements = [],
         lifecycle_hooks_env = [],
-        lifecycle_hooks_no_sandbox = True,
+        lifecycle_hooks_sandboxed = None,
         integrity = "",
         url = "",
         commit = "",
@@ -488,6 +505,8 @@ def npm_import(
         npm_auth_username = "",
         npm_auth_password = "",
         bins = {},
+        # TODO(2.0): remove lifecycle_hooks_no_sandbox
+        lifecycle_hooks_no_sandbox = None,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -614,7 +633,7 @@ def npm_import(
             Defaults to {} which indicates that links may be created in any package as specified by
             the `direct` attribute of the generated npm_link_package.
 
-        run_lifecycle_hooks: If true, runs `preinstall`, `install`, `postinstall` and 'prepare' lifecycle hooks declared
+        run_lifecycle_hooks: If True, runs `preinstall`, `install`, `postinstall` and 'prepare' lifecycle hooks declared
             in this package.
 
         lifecycle_hooks_env: Environment variables applied to the `preinstall`, `install`, `postinstall` and 'prepare'
@@ -636,13 +655,11 @@ def npm_import(
             lifecycle_hooks_execution_requirements: [ "requires-network" ]
             ```
 
-        lifecycle_hooks_no_sandbox: If True, a "no-sandbox" execution requirement is added
-            to the lifecycle hook if there is one.
+        lifecycle_hooks_sandboxed: If True, the lifecycle hook for this package, if it has one,
+            will be run in a sandbox if they are run on a host that supports sandboxed execution.
 
-            Equivalent to adding "no-sandbox" to lifecycle_hooks_execution_requirements.
-
-            This defaults to True to limit the overhead of sandbox creation and copying the output
-            TreeArtifact out of the sandbox.
+            By default, lifecycle hooks are not run in the sandbox to limit the overhead of sandbox
+            creation and copying the output TreeArtifacts out of the sandbox.
 
         integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
             This must match the checksum of the file downloaded.
@@ -709,6 +726,10 @@ def npm_import(
             from information in the pnpm lock file. That feature is currently blocked on
             https://github.com/pnpm/pnpm/issues/5131.
 
+        lifecycle_hooks_no_sandbox: Deprecated.
+
+            Use `lifecycle_hooks_sandboxed` instead.
+
         **kwargs: Internal use only
     """
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
@@ -743,6 +764,11 @@ def npm_import(
         generate_bzl_library_targets = generate_bzl_library_targets,
     )
 
+    if lifecycle_hooks_sandboxed != None and lifecycle_hooks_no_sandbox != None:
+        fail("Expected only one of lifecycle_hooks_sandboxed and lifecycle_hooks_no_sandbox to be set")
+    if lifecycle_hooks_no_sandbox != None:
+        lifecycle_hooks_sandboxed = not lifecycle_hooks_no_sandbox
+
     # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
     _npm_import_links(
@@ -756,7 +782,7 @@ def npm_import(
         lifecycle_build_target = run_lifecycle_hooks or not (not custom_postinstall),
         lifecycle_hooks_env = lifecycle_hooks_env,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
-        lifecycle_hooks_no_sandbox = lifecycle_hooks_no_sandbox,
+        lifecycle_hooks_sandboxed = lifecycle_hooks_sandboxed,
         bins = bins,
         npm_translate_lock_repo = npm_translate_lock_repo,
     )

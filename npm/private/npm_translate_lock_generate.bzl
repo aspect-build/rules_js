@@ -17,8 +17,7 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
-        lifecycle_hooks_no_sandbox = {lifecycle_hooks_no_sandbox},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_lifecycle_hooks_sandbox}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_run_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
     )
 """
 
@@ -367,11 +366,19 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
             requires_build and
             attr.run_lifecycle_hooks and
             name not in attr.lifecycle_hooks_exclude and
-            friendly_name not in attr.lifecycle_hooks_exclude
+            friendly_name not in attr.lifecycle_hooks_exclude and
+            unfriendly_name not in attr.lifecycle_hooks_exclude
         )
 
         lifecycle_hooks_env = _gather_values_from_matching_names(attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
         lifecycle_hooks_execution_requirements = _gather_values_from_matching_names(attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
+
+        lifecycle_hooks_sandboxed = (
+            "*" in attr.lifecycle_hooks_sandboxed or
+            name in attr.lifecycle_hooks_sandboxed or
+            friendly_name in attr.lifecycle_hooks_sandboxed or
+            unfriendly_name in attr.lifecycle_hooks_sandboxed
+        )
 
         bins = {}
         for bin in _gather_values_from_matching_names(attr.bins, "*", name, friendly_name, unfriendly_name):
@@ -415,6 +422,7 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
             run_lifecycle_hooks = run_lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+            lifecycle_hooks_sandboxed = lifecycle_hooks_sandboxed,
             transitive_closure = transitive_closure,
             url = url,
             commit = commit,
@@ -742,6 +750,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
         maybe_lifecycle_hooks_execution_requirements = ("""
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_execution_requirements else ""
+        maybe_lifecycle_hooks_sandbox = ("""
+        lifecycle_hooks_sandboxed = True,""") if _import.lifecycle_hooks_sandboxed else ""
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
         maybe_generate_bzl_library_targets = ("""
@@ -779,7 +789,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         npm_auth_password = "%s",""" % npm_auth_password) if npm_auth_password else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
-            lifecycle_hooks_no_sandbox = rctx.attr.lifecycle_hooks_no_sandbox,
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
             maybe_bins = maybe_bins,
@@ -790,10 +799,11 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_integrity = maybe_integrity,
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
+            maybe_lifecycle_hooks_sandbox = maybe_lifecycle_hooks_sandbox,
             maybe_npm_auth = maybe_npm_auth,
             maybe_npm_auth_basic = maybe_npm_auth_basic,
-            maybe_npm_auth_username = maybe_npm_auth_username,
             maybe_npm_auth_password = maybe_npm_auth_password,
+            maybe_npm_auth_username = maybe_npm_auth_username,
             maybe_patch_args = maybe_patch_args,
             maybe_patches = maybe_patches,
             maybe_run_lifecycle_hooks = maybe_run_lifecycle_hooks,

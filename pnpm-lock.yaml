@@ -156,6 +156,7 @@ importers:
       handlebars-helpers/helper-date: github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55
       inline-fixtures: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662
       json-stable-stringify: 1.0.1
+      jsonpath-plus: 7.2.0
       plotly.js: 2.12.1
       protoc-gen-grpc: git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f
       regl: npm:@plotly/regl@2.1.2
@@ -174,6 +175,7 @@ importers:
       handlebars-helpers/helper-date: github.com/coda/helper-date/a2cb4284148cbba7d36173dff4c7c60ce59eae55
       inline-fixtures: '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662'
       json-stable-stringify: 1.0.1
+      jsonpath-plus: 7.2.0
       plotly.js: 2.12.1
       protoc-gen-grpc: github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f
       regl: /@plotly/regl/2.1.2
@@ -3390,6 +3392,11 @@ packages:
   /jsonpath-plus/0.19.0:
     resolution: {integrity: sha512-GSVwsrzW9LsA5lzsqe4CkuZ9wp+kxBb2GwNniaWzI2YFn5Ig42rSW8ZxVpWXaAfakXNrx5pgY5AbQq7kzX29kg==}
     engines: {node: '>=6.0'}
+    dev: true
+
+  /jsonpath-plus/7.2.0:
+    resolution: {integrity: sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==}
+    engines: {node: '>=12.0.0'}
     dev: true
 
   /jsprim/1.4.2:

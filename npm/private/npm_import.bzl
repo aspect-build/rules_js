@@ -706,7 +706,7 @@ def _impl_links(rctx):
     lifecycle_hooks_execution_requirements = {}
     for ec in rctx.attr.lifecycle_hooks_execution_requirements:
         lifecycle_hooks_execution_requirements[ec] = "1"
-    if rctx.attr.lifecycle_hooks_no_sandbox and "no-sandbox" not in lifecycle_hooks_execution_requirements:
+    if not rctx.attr.lifecycle_hooks_sandboxed and "no-sandbox" not in lifecycle_hooks_execution_requirements:
         lifecycle_hooks_execution_requirements["no-sandbox"] = "1"
 
     maybe_bins = ("""
@@ -758,7 +758,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
-    "lifecycle_hooks_no_sandbox": attr.bool(default = True),
+    "lifecycle_hooks_sandboxed": attr.bool(),
     "npm_translate_lock_repo": attr.string(),
 })
 

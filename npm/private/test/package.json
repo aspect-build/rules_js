@@ -12,6 +12,7 @@
         "handlebars-helpers/helper-date": "github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55",
         "inline-fixtures": "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
         "json-stable-stringify": "1.0.1",
+        "jsonpath-plus": "7.2.0",
         "plotly.js": "2.12.1",
         "protoc-gen-grpc": "git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f",
         "regl": "npm:@plotly/regl@2.1.2",
