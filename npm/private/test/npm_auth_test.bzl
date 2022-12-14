@@ -66,6 +66,48 @@ def _plain_text_token_test_impl(ctx):
         ),
     )
 
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "registry1": {
+                    "basic": "TOKEN1",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:_auth": "TOKEN1",
+            },
+            "",
+            {},
+        ),
+    )
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "registry1": {
+                    "basic": "TOKEN1",
+                },
+                "registry2": {
+                    "basic": "TOKEN2",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:_auth": "TOKEN1",
+                "//registry2/:_auth": "TOKEN2",
+            },
+            "",
+            {},
+        ),
+    )
+
     return unittest.end(env)
 
 def _plain_basic_auth_test_impl(ctx):
