@@ -26,6 +26,9 @@ Set `update_pnpm_lock` to True in your `npm_translate_lock` rule and Bazel will 
 for pnpm to generate the `pnpm-lock.yaml` to the `data` attribute of `npm_translate_lock`. This will
 include the `pnpm-workspace.yaml` if it exists and all `package.json` files in your pnpm workspace.
 
+To list all local `package.json` files that pnpm needs to read, you can run
+`pnpm recursive ls --depth -1 --porcelain`.
+
 ## Can I edit files in `node_modules` for debugging?
 
 Try running Bazel with `--experimental_check_output_files=false` so that your edits inside the `bazel-out/node_modules` tree are preserved.
