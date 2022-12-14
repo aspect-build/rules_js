@@ -53,6 +53,7 @@ filegroup(
         ":node_modules/handlebars-helpers/helper-date",
         ":node_modules/inline-fixtures",
         ":node_modules/json-stable-stringify",
+        ":node_modules/jsonpath-plus",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
         ":node_modules/regl",
