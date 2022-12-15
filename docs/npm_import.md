@@ -183,118 +183,23 @@ npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_tr
                    <a href="#npm_translate_lock-warn_on_unqualified_tarball_url">warn_on_unqualified_tarball_url</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
 </pre>
 
-Repository rule to generate npm_import rules from pnpm lock file or from a package.json and yarn/npm lock file.
+Repository macro to generate `npm_import` rules from a lock file.
 
-The pnpm lockfile format includes all the information needed to define npm_import rules,
-including the integrity hash, as calculated by the package manager.
-
-For more details see, https://github.com/pnpm/pnpm/blob/main/packages/lockfile-types/src/index.ts.
-
-Instead of manually declaring the `npm_imports`, this helper generates an external repository
+In most repositories, it would be an impossible maintenance burden to manually
+declare [`npm_import`](#npm_import) rules. This helper generates an external repository
 containing a helper starlark module `repositories.bzl`, which supplies a loadable macro
-`npm_repositories`. This macro creates an `npm_import` for each package.
+`npm_repositories`. That macro creates an `npm_import` for each package.
 
-The generated repository also contains BUILD files declaring targets for the packages
+The generated repository also contains `BUILD` files declaring targets for the packages
 listed as `dependencies` or `devDependencies` in `package.json`, so you can declare
 dependencies on those packages without having to repeat version information.
 
-Bazel will only fetch the packages which are required for the requested targets to be analyzed.
-Thus it is performant to convert a very large pnpm-lock.yaml file without concern for
-users needing to fetch many unnecessary packages.
+This macro creates a `pnpm` external repository, if the user didn't create a repository named
+"pnpm" prior to calling `npm_translate_lock`.
+`rules_js` currently only uses this repository when `npm_package_lock` or `yarn_lock` are used.
+Set `pnpm_version` to `None` to inhibit this repository creation.
 
-**Compatabilty with pnpm***
-
-The `node_modules` tree laid out by `rules_js` should be bug-for-bug compatible with the `node_modules` tree that
-pnpm lays out with [hoisting](https://pnpm.io/npmrc#hoist) disabled (`hoist=false` set in your `.npmrc`).
-
-We recommend adding `hoist=false` to your `.npmrc`:
-
-```
-echo "hoist=false" &gt;&gt; .npmrc
-```
-
-This will prevent pnpm from creating the hidden `node_modules/.pnpm/node_modules` folder with hoisted
-dependencies which allow for packages to depend on "phantom" undeclared dependencies. In most cases,
-if you hit import/require runtime failures in 3rd party npm packages when using `rules_js`, the failure
-will be reproducible with pnpm outside of Bazel when hoisting is disabled.
-
-`rules_js` does not and will not support pnpm "phantom" [hoisting](https://pnpm.io/npmrc#hoist) which allows for
-packages to depend on undeclared dependencies. All dependencies between packages must be declared under
-`rules_js` in order to support lazy fetching and lazy linking of npm dependencies.
-
-If a 3rd party npm package is relying on "phantom" dependencies to work, the recommended fix for `rules_js` is to
-use [pnpm.packageExtensions](https://pnpm.io/package_json#pnpmpackageextensions) in your `package.json` to add the
-missing `dependencies` or `peerDependencies`. For example,
-https://github.com/aspect-build/rules_js/blob/a8c192eed0e553acb7000beee00c60d60a32ed82/package.json#L12.
-
-NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
-For now, you can emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute
-of `npm_translate_lock`.
-
-**Setup**
-
-In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
-
-```starlark
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
-
-# Read the pnpm-lock.yaml file to automate creation of remaining npm_import rules
-npm_translate_lock(
-    # Creates a new repository named "@npm_deps"
-    name = "npm_deps",
-    pnpm_lock = "//:pnpm-lock.yaml",
-    # Recommended attribute that also checks the .bazelignore file
-    verify_node_modules_ignored = "//:.bazelignore",
-)
-```
-
-Next, there are two choices, either load from the generated repo or check in the generated file.
-The tradeoffs are similar to
-[this rules_python thread](https://github.com/bazelbuild/rules_python/issues/608).
-
-1. Immediately load from the generated `repositories.bzl` file in `WORKSPACE`.
-This is similar to the
-[`pip_parse`](https://github.com/bazelbuild/rules_python/blob/main/docs/pip.md#pip_parse)
-rule in rules_python for example.
-It has the advantage of also creating aliases for simpler dependencies that don't require
-spelling out the version of the packages.
-However it causes Bazel to eagerly evaluate the `npm_translate_lock` rule for every build,
-even if the user didn't ask for anything JavaScript-related.
-
-```starlark
-# Following our example above, we named this "npm_deps"
-load("@npm_deps//:repositories.bzl", "npm_repositories")
-
-npm_repositories()
-```
-
-2. Check in the `repositories.bzl` file to version control, and load that instead.
-This makes it easier to ship a ruleset that has its own npm dependencies, as users don't
-have to install those dependencies. It also avoids eager-evaluation of `npm_translate_lock`
-for builds that don't need it.
-This is similar to the [`update-repos`](https://github.com/bazelbuild/bazel-gazelle#update-repos)
-approach from bazel-gazelle.
-
-In a BUILD file, use a rule like
-[write_source_files](https://github.com/aspect-build/bazel-lib/blob/main/docs/write_source_files.md)
-to copy the generated file to the repo and test that it stays updated:
-
-```starlark
-write_source_files(
-    name = "update_repos",
-    files = {
-        "repositories.bzl": "@npm_deps//:repositories.bzl",
-    },
-)
-```
-
-Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do so.
-
-This macro creates a "pnpm" repository. `rules_js` currently only uses this repository
-when npm_package_lock or yarn_lock are used rather than pnpm_lock.
-Set pnpm_version to None to inhibit this repository creation.
-
-The user can create a "pnpm" repository before calling this in order to override.
+For more detailed documentation, see &lt;/docs/pnpm.md&gt;.
 
 
 **PARAMETERS**
@@ -304,25 +209,25 @@ The user can create a "pnpm" repository before calling this in order to override
 | :------------- | :------------- | :------------- |
 | <a id="npm_translate_lock-name"></a>name |  The repository rule name   |  none |
 | <a id="npm_translate_lock-pnpm_lock"></a>pnpm_lock |  The <code>pnpm-lock.yaml</code> file.   |  <code>None</code> |
-| <a id="npm_translate_lock-npm_package_lock"></a>npm_package_lock |  The <code>package-lock.json</code> file written by <code>npm install</code>.<br><br>Only one of [npm_package_lock, yarn_lock] may be set.   |  <code>None</code> |
-| <a id="npm_translate_lock-yarn_lock"></a>yarn_lock |  The <code>yarn.lock</code> file written by <code>yarn install</code>.<br><br>Only one of [npm_package_lock, yarn_lock] may be set.   |  <code>None</code> |
-| <a id="npm_translate_lock-update_pnpm_lock"></a>update_pnpm_lock |  When True, the pnpm lock file wil be updated automatically when any of its inputs have changed since the last update.<br><br>Defaults to False unless <code>npm_package_lock</code> or <code>yarn_lock</code> are set, in which case it defaults to True.<br><br>A <code>.aspect/rules/external_repository_action_cache/npm_translate_lock_&lt;hash&gt;</code> file will be created and used to determine when the <code>pnpm-lock.yaml</code> file should be updated. This file should be checked into the source control along with the <code>pnpm-lock.yaml</code> file.<br><br>When the <code>pnpm-lock.yaml</code> file needs updating, <code>npm_translate_lock</code> will run either <code>pnpm install --lockfile-only</code> or <code>pnpm import</code>. The latter will be used if there is a <code>npm_package_lock</code> or <code>yarn_lock</code> specified.<br><br>To update the <code>pnpm-lock.yaml</code> file manually either [install pnpm](https://pnpm.io/installation) and run <code>pnpm install --lockfile-only</code> or <code>pnpm import</code> use the Bazel-managed pnpm by running <code>bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only</code> or <code>bazel run -- @pnpm//:pnpm --dir $PWD import</code><br><br>If the ASPECT_RULES_JS_FROZEN_PNPM_LOCK environment variable is set and <code>update_pnpm_lock</code> is True, the build will fail if the pnpm lock file needs updating. It is recommended to set this environment variable on CI when <code>update_pnpm_lock</code> is True.   |  <code>None</code> |
+| <a id="npm_translate_lock-npm_package_lock"></a>npm_package_lock |  The <code>package-lock.json</code> file written by <code>npm install</code>.<br><br>Only one of <code>npm_package_lock</code> and <code>yarn_lock</code> may be set.   |  <code>None</code> |
+| <a id="npm_translate_lock-yarn_lock"></a>yarn_lock |  The <code>yarn.lock</code> file written by <code>yarn install</code>.<br><br>Only one of <code>npm_package_lock</code> and <code>yarn_lock</code> may be set.   |  <code>None</code> |
+| <a id="npm_translate_lock-update_pnpm_lock"></a>update_pnpm_lock |  When True, the pnpm lock file will be updated automatically when any of its inputs have changed since the last update.<br><br>Defaults to True when one of <code>npm_package_lock</code> or <code>yarn_lock</code> are set. Otherwise it defaults to False.<br><br>Read more: &lt;/docs/pnpm.md#update_pnpm_lock&gt;   |  <code>None</code> |
 | <a id="npm_translate_lock-npmrc"></a>npmrc |  The <code>.npmrc</code> file, if any, to use.<br><br>When set, the <code>.npmrc</code> file specified is parsed and npm auth tokens and basic authentication configuration specified in the file are passed to the Bazel downloader for authentication with private npm registries.<br><br>In a future release, pnpm settings such as public-hoist-patterns will be used.   |  <code>None</code> |
 | <a id="npm_translate_lock-use_home_npmrc"></a>use_home_npmrc |  Use the <code>$HOME/.npmrc</code> file (or <code>$USERPROFILE/.npmrc</code> when on Windows) if it exists.<br><br>Settings from home <code>.npmrc</code> are merged with settings loaded from the <code>.npmrc</code> file specified in the <code>npmrc</code> attribute, if any. Where there are conflicting settings, the home <code>.npmrc</code> values will take precedence.<br><br>WARNING: The repository rule will not be invalidated by changes to the home <code>.npmrc</code> file since there is no way to specify this file as an input to the repository rule. If changes are made to the home <code>.npmrc</code> you can force the repository rule to re-run and pick up the changes by running: <code>bazel sync --only={name}</code> where <code>name</code> is the name of the <code>npm_translate_lock</code> you want to re-run.<br><br>Because of the repository rule invalidation issue, using the home <code>.npmrc</code> is not recommended. <code>.npmrc</code> settings should generally go in the <code>npmrc</code> in your repository so they are shared by all developers. The home <code>.npmrc</code> should be reserved for authentication settings for private npm repositories.   |  <code>None</code> |
-| <a id="npm_translate_lock-data"></a>data |  Data files required by this repository rule when auto-updating the pnpm lock file.<br><br>Only needed when <code>update_pnpm_lock</code> is True.<br><br>This should include the <code>pnpm-workspace.yaml</code> file as well as all <code>package.json</code> files in the pnpm workspace. The pnpm lock file update will fail if <code>data</code> is missing any files required to run <code>pnpm install --lockfile-only</code> or <code>pnpm import</code>.<br><br>To list all local <code>package.json</code> files that pnpm needs to read, you can run <code>pnpm recursive ls --depth -1 --porcelain</code>.   |  <code>[]</code> |
-| <a id="npm_translate_lock-patches"></a>patches |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to a label list of patches to apply to the downloaded npm package. Paths in the patch file must be relative to the root of the package. If the version is left out of the package name, the patch will be applied to every version of the npm package.<br><br>For example,<br><br><pre><code> patches = {     "@foo/bar": ["//:patches/foo+bar.patch"],     "fum@0.0.1": ["//:patches/fum@0.0.1.patch"], }, </code></pre><br><br>List of patches are additive when there are multiple matches for a package. More specific matches are appended to previous matches.   |  <code>{}</code> |
-| <a id="npm_translate_lock-patch_args"></a>patch_args |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to a label list arguments to pass to the patch tool.<br><br>Defaults to <code>{"*": ["-p0"]}</code>, but <code>-p1</code> will usually be needed for patches generated by git.<br><br><pre><code> patch_args = {     "*": ["-p1"]     "@foo/bar": ["-p0"]     "fum@0.0.1": ["-p2"] }, </code></pre><br><br>List of patch args are not additive. More specific name matches take precedence.   |  <code>{"*": ["-p0"]}</code> |
+| <a id="npm_translate_lock-data"></a>data |  Data files required by this repository rule when auto-updating the pnpm lock file.<br><br>Only needed when <code>update_pnpm_lock</code> is True. Read more: &lt;/docs/pnpm.md#update_pnpm_lock&gt;   |  <code>[]</code> |
+| <a id="npm_translate_lock-patches"></a>patches |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to a label list of patches to apply to the downloaded npm package. Multiple matches are additive.<br><br>Read more: &lt;/docs/pnpm.md#patching&gt;   |  <code>{}</code> |
+| <a id="npm_translate_lock-patch_args"></a>patch_args |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to a label list arguments to pass to the patch tool. The most specific match wins.<br><br>Read more: &lt;/docs/pnpm.md#patching&gt;   |  <code>{"*": ["-p0"]}</code> |
 | <a id="npm_translate_lock-custom_postinstalls"></a>custom_postinstalls |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to a custom postinstall script to apply to the downloaded npm package after its lifecycle scripts runs. If the version is left out of the package name, the script will run on every version of the npm package. If a custom postinstall scripts exists for a package as well as for a specific version, the script for the versioned package will be appended with <code>&&</code> to the non-versioned package script.<br><br>For example,<br><br><pre><code> custom_postinstalls = {     "@foo/bar": "echo something &gt; somewhere.txt",     "fum@0.0.1": "echo something_else &gt; somewhere_else.txt", }, </code></pre><br><br>Custom postinstalls are additive and joined with <code> && </code> when there are multiple matches for a package. More specific matches are appended to previous matches.   |  <code>{}</code> |
 | <a id="npm_translate_lock-prod"></a>prod |  If True, only install <code>dependencies</code> but not <code>devDependencies</code>.   |  <code>False</code> |
 | <a id="npm_translate_lock-public_hoist_packages"></a>public_hoist_packages |  A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree when linking.<br><br>This is similar to setting https://pnpm.io/npmrc#public-hoist-pattern in an .npmrc file outside of Bazel, however, wild-cards are not yet supported and npm_translate_lock will fail if there are multiple versions of a package that are to be hoisted.<br><br><pre><code> public_hoist_packages = {     "@foo/bar": [""] # link to the root package in the WORKSPACE     "fum@0.0.1": ["some/sub/package"] }, </code></pre><br><br>List of public hoist packages are additive when there are multiple matches for a package. More specific matches are appended to previous matches.   |  <code>{}</code> |
 | <a id="npm_translate_lock-dev"></a>dev |  If True, only install <code>devDependencies</code>   |  <code>False</code> |
 | <a id="npm_translate_lock-no_optional"></a>no_optional |  If True, <code>optionalDependencies</code> are not installed.<br><br>Currently <code>npm_translate_lock</code> behaves differently from pnpm in that is downloads all <code>optionaDependencies</code> while pnpm doesn't download <code>optionalDependencies</code> that are not needed for the platform pnpm is run on. See https://github.com/pnpm/pnpm/pull/3672 for more context.   |  <code>False</code> |
 | <a id="npm_translate_lock-run_lifecycle_hooks"></a>run_lifecycle_hooks |  Sets <code>"*": ["preinstall", "install", "postinstall"]</code> in <code>lifecycle_hooks</code> if <code>*</code> not already set.   |  <code>True</code> |
-| <a id="npm_translate_lock-lifecycle_hooks"></a>lifecycle_hooks |  A dict of package names to list of lifecycle hooks to run for that package.<br><br>By default the <code>preinstall</code>, <code>install</code> and <code>postinstall</code> hooks are run if they exist. This attribute allows the default to be overridden for packages to run <code>prepare</code> for example,<br><br><pre><code> lifecycle_hooks = {     "*": ["preinstall", "install", "postinstall"],     "@kubernetes/client-node": ["prepare"],     "fum@0.0.1": ["postinstall"], } </code></pre><br><br>List of hooks are not additive. More specific name matches take precedence. In the above example, only the <code>prepare</code> lifecycle hook will be run for the <code>@kubernetes/client-node</code> npm package.   |  <code>{}</code> |
-| <a id="npm_translate_lock-lifecycle_hooks_envs"></a>lifecycle_hooks_envs |  Environment variables set for the lifecycle hooks actions on npm packages. The environment variables can be defined per package by package name or globally using "*". Variables are declared as key/value pairs of the form "key=value".<br><br>For example:<br><br><pre><code> lifecycle_hooks_envs: {     "*": ["GLOBAL_KEY1=value1", "GLOBAL_KEY2=value2"],     "@foo/bar": ["GLOBAL_KEY2=", "PREBULT_BINARY=http://downloadurl"], } </code></pre><br><br>Execution variables are additive when there are multiple matches for a package. More specific matches are appended to previous matches.<br><br>In the above example, <code>@foo/bar</code> will have the environment variables <code>["GLOBAL_KEY1=value1", "GLOBAL_KEY2=value2", "GLOBAL_KEY2=", "PREBULT_BINARY=http://downloadurl"]</code> set where the 2nd <code>GLOBAL_KEY</code> environment value will override the first.   |  <code>{}</code> |
-| <a id="npm_translate_lock-lifecycle_hooks_exclude"></a>lifecycle_hooks_exclude |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to not run any lifecycle hooks on.<br><br>Equivalent to adding <code>&lt;value&gt;: []</code> to <code>lifecycle_hooks</code>.   |  <code>[]</code> |
-| <a id="npm_translate_lock-lifecycle_hooks_execution_requirements"></a>lifecycle_hooks_execution_requirements |  Execution requirements applied to the preinstall, install and postinstall lifecycle hooks on npm packages.<br><br>The execution requirements can be defined per package by package name or globally using "*". For example,<br><br><pre><code> lifecycle_hooks_execution_requirements = {     "*": ["no-sandbox"],     "@foo/bar": [], # @foo/bar lifecycle hooks action will be run in the sandbox     "fum@0.0.1": ["no-sandbox", "no-remote-exec"], } </code></pre><br><br>Execution requirements are not additive. More specific name matches take precedence.   |  <code>{}</code> |
-| <a id="npm_translate_lock-lifecycle_hooks_no_sandbox"></a>lifecycle_hooks_no_sandbox |  If True, a "no-sandbox" execution requirement is added to all lifecycle hooks unless overridden by <code>lifecycle_hooks_execution_requirements</code>.<br><br>Equivalent to adding <code>"*": ["no-sandbox"]</code> to <code>lifecycle_hooks_execution_requirements</code>.<br><br>This defaults to True to limit the overhead of sandbox creation and copying the output TreeArtifacts out of the sandbox.   |  <code>True</code> |
+| <a id="npm_translate_lock-lifecycle_hooks"></a>lifecycle_hooks |  A dict of package names to list of lifecycle hooks to run for that package.<br><br>By default the <code>preinstall</code>, <code>install</code> and <code>postinstall</code> hooks are run if they exist. This attribute allows the default to be overridden for packages to run <code>prepare</code>.<br><br>List of hooks are not additive. More specific name matches take precedence.<br><br>Read more: &lt;/docs/pnpm.md#lifecycles&gt;   |  <code>{}</code> |
+| <a id="npm_translate_lock-lifecycle_hooks_envs"></a>lifecycle_hooks_envs |  Environment variables set for the lifecycle hooks actions on npm packages. The environment variables can be defined per package by package name or globally using "*". Variables are declared as key/value pairs of the form "key=value". Multiple matches are additive.<br><br>Read more: &lt;/docs/pnpm.md#lifecycles&gt;   |  <code>{}</code> |
+| <a id="npm_translate_lock-lifecycle_hooks_exclude"></a>lifecycle_hooks_exclude |  A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3") to not run any lifecycle hooks on.<br><br>Equivalent to adding <code>&lt;value&gt;: []</code> to <code>lifecycle_hooks</code>.<br><br>Read more: &lt;/docs/pnpm.md#lifecycles&gt;   |  <code>[]</code> |
+| <a id="npm_translate_lock-lifecycle_hooks_execution_requirements"></a>lifecycle_hooks_execution_requirements |  Execution requirements applied to the preinstall, install and postinstall lifecycle hooks on npm packages.<br><br>The execution requirements can be defined per package by package name or globally using "*".<br><br>Execution requirements are not additive. More specific name matches take precedence.<br><br>Read more: &lt;/docs/pnpm.md#lifecycles&gt;   |  <code>{}</code> |
+| <a id="npm_translate_lock-lifecycle_hooks_no_sandbox"></a>lifecycle_hooks_no_sandbox |  If True, a "no-sandbox" execution requirement is added to all lifecycle hooks unless overridden by <code>lifecycle_hooks_execution_requirements</code>.<br><br>Equivalent to adding <code>"*": ["no-sandbox"]</code> to <code>lifecycle_hooks_execution_requirements</code>.<br><br>This defaults to True to limit the overhead of sandbox creation and copying the output TreeArtifacts out of the sandbox.<br><br>Read more: &lt;/docs/pnpm.md#lifecycles&gt;   |  <code>True</code> |
 | <a id="npm_translate_lock-bins"></a>bins |  Binary files to create in <code>node_modules/.bin</code> for packages in this lock file.<br><br>For a given package, this is typically derived from the "bin" attribute in the package.json file of that package.<br><br>For example:<br><br><pre><code> bins = {     "@foo/bar": {         "foo": "./foo.js",         "bar": "./bar.js"     }, } </code></pre><br><br>Dicts of bins not additive. More specific name matches take precedence.<br><br>In the future, this field may be automatically populated from information in the pnpm lock file. That feature is currently blocked on https://github.com/pnpm/pnpm/issues/5131.   |  <code>{}</code> |
 | <a id="npm_translate_lock-verify_node_modules_ignored"></a>verify_node_modules_ignored |  node_modules folders in the source tree should be ignored by Bazel.<br><br>This points to a <code>.bazelignore</code> file to verify that all nested node_modules directories pnpm will create are listed.<br><br>See https://github.com/bazelbuild/bazel/issues/8106   |  <code>None</code> |
 | <a id="npm_translate_lock-quiet"></a>quiet |  Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.   |  <code>True</code> |
