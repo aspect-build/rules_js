@@ -89,10 +89,10 @@ def npm_translate_lock(
         # buildifier: disable=unused-variable
         warn_on_unqualified_tarball_url = None,
         **kwargs):
-    """Repository macro to generate `npm_import` rules from a lock file.
+    """Repository macro to generate starlark code from a lock file.
 
-    In most repositories, it would be an impossible maintenance burden to manually
-    declare [`npm_import`](#npm_import) rules. This helper generates an external repository
+    In most repositories, it would be an impossible maintenance burden to manually declare all
+    of the [`npm_import`](#npm_import) rules. This helper generates an external repository
     containing a helper starlark module `repositories.bzl`, which supplies a loadable macro
     `npm_repositories`. That macro creates an `npm_import` for each package.
 
@@ -114,11 +114,11 @@ def npm_translate_lock(
 
         npm_package_lock: The `package-lock.json` file written by `npm install`.
 
-            Only one of `npm_package_lock` and `yarn_lock` may be set.
+            Only one of `npm_package_lock` or `yarn_lock` may be set.
 
         yarn_lock: The `yarn.lock` file written by `yarn install`.
 
-            Only one of `npm_package_lock` and `yarn_lock` may be set.
+            Only one of `npm_package_lock` or `yarn_lock` may be set.
 
         update_pnpm_lock: When True, the pnpm lock file will be updated automatically when any of its inputs
             have changed since the last update.
@@ -218,7 +218,7 @@ def npm_translate_lock(
             By default the `preinstall`, `install` and `postinstall` hooks are run if they exist. This attribute allows
             the default to be overridden for packages to run `prepare`.
 
-            List of hooks are not additive. More specific name matches take precedence.
+            List of hooks are not additive. The most specific match wins.
 
             (Read more)[/docs/pnpm.md#lifecycles]
 
@@ -241,7 +241,7 @@ def npm_translate_lock(
 
             The execution requirements can be defined per package by package name or globally using "*".
 
-            Execution requirements are not additive. More specific name matches take precedence.
+            Execution requirements are not additive. The most specific match wins.
 
             (Read more)[/docs/pnpm.md#lifecycles]
 
@@ -271,7 +271,7 @@ def npm_translate_lock(
             }
             ```
 
-            Dicts of bins not additive. More specific name matches take precedence.
+            Dicts of bins not additive. The most specific match wins.
 
             In the future, this field may be automatically populated from information in the pnpm lock
             file. That feature is currently blocked on https://github.com/pnpm/pnpm/issues/5131.

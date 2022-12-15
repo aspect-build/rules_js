@@ -2,15 +2,14 @@
 
 rules_js models dependency handling on [pnpm](https://pnpm.io/). Our design goal is to closely mimic pnpm's behavior.
 
-To start, some non-Bazel-specific tool (typically pnpm) which performs dependency resolutions
-and solves version constraints. It also determines how the `node_modules` tree will be structured for runtime.
+Our story begins when some non-Bazel-specific tool (typically pnpm) performs dependency resolutions
+and solves version constraints.
+It also determines how the `node_modules` tree will be structured for runtime.
 This information is encoded into a lockfile which is checked into the source repository.
 
 The pnpm lockfile format includes all the information needed to define [`npm_import`](/docs/npm_import.md#npm_import) rules,
 allowing Bazel's downloader to do the fetches. This info includes the integrity hash, as calculated by the package manager,
 so that Bazel can guarantee supply-chain security.
-
-For more details, see <https://github.com/pnpm/pnpm/blob/main/packages/lockfile-types/src/index.ts>.
 
 Bazel will only fetch the packages which are required for the requested targets to be analyzed.
 Thus it is performant to convert a very large `pnpm-lock.yaml` file without concern for
@@ -31,8 +30,8 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
 # Read the pnpm-lock.yaml file to automate creation of npm_import rules
 npm_translate_lock(
-    # Creates a new repository named "@npm_deps"
-    name = "npm_deps",
+    # Creates a new repository named "@npm" - you could choose any name you like
+    name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
     # Recommended attribute that also checks the .bazelignore file
     verify_node_modules_ignored = "//:.bazelignore",
@@ -47,8 +46,8 @@ It has the advantage of also creating aliases for simpler dependencies that don'
 spelling out the version of the packages.
 
 ```starlark
-# Following our example above, we named this "npm_deps"
-load("@npm_deps//:repositories.bzl", "npm_repositories")
+# Following our example above, we named this "npm"
+load("@npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
 ```
@@ -56,7 +55,7 @@ npm_repositories()
 Note that you could call `npm_translate_lock` more than once, if you have more than one pnpm workspace in your Bazel workspace.
 
 If you really don't want to rely on this being generated at runtime, we have experimental support
-to check in the result instead. See [checked-in repositories.bzl](#checked-in-repositoriesbzl).
+to check in the result instead. See [checked-in repositories.bzl](#checked-in-repositoriesbzl) below.
 
 ## Hoisting
 
@@ -99,7 +98,8 @@ next time it reads the file.
 ### update_pnpm_lock
 
 During a migration, you may have a legacy lockfile from another package manager.
-You can use the `update_pnpm_lock` attribute of `npm_translate_lock` to have Bazel manage the `pnpm-lock.yaml` file for you.
+You can use the `update_pnpm_lock` attribute of `npm_translate_lock` to have
+Bazel manage the `pnpm-lock.yaml` file for you.
 You might also choose this mode if you want changes like additions to `package.json` to be automatically
 reflected in the lockfile, unlike a typical frontend developer workflow.
 
@@ -171,7 +171,9 @@ npm packages have "lifecycle scripts" such as `postinstall` which are documented
 <https://docs.npmjs.com/cli/v9/using-npm/scripts#life-cycle-scripts>
 
 We refer to these as "lifecycle hooks".
-You can disable this feature completely by setting `lifecycle_hooks = False` in `npm_translate_lock`.
+
+> You can disable this feature completely by setting all packages to have no hooks, using
+> `lifecycle_hooks = { "*": [] }` in `npm_translate_lock`.
 
 Because rules_js models the execution of these hooks as build actions, rather than repository rules,
 the result can be stored in the remote cache and shared between developers.
@@ -206,10 +208,11 @@ npm_translate_lock(
     ...
     lifecycle_hooks = {
         # These three values are the default if lifecycle_hooks was absent
+        # do not sort
         "*": [
+            "preinstall",
             "install",
             "postinstall",
-            "preinstall",
         ],
         # This package comes from a git url so prepare has to run to compile some things
         "@kubernetes/client-node": ["prepare"],
@@ -274,7 +277,7 @@ to copy the generated file to the repo and test that it stays updated:
 write_source_files(
     name = "update_repos",
     files = {
-        "repositories.bzl": "@npm_deps//:repositories.bzl",
+        "repositories.bzl": "@npm//:repositories.bzl",
     },
 )
 ```
