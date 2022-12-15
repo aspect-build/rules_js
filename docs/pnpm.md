@@ -28,7 +28,7 @@ In `WORKSPACE`, call the repository rule pointing to your `pnpm-lock.yaml` file:
 ```starlark
 load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
-# Read the pnpm-lock.yaml file to automate creation of npm_import rules
+# Uses the pnpm-lock.yaml file to automate creation of npm_import rules
 npm_translate_lock(
     # Creates a new repository named "@npm" - you could choose any name you like
     name = "npm",
@@ -70,8 +70,8 @@ echo "hoist=false" >> .npmrc
 
 This will prevent pnpm from creating a hidden `node_modules/.pnpm/node_modules` folder with hoisted
 dependencies which allows packages to depend on "phantom" undeclared dependencies.
-In most cases, if you hit import/require runtime failures in 3rd party npm packages when using `rules_js`,
-the failure will be reproducible with pnpm outside of Bazel, so long as hoisting is disabled.
+With hoisting disabled, most import/require failures (in type-checking or at runtime)
+in 3rd party npm packages when using `rules_js` will be reproducible with pnpm outside of Bazel.
 
 `rules_js` does not and will not support pnpm "phantom" [hoisting](https://pnpm.io/npmrc#hoist) which allows for
 packages to depend on undeclared dependencies.
@@ -178,8 +178,6 @@ We refer to these as "lifecycle hooks".
 Because rules_js models the execution of these hooks as build actions, rather than repository rules,
 the result can be stored in the remote cache and shared between developers.
 Typically these actions are not run in Bazel's action sandbox because of the overhead of setting up and tearing down the sandboxes.
-
-> You can set `lifecycle_hooks_no_sandbox = False` in `npm_translate_lock` to change this default.
 
 In addition to sandboxing, Bazel supports other `execution_requirements` for actions,
 in the attribute of <https://bazel.build/rules/lib/actions#run>.
