@@ -19,8 +19,8 @@ users needing to fetch many unnecessary packages. We have benchmarked this code 
 
 While the [`npm_import`](/docs/npm_import.md#npm_import) rule can be used to bring individual packages into Bazel,
 most users will want to import their entire lockfile.
-The `npm_translate_lock` rule does this, and we describe its operation below.
-You may wish to read the generated API documentation as well: [`npm_translate_lock`](/docs/npm_import.md#npm_translate_lock).
+The `npm_translate_lock` rule does this, and its operation is described below.
+You may wish to read the [generated API documentation](/docs/npm_import.md#npm_translate_lock) as well.
 
 ## Using npm_translate_lock
 
