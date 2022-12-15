@@ -335,7 +335,7 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
 
         # gather patches & patch args
         patches = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
-        patch_args = _gather_values_from_matching_names(False, attr.patch_args, name, friendly_name, unfriendly_name)
+        patch_args = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
 
         # gather custom postinstalls
         custom_postinstalls = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
