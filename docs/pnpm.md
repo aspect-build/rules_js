@@ -1,27 +1,35 @@
 # pnpm and rules_js
 
-rules_js depends on a pnpm lockfile.
-This is created by some tooling and checked into the source repository.
+rules_js models dependency handling on [pnpm](https://pnpm.io/). Our design goal is to closely mimic pnpm's behavior.
 
-The pnpm lockfile format includes all the information needed to define npm_import rules,
-including the integrity hash, as calculated by the package manager.
+To start, some non-Bazel-specific tool (typically pnpm) which performs dependency resolutions
+and solves version constraints. It also determines how the `node_modules` tree will be structured for runtime.
+This information is encoded into a lockfile which is checked into the source repository.
 
-For more details see, https://github.com/pnpm/pnpm/blob/main/packages/lockfile-types/src/index.ts.
+The pnpm lockfile format includes all the information needed to define [`npm_import`](/docs/npm_import.md#npm_import) rules,
+allowing Bazel's downloader to do the fetches. This info includes the integrity hash, as calculated by the package manager,
+so that Bazel can guarantee supply-chain security.
+
+For more details, see <https://github.com/pnpm/pnpm/blob/main/packages/lockfile-types/src/index.ts>.
 
 Bazel will only fetch the packages which are required for the requested targets to be analyzed.
-Thus it is performant to convert a very large pnpm-lock.yaml file without concern for
-users needing to fetch many unnecessary packages.
+Thus it is performant to convert a very large `pnpm-lock.yaml` file without concern for
+users needing to fetch many unnecessary packages. We have benchmarked this code with
+800+ importers and ~15,000 npm packages to run in 3sec, when Bazel determines that an input changed.
 
-Our design goal is to closely mimic pnpm's behavior.
+While the [`npm_import`](/docs/npm_import.md#npm_import) rule can be used to bring individual packages into Bazel,
+most users will want to import their entire lockfile.
+The `npm_translate_lock` rule does this, and we describe its operation below.
+You may wish to read the generated API documentation as well: [`npm_translate_lock`](/docs/npm_import.md#npm_translate_lock).
 
 ## Using npm_translate_lock
 
-In `WORKSPACE`, call the repository rule pointing to your pnpm-lock.yaml file:
+In `WORKSPACE`, call the repository rule pointing to your `pnpm-lock.yaml` file:
 
 ```starlark
 load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
-# Read the pnpm-lock.yaml file to automate creation of remaining npm_import rules
+# Read the pnpm-lock.yaml file to automate creation of npm_import rules
 npm_translate_lock(
     # Creates a new repository named "@npm_deps"
     name = "npm_deps",
@@ -45,8 +53,10 @@ load("@npm_deps//:repositories.bzl", "npm_repositories")
 npm_repositories()
 ```
 
+Note that you could call `npm_translate_lock` more than once, if you have more than one pnpm workspace in your Bazel workspace.
+
 If you really don't want to rely on this being generated at runtime, we have experimental support
-to check in the result instead. See [#checked-in-repositories-bzl].
+to check in the result instead. See [checked-in repositories.bzl](#checked-in-repositoriesbzl).
 
 ## Hoisting
 
@@ -241,7 +251,7 @@ In this example:
 -   `fum` at version 0.0.1 has remote execution disabled. Like other packages aside from `@foo/bar`
     the action sandbox is disabled for performance.
 
-### Checked-in repositories.bzl
+## Checked-in repositories.bzl
 
 This usage is experimental and difficult to get right! Read on with caution.
 
