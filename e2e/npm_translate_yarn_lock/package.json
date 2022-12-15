@@ -1,6 +1,11 @@
 {
     "private": true,
     "dependencies": {
-        "karma-typescript": "5.5.3"
+        "botframework-connector": "4.16.0",
+        "karma-typescript": "5.5.3",
+        "lodash": "4.17.21"
+    },
+    "resolutions": {
+        "**/@types/node": "18.11.15"
     }
 }

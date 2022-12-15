@@ -22,6 +22,8 @@ npm_translate_lock(
     data = ["//:package.json"],
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
+    preupdate = ["//:transform_package_json.js"],
+    quiet = False,
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
     yarn_lock = "//:yarn.lock",
