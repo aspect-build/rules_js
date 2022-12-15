@@ -105,7 +105,7 @@ def npm_translate_lock(
     `rules_js` currently only uses this repository when `npm_package_lock` or `yarn_lock` are used.
     Set `pnpm_version` to `None` to inhibit this repository creation.
 
-    For more detailed documentation, see </docs/pnpm.md>.
+    For more detailed documentation, see [/docs/pnpm.md](docs/pnpm.md).
 
     Args:
         name: The repository rule name
@@ -210,7 +210,8 @@ def npm_translate_lock(
             while pnpm doesn't download `optionalDependencies` that are not needed for the platform pnpm is run on.
             See https://github.com/pnpm/pnpm/pull/3672 for more context.
 
-        run_lifecycle_hooks: Sets `"*": ["preinstall", "install", "postinstall"]` in `lifecycle_hooks` if `*` not already set.
+        run_lifecycle_hooks: Sets a default value for `lifecycle_hooks` if `*` not already set.
+            Set this to `False` to disable lifecycle hooks.
 
         lifecycle_hooks: A dict of package names to list of lifecycle hooks to run for that package.
 
@@ -219,21 +220,21 @@ def npm_translate_lock(
 
             List of hooks are not additive. More specific name matches take precedence.
 
-            Read more: </docs/pnpm.md#lifecycles>
+            (Read more)[/docs/pnpm.md#lifecycles]
 
         lifecycle_hooks_exclude: A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to not run any lifecycle hooks on.
 
             Equivalent to adding `<value>: []` to `lifecycle_hooks`.
 
-            Read more: </docs/pnpm.md#lifecycles>
+            (Read more)[/docs/pnpm.md#lifecycles]
 
         lifecycle_hooks_envs: Environment variables set for the lifecycle hooks actions on npm packages.
             The environment variables can be defined per package by package name or globally using "*".
             Variables are declared as key/value pairs of the form "key=value".
             Multiple matches are additive.
 
-            Read more: </docs/pnpm.md#lifecycles>
+            (Read more)[/docs/pnpm.md#lifecycles]
 
         lifecycle_hooks_execution_requirements: Execution requirements applied to the preinstall, install and postinstall
             lifecycle hooks on npm packages.
@@ -242,7 +243,7 @@ def npm_translate_lock(
 
             Execution requirements are not additive. More specific name matches take precedence.
 
-            Read more: </docs/pnpm.md#lifecycles>
+            (Read more)[/docs/pnpm.md#lifecycles]
 
         lifecycle_hooks_no_sandbox: If True, a "no-sandbox" execution requirement is added to all lifecycle hooks
             unless overridden by `lifecycle_hooks_execution_requirements`.
@@ -252,7 +253,7 @@ def npm_translate_lock(
             This defaults to True to limit the overhead of sandbox creation and copying the output
             TreeArtifacts out of the sandbox.
 
-            Read more: </docs/pnpm.md#lifecycles>
+            (Read more)[/docs/pnpm.md#lifecycles]
 
         bins: Binary files to create in `node_modules/.bin` for packages in this lock file.
 
