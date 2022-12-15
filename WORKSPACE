@@ -126,11 +126,13 @@ npm_translate_lock(
     },
     npmrc = "//:.npmrc",
     patch_args = {
-        "@gregmagolan/test-a": ["-p1"],
+        "*": ["-p1"],
+        "@gregmagolan/test-a": ["-p4"],
     },
     patches = {
         "@gregmagolan/test-a": ["//examples/npm_deps:patches/test-a.patch"],
         "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
+        "@gregmagolan/test-b": ["//examples/npm_deps:patches/test-b.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     pnpm_version = "7.17.1",
