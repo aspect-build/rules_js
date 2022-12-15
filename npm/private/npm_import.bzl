@@ -706,8 +706,6 @@ def _impl_links(rctx):
     lifecycle_hooks_execution_requirements = {}
     for ec in rctx.attr.lifecycle_hooks_execution_requirements:
         lifecycle_hooks_execution_requirements[ec] = "1"
-    if rctx.attr.lifecycle_hooks_no_sandbox and "no-sandbox" not in lifecycle_hooks_execution_requirements:
-        lifecycle_hooks_execution_requirements["no-sandbox"] = "1"
 
     maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(rctx.attr.bins, 3)) if len(rctx.attr.bins) > 0 else ""
@@ -758,14 +756,13 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
-    "lifecycle_hooks_no_sandbox": attr.bool(default = True),
     "npm_translate_lock_repo": attr.string(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
     "extra_build_content": attr.string(),
     "integrity": attr.string(),
-    "patch_args": attr.string_list(default = ["-p0"]),
+    "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "lifecycle_hooks": attr.string_list(),
     "custom_postinstall": attr.string(),

@@ -13,10 +13,12 @@ importers:
     specifiers:
       '@types/node': 16.11.68
       inline-fixtures: 1.1.0
+      jsonpath-plus: 7.2.0
       typescript: 4.8.4
     devDependencies:
       '@types/node': registry.npmjs.org/@types/node/16.11.68
       inline-fixtures: 1.1.0
+      jsonpath-plus: 7.2.0
       typescript: 4.8.4
 
   examples/js_binary:
@@ -3390,6 +3392,11 @@ packages:
   /jsonpath-plus/0.19.0:
     resolution: {integrity: sha512-GSVwsrzW9LsA5lzsqe4CkuZ9wp+kxBb2GwNniaWzI2YFn5Ig42rSW8ZxVpWXaAfakXNrx5pgY5AbQq7kzX29kg==}
     engines: {node: '>=6.0'}
+    dev: true
+
+  /jsonpath-plus/7.2.0:
+    resolution: {integrity: sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==}
+    engines: {node: '>=12.0.0'}
     dev: true
 
   /jsprim/1.4.2:
