@@ -115,6 +115,8 @@ def _init_update_labels(rctx, label_store):
 
     action_cache_path = PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(rctx.name + utils.consistent_label_str(label_store.label("pnpm_lock"))))
     label_store.add_root("action_cache", action_cache_path)
+    for i, d in enumerate(attr.preupdate):
+        label_store.add("preupdate_{}".format(i), d)
     for i, d in enumerate(attr.data):
         label_store.add("data_{}".format(i), d)
 
@@ -197,6 +199,8 @@ def _copy_update_input_files(priv, rctx, label_store):
         "npm_package_lock",
         "yarn_lock",
     ]
+    for i in range(len(rctx.attr.preupdate)):
+        keys.append("preupdate_{}".format(i))
     for i in range(len(rctx.attr.data)):
         keys.append("data_{}".format(i))
     for k in keys:

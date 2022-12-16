@@ -62,6 +62,7 @@ def npm_translate_lock(
         npm_package_lock = None,
         yarn_lock = None,
         update_pnpm_lock = None,
+        preupdate = [],
         npmrc = None,
         use_home_npmrc = None,
         data = [],
@@ -126,6 +127,18 @@ def npm_translate_lock(
             Defaults to True when one of `npm_package_lock` or `yarn_lock` are set.
             Otherwise it defaults to False.
 
+            Read more: [using update_pnpm_lock](/docs/pnpm.md#update_pnpm_lock)
+
+        preupdate: Node.js scripts to run in this repository rule before auto-updating the pnpm lock file.
+
+            Scripts are run sequentially in the order they are listed. The working directory is set to the root of the
+            external repository. Make sure all files required by preupdate scripts are added to the `data` attribute.
+
+            A preupdate script could, for example, transform `resolutions` in the root `package.json` file from a format
+            that yarn understands such as `@foo/**/bar` to the equivalent `@foo/*>bar` that pnpm understands so that
+            `resolutions` are compatible with pnpm when running `pnpm import` to update the pnpm lock file.
+
+            Only needed when `update_pnpm_lock` is True.
             Read more: [using update_pnpm_lock](/docs/pnpm.md#update_pnpm_lock)
 
         npmrc: The `.npmrc` file, if any, to use.
@@ -344,6 +357,9 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
     if update_pnpm_lock == None and (npm_package_lock or yarn_lock):
         update_pnpm_lock = True
 
+    if not update_pnpm_lock and preupdate:
+        fail("expected update_pnpm_lock to be True when preupdate are specified")
+
     # lifecycle_hooks_exclude is a convenience attribute to set `<value>: []` in `lifecycle_hooks`
     for p in lifecycle_hooks_exclude:
         if p in lifecycle_hooks:
@@ -389,6 +405,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         defs_bzl_filename = defs_bzl_filename,
         generate_bzl_library_targets = generate_bzl_library_targets,
         data = data,
+        preupdate = preupdate,
         quiet = quiet,
     )
 

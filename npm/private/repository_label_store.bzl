@@ -99,6 +99,7 @@ def _new(rctx_path):
     repo_root = str(rctx_path(""))
 
     return struct(
+        repo_root = repo_root,
         seed_root = lambda label: _seed_root(priv, rctx_path, label),
         add = lambda key, label, seed_root = False: _add(priv, rctx_path, repo_root, key, label, seed_root),
         add_sibling = lambda sibling_key, key, path: _add_sibling(priv, repo_root, sibling_key, key, path),

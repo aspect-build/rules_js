@@ -17,6 +17,7 @@ _ATTRS = {
     "npm_package_lock": attr.label(),
     "yarn_lock": attr.label(),
     "update_pnpm_lock": attr.bool(),
+    "preupdate": attr.label_list(),
     "npmrc": attr.label(),
     "patches": attr.string_list_dict(),
     "patch_args": attr.string_list_dict(),
@@ -164,7 +165,49 @@ INFO: Initial pnpm-lock.yaml file generated. Please add the generated pnpm-lock.
     fail(msg)
 
 ################################################################################
+def _execute_preupdate_scripts(rctx, state):
+    for i in range(len(rctx.attr.preupdate)):
+        script_key = "preupdate_{}".format(i)
+
+        rctx.report_progress("Executing preupdate Node.js script `{script}` in {wd}".format(
+            script = state.label_store.relative_path(script_key),
+            wd = state.label_store.repo_root,
+        ))
+
+        result = rctx.execute(
+            [
+                state.label_store.path("host_node"),
+                state.label_store.path(script_key),
+            ],
+            # To keep things simple, run at the root of the external repository
+            working_directory = state.label_store.repo_root,
+            quiet = rctx.attr.quiet,
+        )
+        if result.return_code:
+            msg = """
+
+ERROR: `node {script}` exited with status {status}.
+
+       Make sure all package.json and other data files required for the running `node {script}` are added to
+       the data attribute of `npm_translate_lock(name = "{rctx_name}")`.
+
+STDOUT:
+{stdout}
+STDERR:
+{stderr}
+""".format(
+                script = state.label_store.relative_path(script_key),
+                rctx_name = rctx.name,
+                status = result.return_code,
+                stderr = result.stderr,
+                stdout = result.stdout,
+            )
+            fail(msg)
+
+################################################################################
 def _update_pnpm_lock(rctx, state):
+    _execute_preupdate_scripts(rctx, state)
+
     pnpm_lock_label = state.label_store.label("pnpm_lock")
     pnpm_lock_relative_path = state.label_store.relative_path("pnpm_lock")
 
@@ -208,7 +251,8 @@ ERROR: `pnpm {cmd}` exited with status {status}.
        the data attribute of `npm_translate_lock(name = "{rctx_name}")`.
 
        If the problem persists, install pnpm (https://pnpm.io/installation) and run `pnpm {cmd}`
-       manually to update the pnpm-lock.yaml file.
+       manually to update the pnpm-lock.yaml file. If you have specified `preupdate` scripts in
+       `npm_translate_lock(name = "{rctx_name}")` you may have to run these manually as well.
 
 STDOUT:
 {stdout}
