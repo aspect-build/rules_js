@@ -169,9 +169,8 @@ def _execute_preupdate_scripts(rctx, state):
     for i in range(len(rctx.attr.preupdate)):
         script_key = "preupdate_{}".format(i)
 
-        rctx.report_progress("Executing preupdate Node.js script `{script}` in {wd}".format(
+        rctx.report_progress("Executing preupdate Node.js script `{script}`".format(
             script = state.label_store.relative_path(script_key),
-            wd = state.label_store.repo_root,
         ))
 
         result = rctx.execute(
