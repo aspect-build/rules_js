@@ -18,6 +18,11 @@
                     "mocha-junit-reporter": "*"
                 }
             },
+            "segfault-handler": {
+                "dependencies": {
+                    "node-gyp": "*"
+                }
+            },
             "@kubernetes/client-node": {
                 "//1": "these deps are from devDependencies of @kubernetes/client-node and needed for 'prepare' lifecycle hook",
                 "//2": "https://github.com/kubernetes-client/javascript/blob/763decf6e09d0e246b80cefdb2c5fd570373801a/package.json#L72",

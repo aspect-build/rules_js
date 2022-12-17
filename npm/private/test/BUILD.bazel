@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_tests.bzl", "translate_lock_tests")
@@ -39,9 +40,9 @@ write_source_files(
     },
 )
 
-filegroup(
-    name = "build_some_node_modules",
-    srcs = [
+build_test(
+    name = "node_modules_test",
+    targets = [
         ":node_modules/@blockprotocol/type-system-web",
         ":node_modules/@figma/nodegit",
         # @kubernetes/client-node has a "prepare" lifecycle hook that runs tsc
@@ -53,9 +54,12 @@ filegroup(
         ":node_modules/handlebars-helpers/helper-date",
         ":node_modules/inline-fixtures",
         ":node_modules/json-stable-stringify",
+        ":node_modules/node-gyp",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
         ":node_modules/regl",
+        # segfault-handler has a node-gyp install step
+        ":node_modules/segfault-handler",
         ":node_modules/semver-first-satisfied",
         ":node_modules/typescript",
         # intentionally don't include node_modules/unused

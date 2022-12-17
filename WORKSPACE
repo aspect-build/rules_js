@@ -123,6 +123,12 @@ npm_translate_lock(
             "no-remote-exec",
             "requires-network",
         ],
+        "segfault-handler": [
+            "no-sandbox",
+            # Workaround Engflow not honoring requires-network on build actions
+            "no-remote-exec",
+            "requires-network",
+        ],
     },
     npmrc = "//:.npmrc",
     patch_args = {
