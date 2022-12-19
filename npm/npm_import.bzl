@@ -361,6 +361,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         fail("expected update_pnpm_lock to be True when preupdate are specified")
 
     # lifecycle_hooks_exclude is a convenience attribute to set `<value>: []` in `lifecycle_hooks`
+    lifecycle_hooks = dict(lifecycle_hooks)
     for p in lifecycle_hooks_exclude:
         if p in lifecycle_hooks:
             fail("expected '{}' to be in only one of lifecycle_hooks or lifecycle_hooks_exclude".format(p))
