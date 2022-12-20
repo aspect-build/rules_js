@@ -10,12 +10,13 @@ load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 
 def _extension_impl(module_ctx):
+    npm_translate_lock_name = "npm"
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
             # npm_translate_lock MUST run before parse_pnpm_lock below since it may update
             # the pnpm-lock.yaml file when update_pnpm_lock is True.
             npm_translate_lock(
-                name = "npm",
+                name = npm_translate_lock_name,
                 pnpm_lock = attr.pnpm_lock,
                 # TODO: get this working with bzlmod
                 # update_pnpm_lock = attr.update_pnpm_lock,
@@ -27,7 +28,7 @@ def _extension_impl(module_ctx):
             registries = {}
             lock_importers, lock_packages = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
-            imports = npm_translate_lock_helpers.gen_npm_imports(importers, packages, attr.pnpm_lock.package, attr, registries, utils.default_registry())
+            imports = npm_translate_lock_helpers.gen_npm_imports(importers, packages, attr.pnpm_lock.package, npm_translate_lock_name, attr, registries, utils.default_registry())
             for i in imports:
                 npm_import(
                     name = i.name,

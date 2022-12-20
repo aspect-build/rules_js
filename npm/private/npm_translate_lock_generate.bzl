@@ -98,9 +98,11 @@ def _is_url(url):
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
+    keys = []
     result = []
     for name in names:
         if name and name in keyed_lists:
+            keys.append(name)
             v = keyed_lists[name]
             if additive:
                 if type(v) == "list":
@@ -115,7 +117,7 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
                 result = [v]
             else:
                 fail("expected value to be list or string")
-    return result
+    return (result, keys)
 
 ################################################################################
 def _get_npm_auth(npmrc, npmrc_path, environ):
@@ -245,7 +247,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
     return (registries, auth)
 
 ################################################################################
-def _gen_npm_imports(importers, packages, root_package, attr, registries, default_registry):
+def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registries, default_registry):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
@@ -278,6 +280,7 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
         links["packages"] = linked_packages
         importer_links[import_path] = links
 
+    patches_used = []
     result = []
     for package, package_info in packages.items():
         name = package_info.get("name")
@@ -334,11 +337,12 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
             unfriendly_name = None
 
         # gather patches & patch args
-        patches = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
-        patch_args = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
+        patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
+        patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
+        patches_used.extend(patches_keys)
 
         # gather custom postinstalls
-        custom_postinstalls = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
+        custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
         repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
@@ -354,20 +358,21 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
                 link_packages[links["link_package"]] = link_names
 
         # check if this package should be hoisted via public_hoist_packages
-        public_hoist_packages = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
+        public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
         for public_hoist_package in public_hoist_packages:
             if public_hoist_package not in link_packages:
                 link_packages[public_hoist_package] = [name]
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        lifecycle_hooks = _gather_values_from_matching_names(False, attr.lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_env = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_execution_requirements = _gather_values_from_matching_names(False, attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks, _ = _gather_values_from_matching_names(False, attr.lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
         run_lifecycle_hooks = requires_build and lifecycle_hooks
 
         bins = {}
-        for bin in _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name, unfriendly_name):
+        matching_bins, _ = _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name, unfriendly_name)
+        for bin in matching_bins:
             key_value = bin.split("=", 1)
             if len(key_value) == 2:
                 bins[key_value[0]] = key_value[1]
@@ -416,6 +421,23 @@ def _gen_npm_imports(importers, packages, root_package, attr, registries, defaul
             bins = bins,
             package_info = package_info,
         ))
+
+    # Check that all patches files specified were used; this is a defense-in-depth since it is too
+    # easy to make a type in the patches keys or for a dep to change both of with could result
+    # in a patch file being silently ignored.
+    for key in attr.patches.keys():
+        if key not in patches_used:
+            msg = """
+
+ERROR: Patch file key `{key}` does not match any npm packages in `npm_translate_lock(name = "{repo}").
+
+Either remove this patch file if it is no longer needed or change its key to match an existing npm package.
+
+""".format(
+                key = key,
+                repo = rctx_name,
+            )
+            fail(msg)
 
     return result
 
@@ -497,7 +519,7 @@ def _verify_node_modules_ignored(rctx, importers, root_package):
     if rctx.attr.verify_node_modules_ignored != None:
         missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
         if missing_ignores:
-            fail("""
+            msg = """
 
 ERROR: in verify_node_modules_ignored:
 pnpm install will create nested node_modules, but not all of them are ignored by Bazel.
@@ -513,7 +535,8 @@ or disable this check by setting `verify_node_modules_ignored = None` in `npm_tr
                 fixes = "\n".join(missing_ignores),
                 bazelignore = rctx.attr.verify_node_modules_ignored,
                 repo = rctx.name,
-            ))
+            )
+            fail(msg)
 
 ################################################################################
 def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_package, default_registry, npm_registries, npm_auth, link_workspace):
@@ -534,7 +557,7 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(importers, packages, root_package, rctx.attr, npm_registries, default_registry)
+    npm_imports = _gen_npm_imports(importers, packages, root_package, rctx.name, rctx.attr, npm_registries, default_registry)
 
     fp_links = {}
     rctx_files = {
