@@ -147,10 +147,23 @@ manifest_path = next((argv.replace("--manifest=", "") for argv in sys.argv if ar
 with open(manifest_path, "r") as manifest_fp:
     manifest = json.load(manifest_fp)
 
-def strip_execroot(p):
+def strip(p):
     parts = p.split(os.sep)
-    i = parts.index("execroot") 
-    return os.sep.join(parts[i+2:]) 
+    is_local_build = "execroot" in parts
+    return strip_execroot(parts) if is_local_build else strip_rbe_dir(p, parts)
+
+def strip_execroot(parts):
+    i = parts.index("execroot")
+    return os.sep.join(parts[i+2:])
+
+def strip_rbe_dir(p, parts):
+    manifest_path_parts = manifest_path.split(os.sep)
+    i = manifest_path_parts.index("bin")
+    bin_dir = os.sep.join(manifest_path_parts[:i+1])
+    if "cache" in parts:
+        i = parts.index("cache")
+        p = "/node_modules/" + os.sep.join(parts[i+2:])
+    return bin_dir + p
 
 def get_runfiles_path(p):
     for entry in manifest:
@@ -158,12 +171,11 @@ def get_runfiles_path(p):
             return entry[1]
     raise Exception("could not find a corresponding file for %s within manifest.")
 
-
 for entry in manifest:
     p = entry[2]
     if "node_modules" in p and os.path.islink(p):
         link_to = os.path.realpath(p)
-        link_to_execroot_stripped = strip_execroot(link_to)
+        link_to_execroot_stripped = strip(link_to)
         overwritten_to = get_runfiles_path(link_to_execroot_stripped)
         # fix it!
         entry[0] = 1 # make it a symlink
