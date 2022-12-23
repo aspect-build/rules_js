@@ -1,7 +1,6 @@
 # Bazel rules for JavaScript
 
-This ruleset is a high-performance alternative to the `build_bazel_rules_nodejs` Bazel module and
-accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs.
+This ruleset is a high-performance and npm-compatible Bazel integration for JavaScript.
 
 -   Lazy: only fetches/installs npm packages needed for the requested build/test targets.
 -   Correct: works seamlessly with node.js module resolution. For example there are no pathMapping issues with TypeScript `rootDirs`.
@@ -14,9 +13,7 @@ Google does not fund development of rules_js. If your company benefits, please c
 
 Known issues:
 
--   Remote Execution (RBE) requires the latest version of Bazel, 6.0. Run `echo 6.0.0rc3 > .bazelversion` or set environment `USE_BAZEL_VERSION=6.0.0rc3`.
--   `--remote_download_outputs` set to either `toplevel` or `minimal` has a regression in Bazel 6.0.0rc1 and 6.0.0rc2
-    due to https://github.com/bazelbuild/bazel/issues/16789. The fix is included in Bazel 6.0.0rc3.
+-   Remote Execution (RBE) requires the latest version of Bazel, [6.0](https://blog.bazel.build/2022/12/19/bazel-6.0.html).
 -   Building docker containers works, per [this example](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image) however it requires some Starlark code which ought to be in our public API, see https://github.com/aspect-build/rules_js/issues/304
 -   No examples yet for stamping and publishing npm packages.
 -   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
@@ -66,6 +63,10 @@ Larger examples can be found in our [bazel-examples]() repository including:
 -   [NestJS](https://github.com/aspect-build/bazel-examples/tree/main/nestjs) / [rules_ts](https://github.com/aspect-build/rules_ts), [rules_swc](https://github.com/aspect-build/rules_swc)
 
 ## Relationship to rules_nodejs
+
+rules_js is an alternative to the `build_bazel_rules_nodejs` Bazel module and
+accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs,
+which is now unmaintained. All users are recommended to use rules_js instead.
 
 rules_js replaces some parts of [bazelbuild/rules_nodejs](http://github.com/bazelbuild/rules_nodejs) and re-uses other parts:
 
