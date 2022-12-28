@@ -13,12 +13,12 @@ npm_link_package(<a href="#npm_link_package-name">name</a>, <a href="#npm_link_p
 
 "Links an npm package to node_modules if link is True.
 
-When called at the root_package, a virtual store target is generated named "link__{bazelified_name}__store".
+When called at the root_package, a virtual store target is generated named `link__{bazelified_name}__store`.
 
-When linking, a "{name}" target is generated which consists of the node_modules/&lt;package&gt; symlink and transitively
+When linking, a `{name}` target is generated which consists of the `node_modules/&lt;package&gt;` symlink and transitively
 its virtual store link and the virtual store links of the transitive closure of deps.
 
-When linking, "{name}/dir" filegroup is also generated that refers to a directory artifact can be used to access
+When linking, `{name}/dir` filegroup is also generated that refers to a directory artifact can be used to access
 the package directory for creating entry points or accessing files in the package.
 
 
