@@ -1,3 +1,7 @@
+---
+title: FAQ
+---
+
 ## Making the editor happy
 
 Editors (and the language services they host) expect a couple of things:
