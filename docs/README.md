@@ -134,7 +134,7 @@ You'll see something like this:
 ```bash
 # the virtual store
 bazel-bin/node_modules/.aspect_rules_js
- # symlink into the virtual store
+# symlink into the virtual store
 bazel-bin/node_modules/some_pkg
 # If you used pnpm workspaces:
 bazel-bin/packages/some_pkg/node_modules/some_dep
