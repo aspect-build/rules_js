@@ -12,12 +12,11 @@ However we recommend 5.1 because it includes a [cache for MerkleTree computation
 
 ## Upgrade to rules_nodejs 5.0 or greater
 
-As explained in the [README](/README.md), `rules_js` depends on `rules_nodejs`,
-the core module from https://github.com/bazelbuild/rules_nodejs.
-We need at least version 5.0 of the core `rules_nodejs` module.
+`rules_js` depends on `rules_nodejs`, the core module from https://github.com/bazelbuild/rules_nodejs. We need at least version 5.0 of the core `rules_nodejs` module.
 
 This does not require that you upgrade `build_bazel_rules_nodejs` to 5.x.
-`build_bazel_rules_nodejs` can remain at 4.x or older and work along side `rules_nodejs` 5.x and `rules_js`.
+`build_bazel_rules_nodejs` can remain at 4.x or older and work along side `rules_nodejs` 5.x and `rules_js`. See the [rules_nodejs_to_rules_js_migration](https://github.com/aspect-build/bazel-examples/blob/main/rules_nodejs_to_rules_js_migration/WORKSPACE) example for how to configure
+your WORKSPACE to build with both `rules_nodejs` and `rules_js` while migrating.
 
 ## Install pnpm (optional)
 
