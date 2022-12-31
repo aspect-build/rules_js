@@ -1,4 +1,6 @@
-# rules_js documentation
+---
+title: Getting Started
+---
 
 > Migrating from rules_nodejs? Start at the [Migration Guide](./migrate.md)
 
