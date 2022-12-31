@@ -335,7 +335,7 @@ stardoc_with_diff_test(
 update_docs(name = "docs")
 ```
 
-This setup appears in [examples/macro](../examples/macro).
+This setup appears in [examples/macro](https://github.com/aspect-build/rules_js/blob/main/examples/macro/BUILD.bazel).
 
 ### Create first-party npm packages
 
