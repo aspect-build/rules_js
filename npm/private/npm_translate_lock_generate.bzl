@@ -22,7 +22,7 @@ _NPM_IMPORT_TMPL = \
 """
 
 _BIN_TMPL = \
-    """load("{repo_package_json_bzl}", _bin = "bin", _bin_factory = "bin_factory")
+    """load("@{repo_package_json_bzl}", _bin = "bin", _bin_factory = "bin_factory")
 bin = _bin
 bin_factory = _bin_factory
 """

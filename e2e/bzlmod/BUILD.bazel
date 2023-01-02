@@ -1,5 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:less/package_json.bzl", "bin")
 load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
 
 npm_link_all_packages(
@@ -16,4 +17,14 @@ js_test(
         ":node_modules/meaning-of-life",
     ],
     entry_point = "main.mjs",
+)
+
+bin.lessc(
+    name = "styles",
+    srcs = ["my.less"],
+    outs = ["my.css"],
+    args = [
+        "my.less",
+        "my.css",
+    ],
 )
