@@ -889,7 +889,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                         ),
                     ))
                 package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
-                repo_package_json_bzl = "@{repo_name}//{link_package}:{package_json_bzl}".format(
+                repo_package_json_bzl = "{at}{repo_name}//{link_package}:{package_json_bzl}".format(
+                    at = "@@" if utils.bzlmod_supported else "@",
                     repo_name = _import.name,
                     link_package = link_package,
                     package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,

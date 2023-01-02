@@ -1,6 +1,7 @@
 {
     "private": true,
     "dependencies": {
-        "chalk": "latest"
+        "chalk": "latest",
+        "less": "latest"
     }
 }
