@@ -5,7 +5,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 load("//npm/private:utils.bzl", "utils")
 load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
-load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import")
+load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import", npm_import_links_lib = "npm_import_links")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
@@ -35,6 +35,7 @@ def _extension_impl(module_ctx):
             for i in imports:
                 npm_import(
                     name = i.name,
+                    bins = i.bins,
                     custom_postinstall = i.custom_postinstall,
                     deps = i.deps,
                     integrity = i.integrity,
@@ -53,6 +54,7 @@ def _extension_impl(module_ctx):
         for i in mod.tags.npm_import:
             npm_import(
                 name = i.name,
+                bins = i.bins,
                 custom_postinstall = i.custom_postinstall,
                 integrity = i.integrity,
                 lifecycle_hooks = i.lifecycle_hooks,
@@ -77,6 +79,7 @@ def _npm_translate_lock_attrs():
 
 def _npm_import_attrs():
     attrs = dict(**npm_import_lib.attrs)
+    attrs.update(**npm_import_links_lib.attrs)
 
     # Add macro attrs that aren't in the rule attrs.
     attrs["name"] = attr.string()
