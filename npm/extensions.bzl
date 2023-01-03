@@ -36,6 +36,7 @@ def _extension_impl(module_ctx):
                 npm_import(
                     name = i.name,
                     bins = i.bins,
+                    commit = i.commit,
                     custom_postinstall = i.custom_postinstall,
                     deps = i.deps,
                     integrity = i.integrity,
@@ -55,6 +56,7 @@ def _extension_impl(module_ctx):
             npm_import(
                 name = i.name,
                 bins = i.bins,
+                commit = i.commit,
                 custom_postinstall = i.custom_postinstall,
                 integrity = i.integrity,
                 lifecycle_hooks = i.lifecycle_hooks,
