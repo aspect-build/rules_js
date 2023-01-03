@@ -8,6 +8,9 @@ load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
 load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
+load("//npm/private:versions.bzl", "PNPM_VERSIONS")
+
+LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
 def _extension_impl(module_ctx):
     for mod in module_ctx.modules:
@@ -17,6 +20,7 @@ def _extension_impl(module_ctx):
             npm_translate_lock(
                 name = attr.name,
                 pnpm_lock = attr.pnpm_lock,
+                pnpm_version =  attr.pnpm_version,
                 # TODO: get this working with bzlmod
                 # update_pnpm_lock = attr.update_pnpm_lock,
             )
@@ -67,6 +71,7 @@ def _npm_translate_lock_attrs():
 
     # Add macro attrs that aren't in the rule attrs.
     attrs["name"] = attr.string()
+    attrs["pnpm_version"] = attr.string(default = LATEST_PNPM_VERSION)
 
     return attrs
 
