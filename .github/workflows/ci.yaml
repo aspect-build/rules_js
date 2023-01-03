@@ -127,6 +127,7 @@ jobs:
                 config: ${{ fromJSON(needs.matrix-prep-config.outputs.configs) }}
                 bazelversion: ${{ fromJSON(needs.matrix-prep-bazelversion.outputs.bazelversions) }}
                 folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folders) }}
+                bzlmodEnabled: [true, false]
                 exclude:
                     # Don't test RBE with Bazel 5 (not supported)
                     - config: rbe
@@ -138,6 +139,48 @@ jobs:
                       folder: e2e/bzlmod
                     - bazelversion: 5.1.1
                       folder: e2e/bzlmod
+                    # Don't run bzlmod e2e tests with Bazel 5
+                    - bazelversion: 5.3.2
+                      bzlmodEnabled: true
+                    - bazelversion: 5.1.1
+                      bzlmodEnabled: true
+                    # TODO: un-exclude the following bzlmod tests once they work
+                    - folder: .
+                      bzlmodEnabled: true
+                    - folder: e2e/js_image
+                      bzlmodEnabled: true
+                    - folder: e2e/js_run_devserver
+                      bzlmodEnabled: true
+                    - folder: e2e/npm_link_package-esm
+                      bzlmodEnabled: true
+                    - folder: e2e/npm_link_package
+                      bzlmodEnabled: true
+                    - folder: e2e/npm_translate_lock
+                      bzlmodEnabled: true
+                    - folder: e2e/npm_translate_package_lock
+                      bzlmodEnabled: true
+                    - folder: e2e/npm_translate_yarn_lock
+                      bzlmodEnabled: true
+                    - folder: e2e/package_json_module
+                      bzlmodEnabled: true
+                    - folder: e2e/pnpm_workspace_rerooted
+                      bzlmodEnabled: true
+                    - folder: e2e/pnpm_workspace
+                      bzlmodEnabled: true
+                    - folder: e2e/rules_foo
+                      bzlmodEnabled: true
+                    - folder: e2e/update_pnpm_lock
+                      bzlmodEnabled: true
+                    - folder: e2e/update_pnpm_lock_with_import
+                      bzlmodEnabled: true
+                    - folder: e2e/vendored_node
+                      bzlmodEnabled: true
+                    - folder: e2e/webpack_devserver
+                      bzlmodEnabled: true
+                    - folder: e2e/webpack_devserver_esm
+                      bzlmodEnabled: true
+                    - folder: e2e/workspace
+                      bzlmodEnabled: true
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
@@ -181,10 +224,17 @@ jobs:
               with:
                   files: '${{ matrix.folder }}/test.sh'
 
+            - name: Set bzlmod flag
+              # Store the --enable_bzlmod flag that we add to the test command below
+              # only when we're running bzlmod in our test matrix.
+              id: set_bzlmod_flag
+              if: matrix.bzlmodEnabled
+              run: echo "bzlmod_flag=--enable_bzlmod" >> $GITHUB_OUTPUT
+
             - name: bazel test //...
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }}  //...
+                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
               env:
                   # Bazelisk will download bazel to here
