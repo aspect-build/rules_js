@@ -5,9 +5,12 @@ See https://bazel.build/docs/bzlmod#extension-definition
 load("//npm/private:utils.bzl", "utils")
 load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
-load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import")
+load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import", npm_import_links_lib = "npm_import_links")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
+load("//npm/private:versions.bzl", "PNPM_VERSIONS")
+
+LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
 def _extension_impl(module_ctx):
     for mod in module_ctx.modules:
@@ -17,6 +20,7 @@ def _extension_impl(module_ctx):
             npm_translate_lock(
                 name = attr.name,
                 pnpm_lock = attr.pnpm_lock,
+                pnpm_version =  attr.pnpm_version,
                 # TODO: get this working with bzlmod
                 # update_pnpm_lock = attr.update_pnpm_lock,
             )
@@ -31,10 +35,13 @@ def _extension_impl(module_ctx):
             for i in imports:
                 npm_import(
                     name = i.name,
+                    bins = i.bins,
+                    commit = i.commit,
                     custom_postinstall = i.custom_postinstall,
                     deps = i.deps,
                     integrity = i.integrity,
                     lifecycle_hooks = i.lifecycle_hooks,
+                    lifecycle_hooks_env = i.lifecycle_hooks_env,
                     link_packages = i.link_packages,
                     npm_translate_lock_repo = attr.name,
                     package = i.package,
@@ -49,9 +56,12 @@ def _extension_impl(module_ctx):
         for i in mod.tags.npm_import:
             npm_import(
                 name = i.name,
+                bins = i.bins,
+                commit = i.commit,
                 custom_postinstall = i.custom_postinstall,
                 integrity = i.integrity,
                 lifecycle_hooks = i.lifecycle_hooks,
+                lifecycle_hooks_env = i.lifecycle_hooks_env,
                 link_packages = i.link_packages,
                 link_workspace = i.link_workspace,
                 package = i.package,
@@ -67,11 +77,13 @@ def _npm_translate_lock_attrs():
 
     # Add macro attrs that aren't in the rule attrs.
     attrs["name"] = attr.string()
+    attrs["pnpm_version"] = attr.string(default = LATEST_PNPM_VERSION)
 
     return attrs
 
 def _npm_import_attrs():
     attrs = dict(**npm_import_lib.attrs)
+    attrs.update(**npm_import_links_lib.attrs)
 
     # Add macro attrs that aren't in the rule attrs.
     attrs["name"] = attr.string()
