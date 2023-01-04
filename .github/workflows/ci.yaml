@@ -220,7 +220,7 @@ jobs:
               # Checks for the existence of test.sh in the folder. Downstream steps can use
               # steps.has_test_sh.outputs.files_exists as a conditional.
               id: has_test_sh
-              uses: andstor/file-existence-action@v1
+              uses: andstor/file-existence-action@v2
               with:
                   files: '${{ matrix.folder }}/test.sh'
 
