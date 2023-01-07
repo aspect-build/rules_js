@@ -8,19 +8,26 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 ```
 """
 
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_action", "copy_to_directory_lib")
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
+load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:libs.bzl", "js_lib_helpers")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
+_glob_support_docstring = """Glob patterns are supported. Standard wildcards (globbing patterns) plus the `**` doublestar (aka. super-asterisk)
+are supported with the underlying globbing library, https://github.com/bmatcuk/doublestar. This is the same
+globbing library used by [gazelle](https://github.com/bazelbuild/bazel-gazelle). See https://github.com/bmatcuk/doublestar#patterns
+for more information on supported globbing patterns.
+"""
+
 _DOC = """A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
 This target can be used as the `src` attribute to `npm_link_package`.
 
 `npm_package` makes use of `copy_to_directory`
-(https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md) under the hood,
+(https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directoryd) under the hood,
 adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
 npm_package includes `transitive_sources` and `transitive_declarations` files from `JsInfo` providers in srcs
 by default. The behavior of including sources and declarations from `JsInfo` can be configured
@@ -65,15 +72,11 @@ If unset, a npm_link_package that references this npm_package must define the pa
         default = "0.0.0",
     ),
     "include_srcs_packages": attr.string_list(
-        default = [".", "./**"],
+        default = ["./**"],
         doc = """List of Bazel packages (with glob support) to include in output directory.
 
-        Glob patterns `**`, `*` and `?` are supported. See `glob_match` documentation for
-        more details on how to use glob patterns:
-        https://github.com/aspect-build/bazel-lib/blob/main/docs/glob_match.md.
-
-        Files and directories in srcs are only copied to the output directory if
-        the Bazel package of the file or directory matches one of the patterns specified.
+        Files in srcs are only copied to the output directory if
+        the Bazel package of the file matches one of the patterns specified.
 
         Forward slashes (`/`) should be used as path separators.
 
@@ -81,48 +84,45 @@ If unset, a npm_link_package that references this npm_package must define the pa
         A "./**" value expands to the target's package path followed by a slash and a
         globstar (`"{{}}/**".format(ctx.label.package)`).
 
-        Defaults to [".", "./**"] which includes sources target's package and subpackages.
+        Defaults to ["./**"] which includes sources target's package and subpackages.
 
         Files and directories that have matching Bazel packages are subject to subsequent filters and
         transformations to determine if they are copied and what their path in the output
         directory will be.
 
+        {glob_support_docstring}
+
         See `copy_to_directory_action` documentation for list of order of filters and transformations:
-        https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md#copy_to_directory.
-        """,
+        https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory.
+        """.format(
+            glob_support_docstring = _glob_support_docstring,
+        ),
     ),
     "exclude_srcs_patterns": attr.string_list(
         default = [
-            "node_modules/**",
             "**/node_modules/**",
         ],
         doc = """List of paths (with glob support) to exclude from output directory.
 
-        Glob patterns `**`, `*` and `?` are supported. See `glob_match` documentation for
-        more details on how to use glob patterns:
-        https://github.com/aspect-build/bazel-lib/blob/main/docs/glob_match.md.
-
         Files and directories in srcs are not copied to the output directory if their output
         directory path, after applying `root_paths`, matches one of the patterns specified.
 
-        Patterns do not look into files within source directory or generated directory (TreeArtifact)
-        targets since matches are performed in Starlark. To use `include_srcs_patterns` on files
-        within directories you can use the `make_directory_paths` helper to specify individual files inside
-        directories in `srcs`. This restriction may be fixed in a future release by performing matching
-        inside the copy action instead of in Starlark.
-
         Forward slashes (`/`) should be used as path separators.
 
-        Defaults to ["node_modules/**", "**/node_modules/**"] which excludes all node_modules folders
+        Defaults to ["**/node_modules/**"] which excludes all node_modules folders
         from the output directory.
 
         Files and directories that do not have matching output directory paths are subject to subsequent
         filters and transformations to determine if they are copied and what their path in the output
         directory will be.
 
+        {glob_support_docstring}
+
         See `copy_to_directory_action` documentation for list of order of filters and transformations:
-        https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_to_directory.md#copy_to_directory.
-        """,
+        https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory.
+        """.format(
+            glob_support_docstring = _glob_support_docstring,
+        ),
     ),
     "data": attr.label_list(
         doc = """Runtime / linktime npm dependencies of this npm package.
@@ -167,12 +167,9 @@ repository with many npm_package targets.
         # TODO(2.0): flip default to False
         default = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 })
 
 def _impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
-
     dst = ctx.actions.declare_directory(ctx.attr.out if ctx.attr.out else ctx.attr.name)
 
     additional_files_depsets = []
@@ -224,11 +221,13 @@ def _impl(ctx):
         targets = ctx.attr.data,
     ))
 
-    copy_to_directory_action(
+    copy_to_directory_bin_action(
         ctx,
-        srcs = ctx.attr.srcs,
+        name = ctx.attr.name,
+        copy_to_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"].copy_to_directory_info.bin,
         dst = dst,
-        additional_files = depset(transitive = additional_files_depsets),
+        files = ctx.files.srcs + depset(transitive = additional_files_depsets).to_list(),
+        targets = [t for t in ctx.attr.srcs if DirectoryPathInfo in t],
         root_paths = ctx.attr.root_paths,
         include_external_repositories = ctx.attr.include_external_repositories,
         include_srcs_packages = ctx.attr.include_srcs_packages,
@@ -237,7 +236,7 @@ def _impl(ctx):
         exclude_srcs_patterns = ctx.attr.exclude_srcs_patterns,
         replace_prefixes = ctx.attr.replace_prefixes,
         allow_overwrites = ctx.attr.allow_overwrites,
-        is_windows = is_windows,
+        verbose = ctx.attr.verbose,
     )
 
     # TODO: add a verification action that checks that the package and version match the contained package.json;
@@ -266,6 +265,7 @@ npm_package = rule(
     implementation = npm_package_lib.implementation,
     attrs = npm_package_lib.attrs,
     provides = npm_package_lib.provides,
+    toolchains = ["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"],
 )
 
 def stamped_package_json(name, stamp_var, **kwargs):
@@ -274,7 +274,7 @@ def stamped_package_json(name, stamp_var, **kwargs):
     In unstamped builds (typically those without `--stamp`) the version will be set to `0.0.0`.
     This ensures that actions which use the package.json file can get cache hits.
 
-    For more information on stamping, read https://github.com/aspect-build/bazel-lib/blob/main/docs/stamping.md.
+    For more information on stamping, read https://docs.aspect.build/rules/aspect_bazel_lib/docs/stamping.
 
     Using this rule requires that you register the jq toolchain in your WORKSPACE:
 
@@ -287,7 +287,7 @@ def stamped_package_json(name, stamp_var, **kwargs):
     Args:
         name: name of the resulting `jq` target, must be "package"
         stamp_var: a key from the bazel-out/stable-status.txt or bazel-out/volatile-status.txt files
-        **kwargs: additional attributes passed to the jq rule, see https://github.com/aspect-build/bazel-lib/blob/main/docs/jq.md
+        **kwargs: additional attributes passed to the jq rule, see https://docs.aspect.build/rules/aspect_bazel_lib/docs/jq
     """
     if name != "package":
         fail("""stamped_package_json should always be named "package" so that the default output is named "package.json".
