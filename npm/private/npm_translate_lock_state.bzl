@@ -34,7 +34,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     if _should_update_pnpm_lock(priv) or not rctx.attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
-        _init_pnpm_labels(label_store)
+        _init_pnpm_labels(label_store, rctx)
 
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
@@ -105,8 +105,17 @@ def _init_common_labels(rctx, label_store):
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
 
 ################################################################################
-def _init_pnpm_labels(label_store):
-    label_store.add("host_node", Label("@nodejs_host//:bin/node"))
+def _init_pnpm_labels(label_store, rctx):
+    # Note that we must reference the node binary under the platform-specific node
+    # toolchain repository rather than under @nodejs_host since running rctx.path
+    # (called outside this function) on the alias in the host repo fails under bzlmod.
+    # It appears to fail because the platform-specific repository does not exist
+    # unless we reference the label here.
+    #
+    # TODO: Try to understand this better and see if we can go back to using
+    #  Label("@nodejs_host//:bin/node")
+    label_store.add("host_node", Label("@nodejs_%s//:bin/node" % repo_utils.platform(rctx)))
+
     label_store.add("pnpm_entry", Label("@pnpm//:package/bin/pnpm.cjs"))
 
 ################################################################################
@@ -283,7 +292,7 @@ def _action_cache_miss(priv, rctx, label_store):
 ################################################################################
 def _write_action_cache(priv, rctx, label_store):
     contents = [
-        "# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").".format(rctx.name, utils.consistent_label_str(label_store.label("pnpm_lock"))),
+        "# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").".format(helpers.to_apparent_repo_name(rctx.name), utils.consistent_label_str(label_store.label("pnpm_lock"))),
         "# This file should be checked into version control along with the pnpm-lock.yaml file.",
     ]
     for key, value in priv["input_hashes"].items():

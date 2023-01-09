@@ -155,8 +155,6 @@ jobs:
                       bzlmodEnabled: true
                     - folder: e2e/npm_link_package
                       bzlmodEnabled: true
-                    - folder: e2e/npm_translate_lock
-                      bzlmodEnabled: true
                     - folder: e2e/npm_translate_lock_auth
                       bzlmodEnabled: true
                     - folder: e2e/npm_translate_package_lock
