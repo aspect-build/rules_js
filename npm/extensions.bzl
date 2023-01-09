@@ -6,7 +6,7 @@ load("//npm/private:utils.bzl", "utils")
 load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
 load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import", npm_import_links_lib = "npm_import_links")
-load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock")
+load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock", "pnpm_repository")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 
@@ -19,11 +19,13 @@ def _extension_impl(module_ctx):
             # the pnpm-lock.yaml file when update_pnpm_lock is True.
             npm_translate_lock(
                 name = attr.name,
+                data = attr.data,
+                npmrc = attr.npmrc,
                 pnpm_lock = attr.pnpm_lock,
                 pnpm_version = attr.pnpm_version,
-                # TODO: get this working with bzlmod
-                # update_pnpm_lock = attr.update_pnpm_lock,
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
+                update_pnpm_lock = attr.update_pnpm_lock,
+                verify_node_modules_ignored = attr.verify_node_modules_ignored,
             )
 
         for attr in mod.tags.npm_translate_lock:
@@ -98,5 +100,20 @@ npm = module_extension(
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
+    },
+)
+
+def _pnpm_impl(module_ctx):
+    for mod in module_ctx.modules:
+        for attr in mod.tags.pnpm:
+            pnpm_repository(
+                name = attr.name,
+                pnpm_version = attr.pnpm_version,
+            )
+
+pnpm = module_extension(
+    implementation = _pnpm_impl,
+    tag_classes = {
+        "pnpm": tag_class(attrs = {"name": attr.string(), "pnpm_version": attr.string(default = LATEST_PNPM_VERSION)}),
     },
 )
