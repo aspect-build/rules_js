@@ -9,8 +9,9 @@ def _npmrc_test(ctx, expected, content):
     return unittest.end(env)
 
 def _basic(ctx):
-    return _npmrc_test(ctx, [["a", "b"]], """
+    return _npmrc_test(ctx, [["a", "b"], ["c", ""]], """
         a=b
+        c=
     """)
 
 def _comments(ctx):
@@ -24,14 +25,14 @@ def _comments(ctx):
     """)
 
 def _whitespace(ctx):
-    return _npmrc_test(ctx, [["a", "b"], ["c", "3"]], """
+    return _npmrc_test(ctx, [["a", "b"], ["c", "3"], ["d", ""]], """
         ; foo
 
         a = b ; 
 
         c = 3
 
-        
+        d =   
     """)
 
 def _dupe(ctx):
@@ -67,6 +68,13 @@ def _glob_characters(ctx):
         protocol=file://path/to/file.ext
     """)
 
+def _quotes(ctx):
+    return _npmrc_test(ctx, [["a", " 1 "], ["b", "2"], ["c", ""]], """
+        a=" 1 "
+        b= "2" #dkjf
+        c = "" ; "dkj;f'
+    """)
+
 basic_test = unittest.make(_basic)
 comments_test = unittest.make(_comments)
 whitespace_test = unittest.make(_whitespace)
@@ -74,6 +82,7 @@ dupe_test = unittest.make(_dupe)
 sections_test = unittest.make(_sections)
 case_sensitivity_test = unittest.make(_case_sensitivity)
 glob_characters_test = unittest.make(_glob_characters)
+_quotes_test = unittest.make(_quotes)
 
 def npmrc_tests(name):
     unittest.suite(
@@ -85,4 +94,5 @@ def npmrc_tests(name):
         sections_test,
         case_sensitivity_test,
         glob_characters_test,
+        _quotes_test,
     )

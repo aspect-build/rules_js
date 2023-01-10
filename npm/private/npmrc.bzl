@@ -43,8 +43,13 @@ def parse_npmrc(npmrc_content):
         if len(line) == 0:
             continue
 
-        [name, _, value] = line.strip().partition("=")
+        p = line.partition("=")
+        name = p[0].strip()
+        value = p[2].strip()
 
-        props.append([name.strip(), value.strip()])
+        if len(value) > 1 and value[0] == "\"" and value[-1] == "\"":
+            value = value[1:-1]
+
+        props.append([name, value])
 
     return dict(props)
