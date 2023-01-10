@@ -20,9 +20,10 @@ def _extension_impl(module_ctx):
             npm_translate_lock(
                 name = attr.name,
                 pnpm_lock = attr.pnpm_lock,
-                pnpm_version =  attr.pnpm_version,
+                pnpm_version = attr.pnpm_version,
                 # TODO: get this working with bzlmod
                 # update_pnpm_lock = attr.update_pnpm_lock,
+                register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
             )
 
         for attr in mod.tags.npm_translate_lock:
@@ -51,6 +52,7 @@ def _extension_impl(module_ctx):
                     transitive_closure = i.transitive_closure,
                     url = i.url,
                     version = i.version,
+                    register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 )
 
         for i in mod.tags.npm_import:
@@ -70,6 +72,7 @@ def _extension_impl(module_ctx):
                 root_package = i.root_package,
                 url = i.url,
                 version = i.version,
+                register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
             )
 
 def _npm_translate_lock_attrs():

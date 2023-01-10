@@ -30,6 +30,7 @@ load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock = "npm_translate_lock")
+load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
@@ -43,6 +44,7 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
         name: name of the resulting external repository
         pnpm_version: version of pnpm, see https://www.npmjs.com/package/pnpm?activeTab=versions
     """
+
     if not native.existing_rule(name):
         npm_import(
             name = name,
@@ -54,6 +56,7 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
                 """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
                 """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ],
+            register_copy_to_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
         )
 
 def npm_translate_lock(
@@ -84,6 +87,7 @@ def npm_translate_lock(
         quiet = True,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
+        register_copy_to_directory_toolchains = True,
         # TODO(2.0): remove package_json
         package_json = None,
         # TODO(2.0): remove warn_on_unqualified_tarball_url
@@ -309,6 +313,8 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
+        register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
+
         package_json: Deprecated.
 
             Add all `package.json` files that are part of the workspace to `data` instead.
@@ -317,6 +323,10 @@ def npm_translate_lock(
 
         **kwargs: Internal use only
     """
+
+    # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
+    if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
+        _register_copy_to_directory_toolchains()
 
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)
@@ -444,6 +454,7 @@ def npm_import(
         npm_auth_username = "",
         npm_auth_password = "",
         bins = {},
+        register_copy_to_directory_toolchains = True,
         # TODO(2.0): remove run_lifecycle_hooks from npm_import
         run_lifecycle_hooks = None,
         # TODO(2.0): remove lifecycle_hooks_no_sandbox from npm_import
@@ -664,6 +675,8 @@ def npm_import(
             from information in the pnpm lock file. That feature is currently blocked on
             https://github.com/pnpm/pnpm/issues/5131.
 
+        register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
+
         run_lifecycle_hooks: If True, runs `preinstall`, `install`, `postinstall` and 'prepare' lifecycle hooks declared
             in this package.
 
@@ -675,6 +688,11 @@ def npm_import(
 
         **kwargs: Internal use only
     """
+
+    # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
+    if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
+        _register_copy_to_directory_toolchains()
+
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
