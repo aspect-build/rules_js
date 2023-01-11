@@ -12,7 +12,7 @@ _sedi () {
   sed "${sedi[@]}" "$@"
 }
 
-if ! bazel test //...; then
+if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test //...' to pass"
   exit 1
 fi
@@ -27,17 +27,28 @@ _sedi 's#"@types/node": "18.11.18"#"@types/node": "16"#' package.json
 
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 
-if bazel test //...; then
+if bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1 bazel test //...' to fail"
   exit 1
 fi
 
 ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 
-if ! bazel sync --only=npm; then
-  echo "ERROR: expected 'bazel sync --only=npm' to pass"
-  exit 1
+# Trigger the update of the pnpm lockfile
+if [ ! $BZLMOD_FLAG ]; then
+  if ! bazel sync $BZLMOD_FLAG --only=npm; then
+    echo "ERROR: expected 'bazel sync' to pass"
+    exit 1
+  fi
+else
+  # bazel sync isn't load bearing under bzlmod.
+  # Intead, run a build to trigger updating the lockfile.
+  if bazel build $BZLMOD_FLAG //...; then
+    echo "ERROR: expected 'bazel build //...' to fail"
+    exit 1
+  fi
 fi
+
 
 diff="$(git diff pnpm-lock.yaml)"
 if [ -z "$diff" ]; then
@@ -52,7 +63,7 @@ if [ -z "$diff" ]; then
   exit 1
 fi
 
-if ! bazel test //...; then
+if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test //...' to pass"
   exit 1
 fi
