@@ -171,8 +171,6 @@ jobs:
                       bzlmodEnabled: true
                     - folder: e2e/rules_foo
                       bzlmodEnabled: true
-                    - folder: e2e/update_pnpm_lock
-                      bzlmodEnabled: true
                     - folder: e2e/update_pnpm_lock_with_import
                       bzlmodEnabled: true
                     - folder: e2e/vendored_node
@@ -264,7 +262,9 @@ jobs:
               if: steps.has_test_sh.outputs.files_exists == 'true'
               working-directory: ${{ matrix.folder }}
               shell: bash
-              run: ./test.sh
+              # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod. All test.sh
+              # scripts that run bazel directly should make use of this variable.
+              run: BZLMOD_FLAG=${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ./test.sh
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
