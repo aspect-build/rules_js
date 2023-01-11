@@ -122,7 +122,7 @@ def _init_pnpm_labels(label_store, rctx):
 def _init_update_labels(rctx, label_store):
     attr = rctx.attr
 
-    action_cache_path = PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(rctx.name + utils.consistent_label_str(label_store.label("pnpm_lock"))))
+    action_cache_path = PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(rctx.name) + utils.consistent_label_str(label_store.label("pnpm_lock"))))
     label_store.add_root("action_cache", action_cache_path)
     for i, d in enumerate(attr.preupdate):
         label_store.add("preupdate_{}".format(i), d)
