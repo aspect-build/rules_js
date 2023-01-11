@@ -134,10 +134,12 @@ jobs:
                       bazelversion: 5.3.2
                     - config: rbe
                       bazelversion: 5.1.1
-                    # Don't test bzlmod with Bazel 5 (not supported)
+                    # Don't run bzlmod smoke test with Bazel 5 (not supported) or without bzlmod enabled
                     - bazelversion: 5.3.2
                       folder: e2e/bzlmod
                     - bazelversion: 5.1.1
+                      folder: e2e/bzlmod
+                    - bzlmodEnabled: false
                       folder: e2e/bzlmod
                     # Don't run bzlmod e2e tests with Bazel 5
                     - bazelversion: 5.3.2
