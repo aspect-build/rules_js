@@ -2,8 +2,8 @@ lockfileVersion: 5.4
 
 overrides:
   jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
-  semver-max: file:../../../npm/private/test/vendored/semver-max
-  is-odd: file:../../../../../npm/private/test/vendored/is-odd
+  semver-max: file:./npm/private/test/vendored/semver-max
+  is-odd: file:./npm/private/test/vendored/is-odd
 
 packageExtensionsChecksum: fd9f894fe7eb428c9986d2de2ca012c9
 

@@ -33,11 +33,10 @@
                 }
             }
         },
-        "// overrides.semver-max&is-odd": "// these are for the npm/private/test/package.json but pnpm has a bug where resolutions need to be specified in the root package.json but the paths are still relative to the package.json where the resolution applies",
         "overrides": {
             "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
-            "semver-max": "file:../../../npm/private/test/vendored/semver-max",
-            "is-odd": "file:../../../../../npm/private/test/vendored/is-odd"
+            "semver-max": "file:./npm/private/test/vendored/semver-max",
+            "is-odd": "file:./npm/private/test/vendored/is-odd"
         }
     }
 }
