@@ -42,13 +42,11 @@ copy the WORKSPACE snippet into your `WORKSPACE` file.
 
 See the documentation in the [docs](docs/) folder.
 
-> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
-
-Read our [migration guide](docs/migrate.md) to adopt rules_js in an existing project.
-
 ## Examples
 
 Basic usage examples can be found under the [examples](https://github.com/aspect-build/rules_js/tree/main/examples) folder.
+
+> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
 
 The [e2e](https://github.com/aspect-build/rules_js/tree/main/e2e) folder also has a few useful examples such as [js_image](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image) for containerizing a js_binary and [js_run_devserver](https://github.com/aspect-build/rules_js/tree/main/e2e/js_run_devserver), a generic rule for running a devserver in watch mode with [ibazel](https://github.com/bazelbuild/bazel-watcher).
 
