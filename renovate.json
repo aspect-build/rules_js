@@ -20,7 +20,7 @@
             "stabilityDays": 3
         },
         {
-            "groupName": "all patch updates",
+            "groupName": "patch updates",
             "matchPackagePatterns": ["*"],
             "matchUpdateTypes": ["patch"]
         },
@@ -37,19 +37,19 @@
         },
         {
             "groupName": "@types",
-            "matchUpdateTypes": ["major"],
+            "matchUpdateTypes": ["patch", "minor"],
             "matchPackagePatterns": ["^@types/"],
             "extends": ["schedule:monthly"]
         },
         {
             "groupName": "rollup",
-            "matchUpdateTypes": ["major"],
+            "matchUpdateTypes": ["patch", "minor"],
             "matchPackagePatterns": ["rollup"],
             "extends": ["schedule:monthly"]
         },
         {
             "groupName": "Webpack",
-            "matchUpdateTypes": ["major"],
+            "matchUpdateTypes": ["patch", "minor"],
             "matchPackagePatterns": ["webpack"],
             "extends": ["schedule:monthly"]
         }
