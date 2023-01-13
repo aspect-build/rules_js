@@ -4,9 +4,9 @@ importers:
 
   .:
     specifiers:
-      mocha: 10.1.0
+      mocha: 10.2.0
     dependencies:
-      mocha: 10.1.0
+      mocha: 10.2.0
 
 packages:
 
@@ -310,8 +310,8 @@ packages:
       brace-expansion: 2.0.1
     dev: false
 
-  /mocha/10.1.0:
-    resolution: {integrity: sha512-vUF7IYxEoN7XhQpFLxQAEMtE4W91acW4B6En9l97MwE9stL1A9gusXfoHZCLVHDUJ/7V5+lbCM6yMqzo5vNymg==}
+  /mocha/10.2.0:
+    resolution: {integrity: sha512-IDY7fl/BecMwFHzoqF2sg/SHHANeBoMMXFlS9r0OXKDssYE1M5O43wUY/9BVPeIvfH2zmEbBfseqN9gBQZzXkg==}
     engines: {node: '>= 14.0.0'}
     hasBin: true
     dependencies:

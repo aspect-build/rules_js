@@ -2,6 +2,6 @@
     "private": "true",
     "type": "module",
     "dependencies": {
-        "mocha": "10.1.0"
+        "mocha": "10.2.0"
     }
 }
