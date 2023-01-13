@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 overrides:
-  '@types/node': 18.11.15
+  '@types/node': 18.11.18
 
 specifiers:
   botframework-connector: 4.16.0
@@ -420,23 +420,23 @@ packages:
   /@types/jsonwebtoken/7.2.8:
     resolution: {integrity: sha512-XENN3YzEB8D6TiUww0O8SRznzy1v+77lH7UmuN54xq/IHIsyWjWOzZuFFTtoiRuaE782uAoRwBe/wwow+vQXZw==}
     dependencies:
-      '@types/node': 18.11.15
+      '@types/node': 18.11.18
     dev: false
 
-  /@types/node/18.11.15:
-    resolution: {integrity: sha512-VkhBbVo2+2oozlkdHXLrb3zjsRkpdnaU2bXmX8Wgle3PUi569eLRaHGlgETQHR7lLL1w7GiG3h9SnePhxNDecw==}
+  /@types/node/18.11.18:
+    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==}
     dev: false
 
   /@types/stoppable/1.1.1:
     resolution: {integrity: sha512-b8N+fCADRIYYrGZOcmOR8ZNBOqhktWTB/bMUl5LvGtT201QKJZOOH5UsFyI3qtteM6ZAJbJqZoBcLqqxKIwjhw==}
     dependencies:
-      '@types/node': 18.11.15
+      '@types/node': 18.11.18
     dev: false
 
   /@types/tunnel/0.0.0:
     resolution: {integrity: sha512-FGDp0iBRiBdPjOgjJmn1NH0KDLN+Z8fRmo+9J7XGBhubq1DPrGrbmG4UTlGzrpbCpesMqD0sWkzi27EYkOMHyg==}
     dependencies:
-      '@types/node': 18.11.15
+      '@types/node': 18.11.18
     dev: false
 
   /@xmldom/xmldom/0.7.9:
@@ -571,7 +571,7 @@ packages:
       '@azure/identity': 2.0.0-beta.6
       '@azure/ms-rest-js': 1.9.1
       '@types/jsonwebtoken': 7.2.8
-      '@types/node': 18.11.15
+      '@types/node': 18.11.18
       adal-node: 0.2.3
       axios: 0.25.0
       base64url: 3.0.1

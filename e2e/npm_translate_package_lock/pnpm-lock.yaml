@@ -1,16 +1,17 @@
 lockfileVersion: 5.4
 
-importers:
+overrides:
+  '@types/node': 18.11.18
 
-  .:
-    specifiers:
-      botframework-connector: 4.19.0
-      karma-typescript: 5.5.3
-      lodash: 4.17.21
-    dependencies:
-      botframework-connector: 4.19.0
-      karma-typescript: 5.5.3
-      lodash: 4.17.21
+specifiers:
+  botframework-connector: 4.19.0
+  karma-typescript: 5.5.3
+  lodash: 4.17.21
+
+dependencies:
+  botframework-connector: 4.19.0
+  karma-typescript: 5.5.3
+  lodash: 4.17.21
 
 packages:
 
