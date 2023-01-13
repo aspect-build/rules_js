@@ -7,11 +7,11 @@ importers:
       '@aspect-test/a': 5.0.2
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.2
-      sharp: 0.31.2
+      sharp: 0.31.3
       uvu: 0.5.6
     dependencies:
       '@aspect-test/a': 5.0.2
-      sharp: 0.31.2
+      sharp: 0.31.3
       uvu: 0.5.6
     optionalDependencies:
       '@aspect-test/c': 2.0.2
@@ -275,8 +275,8 @@ packages:
       lru-cache: 6.0.0
     dev: false
 
-  /sharp/0.31.2:
-    resolution: {integrity: sha512-DUdNVEXgS5A97cTagSLIIp8dUZ/lZtk78iNVZgHdHbx1qnQR7JAHY0BnXnwwH39Iw+VKhO08CTYhIg0p98vQ5Q==}
+  /sharp/0.31.3:
+    resolution: {integrity: sha512-XcR4+FCLBFKw1bdB+GEhnUNXNXvnt0tDo4WsBsraKymuo/IAuPuCBVAL2wIkUw2r/dwFW5Q5+g66Kwl2dgDFVg==}
     engines: {node: '>=14.15.0'}
     requiresBuild: true
     dependencies:
