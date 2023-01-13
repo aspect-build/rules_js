@@ -8,5 +8,6 @@ packages:
     - 'examples/webpack_cli'
     - 'js/private/coverage/bundle'
     - 'js/private/worker/src'
+    - 'js/private/image'
     - 'npm/private/test'
     - 'npm/private/test/npm_package'

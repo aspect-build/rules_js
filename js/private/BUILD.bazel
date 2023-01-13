@@ -1,6 +1,7 @@
 "Internal implementation details"
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("//js:defs.bzl", "js_binary")
 
@@ -149,6 +150,19 @@ bzl_library(
     visibility = ["//visibility:public"],
 )
 
+bzl_library(
+    name = "js_image_layer",
+    srcs = ["js_image_layer.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//js:__subpackages__",
+    ],
+    deps = [
+        "@aspect_bazel_lib//lib:paths",
+        "@bazel_skylib//lib:paths",
+    ],
+)
+
 js_binary(
     name = "expand_template_binary",
     entry_point = "expand_template.js",
@@ -160,5 +174,18 @@ js_binary(
 copy_to_bin(
     name = "js_devserver_entrypoint",
     srcs = ["js_run_devserver.mjs"],
+    visibility = ["//visibility:public"],
+)
+
+write_source_files(
+    name = "js_image_layer_checked",
+    files = {
+        "js_image_layer.mjs": "//js/private/image:image.mjs",
+    },
+)
+
+js_binary(
+    name = "js_image_layer_builder",
+    entry_point = "js_image_layer.mjs",
     visibility = ["//visibility:public"],
 )

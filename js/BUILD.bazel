@@ -13,6 +13,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/private:js_binary",
+        "//js/private:js_image_layer",
         "//js/private:js_library",
         "//js/private:js_run_binary",
         "//js/private:js_run_devserver",

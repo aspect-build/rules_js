@@ -13,7 +13,12 @@ examples/npm_package/packages/pkg_a/package.json=-1053875011
 examples/npm_package/packages/pkg_b/package.json=-994654274
 examples/webpack_cli/package.json=1775843160
 js/private/coverage/bundle/package.json=-975746706
+<<<<<<< HEAD
 js/private/worker/src/package.json=-433137194
+=======
+js/private/image/package.json=1973451027
+js/private/worker/src/package.json=-1936685546
+>>>>>>> refactor: promote js_image_layer to public api
 npm/private/test/package.json=1727477721
 npm/private/test/vendored/lodash-4.17.21.tgz=-1206623349
 npm/private/test/npm_package/package.json=-1377103079

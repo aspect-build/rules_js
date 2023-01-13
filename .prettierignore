@@ -8,3 +8,4 @@ min/
 npm/private/test/vendored/
 js/private/worker/worker.js
 js/private/worker/src/worker_protocol.ts
+js/private/js_image_layer.mjs

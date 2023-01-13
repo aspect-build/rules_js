@@ -1,19 +1,37 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 load("@io_bazel_rules_docker//contrib:test.bzl", "container_test")
 load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
-load(":js_image_layer.bzl", "js_image_layer")
+load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
 npm_link_all_packages(name = "node_modules")
+
+platform(
+    name = "arm64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+copy_to_bin(
+    name = "ascii",
+    srcs = ["src/ascii.art"],
+)
+
+platform_transition_filegroup(
+    name = "transition",
+    srcs = ["ascii"],
+    target_platform = ":arm64_linux",
+)
 
 js_binary(
     name = "main",
     args = ["foo"],
     data = [
-        "src/ascii.art",
+        "transition",
         "//:node_modules/chalk",
     ],
     entry_point = "src/main.js",
@@ -24,21 +42,29 @@ js_image_layer(
     name = "layers",
     binary = ":main",
     root = "/app",
-    # FIXME: fails with
-    # File "/mnt/engflow/worker/work/0/exec/bazel-out/k8-opt-exec-41DC9EB7-ST-f4b2833703dd/bin/layers.build_tar.runfiles/rules_pkg/pkg/private/tar/tar_writer.py", line 241, in add_file
-    # IsADirectoryError: [Errno 21] Is a directory: 'bazel-out/k8-fastbuild-ST-4a519fd6d3e4/bin/node_modules/.aspect_rules_js/ansi-styles@4.3.0/node_modules/color-convert'
-    tags = ["no-remote-exec"],
     visibility = ["//visibility:__pkg__"],
+)
+
+filegroup(
+    name = "app_tar",
+    srcs = [":layers"],
+    output_group = "app",
 )
 
 container_layer(
     name = "app_layer",
-    tars = [":layers/app.tar"],
+    tars = [":app_tar"],
+)
+
+filegroup(
+    name = "node_modules_tar",
+    srcs = [":layers"],
+    output_group = "node_modules",
 )
 
 container_layer(
     name = "node_modules_layer",
-    tars = [":layers/node_modules.tar"],
+    tars = [":node_modules_tar"],
 )
 
 container_image(
@@ -63,43 +89,3 @@ container_test(
     # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
     tags = ["no-remote-exec"],
 )
-
-bzl_library(
-    name = "rules_pkg",
-    srcs = [
-        "@rules_pkg//:pkg.bzl",
-        "@rules_pkg//:providers.bzl",
-    ],
-    deps = [
-        "@rules_pkg//pkg:bzl_srcs",
-    ],
-)
-
-bzl_library(
-    name = "rules_python",
-    srcs = [
-        "@bazel_tools//tools/python:private/defs.bzl",
-        "@bazel_tools//tools/python:srcs_version.bzl",
-        "@bazel_tools//tools/python:toolchain.bzl",
-        "@bazel_tools//tools/python:utils.bzl",
-        "@rules_python//python:bzl",
-    ],
-)
-
-bzl_library(
-    name = "js_image_layer",
-    srcs = ["js_image_layer.bzl"],
-    deps = [
-        ":rules_pkg",
-        ":rules_python",
-        "@aspect_bazel_lib//lib:paths",
-        "@bazel_skylib//rules:write_file",
-    ],
-)
-
-stardoc_with_diff_test(
-    name = "js_image_layer-docs",
-    bzl_library_target = ":js_image_layer",
-)
-
-update_docs(name = "docs")

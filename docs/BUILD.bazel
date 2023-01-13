@@ -26,6 +26,11 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
+    name = "js_image_layer",
+    bzl_library_target = "//js/private:js_image_layer",
+)
+
+stardoc_with_diff_test(
     name = "npm_package",
     bzl_library_target = "//npm/private:npm_package",
 )
