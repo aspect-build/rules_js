@@ -49,9 +49,9 @@ go_register_toolchains(version = "1.19.3")
 
 http_archive(
     name = "com_github_ash2k_bazel_tools",
-    sha256 = "e5f368ccf258adae5170c470cc8ee06b756e67db9b8bffe4b9f7b3b0d6e9daf4",
-    strip_prefix = "bazel-tools-60261202f33bd2537264040b7c741768c0ed8b3b",
-    url = "https://github.com/ash2k/bazel-tools/archive/60261202f33bd2537264040b7c741768c0ed8b3b.tar.gz",
+    sha256 = "0ad31a16c9e48b01a1a11daf908227a6bf6106269187cccf7398625fea2ba45a",
+    strip_prefix = "bazel-tools-4e045b9b4e3e613970ab68941b556a356239d433",
+    url = "https://github.com/ash2k/bazel-tools/archive/4e045b9b4e3e613970ab68941b556a356239d433.tar.gz",
 )
 
 load("@com_github_ash2k_bazel_tools//multirun:deps.bzl", "multirun_dependencies")
