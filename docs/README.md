@@ -177,10 +177,49 @@ with a rule like [`copy_to_bin`](https://docs.aspect.build/aspect-build/bazel-li
 rules_js automatically mirrors the `bin` field from the `package.json` file of your npm dependencies
 to a Starlark API you can load from in your BUILD file or macro.
 
-For example, if you depend on the `typescript` npm package, you write this in `BUILD`:
+The format of the generated starlark file is `@<npm external repo name>//<package name where npm binary is loaded>:<npm package name>/package_json.bzl`.
+
+For example, let's imagine you have this folder structure:
+
+```
+app/
+├─ BUILD
+BUILD
+package.json
+WORKSPACE
+
+```
+and you have imported npm packages in your `WORKSPACE` file with the external repo name `npm`:
+
+```starlark=
+npm_translate_lock(
+    name = "npm",
+    ...
+)
+```
+
+To use the `typescript` npm package in the root bazel package of your project, you write this in the `BUILD` file:
 
 ```starlark=
 load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
+
+typescript_bin.tsc(
+    name = "compile",
+    srcs = [
+        "fs.ts",
+        "tsconfig.json",
+        "//:node_modules/@types/node",
+    ],
+    outs = ["fs.js"],
+    chdir = package_name(),
+    args = ["-p", "tsconfig.json"],
+)
+```
+
+To use the `typescript` npm package in the `//app` bazel package of your project, you write this in the `app/BUILD` file:
+
+```starlark=
+load("@npm//app:typescript/package_json.bzl", typescript_bin = "bin")
 
 typescript_bin.tsc(
     name = "compile",
