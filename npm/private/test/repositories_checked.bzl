@@ -19903,26 +19903,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__typescript__4.7.4",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "typescript",
-        version = "4.7.4",
-        url = "https://registry.npmjs.org/typescript/-/typescript-4.7.4.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==",
-        transitive_closure = {
-            "typescript": ["4.7.4"],
-        },
-        bins = {
-            "tsc": "./bin/tsc",
-            "tsserver": "./bin/tsserver",
-        },
-    )
-
-    npm_import(
         name = "npm__typescript__4.8.4",
         root_package = "",
         link_workspace = "",
@@ -19959,6 +19939,26 @@ def npm_repositories():
         integrity = "sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==",
         transitive_closure = {
             "typescript": ["4.9.3"],
+        },
+        bins = {
+            "tsc": "./bin/tsc",
+            "tsserver": "./bin/tsserver",
+        },
+    )
+
+    npm_import(
+        name = "npm__typescript__4.9.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "typescript",
+        version = "4.9.4",
+        url = "https://registry.npmjs.org/typescript/-/typescript-4.9.4.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==",
+        transitive_closure = {
+            "typescript": ["4.9.4"],
         },
         bins = {
             "tsc": "./bin/tsc",
@@ -21760,7 +21760,7 @@ def npm_repositories():
             "tar": "6.1.11",
             "tmp-promise": "3.0.3",
             "tslib": "2.4.1",
-            "typescript": "4.7.4",
+            "typescript": "4.9.4",
             "underscore": "1.13.6",
             "ws": "8.12.0_bufferutil@4.0.1",
         },
@@ -21781,7 +21781,7 @@ def npm_repositories():
             "tar": ["6.1.11"],
             "tmp-promise": ["3.0.3"],
             "tslib": ["2.4.1"],
-            "typescript": ["4.7.4"],
+            "typescript": ["4.9.4"],
             "underscore": ["1.13.6"],
             "ws": ["8.12.0_bufferutil@4.0.1"],
             "openid-client": ["5.3.1"],

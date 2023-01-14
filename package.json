@@ -25,11 +25,10 @@
             },
             "@kubernetes/client-node": {
                 "//1": "these deps are from devDependencies of @kubernetes/client-node and needed for 'prepare' lifecycle hook",
-                "//2": "https://github.com/kubernetes-client/javascript/blob/763decf6e09d0e246b80cefdb2c5fd570373801a/package.json#L72",
+                "//2": "https://github.com/kubernetes-client/javascript/blob/fc681991e61c6808dd26012a2331f83671a11218/package.json",
                 "dependencies": {
-                    "@types/node": "^10.12.0",
-                    "@types/underscore": "^1.8.9",
-                    "typescript": "~4.7.4"
+                    "@types/underscore": "^1.11.4",
+                    "typescript": "~4.9.4"
                 }
             }
         },
