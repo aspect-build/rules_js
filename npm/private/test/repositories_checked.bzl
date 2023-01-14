@@ -22119,38 +22119,20 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.68",
+        name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.18.11",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "": ["@types/node"],
         },
         package = "@types/node",
-        version = "registry.npmjs.org/@types/node/16.11.68",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-16.11.68.tgz",
+        version = "registry.npmjs.org/@types/node/16.18.11",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-16.18.11.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-JkRpuVz3xCNCWaeQ5EHLR/6woMbHZz/jZ7Kmc63AkU+1HxnoUugzSWMck7dsR4DvNYX8jp9wTi9K7WvnxOIQZQ==",
+        integrity = "sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==",
         transitive_closure = {
-            "@types/node": ["registry.npmjs.org/@types/node/16.11.68"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__registry.npmjs.org_at_types_node_18.11.11",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/worker/src": ["@types/node"],
-        },
-        package = "@types/node",
-        version = "registry.npmjs.org/@types/node/18.11.11",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.11.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==",
-        transitive_closure = {
-            "@types/node": ["registry.npmjs.org/@types/node/18.11.11"],
+            "@types/node": ["registry.npmjs.org/@types/node/16.18.11"],
         },
     )
 
@@ -22158,7 +22140,9 @@ def npm_repositories():
         name = "npm__at_types_node__registry.npmjs.org_at_types_node_18.11.18",
         root_package = "",
         link_workspace = "",
-        link_packages = {},
+        link_packages = {
+            "js/private/worker/src": ["@types/node"],
+        },
         package = "@types/node",
         version = "registry.npmjs.org/@types/node/18.11.18",
         url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz",

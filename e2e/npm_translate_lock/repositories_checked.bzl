@@ -149,19 +149,19 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_types_node__registry.npmjs.org_at_types_node_18.11.11",
+        name = "npm__at_types_node__registry.npmjs.org_at_types_node_18.11.18",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "": ["@types/node"],
         },
         package = "@types/node",
-        version = "registry.npmjs.org/@types/node/18.11.11",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.11.tgz",
+        version = "registry.npmjs.org/@types/node/18.11.18",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz",
         npm_translate_lock_repo = "npm",
-        integrity = "sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==",
+        integrity = "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==",
         transitive_closure = {
-            "@types/node": ["registry.npmjs.org/@types/node/18.11.11"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
 
