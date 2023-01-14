@@ -1323,22 +1323,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_jridgewell_resolve-uri__3.0.7",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@jridgewell/resolve-uri",
-        version = "3.0.7",
-        url = "https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.0.7.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-8cXDaBBHOr2pQ7j77Y6Vp5VDT2sIqWyWQ56TjEq4ih/a4iST3dItRe8Q9fp0rrIl9DoKhWQtUQz/YpOxLkXbNA==",
-        transitive_closure = {
-            "@jridgewell/resolve-uri": ["3.0.7"],
-        },
-    )
-
-    npm_import(
         name = "npm__at_jridgewell_resolve-uri__3.1.0",
         root_package = "",
         link_workspace = "",
@@ -1396,22 +1380,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_jridgewell_sourcemap-codec__1.4.13",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@jridgewell/sourcemap-codec",
-        version = "1.4.13",
-        url = "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.13.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-GryiOJmNcWbovBxTfZSF71V/mXbgcV3MewDe3kIMCLyIh5e7SKAeUZs+rMnJ8jkMolZ/4/VsdBmMrw3l+VdZ3w==",
-        transitive_closure = {
-            "@jridgewell/sourcemap-codec": ["1.4.13"],
-        },
-    )
-
-    npm_import(
         name = "npm__at_jridgewell_sourcemap-codec__1.4.14",
         root_package = "",
         link_workspace = "",
@@ -1424,28 +1392,6 @@ def npm_repositories():
         integrity = "sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==",
         transitive_closure = {
             "@jridgewell/sourcemap-codec": ["1.4.14"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_jridgewell_trace-mapping__0.3.13",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@jridgewell/trace-mapping",
-        version = "0.3.13",
-        url = "https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.13.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-o1xbKhp9qnIAoHJSWd6KlCZfqslL4valSF81H8ImioOAxluWYWOpWkpyktY2vnt4tbrX9XYaxovq6cgowaJp2w==",
-        deps = {
-            "@jridgewell/resolve-uri": "3.0.7",
-            "@jridgewell/sourcemap-codec": "1.4.13",
-        },
-        transitive_closure = {
-            "@jridgewell/trace-mapping": ["0.3.13"],
-            "@jridgewell/resolve-uri": ["3.0.7"],
-            "@jridgewell/sourcemap-codec": ["1.4.13"],
         },
     )
 
@@ -1991,84 +1937,39 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.0__rollup_2.79.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/worker/src": ["@rollup/plugin-commonjs"],
-        },
-        package = "@rollup/plugin-commonjs",
-        version = "23.0.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-JbrTRyDNtLQj/rhl7RFUuYXwQ2fac+33oLDAu2k++WD95zweyo28UAomLVA0JMGx4vmCa7Nw4T6k/1F6lelExg==",
-        deps = {
-            "@rollup/pluginutils": "4.2.1",
-            "commondir": "1.0.1",
-            "estree-walker": "2.0.2",
-            "glob": "8.0.3",
-            "is-reference": "1.2.1",
-            "magic-string": "0.26.7",
-            "rollup": "2.79.1",
-        },
-        transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.0_rollup@2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
-            "commondir": ["1.0.1"],
-            "estree-walker": ["2.0.2"],
-            "glob": ["8.0.3"],
-            "is-reference": ["1.2.1"],
-            "magic-string": ["0.26.7"],
-            "rollup": ["2.79.1"],
-            "fsevents": ["2.3.2"],
-            "sourcemap-codec": ["1.4.8"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
-            "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
-            "minimatch": ["5.0.1"],
-            "once": ["1.4.0"],
-            "wrappy": ["1.0.2"],
-            "brace-expansion": ["2.0.1"],
-            "balanced-match": ["1.0.2"],
-            "picomatch": ["2.3.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.2__rollup_3.2.5",
+        name = "npm__at_rollup_plugin-commonjs__23.0.7__rollup_3.10.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
+            "js/private/worker/src": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "23.0.2_rollup@3.2.5",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.2.tgz",
+        version = "23.0.7_rollup@3.10.0",
+        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.7.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-e9ThuiRf93YlVxc4qNIurvv+Hp9dnD+4PjOqQs5vAYfcZ3+AXSrcdzXnVjWxcGQOa6KGJFcRZyUI3ktWLavFjg==",
+        integrity = "sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup@3.2.5",
+            "@rollup/pluginutils": "5.0.2_rollup@3.10.0",
             "commondir": "1.0.1",
             "estree-walker": "2.0.2",
             "glob": "8.0.3",
             "is-reference": "1.2.1",
-            "magic-string": "0.26.7",
-            "rollup": "3.2.5",
+            "magic-string": "0.27.0",
+            "rollup": "3.10.0",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.2_rollup@3.2.5"],
-            "@rollup/pluginutils": ["5.0.2_rollup@3.2.5"],
+            "@rollup/plugin-commonjs": ["23.0.7_rollup@3.10.0"],
+            "@rollup/pluginutils": ["5.0.2_rollup@3.10.0"],
             "commondir": ["1.0.1"],
             "estree-walker": ["2.0.2"],
             "glob": ["8.0.3"],
             "is-reference": ["1.2.1"],
-            "magic-string": ["0.26.7"],
-            "rollup": ["3.2.5"],
+            "magic-string": ["0.27.0"],
+            "rollup": ["3.10.0"],
             "fsevents": ["2.3.2"],
-            "sourcemap-codec": ["1.4.8"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
             "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "fs.realpath": ["1.0.0"],
             "inflight": ["1.0.6"],
@@ -2083,53 +1984,27 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.0__rollup_2.79.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/worker/src": ["@rollup/plugin-json"],
-        },
-        package = "@rollup/plugin-json",
-        version = "5.0.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-LsWDA5wJs/ggzakVuKQhZo7HPRcQZgBa3jWIVxQSFxaRToUGNi8ZBh3+k/gQ+1eInVYJgn4WBRCUkmoDrmmGzw==",
-        deps = {
-            "@rollup/pluginutils": "4.2.1",
-            "rollup": "2.79.1",
-        },
-        transitive_closure = {
-            "@rollup/plugin-json": ["5.0.0_rollup@2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
-            "rollup": ["2.79.1"],
-            "fsevents": ["2.3.2"],
-            "estree-walker": ["2.0.2"],
-            "picomatch": ["2.3.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.1__rollup_3.2.5",
+        name = "npm__at_rollup_plugin-json__5.0.2__rollup_3.10.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-json"],
+            "js/private/worker/src": ["@rollup/plugin-json"],
         },
         package = "@rollup/plugin-json",
-        version = "5.0.1_rollup@3.2.5",
-        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.1.tgz",
+        version = "5.0.2_rollup@3.10.0",
+        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.2.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-QCwhZZLvM8nRcTHyR1vOgyTMiAnjiNj1ebD/BMRvbO1oc/z14lZH6PfxXeegee2B6mky/u9fia4fxRM4TqrUaw==",
+        integrity = "sha512-D1CoOT2wPvadWLhVcmpkDnesTzjhNIQRWLsc3fA49IFOP2Y84cFOOJ+nKGYedvXHKUsPeq07HR4hXpBBr+CHlA==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup@3.2.5",
-            "rollup": "3.2.5",
+            "@rollup/pluginutils": "5.0.2_rollup@3.10.0",
+            "rollup": "3.10.0",
         },
         transitive_closure = {
-            "@rollup/plugin-json": ["5.0.1_rollup@3.2.5"],
-            "@rollup/pluginutils": ["5.0.2_rollup@3.2.5"],
-            "rollup": ["3.2.5"],
+            "@rollup/plugin-json": ["5.0.2_rollup@3.10.0"],
+            "@rollup/pluginutils": ["5.0.2_rollup@3.10.0"],
+            "rollup": ["3.10.0"],
             "fsevents": ["2.3.2"],
             "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "estree-walker": ["2.0.2"],
@@ -2138,79 +2013,37 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.0__rollup_2.79.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/worker/src": ["@rollup/plugin-node-resolve"],
-        },
-        package = "@rollup/plugin-node-resolve",
-        version = "15.0.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.0.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-iwJbzfTzlzDDQcGmkS7EkCKwe2kSkdBrjX87Fy/KrNjr6UNnLpod0t6X66e502LRe5JJCA4FFqrEscWPnZAkig==",
-        deps = {
-            "@rollup/pluginutils": "4.2.1",
-            "@types/resolve": "registry.npmjs.org/@types/resolve/1.20.2",
-            "deepmerge": "4.2.2",
-            "is-builtin-module": "3.2.0",
-            "is-module": "1.0.0",
-            "resolve": "1.22.1",
-            "rollup": "2.79.1",
-        },
-        transitive_closure = {
-            "@rollup/plugin-node-resolve": ["15.0.0_rollup@2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
-            "@types/resolve": ["registry.npmjs.org/@types/resolve/1.20.2"],
-            "deepmerge": ["4.2.2"],
-            "is-builtin-module": ["3.2.0"],
-            "is-module": ["1.0.0"],
-            "resolve": ["1.22.1"],
-            "rollup": ["2.79.1"],
-            "fsevents": ["2.3.2"],
-            "is-core-module": ["2.9.0"],
-            "path-parse": ["1.0.7"],
-            "supports-preserve-symlinks-flag": ["1.0.0"],
-            "has": ["1.0.3"],
-            "function-bind": ["1.1.1"],
-            "builtin-modules": ["3.3.0"],
-            "estree-walker": ["2.0.2"],
-            "picomatch": ["2.3.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.1__rollup_3.2.5",
+        name = "npm__at_rollup_plugin-node-resolve__15.0.1__rollup_3.10.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
+            "js/private/worker/src": ["@rollup/plugin-node-resolve"],
         },
         package = "@rollup/plugin-node-resolve",
-        version = "15.0.1_rollup@3.2.5",
+        version = "15.0.1_rollup@3.10.0",
         url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.0.1.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
         integrity = "sha512-ReY88T7JhJjeRVbfCyNj+NXAG3IIsVMsX9b5/9jC98dRP8/yxlZdz7mHZbHk5zHr24wZZICS5AcXsFZAXYUQEg==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup@3.2.5",
+            "@rollup/pluginutils": "5.0.2_rollup@3.10.0",
             "@types/resolve": "registry.npmjs.org/@types/resolve/1.20.2",
             "deepmerge": "4.2.2",
             "is-builtin-module": "3.2.0",
             "is-module": "1.0.0",
             "resolve": "1.22.1",
-            "rollup": "3.2.5",
+            "rollup": "3.10.0",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["15.0.1_rollup@3.2.5"],
-            "@rollup/pluginutils": ["5.0.2_rollup@3.2.5"],
+            "@rollup/plugin-node-resolve": ["15.0.1_rollup@3.10.0"],
+            "@rollup/pluginutils": ["5.0.2_rollup@3.10.0"],
             "@types/resolve": ["registry.npmjs.org/@types/resolve/1.20.2"],
             "deepmerge": ["4.2.2"],
             "is-builtin-module": ["3.2.0"],
             "is-module": ["1.0.0"],
             "resolve": ["1.22.1"],
-            "rollup": ["3.2.5"],
+            "rollup": ["3.10.0"],
             "fsevents": ["2.3.2"],
             "is-core-module": ["2.9.0"],
             "path-parse": ["1.0.7"],
@@ -2225,27 +2058,27 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-terser__0.2.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-terser__0.3.0__rollup_3.10.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["@rollup/plugin-terser"],
         },
         package = "@rollup/plugin-terser",
-        version = "0.2.0_rollup@2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-terser/-/plugin-terser-0.2.0.tgz",
+        version = "0.3.0_rollup@3.10.0",
+        url = "https://registry.npmjs.org/@rollup/plugin-terser/-/plugin-terser-0.3.0.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-UBr4WNXBFipKW2C2db9JIzIdq9bFZsaTZwKeAd9Y0N9Pv9G2XgRhaimGdotx1+Wf/2XTuTJ+FVS2SO+y2WyiUQ==",
+        integrity = "sha512-mYTkNW9KjOscS/3QWU5LfOKsR3/fAAVDaqcAe2TZ7ng6pN46f+C7FOZbITuIW/neA+PhcjoKl7yMyB3XcmA4gw==",
         deps = {
-            "rollup": "2.79.1",
+            "rollup": "3.10.0",
             "serialize-javascript": "6.0.0",
             "smob": "0.0.6",
             "terser": "5.15.1",
         },
         transitive_closure = {
-            "@rollup/plugin-terser": ["0.2.0_rollup@2.79.1"],
-            "rollup": ["2.79.1"],
+            "@rollup/plugin-terser": ["0.3.0_rollup@3.10.0"],
+            "rollup": ["3.10.0"],
             "serialize-javascript": ["6.0.0"],
             "smob": ["0.0.6"],
             "terser": ["5.15.1"],
@@ -2267,30 +2100,30 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-typescript__10.0.1__sbiskyiysxhldmns7rmnvoiszu",
+        name = "npm__at_rollup_plugin-typescript__10.0.1__6xbyoujvh6bzbrau3o3neoxpya",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["@rollup/plugin-typescript"],
         },
         package = "@rollup/plugin-typescript",
-        version = "10.0.1_sbiskyiysxhldmns7rmnvoiszu",
+        version = "10.0.1_6xbyoujvh6bzbrau3o3neoxpya",
         url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-10.0.1.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
         integrity = "sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup@2.79.1",
+            "@rollup/pluginutils": "5.0.2_rollup@3.10.0",
             "resolve": "1.22.1",
-            "rollup": "2.79.1",
+            "rollup": "3.10.0",
             "tslib": "2.4.1",
             "typescript": "4.9.4",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": ["10.0.1_sbiskyiysxhldmns7rmnvoiszu"],
-            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
+            "@rollup/plugin-typescript": ["10.0.1_6xbyoujvh6bzbrau3o3neoxpya"],
+            "@rollup/pluginutils": ["5.0.2_rollup@3.10.0"],
             "resolve": ["1.22.1"],
-            "rollup": ["2.79.1"],
+            "rollup": ["3.10.0"],
             "tslib": ["2.4.1"],
             "typescript": ["4.9.4"],
             "fsevents": ["2.3.2"],
@@ -2333,34 +2166,12 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__4.2.1",
+        name = "npm__at_rollup_pluginutils__5.0.2__rollup_3.10.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@rollup/pluginutils",
-        version = "4.2.1",
-        url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-4.2.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==",
-        deps = {
-            "estree-walker": "2.0.2",
-            "picomatch": "2.3.1",
-        },
-        transitive_closure = {
-            "@rollup/pluginutils": ["4.2.1"],
-            "estree-walker": ["2.0.2"],
-            "picomatch": ["2.3.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_pluginutils__5.0.2__rollup_2.79.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@rollup/pluginutils",
-        version = "5.0.2_rollup@2.79.1",
+        version = "5.0.2_rollup@3.10.0",
         url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-5.0.2.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
@@ -2369,41 +2180,14 @@ def npm_repositories():
             "@types/estree": "registry.npmjs.org/@types/estree/1.0.0",
             "estree-walker": "2.0.2",
             "picomatch": "2.3.1",
-            "rollup": "2.79.1",
+            "rollup": "3.10.0",
         },
         transitive_closure = {
-            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
+            "@rollup/pluginutils": ["5.0.2_rollup@3.10.0"],
             "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "estree-walker": ["2.0.2"],
             "picomatch": ["2.3.1"],
-            "rollup": ["2.79.1"],
-            "fsevents": ["2.3.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_pluginutils__5.0.2__rollup_3.2.5",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@rollup/pluginutils",
-        version = "5.0.2_rollup@3.2.5",
-        url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-5.0.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==",
-        deps = {
-            "@types/estree": "registry.npmjs.org/@types/estree/1.0.0",
-            "estree-walker": "2.0.2",
-            "picomatch": "2.3.1",
-            "rollup": "3.2.5",
-        },
-        transitive_closure = {
-            "@rollup/pluginutils": ["5.0.2_rollup@3.2.5"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
-            "estree-walker": ["2.0.2"],
-            "picomatch": ["2.3.1"],
-            "rollup": ["3.2.5"],
+            "rollup": ["3.10.0"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -5070,12 +4854,12 @@ def npm_repositories():
             "ansi-styles": ["4.3.0"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
-            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@jridgewell/trace-mapping": ["0.3.17"],
             "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
             "convert-source-map": ["1.8.0"],
             "safe-buffer": ["5.1.2"],
-            "@jridgewell/resolve-uri": ["3.0.7"],
-            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "@jridgewell/resolve-uri": ["3.1.0"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
             "glob": ["7.2.3"],
             "minimatch": ["3.1.2"],
             "brace-expansion": ["1.1.11"],
@@ -12389,22 +12173,22 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__magic-string__0.26.7",
+        name = "npm__magic-string__0.27.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "magic-string",
-        version = "0.26.7",
-        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.27.0.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==",
+        integrity = "sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==",
         deps = {
-            "sourcemap-codec": "1.4.8",
+            "@jridgewell/sourcemap-codec": "1.4.14",
         },
         transitive_closure = {
-            "magic-string": ["0.26.7"],
-            "sourcemap-codec": ["1.4.8"],
+            "magic-string": ["0.27.0"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
         },
     )
 
@@ -17578,45 +17362,24 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__rollup__2.79.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/worker/src": ["rollup"],
-        },
-        package = "rollup",
-        version = "2.79.1",
-        url = "https://registry.npmjs.org/rollup/-/rollup-2.79.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==",
-        deps = {
-            "fsevents": "2.3.2",
-        },
-        transitive_closure = {
-            "rollup": ["2.79.1"],
-            "fsevents": ["2.3.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__rollup__3.2.5",
+        name = "npm__rollup__3.10.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["rollup"],
+            "js/private/worker/src": ["rollup"],
         },
         package = "rollup",
-        version = "3.2.5",
-        url = "https://registry.npmjs.org/rollup/-/rollup-3.2.5.tgz",
+        version = "3.10.0",
+        url = "https://registry.npmjs.org/rollup/-/rollup-3.10.0.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-/Ha7HhVVofduy+RKWOQJrxe4Qb3xyZo+chcpYiD8SoQa4AG7llhupUtyfKSSrdBM2mWJjhM8wZwmbY23NmlIYw==",
+        integrity = "sha512-JmRYz44NjC1MjVF2VKxc0M1a97vn+cDxeqWmnwyAF4FvpjK8YFdHpaqvQB+3IxCvX05vJxKZkoMDU8TShhmJVA==",
         deps = {
             "fsevents": "2.3.2",
         },
         transitive_closure = {
-            "rollup": ["3.2.5"],
+            "rollup": ["3.10.0"],
             "fsevents": ["2.3.2"],
         },
     )
@@ -20343,18 +20106,18 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-74Y4LqY74kLE6IFyIjPtkSTWzUZmj8tdHT9Ii/26dvQ6K9Dl2NbEfj0XgU2sHCtKgt5VupqhlO/5aWuqS+IY1w==",
         deps = {
-            "@jridgewell/trace-mapping": "0.3.13",
+            "@jridgewell/trace-mapping": "0.3.17",
             "@types/istanbul-lib-coverage": "registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4",
             "convert-source-map": "1.8.0",
         },
         transitive_closure = {
             "v8-to-istanbul": ["9.0.1"],
-            "@jridgewell/trace-mapping": ["0.3.13"],
+            "@jridgewell/trace-mapping": ["0.3.17"],
             "@types/istanbul-lib-coverage": ["registry.npmjs.org/@types/istanbul-lib-coverage/2.0.4"],
             "convert-source-map": ["1.8.0"],
             "safe-buffer": ["5.1.2"],
-            "@jridgewell/resolve-uri": ["3.0.7"],
-            "@jridgewell/sourcemap-codec": ["1.4.13"],
+            "@jridgewell/resolve-uri": ["3.1.0"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
         },
     )
 

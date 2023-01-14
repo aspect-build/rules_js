@@ -14,9 +14,16 @@ var require$$12 = require('module');
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function getAugmentedNamespace(n) {
+  if (n.__esModule) return n;
   var f = n.default;
 	if (typeof f == "function") {
-		var a = function () {
+		var a = function a () {
+			if (this instanceof a) {
+				var args = [null];
+				args.push.apply(args, arguments);
+				var Ctor = Function.bind.apply(f, args);
+				return new Ctor();
+			}
 			return f.apply(this, arguments);
 		};
 		a.prototype = f.prototype;
@@ -1628,14 +1635,22 @@ function regExpEscape (s) {
   return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-var inherits = {exports: {}};
+var inheritsExports = {};
+var inherits = {
+  get exports(){ return inheritsExports; },
+  set exports(v){ inheritsExports = v; },
+};
 
-var inherits_browser = {exports: {}};
+var inherits_browserExports = {};
+var inherits_browser = {
+  get exports(){ return inherits_browserExports; },
+  set exports(v){ inherits_browserExports = v; },
+};
 
 var hasRequiredInherits_browser;
 
 function requireInherits_browser () {
-	if (hasRequiredInherits_browser) return inherits_browser.exports;
+	if (hasRequiredInherits_browser) return inherits_browserExports;
 	hasRequiredInherits_browser = 1;
 	if (typeof Object.create === 'function') {
 	  // implementation from standard node.js 'util' module
@@ -1664,7 +1679,7 @@ function requireInherits_browser () {
 	    }
 	  };
 	}
-	return inherits_browser.exports;
+	return inherits_browserExports;
 }
 
 (function (module) {
@@ -1679,7 +1694,11 @@ function requireInherits_browser () {
 	}
 } (inherits));
 
-var pathIsAbsolute = {exports: {}};
+var pathIsAbsoluteExports = {};
+var pathIsAbsolute = {
+  get exports(){ return pathIsAbsoluteExports; },
+  set exports(v){ pathIsAbsoluteExports = v; },
+};
 
 function posix(path) {
 	return path.charAt(0) === '/';
@@ -1697,8 +1716,8 @@ function win32(path) {
 }
 
 pathIsAbsolute.exports = process.platform === 'win32' ? win32 : posix;
-pathIsAbsolute.exports.posix = posix;
-pathIsAbsolute.exports.win32 = win32;
+pathIsAbsoluteExports.posix = posix;
+pathIsAbsoluteExports.win32 = win32;
 
 var common = {};
 
@@ -1717,7 +1736,7 @@ function ownProp (obj, field) {
 var fs$3 = require$$0$1;
 var path$4 = require$$0;
 var minimatch$1 = minimatch_1;
-var isAbsolute$2 = pathIsAbsolute.exports;
+var isAbsolute$2 = pathIsAbsoluteExports;
 var Minimatch = minimatch$1.Minimatch;
 
 function alphasort (a, b) {
@@ -1956,7 +1975,7 @@ function requireSync () {
 	requireGlob().Glob;
 	var path = require$$0;
 	var assert = require$$5;
-	var isAbsolute = pathIsAbsolute.exports;
+	var isAbsolute = pathIsAbsoluteExports;
 	var common$1 = common;
 	var setopts = common$1.setopts;
 	var ownProp = common$1.ownProp;
@@ -2465,11 +2484,15 @@ function wrappy$2 (fn, cb) {
   }
 }
 
-var once$2 = {exports: {}};
+var onceExports = {};
+var once$2 = {
+  get exports(){ return onceExports; },
+  set exports(v){ onceExports = v; },
+};
 
 var wrappy$1 = wrappy_1;
 once$2.exports = wrappy$1(once$1);
-once$2.exports.strict = wrappy$1(onceStrict);
+onceExports.strict = wrappy$1(onceStrict);
 
 once$1.proto = once$1(function () {
   Object.defineProperty(Function.prototype, 'once', {
@@ -2512,7 +2535,7 @@ function onceStrict (fn) {
 
 var wrappy = wrappy_1;
 var reqs = Object.create(null);
-var once = once$2.exports;
+var once = onceExports;
 
 var inflight_1 = wrappy(inflight);
 
@@ -2616,11 +2639,11 @@ function requireGlob () {
 	var rp = fs_realpath;
 	var minimatch = minimatch_1;
 	minimatch.Minimatch;
-	var inherits$1 = inherits.exports;
+	var inherits = inheritsExports;
 	var EE = require$$3.EventEmitter;
 	var path = require$$0;
 	var assert = require$$5;
-	var isAbsolute = pathIsAbsolute.exports;
+	var isAbsolute = pathIsAbsoluteExports;
 	var globSync = requireSync();
 	var common$1 = common;
 	var setopts = common$1.setopts;
@@ -2629,7 +2652,7 @@ function requireGlob () {
 	var childrenIgnored = common$1.childrenIgnored;
 	var isIgnored = common$1.isIgnored;
 
-	var once = once$2.exports;
+	var once = onceExports;
 
 	function glob (pattern, options, cb) {
 	  if (typeof options === 'function') cb = options, options = {};
@@ -2685,7 +2708,7 @@ function requireGlob () {
 	};
 
 	glob.Glob = Glob;
-	inherits$1(Glob, EE);
+	inherits(Glob, EE);
 	function Glob (pattern, options, cb) {
 	  if (typeof options === 'function') {
 	    cb = options;
@@ -3855,7 +3878,11 @@ var schema = {
 	)
 };
 
-var isOutsideDir$1 = {exports: {}};
+var isOutsideDirExports = {};
+var isOutsideDir$1 = {
+  get exports(){ return isOutsideDirExports; },
+  set exports(v){ isOutsideDirExports = v; },
+};
 
 var isOutsideDirWin32;
 var hasRequiredIsOutsideDirWin32;
@@ -3904,7 +3931,7 @@ const { promisify: promisify$1 } = require$$2;
 const glob = promisify$1(requireGlob());
 const minimatch = minimatch_1;
 const { defaults } = schema;
-const isOutsideDir = isOutsideDir$1.exports;
+const isOutsideDir = isOutsideDirExports;
 
 class TestExclude {
     constructor(opts = {}) {
@@ -4059,7 +4086,11 @@ function getExtensionPattern(extension) {
 
 var testExclude = TestExclude;
 
-var istanbulLibCoverage = {exports: {}};
+var istanbulLibCoverageExports = {};
+var istanbulLibCoverage = {
+  get exports(){ return istanbulLibCoverageExports; },
+  set exports(v){ istanbulLibCoverageExports = v; },
+};
 
 /*
  Copyright 2012-2015, Yahoo Inc.
@@ -4735,16 +4766,24 @@ istanbulLibCoverage.exports = {
 };
 
 /** classes exported for reuse */
-istanbulLibCoverage.exports.classes = {
+istanbulLibCoverageExports.classes = {
     /**
      * the file coverage constructor
      */
     FileCoverage
 };
 
-var makeDir$1 = {exports: {}};
+var makeDirExports = {};
+var makeDir$1 = {
+  get exports(){ return makeDirExports; },
+  set exports(v){ makeDirExports = v; },
+};
 
-var semver$1 = {exports: {}};
+var semverExports = {};
+var semver$1 = {
+  get exports(){ return semverExports; },
+  set exports(v){ semverExports = v; },
+};
 
 (function (module, exports) {
 	exports = module.exports = SemVer;
@@ -6343,12 +6382,12 @@ var semver$1 = {exports: {}};
 	    '.' + (match[3] || '0') +
 	    '.' + (match[4] || '0'), options)
 	}
-} (semver$1, semver$1.exports));
+} (semver$1, semverExports));
 
 const fs$2 = require$$0$1;
 const path$2 = require$$0;
 const {promisify} = require$$2;
-const semver = semver$1.exports;
+const semver = semverExports;
 
 const useNativeRecursiveOption = semver.satisfies(process.version, '>=10.12.0');
 
@@ -6450,7 +6489,7 @@ const makeDir = async (input, options) => {
 
 makeDir$1.exports = makeDir;
 
-makeDir$1.exports.sync = (input, options) => {
+makeDirExports.sync = (input, options) => {
 	checkPath(input);
 	options = processOptions(options);
 
@@ -6649,7 +6688,7 @@ var supportsColor_1 = {
  */
 const path$1 = require$$0;
 const fs$1 = require$$0$1;
-const mkdirp = makeDir$1.exports;
+const mkdirp = makeDirExports;
 const supportsColor = supportsColor_1;
 
 /**
@@ -7248,7 +7287,7 @@ Path$1.tester = {
  Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
  */
 
-const coverage = istanbulLibCoverage.exports;
+const coverage = istanbulLibCoverageExports;
 const Path = path_1;
 const { BaseNode, BaseTree } = tree$1;
 
@@ -7926,7 +7965,11 @@ var sourceMapFromFile_1 = getSourceMapFromFile$1;
 
 var convertSourceMap$1 = {};
 
-var safeBuffer = {exports: {}};
+var safeBufferExports = {};
+var safeBuffer = {
+  get exports(){ return safeBufferExports; },
+  set exports(v){ safeBufferExports = v; },
+};
 
 /* eslint-disable node/no-deprecated-api */
 
@@ -7992,12 +8035,12 @@ var safeBuffer = {exports: {}};
 	  }
 	  return buffer.SlowBuffer(size)
 	};
-} (safeBuffer, safeBuffer.exports));
+} (safeBuffer, safeBufferExports));
 
 (function (exports) {
 	var fs = require$$0$1;
 	var path = require$$0;
-	var SafeBuffer = safeBuffer.exports;
+	var SafeBuffer = safeBufferExports;
 
 	Object.defineProperty(exports, 'commentRegex', {
 	  get: function getCommentRegex () {
@@ -8296,14 +8339,22 @@ function requireRange () {
 	return range;
 }
 
-var traceMapping_umd = {exports: {}};
+var traceMapping_umdExports = {};
+var traceMapping_umd = {
+  get exports(){ return traceMapping_umdExports; },
+  set exports(v){ traceMapping_umdExports = v; },
+};
 
-var sourcemapCodec_umd = {exports: {}};
+var sourcemapCodec_umdExports = {};
+var sourcemapCodec_umd = {
+  get exports(){ return sourcemapCodec_umdExports; },
+  set exports(v){ sourcemapCodec_umdExports = v; },
+};
 
 var hasRequiredSourcemapCodec_umd;
 
 function requireSourcemapCodec_umd () {
-	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umd.exports;
+	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umdExports;
 	hasRequiredSourcemapCodec_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
@@ -8478,16 +8529,20 @@ function requireSourcemapCodec_umd () {
 
 		}));
 		
-} (sourcemapCodec_umd, sourcemapCodec_umd.exports));
-	return sourcemapCodec_umd.exports;
+} (sourcemapCodec_umd, sourcemapCodec_umdExports));
+	return sourcemapCodec_umdExports;
 }
 
-var resolveUri_umd = {exports: {}};
+var resolveUri_umdExports = {};
+var resolveUri_umd = {
+  get exports(){ return resolveUri_umdExports; },
+  set exports(v){ resolveUri_umdExports = v; },
+};
 
 var hasRequiredResolveUri_umd;
 
 function requireResolveUri_umd () {
-	if (hasRequiredResolveUri_umd) return resolveUri_umd.exports;
+	if (hasRequiredResolveUri_umd) return resolveUri_umdExports;
 	hasRequiredResolveUri_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
@@ -8502,16 +8557,30 @@ function requireResolveUri_umd () {
 		     * 3. Host, guaranteed.
 		     * 4. Port, including ":", optional.
 		     * 5. Path, including "/", optional.
+		     * 6. Query, including "?", optional.
+		     * 7. Hash, including "#", optional.
 		     */
-		    const urlRegex = /^([\w+.-]+:)\/\/([^@/#?]*@)?([^:/#?]*)(:\d+)?(\/[^#?]*)?/;
+		    const urlRegex = /^([\w+.-]+:)\/\/([^@/#?]*@)?([^:/#?]*)(:\d+)?(\/[^#?]*)?(\?[^#]*)?(#.*)?/;
 		    /**
 		     * File URLs are weird. They dont' need the regular `//` in the scheme, they may or may not start
 		     * with a leading `/`, they can have a domain (but only if they don't start with a Windows drive).
 		     *
 		     * 1. Host, optional.
-		     * 2. Path, which may inclue "/", guaranteed.
+		     * 2. Path, which may include "/", guaranteed.
+		     * 3. Query, including "?", optional.
+		     * 4. Hash, including "#", optional.
 		     */
-		    const fileRegex = /^file:(?:\/\/((?![a-z]:)[^/]*)?)?(\/?.*)/i;
+		    const fileRegex = /^file:(?:\/\/((?![a-z]:)[^/#?]*)?)?(\/?[^#?]*)(\?[^#]*)?(#.*)?/i;
+		    var UrlType;
+		    (function (UrlType) {
+		        UrlType[UrlType["Empty"] = 1] = "Empty";
+		        UrlType[UrlType["Hash"] = 2] = "Hash";
+		        UrlType[UrlType["Query"] = 3] = "Query";
+		        UrlType[UrlType["RelativePath"] = 4] = "RelativePath";
+		        UrlType[UrlType["AbsolutePath"] = 5] = "AbsolutePath";
+		        UrlType[UrlType["SchemeRelative"] = 6] = "SchemeRelative";
+		        UrlType[UrlType["Absolute"] = 7] = "Absolute";
+		    })(UrlType || (UrlType = {}));
 		    function isAbsoluteUrl(input) {
 		        return schemeRegex.test(input);
 		    }
@@ -8524,35 +8593,42 @@ function requireResolveUri_umd () {
 		    function isFileUrl(input) {
 		        return input.startsWith('file:');
 		    }
+		    function isRelative(input) {
+		        return /^[.?#]/.test(input);
+		    }
 		    function parseAbsoluteUrl(input) {
 		        const match = urlRegex.exec(input);
-		        return makeUrl(match[1], match[2] || '', match[3], match[4] || '', match[5] || '/');
+		        return makeUrl(match[1], match[2] || '', match[3], match[4] || '', match[5] || '/', match[6] || '', match[7] || '');
 		    }
 		    function parseFileUrl(input) {
 		        const match = fileRegex.exec(input);
 		        const path = match[2];
-		        return makeUrl('file:', '', match[1] || '', '', isAbsolutePath(path) ? path : '/' + path);
+		        return makeUrl('file:', '', match[1] || '', '', isAbsolutePath(path) ? path : '/' + path, match[3] || '', match[4] || '');
 		    }
-		    function makeUrl(scheme, user, host, port, path) {
+		    function makeUrl(scheme, user, host, port, path, query, hash) {
 		        return {
 		            scheme,
 		            user,
 		            host,
 		            port,
 		            path,
-		            relativePath: false,
+		            query,
+		            hash,
+		            type: UrlType.Absolute,
 		        };
 		    }
 		    function parseUrl(input) {
 		        if (isSchemeRelativeUrl(input)) {
 		            const url = parseAbsoluteUrl('http:' + input);
 		            url.scheme = '';
+		            url.type = UrlType.SchemeRelative;
 		            return url;
 		        }
 		        if (isAbsolutePath(input)) {
 		            const url = parseAbsoluteUrl('http://foo.com' + input);
 		            url.scheme = '';
 		            url.host = '';
+		            url.type = UrlType.AbsolutePath;
 		            return url;
 		        }
 		        if (isFileUrl(input))
@@ -8562,7 +8638,13 @@ function requireResolveUri_umd () {
 		        const url = parseAbsoluteUrl('http://foo.com/' + input);
 		        url.scheme = '';
 		        url.host = '';
-		        url.relativePath = true;
+		        url.type = input
+		            ? input.startsWith('?')
+		                ? UrlType.Query
+		                : input.startsWith('#')
+		                    ? UrlType.Hash
+		                    : UrlType.RelativePath
+		            : UrlType.Empty;
 		        return url;
 		    }
 		    function stripPathFilename(path) {
@@ -8574,10 +8656,7 @@ function requireResolveUri_umd () {
 		        return path.slice(0, index + 1);
 		    }
 		    function mergePaths(url, base) {
-		        // If we're not a relative path, then we're an absolute path, and it doesn't matter what base is.
-		        if (!url.relativePath)
-		            return;
-		        normalizePath(base);
+		        normalizePath(base, base.type);
 		        // If the path is just a "/", then it was an empty path to begin with (remember, we're a relative
 		        // path).
 		        if (url.path === '/') {
@@ -8587,15 +8666,13 @@ function requireResolveUri_umd () {
 		            // Resolution happens relative to the base path's directory, not the file.
 		            url.path = stripPathFilename(base.path) + url.path;
 		        }
-		        // If the base path is absolute, then our path is now absolute too.
-		        url.relativePath = base.relativePath;
 		    }
 		    /**
 		     * The path can have empty directories "//", unneeded parents "foo/..", or current directory
 		     * "foo/.". We need to normalize to a standard representation.
 		     */
-		    function normalizePath(url) {
-		        const { relativePath } = url;
+		    function normalizePath(url, type) {
+		        const rel = type <= UrlType.RelativePath;
 		        const pieces = url.path.split('/');
 		        // We need to preserve the first piece always, so that we output a leading slash. The item at
 		        // pieces[0] is an empty string.
@@ -8627,7 +8704,7 @@ function requireResolveUri_umd () {
 		                    positive--;
 		                    pointer--;
 		                }
-		                else if (relativePath) {
+		                else if (rel) {
 		                    // If we're in a relativePath, then we need to keep the excess parents. Else, in an absolute
 		                    // URL, protocol relative URL, or an absolute path, we don't need to keep excess.
 		                    pieces[pointer++] = piece;
@@ -8655,37 +8732,60 @@ function requireResolveUri_umd () {
 		        if (!input && !base)
 		            return '';
 		        const url = parseUrl(input);
-		        // If we have a base, and the input isn't already an absolute URL, then we need to merge.
-		        if (base && !url.scheme) {
+		        let inputType = url.type;
+		        if (base && inputType !== UrlType.Absolute) {
 		            const baseUrl = parseUrl(base);
-		            url.scheme = baseUrl.scheme;
-		            // If there's no host, then we were just a path.
-		            if (!url.host) {
-		                // The host, user, and port are joined, you can't copy one without the others.
-		                url.user = baseUrl.user;
-		                url.host = baseUrl.host;
-		                url.port = baseUrl.port;
+		            const baseType = baseUrl.type;
+		            switch (inputType) {
+		                case UrlType.Empty:
+		                    url.hash = baseUrl.hash;
+		                // fall through
+		                case UrlType.Hash:
+		                    url.query = baseUrl.query;
+		                // fall through
+		                case UrlType.Query:
+		                case UrlType.RelativePath:
+		                    mergePaths(url, baseUrl);
+		                // fall through
+		                case UrlType.AbsolutePath:
+		                    // The host, user, and port are joined, you can't copy one without the others.
+		                    url.user = baseUrl.user;
+		                    url.host = baseUrl.host;
+		                    url.port = baseUrl.port;
+		                // fall through
+		                case UrlType.SchemeRelative:
+		                    // The input doesn't have a schema at least, so we need to copy at least that over.
+		                    url.scheme = baseUrl.scheme;
 		            }
-		            mergePaths(url, baseUrl);
+		            if (baseType > inputType)
+		                inputType = baseType;
 		        }
-		        normalizePath(url);
-		        // If the input (and base, if there was one) are both relative, then we need to output a relative.
-		        if (url.relativePath) {
-		            // The first char is always a "/".
-		            const path = url.path.slice(1);
-		            if (!path)
-		                return '.';
-		            // If base started with a leading ".", or there is no base and input started with a ".", then we
-		            // need to ensure that the relative path starts with a ".". We don't know if relative starts
-		            // with a "..", though, so check before prepending.
-		            const keepRelative = (base || input).startsWith('.');
-		            return !keepRelative || path.startsWith('.') ? path : './' + path;
+		        normalizePath(url, inputType);
+		        const queryHash = url.query + url.hash;
+		        switch (inputType) {
+		            // This is impossible, because of the empty checks at the start of the function.
+		            // case UrlType.Empty:
+		            case UrlType.Hash:
+		            case UrlType.Query:
+		                return queryHash;
+		            case UrlType.RelativePath: {
+		                // The first char is always a "/", and we need it to be relative.
+		                const path = url.path.slice(1);
+		                if (!path)
+		                    return queryHash || '.';
+		                if (isRelative(base || input) && !isRelative(path)) {
+		                    // If base started with a leading ".", or there is no base and input started with a ".",
+		                    // then we need to ensure that the relative path starts with a ".". We don't know if
+		                    // relative starts with a "..", though, so check before prepending.
+		                    return './' + path + queryHash;
+		                }
+		                return path + queryHash;
+		            }
+		            case UrlType.AbsolutePath:
+		                return url.path + queryHash;
+		            default:
+		                return url.scheme + '//' + url.user + url.host + url.port + url.path + queryHash;
 		        }
-		        // If there's no host (and no scheme/user/port), then we need to output an absolute path.
-		        if (!url.scheme && !url.host)
-		            return url.path;
-		        // We're outputting either an absolute URL, or a protocol relative one.
-		        return `${url.scheme}//${url.user}${url.host}${url.port}${url.path}`;
 		    }
 
 		    return resolve;
@@ -8693,13 +8793,13 @@ function requireResolveUri_umd () {
 		}));
 		
 } (resolveUri_umd));
-	return resolveUri_umd.exports;
+	return resolveUri_umdExports;
 }
 
 var hasRequiredTraceMapping_umd;
 
 function requireTraceMapping_umd () {
-	if (hasRequiredTraceMapping_umd) return traceMapping_umd.exports;
+	if (hasRequiredTraceMapping_umd) return traceMapping_umdExports;
 	hasRequiredTraceMapping_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
@@ -9018,13 +9118,13 @@ function requireTraceMapping_umd () {
 		     */
 		    exports.originalPositionFor = void 0;
 		    /**
-		     * Finds the source/line/column directly after the mapping returned by originalPositionFor, provided
-		     * the found mapping is from the same source and line as the originalPositionFor mapping.
-		     *
-		     * Eg, in the code `let id = 1`, `originalPositionAfter` could find the mapping associated with `1`
-		     * using the same needle that would return `id` when calling `originalPositionFor`.
+		     * Finds the generated line/column position of the provided source/line/column source position.
 		     */
 		    exports.generatedPositionFor = void 0;
+		    /**
+		     * Finds all generated line/column positions of the provided source/line/column source position.
+		     */
+		    exports.allGeneratedPositionsFor = void 0;
 		    /**
 		     * Iterates each mapping in generated position order.
 		     */
@@ -9050,9 +9150,6 @@ function requireTraceMapping_umd () {
 		    exports.encodedMap = void 0;
 		    class TraceMap {
 		        constructor(map, mapUrl) {
-		            this._decodedMemo = memoizedState();
-		            this._bySources = undefined;
-		            this._bySourceMemos = undefined;
 		            const isString = typeof map === 'string';
 		            if (!isString && map._decodedMemo)
 		                return map;
@@ -9075,6 +9172,9 @@ function requireTraceMapping_umd () {
 		                this._encoded = undefined;
 		                this._decoded = maybeSort(mappings, isString);
 		            }
+		            this._decodedMemo = memoizedState();
+		            this._bySources = undefined;
+		            this._bySourceMemos = undefined;
 		        }
 		    }
 		    (() => {
@@ -9091,7 +9191,9 @@ function requireTraceMapping_umd () {
 		            // mapping (like a "//# sourceMappingURL=") at the end of the child file.
 		            if (line >= decoded.length)
 		                return null;
-		            return traceSegmentInternal(decoded[line], map._decodedMemo, line, column, GREATEST_LOWER_BOUND);
+		            const segments = decoded[line];
+		            const index = traceSegmentInternal(segments, map._decodedMemo, line, column, GREATEST_LOWER_BOUND);
+		            return index === -1 ? null : segments[index];
 		        };
 		        exports.originalPositionFor = (map, { line, column, bias }) => {
 		            line--;
@@ -9104,35 +9206,22 @@ function requireTraceMapping_umd () {
 		            // mapping (like a "//# sourceMappingURL=") at the end of the child file.
 		            if (line >= decoded.length)
 		                return OMapping(null, null, null, null);
-		            const segment = traceSegmentInternal(decoded[line], map._decodedMemo, line, column, bias || GREATEST_LOWER_BOUND);
-		            if (segment == null)
+		            const segments = decoded[line];
+		            const index = traceSegmentInternal(segments, map._decodedMemo, line, column, bias || GREATEST_LOWER_BOUND);
+		            if (index === -1)
 		                return OMapping(null, null, null, null);
-		            if (segment.length == 1)
+		            const segment = segments[index];
+		            if (segment.length === 1)
 		                return OMapping(null, null, null, null);
 		            const { names, resolvedSources } = map;
 		            return OMapping(resolvedSources[segment[SOURCES_INDEX]], segment[SOURCE_LINE] + 1, segment[SOURCE_COLUMN], segment.length === 5 ? names[segment[NAMES_INDEX]] : null);
 		        };
+		        exports.allGeneratedPositionsFor = (map, { source, line, column, bias }) => {
+		            // SourceMapConsumer uses LEAST_UPPER_BOUND for some reason, so we follow suit.
+		            return generatedPosition(map, source, line, column, bias || LEAST_UPPER_BOUND, true);
+		        };
 		        exports.generatedPositionFor = (map, { source, line, column, bias }) => {
-		            line--;
-		            if (line < 0)
-		                throw new Error(LINE_GTR_ZERO);
-		            if (column < 0)
-		                throw new Error(COL_GTR_EQ_ZERO);
-		            const { sources, resolvedSources } = map;
-		            let sourceIndex = sources.indexOf(source);
-		            if (sourceIndex === -1)
-		                sourceIndex = resolvedSources.indexOf(source);
-		            if (sourceIndex === -1)
-		                return GMapping(null, null);
-		            const generated = (map._bySources || (map._bySources = buildBySources(exports.decodedMappings(map), (map._bySourceMemos = sources.map(memoizedState)))));
-		            const memos = map._bySourceMemos;
-		            const segments = generated[sourceIndex][line];
-		            if (segments == null)
-		                return GMapping(null, null);
-		            const segment = traceSegmentInternal(segments, memos[sourceIndex], line, column, bias || GREATEST_LOWER_BOUND);
-		            if (segment == null)
-		                return GMapping(null, null);
-		            return GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]);
+		            return generatedPosition(map, source, line, column, bias || GREATEST_LOWER_BOUND, false);
 		        };
 		        exports.eachMapping = (map, cb) => {
 		            const decoded = exports.decodedMappings(map);
@@ -9175,35 +9264,53 @@ function requireTraceMapping_umd () {
 		            return index === -1 ? null : sourcesContent[index];
 		        };
 		        exports.presortedDecodedMap = (map, mapUrl) => {
-		            const clone = Object.assign({}, map);
-		            clone.mappings = [];
-		            const tracer = new TraceMap(clone, mapUrl);
+		            const tracer = new TraceMap(clone(map, []), mapUrl);
 		            tracer._decoded = map.mappings;
 		            return tracer;
 		        };
 		        exports.decodedMap = (map) => {
-		            return {
-		                version: 3,
-		                file: map.file,
-		                names: map.names,
-		                sourceRoot: map.sourceRoot,
-		                sources: map.sources,
-		                sourcesContent: map.sourcesContent,
-		                mappings: exports.decodedMappings(map),
-		            };
+		            return clone(map, exports.decodedMappings(map));
 		        };
 		        exports.encodedMap = (map) => {
-		            return {
-		                version: 3,
-		                file: map.file,
-		                names: map.names,
-		                sourceRoot: map.sourceRoot,
-		                sources: map.sources,
-		                sourcesContent: map.sourcesContent,
-		                mappings: exports.encodedMappings(map),
-		            };
+		            return clone(map, exports.encodedMappings(map));
 		        };
+		        function generatedPosition(map, source, line, column, bias, all) {
+		            line--;
+		            if (line < 0)
+		                throw new Error(LINE_GTR_ZERO);
+		            if (column < 0)
+		                throw new Error(COL_GTR_EQ_ZERO);
+		            const { sources, resolvedSources } = map;
+		            let sourceIndex = sources.indexOf(source);
+		            if (sourceIndex === -1)
+		                sourceIndex = resolvedSources.indexOf(source);
+		            if (sourceIndex === -1)
+		                return all ? [] : GMapping(null, null);
+		            const generated = (map._bySources || (map._bySources = buildBySources(exports.decodedMappings(map), (map._bySourceMemos = sources.map(memoizedState)))));
+		            const segments = generated[sourceIndex][line];
+		            if (segments == null)
+		                return all ? [] : GMapping(null, null);
+		            const memo = map._bySourceMemos[sourceIndex];
+		            if (all)
+		                return sliceGeneratedPositions(segments, memo, line, column, bias);
+		            const index = traceSegmentInternal(segments, memo, line, column, bias);
+		            if (index === -1)
+		                return GMapping(null, null);
+		            const segment = segments[index];
+		            return GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]);
+		        }
 		    })();
+		    function clone(map, mappings) {
+		        return {
+		            version: map.version,
+		            file: map.file,
+		            names: map.names,
+		            sourceRoot: map.sourceRoot,
+		            sources: map.sources,
+		            sourcesContent: map.sourcesContent,
+		            mappings,
+		        };
+		    }
 		    function OMapping(source, line, column, name) {
 		        return { source, line, column, name };
 		    }
@@ -9218,8 +9325,35 @@ function requireTraceMapping_umd () {
 		        else if (bias === LEAST_UPPER_BOUND)
 		            index++;
 		        if (index === -1 || index === segments.length)
-		            return null;
-		        return segments[index];
+		            return -1;
+		        return index;
+		    }
+		    function sliceGeneratedPositions(segments, memo, line, column, bias) {
+		        let min = traceSegmentInternal(segments, memo, line, column, GREATEST_LOWER_BOUND);
+		        // We ignored the bias when tracing the segment so that we're guarnateed to find the first (in
+		        // insertion order) segment that matched. Even if we did respect the bias when tracing, we would
+		        // still need to call `lowerBound()` to find the first segment, which is slower than just looking
+		        // for the GREATEST_LOWER_BOUND to begin with. The only difference that matters for us is when the
+		        // binary search didn't match, in which case GREATEST_LOWER_BOUND just needs to increment to
+		        // match LEAST_UPPER_BOUND.
+		        if (!found && bias === LEAST_UPPER_BOUND)
+		            min++;
+		        if (min === -1 || min === segments.length)
+		            return [];
+		        // We may have found the segment that started at an earlier column. If this is the case, then we
+		        // need to slice all generated segments that match _that_ column, because all such segments span
+		        // to our desired column.
+		        const matchedColumn = found ? column : segments[min][COLUMN];
+		        // The binary search is not guaranteed to find the lower bound when a match wasn't found.
+		        if (!found)
+		            min = lowerBound(segments, matchedColumn, min);
+		        const max = upperBound(segments, matchedColumn, min);
+		        const result = [];
+		        for (; min <= max; min++) {
+		            const segment = segments[min];
+		            result.push(GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]));
+		        }
+		        return result;
 		    }
 
 		    exports.AnyMap = AnyMap;
@@ -9231,8 +9365,8 @@ function requireTraceMapping_umd () {
 
 		}));
 		
-} (traceMapping_umd, traceMapping_umd.exports));
-	return traceMapping_umd.exports;
+} (traceMapping_umd, traceMapping_umdExports));
+	return traceMapping_umdExports;
 }
 
 var source;
@@ -10611,27 +10745,27 @@ function nextChild(openRange, parentToNested) {
 
 var lib = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	emitForest: emitForest,
-	emitForestLines: emitForestLines,
-	parseFunctionRanges: parseFunctionRanges,
-	parseOffsets: parseOffsets,
+	RangeTree: RangeTree,
 	cloneFunctionCov: cloneFunctionCov,
 	cloneProcessCov: cloneProcessCov,
-	cloneScriptCov: cloneScriptCov,
 	cloneRangeCov: cloneRangeCov,
-	compareScriptCovs: compareScriptCovs,
+	cloneScriptCov: cloneScriptCov,
 	compareFunctionCovs: compareFunctionCovs,
 	compareRangeCovs: compareRangeCovs,
+	compareScriptCovs: compareScriptCovs,
+	emitForest: emitForest,
+	emitForestLines: emitForestLines,
 	mergeFunctionCovs: mergeFunctionCovs,
 	mergeProcessCovs: mergeProcessCovs,
 	mergeScriptCovs: mergeScriptCovs,
-	RangeTree: RangeTree
+	parseFunctionRanges: parseFunctionRanges,
+	parseOffsets: parseOffsets
 });
 
 var require$$11 = /*@__PURE__*/getAugmentedNamespace(lib);
 
 const Exclude = testExclude;
-const libCoverage = istanbulLibCoverage.exports;
+const libCoverage = istanbulLibCoverageExports;
 const libReport = istanbulLibReport;
 const reports = istanbulReports;
 const { readdirSync, readFileSync, statSync } = require$$0$1;
