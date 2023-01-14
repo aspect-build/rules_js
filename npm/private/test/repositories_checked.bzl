@@ -8568,48 +8568,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__execa__5.0.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "execa",
-        version = "5.0.0",
-        url = "https://registry.npmjs.org/execa/-/execa-5.0.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-ov6w/2LCiuyO4RLYGdpFGjkcs0wMTgGE8PrkTHikeUy5iJekXyPIKUjifk5CsE0pt7sMCrMZ3YNqoCj6idQOnQ==",
-        deps = {
-            "cross-spawn": "7.0.3",
-            "get-stream": "6.0.1",
-            "human-signals": "2.1.0",
-            "is-stream": "2.0.1",
-            "merge-stream": "2.0.0",
-            "npm-run-path": "4.0.1",
-            "onetime": "5.1.2",
-            "signal-exit": "3.0.7",
-            "strip-final-newline": "2.0.0",
-        },
-        transitive_closure = {
-            "execa": ["5.0.0"],
-            "cross-spawn": ["7.0.3"],
-            "get-stream": ["6.0.1"],
-            "human-signals": ["2.1.0"],
-            "is-stream": ["2.0.1"],
-            "merge-stream": ["2.0.0"],
-            "npm-run-path": ["4.0.1"],
-            "onetime": ["5.1.2"],
-            "signal-exit": ["3.0.7"],
-            "strip-final-newline": ["2.0.0"],
-            "mimic-fn": ["2.1.0"],
-            "path-key": ["3.1.1"],
-            "shebang-command": ["2.0.0"],
-            "which": ["2.0.2"],
-            "isexe": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-        },
-    )
-
-    npm_import(
         name = "npm__ext__1.6.0",
         root_package = "",
         link_workspace = "",
@@ -9027,6 +8985,32 @@ def npm_repositories():
         },
         transitive_closure = {
             "form-data": ["2.3.3"],
+            "asynckit": ["0.4.0"],
+            "combined-stream": ["1.0.8"],
+            "mime-types": ["2.1.35"],
+            "mime-db": ["1.52.0"],
+            "delayed-stream": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__form-data__2.5.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "form-data",
+        version = "2.5.1",
+        url = "https://registry.npmjs.org/form-data/-/form-data-2.5.1.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-m21N3WOmEEURgk6B9GLOE4RuWOFf28Lhh9qGYeNlGq4VDXUlJy2th2slBNU8Gp8EzloYZOibZJ7t5ecIrFSjVA==",
+        deps = {
+            "asynckit": "0.4.0",
+            "combined-stream": "1.0.8",
+            "mime-types": "2.1.35",
+        },
+        transitive_closure = {
+            "form-data": ["2.5.1"],
             "asynckit": ["0.4.0"],
             "combined-stream": ["1.0.8"],
             "mime-types": ["2.1.35"],
@@ -10649,22 +10633,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__human-signals__2.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "human-signals",
-        version = "2.1.0",
-        url = "https://registry.npmjs.org/human-signals/-/human-signals-2.1.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==",
-        transitive_closure = {
-            "human-signals": ["2.1.0"],
-        },
-    )
-
-    npm_import(
         name = "npm__humanize-ms__1.2.1",
         root_package = "",
         link_workspace = "",
@@ -11001,22 +10969,6 @@ def npm_repositories():
             "os-tmpdir": ["1.0.2"],
             "pify": ["4.0.1"],
             "semver": ["5.7.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__interpret__1.4.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "interpret",
-        version = "1.4.0",
-        url = "https://registry.npmjs.org/interpret/-/interpret-1.4.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==",
-        transitive_closure = {
-            "interpret": ["1.4.0"],
         },
     )
 
@@ -11498,22 +11450,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__is-stream__2.0.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "is-stream",
-        version = "2.0.1",
-        url = "https://registry.npmjs.org/is-stream/-/is-stream-2.0.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==",
-        transitive_closure = {
-            "is-stream": ["2.0.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__is-string-blank__1.0.1",
         root_package = "",
         link_workspace = "",
@@ -11658,22 +11594,22 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__isomorphic-ws__4.0.1__ws_7.5.8",
+        name = "npm__isomorphic-ws__5.0.0__ws_8.12.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "isomorphic-ws",
-        version = "4.0.1_ws@7.5.8",
-        url = "https://registry.npmjs.org/isomorphic-ws/-/isomorphic-ws-4.0.1.tgz",
+        version = "5.0.0_ws@8.12.0",
+        url = "https://registry.npmjs.org/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-BhBvN2MBpWTaSHdWRb/bwdZJ1WaehQ2L1KngkCkfLUGF0mAWAT1sQUQacEmQ0jXkFw/czDXPNQSL5u2/Krsz1w==",
+        integrity = "sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==",
         deps = {
-            "ws": "7.5.8_bufferutil@4.0.1",
+            "ws": "8.12.0_bufferutil@4.0.1",
         },
         transitive_closure = {
-            "isomorphic-ws": ["4.0.1_ws@7.5.8"],
-            "ws": ["7.5.8_bufferutil@4.0.1"],
+            "isomorphic-ws": ["5.0.0_ws@8.12.0"],
+            "ws": ["8.12.0_bufferutil@4.0.1"],
             "bufferutil": ["4.0.1"],
             "node-gyp-build": ["3.7.0"],
         },
@@ -12056,22 +11992,6 @@ def npm_repositories():
         transitive_closure = {
             "jsonfile": ["4.0.0"],
             "graceful-fs": ["4.2.10"],
-        },
-    )
-
-    npm_import(
-        name = "npm__jsonpath-plus__0.19.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "jsonpath-plus",
-        version = "0.19.0",
-        url = "https://registry.npmjs.org/jsonpath-plus/-/jsonpath-plus-0.19.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-GSVwsrzW9LsA5lzsqe4CkuZ9wp+kxBb2GwNniaWzI2YFn5Ig42rSW8ZxVpWXaAfakXNrx5pgY5AbQq7kzX29kg==",
-        transitive_closure = {
-            "jsonpath-plus": ["0.19.0"],
         },
     )
 
@@ -12865,22 +12785,6 @@ def npm_repositories():
         transitive_closure = {
             "mime-types": ["2.1.35"],
             "mime-db": ["1.52.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__mimic-fn__2.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "mimic-fn",
-        version = "2.1.0",
-        url = "https://registry.npmjs.org/mimic-fn/-/mimic-fn-2.1.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==",
-        transitive_closure = {
-            "mimic-fn": ["2.1.0"],
         },
     )
 
@@ -14756,26 +14660,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__npm-run-path__4.0.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "npm-run-path",
-        version = "4.0.1",
-        url = "https://registry.npmjs.org/npm-run-path/-/npm-run-path-4.0.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==",
-        deps = {
-            "path-key": "3.1.1",
-        },
-        transitive_closure = {
-            "npm-run-path": ["4.0.1"],
-            "path-key": ["3.1.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__npmlog__4.1.2",
         root_package = "",
         link_workspace = "",
@@ -15060,26 +14944,6 @@ def npm_repositories():
         transitive_closure = {
             "once": ["1.4.0"],
             "wrappy": ["1.0.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__onetime__5.1.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "onetime",
-        version = "5.1.2",
-        url = "https://registry.npmjs.org/onetime/-/onetime-5.1.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==",
-        deps = {
-            "mimic-fn": "2.1.0",
-        },
-        transitive_closure = {
-            "onetime": ["5.1.2"],
-            "mimic-fn": ["2.1.0"],
         },
     )
 
@@ -16748,31 +16612,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__rechoir__0.6.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "rechoir",
-        version = "0.6.2",
-        url = "https://registry.npmjs.org/rechoir/-/rechoir-0.6.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==",
-        deps = {
-            "resolve": "1.22.1",
-        },
-        transitive_closure = {
-            "rechoir": ["0.6.2"],
-            "resolve": ["1.22.1"],
-            "is-core-module": ["2.9.0"],
-            "path-parse": ["1.0.7"],
-            "supports-preserve-symlinks-flag": ["1.0.0"],
-            "has": ["1.0.3"],
-            "function-bind": ["1.1.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__rechoir__0.8.0",
         root_package = "",
         link_workspace = "",
@@ -18265,46 +18104,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__shelljs__0.8.5",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "shelljs",
-        version = "0.8.5",
-        url = "https://registry.npmjs.org/shelljs/-/shelljs-0.8.5.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==",
-        deps = {
-            "glob": "7.2.3",
-            "interpret": "1.4.0",
-            "rechoir": "0.6.2",
-        },
-        transitive_closure = {
-            "shelljs": ["0.8.5"],
-            "glob": ["7.2.3"],
-            "interpret": ["1.4.0"],
-            "rechoir": ["0.6.2"],
-            "resolve": ["1.22.1"],
-            "is-core-module": ["2.9.0"],
-            "path-parse": ["1.0.7"],
-            "supports-preserve-symlinks-flag": ["1.0.0"],
-            "has": ["1.0.3"],
-            "function-bind": ["1.1.1"],
-            "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "wrappy": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__signal-exit__3.0.7",
         root_package = "",
         link_workspace = "",
@@ -18836,22 +18635,6 @@ def npm_repositories():
         transitive_closure = {
             "strip-ansi": ["6.0.1"],
             "ansi-regex": ["5.0.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__strip-final-newline__2.0.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "strip-final-newline",
-        version = "2.0.0",
-        url = "https://registry.npmjs.org/strip-final-newline/-/strip-final-newline-2.0.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-BrpvfNAE3dcvq7ll3xVumzjKjZQ5tI1sEUIKr3Uoks0XUl45St3FlatVqef9prk4jRDzhW6WZg+3bk93y6pLjA==",
-        transitive_closure = {
-            "strip-final-newline": ["2.0.0"],
         },
     )
 
@@ -19881,22 +19664,6 @@ def npm_repositories():
         integrity = "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==",
         transitive_closure = {
             "tr46": ["0.0.3"],
-        },
-    )
-
-    npm_import(
-        name = "npm__tslib__1.14.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "tslib",
-        version = "1.14.1",
-        url = "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==",
-        transitive_closure = {
-            "tslib": ["1.14.1"],
         },
     )
 
@@ -21568,6 +21335,27 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__ws__8.12.0__bufferutil_4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ws",
+        version = "8.12.0_bufferutil@4.0.1",
+        url = "https://registry.npmjs.org/ws/-/ws-8.12.0.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==",
+        deps = {
+            "bufferutil": "4.0.1",
+        },
+        transitive_closure = {
+            "ws": ["8.12.0_bufferutil@4.0.1"],
+            "bufferutil": ["4.0.1"],
+            "node-gyp-build": ["3.7.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__xml__1.0.1",
         root_package = "",
         link_workspace = "",
@@ -21944,56 +21732,58 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_763decf__bufferutil_4.0.1",
+        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_fc681991e61c6808dd26012a2331f83671a11218__bufferutil_4.0.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["@kubernetes/client-node"],
         },
         package = "@kubernetes/client-node",
-        version = "github.com/kubernetes-client/javascript/763decf_bufferutil@4.0.1",
-        url = "https://codeload.github.com/kubernetes-client/javascript/tar.gz/763decf",
+        version = "github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.1",
+        url = "https://codeload.github.com/kubernetes-client/javascript/tar.gz/fc681991e61c6808dd26012a2331f83671a11218",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
         deps = {
             "openid-client": "5.3.1",
-            "@types/node": "registry.npmjs.org/@types/node/10.17.60",
+            "@types/js-yaml": "registry.npmjs.org/@types/js-yaml/4.0.5",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
+            "@types/request": "registry.npmjs.org/@types/request/2.48.8",
             "@types/underscore": "registry.npmjs.org/@types/underscore/1.11.4",
+            "@types/ws": "registry.npmjs.org/@types/ws/8.5.4",
             "byline": "5.0.0",
-            "execa": "5.0.0",
-            "isomorphic-ws": "4.0.1_ws@7.5.8",
+            "isomorphic-ws": "5.0.0_ws@8.12.0",
             "js-yaml": "4.1.0",
-            "jsonpath-plus": "0.19.0",
+            "jsonpath-plus": "7.2.0",
             "request": "2.88.2",
             "rfc4648": "1.5.2",
-            "shelljs": "0.8.5",
             "stream-buffers": "3.0.2",
             "tar": "6.1.11",
             "tmp-promise": "3.0.3",
-            "tslib": "1.14.1",
+            "tslib": "2.4.1",
             "typescript": "4.7.4",
             "underscore": "1.13.6",
-            "ws": "7.5.8_bufferutil@4.0.1",
+            "ws": "8.12.0_bufferutil@4.0.1",
         },
         transitive_closure = {
-            "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/763decf_bufferutil@4.0.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/10.17.60"],
+            "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.1"],
+            "@types/js-yaml": ["registry.npmjs.org/@types/js-yaml/4.0.5"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
+            "@types/request": ["registry.npmjs.org/@types/request/2.48.8"],
             "@types/underscore": ["registry.npmjs.org/@types/underscore/1.11.4"],
+            "@types/ws": ["registry.npmjs.org/@types/ws/8.5.4"],
             "byline": ["5.0.0"],
-            "execa": ["5.0.0"],
-            "isomorphic-ws": ["4.0.1_ws@7.5.8"],
+            "isomorphic-ws": ["5.0.0_ws@8.12.0"],
             "js-yaml": ["4.1.0"],
-            "jsonpath-plus": ["0.19.0"],
+            "jsonpath-plus": ["7.2.0"],
             "request": ["2.88.2"],
             "rfc4648": ["1.5.2"],
-            "shelljs": ["0.8.5"],
             "stream-buffers": ["3.0.2"],
             "tar": ["6.1.11"],
             "tmp-promise": ["3.0.3"],
-            "tslib": ["1.14.1"],
+            "tslib": ["2.4.1"],
             "typescript": ["4.7.4"],
             "underscore": ["1.13.6"],
-            "ws": ["7.5.8_bufferutil@4.0.1"],
+            "ws": ["8.12.0_bufferutil@4.0.1"],
             "openid-client": ["5.3.1"],
             "jose": ["4.11.1"],
             "lru-cache": ["6.0.0"],
@@ -22020,21 +21810,13 @@ def npm_repositories():
             "minipass": ["3.3.4"],
             "minizlib": ["2.1.2"],
             "mkdirp": ["1.0.4"],
-            "interpret": ["1.4.0"],
-            "rechoir": ["0.6.2"],
-            "resolve": ["1.22.1"],
-            "is-core-module": ["2.9.0"],
-            "path-parse": ["1.0.7"],
-            "supports-preserve-symlinks-flag": ["1.0.0"],
-            "has": ["1.0.3"],
-            "function-bind": ["1.1.1"],
             "aws-sign2": ["0.7.0"],
             "aws4": ["1.11.0"],
             "caseless": ["0.12.0"],
             "combined-stream": ["1.0.8"],
             "extend": ["3.0.2"],
             "forever-agent": ["0.6.1"],
-            "form-data": ["2.3.3"],
+            "form-data": ["2.5.1", "2.3.3"],
             "har-validator": ["5.1.5"],
             "http-signature": ["1.2.0"],
             "is-typedarray": ["1.0.0"],
@@ -22075,21 +21857,8 @@ def npm_repositories():
             "asynckit": ["0.4.0"],
             "delayed-stream": ["1.0.0"],
             "argparse": ["2.0.1"],
-            "cross-spawn": ["7.0.3"],
-            "get-stream": ["6.0.1"],
-            "human-signals": ["2.1.0"],
-            "is-stream": ["2.0.1"],
-            "merge-stream": ["2.0.0"],
-            "npm-run-path": ["4.0.1"],
-            "onetime": ["5.1.2"],
-            "signal-exit": ["3.0.7"],
-            "strip-final-newline": ["2.0.0"],
-            "mimic-fn": ["2.1.0"],
-            "path-key": ["3.1.1"],
-            "shebang-command": ["2.0.0"],
-            "which": ["2.0.2"],
-            "isexe": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
+            "@types/caseless": ["registry.npmjs.org/@types/caseless/0.12.2"],
+            "@types/tough-cookie": ["registry.npmjs.org/@types/tough-cookie/4.0.2"],
         },
         lifecycle_hooks = ["prepare"],
         lifecycle_hooks_execution_requirements = [],
@@ -22139,6 +21908,22 @@ def npm_repositories():
             "@types/keyv": ["registry.npmjs.org/@types/keyv/3.1.4"],
             "@types/node": ["registry.npmjs.org/@types/node/18.11.11"],
             "@types/responselike": ["registry.npmjs.org/@types/responselike/1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_caseless__registry.npmjs.org_at_types_caseless_0.12.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/caseless",
+        version = "registry.npmjs.org/@types/caseless/0.12.2",
+        url = "https://registry.yarnpkg.com/@types/caseless/-/caseless-0.12.2.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==",
+        transitive_closure = {
+            "@types/caseless": ["registry.npmjs.org/@types/caseless/0.12.2"],
         },
     )
 
@@ -22286,6 +22071,22 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_types_js-yaml__registry.npmjs.org_at_types_js-yaml_4.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/js-yaml",
+        version = "registry.npmjs.org/@types/js-yaml/4.0.5",
+        url = "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.5.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==",
+        transitive_closure = {
+            "@types/js-yaml": ["registry.npmjs.org/@types/js-yaml/4.0.5"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_json-buffer__registry.npmjs.org_at_types_json-buffer_3.0.0",
         root_package = "",
         link_workspace = "",
@@ -22338,22 +22139,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_types_node__registry.npmjs.org_at_types_node_10.17.60",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/node",
-        version = "registry.npmjs.org/@types/node/10.17.60",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==",
-        transitive_closure = {
-            "@types/node": ["registry.npmjs.org/@types/node/10.17.60"],
-        },
-    )
-
-    npm_import(
         name = "npm__at_types_node__registry.npmjs.org_at_types_node_16.11.68",
         root_package = "",
         link_workspace = "",
@@ -22386,6 +22171,53 @@ def npm_repositories():
         integrity = "sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==",
         transitive_closure = {
             "@types/node": ["registry.npmjs.org/@types/node/18.11.11"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_node__registry.npmjs.org_at_types_node_18.11.18",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/node",
+        version = "registry.npmjs.org/@types/node/18.11.18",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==",
+        transitive_closure = {
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_request__registry.npmjs.org_at_types_request_2.48.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/request",
+        version = "registry.npmjs.org/@types/request/2.48.8",
+        url = "https://registry.yarnpkg.com/@types/request/-/request-2.48.8.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==",
+        deps = {
+            "@types/caseless": "registry.npmjs.org/@types/caseless/0.12.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
+            "@types/tough-cookie": "registry.npmjs.org/@types/tough-cookie/4.0.2",
+            "form-data": "2.5.1",
+        },
+        transitive_closure = {
+            "@types/request": ["registry.npmjs.org/@types/request/2.48.8"],
+            "@types/caseless": ["registry.npmjs.org/@types/caseless/0.12.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
+            "@types/tough-cookie": ["registry.npmjs.org/@types/tough-cookie/4.0.2"],
+            "form-data": ["2.5.1"],
+            "asynckit": ["0.4.0"],
+            "combined-stream": ["1.0.8"],
+            "mime-types": ["2.1.35"],
+            "mime-db": ["1.52.0"],
+            "delayed-stream": ["1.0.0"],
         },
     )
 
@@ -22426,6 +22258,22 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_types_tough-cookie__registry.npmjs.org_at_types_tough-cookie_4.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/tough-cookie",
+        version = "registry.npmjs.org/@types/tough-cookie/4.0.2",
+        url = "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.2.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==",
+        transitive_closure = {
+            "@types/tough-cookie": ["registry.npmjs.org/@types/tough-cookie/4.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_types_underscore__registry.npmjs.org_at_types_underscore_1.11.4",
         root_package = "",
         link_workspace = "",
@@ -22438,5 +22286,25 @@ def npm_repositories():
         integrity = "sha512-uO4CD2ELOjw8tasUrAhvnn2W4A0ZECOvMjCivJr4gA9pGgjv+qxKWY9GLTMVEK8ej85BxQOocUyE7hImmSQYcg==",
         transitive_closure = {
             "@types/underscore": ["registry.npmjs.org/@types/underscore/1.11.4"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_ws__registry.npmjs.org_at_types_ws_8.5.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/ws",
+        version = "registry.npmjs.org/@types/ws/8.5.4",
+        url = "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.4.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==",
+        deps = {
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
+        },
+        transitive_closure = {
+            "@types/ws": ["registry.npmjs.org/@types/ws/8.5.4"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
