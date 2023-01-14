@@ -131,7 +131,7 @@ importers:
       google-protobuf: 3.21.2
       rollup: 2.79.1
       tslib: 2.4.1
-      typescript: 4.9.3
+      typescript: 4.9.4
     dependencies:
       google-protobuf: 3.21.2
     devDependencies:
@@ -139,12 +139,12 @@ importers:
       '@rollup/plugin-json': 5.0.0_rollup@2.79.1
       '@rollup/plugin-node-resolve': 15.0.0_rollup@2.79.1
       '@rollup/plugin-terser': 0.2.0_rollup@2.79.1
-      '@rollup/plugin-typescript': 10.0.1_aalyefftcnrin63wtgzqkmrdqa
+      '@rollup/plugin-typescript': 10.0.1_sbiskyiysxhldmns7rmnvoiszu
       '@types/google-protobuf': registry.npmjs.org/@types/google-protobuf/3.15.6
       '@types/node': registry.npmjs.org/@types/node/18.11.11
       rollup: 2.79.1
       tslib: 2.4.1
-      typescript: 4.9.3
+      typescript: 4.9.4
 
   npm/private/test:
     specifiers:
@@ -811,7 +811,7 @@ packages:
       terser: 5.15.1
     dev: true
 
-  /@rollup/plugin-typescript/10.0.1_aalyefftcnrin63wtgzqkmrdqa:
+  /@rollup/plugin-typescript/10.0.1_sbiskyiysxhldmns7rmnvoiszu:
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -828,7 +828,7 @@ packages:
       resolve: 1.22.1
       rollup: 2.79.1
       tslib: 2.4.1
-      typescript: 4.9.3
+      typescript: 4.9.4
     dev: true
 
   /@rollup/pluginutils/3.1.0_rollup@2.70.2:
@@ -3474,7 +3474,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.11.11
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -5652,12 +5652,6 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript/4.9.3:
-    resolution: {integrity: sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-    dev: true
-
   /typescript/4.9.4:
     resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}
     engines: {node: '>=4.2.0'}
@@ -6254,7 +6248,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics/4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv/3.1.4
-      '@types/node': registry.npmjs.org/@types/node/18.11.11
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
       '@types/responselike': registry.npmjs.org/@types/responselike/1.0.0
     dev: true
 
@@ -6336,7 +6330,7 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.11.11
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
     dev: true
 
   registry.npmjs.org/@types/node/16.11.68:
@@ -6349,12 +6343,12 @@ packages:
     resolution: {integrity: sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.11.tgz}
     name: '@types/node'
     version: 18.11.11
+    dev: true
 
   registry.npmjs.org/@types/node/18.11.18:
     resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
     name: '@types/node'
     version: 18.11.18
-    dev: true
 
   registry.npmjs.org/@types/request/2.48.8:
     resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/request/-/request-2.48.8.tgz}
@@ -6378,7 +6372,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.11.11
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
     dev: true
 
   registry.npmjs.org/@types/tough-cookie/4.0.2:
