@@ -6,7 +6,7 @@
         "semver": "7.3.8"
     },
     "devDependencies": {
-        "@types/node": "18.11.11",
+        "@types/node": "18.11.18",
         "@types/semver": "7.3.13"
     }
 }
