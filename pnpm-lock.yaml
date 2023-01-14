@@ -5,7 +5,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: fd9f894fe7eb428c9986d2de2ca012c9
+packageExtensionsChecksum: 60d08949101fc004c7564f98037b7764
 
 importers:
 
@@ -5646,12 +5646,6 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript/4.7.4:
-    resolution: {integrity: sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-    dev: true
-
   /typescript/4.8.4:
     resolution: {integrity: sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==}
     engines: {node: '>=4.2.0'}
@@ -5660,6 +5654,12 @@ packages:
 
   /typescript/4.9.3:
     resolution: {integrity: sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
+  /typescript/4.9.4:
+    resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
@@ -6224,7 +6224,7 @@ packages:
       tar: 6.1.11
       tmp-promise: 3.0.3
       tslib: 2.4.1
-      typescript: 4.7.4
+      typescript: 4.9.4
       underscore: 1.13.6
       ws: 8.12.0_bufferutil@4.0.1
     optionalDependencies:
