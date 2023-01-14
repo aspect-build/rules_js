@@ -3,7 +3,7 @@
         "google-protobuf": "3.21.2"
     },
     "devDependencies": {
-        "rollup": "3.10.0",
+        "rollup": "2.79.1",
         "@rollup/plugin-commonjs": "23.0.7",
         "@rollup/plugin-node-resolve": "15.0.1",
         "@rollup/plugin-json": "5.0.2",

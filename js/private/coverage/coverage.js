@@ -10745,21 +10745,21 @@ function nextChild(openRange, parentToNested) {
 
 var lib = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	RangeTree: RangeTree,
-	cloneFunctionCov: cloneFunctionCov,
-	cloneProcessCov: cloneProcessCov,
-	cloneRangeCov: cloneRangeCov,
-	cloneScriptCov: cloneScriptCov,
-	compareFunctionCovs: compareFunctionCovs,
-	compareRangeCovs: compareRangeCovs,
-	compareScriptCovs: compareScriptCovs,
 	emitForest: emitForest,
 	emitForestLines: emitForestLines,
+	parseFunctionRanges: parseFunctionRanges,
+	parseOffsets: parseOffsets,
+	cloneFunctionCov: cloneFunctionCov,
+	cloneProcessCov: cloneProcessCov,
+	cloneScriptCov: cloneScriptCov,
+	cloneRangeCov: cloneRangeCov,
+	compareScriptCovs: compareScriptCovs,
+	compareFunctionCovs: compareFunctionCovs,
+	compareRangeCovs: compareRangeCovs,
 	mergeFunctionCovs: mergeFunctionCovs,
 	mergeProcessCovs: mergeProcessCovs,
 	mergeScriptCovs: mergeScriptCovs,
-	parseFunctionRanges: parseFunctionRanges,
-	parseOffsets: parseOffsets
+	RangeTree: RangeTree
 });
 
 var require$$11 = /*@__PURE__*/getAugmentedNamespace(lib);
