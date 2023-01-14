@@ -19903,32 +19903,11 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__typescript__4.8.4",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "": ["typescript"],
-        },
-        package = "typescript",
-        version = "4.8.4",
-        url = "https://registry.npmjs.org/typescript/-/typescript-4.8.4.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==",
-        transitive_closure = {
-            "typescript": ["4.8.4"],
-        },
-        bins = {
-            "tsc": "./bin/tsc",
-            "tsserver": "./bin/tsserver",
-        },
-    )
-
-    npm_import(
         name = "npm__typescript__4.9.4",
         root_package = "",
         link_workspace = "",
         link_packages = {
+            "": ["typescript"],
             "js/private/worker/src": ["typescript"],
         },
         package = "typescript",
