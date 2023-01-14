@@ -1,6 +1,6 @@
 "npm_package_store rule"
 
-load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_action")
+load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
 load(":npm_package_info.bzl", "NpmPackageInfo")
@@ -138,12 +138,29 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
         ```
         """,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
+    "hardlink": attr.string(
+        values = ["auto", "off", "on"],
+        default = "auto",
+        doc = """Controls when to use hardlinks to files instead of making copies.
+
+        Creating hardlinks is much faster than making copies of files with the caveat that
+        hardlinks share file permissions with their source.
+
+        Since Bazel removes write permissions on files in the output tree after an action completes,
+        hardlinks to source files is not recommended since write permissions will be inadvertently
+        removed from sources files.
+
+        - "auto": hardlinks are used for generated files already in the output tree
+        - "off": all files are copied
+        - "on": hardlinks are used for all files (not recommended)
+        """,
+    ),
+    "verbose": attr.bool(
+        doc = """If true, prints out verbose logs to stdout""",
+    ),
 }
 
 def _impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
-
     package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
     version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
 
@@ -176,7 +193,15 @@ def _impl(ctx):
             virtual_store_directory = src_directory
         else:
             virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
-            copy_directory_action(ctx, src_directory, virtual_store_directory, is_windows = is_windows)
+            hardlink = ctx.attr.src[NpmPackageInfo].hardlink if hasattr(ctx.attr.src[NpmPackageInfo], "hardlink") else False
+            copy_directory_bin_action(
+                ctx,
+                src = src_directory,
+                dst = virtual_store_directory,
+                copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
+                hardlink = "on" if hardlink else ctx.attr.hardlink,
+                verbose = ctx.attr.verbose,
+            )
 
         for store in npm_package_store_deps:
             dep_package = store.package
@@ -288,6 +313,7 @@ npm_package_store_lib = struct(
     attrs = _ATTRS,
     implementation = _impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
+    toolchains = ["@aspect_bazel_lib//lib:copy_directory_toolchain_type"],
 )
 
 npm_package_store = rule(
@@ -295,4 +321,5 @@ npm_package_store = rule(
     implementation = npm_package_store_lib.implementation,
     attrs = npm_package_store_lib.attrs,
     provides = npm_package_store_lib.provides,
+    toolchains = npm_package_store_lib.toolchains,
 )

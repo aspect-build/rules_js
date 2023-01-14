@@ -20,13 +20,13 @@ _INTERNAL_ATTRS_STORE = dicts.add(_npm_package_store_lib.attrs, {
     "package": attr.string(
         doc = """The package name to link to.
         
-        Takes precendance over the package name in the NpmPackageInfo src.""",
+        Takes precedence over the package name in the NpmPackageInfo src.""",
         mandatory = True,
     ),
     "version": attr.string(
         doc = """The package version to link to.
         
-        Takes precendance over the package version in the NpmPackageInfo src.""",
+        Takes precedence over the package version in the NpmPackageInfo src.""",
         mandatory = True,
     ),
 })
@@ -35,4 +35,5 @@ npm_package_store_internal = rule(
     implementation = _npm_package_store_lib.implementation,
     attrs = _INTERNAL_ATTRS_STORE,
     provides = _npm_package_store_lib.provides,
+    toolchains = _npm_package_store_lib.toolchains,
 )
