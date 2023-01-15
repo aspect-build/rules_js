@@ -46,6 +46,12 @@ const _fs = require('fs');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const patcher = (fs = _fs, roots) => {
     fs = fs || _fs;
+    // Make the original version of the library available for when access to the
+    // unguarded file system is necessary, such as the esbuild plugin that
+    // protects against sandbox escaping that occurs through module resolution
+    // in the Go binary. See
+    // https://github.com/aspect-build/rules_esbuild/issues/58.
+    fs._unpatched = Object.assign({}, fs);
     roots = roots || [];
     roots = roots.filter((root) => fs.existsSync(root));
     if (!roots.length) {
