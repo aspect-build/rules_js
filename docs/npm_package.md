@@ -27,7 +27,7 @@ A rule that packages sources into a directory (a tree artifact) and provides an 
 This target can be used as the `src` attribute to `npm_link_package`.
 
 `npm_package` makes use of `copy_to_directory`
-(https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directoryd) under the hood,
+(https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory) under the hood,
 adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
 npm_package includes `transitive_sources` and `transitive_declarations` files from `JsInfo` providers in srcs
 by default. The behavior of including sources and declarations from `JsInfo` can be configured
