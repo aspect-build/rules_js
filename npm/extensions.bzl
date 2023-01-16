@@ -9,6 +9,8 @@ load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import", npm_import_l
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock", "pnpm_repository")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
+load("//npm/private:npmrc.bzl", "parse_npmrc")
+
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
@@ -30,12 +32,14 @@ def _extension_impl(module_ctx):
             )
 
         for attr in mod.tags.npm_translate_lock:
-            # TODO: registries was introduced in https://github.com/aspect-build/rules_js/pull/503
-            # but not added to bzlmod. For now, not supported here.
-            registries = {}
             lock_importers, lock_packages = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
-            imports = npm_translate_lock_helpers.gen_npm_imports(importers, packages, attr.pnpm_lock.package, attr.name, attr, registries, utils.default_registry())
+            registries = {}
+            npm_auth = {}
+            if attr.npmrc:
+                npmrc = parse_npmrc(module_ctx.read(attr.npmrc))
+                (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
+            imports = npm_translate_lock_helpers.gen_npm_imports(importers, packages, attr.pnpm_lock.package, attr.name, attr, registries, utils.default_registry(), npm_auth)
             for i in imports:
                 npm_import(
                     name = i.name,
@@ -47,6 +51,10 @@ def _extension_impl(module_ctx):
                     lifecycle_hooks = i.lifecycle_hooks,
                     lifecycle_hooks_env = i.lifecycle_hooks_env,
                     link_packages = i.link_packages,
+                    npm_auth = i.npm_auth,
+                    npm_auth_basic = i.npm_auth_basic,
+                    npm_auth_password = i.npm_auth_password,
+                    npm_auth_username = i.npm_auth_username,
                     npm_translate_lock_repo = attr.name,
                     package = i.package,
                     patch_args = i.patch_args,

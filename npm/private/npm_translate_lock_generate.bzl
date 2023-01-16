@@ -252,7 +252,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
     return (registries, auth)
 
 ################################################################################
-def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registries, default_registry):
+def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     if attr.prod and attr.dev:
@@ -385,7 +385,6 @@ def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registr
                 msg = "bins contains invalid key value pair '{}', required '=' separator not found".format(bin)
                 fail(msg)
 
-        url = None
         if resolution_type == "git":
             url = repo
         elif tarball:
@@ -405,6 +404,26 @@ def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registr
         else:
             url = utils.npm_registry_download_url(name, version, registries, default_registry)
 
+        registry = url.split("//", 1)[-1]
+        npm_auth_bearer = None
+        npm_auth_basic = None
+        npm_auth_username = None
+        npm_auth_password = None
+        match_len = 0
+        for auth_registry, auth_info in npm_auth.items():
+            if auth_registry == "" and match_len == 0:
+                # global auth applied to all registries; will be overridden by a registry scoped auth
+                npm_auth_bearer = auth_info.get("bearer")
+                npm_auth_basic = auth_info.get("basic")
+                npm_auth_username = auth_info.get("username")
+                npm_auth_password = auth_info.get("password")
+            if registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                npm_auth_bearer = auth_info.get("bearer")
+                npm_auth_basic = auth_info.get("basic")
+                npm_auth_username = auth_info.get("username")
+                npm_auth_password = auth_info.get("password")
+                match_len = len(auth_registry)
+
         result.append(struct(
             custom_postinstall = custom_postinstall,
             deps = deps,
@@ -419,6 +438,10 @@ def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registr
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+            npm_auth = npm_auth_bearer,
+            npm_auth_basic = npm_auth_basic,
+            npm_auth_username = npm_auth_username,
+            npm_auth_password = npm_auth_password,
             transitive_closure = transitive_closure,
             url = url,
             commit = commit,
@@ -562,7 +585,7 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, root_
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(importers, packages, root_package, rctx.name, rctx.attr, npm_registries, default_registry)
+    npm_imports = _gen_npm_imports(importers, packages, root_package, rctx.name, rctx.attr, npm_registries, default_registry, npm_auth)
 
     fp_links = {}
     rctx_files = {
@@ -744,8 +767,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     stores_bzl = []
     links_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        url = _import.url if _import.url else utils.npm_registry_download_url(_import.package, _import.version, npm_registries, default_registry)
-
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
         maybe_deps = ("""
@@ -770,35 +791,14 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
         maybe_commit = """
         commit = "%s",""" % _import.commit if _import.commit else ""
-
-        _registry = url.split("//", 1)[-1]
-        npm_auth_bearer = None
-        npm_auth_basic = None
-        npm_auth_username = None
-        npm_auth_password = None
-        match_len = 0
-        for auth_registry, auth_info in npm_auth.items():
-            if auth_registry == "" and match_len == 0:
-                # global auth applied to all registries; will be overridden by a registry scoped auth
-                npm_auth_bearer = auth_info.get("bearer")
-                npm_auth_basic = auth_info.get("basic")
-                npm_auth_username = auth_info.get("username")
-                npm_auth_password = auth_info.get("password")
-            if _registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                npm_auth_bearer = auth_info.get("bearer")
-                npm_auth_basic = auth_info.get("basic")
-                npm_auth_username = auth_info.get("username")
-                npm_auth_password = auth_info.get("password")
-                match_len = len(auth_registry)
-
         maybe_npm_auth = ("""
-        npm_auth = "%s",""" % npm_auth_bearer) if npm_auth_bearer else ""
+        npm_auth = "%s",""" % _import.npm_auth) if _import.npm_auth else ""
         maybe_npm_auth_basic = ("""
-        npm_auth_basic = "%s",""" % npm_auth_basic) if npm_auth_basic else ""
+        npm_auth_basic = "%s",""" % _import.npm_auth_basic) if _import.npm_auth_basic else ""
         maybe_npm_auth_username = ("""
-        npm_auth_username = "%s",""" % npm_auth_username) if npm_auth_username else ""
+        npm_auth_username = "%s",""" % _import.npm_auth_username) if _import.npm_auth_username else ""
         maybe_npm_auth_password = ("""
-        npm_auth_password = "%s",""" % npm_auth_password) if npm_auth_password else ""
+        npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -823,7 +823,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             npm_translate_lock_repo = _to_apparent_repo_name(rctx.name),
             package = _import.package,
             root_package = _import.root_package,
-            url = url,
+            url = _import.url,
             version = _import.version,
         ))
 
