@@ -151,6 +151,7 @@ npm_translate_lock(
     },
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
+    verify_patches = "examples/npm_deps/patches",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")

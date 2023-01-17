@@ -1,0 +1,8 @@
+{
+    "private": true,
+    "dependencies": {
+        "@aspect-test/a": "5.0.2",
+        "@aspect-test/c": "2.0.2",
+        "@gregmagolan/test-b": "0.0.2"
+    }
+}
