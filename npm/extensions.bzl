@@ -28,6 +28,7 @@ def _extension_impl(module_ctx):
                 pnpm_version = attr.pnpm_version,
                 preupdate = attr.preupdate,
                 quiet = attr.quiet,
+                register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 update_pnpm_lock = attr.update_pnpm_lock,
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
@@ -66,6 +67,7 @@ def _extension_impl(module_ctx):
                     transitive_closure = i.transitive_closure,
                     url = i.url,
                     version = i.version,
+                    register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                     register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 )
 
@@ -86,6 +88,7 @@ def _extension_impl(module_ctx):
                 root_package = i.root_package,
                 url = i.url,
                 version = i.version,
+                register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
             )
 

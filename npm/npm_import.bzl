@@ -30,7 +30,7 @@ load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock = "npm_translate_lock")
-load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
@@ -56,6 +56,7 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
                 """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
                 """js_binary(name = "pnpm", entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ],
+            register_copy_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
             register_copy_to_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
         )
 
@@ -87,6 +88,7 @@ def npm_translate_lock(
         quiet = True,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
+        register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
         # TODO(2.0): remove package_json
         package_json = None,
@@ -313,6 +315,8 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
+        register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
+
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
 
         package_json: Deprecated.
@@ -325,6 +329,8 @@ def npm_translate_lock(
     """
 
     # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
+    if register_copy_directory_toolchains and not native.existing_rule("copy_directory_toolchains"):
+        _register_copy_directory_toolchains()
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
 
@@ -454,6 +460,7 @@ def npm_import(
         npm_auth_username = "",
         npm_auth_password = "",
         bins = {},
+        register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
         # TODO(2.0): remove run_lifecycle_hooks from npm_import
         run_lifecycle_hooks = None,
@@ -675,6 +682,8 @@ def npm_import(
             from information in the pnpm lock file. That feature is currently blocked on
             https://github.com/pnpm/pnpm/issues/5131.
 
+        register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
+
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
 
         run_lifecycle_hooks: If True, runs `preinstall`, `install`, `postinstall` and 'prepare' lifecycle hooks declared
@@ -690,6 +699,8 @@ def npm_import(
     """
 
     # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
+    if register_copy_directory_toolchains and not native.existing_rule("copy_directory_toolchains"):
+        _register_copy_directory_toolchains()
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
 

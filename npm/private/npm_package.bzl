@@ -236,6 +236,7 @@ def _impl(ctx):
         exclude_srcs_patterns = ctx.attr.exclude_srcs_patterns,
         replace_prefixes = ctx.attr.replace_prefixes,
         allow_overwrites = ctx.attr.allow_overwrites,
+        hardlink = ctx.attr.hardlink,
         verbose = ctx.attr.verbose,
     )
 

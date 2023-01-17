@@ -50,6 +50,7 @@ bzl_library(
         ":npm_package_store_info",
         ":utils",
         "//js:providers",
+        "@aspect_bazel_lib//lib:copy_directory",
         "@bazel_skylib//lib:paths",
     ],
 )
