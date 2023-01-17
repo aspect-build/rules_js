@@ -23,8 +23,10 @@ def _extension_impl(module_ctx):
                 name = attr.name,
                 data = attr.data,
                 npmrc = attr.npmrc,
+                npm_package_lock = attr.npm_package_lock,
                 pnpm_lock = attr.pnpm_lock,
                 pnpm_version = attr.pnpm_version,
+                preupdate = attr.preupdate,
                 quiet = attr.quiet,
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 update_pnpm_lock = attr.update_pnpm_lock,
