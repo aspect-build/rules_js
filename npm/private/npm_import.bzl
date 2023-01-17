@@ -743,37 +743,37 @@ def _impl_links(rctx):
     rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_DEFS_BZL_FILENAME]))
 
 _COMMON_ATTRS = {
-    "package": attr.string(mandatory = True),
-    "version": attr.string(mandatory = True),
-    "root_package": attr.string(),
     "link_packages": attr.string_list_dict(),
+    "package": attr.string(mandatory = True),
+    "root_package": attr.string(),
+    "version": attr.string(mandatory = True),
 }
 
 _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
-    "transitive_closure": attr.string_list_dict(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "npm_translate_lock_repo": attr.string(),
+    "transitive_closure": attr.string_list_dict(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
-    "extra_build_content": attr.string(),
-    "integrity": attr.string(),
-    "patch_args": attr.string_list(),
-    "patches": attr.label_list(),
-    "lifecycle_hooks": attr.string_list(),
-    "custom_postinstall": attr.string(),
-    "link_workspace": attr.string(),
-    "url": attr.string(),
     "commit": attr.string(),
+    "custom_postinstall": attr.string(),
+    "extra_build_content": attr.string(),
+    "generate_bzl_library_targets": attr.bool(),
+    "integrity": attr.string(),
+    "lifecycle_hooks": attr.string_list(),
+    "link_workspace": attr.string(),
     "npm_auth": attr.string(),
     "npm_auth_basic": attr.string(),
-    "npm_auth_username": attr.string(),
     "npm_auth_password": attr.string(),
-    "generate_bzl_library_targets": attr.bool(),
+    "npm_auth_username": attr.string(),
+    "patch_args": attr.string_list(),
+    "patches": attr.label_list(),
+    "url": attr.string(),
 })
 
 def _get_bin_entries(pkg_json, package):
