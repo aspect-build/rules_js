@@ -25,6 +25,8 @@ def _extension_impl(module_ctx):
                 data = attr.data,
                 npmrc = attr.npmrc,
                 npm_package_lock = attr.npm_package_lock,
+                patches = attr.patches,
+                patch_args = attr.patch_args,
                 pnpm_lock = attr.pnpm_lock,
                 pnpm_version = attr.pnpm_version,
                 preupdate = attr.preupdate,

@@ -343,6 +343,13 @@ def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registr
 
         # gather patches & patch args
         patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
+
+        # Prevent the patch string labels from going through further repo mapping:
+        # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
+        # Further, prepend the optional '@' for earlier versions of Bazel so that checked in
+        # repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
+        patches = [("" if utils.bzlmod_supported else "@") + str(attr.pnpm_lock.relative(patch)) for patch in patches]
+
         patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
         patches_used.extend(patches_keys)
 

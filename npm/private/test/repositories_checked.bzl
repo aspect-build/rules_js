@@ -1231,7 +1231,7 @@ def npm_repositories():
         transitive_closure = {
             "@gregmagolan/test-a": ["0.0.1"],
         },
-        patches = ["//examples/npm_deps:patches/test-a.patch", "//examples/npm_deps:patches/test-a@0.0.1.patch"],
+        patches = ["@//examples/npm_deps:patches/test-a.patch", "@//examples/npm_deps:patches/test-a@0.0.1.patch"],
         patch_args = ["-p4"],
     )
 
@@ -1255,7 +1255,7 @@ def npm_repositories():
             "@gregmagolan/test-b": ["0.0.2"],
             "@gregmagolan/test-a": ["0.0.1"],
         },
-        patches = ["//examples/npm_deps:patches/test-b.patch"],
+        patches = ["@//examples/npm_deps:patches/test-b.patch"],
         patch_args = ["-p1"],
     )
 
