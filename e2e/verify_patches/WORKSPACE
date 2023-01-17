@@ -1,0 +1,43 @@
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "nodejs",
+    node_version = DEFAULT_NODE_VERSION,
+)
+
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
+
+npm_translate_lock(
+    name = "npm",
+    data = [
+        "//:package.json",
+        "//:pnpm-workspace.yaml",
+    ],
+    npmrc = "//:.npmrc",
+    patch_args = {
+        "*": ["-p1"],
+        "@gregmagolan/test-a": ["-p4"],
+    },
+    patches = {
+        "@gregmagolan/test-a": ["//:patches/test-a.patch"],
+        "@gregmagolan/test-a@0.0.1": ["//:patches/test-a@0.0.1.patch"],
+        "@gregmagolan/test-b": ["//:patches/test-b.patch"],
+    },
+    pnpm_lock = "//:pnpm-lock.yaml",
+    update_pnpm_lock = True,
+    verify_node_modules_ignored = "//:.bazelignore",
+    verify_patches = "patches",
+)
+
+load("@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()

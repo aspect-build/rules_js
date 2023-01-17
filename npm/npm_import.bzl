@@ -85,6 +85,8 @@ def npm_translate_lock(
         lifecycle_hooks_no_sandbox = True,
         bins = {},
         verify_node_modules_ignored = None,
+        verify_patches = None,
+        verify_patches_extensions = [".diff", ".patch"],
         quiet = True,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
@@ -302,6 +304,18 @@ def npm_translate_lock(
 
             See https://github.com/bazelbuild/bazel/issues/8106
 
+        verify_patches: Path to a workspace folder containing all patches used in the `patches` attribute. Will
+            fail if any patches are missing. Does not recurse into subfolders.
+
+            For example:
+
+            ```
+            verify_patches = "path/to/patches",
+            ```
+
+        verify_patches_extensions: Patch file extensions to look for when using `verify_patches`. Add `""` to allow
+            extensionless patches.
+
         quiet: Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.
 
         link_workspace: The workspace name where links will be created for the packages in this lock file.
@@ -422,6 +436,8 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         bins = bins_string_list_dict,
         verify_node_modules_ignored = verify_node_modules_ignored,
+        verify_patches = verify_patches,
+        verify_patches_extensions = verify_patches_extensions,
         link_workspace = link_workspace,
         root_package = root_package,
         additional_file_contents = additional_file_contents,

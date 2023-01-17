@@ -11,7 +11,6 @@ load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 
-
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
 def _extension_impl(module_ctx):
@@ -35,6 +34,8 @@ def _extension_impl(module_ctx):
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 update_pnpm_lock = attr.update_pnpm_lock,
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
+                verify_patches = attr.verify_patches,
+                verify_patches_extensions = attr.verify_patches_extensions,
                 yarn_lock = attr.yarn_lock,
             )
 

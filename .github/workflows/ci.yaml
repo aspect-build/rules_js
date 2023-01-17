@@ -103,6 +103,8 @@ jobs:
               run: echo "folder=e2e/update_pnpm_lock_with_import" >> $GITHUB_OUTPUT
             - id: vendored_node
               run: echo "folder=e2e/vendored_node" >> $GITHUB_OUTPUT
+            - id: verify_patches
+              run: echo "folder=e2e/verify_patches" >> $GITHUB_OUTPUT
             - id: webpack_devserver
               run: echo "folder=e2e/webpack_devserver" >> $GITHUB_OUTPUT
             - id: webpack_devserver_esm

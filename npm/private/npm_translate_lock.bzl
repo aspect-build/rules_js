@@ -1,7 +1,8 @@
 "Convert pnpm lock file into starlark Bazel fetches"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load(":npm_translate_lock_generate.bzl", "helpers")
+load(":npm_translate_lock_generate.bzl", gen_helpers = "helpers")
+load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
 load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
@@ -39,6 +40,8 @@ _ATTRS = {
     "update_pnpm_lock": attr.bool(),
     "use_home_npmrc": attr.bool(),
     "verify_node_modules_ignored": attr.label(),
+    "verify_patches": attr.string(),
+    "verify_patches_extensions": attr.string_list(default = [".diff", ".patch"]),
     "yarn_lock": attr.label(),
 }
 
@@ -65,7 +68,8 @@ def _impl(rctx):
                 # If the pnpm lock file was changed then reload it before translation
                 state.reload_lockfile()
 
-    helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
+    gen_helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
+    helpers.verify_patches(rctx)
 
     rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
@@ -79,7 +83,7 @@ def _impl(rctx):
 
     rctx.report_progress("Generating starlark for npm dependencies")
 
-    helpers.generate_repository_files(
+    gen_helpers.generate_repository_files(
         rctx,
         state.label_store.label("pnpm_lock"),
         importers,
