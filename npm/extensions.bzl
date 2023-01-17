@@ -31,6 +31,7 @@ def _extension_impl(module_ctx):
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 update_pnpm_lock = attr.update_pnpm_lock,
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
+                yarn_lock = attr.yarn_lock,
             )
 
         for attr in mod.tags.npm_translate_lock:
