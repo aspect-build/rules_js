@@ -143,6 +143,12 @@ bzl_library(
     visibility = ["//js:__subpackages__"],
 )
 
+bzl_library(
+    name = "expand_template",
+    srcs = ["expand_template.bzl"],
+    visibility = ["//visibility:public"],
+)
+
 js_binary(
     name = "expand_template_binary",
     entry_point = "expand_template.js",
