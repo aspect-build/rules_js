@@ -21,6 +21,7 @@ def _extension_impl(module_ctx):
             # the pnpm-lock.yaml file when update_pnpm_lock is True.
             npm_translate_lock(
                 name = attr.name,
+                bins = attr.bins,
                 data = attr.data,
                 npmrc = attr.npmrc,
                 npm_package_lock = attr.npm_package_lock,

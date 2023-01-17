@@ -361,6 +361,13 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
     if type(bins) != "dict":
         fail("Expected bins to be a dict")
     for key, value in bins.items():
+        if type(value) == "list":
+            # The passed 'bins' value is already in the dict-of-string-list
+            # form needed by the rule. This is undocumented but necessary for
+            # the bzlmod interface to use this macro since dict-of-dicts attributes
+            # cannot be passed into module extension attrs.
+            bins_string_list_dict = bins
+            break
         if type(value) != "dict":
             fail("Expected values in bins to be a dicts")
         if key not in bins_string_list_dict:
