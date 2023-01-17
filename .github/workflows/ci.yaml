@@ -163,8 +163,6 @@ jobs:
                       bzlmodEnabled: true
                     - folder: e2e/npm_translate_yarn_lock
                       bzlmodEnabled: true
-                    - folder: e2e/package_json_module
-                      bzlmodEnabled: true
                     - folder: e2e/pnpm_workspace_rerooted
                       bzlmodEnabled: true
                     - folder: e2e/pnpm_workspace
