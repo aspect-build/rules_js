@@ -422,7 +422,6 @@ def npm_package(
         **kwargs: Additional attributes such as `tags` and `visibility`
     """
 
-    files_target = None
     if include_sources or include_transitive_sources or include_declarations or include_transitive_declarations or include_runfiles:
         files_target = "{}_files".format(name)
         _npm_package_files(
@@ -438,9 +437,8 @@ def npm_package(
             # Always propagate the testonly attribute
             testonly = kwargs.get("testonly", False),
         )
-
-    if files_target:
         srcs = srcs + [files_target]
+
     _npm_package(
         name = name,
         srcs = srcs,
