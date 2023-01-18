@@ -5372,6 +5372,7 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "examples/npm_package/libs/lib_a": ["chalk"],
+            "npm/private/test/npm_package": ["chalk"],
         },
         package = "chalk",
         version = "5.0.1",

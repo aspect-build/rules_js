@@ -86,6 +86,7 @@ npm_translate_lock(
         "//js/private/coverage/bundle:package.json",
         "//js/private/worker/src:package.json",
         "//npm/private/test:package.json",
+        "//npm/private/test/npm_package:package.json",
         "//npm/private/test/vendored/is-odd:package.json",
         "//npm/private/test/vendored/semver-max:package.json",
     ],
