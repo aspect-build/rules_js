@@ -1,13 +1,20 @@
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//npm:defs.bzl", "npm_package")
 load("//js:defs.bzl", "js_library")
+
+npm_link_all_packages(name = "node_modules")
 
 js_library(
     name = "lib_a",
     srcs = [
-        ":index.d.ts",
         ":index.js",
+        ":package.json",
+    ],
+    deps = [
+        # node_modules deps should be excluded from the contents of the npm_package
+        ":node_modules/chalk",
     ],
 )
 
@@ -20,8 +27,8 @@ npm_package(
 copy_to_directory(
     name = "expected_pkg_a",
     srcs = [
-        "index.d.ts",
         "index.js",
+        ":package.json",
     ],
 )
 

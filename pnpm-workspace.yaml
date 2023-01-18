@@ -9,3 +9,4 @@ packages:
     - 'js/private/coverage/bundle'
     - 'js/private/worker/src'
     - 'npm/private/test'
+    - 'npm/private/test/npm_package'
