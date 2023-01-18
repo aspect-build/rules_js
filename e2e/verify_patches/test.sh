@@ -20,6 +20,23 @@ if ! bazel build $BZLMOD_FLAG //...; then
   exit 1
 fi
 
+# Should succeed after adding an ignored patch extension
+touch patches/foo.diff
+if ! bazel build $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+  exit 1
+fi
+rm patches/foo.diff
+
+# Should fail after adding a patch that isn't in `patches`
+bazel clean --expunge # Need to invalidate the repository cache to see the missing file
+touch patches/foo.patch
+if bazel build $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to fail"
+  exit 1
+fi
+rm patches/foo.patch
+
 # Remove one of the patches
 if [ $BZLMOD_FLAG ]; then
   _sedi 's#"@gregmagolan/test-a": \["//:patches/test-a.patch"\],##' MODULE.bazel
