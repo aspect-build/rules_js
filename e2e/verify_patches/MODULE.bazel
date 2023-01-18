@@ -32,9 +32,7 @@ npm.npm_translate_lock(
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
-    verify_patches = "patches",
-    verify_patches_extensions = [".patch"],
-    verify_node_modules_ignored = "//:.bazelignore",
+    verify_patches = "//patches:patches.list",
 )
 
 use_repo(npm, "npm")

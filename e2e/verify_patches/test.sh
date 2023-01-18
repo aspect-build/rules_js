@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
+print_step() {
+  printf "\n\n+----------------------------------------------------------------------+"
+  printf "\n  $@"
+  printf "\n+----------------------------------------------------------------------+\n"
+}
+
 # sedi makes `sed -i` work on both OSX & Linux
 # See https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd
 _sedi () {
@@ -12,42 +18,70 @@ _sedi () {
   sed "${sedi[@]}" "$@"
 }
 
+
 BZLMOD_FLAG="${BZLMOD_FLAG:-}"
 
-# Verify patches should initially succeed
+print_step "Should initially succeed"
 if ! bazel build $BZLMOD_FLAG //...; then
-  echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+  printf "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
 
-# Should succeed after adding an ignored patch extension
+print_step "Should pass the generated patch list test when adding an excluded patch format"
 touch patches/foo.diff
-if ! bazel build $BZLMOD_FLAG //...; then
-  echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+if ! bazel test $BZLMOD_FLAG //patches:patches_update_test; then
+  printf "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to pass"
   exit 1
 fi
 rm patches/foo.diff
 
-# Should fail after adding a patch that isn't in `patches`
-bazel clean --expunge # Need to invalidate the repository cache to see the missing file
-touch patches/foo.patch
-if bazel build $BZLMOD_FLAG //...; then
-  echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to fail"
+print_step "Should fail the generated patch list test when adding a new patch"
+
+patch="diff --git a/main.js b/main.js
+index bdc8c4e..4f9c0fb 100755
+--- a/main.js
++++ b/main.js
+@@ -1,4 +1,5 @@
+ const testA = require('@gregmagolan/test-a');
+ console.log(\"Hello world!\")
++console.log(\"foobar\")"
+echo "$patch" > patches/foo.patch
+
+if bazel test $BZLMOD_FLAG //patches:patches_update_test; then
+  printf "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to fail"
   exit 1
 fi
-rm patches/foo.patch
 
-# Remove one of the patches
+print_step "Should succeed running the patches update target"
+if ! bazel run $BZLMOD_FLAG //patches:patches_update; then
+  printf "ERROR: expected 'bazel run $BZLMOD_FLAG //patches:patches_update' to pass"
+  exit 1
+fi
+
+print_step "Should fail the build because the new patch isn't in 'patches'"
+if bazel build $BZLMOD_FLAG //...; then
+  printf "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to fail"
+  exit 1
+fi
+
+print_step "Should pass the build after adding the new patch to 'patches'"
 if [ $BZLMOD_FLAG ]; then
-  _sedi 's#"@gregmagolan/test-a": \["//:patches/test-a.patch"\],##' MODULE.bazel
+  _sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' MODULE.bazel
 else
-  _sedi 's#"@gregmagolan/test-a": \["//:patches/test-a.patch"\],##' WORKSPACE
+  _sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' WORKSPACE
 fi
 
-# Should fail when not all patches are included
-if bazel build $BZLMOD_FLAG //...; then
-  echo "ERROR: expected bazel build $BZLMOD_FLAG //...' to fail"
+if ! bazel build $BZLMOD_FLAG //...; then
+  printf "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
 
-echo "All tests passed"
+print_step "Should succeed the generated patch list test"
+
+if ! bazel test $BZLMOD_FLAG //patches:patches_update_test; then
+  printf "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to pass"
+  exit 1
+fi
+
+print_step "All tests passed"
+

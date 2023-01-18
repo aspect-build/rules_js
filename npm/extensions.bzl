@@ -35,7 +35,6 @@ def _extension_impl(module_ctx):
                 update_pnpm_lock = attr.update_pnpm_lock,
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
                 verify_patches = attr.verify_patches,
-                verify_patches_extensions = attr.verify_patches_extensions,
                 yarn_lock = attr.yarn_lock,
             )
 

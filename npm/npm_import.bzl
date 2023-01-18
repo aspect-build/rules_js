@@ -30,7 +30,9 @@ load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock = "npm_translate_lock")
+load("//npm/private:list_sources.bzl", "list_sources")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 
@@ -86,7 +88,6 @@ def npm_translate_lock(
         bins = {},
         verify_node_modules_ignored = None,
         verify_patches = None,
-        verify_patches_extensions = [".diff", ".patch"],
         quiet = True,
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
@@ -304,17 +305,28 @@ def npm_translate_lock(
 
             See https://github.com/bazelbuild/bazel/issues/8106
 
-        verify_patches: Path to a workspace folder containing all patches used in the `patches` attribute. Will
-            fail if any patches are missing. Does not recurse into subfolders.
+        verify_patches: Label to a patch list file.
+
+            Use this in together with the `list_patches` macro to guarantee that all patches in a patch folder
+            are included in the `patches` attribute.
 
             For example:
 
             ```
-            verify_patches = "path/to/patches",
+            verify_patches = "//patches:patches.list",
             ```
 
-        verify_patches_extensions: Patch file extensions to look for when using `verify_patches`. Add `""` to allow
-            extensionless patches.
+            In your patches folder add a BUILD.bazel file containing.
+            ```
+            load("@aspect_rules_js//npm:npm_import.bzl", "list_patches")
+
+            list_patches(
+                name = "patches",
+                out = "patches.list",
+            )
+            ```
+
+            See the `list_patches` documentation for further info.
 
         quiet: Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.
 
@@ -437,7 +449,6 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         bins = bins_string_list_dict,
         verify_node_modules_ignored = verify_node_modules_ignored,
         verify_patches = verify_patches,
-        verify_patches_extensions = verify_patches_extensions,
         link_workspace = link_workspace,
         root_package = root_package,
         additional_file_contents = additional_file_contents,
@@ -786,4 +797,34 @@ def npm_import(
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         bins = bins,
         npm_translate_lock_repo = npm_translate_lock_repo,
+    )
+
+def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_patterns = []):
+    """Write a file containing a list of all patches in the current folder to the source tree.
+
+    Use this together with the `verify_patches` attribute of `npm_translate_lock` to verify
+    that all patches in a patch folder are included. This macro stamps a test to ensure the
+    file stays up to date.
+
+    Args:
+        name: Name of the target
+        out: Name of file to write to the source tree. If unspecified, `name` is used
+        include_patterns: Patterns to pass to a glob of patch files
+        exclude_patterns: Patterns to ignore in a glob of patch files
+    """
+    outfile = out if out else name
+
+    # Ignore the patch list file we generate
+    exclude_patterns = exclude_patterns[:]
+    exclude_patterns.append(outfile)
+
+    list_sources(
+        name = "%s_list" % name,
+        srcs = native.glob(include_patterns, exclude = exclude_patterns),
+    )
+
+    write_source_file(
+        name = "%s_update" % name,
+        in_file = ":%s_list" % name,
+        out_file = outfile,
     )

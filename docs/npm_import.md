@@ -27,6 +27,32 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 
 
+<a id="list_patches"></a>
+
+## list_patches
+
+<pre>
+list_patches(<a href="#list_patches-name">name</a>, <a href="#list_patches-out">out</a>, <a href="#list_patches-include_patterns">include_patterns</a>, <a href="#list_patches-exclude_patterns">exclude_patterns</a>)
+</pre>
+
+Write a file containing a list of all patches in the current folder to the source tree.
+
+Use this together with the `verify_patches` attribute of `npm_translate_lock` to verify
+that all patches in a patch folder are included. This macro stamps a test to ensure the
+file stays up to date.
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :------------- | :------------- | :------------- |
+| <a id="list_patches-name"></a>name |  Name of the target   |  none |
+| <a id="list_patches-out"></a>out |  Name of file to write to the source tree. If unspecified, <code>name</code> is used   |  <code>None</code> |
+| <a id="list_patches-include_patterns"></a>include_patterns |  Patterns to pass to a glob of patch files   |  <code>["*.diff", "*.patch"]</code> |
+| <a id="list_patches-exclude_patterns"></a>exclude_patterns |  Patterns to ignore in a glob of patch files   |  <code>[]</code> |
+
+
 <a id="npm_import"></a>
 
 ## npm_import
@@ -182,10 +208,9 @@ npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_tr
                    <a href="#npm_translate_lock-public_hoist_packages">public_hoist_packages</a>, <a href="#npm_translate_lock-dev">dev</a>, <a href="#npm_translate_lock-no_optional">no_optional</a>, <a href="#npm_translate_lock-run_lifecycle_hooks">run_lifecycle_hooks</a>, <a href="#npm_translate_lock-lifecycle_hooks">lifecycle_hooks</a>,
                    <a href="#npm_translate_lock-lifecycle_hooks_envs">lifecycle_hooks_envs</a>, <a href="#npm_translate_lock-lifecycle_hooks_exclude">lifecycle_hooks_exclude</a>,
                    <a href="#npm_translate_lock-lifecycle_hooks_execution_requirements">lifecycle_hooks_execution_requirements</a>, <a href="#npm_translate_lock-lifecycle_hooks_no_sandbox">lifecycle_hooks_no_sandbox</a>, <a href="#npm_translate_lock-bins">bins</a>,
-                   <a href="#npm_translate_lock-verify_node_modules_ignored">verify_node_modules_ignored</a>, <a href="#npm_translate_lock-verify_patches">verify_patches</a>, <a href="#npm_translate_lock-verify_patches_extensions">verify_patches_extensions</a>, <a href="#npm_translate_lock-quiet">quiet</a>,
-                   <a href="#npm_translate_lock-link_workspace">link_workspace</a>, <a href="#npm_translate_lock-pnpm_version">pnpm_version</a>, <a href="#npm_translate_lock-register_copy_directory_toolchains">register_copy_directory_toolchains</a>,
-                   <a href="#npm_translate_lock-register_copy_to_directory_toolchains">register_copy_to_directory_toolchains</a>, <a href="#npm_translate_lock-package_json">package_json</a>,
-                   <a href="#npm_translate_lock-warn_on_unqualified_tarball_url">warn_on_unqualified_tarball_url</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
+                   <a href="#npm_translate_lock-verify_node_modules_ignored">verify_node_modules_ignored</a>, <a href="#npm_translate_lock-verify_patches">verify_patches</a>, <a href="#npm_translate_lock-quiet">quiet</a>, <a href="#npm_translate_lock-link_workspace">link_workspace</a>, <a href="#npm_translate_lock-pnpm_version">pnpm_version</a>,
+                   <a href="#npm_translate_lock-register_copy_directory_toolchains">register_copy_directory_toolchains</a>, <a href="#npm_translate_lock-register_copy_to_directory_toolchains">register_copy_to_directory_toolchains</a>,
+                   <a href="#npm_translate_lock-package_json">package_json</a>, <a href="#npm_translate_lock-warn_on_unqualified_tarball_url">warn_on_unqualified_tarball_url</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
 </pre>
 
 Repository macro to generate starlark code from a lock file.
@@ -236,8 +261,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 | <a id="npm_translate_lock-lifecycle_hooks_no_sandbox"></a>lifecycle_hooks_no_sandbox |  If True, a "no-sandbox" execution requirement is added to all lifecycle hooks unless overridden by <code>lifecycle_hooks_execution_requirements</code>.<br><br>Equivalent to adding <code>"*": ["no-sandbox"]</code> to <code>lifecycle_hooks_execution_requirements</code>.<br><br>This defaults to True to limit the overhead of sandbox creation and copying the output TreeArtifacts out of the sandbox.<br><br>Read more: [lifecycles](/docs/pnpm.md#lifecycles)   |  <code>True</code> |
 | <a id="npm_translate_lock-bins"></a>bins |  Binary files to create in <code>node_modules/.bin</code> for packages in this lock file.<br><br>For a given package, this is typically derived from the "bin" attribute in the package.json file of that package.<br><br>For example:<br><br><pre><code> bins = {     "@foo/bar": {         "foo": "./foo.js",         "bar": "./bar.js"     }, } </code></pre><br><br>Dicts of bins not additive. The most specific match wins.<br><br>In the future, this field may be automatically populated from information in the pnpm lock file. That feature is currently blocked on https://github.com/pnpm/pnpm/issues/5131.   |  <code>{}</code> |
 | <a id="npm_translate_lock-verify_node_modules_ignored"></a>verify_node_modules_ignored |  node_modules folders in the source tree should be ignored by Bazel.<br><br>This points to a <code>.bazelignore</code> file to verify that all nested node_modules directories pnpm will create are listed.<br><br>See https://github.com/bazelbuild/bazel/issues/8106   |  <code>None</code> |
-| <a id="npm_translate_lock-verify_patches"></a>verify_patches |  Path to a workspace folder containing all patches used in the <code>patches</code> attribute. Will fail if any patches are missing. Does not recurse into subfolders.<br><br>For example:<br><br><pre><code> verify_patches = "path/to/patches", </code></pre>   |  <code>None</code> |
-| <a id="npm_translate_lock-verify_patches_extensions"></a>verify_patches_extensions |  Patch file extensions to look for when using <code>verify_patches</code>. Add <code>""</code> to allow extensionless patches.   |  <code>[".diff", ".patch"]</code> |
+| <a id="npm_translate_lock-verify_patches"></a>verify_patches |  Label to a patch list file.<br><br>Use this in together with the <code>list_patches</code> macro to guarantee that all patches in a patch folder are included in the <code>patches</code> attribute.<br><br>For example:<br><br><pre><code> verify_patches = "//patches:patches.list", </code></pre><br><br>In your patches folder add a BUILD.bazel file containing. <pre><code> load("@aspect_rules_js//npm:npm_import.bzl", "list_patches")<br><br>list_patches(     name = "patches",     out = "patches.list", ) </code></pre><br><br>See the <code>list_patches</code> documentation for further info.   |  <code>None</code> |
 | <a id="npm_translate_lock-quiet"></a>quiet |  Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.   |  <code>True</code> |
 | <a id="npm_translate_lock-link_workspace"></a>link_workspace |  The workspace name where links will be created for the packages in this lock file.<br><br>This is typically set in rule sets and libraries that vendor the starlark generated by npm_translate_lock so the link_workspace passed to npm_import is set correctly so that links are created in the external repository and not the user workspace.<br><br>Can be left unspecified if the link workspace is the user workspace.   |  <code>None</code> |
 | <a id="npm_translate_lock-pnpm_version"></a>pnpm_version |  pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.   |  <code>"7.25.0"</code> |
