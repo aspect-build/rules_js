@@ -188,6 +188,12 @@ importers:
       unused: 0.2.2
       webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
 
+  npm/private/test/npm_package:
+    specifiers:
+      chalk: 5.0.1
+    dependencies:
+      chalk: 5.0.1
+
 packages:
 
   /@ampproject/remapping/2.2.0:
