@@ -164,8 +164,6 @@ jobs:
                       bzlmodEnabled: true
                     - folder: e2e/rules_foo
                       bzlmodEnabled: true
-                    - folder: e2e/update_pnpm_lock_with_import
-                      bzlmodEnabled: true
                     - folder: e2e/webpack_devserver
                       bzlmodEnabled: true
                     - folder: e2e/webpack_devserver_esm

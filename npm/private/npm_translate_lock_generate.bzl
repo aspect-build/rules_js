@@ -599,6 +599,15 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
         "BUILD.bazel": [
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
             "",
+            """
+# A no-op run target that can be run to invalidate the repository
+# to update the pnpm lockfile. Useful under bzlmod where
+# `bazel sync --only=repo` is a no-op.
+sh_binary(
+    name = "sync",
+    srcs = ["@aspect_rules_js//npm/private:noop.sh"],
+)""",
+            "",
             "exports_files({})".format(starlark_codegen_utils.to_list_attr([
                 rctx.attr.defs_bzl_filename,
                 rctx.attr.repositories_bzl_filename,

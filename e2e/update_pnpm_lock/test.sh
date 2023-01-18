@@ -35,20 +35,10 @@ fi
 ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 
 # Trigger the update of the pnpm lockfile
-if [ ! $BZLMOD_FLAG ]; then
-  if ! bazel sync $BZLMOD_FLAG --only=npm; then
-    echo "ERROR: expected 'bazel sync' to pass"
-    exit 1
-  fi
-else
-  # bazel sync isn't load bearing under bzlmod.
-  # Intead, run a build to trigger updating the lockfile.
-  if bazel build $BZLMOD_FLAG //...; then
-    echo "ERROR: expected 'bazel build //...' to fail"
-    exit 1
-  fi
+if ! bazel run $BZLMOD_FLAG @npm//:sync; then
+  echo "ERROR: expected 'bazel run $BZLMOD_FLAG @npm//:sync' to pass"
+  exit 1
 fi
-
 
 diff="$(git diff pnpm-lock.yaml)"
 if [ -z "$diff" ]; then

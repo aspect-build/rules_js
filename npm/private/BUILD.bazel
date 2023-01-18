@@ -7,6 +7,11 @@ exports_files(
     visibility = ["//docs:__pkg__"],
 )
 
+exports_files(
+    ["noop.sh"],
+    visibility = ["//visibility:public"],
+)
+
 bzl_library(
     name = "list_sources",
     srcs = ["list_sources.bzl"],
@@ -98,7 +103,7 @@ bzl_library(
     srcs = ["repository_label_store.bzl"],
     visibility = ["//npm:__subpackages__"],
     deps = [
-        "@bazel_skylib//lib:partial",
+        "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:paths",
     ],
 )
