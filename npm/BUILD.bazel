@@ -44,11 +44,13 @@ bzl_library(
     srcs = ["npm_import.bzl"],
     visibility = ["//visibility:public"],
     deps = [
+        "//npm/private:list_sources",
         "//npm/private:npm_import",
         "//npm/private:npm_translate_lock",
         "//npm/private:utils",
         "//npm/private:versions",
         "@aspect_bazel_lib//lib:repositories",
+        "@aspect_bazel_lib//lib:write_source_files",
         "@bazel_skylib//lib:dicts",
     ],
 )

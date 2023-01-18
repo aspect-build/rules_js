@@ -1,0 +1,3 @@
+examples/npm_deps/patches/test-a.patch
+examples/npm_deps/patches/test-a@0.0.1.patch
+examples/npm_deps/patches/test-b.patch

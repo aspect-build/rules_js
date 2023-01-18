@@ -40,6 +40,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         # labels only needed when updating the pnpm lock file
         _init_update_labels(rctx, label_store)
 
+    _init_patch_labels(rctx, label_store)
+
     _init_link_workspace(priv, rctx, label_store)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
@@ -133,6 +135,21 @@ def _init_update_labels(rctx, label_store):
         label_store.add("npm_package_lock", attr.npm_package_lock, seed_root = True)
     if attr.yarn_lock:
         label_store.add("yarn_lock", attr.yarn_lock, seed_root = True)
+
+################################################################################
+def _init_patch_labels(rctx, label_store):
+    if rctx.attr.verify_patches:
+        label_store.add("verify_patches", rctx.attr.verify_patches)
+
+    patches = []
+    for pkg_patches in rctx.attr.patches.values():
+        patches.extend(pkg_patches)
+
+    # Convert patch label strings to labels
+    patches = [rctx.attr.pnpm_lock.relative(p) for p in patches]
+
+    for i, d in enumerate(patches):
+        label_store.add("patches_{}".format(i), d)
 
 ################################################################################
 def _init_importer_labels(priv, label_store):

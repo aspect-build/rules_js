@@ -8,6 +8,15 @@ exports_files(
 )
 
 bzl_library(
+    name = "list_sources",
+    srcs = ["list_sources.bzl"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//npm:__subpackages__",
+    ],
+)
+
+bzl_library(
     name = "npm_package",
     srcs = ["npm_package.bzl"],
     visibility = [
