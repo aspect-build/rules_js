@@ -12,10 +12,21 @@ _sedi () {
   sed "${sedi[@]}" "$@"
 }
 
-if ! bazel test //...; then
-  echo "ERROR: expected 'bazel test //...' to pass"
+print_step() {
+  printf "\n\n+----------------------------------------------------------------------+"
+  printf "\n  $@"
+  printf "\n+----------------------------------------------------------------------+\n"
+}
+
+BZLMOD_FLAG="${BZLMOD_FLAG:-}"
+
+print_step "It should initially pass"
+if ! bazel test $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
+
+print_step "It should fail a bazel test run after updating a dependency when ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1"
 
 diff="$(git diff .)"
 if [ "$diff" ]; then
@@ -27,15 +38,16 @@ _sedi 's#"@types/node": "18.11.18"#"@types/node": "16"#' package.json
 
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 
-if bazel test //...; then
-  echo "ERROR: expected 'ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1 bazel test //...' to fail"
+if bazel test $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1 bazel test $BZLMOD_FLAG //...' to fail"
   exit 1
 fi
 
 ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 
-if ! bazel sync --only=npm; then
-  echo "ERROR: expected 'bazel sync --only=npm' to pass"
+print_step "It should update the lockfile after a running the invalide target with ASPECT_RULES_JS_FROZEN_PNPM_LOCK unset"
+if ! bazel run $BZLMOD_FLAG @npm//:sync; then
+  echo "ERROR: expected 'bazel run $BZLMOD_FLAG @npm//:sync' to pass"
   exit 1
 fi
 
@@ -52,17 +64,25 @@ if [ -z "$diff" ]; then
   exit 1
 fi
 
-if ! bazel test //...; then
-  echo "ERROR: expected 'bazel test //...' to pass"
+print_step "It should pass a bazel test run"
+
+if ! bazel test $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
 
-# test bootstrapping code path
-rm pnpm-lock.yaml
-_sedi 's#pnpm_lock = "//:pnpm-lock.yaml"#\# pnpm_lock = "//:pnpm-lock.yaml"#' WORKSPACE
+print_step "It should bootstrap the lockfile when pnpm_lock is missing"
 
-if bazel test //...; then
-  echo "ERROR: expected 'bazel test //...' to fail"
+rm pnpm-lock.yaml
+
+if [ ! $BZLMOD_FLAG ]; then
+  _sedi 's#pnpm_lock = "//:pnpm-lock.yaml"#\# pnpm_lock = "//:pnpm-lock.yaml"#' WORKSPACE
+else
+  _sedi 's#pnpm_lock = "//:pnpm-lock.yaml"#\# pnpm_lock = "//:pnpm-lock.yaml"#' MODULE.bazel
+fi
+
+if bazel test $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to fail"
   exit 1
 fi
 
@@ -71,8 +91,19 @@ if [ ! -e pnpm-lock.yaml ]; then
   exit 1
 fi
 
-if ! bazel test //...; then
-  echo "ERROR: expected 'bazel test //...' to pass"
+# Under WORKSPACE, the `pnpm_lock` attribute does not need to be restored at this point
+# as the @//:pnpm-lock.yaml label can be implicitly used. However, under bzlmod it must be
+# restored due to the module extension needing to explicitly parse the the pnpm lockfile.
+# By the time the read occurs the bootstrapping logic will not have executed so the file
+# doesn't exist.
+if [ $BZLMOD_FLAG ]; then
+  _sedi 's#\# pnpm_lock = "//:pnpm-lock.yaml"#pnpm_lock = "//:pnpm-lock.yaml"#' MODULE.bazel
+fi
+
+print_step "It should pass a test after the lockfile has been bootstrapped"
+
+if ! bazel test $BZLMOD_FLAG //...; then
+  echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
 

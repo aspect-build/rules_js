@@ -294,7 +294,7 @@ def _fail_if_frozen_pnpm_lock(rctx, state):
 
 ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To update run,
 
-           bazel sync --only={rctx_name}
+           bazel run @//{rctx_name}:sync
 
 """.format(
             action_cache = state.label_store.relative_path("action_cache"),

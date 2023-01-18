@@ -40,6 +40,11 @@ def _extension_impl(module_ctx):
             )
 
         for attr in mod.tags.npm_translate_lock:
+            # We cannot read the pnpm_lock file before it has been bootstrapped.
+            # See comment in e2e/update_pnpm_lock_with_import/test.sh.
+            if not attr.pnpm_lock:
+                continue
+
             lock_importers, lock_packages = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
             importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
             registries = {}
