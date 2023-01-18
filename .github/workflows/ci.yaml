@@ -143,6 +143,9 @@ jobs:
                       folder: e2e/bzlmod
                     - bzlmodEnabled: false
                       folder: e2e/bzlmod
+                    # Don't run workspace smoke test under bzlmod
+                    - folder: e2e/workspace
+                      bzlmodEnabled: true
                     # Don't run bzlmod e2e tests with Bazel 5
                     - bazelversion: 5.3.2
                       bzlmodEnabled: true
@@ -168,8 +171,6 @@ jobs:
                     - folder: e2e/webpack_devserver
                       bzlmodEnabled: true
                     - folder: e2e/webpack_devserver_esm
-                      bzlmodEnabled: true
-                    - folder: e2e/workspace
                       bzlmodEnabled: true
 
         # Steps represent a sequence of tasks that will be executed as part of the job
