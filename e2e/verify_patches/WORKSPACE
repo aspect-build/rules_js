@@ -36,6 +36,7 @@ npm_translate_lock(
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
     verify_patches = "patches",
+    verify_patches_extensions = [".patch"],
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")

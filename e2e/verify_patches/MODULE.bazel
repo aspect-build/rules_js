@@ -33,6 +33,7 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_patches = "patches",
+    verify_patches_extensions = [".patch"],
     verify_node_modules_ignored = "//:.bazelignore",
 )
 

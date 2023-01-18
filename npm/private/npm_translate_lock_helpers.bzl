@@ -21,7 +21,7 @@ def _verify_patches(rctx):
         all_patch_files = sets.make()
         for file in files_in_patch_folder:
             for ext in rctx.attr.verify_patches_extensions:
-                if ext == "" and file.basename.find(".") == -1 or file.basename.endswith("." + ext):
+                if ext == "" and file.basename.find(".") == -1 or file.basename.endswith(ext):
                     sets.insert(all_patch_files, file)
                     break
 
