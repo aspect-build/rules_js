@@ -66,11 +66,15 @@ export async function enterWorkerLoop(implementation: ImplementationFunc) {
             })
             .catch((reason) => {
                 response.exit_code = 1
-                if ('stack' in reason) {
-                    outputStream.write(String(reason.stack))
+                let error: string
+                if (typeof reason == 'object' && 'stack' in reason) {
+                    error = String(reason.stack)
                 } else {
-                    outputStream.write(String(reason))
+                    error = String(reason)
                 }
+                outputStream.write(error)
+                // also output worker log if verbose.
+                request.verbosity > 0 && console.error(error)
             })
             .finally(() => {
                 abortionMap.delete(request.request_id)
