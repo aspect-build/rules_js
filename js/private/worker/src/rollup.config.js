@@ -6,5 +6,8 @@ import terser from '@rollup/plugin-terser'
 
 /** @type {import("rollup").RollupOptions} */
 export default {
-    plugins: [resolve(), commonjs(), json(), ts(), terser()],
+    plugins: [resolve(), commonjs(), json(), ts({ sourceMap: true }), terser()],
+    output: {
+        sourcemap: 'inline',
+    },
 }
