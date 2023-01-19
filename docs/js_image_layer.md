@@ -1,6 +1,19 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-creates tar layers from js_binary targets
+Rules for creating container image layers from js_binary targets
+
+For example, this js_image_layer target outputs `node_modules.tar` and `app.tar` with `/app` prefix.
+
+```starlark
+load("@aspect_rules_js//js:defs.bzl", "js_image_layer")
+
+js_image_layer(
+    name = "layers",
+    binary = "//label/to:js_binary",
+    root = "/app",
+)
+```
+
 
 <a id="js_image_layer"></a>
 
@@ -11,6 +24,35 @@ js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer
 </pre>
 
 Create container image layers from js_binary targets.
+
+An example using rules_oci
+
+```starlark
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@contrib_rules_oci//oci:defs.bzl", "oci_image")
+
+js_binary(
+    name = "binary",
+    entry_point = "main.js",
+)
+
+js_image_layer(
+    name = "layers",
+    binary = ":binary",
+    root = "/app"
+)
+
+oci_image(
+    name = "image",
+    tars = [
+        ":layers"
+    ]
+)
+```
+
+An example using legacy rules_docker
+
+See `e2e/js_image_rules_docker` for full example.
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
