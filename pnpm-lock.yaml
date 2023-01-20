@@ -125,7 +125,7 @@ importers:
       '@rollup/plugin-json': 5.0.0
       '@rollup/plugin-node-resolve': 15.0.0
       '@rollup/plugin-terser': 0.2.0
-      '@rollup/plugin-typescript': 10.0.1
+      '@rollup/plugin-typescript': 11.0.0
       '@types/google-protobuf': 3.15.6
       '@types/node': 18.11.18
       google-protobuf: 3.21.2
@@ -139,7 +139,7 @@ importers:
       '@rollup/plugin-json': 5.0.0_rollup@2.79.1
       '@rollup/plugin-node-resolve': 15.0.0_rollup@2.79.1
       '@rollup/plugin-terser': 0.2.0_rollup@2.79.1
-      '@rollup/plugin-typescript': 10.0.1_sbiskyiysxhldmns7rmnvoiszu
+      '@rollup/plugin-typescript': 11.0.0_sbiskyiysxhldmns7rmnvoiszu
       '@types/google-protobuf': registry.npmjs.org/@types/google-protobuf/3.15.6
       '@types/node': registry.npmjs.org/@types/node/18.11.18
       rollup: 2.79.1
@@ -817,8 +817,8 @@ packages:
       terser: 5.15.1
     dev: true
 
-  /@rollup/plugin-typescript/10.0.1_sbiskyiysxhldmns7rmnvoiszu:
-    resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
+  /@rollup/plugin-typescript/11.0.0_sbiskyiysxhldmns7rmnvoiszu:
+    resolution: {integrity: sha512-goPyCWBiimk1iJgSTgsehFD5OOFHiAknrRJjqFCudcW8JtWiBlK284Xnn4flqMqg6YAjVG/EE+3aVzrL5qNSzQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.14.0||^3.0.0
