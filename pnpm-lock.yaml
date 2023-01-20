@@ -107,7 +107,7 @@ importers:
   js/private/coverage/bundle:
     specifiers:
       '@rollup/plugin-commonjs': 23.0.2
-      '@rollup/plugin-json': 5.0.1
+      '@rollup/plugin-json': 6.0.0
       '@rollup/plugin-node-resolve': 15.0.1
       c8: 7.12.0
       rollup: 3.2.5
@@ -115,14 +115,14 @@ importers:
       c8: 7.12.0
     devDependencies:
       '@rollup/plugin-commonjs': 23.0.2_rollup@3.2.5
-      '@rollup/plugin-json': 5.0.1_rollup@3.2.5
+      '@rollup/plugin-json': 6.0.0_rollup@3.2.5
       '@rollup/plugin-node-resolve': 15.0.1_rollup@3.2.5
       rollup: 3.2.5
 
   js/private/worker/src:
     specifiers:
       '@rollup/plugin-commonjs': 23.0.0
-      '@rollup/plugin-json': 5.0.0
+      '@rollup/plugin-json': 6.0.0
       '@rollup/plugin-node-resolve': 15.0.0
       '@rollup/plugin-terser': 0.2.0
       '@rollup/plugin-typescript': 10.0.1
@@ -136,7 +136,7 @@ importers:
       google-protobuf: 3.21.2
     devDependencies:
       '@rollup/plugin-commonjs': 23.0.0_rollup@2.79.1
-      '@rollup/plugin-json': 5.0.0_rollup@2.79.1
+      '@rollup/plugin-json': 6.0.0_rollup@2.79.1
       '@rollup/plugin-node-resolve': 15.0.0_rollup@2.79.1
       '@rollup/plugin-terser': 0.2.0_rollup@2.79.1
       '@rollup/plugin-typescript': 10.0.1_sbiskyiysxhldmns7rmnvoiszu
@@ -740,8 +740,8 @@ packages:
       rollup: 3.2.5
     dev: true
 
-  /@rollup/plugin-json/5.0.0_rollup@2.79.1:
-    resolution: {integrity: sha512-LsWDA5wJs/ggzakVuKQhZo7HPRcQZgBa3jWIVxQSFxaRToUGNi8ZBh3+k/gQ+1eInVYJgn4WBRCUkmoDrmmGzw==}
+  /@rollup/plugin-json/6.0.0_rollup@2.79.1:
+    resolution: {integrity: sha512-i/4C5Jrdr1XUarRhVu27EEwjt4GObltD7c+MkCIpO2QIbojw8MUs+CCTqOphQi3Qtg1FLmYt+l+6YeoIf51J7w==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0
@@ -749,12 +749,12 @@ packages:
       rollup:
         optional: true
     dependencies:
-      '@rollup/pluginutils': 4.2.1
+      '@rollup/pluginutils': 5.0.2_rollup@2.79.1
       rollup: 2.79.1
     dev: true
 
-  /@rollup/plugin-json/5.0.1_rollup@3.2.5:
-    resolution: {integrity: sha512-QCwhZZLvM8nRcTHyR1vOgyTMiAnjiNj1ebD/BMRvbO1oc/z14lZH6PfxXeegee2B6mky/u9fia4fxRM4TqrUaw==}
+  /@rollup/plugin-json/6.0.0_rollup@3.2.5:
+    resolution: {integrity: sha512-i/4C5Jrdr1XUarRhVu27EEwjt4GObltD7c+MkCIpO2QIbojw8MUs+CCTqOphQi3Qtg1FLmYt+l+6YeoIf51J7w==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0
