@@ -36,9 +36,9 @@ npm_repositories()
 ###
 http_archive(
     name = "rules_python",
-    sha256 = "a868059c8c6dd6ad45a205cca04084c652cfe1852e6df2d5aca036f6e5438380",
-    strip_prefix = "rules_python-0.14.0",
-    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.14.0.tar.gz",
+    sha256 = "48a838a6e1983e4884b26812b2c748a35ad284fd339eb8e2a6f3adf95307fbcd",
+    strip_prefix = "rules_python-0.16.2",
+    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.16.2.tar.gz",
 )
 
 http_archive(
@@ -60,8 +60,8 @@ rules_pkg_dependencies()
 # See: https://github.com/bazelbuild/rules_docker/pull/2035
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "099a9fb96a376ccbbb7d291ed4ecbdfd42f6bc822ab77ae6f1b5cb9e914e94fa",
-    urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.35.0/rules_go-v0.35.0.zip"],
+    sha256 = "56d8c5a5c91e1af73eca71a6fab2ced959b67c86d12ba37feedb0a2dfea441a6",
+    urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.37.0/rules_go-v0.37.0.zip"],
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
