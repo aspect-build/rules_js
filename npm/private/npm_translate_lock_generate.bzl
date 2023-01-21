@@ -404,6 +404,8 @@ def _gen_npm_imports(importers, packages, root_package, rctx_name, attr, registr
                     url = registry + tarball[len(utils.default_registry()):]
                 else:
                     url = tarball
+            elif tarball.startswith("file:"):
+                url = tarball
             else:
                 if not registry:
                     registry = utils.npm_registry_url(name, registries, default_registry)

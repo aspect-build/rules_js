@@ -55,6 +55,16 @@ def _gather_package_info(package_path, package_snapshot):
         name, version = utils.parse_pnpm_name(package)
         friendly_version = utils.strip_peer_dep_version(version)
         package_key = package
+    elif package_path.startswith("file:") and "id" in package_snapshot and package_snapshot["id"].endswith(".tgz"):
+        if "name" not in package_snapshot:
+            fail("expected package %s to have a name field" % package_path)
+        name = package_snapshot["name"]
+        package = package_snapshot["name"]
+        version = package_path
+        if "version" in package_snapshot:
+            version = package_snapshot["version"]
+        package_key = "{}/{}".format(package, version)
+        friendly_version = version
     elif package_path.startswith("file:"):
         package = package_path
         if "name" not in package_snapshot:
@@ -110,20 +120,31 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
     Returns:
         Nested dictionary suitable for further processing in our repository rule
     """
+    packages = {}
+    for package_path, package_snapshot in lock_packages.items():
+        package, package_info = _gather_package_info(package_path, package_snapshot)
+        packages[package] = package_info
+
+    tar_packages = {
+        p: info
+        for p, info in packages.items()
+        if info["resolution"].get("tarball") and info["resolution"]["tarball"].startswith("file:")
+    }
     importers = {}
     for importPath in lock_importers.keys():
         lock_importer = lock_importers[importPath]
         prod_deps = {} if dev else lock_importer.get("dependencies", {})
         dev_deps = {} if prod else lock_importer.get("devDependencies", {})
         opt_deps = {} if no_optional else lock_importer.get("optionalDependencies", {})
-        importers[importPath] = {
-            "dependencies": dicts.add(prod_deps, dev_deps, opt_deps),
-        }
+        dependencies = dicts.add(prod_deps, dev_deps, opt_deps)
 
-    packages = {}
-    for package_path, package_snapshot in lock_packages.items():
-        package, package_info = _gather_package_info(package_path, package_snapshot)
-        packages[package] = package_info
+        for info in tar_packages.values():
+            if info["name"] in dependencies:
+                dependencies[info["name"]] = info["version"]
+
+        importers[importPath] = {
+            "dependencies": dependencies,
+        }
 
     for package in packages.keys():
         package_info = packages[package]
