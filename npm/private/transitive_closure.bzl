@@ -55,7 +55,7 @@ def _gather_package_info(package_path, package_snapshot):
         name, version = utils.parse_pnpm_name(package)
         friendly_version = utils.strip_peer_dep_version(version)
         package_key = package
-    elif package_path.startswith("file:") and "id" in package_snapshot and package_snapshot["id"].endswith(".tgz"):
+    elif package_path.startswith("file:") and utils.is_vendored_tarfile(package_snapshot):
         if "name" not in package_snapshot:
             fail("expected package %s to have a name field" % package_path)
         name = package_snapshot["name"]
