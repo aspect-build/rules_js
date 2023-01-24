@@ -111,6 +111,8 @@ jobs:
               run: echo "folder=e2e/webpack_devserver_esm" >> $GITHUB_OUTPUT
             - id: workspace
               run: echo "folder=e2e/workspace" >> $GITHUB_OUTPUT
+            - id: vendored_tarfile
+              run: echo "folder=e2e/vendored_tarfile" >> $GITHUB_OUTPUT
         outputs:
             # Will look like [".", "e2e/bzlmod", ...]
             folders: ${{ toJSON(steps.*.outputs.folder) }}

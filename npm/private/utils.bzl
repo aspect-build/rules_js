@@ -304,6 +304,11 @@ WARNING: Issue while reading "{npmrc}". Failed to replace env in config: ${{{tok
             ))
     return token
 
+def _is_vendored_tarfile(package_snapshot):
+    if "resolution" in package_snapshot:
+        return "tarball" in package_snapshot["resolution"]
+    return False
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -334,4 +339,5 @@ utils = struct(
     exists = _exists,
     home_directory = _home_directory,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
+    is_vendored_tarfile = _is_vendored_tarfile,
 )

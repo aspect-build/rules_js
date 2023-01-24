@@ -54,6 +54,8 @@ build_test(
         ":node_modules/handlebars-helpers/helper-date",
         ":node_modules/inline-fixtures",
         ":node_modules/json-stable-stringify",
+        # a vendored .tgz file
+        ":node_modules/lodash",
         ":node_modules/node-gyp",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
