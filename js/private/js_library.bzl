@@ -77,11 +77,24 @@ _ATTRS = {
     "deps": attr.label_list(
         doc = """Dependencies of this target.
 
-        This may include other js_library targets or other targets that provide JsInfo
+        This may include other `js_library` targets or other targets that provide `JsInfo`.
 
         The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
         runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
         runtime dependency on this target.
+
+        Npm dependencies in `deps` are propagated to the transitive npm dependencies of downstream `npm_package` targets when
+        they are linked.
+        """,
+        providers = [JsInfo],
+    ),
+    "dev_deps": attr.label_list(
+        doc = """Development dependencies of this target.
+
+        This may include other `js_library` targets or other targets that provide `JsInfo`.
+
+        Development dependencies are not added to the runfiles of this target or propagated to the transitive npm
+        deps of downstream `npm_package` targets when they are linked.
         """,
         providers = [JsInfo],
     ),
@@ -212,11 +225,11 @@ def _js_library_impl(ctx):
 
     npm_linked_packages = gather_npm_linked_packages(
         srcs = ctx.attr.srcs + ctx.attr.declarations,
-        deps = ctx.attr.deps,
+        deps = ctx.attr.deps + ctx.attr.dev_deps,
     )
 
     npm_package_store_deps = gather_npm_package_store_deps(
-        targets = ctx.attr.data,
+        targets = ctx.attr.deps + ctx.attr.data,
     )
 
     runfiles = gather_runfiles(

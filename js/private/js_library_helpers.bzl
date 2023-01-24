@@ -12,13 +12,8 @@ JS_LIBRARY_DATA_ATTR = attr.label_list(
     are added to the runfiles of this target. They should appear in the '*.runfiles' area of any executable which has
     a runtime dependency on this target.
 
-    If this list contains linked npm packages, npm package store targets or other targets that provide `JsInfo`,
-    `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from the
-    `npm_package_store_deps` field of these. For linked npm package targets, the underlying npm_package_store
-    target(s) that back the links is used.
-
-    Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies when linking a downstream
-    `npm_package` target with `npm_link_package`.
+    Npm dependencies in `data` are propagated to the transitive npm dependencies of downstream `npm_package` targets when
+    they are linked.
     """,
     allow_files = True,
 )
