@@ -158,6 +158,7 @@ importers:
       handlebars-helpers/helper-date: github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55
       inline-fixtures: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662
       json-stable-stringify: 1.0.1
+      lodash: file:vendored/lodash-4.17.21.tgz
       node-gyp: 9.3.0
       plotly.js: 2.12.1
       protoc-gen-grpc: git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f
@@ -178,6 +179,7 @@ importers:
       handlebars-helpers/helper-date: github.com/coda/helper-date/a2cb4284148cbba7d36173dff4c7c60ce59eae55
       inline-fixtures: '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662'
       json-stable-stringify: 1.0.1
+      lodash: file:npm/private/test/vendored/lodash-4.17.21.tgz
       node-gyp: 9.3.0
       plotly.js: 2.12.1
       protoc-gen-grpc: github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f
@@ -6160,6 +6162,12 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
+    dev: true
+
+  file:npm/private/test/vendored/lodash-4.17.21.tgz:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:npm/private/test/vendored/lodash-4.17.21.tgz}
+    name: lodash
+    version: 4.17.21
     dev: true
 
   file:npm/private/test/vendored/semver-max:
