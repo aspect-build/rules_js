@@ -335,7 +335,7 @@ def _copy_input_file(priv, rctx, label_store, key):
 
 def _is_text_file(p):
     # we can assume some files types are text files that are commonly copied
-    return p.endswith(".yaml") or p.endswith(".json") or p.endswith(".npmrc")
+    return p.endswith(".yaml") or p.endswith(".json") or p.endswith(".npmrc") or p.endswith(".lock")
 
 def _copy_text_file(priv, rctx, label_store, key):
     contents = rctx.read(label_store.path(key))
