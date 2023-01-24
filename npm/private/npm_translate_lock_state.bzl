@@ -328,6 +328,16 @@ def _write_action_cache(priv, rctx, label_store):
 def _copy_input_file(priv, rctx, label_store, key):
     if not label_store.has(key):
         fail("key not found '{}'".format(key))
+    if _is_text_file(label_store.path(key)):
+        _copy_text_file(priv, rctx, label_store, key)
+    else:
+        _copy_binary_file(priv, rctx, label_store, key)
+
+def _is_text_file(p):
+    # we can assume some files types are text files that are commonly copied
+    return p.endswith(".yaml") or p.endswith(".json") or p.endswith(".npmrc")
+
+def _copy_text_file(priv, rctx, label_store, key):
     contents = rctx.read(label_store.path(key))
     if _should_update_pnpm_lock(priv):
         _set_input_hash(
@@ -340,6 +350,30 @@ def _copy_input_file(priv, rctx, label_store, key):
         content = contents,
         executable = False,
     )
+
+def _copy_binary_file(priv, rctx, label_store, key):
+    # For the purposes of the hash we can load the file in text mode
+    contents = rctx.read(label_store.path(key))
+    if _should_update_pnpm_lock(priv):
+        _set_input_hash(
+            priv,
+            label_store.relative_path(key),
+            utils.hash(contents),
+        )
+
+    # Create a sibling file to ensure the output directory exists
+    rctx.file(
+        label_store.repository_path(key) + "_",
+        content = "",
+        executable = False,
+    )
+
+    # Copy the file over using cp (xcopy on Windows)
+    is_windows = repo_utils.is_windows(rctx)
+    cp_args = ["cp", "-f", label_store.path(key), label_store.repository_path(key)] if not is_windows else ["xcopy", "/Y", label_store.path(key).replace("/", "\\"), label_store.repository_path(key).replace("/", "\\")]
+    result = rctx.execute(cp_args, quiet = rctx.attr.quiet)
+    if result.return_code:
+        fail("copy {} to {} failed:\nSTDOUT:\n{}\nSTDERR:\n{}".format(label_store.path(key), label_store.repository_path(key), result.stdout, result.stderr))
 
 ################################################################################
 def _load_npmrc(priv, rctx, npmrc_path):
