@@ -11,11 +11,13 @@ load("//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_jq_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_coreutils_toolchains", "register_jq_toolchains")
 
 aspect_bazel_lib_dependencies(override_local_config_platform = True)
 
 register_jq_toolchains()
+
+register_coreutils_toolchains()
 
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
@@ -33,6 +35,11 @@ nodejs_register_toolchains(
 nodejs_register_toolchains(
     name = "node16",
     node_version = "16.13.1",
+)
+
+nodejs_register_toolchains(
+    name = "node18",
+    node_version = "18.12.0",
 )
 
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
@@ -86,6 +93,7 @@ npm_translate_lock(
         "//examples/webpack_cli:package.json",
         "//js/private/coverage/bundle:package.json",
         "//js/private/image:package.json",
+        "//js/private/test/image/structure:package.json",
         "//js/private/worker/src:package.json",
         "//npm/private/test:package.json",
         "//npm/private/test:vendored/lodash-4.17.21.tgz",

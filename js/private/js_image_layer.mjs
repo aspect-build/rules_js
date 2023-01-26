@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url';
 import require$$0 from 'fs';
 import require$$1 from 'events';
 import require$$1$1 from 'path';
@@ -26544,15 +26545,9 @@ vending.registerFormat('json', json);
 
 var archiver = vending;
 
-const [entriesPath, appLayerPath, nodeModulesLayerPath] = process.argv.slice(2);
-const app = archiver.create('tar', { gzip: true });
-app.pipe(createWriteStream(appLayerPath));
-const app_structure = new Set();
-const node_modules = archiver.create('tar', { gzip: true });
-node_modules.pipe(createWriteStream(nodeModulesLayerPath));
-const node_modules_structure = new Set();
-const entries = JSON.parse((await readFile(entriesPath)).toString());
-function mkdirP(p, output, structure) {
+const MTIME = new Date(0);
+const NOBYTES = Buffer.concat([]);
+function mkdirP(p, output, structure, mtime) {
     const dirname = path$7.dirname(p).split('/');
     let prev = '/';
     for (const part of dirname) {
@@ -26564,10 +26559,10 @@ function mkdirP(p, output, structure) {
             continue;
         }
         structure.add(prev);
-        output = output.append(null, { name: prev, type: 'directory' });
+        output.append(NOBYTES, { name: prev, date: mtime, ['type']: 'directory' });
     }
 }
-function findKeyByValue(value) {
+function findKeyByValue(entries, value) {
     for (const [key, { dest: val }] of Object.entries(entries)) {
         if (val == value) {
             return key;
@@ -26586,48 +26581,92 @@ async function* walk(dir, accumulate = '') {
         }
     }
 }
-for (const key of Object.keys(entries).sort()) {
-    const { dest, is_directory, is_source, root } = entries[key];
-    const outputArchive = dest.indexOf('node_modules') ? node_modules : app;
-    const structure = dest.indexOf('node_modules')
-        ? node_modules_structure
-        : app_structure;
-    mkdirP(key, outputArchive, structure);
-    if (is_directory) {
-        for await (const sub_key of walk(dest)) {
-            const new_key = path$7.join(key, sub_key);
-            const new_dest = path$7.join(dest, sub_key);
-            mkdirP(new_key, outputArchive, structure);
-            outputArchive.append(createReadStream(new_dest), { name: new_key });
-        }
-        continue;
-    }
-    else {
-        const entryStat = await stat$1(dest);
-        if (is_source) {
-            outputArchive.append(createReadStream(dest), {
-                name: key,
-                stats: entryStat,
-            });
-        }
-        else {
-            if (!root) {
-                // everything except sources should have
-                throw new Error(`unexpected entry format. ${JSON.stringify(entries[key])}. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose`);
-            }
-            let realp = await realpath$1(dest);
-            const outputPath = realp.slice(realp.indexOf(root));
-            if (outputPath != dest) {
-                outputArchive.symlink(key.replace(/^\//, ''), findKeyByValue(outputPath));
-            }
-            else {
-                outputArchive.append(createReadStream(dest), {
-                    name: key,
-                    stats: entryStat,
+function hermeticStat(stat) {
+    return {
+        size: stat.size,
+        mode: stat.mode,
+        mtime: MTIME,
+        isDirectory: stat.isDirectory,
+        isFile: stat.isFile,
+        isSymbolicLink: stat.isSymbolicLink,
+    };
+}
+async function build(entries, appLayerPath, nodeModulesLayerPath, mtime = MTIME) {
+    const app = archiver.create('tar', { gzip: true });
+    app.pipe(createWriteStream(appLayerPath));
+    const app_structure = new Set();
+    const node_modules = archiver.create('tar', { gzip: true });
+    node_modules.pipe(createWriteStream(nodeModulesLayerPath));
+    const node_modules_structure = new Set();
+    for (const key of Object.keys(entries).sort()) {
+        const { dest, is_directory, is_source, root } = entries[key];
+        const outputArchive = dest.indexOf('node_modules') != -1 ? node_modules : app;
+        const structure = dest.indexOf('node_modules') != -1
+            ? node_modules_structure
+            : app_structure;
+        mkdirP(key, outputArchive, structure, mtime);
+        if (is_directory) {
+            for await (const sub_key of walk(dest)) {
+                const new_key = path$7.join(key, sub_key);
+                const new_dest = path$7.join(dest, sub_key);
+                mkdirP(new_key, outputArchive, structure, mtime);
+                const entryStat = await stat$1(new_dest);
+                outputArchive.append(createReadStream(new_dest), {
+                    name: new_key,
+                    date: mtime,
+                    mode: entryStat.mode,
+                    stats: hermeticStat(entryStat),
                 });
             }
+            continue;
+        }
+        else {
+            const entryStat = await stat$1(dest);
+            if (is_source) {
+                outputArchive.append(createReadStream(dest), {
+                    name: key,
+                    mode: entryStat.mode,
+                    date: mtime,
+                    stats: hermeticStat(entryStat),
+                });
+            }
+            else {
+                if (!root) {
+                    // everything except sources should have
+                    throw new Error(`unexpected entry format. ${JSON.stringify(entries[key])}. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose`);
+                }
+                let realp = await realpath$1(dest);
+                const outputPath = realp.slice(realp.indexOf(root));
+                if (outputPath != dest) {
+                    // .symlink function from archiver does not support setting the mtime which leads to non-reproducible builds. 
+                    // therefore we'll use .append instead. 
+                    outputArchive.append(NOBYTES, {
+                        ['type']: 'symlink',
+                        name: key.replace(/\\/g, '/').replace(/^\//, ''),
+                        ['linkname']: findKeyByValue(entries, outputPath).replace(/\\/g, '/'),
+                        date: mtime,
+                        mode: entryStat.mode,
+                        stats: hermeticStat(entryStat)
+                    });
+                }
+                else {
+                    outputArchive.append(createReadStream(dest), {
+                        name: key,
+                        mode: entryStat.mode,
+                        date: mtime,
+                        stats: hermeticStat(entryStat),
+                    });
+                }
+            }
         }
     }
+    await app.finalize();
+    await node_modules.finalize();
 }
-await app.finalize();
-await node_modules.finalize();
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+    const [entriesPath, appLayerPath, nodeModulesLayerPath] = process.argv.slice(2);
+    const entries = JSON.parse((await readFile(entriesPath)).toString());
+    build(entries, appLayerPath, nodeModulesLayerPath);
+}
+
+export { build };

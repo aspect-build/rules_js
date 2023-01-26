@@ -1,0 +1,91 @@
+load("//js:defs.bzl", "js_binary", "js_image_layer")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+js_binary(
+    name = "bin",
+    data = [
+        "//:node_modules/acorn",
+    ],
+    entry_point = "main.js",
+)
+
+js_image_layer(
+    name = "layers",
+    binary = ":bin",
+    root = "/app",
+    visibility = ["//visibility:__pkg__"],
+)
+
+platform(
+    name = "arm64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+filegroup(
+    name = "app_layer",
+    srcs = [":layers"],
+    output_group = "app",
+)
+
+platform_transition_filegroup(
+    name = "app_layer_transition",
+    srcs = [":app_layer"],
+    target_platform = ":arm64_linux",
+)
+
+filegroup(
+    name = "node_modules_layer",
+    srcs = [":layers"],
+    output_group = "node_modules",
+)
+
+platform_transition_filegroup(
+    name = "node_modules_layer_transition",
+    srcs = [":node_modules_layer"],
+    target_platform = ":arm64_linux",
+)
+
+genrule(
+    name = "structure",
+    srcs = [
+        ":app_layer_transition",
+        ":node_modules_layer_transition",
+    ],
+    outs = [
+        "app_structure_generated.mf",
+        "node_modules_structure_generated.mf",
+        "digests_generated.sum",
+    ],
+    cmd = """
+    tar -tf ./$(location :app_layer_transition) > $(location :app_structure_generated.mf) &&
+    tar -tf ./$(location :node_modules_layer_transition) > $(location :node_modules_structure_generated.mf) && 
+    $(COREUTILS_BIN) sha256sum ./$(location :app_layer_transition) ./$(location :node_modules_layer_transition) | $(COREUTILS_BIN) cut -f1 -d " " > $(location digests_generated.sum)
+    """,
+    output_to_bindir = True,
+    toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
+)
+
+diff_test(
+    name = "app_structure_diff",
+    file1 = ":app_structure_generated.mf",
+    file2 = "app_structure.mf",
+)
+
+diff_test(
+    name = "node_modules_structure_diff",
+    file1 = ":node_modules_structure_generated.mf",
+    file2 = "node_modules_structure.mf",
+)
+
+diff_test(
+    name = "digests_diff",
+    file1 = ":digests_generated.sum",
+    file2 = "digests.sum",
+)
