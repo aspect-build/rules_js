@@ -66,11 +66,16 @@ jobs:
         runs-on: ubuntu-latest
         env:
             ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         steps:
             - id: root
               run: echo "folder=." >> $GITHUB_OUTPUT
             - id: bzlmod
               run: echo "folder=e2e/bzlmod" >> $GITHUB_OUTPUT
+            - id: git_dep_metadata
+              run: echo "folder=e2e/git_dep_metadata" >> $GITHUB_OUTPUT
+              # Don't run e2e/git_dep_metadata if there is no ssh key secret which is the case on forks.
+              if: ${{ env.SSH_PRIVATE_KEY != '' }}
             - id: js_image
               run: echo "folder=e2e/js_image" >> $GITHUB_OUTPUT
             - id: js_run_devserver
@@ -175,6 +180,15 @@ jobs:
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v3
+
+            # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
+            # which exercises fetching a git repository via ssh.
+            - uses: webfactory/ssh-agent@v0.7.0
+              env:
+                  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+              if: ${{ env.SSH_PRIVATE_KEY != '' }}
+              with:
+                  ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
             - name: Mount bazel caches
               uses: actions/cache@v3
