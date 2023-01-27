@@ -80,6 +80,8 @@ jobs:
               run: echo "folder=e2e/js_image" >> $GITHUB_OUTPUT
             - id: js_image_docker
               run: echo "folder=e2e/js_image_docker" >> $GITHUB_OUTPUT
+            - id: js_image_oci
+              run: echo "folder=e2e/js_image_oci" >> $GITHUB_OUTPUT
             - id: js_run_devserver
               run: echo "folder=e2e/js_run_devserver" >> $GITHUB_OUTPUT
             - id: npm_link_package-esm
@@ -175,6 +177,10 @@ jobs:
                     - folder: .
                       bzlmodEnabled: true
                     - folder: e2e/js_image_docker
+                      bzlmodEnabled: true
+                    - folder: e2e/js_image_oci
+                      bzlmodEnabled: true
+                    - folder: e2e/js_run_devserver
                       bzlmodEnabled: true
                     - folder: e2e/npm_link_package-esm
                       bzlmodEnabled: true

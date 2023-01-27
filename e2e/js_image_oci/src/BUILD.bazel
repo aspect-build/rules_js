@@ -1,0 +1,56 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@contrib_rules_oci//oci:defs.bzl", "oci_image", "structure_test")
+load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+
+js_binary(
+    name = "main",
+    args = ["foo"],
+    data = [
+        "ascii.art",
+        "//:node_modules/chalk",
+    ],
+    entry_point = "main.js",
+)
+
+# Image
+js_image_layer(
+    name = "layers",
+    binary = ":main",
+    root = "/app",
+    visibility = ["//visibility:__pkg__"],
+)
+
+platform(
+    name = "amd64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform_transition_filegroup(
+    name = "transitioned_layers",
+    srcs = [":layers"],
+    target_platform = ":amd64_linux",
+)
+
+oci_image(
+    name = "image",
+    # Since js_binary depends on bash we have to bring in a base image that has bash
+    base = "@debian_amd64//:image",
+    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
+    cmd = ["/app/src/main"],
+    entrypoint = ["bash"],
+    tars = [
+        ":transitioned_layers",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+structure_test(
+    name = "image_test",
+    config = [":smoketest.yaml"],
+    image = ":image",
+    # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
+    tags = ["no-remote-exec"],
+)

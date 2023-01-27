@@ -73,8 +73,8 @@ container_image(
 
     # Since js_binary depends on bash we have to bring in a base image that has bash
     base = "@debian_amd64//image",  # or "@debian_arm64//image", if you are on an arm machine
-    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}.sh
-    cmd = ["/app/main.sh"],
+    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
+    cmd = ["/app/main"],
     entrypoint = ["bash"],
     layers = [
         ":app_layer",

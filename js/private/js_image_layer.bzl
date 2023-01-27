@@ -37,6 +37,8 @@ js_image_layer(
 
 oci_image(
     name = "image",
+    cmd = ["/app/main"],
+    entrypoint = ["bash"],
     tars = [
         ":layers"
     ]
@@ -89,7 +91,7 @@ container_layer(
 
 container_image(
     name = "image",
-    cmd = ["/app/main.sh"],
+    cmd = ["/app/main"],
     entrypoint = ["bash"],
     layers = [
         ":app_layer",
@@ -122,7 +124,9 @@ def _runfile_path(ctx, file, runfiles_dir):
 
 def _runfiles_dir(root, default):
     manifest = default.files_to_run.runfiles_manifest
-    return paths.join(root, manifest.short_path.replace(manifest.basename, "")[:-1])
+
+    runfiles = manifest.short_path.replace(manifest.basename, "")[:-1]
+    return paths.join(root, runfiles.replace(".sh", ""))
 
 def _js_image_layer_impl(ctx):
     default = ctx.attr.binary[DefaultInfo]
@@ -135,7 +139,7 @@ def _js_image_layer_impl(ctx):
     files = {}
 
     files[original_executable_path] = {"dest": executable.path, "root": executable.root.path}
-    files[executable_path] = {"dest": launcher.path, "root": launcher.root.path}
+    files[executable_path.replace(".sh", "")] = {"dest": launcher.path, "root": launcher.root.path}
 
     runfiles_dir = _runfiles_dir(ctx.attr.root, default)
 

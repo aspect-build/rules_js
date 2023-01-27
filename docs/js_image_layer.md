@@ -44,6 +44,8 @@ js_image_layer(
 
 oci_image(
     name = "image",
+    cmd = ["/app/main"],
+    entrypoint = ["bash"],
     tars = [
         ":layers"
     ]
@@ -96,7 +98,7 @@ container_layer(
 
 container_image(
     name = "image",
-    cmd = ["/app/main.sh"],
+    cmd = ["/app/main"],
     entrypoint = ["bash"],
     layers = [
         ":app_layer",
