@@ -2,6 +2,7 @@
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=-2065072158
 <<<<<<< HEAD
+<<<<<<< HEAD
 pnpm-lock.yaml=114911151
 examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch=-442666336
 package.json=325733595
@@ -11,6 +12,11 @@ pnpm-lock.yaml=-1015897635
 package.json=-2091148127
 pnpm-workspace.yaml=1061346703
 >>>>>>> add structure and digest tests
+=======
+pnpm-lock.yaml=2113195138
+package.json=-2091148127
+pnpm-workspace.yaml=1536402859
+>>>>>>> add more tests
 examples/js_binary/package.json=-41174383
 examples/macro/package.json=-696073599
 examples/npm_deps/package.json=283109008
@@ -23,7 +29,7 @@ js/private/coverage/bundle/package.json=-975746706
 js/private/worker/src/package.json=-433137194
 =======
 js/private/image/package.json=1973451027
-js/private/test/image/structure/package.json=1286417612
+js/private/test/image/package.json=1295393035
 js/private/worker/src/package.json=-1936685546
 >>>>>>> refactor: promote js_image_layer to public api
 npm/private/test/package.json=1727477721

@@ -12,4 +12,4 @@ node_modules/
 npm/private/test/node_modules/
 npm/private/test/npm_package/node_modules/
 js/private/image/node_modules
-js/private/test/image/structure/node_modules
+js/private/test/image/node_modules

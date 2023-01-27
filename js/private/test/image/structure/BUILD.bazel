@@ -1,14 +1,11 @@
 load("//js:defs.bzl", "js_binary", "js_image_layer")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
-load("@npm//:defs.bzl", "npm_link_all_packages")
-
-npm_link_all_packages(name = "node_modules")
 
 js_binary(
     name = "bin",
     data = [
-        "//:node_modules/acorn",
+        "//js/private/test/image:node_modules/acorn",
     ],
     entry_point = "main.js",
 )

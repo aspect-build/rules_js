@@ -9,6 +9,6 @@ packages:
     - 'js/private/coverage/bundle'
     - 'js/private/worker/src'
     - 'js/private/image'
-    - 'js/private/test/image/structure'
+    - 'js/private/test/image'
     - 'npm/private/test'
     - 'npm/private/test/npm_package'

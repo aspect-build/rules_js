@@ -26559,7 +26559,11 @@ function mkdirP(p, output, structure, mtime) {
             continue;
         }
         structure.add(prev);
-        output.append(NOBYTES, { name: prev, date: mtime, ['type']: 'directory' });
+        output.append(NOBYTES, {
+            name: prev,
+            date: mtime,
+            ['type']: 'directory',
+        });
     }
 }
 function findKeyByValue(entries, value) {
@@ -26638,15 +26642,15 @@ async function build(entries, appLayerPath, nodeModulesLayerPath, mtime = MTIME)
                 let realp = await realpath$1(dest);
                 const outputPath = realp.slice(realp.indexOf(root));
                 if (outputPath != dest) {
-                    // .symlink function from archiver does not support setting the mtime which leads to non-reproducible builds. 
-                    // therefore we'll use .append instead. 
+                    // .symlink function from archiver does not support setting the mtime which leads to non-reproducible builds.
+                    // therefore we'll use .append instead.
                     outputArchive.append(NOBYTES, {
                         ['type']: 'symlink',
                         name: key.replace(/\\/g, '/').replace(/^\//, ''),
                         ['linkname']: findKeyByValue(entries, outputPath).replace(/\\/g, '/'),
                         date: mtime,
                         mode: entryStat.mode,
-                        stats: hermeticStat(entryStat)
+                        stats: hermeticStat(entryStat),
                     });
                 }
                 else {

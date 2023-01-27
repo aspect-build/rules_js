@@ -1,5 +1,5 @@
 import { pathToFileURL } from 'node:url'
-import archiver, { Archiver, create } from 'archiver'
+import { Archiver, create } from 'archiver'
 import { createReadStream, createWriteStream, Stats } from 'node:fs'
 import { readdir, readFile, realpath, stat } from 'node:fs/promises'
 import * as path from 'node:path'

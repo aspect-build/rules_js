@@ -1,0 +1,43 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//js:defs.bzl", "js_binary", "js_image_layer", "js_test")
+
+npm_link_all_packages(name = "node_modules")
+
+js_binary(
+    name = "bin",
+    data = [
+        ":node_modules/acorn",
+    ],
+    entry_point = "main.js",
+)
+
+js_image_layer(
+    name = "layers",
+    binary = ":bin",
+    root = "/app",
+    visibility = ["//visibility:__pkg__"],
+)
+
+js_test(
+    name = "mtime",
+    args = [
+        "$(locations :layers)",
+    ],
+    data = [
+        ":layers",
+        ":node_modules/tar",
+    ],
+    entry_point = "mtime.test.mjs",
+)
+
+js_test(
+    name = "symlink_tree",
+    args = [
+        "$(locations :layers)",
+    ],
+    data = [
+        ":layers",
+        ":node_modules/tar-stream",
+    ],
+    entry_point = "symlink_tree.test.mjs",
+)
