@@ -1,0 +1,25 @@
+module(
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+
+npm.npm_import(
+    name = "protoc-gen-grpc",
+    commit = "be5580b06348d3eb9b4610a4a94065154a0df41f",
+    package = "protoc-gen-grpc",
+    root_package = "",
+    url = "git+ssh://git@github.com/gregmagolan-codaio/protoc-gen-grpc-ts.git",
+    version = "github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f",
+)
+
+use_repo(npm, "protoc-gen-grpc")
+use_repo(npm, "protoc-gen-grpc__links")
