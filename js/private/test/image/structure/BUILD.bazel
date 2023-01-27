@@ -18,10 +18,10 @@ js_image_layer(
 )
 
 platform(
-    name = "arm64_linux",
+    name = "amd64_linux",
     constraint_values = [
         "@platforms//os:linux",
-        "@platforms//cpu:arm64",
+        "@platforms//cpu:x86_64",
     ],
 )
 
@@ -34,7 +34,7 @@ filegroup(
 platform_transition_filegroup(
     name = "app_layer_transition",
     srcs = [":app_layer"],
-    target_platform = ":arm64_linux",
+    target_platform = ":amd64_linux",
 )
 
 filegroup(
@@ -46,7 +46,7 @@ filegroup(
 platform_transition_filegroup(
     name = "node_modules_layer_transition",
     srcs = [":node_modules_layer"],
-    target_platform = ":arm64_linux",
+    target_platform = ":amd64_linux",
 )
 
 genrule(

@@ -19,9 +19,9 @@ app/js/private/test/image/structure/bin.sh.runfiles/aspect_rules_js/js/private/t
 app/js/private/test/image/structure/bin.sh.runfiles/aspect_rules_js/js/private/test/image/structure/bin_node_bin/
 app/js/private/test/image/structure/bin.sh.runfiles/aspect_rules_js/js/private/test/image/structure/bin_node_bin/node
 app/js/private/test/image/structure/bin.sh.runfiles/aspect_rules_js/js/private/test/image/structure/main.js
-app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_arm64/
-app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_arm64/bin/
-app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_arm64/bin/nodejs/
-app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_arm64/bin/nodejs/bin/
-app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_arm64/bin/nodejs/bin/node
+app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_amd64/
+app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_amd64/bin/
+app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_amd64/bin/nodejs/
+app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_amd64/bin/nodejs/bin/
+app/js/private/test/image/structure/bin.sh.runfiles/nodejs_linux_amd64/bin/nodejs/bin/node
 app/js/private/test/image/structure/bin_.sh
