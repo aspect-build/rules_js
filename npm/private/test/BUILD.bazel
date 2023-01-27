@@ -87,3 +87,16 @@ sh_test(
     ],
     toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
 )
+
+# Test that a package imported directly from a git repository has its
+# .git folder removed.
+sh_test(
+    name = "no_git_metadata_test",
+    srcs = ["no_git_metadata_test.sh"],
+    args = [
+        "$(rootpath @protoc-gen-grpc//:pkg)",
+    ],
+    data = [
+        "@protoc-gen-grpc//:pkg",
+    ],
+)

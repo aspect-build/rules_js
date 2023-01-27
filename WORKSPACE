@@ -172,3 +172,14 @@ npm_import(
     root_package = "",
     version = "8.4.0",
 )
+
+# Import a package using git+ssh to test that the .git folder is removed
+# See //npm/private/test:no_git_metadata_test.
+npm_import(
+    name = "protoc-gen-grpc",
+    commit = "be5580b06348d3eb9b4610a4a94065154a0df41f",
+    package = "protoc-gen-grpc",
+    root_package = "",
+    url = "git+ssh://git@github.com/gregmagolan-codaio/protoc-gen-grpc-ts.git",
+    version = "github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f",
+)

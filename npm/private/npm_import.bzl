@@ -372,6 +372,10 @@ def _fetch_git_repository(rctx):
     _git_reset(rctx, git_repo)
     _git_clean(rctx, git_repo)
 
+    git_metadata_folder = git_repo.directory.get_child(".git")
+    if not rctx.delete(git_metadata_folder):
+        fail("Failed to delete .git folder in %s" % str(git_repo.directory))
+
 def _download_and_extract_archive(rctx):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
