@@ -89,7 +89,7 @@ function add_symlink(
     pkg.entry({
         type: 'symlink',
         name: name.replace(/^\//, ''),
-        linkname: linkname.replace(/^\//, ''),
+        linkname: linkname,
         mode: stats.mode,
         mtime: MTIME,
     }).end()
