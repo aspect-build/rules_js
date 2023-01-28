@@ -1,5 +1,5 @@
 load("//js:defs.bzl", "js_binary", "js_image_layer")
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
 js_binary(
@@ -69,20 +69,11 @@ genrule(
     toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
 )
 
-diff_test(
-    name = "app_structure_diff",
-    file1 = ":app_structure_generated.mf",
-    file2 = "app_structure.mf",
-)
-
-diff_test(
-    name = "node_modules_structure_diff",
-    file1 = ":node_modules_structure_generated.mf",
-    file2 = "node_modules_structure.mf",
-)
-
-diff_test(
-    name = "digests_diff",
-    file1 = ":digests_generated.sum",
-    file2 = "digests.sum",
+write_source_files(
+    name = "diff",
+    files = {
+        "app_structure.mf": ":app_structure_generated.mf",
+        "node_modules_structure.mf": ":node_modules_structure_generated.mf",
+        "digests.sum": ":digests_generated.sum",
+    },
 )

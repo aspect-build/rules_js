@@ -11,10 +11,8 @@ rollup_bin.rollup(
         ":node_modules/@rollup/plugin-commonjs",
         ":node_modules/@rollup/plugin-node-resolve",
         ":node_modules/@rollup/plugin-typescript",
-        ":node_modules/@types/archiver",
         ":node_modules/@types/node",
         ":node_modules/@types/tar-stream",
-        ":node_modules/archiver",
         ":node_modules/tar-stream",
     ],
     outs = [
