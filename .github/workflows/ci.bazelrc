@@ -18,7 +18,7 @@ build --grpc_keepalive_time=30s
 
 # Generic remote build execution
 build:rbe --extra_execution_platforms=@aspect_rules_js//platforms:x86_64_linux_remote
-build:rbe --genrule_strategy=remote
+build:rbe --genrule_strategy=remote,local
 build:rbe --host_platform=@aspect_rules_js//platforms:x86_64_linux_remote
 build:rbe --jobs=32
 
