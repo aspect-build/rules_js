@@ -4302,128 +4302,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__archiver-utils__2.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "archiver-utils",
-        version = "2.1.0",
-        url = "https://registry.npmjs.org/archiver-utils/-/archiver-utils-2.1.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-bEL/yUb/fNNiNTuUz979Z0Yg5L+LzLxGJz8x79lYmR54fmTIb6ob/hNQgkQnIUDWIFjZVQwl9Xs356I6BAMHfw==",
-        deps = {
-            "glob": "7.2.3",
-            "graceful-fs": "4.2.10",
-            "lazystream": "1.0.1",
-            "lodash.defaults": "4.2.0",
-            "lodash.difference": "4.5.0",
-            "lodash.flatten": "4.4.0",
-            "lodash.isplainobject": "4.0.6",
-            "lodash.union": "4.6.0",
-            "normalize-path": "3.0.0",
-            "readable-stream": "2.3.7",
-        },
-        transitive_closure = {
-            "archiver-utils": ["2.1.0"],
-            "glob": ["7.2.3"],
-            "graceful-fs": ["4.2.10"],
-            "lazystream": ["1.0.1"],
-            "lodash.defaults": ["4.2.0"],
-            "lodash.difference": ["4.5.0"],
-            "lodash.flatten": ["4.4.0"],
-            "lodash.isplainobject": ["4.0.6"],
-            "lodash.union": ["4.6.0"],
-            "normalize-path": ["3.0.0"],
-            "readable-stream": ["2.3.7"],
-            "core-util-is": ["1.0.3"],
-            "inherits": ["2.0.4"],
-            "isarray": ["1.0.0"],
-            "process-nextick-args": ["2.0.1"],
-            "safe-buffer": ["5.1.2"],
-            "string_decoder": ["1.1.1"],
-            "util-deprecate": ["1.0.2"],
-            "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "wrappy": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__archiver__5.3.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/image": ["archiver"],
-        },
-        package = "archiver",
-        version = "5.3.1",
-        url = "https://registry.npmjs.org/archiver/-/archiver-5.3.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-8KyabkmbYrH+9ibcTScQ1xCJC/CGcugdVIwB+53f5sZziXgwUh3iXlAlANMxcZyDEfTHMe6+Z5FofV8nopXP7w==",
-        deps = {
-            "archiver-utils": "2.1.0",
-            "async": "3.2.4",
-            "buffer-crc32": "0.2.13",
-            "readable-stream": "3.6.0",
-            "readdir-glob": "1.1.2",
-            "tar-stream": "2.2.0",
-            "zip-stream": "4.1.0",
-        },
-        transitive_closure = {
-            "archiver": ["5.3.1"],
-            "archiver-utils": ["2.1.0"],
-            "async": ["3.2.4"],
-            "buffer-crc32": ["0.2.13"],
-            "readable-stream": ["2.3.7", "3.6.0"],
-            "readdir-glob": ["1.1.2"],
-            "tar-stream": ["2.2.0"],
-            "zip-stream": ["4.1.0"],
-            "compress-commons": ["4.1.1"],
-            "crc32-stream": ["4.0.2"],
-            "normalize-path": ["3.0.0"],
-            "crc-32": ["1.2.2"],
-            "bl": ["4.1.0"],
-            "end-of-stream": ["1.4.4"],
-            "fs-constants": ["1.0.0"],
-            "inherits": ["2.0.4"],
-            "once": ["1.4.0"],
-            "wrappy": ["1.0.2"],
-            "buffer": ["5.7.1"],
-            "base64-js": ["1.5.1"],
-            "ieee754": ["1.2.1"],
-            "minimatch": ["3.1.2", "5.1.4"],
-            "brace-expansion": ["1.1.11", "2.0.1"],
-            "balanced-match": ["1.0.2"],
-            "string_decoder": ["1.1.1", "1.3.0"],
-            "util-deprecate": ["1.0.2"],
-            "safe-buffer": ["5.1.2", "5.2.1"],
-            "glob": ["7.2.3"],
-            "graceful-fs": ["4.2.10"],
-            "lazystream": ["1.0.1"],
-            "lodash.defaults": ["4.2.0"],
-            "lodash.difference": ["4.5.0"],
-            "lodash.flatten": ["4.4.0"],
-            "lodash.isplainobject": ["4.0.6"],
-            "lodash.union": ["4.6.0"],
-            "core-util-is": ["1.0.3"],
-            "isarray": ["1.0.0"],
-            "process-nextick-args": ["2.0.1"],
-            "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "path-is-absolute": ["1.0.1"],
-            "concat-map": ["0.0.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__are-we-there-yet__1.1.7",
         root_package = "",
         link_workspace = "",
@@ -4653,22 +4531,6 @@ def npm_repositories():
         integrity = "sha512-NfJ4UzBCcQGLDlQq7nHxH+tv3kyZ0hHQqF5BO6J7tNJeP5do1llPr8dZ8zHonfhAu0PHAdMkSo+8o0wxg9lZWw==",
         transitive_closure = {
             "assert-plus": ["1.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__async__3.2.4",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "async",
-        version = "3.2.4",
-        url = "https://registry.npmjs.org/async/-/async-3.2.4.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==",
-        transitive_closure = {
-            "async": ["3.2.4"],
         },
     )
 
@@ -4961,35 +4823,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__bl__4.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "bl",
-        version = "4.1.0",
-        url = "https://registry.npmjs.org/bl/-/bl-4.1.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==",
-        deps = {
-            "buffer": "5.7.1",
-            "inherits": "2.0.4",
-            "readable-stream": "3.6.0",
-        },
-        transitive_closure = {
-            "bl": ["4.1.0"],
-            "buffer": ["5.7.1"],
-            "inherits": ["2.0.4"],
-            "readable-stream": ["3.6.0"],
-            "string_decoder": ["1.3.0"],
-            "util-deprecate": ["1.0.2"],
-            "safe-buffer": ["5.2.1"],
-            "base64-js": ["1.5.1"],
-            "ieee754": ["1.2.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__bl__6.0.0",
         root_package = "",
         link_workspace = "",
@@ -5166,22 +4999,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__buffer-crc32__0.2.13",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "buffer-crc32",
-        version = "0.2.13",
-        url = "https://registry.npmjs.org/buffer-crc32/-/buffer-crc32-0.2.13.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-VO9Ht/+p3SN7SKWqcrgEzjGbRSJYTx+Q1pTQC0wrWqHx0vpJraQ6GtHx8tvcg1rlK1byhU5gccxgOgj7B0TDkQ==",
-        transitive_closure = {
-            "buffer-crc32": ["0.2.13"],
-        },
-    )
-
-    npm_import(
         name = "npm__buffer-fill__1.0.0",
         root_package = "",
         link_workspace = "",
@@ -5210,28 +5027,6 @@ def npm_repositories():
         integrity = "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==",
         transitive_closure = {
             "buffer-from": ["1.1.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__buffer__5.7.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "buffer",
-        version = "5.7.1",
-        url = "https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==",
-        deps = {
-            "base64-js": "1.5.1",
-            "ieee754": "1.2.1",
-        },
-        transitive_closure = {
-            "buffer": ["5.7.1"],
-            "base64-js": ["1.5.1"],
-            "ieee754": ["1.2.1"],
         },
     )
 
@@ -6262,37 +6057,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__compress-commons__4.1.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "compress-commons",
-        version = "4.1.1",
-        url = "https://registry.npmjs.org/compress-commons/-/compress-commons-4.1.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-QLdDLCKNV2dtoTorqgxngQCMA+gWXkM/Nwu7FpeBhk/RdkzimqC3jueb/FDmaZeXh+uby1jkBqE3xArsLBE5wQ==",
-        deps = {
-            "buffer-crc32": "0.2.13",
-            "crc32-stream": "4.0.2",
-            "normalize-path": "3.0.0",
-            "readable-stream": "3.6.0",
-        },
-        transitive_closure = {
-            "compress-commons": ["4.1.1"],
-            "buffer-crc32": ["0.2.13"],
-            "crc32-stream": ["4.0.2"],
-            "normalize-path": ["3.0.0"],
-            "readable-stream": ["3.6.0"],
-            "inherits": ["2.0.4"],
-            "string_decoder": ["1.3.0"],
-            "util-deprecate": ["1.0.2"],
-            "safe-buffer": ["5.2.1"],
-            "crc-32": ["1.2.2"],
-        },
-    )
-
-    npm_import(
         name = "npm__compute-dims__1.1.0",
         root_package = "",
         link_workspace = "",
@@ -6493,48 +6257,6 @@ def npm_repositories():
         integrity = "sha512-iSPlClZP8vX7MC3/u6s3lrDuoQyhQukh5LyABJ3hvfzbQ3Yyayd4fp04zjLnfi267B/B2FkumcWWgrbban7sSA==",
         transitive_closure = {
             "country-regex": ["1.1.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__crc-32__1.2.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "crc-32",
-        version = "1.2.2",
-        url = "https://registry.npmjs.org/crc-32/-/crc-32-1.2.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-ROmzCKrTnOwybPcJApAA6WBWij23HVfGVNKqqrZpuyZOHqK2CwHSvpGuyt/UNNvaIjEd8X5IFGp4Mh+Ie1IHJQ==",
-        transitive_closure = {
-            "crc-32": ["1.2.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__crc32-stream__4.0.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "crc32-stream",
-        version = "4.0.2",
-        url = "https://registry.npmjs.org/crc32-stream/-/crc32-stream-4.0.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-DxFZ/Hk473b/muq1VJ///PMNLj0ZMnzye9thBpmjpJKCc5eMgB95aK8zCGrGfQ90cWo561Te6HK9D+j4KPdM6w==",
-        deps = {
-            "crc-32": "1.2.2",
-            "readable-stream": "3.6.0",
-        },
-        transitive_closure = {
-            "crc32-stream": ["4.0.2"],
-            "crc-32": ["1.2.2"],
-            "readable-stream": ["3.6.0"],
-            "inherits": ["2.0.4"],
-            "string_decoder": ["1.3.0"],
-            "util-deprecate": ["1.0.2"],
-            "safe-buffer": ["5.2.1"],
         },
     )
 
@@ -12500,33 +12222,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__lazystream__1.0.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "lazystream",
-        version = "1.0.1",
-        url = "https://registry.npmjs.org/lazystream/-/lazystream-1.0.1.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-b94GiNHQNy6JNTrt5w6zNyffMrNkXZb3KTkCZJb2V1xaEGCk093vkZ2jk3tpaeP33/OiXC+WvK9AxUebnf5nbw==",
-        deps = {
-            "readable-stream": "2.3.7",
-        },
-        transitive_closure = {
-            "lazystream": ["1.0.1"],
-            "readable-stream": ["2.3.7"],
-            "core-util-is": ["1.0.3"],
-            "inherits": ["2.0.4"],
-            "isarray": ["1.0.0"],
-            "process-nextick-args": ["2.0.1"],
-            "safe-buffer": ["5.1.2"],
-            "string_decoder": ["1.1.1"],
-            "util-deprecate": ["1.0.2"],
-        },
-    )
-
-    npm_import(
         name = "npm__levn__0.3.0",
         root_package = "",
         link_workspace = "",
@@ -12633,70 +12328,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__lodash.defaults__4.2.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "lodash.defaults",
-        version = "4.2.0",
-        url = "https://registry.npmjs.org/lodash.defaults/-/lodash.defaults-4.2.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==",
-        transitive_closure = {
-            "lodash.defaults": ["4.2.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__lodash.difference__4.5.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "lodash.difference",
-        version = "4.5.0",
-        url = "https://registry.npmjs.org/lodash.difference/-/lodash.difference-4.5.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-dS2j+W26TQ7taQBGN8Lbbq04ssV3emRw4NY58WErlTO29pIqS0HmoT5aJ9+TUQ1N3G+JOZSji4eugsWwGp9yPA==",
-        transitive_closure = {
-            "lodash.difference": ["4.5.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__lodash.flatten__4.4.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "lodash.flatten",
-        version = "4.4.0",
-        url = "https://registry.npmjs.org/lodash.flatten/-/lodash.flatten-4.4.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-C5N2Z3DgnnKr0LOpv/hKCgKdb7ZZwafIrsesve6lmzvZIRZRGaZ/l6Q8+2W7NaT+ZwO3fFlSCzCzrDCFdJfZ4g==",
-        transitive_closure = {
-            "lodash.flatten": ["4.4.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__lodash.isplainobject__4.0.6",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "lodash.isplainobject",
-        version = "4.0.6",
-        url = "https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==",
-        transitive_closure = {
-            "lodash.isplainobject": ["4.0.6"],
-        },
-    )
-
-    npm_import(
         name = "npm__lodash.merge__4.6.2",
         root_package = "",
         link_workspace = "",
@@ -12709,22 +12340,6 @@ def npm_repositories():
         integrity = "sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==",
         transitive_closure = {
             "lodash.merge": ["4.6.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__lodash.union__4.6.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "lodash.union",
-        version = "4.6.0",
-        url = "https://registry.npmjs.org/lodash.union/-/lodash.union-4.6.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-c4pB2CdGrGdjMKYLA+XiRDO7Y0PRQbm/Gzg8qMj+QH+pFVAoTp5sBpO0odL3FjoPCGjK96p6qsP+yQoiLoOBcw==",
-        transitive_closure = {
-            "lodash.union": ["4.6.0"],
         },
     )
 
@@ -17220,28 +16835,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__readdir-glob__1.1.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "readdir-glob",
-        version = "1.1.2",
-        url = "https://registry.npmjs.org/readdir-glob/-/readdir-glob-1.1.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-6RLVvwJtVwEDfPdn6X6Ille4/lxGl0ATOY4FN/B9nxQcgOazvvI0nodiD19ScKq0PvA/29VpaOQML36o5IzZWA==",
-        deps = {
-            "minimatch": "5.1.4",
-        },
-        transitive_closure = {
-            "readdir-glob": ["1.1.2"],
-            "minimatch": ["5.1.4"],
-            "brace-expansion": ["2.0.1"],
-            "balanced-match": ["1.0.2"],
-        },
-    )
-
-    npm_import(
         name = "npm__readdirp__3.6.0",
         root_package = "",
         link_workspace = "",
@@ -19638,42 +19231,6 @@ def npm_repositories():
             "wrappy": ["1.0.2"],
             "buffer-alloc-unsafe": ["1.1.0"],
             "buffer-fill": ["1.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__tar-stream__2.2.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "tar-stream",
-        version = "2.2.0",
-        url = "https://registry.npmjs.org/tar-stream/-/tar-stream-2.2.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==",
-        deps = {
-            "bl": "4.1.0",
-            "end-of-stream": "1.4.4",
-            "fs-constants": "1.0.0",
-            "inherits": "2.0.4",
-            "readable-stream": "3.6.0",
-        },
-        transitive_closure = {
-            "tar-stream": ["2.2.0"],
-            "bl": ["4.1.0"],
-            "end-of-stream": ["1.4.4"],
-            "fs-constants": ["1.0.0"],
-            "inherits": ["2.0.4"],
-            "readable-stream": ["3.6.0"],
-            "string_decoder": ["1.3.0"],
-            "util-deprecate": ["1.0.2"],
-            "safe-buffer": ["5.2.1"],
-            "once": ["1.4.0"],
-            "wrappy": ["1.0.2"],
-            "buffer": ["5.7.1"],
-            "base64-js": ["1.5.1"],
-            "ieee754": ["1.2.1"],
         },
     )
 
@@ -22263,58 +21820,6 @@ def npm_repositories():
         integrity = "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==",
         transitive_closure = {
             "yocto-queue": ["0.1.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__zip-stream__4.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "zip-stream",
-        version = "4.1.0",
-        url = "https://registry.npmjs.org/zip-stream/-/zip-stream-4.1.0.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-zshzwQW7gG7hjpBlgeQP9RuyPGNxvJdzR8SUM3QhxCnLjWN2E7j3dOvpeDcQoETfHx0urRS7EtmVToql7YpU4A==",
-        deps = {
-            "archiver-utils": "2.1.0",
-            "compress-commons": "4.1.1",
-            "readable-stream": "3.6.0",
-        },
-        transitive_closure = {
-            "zip-stream": ["4.1.0"],
-            "archiver-utils": ["2.1.0"],
-            "compress-commons": ["4.1.1"],
-            "readable-stream": ["2.3.7", "3.6.0"],
-            "inherits": ["2.0.4"],
-            "string_decoder": ["1.1.1", "1.3.0"],
-            "util-deprecate": ["1.0.2"],
-            "safe-buffer": ["5.1.2", "5.2.1"],
-            "buffer-crc32": ["0.2.13"],
-            "crc32-stream": ["4.0.2"],
-            "normalize-path": ["3.0.0"],
-            "crc-32": ["1.2.2"],
-            "glob": ["7.2.3"],
-            "graceful-fs": ["4.2.10"],
-            "lazystream": ["1.0.1"],
-            "lodash.defaults": ["4.2.0"],
-            "lodash.difference": ["4.5.0"],
-            "lodash.flatten": ["4.4.0"],
-            "lodash.isplainobject": ["4.0.6"],
-            "lodash.union": ["4.6.0"],
-            "core-util-is": ["1.0.3"],
-            "isarray": ["1.0.0"],
-            "process-nextick-args": ["2.0.1"],
-            "fs.realpath": ["1.0.0"],
-            "inflight": ["1.0.6"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "wrappy": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "balanced-match": ["1.0.2"],
-            "concat-map": ["0.0.1"],
         },
     )
 
