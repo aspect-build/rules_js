@@ -1,6 +1,7 @@
 import { createWriteStream, createReadStream } from 'node:fs';
 import { readFile, stat, realpath, readdir } from 'node:fs/promises';
 import * as path from 'node:path';
+import { Readable as Readable$2 } from 'node:stream';
 import { pathToFileURL } from 'node:url';
 import { createGzip } from 'node:zlib';
 import require$$0$1 from 'stream';
@@ -9645,15 +9646,20 @@ function add_file(name, content, pkg, stats) {
         content.pipe(entry);
     });
 }
-async function build(entries, appLayerPath, nodeModulesLayerPath) {
+async function build(entries, appLayerPath, nodeModulesLayerPath, compression) {
     const app = pack();
     const nm = pack();
     const app_existing_paths = new Set();
     const nm_existing_paths = new Set();
-    app.pipe(createGzip()).pipe(createWriteStream(appLayerPath));
-    nm.pipe(createGzip()).pipe(createWriteStream(nodeModulesLayerPath));
+    let app_output = app, nm_output = nm;
+    if (compression == "gzip") {
+        app_output = app_output.pipe(createGzip());
+        nm_output = nm_output.pipe(createGzip());
+    }
+    app_output.pipe(createWriteStream(appLayerPath));
+    nm_output.pipe(createWriteStream(nodeModulesLayerPath));
     for (const key of Object.keys(entries).sort()) {
-        const { dest, is_directory, is_source, root } = entries[key];
+        const { dest, is_directory, is_source, root, remove_non_hermetic_lines } = entries[key];
         const output = dest.indexOf('node_modules') != -1 ? nm : app;
         const existing_paths = dest.indexOf('node_modules') != -1
             ? nm_existing_paths
@@ -9692,16 +9698,26 @@ async function build(entries, appLayerPath, nodeModulesLayerPath) {
         }
         else {
             const stats = await stat(dest);
-            await add_file(key, createReadStream(dest), output, stats);
+            let stream = createReadStream(dest);
+            if (remove_non_hermetic_lines) {
+                const content = await readFile(dest);
+                const replaced = Buffer.from(content.toString()
+                    .replace(/.*JS_BINARY__TARGET_CPU=".*?"/g, `export JS_BINARY__TARGET_CPU="$(uname -m)"`)
+                    .replace(/.*JS_BINARY__BINDIR=".*"/g, `export JS_BINARY__BINDIR="$(pwd)"`));
+                stream = Readable$2.from(replaced);
+                stats.size = replaced.byteLength;
+            }
+            await add_file(key, stream, output, stats);
         }
     }
     app.finalize();
     nm.finalize();
 }
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [entriesPath, appLayerPath, nodeModulesLayerPath] = process.argv.slice(2);
-    const entries = JSON.parse((await readFile(entriesPath)).toString());
-    build(entries, appLayerPath, nodeModulesLayerPath);
+    const [entriesPath, appLayerPath, nodeModulesLayerPath, compression] = process.argv.slice(2);
+    const raw_entries = await readFile(entriesPath);
+    const entries = JSON.parse(raw_entries.toString());
+    build(entries, appLayerPath, nodeModulesLayerPath, compression);
 }
 
 export { build };

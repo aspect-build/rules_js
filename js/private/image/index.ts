@@ -1,6 +1,7 @@
-import { createReadStream, createWriteStream, ReadStream } from 'node:fs'
+import { createReadStream, createWriteStream } from 'node:fs'
 import { readdir, readFile, realpath, stat } from 'node:fs/promises'
 import * as path from 'node:path'
+import { Readable, Stream } from 'node:stream'
 import { pathToFileURL } from 'node:url'
 import { createGzip } from 'node:zlib'
 import { pack, Pack } from 'tar-stream'
@@ -13,14 +14,16 @@ type HermeticStat = {
     size?: number
 }
 
-export type Entries = {
-    [k: string]: {
-        is_source: boolean
-        is_directory: boolean
-        dest: string
-        root?: string
-    }
+type Entry = {
+    is_source: boolean
+    is_directory: boolean
+    dest: string
+    root?: string
+    remove_non_hermetic_lines?: boolean
 }
+type Entries = { [path: string]: Entry }
+
+type Compression = 'gzip' | 'none'
 
 function findKeyByValue(entries: Entries, value: string): string {
     for (const [key, { dest: val }] of Object.entries(entries)) {
@@ -97,7 +100,7 @@ function add_symlink(
 
 function add_file(
     name: string,
-    content: ReadStream,
+    content: Readable,
     pkg: Pack,
     stats: HermeticStat
 ) {
@@ -125,7 +128,8 @@ function add_file(
 export async function build(
     entries: Entries,
     appLayerPath: string,
-    nodeModulesLayerPath: string
+    nodeModulesLayerPath: string,
+    compression: Compression
 ) {
     const app = pack()
     const nm = pack()
@@ -133,11 +137,25 @@ export async function build(
     const app_existing_paths = new Set<string>()
     const nm_existing_paths = new Set<string>()
 
-    app.pipe(createGzip()).pipe(createWriteStream(appLayerPath))
-    nm.pipe(createGzip()).pipe(createWriteStream(nodeModulesLayerPath))
+    let app_output: Stream = app,
+        nm_output: Stream = nm
+
+    if (compression == 'gzip') {
+        app_output = app_output.pipe(createGzip())
+        nm_output = nm_output.pipe(createGzip())
+    }
+
+    app_output.pipe(createWriteStream(appLayerPath))
+    nm_output.pipe(createWriteStream(nodeModulesLayerPath))
 
     for (const key of Object.keys(entries).sort()) {
-        const { dest, is_directory, is_source, root } = entries[key]
+        const {
+            dest,
+            is_directory,
+            is_source,
+            root,
+            remove_non_hermetic_lines,
+        } = entries[key]
 
         const output = dest.indexOf('node_modules') != -1 ? nm : app
         const existing_paths =
@@ -193,7 +211,27 @@ export async function build(
             add_symlink(key, linkname, output, stats)
         } else {
             const stats = await stat(dest)
-            await add_file(key, createReadStream(dest), output, stats)
+            let stream: Readable = createReadStream(dest)
+
+            if (remove_non_hermetic_lines) {
+                const content = await readFile(dest)
+                const replaced = Buffer.from(
+                    content
+                        .toString()
+                        .replace(
+                            /.*JS_BINARY__TARGET_CPU=".*?"/g,
+                            `export JS_BINARY__TARGET_CPU="$(uname -m)"`
+                        )
+                        .replace(
+                            /.*JS_BINARY__BINDIR=".*"/g,
+                            `export JS_BINARY__BINDIR="$(pwd)"`
+                        )
+                )
+                stream = Readable.from(replaced)
+                stats.size = replaced.byteLength
+            }
+
+            await add_file(key, stream, output, stats)
         }
     }
 
@@ -202,12 +240,15 @@ export async function build(
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [entriesPath, appLayerPath, nodeModulesLayerPath] =
+    const [entriesPath, appLayerPath, nodeModulesLayerPath, compression] =
         process.argv.slice(2)
 
-    const entries: Entries = JSON.parse(
-        (await readFile(entriesPath)).toString()
+    const raw_entries = await readFile(entriesPath)
+    const entries: Entries = JSON.parse(raw_entries.toString())
+    build(
+        entries,
+        appLayerPath,
+        nodeModulesLayerPath,
+        compression as Compression
     )
-
-    build(entries, appLayerPath, nodeModulesLayerPath)
 }

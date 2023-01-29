@@ -24,4 +24,3 @@ app/js/private/test/image/structure/bin.runfiles/nodejs_linux_amd64/bin
 app/js/private/test/image/structure/bin.runfiles/nodejs_linux_amd64/bin/nodejs
 app/js/private/test/image/structure/bin.runfiles/nodejs_linux_amd64/bin/nodejs/bin
 app/js/private/test/image/structure/bin.runfiles/nodejs_linux_amd64/bin/nodejs/bin/node
-app/js/private/test/image/structure/bin_.sh

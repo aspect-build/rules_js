@@ -1,6 +1,5 @@
 load("//js:defs.bzl", "js_binary", "js_image_layer")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 
 js_binary(
     name = "bin",
@@ -8,13 +7,6 @@ js_binary(
         "//js/private/test/image:node_modules/acorn",
     ],
     entry_point = "main.js",
-)
-
-js_image_layer(
-    name = "layers",
-    binary = ":bin",
-    root = "/app",
-    visibility = ["//visibility:__pkg__"],
 )
 
 platform(
@@ -25,16 +17,21 @@ platform(
     ],
 )
 
+js_image_layer(
+    name = "layers",
+    binary = ":bin",
+    # gzip compression embeds os information into the archive which is not okay from reproducibility standpoint.
+    # set it to none since uncompressed archive is always stable.
+    # more: https://stackoverflow.com/questions/26516369/zlib-gzip-produces-different-results-for-same-input-on-different-oses
+    compression = "none",
+    platform = ":amd64_linux",
+    root = "/app",
+)
+
 filegroup(
     name = "app_layer",
     srcs = [":layers"],
     output_group = "app",
-)
-
-platform_transition_filegroup(
-    name = "app_layer_transition",
-    srcs = [":app_layer"],
-    target_platform = ":amd64_linux",
 )
 
 filegroup(
@@ -43,17 +40,11 @@ filegroup(
     output_group = "node_modules",
 )
 
-platform_transition_filegroup(
-    name = "node_modules_layer_transition",
-    srcs = [":node_modules_layer"],
-    target_platform = ":amd64_linux",
-)
-
 genrule(
     name = "structure",
     srcs = [
-        ":app_layer_transition",
-        ":node_modules_layer_transition",
+        ":app_layer",
+        ":node_modules_layer",
     ],
     outs = [
         "app_structure_generated.mf",
@@ -61,9 +52,9 @@ genrule(
         "digests_generated.sum",
     ],
     cmd = """
-    tar -tf ./$(location :app_layer_transition) > $(location :app_structure_generated.mf) &&
-    tar -tf ./$(location :node_modules_layer_transition) > $(location :node_modules_structure_generated.mf) && 
-    $(COREUTILS_BIN) sha256sum ./$(location :app_layer_transition) ./$(location :node_modules_layer_transition) | $(COREUTILS_BIN) cut -f1 -d " " > $(location digests_generated.sum)
+    tar -tf ./$(location :app_layer) > $(location :app_structure_generated.mf) &&
+    tar -tf ./$(location :node_modules_layer) > $(location :node_modules_structure_generated.mf) && 
+    $(COREUTILS_BIN) sha256sum ./$(location :app_layer) ./$(location :node_modules_layer) | $(COREUTILS_BIN) cut -f1 -d " " > $(location digests_generated.sum)
     """,
     output_to_bindir = True,
     toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
