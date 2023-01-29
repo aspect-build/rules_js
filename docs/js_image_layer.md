@@ -20,12 +20,14 @@ js_image_layer(
 ## js_image_layer
 
 <pre>
-js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-root">root</a>)
+js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-platform">platform</a>, <a href="#js_image_layer-root">root</a>)
 </pre>
 
 Create container image layers from js_binary targets.
 
-An example using rules_oci
+js_image_layer supports transitioning to specific platform for cross-compiling.
+
+A partial example using rules_oci with transition to linux/amd64 platform.
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
@@ -36,9 +38,18 @@ js_binary(
     entry_point = "main.js",
 )
 
+platform(
+    name = "amd64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
 js_image_layer(
     name = "layers",
     binary = ":binary",
+    platform = ":amd64_linux",
     root = "/app"
 )
 
@@ -115,6 +126,8 @@ container_image(
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="js_image_layer-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="js_image_layer-binary"></a>binary |  Label to an js_binary target   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
+| <a id="js_image_layer-compression"></a>compression |  Compression algorithm. Can be one of <code>gzip</code>, <code>none</code>.   | String | optional | <code>"gzip"</code> |
+| <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional | <code>None</code> |
 | <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional | <code>""</code> |
 
 
