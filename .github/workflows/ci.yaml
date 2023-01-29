@@ -118,7 +118,7 @@ jobs:
             folders: ${{ toJSON(steps.*.outputs.folder) }}
 
     test:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
 
         needs:
             - matrix-prep-config
@@ -128,11 +128,18 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                os: [ubuntu-latest, macos-latest]
                 config: ${{ fromJSON(needs.matrix-prep-config.outputs.configs) }}
                 bazelversion: ${{ fromJSON(needs.matrix-prep-bazelversion.outputs.bazelversions) }}
                 folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folders) }}
                 bzlmodEnabled: [true, false]
                 exclude:
+                    # Don't test docker on macos (not supported)
+                    - folder: e2e/js_image
+                      os: macos-latest
+                    # Don't test the devserver on macos (not supported)
+                    - folder: e2e/js_run_devserver
+                      os: macos-latest
                     # Don't test RBE with Bazel 5 (not supported)
                     - config: rbe
                       bazelversion: 5.3.2
