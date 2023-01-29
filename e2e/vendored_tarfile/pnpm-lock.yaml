@@ -1,17 +1,18 @@
 lockfileVersion: 5.4
 
 importers:
-
   .:
-    specifiers:
-      lodash: file:lodash-4.17.21.tgz
-    dependencies:
-      lodash: file:lodash-4.17.21.tgz
+  specifiers:
+    pyright: file:pyright-1.1.291.tgz
+
+  dependencies:
+    pyright: file:pyright-1.1.291.tgz
 
 packages:
 
-  file:lodash-4.17.21.tgz:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:lodash-4.17.21.tgz}
-    name: lodash
-    version: 4.17.21
+  file:pyright-1.1.291.tgz:
+    resolution: {integrity: sha512-wkSlCEhF1OwtJqHuifwxk76UMr1NPqsAbPIlCh7tiZx8VUdZs17NCGNorhyb2M+GFEvp8pod9Xyu1LXN1JL2kQ==, tarball: file:pyright-1.1.291.tgz}
+    engines: {node: '>=12.0.0'}
+    name: pyright
+    version: 1.1.291
     dev: false

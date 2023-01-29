@@ -21,9 +21,9 @@ npm_translate_lock(
     data = [
         "//:package.json",
     ],
-    npmrc = "//:.npmrc",
+    # npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
-    verify_node_modules_ignored = "//:.bazelignore",
+    # verify_node_modules_ignored = "//:.bazelignore",
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
