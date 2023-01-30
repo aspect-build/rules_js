@@ -9692,7 +9692,11 @@ async function build(entries, appLayerPath, nodeModulesLayerPath, compression) {
         const realp = await realpath(dest);
         const output_path = realp.slice(realp.indexOf(root));
         if (output_path != dest) {
-            const stats = await stat(dest);
+            // interestingly, bazel 5 and 6 sets different mode bits on symlinks.
+            // well use `0o755` to allow owner&group to `rwx` and others `rx`
+            // see: https://chmodcommand.com/chmod-775/
+            // const stats = await stat(dest)
+            const stats = { mode: 0o775, mtime: MTIME };
             const linkname = findKeyByValue(entries, output_path);
             add_symlink(key, linkname, output, stats);
         }
