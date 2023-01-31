@@ -1,25 +1,17 @@
 # An example/e2e for rules_js + rules_docker
 
-`js_image_layer.bzl` helper contains a macro to make rules_docker, pkg_tar and rules_js work together.
-You can copy this code to your workspace for now.
-https://github.com/aspect-build/rules_js/issues/304 tracks the work of moving the `js_image_layer` rule into our public API.
-
 The rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `container_image` rule from rules_docker. You can `bazel run` the target to get the image to load into your Docker daemon. See the [rules_docker documentation](https://github.com/bazelbuild/rules_docker/blob/a8aff4076f75c4dfb39bd768dd9870b5d263e70d/README.md#using-with-docker-locally)
 
 > Like all lang_image rules in rules_docker, the nodejs_image rule has different behavior under `bazel run` where the container is booted and executes.
 
 ## Fine-grained layering
 
-`js_image_layer` is a macro that yields two tar files `:<name>/app.tar` and `:<name>/node_modules.tar`. While `app.tar` contains first-party sources, `node_modules.tar` contains all third-party dependencies.
+`js_image_layer` is a macro that yields two tar files `app.tar` and `node_modules.tar`. While `app.tar` contains first-party sources, `node_modules.tar` contains all third-party dependencies.
 
 This speeds up developer change-build-push cycle by allowing build and push of only what has changed.
 
 For instance, when a new third-party dependency is added, then only `node_modules.tar` will change and one will only have to push changes to dependencies.
 On the other hand, if the application code is changed, then only `app.tar` will be updated and pushed.
-
-To get more fine-grained layers, one could use [runfiles rule](./js_image_layer.bzl) from `js_image_layer.bzl` simply by changing `include` and `exclude` attributes.
-
-Please see the [js_image_layer](./js_image_layer.bzl) for how this done for `app.tar` and `node_modules.tar`
 
 ### dive <image>
 
