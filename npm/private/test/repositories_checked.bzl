@@ -2267,14 +2267,14 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-typescript__10.0.1__sbiskyiysxhldmns7rmnvoiszu",
+        name = "npm__at_rollup_plugin-typescript__10.0.1__bgwi2fgwyi362qsw25gfipc3ca",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["@rollup/plugin-typescript"],
         },
         package = "@rollup/plugin-typescript",
-        version = "10.0.1_sbiskyiysxhldmns7rmnvoiszu",
+        version = "10.0.1_bgwi2fgwyi362qsw25gfipc3ca",
         url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-10.0.1.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
@@ -2283,15 +2283,15 @@ def npm_repositories():
             "@rollup/pluginutils": "5.0.2_rollup@2.79.1",
             "resolve": "1.22.1",
             "rollup": "2.79.1",
-            "tslib": "2.4.1",
+            "tslib": "2.5.0",
             "typescript": "4.9.4",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": ["10.0.1_sbiskyiysxhldmns7rmnvoiszu"],
+            "@rollup/plugin-typescript": ["10.0.1_bgwi2fgwyi362qsw25gfipc3ca"],
             "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
             "resolve": ["1.22.1"],
             "rollup": ["2.79.1"],
-            "tslib": ["2.4.1"],
+            "tslib": ["2.5.0"],
             "typescript": ["4.9.4"],
             "fsevents": ["2.3.2"],
             "is-core-module": ["2.9.0"],
@@ -19691,20 +19691,20 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__tslib__2.4.1",
+        name = "npm__tslib__2.5.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["tslib"],
         },
         package = "tslib",
-        version = "2.4.1",
-        url = "https://registry.npmjs.org/tslib/-/tslib-2.4.1.tgz",
+        version = "2.5.0",
+        url = "https://registry.npmjs.org/tslib/-/tslib-2.5.0.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==",
+        integrity = "sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==",
         transitive_closure = {
-            "tslib": ["2.4.1"],
+            "tslib": ["2.5.0"],
         },
     )
 
@@ -21762,7 +21762,7 @@ def npm_repositories():
             "stream-buffers": "3.0.2",
             "tar": "6.1.11",
             "tmp-promise": "3.0.3",
-            "tslib": "2.4.1",
+            "tslib": "2.5.0",
             "typescript": "4.9.4",
             "underscore": "1.13.6",
             "ws": "8.12.0_bufferutil@4.0.1",
@@ -21783,7 +21783,7 @@ def npm_repositories():
             "stream-buffers": ["3.0.2"],
             "tar": ["6.1.11"],
             "tmp-promise": ["3.0.3"],
-            "tslib": ["2.4.1"],
+            "tslib": ["2.5.0"],
             "typescript": ["4.9.4"],
             "underscore": ["1.13.6"],
             "ws": ["8.12.0_bufferutil@4.0.1"],
