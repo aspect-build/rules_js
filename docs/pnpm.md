@@ -132,10 +132,36 @@ It is recommended to set this environment variable on CI when `update_pnpm_lock`
 
 ## Working with packages
 
-### Patching
+### Patching via pnpm.patchedDependencies
 
-You can apply patches to packages you fetch remotely such as from npm.
-Use the `patches` and `patch_args` attributes of `npm_translate_lock`.
+Patches included in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies) are automatically applied. These patches must be included in the `data` attribute of `npm_translate_lock`, for example:
+
+```json
+{
+    ...
+    "pnpm": {
+        "patchedDependencies": {
+            "fum@0.0.1": "patches/fum@0.0.1.patch"
+        }
+    }
+}
+```
+
+```starlark
+npm_translate_lock(
+    ...
+    data = [
+        "//:patches/fum@0.0.1.patch",
+    ],
+)
+```
+
+### Patching via `patches` attribute
+
+We recommend patching via [pnpm.patchedDependencies](#patching-via-pnpmpatcheddependencies) as above, but if you are importing
+a yarn or npm lockfile and do not have this field in your package.json, you can apply additional
+patches using the `patches` and `patch_args` attributes of `npm_translate_lock`.
+
 These are designed to be similar to the same-named attributes of
 [http_archive](https://bazel.build/rules/lib/repo/http#http_archive-patch_args).
 
@@ -148,10 +174,12 @@ In case multiple entries in `patches` match, the list of patches are additive.
 (More specific matches are appended to previous matches.)
 However if multiple entries in `patch_args` match, then the more specific name matches take precedence.
 
+Patches in `patches` are applied after any patches included in `pnpm.patchedDependencies`.
+
 For example,
 
 ```starlark
-npm_translate_lock (
+npm_translate_lock(
     ...
     patches = {
         "@foo/bar": ["//:patches/foo+bar.patch"],

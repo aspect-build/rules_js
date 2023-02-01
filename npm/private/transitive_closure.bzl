@@ -53,7 +53,7 @@ def _gather_package_info(package_path, package_snapshot):
         # an aliased dependency
         package = package_path[1:]
         name, version = utils.parse_pnpm_name(package)
-        friendly_version = utils.strip_peer_dep_version(version)
+        friendly_version = utils.strip_peer_dep_or_patched_version(version)
         package_key = package
     elif package_path.startswith("file:") and utils.is_vendored_tarfile(package_snapshot):
         if "name" not in package_snapshot:
@@ -103,6 +103,7 @@ def _gather_package_info(package_path, package_snapshot):
         "optional_dependencies": package_snapshot.get("optionalDependencies", {}),
         "dev": "dev" in package_snapshot.keys(),
         "optional": "optional" in package_snapshot.keys(),
+        "patched": package_snapshot.get("patched", False),
         "has_bin": "hasBin" in package_snapshot.keys(),
         "requires_build": "requiresBuild" in package_snapshot.keys(),
     }

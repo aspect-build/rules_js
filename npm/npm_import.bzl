@@ -180,6 +180,8 @@ def npm_translate_lock(
         patches: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list of patches to apply to the downloaded npm package. Multiple matches are additive.
 
+            These patches are applied after any patches in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies).
+
             Read more: [patching](/docs/pnpm.md#patching)
 
         patch_args: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
