@@ -34,10 +34,11 @@ def _bazel_name(name, version = None):
         escaped_version = "%s__%s" % (escaped_version, _sanitize_string(peer_version))
     return "%s__%s" % (escaped_name, escaped_version)
 
-def _strip_peer_dep_version(version):
-    "Remove peer dependency syntax from version string"
+def _strip_peer_dep_or_patched_version(version):
+    "Remove peer dependency or patched syntax from version string"
 
     # 21.1.0_rollup@2.70.2 becomes 21.1.0
+    # 1.0.0_o3deharooos255qt5xdujc3cuq becomes 1.0.0
     index = version.find("_")
     if index != -1:
         return version[:index]
@@ -84,7 +85,9 @@ def _parse_pnpm_lock(content):
 
     packages = parsed.get("packages", {})
 
-    return importers, packages
+    patched_dependencies = parsed.get("patchedDependencies", {})
+
+    return importers, packages, patched_dependencies
 
 def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):
@@ -176,7 +179,7 @@ def _npm_registry_download_url(package, version, registries, default_registry):
         registry.removesuffix("/"),
         package,
         package_name_no_scope,
-        _strip_peer_dep_version(version),
+        _strip_peer_dep_or_patched_version(version),
     )
 
 def _is_git_repository_url(url):
@@ -317,7 +320,7 @@ utils = struct(
     parse_pnpm_lock = _parse_pnpm_lock,
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,
-    strip_peer_dep_version = _strip_peer_dep_version,
+    strip_peer_dep_or_patched_version = _strip_peer_dep_or_patched_version,
     make_symlink = _make_symlink,
     # Symlinked node_modules structure virtual store path under node_modules
     virtual_store_root = ".aspect_rules_js",

@@ -69,7 +69,7 @@ def _impl(rctx):
 
     gen_helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
 
-    helpers.verify_patches(rctx, state.label_store)
+    helpers.verify_patches(rctx, state)
 
     rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
@@ -88,6 +88,7 @@ def _impl(rctx):
         state.label_store.label("pnpm_lock"),
         importers,
         packages,
+        state.patched_dependencies(),
         state.root_package(),
         state.default_registry(),
         state.npm_registries(),

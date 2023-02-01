@@ -5,14 +5,15 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:utils.bzl", "utils")
 
-def test_strip_peer_dep_version(ctx):
+def test_strip_peer_dep_or_patched_version(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
         "21.1.0",
-        utils.strip_peer_dep_version("21.1.0_rollup@2.70.2_x@1.1.1"),
+        utils.strip_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
     )
-    asserts.equals(env, "21.1.0", utils.strip_peer_dep_version("21.1.0"))
+    asserts.equals(env, "1.0.0", utils.strip_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
+    asserts.equals(env, "21.1.0", utils.strip_peer_dep_or_patched_version("21.1.0"))
     return unittest.end(env)
 
 def test_bazel_name(ctx):
@@ -135,7 +136,7 @@ def test_npm_registry_download_url(ctx):
     )
     return unittest.end(env)
 
-t0_test = unittest.make(test_strip_peer_dep_version)
+t0_test = unittest.make(test_strip_peer_dep_or_patched_version)
 t1_test = unittest.make(test_bazel_name)
 t2_test = unittest.make(test_pnpm_name)
 t3_test = unittest.make(test_friendly_name)

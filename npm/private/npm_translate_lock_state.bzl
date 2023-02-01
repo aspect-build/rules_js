@@ -40,8 +40,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         # labels only needed when updating the pnpm lock file
         _init_update_labels(rctx, label_store)
 
-    _init_patch_labels(rctx, label_store)
-
     _init_link_workspace(priv, rctx, label_store)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
@@ -52,6 +50,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
+
+    _init_patch_labels(priv, rctx, label_store)
 
     _init_root_package(priv, rctx, label_store)
 
@@ -106,6 +106,9 @@ def _init_common_labels(rctx, label_store):
     # pnpm-workspace.yaml file
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
 
+    # root package.json file
+    label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
+
 ################################################################################
 def _init_pnpm_labels(label_store, rctx):
     # Note that we must reference the node binary under the platform-specific node
@@ -137,11 +140,18 @@ def _init_update_labels(rctx, label_store):
         label_store.add("yarn_lock", attr.yarn_lock, seed_root = True)
 
 ################################################################################
-def _init_patch_labels(rctx, label_store):
+def _init_patch_labels(priv, rctx, label_store):
     if rctx.attr.verify_patches:
         label_store.add("verify_patches", rctx.attr.verify_patches)
 
     patches = []
+
+    # Add patches from `pnpm.patchedDependencies`
+    root_package_json = _read_root_package_json(priv, rctx, label_store)
+    for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values():
+        patches.append("//:%s" % patch)
+
+    # Add patches in `patches` attribute
     for pkg_patches in rctx.attr.patches.values():
         patches.extend(pkg_patches)
 
@@ -150,6 +160,8 @@ def _init_patch_labels(rctx, label_store):
 
     for i, d in enumerate(patches):
         label_store.add("patches_{}".format(i), d)
+
+    priv["num_patches"] = len(patches)
 
 ################################################################################
 def _init_importer_labels(priv, label_store):
@@ -281,6 +293,32 @@ WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lo
                 fail(msg)
             _copy_input_file(priv, rctx, label_store, package_json_key)
 
+    # pnpm.patchedDependencies patch files
+    root_package_json = _read_root_package_json(priv, rctx, label_store)
+    pnpm_patches = root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()
+    root_package_json_label = label_store.label("package_json_root")
+
+    for i, _ in enumerate(pnpm_patches):
+        # The key for pnpm.patchesDependencies patches are indexed before other patches and start at 0
+        patch_key = "patches_{}".format(i)
+        if not _has_input_hash(priv, label_store.relative_path(patch_key)):
+            # buildifier: disable=print
+            print("""
+WARNING: Implicitly using patch file `{patch}` since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.
+    Add '{patch}' to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
+""".format(
+                package_json = root_package_json_label,
+                patch = label_store.label(patch_key),
+                rctx_name = rctx.name,
+            ))
+            if not utils.exists(rctx, label_store.path(patch_key)):
+                msg = "ERROR: expected {path} to exist since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.".format(
+                    path = label_store.path(patch_key),
+                    package_json = root_package_json_label,
+                )
+                fail(msg)
+            _copy_input_file(priv, rctx, label_store, patch_key)
+
 ################################################################################
 def _has_input_hash(priv, path):
     return path in priv["input_hashes"]
@@ -374,14 +412,22 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
 ################################################################################
 def _load_lockfile(priv, rctx, label_store):
-    importers, packages = utils.parse_pnpm_lock(rctx.read(label_store.path("pnpm_lock")))
+    importers, packages, patched_dependencies = utils.parse_pnpm_lock(rctx.read(label_store.path("pnpm_lock")))
     priv["importers"] = importers
     priv["packages"] = packages
+    priv["patched_dependencies"] = patched_dependencies
 
 ################################################################################
 def _has_workspaces(priv):
     importer_paths = priv["importers"].keys()
     return importer_paths and (len(importer_paths) > 1 or importer_paths[0] != ".")
+
+################################################################################
+def _read_root_package_json(priv, rctx, label_store):
+    if "root_package_json" not in priv:
+        root_package_json_path = label_store.path("package_json_root")
+        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
+    return priv["root_package_json"]
 
 ################################################################################
 def _should_update_pnpm_lock(priv):
@@ -398,6 +444,12 @@ def _importers(priv):
 
 def _packages(priv):
     return priv["packages"]
+
+def _patched_dependencies(priv):
+    return priv["patched_dependencies"]
+
+def _num_patches(priv):
+    return priv["num_patches"]
 
 def _npm_registries(priv):
     return priv["npm_registries"]
@@ -433,8 +485,10 @@ def _new(rctx):
         link_workspace = lambda: _link_workspace(priv),
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
+        patched_dependencies = lambda: _patched_dependencies(priv),
         npm_registries = lambda: _npm_registries(priv),
         npm_auth = lambda: _npm_auth(priv),
+        num_patches = lambda: _num_patches(priv),
         root_package = lambda: _root_package(priv),
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
         action_cache_miss = lambda: _action_cache_miss(priv, rctx, label_store),

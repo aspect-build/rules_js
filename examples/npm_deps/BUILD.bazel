@@ -252,3 +252,13 @@ js_test(
     ],
     entry_point = "case7.js",
 )
+
+#######################################
+# Case 8: patch applied via `pnpm.patchesDependencies` then by `patches`
+js_test(
+    name = "test8",
+    data = [
+        ":node_modules/meaning-of-life",
+    ],
+    entry_point = "patched-dependencies-test.js",
+)

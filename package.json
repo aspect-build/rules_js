@@ -36,6 +36,9 @@
             "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
             "semver-max": "file:./npm/private/test/vendored/semver-max",
             "is-odd": "file:./npm/private/test/vendored/is-odd"
+        },
+        "patchedDependencies": {
+            "meaning-of-life@1.0.0": "examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch"
         }
     }
 }

@@ -7,6 +7,11 @@ overrides:
 
 packageExtensionsChecksum: 60d08949101fc004c7564f98037b7764
 
+patchedDependencies:
+  meaning-of-life@1.0.0:
+    hash: o3deharooos255qt5xdujc3cuq
+    path: examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch
+
 importers:
 
   .:
@@ -45,6 +50,7 @@ importers:
       '@mycorp/pkg-a': workspace:*
       '@rollup/plugin-commonjs': 21.1.0
       debug: 3.2.7
+      meaning-of-life: 1.0.0
       mobx: 6.3.0
       mobx-react: 7.3.0
       react: 17.0.2
@@ -57,6 +63,7 @@ importers:
       '@mycorp/pkg-a': link:../npm_package/packages/pkg_a
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       debug: 3.2.7
+      meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       mobx: 6.3.0
       mobx-react: 7.3.0_mobx@6.3.0+react@17.0.2
       react: 17.0.2
@@ -3781,6 +3788,11 @@ packages:
       crypt: 0.0.2
       is-buffer: 1.1.6
     dev: true
+
+  /meaning-of-life/1.0.0_o3deharooos255qt5xdujc3cuq:
+    resolution: {integrity: sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==}
+    dev: true
+    patched: true
 
   /media-query-parser/2.0.2:
     resolution: {integrity: sha512-1N4qp+jE0pL5Xv4uEcwVUhIkwdUO3S/9gML90nqKA7v7FcOS5vUtatfzok9S9U1EJU8dHWlcv95WLnKmmxZI9w==}

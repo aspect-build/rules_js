@@ -74,6 +74,7 @@ npm_translate_lock(
         "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
     },
     data = [
+        "//:examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch",
         "//:package.json",
         "//:pnpm-workspace.yaml",
         "//examples/js_binary:package.json",
@@ -141,6 +142,7 @@ npm_translate_lock(
         "@gregmagolan/test-a": ["//examples/npm_deps:patches/test-a.patch"],
         "@gregmagolan/test-a@0.0.1": ["//examples/npm_deps:patches/test-a@0.0.1.patch"],
         "@gregmagolan/test-b": ["//examples/npm_deps:patches/test-b.patch"],
+        "meaning-of-life@1.0.0": ["//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     pnpm_version = "7.25.0",
