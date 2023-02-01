@@ -178,16 +178,16 @@ jobs:
               with:
                   persist-credentials: false
 
-            # - name: Reconfigure git to use HTTP authentication
-            #   run: >
-            #       git config --global url."https://github.com/".insteadOf
-            #       ssh://git@github.com/
+            - name: Reconfigure git to use HTTP authentication
+              run: >
+                  git config --global url."https://github.com/".insteadOf
+                  ssh://git@github.com/
 
             # - uses: webfactory/ssh-agent@v0.7.0
             #   with:
             #       ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-            - run: ssh -vT git@github.com
+            # - run: ssh -vT git@github.com
 
             - name: Mount bazel caches
               uses: actions/cache@v3
