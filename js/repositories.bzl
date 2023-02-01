@@ -23,7 +23,7 @@ def rules_js_dependencies():
 
     http_archive(
         name = "aspect_bazel_lib",
-        sha256 = "79623d656aa23ad3fd4692ab99786c613cd36e49f5566469ed97bc9b4c655f03",
-        strip_prefix = "bazel-lib-1.23.3",
-        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.23.3.tar.gz",
+        sha256 = "8743da1d0d82df1eb6d9fd240fc213033b65d099ba4f7caa3ec52f6655fc25e1",
+        strip_prefix = "bazel-lib-1.24.0",
+        url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.24.0/bazel-lib-v1.24.0.tar.gz",
     )
