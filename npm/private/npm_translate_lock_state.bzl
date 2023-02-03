@@ -424,6 +424,11 @@ def _has_workspaces(priv):
 
 ################################################################################
 def _read_root_package_json(priv, rctx, label_store):
+    has_root_importer = "." in priv["importers"].keys()
+    if not has_root_importer:
+        # if there is no root importer that means there is no root package.json to read; pnpm allows
+        # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
+        return {}
     if "root_package_json" not in priv:
         root_package_json_path = label_store.path("package_json_root")
         priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))

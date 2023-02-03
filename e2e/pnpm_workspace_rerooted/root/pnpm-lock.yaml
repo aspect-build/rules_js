@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 importers:
 
-  .:
+  ..:
     specifiers:
       typescript: 4.9.4
     dependencies:

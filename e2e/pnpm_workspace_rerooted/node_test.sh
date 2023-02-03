@@ -8,5 +8,5 @@ if [[ "$node_path" == external/* ]]; then
 fi
 PATH="$PWD/../$node_path:$PATH"
 
-node ./root/node_modules/typescript/bin/tsc --version
-./root/node_modules/.bin/tsc --version
+node ./node_modules/typescript/bin/tsc --version
+./node_modules/.bin/tsc --version
