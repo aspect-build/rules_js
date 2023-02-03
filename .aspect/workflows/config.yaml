@@ -1,62 +1,47 @@
 ---
 workspaces:
     - .:
-          group:
-              icon: js
-              label: rules_js
+          icon: js
+          label: rules_js
     - e2e/bzlmod:
-          group:
-              icon: bazel
+          icon: bazel
     - e2e/js_image:
-          group:
-              icon: docker
+          icon: docker
     # No test targets. Requires running test.sh.
     # - e2e/js_run_devserver:
-    #       group:
-    #           icon: js
+    #    icon: js
     - e2e/npm_link_package:
-          group:
-              icon: npm
+          icon: npm
     - e2e/npm_link_package-esm:
-          group:
-              icon: npm
+          icon: npm
     - e2e/npm_translate_lock:
-          group:
-              icon: npm
+          icon: npm
     # Requires an auth token?
     # - e2e/npm_translate_lock_auth:
-    #     group:
-    #       icon: npm
+    #     icon: npm
     - e2e/npm_translate_package_lock:
-          group:
-              icon: npm
+          icon: npm
     - e2e/npm_translate_yarn_lock:
-          group:
-              icon: yarn
+          icon: yarn
     - e2e/package_json_module:
-          group:
-              icon: npm
+          icon: npm
     - e2e/pnpm_workspace:
-          group:
-              icon: pnpm
+          icon: pnpm
     - e2e/pnpm_workspace_rerooted:
-          group:
-              icon: pnpm
+          icon: pnpm
     - e2e/rules_foo:
-          group:
-              icon: js
+          icon: js
     - e2e/vendored_node:
-          group:
-              icon: js
+          icon: js
     # No test targets. Requires running test.sh.
     # - e2e/webpack_devserver:
-    #       group:
-    #           icon: js
+    #     icon: js
     # - e2e/webpack_devserver_esm:
-    #       group:
-    #           icon: js
+    #     icon: js
 
 tasks:
+    branch_freshness:
+        update_strategy: rebase
     test:
         flags:
             - --remote_default_exec_properties=cache-silo-key="74aed5f7"
