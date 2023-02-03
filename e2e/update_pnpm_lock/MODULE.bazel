@@ -21,6 +21,8 @@ npm.npm_translate_lock(
         "//:pnpm-workspace.yaml",
         "//workspace_package:package.json",
     ],
+    # location of action cache is configurable
+    external_repository_action_cache = ".aspect/external_repository_action_cache",
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     quiet = False,

@@ -22,6 +22,7 @@ def _extension_impl(module_ctx):
                 name = attr.name,
                 bins = attr.bins,
                 data = attr.data,
+                external_repository_action_cache = attr.external_repository_action_cache,
                 npmrc = attr.npmrc,
                 npm_package_lock = attr.npm_package_lock,
                 patches = attr.patches,
