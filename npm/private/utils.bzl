@@ -9,6 +9,7 @@ load(":yaml.bzl", _parse_yaml = "parse")
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
 DEFAULT_REGISTRY_PROTOCOL = "https"
+DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
 def _sanitize_string(string):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
@@ -312,6 +313,9 @@ def _is_vendored_tarfile(package_snapshot):
         return "tarball" in package_snapshot["resolution"]
     return False
 
+def _default_external_repository_action_cache():
+    return DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -333,6 +337,7 @@ utils = struct(
     parse_package_name = _parse_package_name,
     is_git_repository_url = _is_git_repository_url,
     to_registry_url = _to_registry_url,
+    default_external_repository_action_cache = _default_external_repository_action_cache,
     default_registry = _default_registry,
     hash = _hash,
     dicts_match = _dicts_match,

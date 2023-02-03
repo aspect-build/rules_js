@@ -14,7 +14,7 @@ NPM_RC_FILENAME = ".npmrc"
 PACKAGE_JSON_FILENAME = "package.json"
 PNPM_LOCK_FILENAME = "pnpm-lock.yaml"
 PNPM_WORKSPACE_FILENAME = "pnpm-workspace.yaml"
-PNPM_LOCK_ACTION_CACHE_PREFIX = ".aspect/rules/external_repository_action_cache/npm_translate_lock_"
+PNPM_LOCK_ACTION_CACHE_PREFIX = "npm_translate_lock_"
 DEFAULT_ROOT_PACKAGE = "."
 
 ################################################################################
@@ -30,6 +30,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _validate_attrs(rctx.attr, is_windows)
 
+    _init_external_repository_action_cache(priv, rctx)
+
     _init_common_labels(rctx, label_store)
 
     if _should_update_pnpm_lock(priv) or not rctx.attr.pnpm_lock:
@@ -38,7 +40,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
-        _init_update_labels(rctx, label_store)
+        _init_update_labels(priv, rctx, label_store)
 
     _init_link_workspace(priv, rctx, label_store)
 
@@ -124,10 +126,13 @@ def _init_pnpm_labels(label_store, rctx):
     label_store.add("pnpm_entry", Label("@pnpm//:package/bin/pnpm.cjs"))
 
 ################################################################################
-def _init_update_labels(rctx, label_store):
+def _init_update_labels(priv, rctx, label_store):
     attr = rctx.attr
 
-    action_cache_path = PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(rctx.name) + utils.consistent_label_str(label_store.label("pnpm_lock"))))
+    action_cache_path = paths.join(
+        priv["external_repository_action_cache"],
+        PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(rctx.name) + utils.consistent_label_str(label_store.label("pnpm_lock")))),
+    )
     label_store.add_root("action_cache", action_cache_path)
     for i, d in enumerate(attr.preupdate):
         label_store.add("preupdate_{}".format(i), d)
@@ -172,6 +177,11 @@ def _init_importer_labels(priv, label_store):
 def _init_link_workspace(priv, rctx, label_store):
     # initialize link_workspace either from pnpm_lock label or from override
     priv["link_workspace"] = rctx.attr.link_workspace if rctx.attr.link_workspace else label_store.label("pnpm_lock").workspace_name
+
+################################################################################
+def _init_external_repository_action_cache(priv, rctx):
+    # initialize external_repository_action_cache
+    priv["external_repository_action_cache"] = rctx.attr.external_repository_action_cache if rctx.attr.external_repository_action_cache else utils.default_external_repository_action_cache()
 
 ################################################################################
 def _init_root_package(priv, rctx, label_store):
@@ -465,15 +475,16 @@ def _new(rctx):
     label_store = repository_label_store.new(rctx.path)
 
     priv = {
-        "should_update_pnpm_lock": rctx.attr.update_pnpm_lock,
         "default_registry": utils.default_registry(),
+        "external_repository_action_cache": None,
+        "importers": {},
         "input_hashes": {},
         "link_workspace": None,
-        "importers": {},
-        "packages": {},
-        "npm_registries": {},
         "npm_auth": {},
+        "npm_registries": {},
+        "packages": {},
         "root_package": None,
+        "should_update_pnpm_lock": rctx.attr.update_pnpm_lock,
     }
 
     _init(priv, rctx, label_store)

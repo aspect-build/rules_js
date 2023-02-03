@@ -12,6 +12,8 @@ _sedi () {
   sed "${sedi[@]}" "$@"
 }
 
+# TODO: quote $BZLMOD_FLAG once https://github.com/aspect-build/silo/issues/1312 is fixed
+# shellcheck disable=SC2086
 if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test //...' to pass"
   exit 1
@@ -27,6 +29,8 @@ _sedi 's#"@types/node": "18.11.18"#"@types/node": "16"#' package.json
 
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 
+# TODO: quote $BZLMOD_FLAG once https://github.com/aspect-build/silo/issues/1312 is fixed
+# shellcheck disable=SC2086
 if bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1 bazel test //...' to fail"
   exit 1
@@ -35,6 +39,8 @@ fi
 ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 
 # Trigger the update of the pnpm lockfile
+# TODO: quote $BZLMOD_FLAG once https://github.com/aspect-build/silo/issues/1312 is fixed
+# shellcheck disable=SC2086
 if ! bazel run $BZLMOD_FLAG @npm//:sync; then
   echo "ERROR: expected 'bazel run $BZLMOD_FLAG @npm//:sync' to pass"
   exit 1
@@ -46,13 +52,15 @@ if [ -z "$diff" ]; then
   exit 1
 fi
 
-action_cache_file=".aspect/rules/external_repository_action_cache/npm_translate_lock_LTE4Nzc1MDcwNjU="
+action_cache_file=".aspect/external_repository_action_cache/npm_translate_lock_LTE4Nzc1MDcwNjU="
 diff="$(git diff "$action_cache_file")"
 if [ -z "$diff" ]; then
   echo "ERROR: expected 'git diff $action_cache_file' to not be empty"
   exit 1
 fi
 
+# TODO: quote $BZLMOD_FLAG once https://github.com/aspect-build/silo/issues/1312 is fixed
+# shellcheck disable=SC2086
 if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test //...' to pass"
   exit 1
