@@ -522,12 +522,7 @@ def _find_missing_bazel_ignores(root_package, importer_paths, bazelignore):
 
     # The pnpm-lock.yaml file package needs to be prefixed on paths
     for i in importer_paths:
-        if i == ".":
-            expected = root_package
-        else:
-            expected = paths.normalize(paths.join(root_package, i))
-
-        expected = paths.join(expected, "node_modules")
+        expected = paths.normalize(paths.join(root_package, i, "node_modules"))
         if expected not in bazelignore:
             missing_ignores.append(expected)
     return missing_ignores

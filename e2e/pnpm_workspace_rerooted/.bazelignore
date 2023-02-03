@@ -1,5 +1,4 @@
-root/node_modules/
-root/sub/node_modules/
+node_modules/
 app/a/node_modules/
 app/b/node_modules/
 app/c/node_modules
