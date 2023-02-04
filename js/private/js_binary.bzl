@@ -348,6 +348,9 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         toolchain_files.append(npm_wrapper)
 
     launcher_subst = {
+        "{{target_label}}": str(ctx.label),
+        "{{template_label}}": str(ctx.attr._launcher_template.label),
+        "{{entry_point_label}}": str(ctx.attr.entry_point.label),
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args_expanded),
