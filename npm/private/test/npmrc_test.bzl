@@ -69,10 +69,14 @@ def _glob_characters(ctx):
     """)
 
 def _quotes(ctx):
-    return _npmrc_test(ctx, [["a", " 1 "], ["b", "2"], ["c", ""]], """
+    return _npmrc_test(ctx, [["a", " 1 "], ["b", "2"], ["c", ""], ["d", "4"], ["e", "\"5\""], ["f", "'6'"], ["registry", "https://url.com"]], """
         a=" 1 "
         b= "2" #dkjf
         c = "" ; "dkj;f'
+        d = '4'
+        e = '"5"'
+        f = "'6'"
+        registry = 'https://url.com'
     """)
 
 basic_test = unittest.make(_basic)
