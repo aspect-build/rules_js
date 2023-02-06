@@ -30,6 +30,7 @@ def _extension_impl(module_ctx):
                 pnpm_lock = attr.pnpm_lock,
                 pnpm_version = attr.pnpm_version,
                 preupdate = attr.preupdate,
+                public_hoist_packages = attr.public_hoist_packages,
                 quiet = attr.quiet,
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
