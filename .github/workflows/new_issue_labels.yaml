@@ -1,4 +1,4 @@
-name: Label issues when opened
+name: New issue labels
 on:
     issues:
         types:
