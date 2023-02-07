@@ -1,0 +1,30 @@
+name: New issue
+on:
+    issues:
+        types:
+            - opened
+            - reopened
+jobs:
+    new_issue:
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+        steps:
+            - uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.issues.addLabels({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        labels: ["untriaged"]
+                      })
+            - run: |
+                  gh api graphql -f query="mutation { addProjectV2ItemById(input: {projectId: \"$PROJECT_ID\" contentId: \"$CONTENT_ID\"}) { item { id } } }"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_PROJECTS_RW_TOKEN }}
+                  OWNER: ${{ github.repository_owner }}
+                  REPO: ${{ github.event.repository.name }}
+                  CONTENT_ID: ${{ github.event.issue.node_id }}
+                  # Project: Aspect OSS Bazel Rules
+                  PROJECT_ID: PVT_kwDOA6IKMs4ALj2o
