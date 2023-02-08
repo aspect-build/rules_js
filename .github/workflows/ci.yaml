@@ -174,8 +174,6 @@ jobs:
                     - bazelversion: 5.1.1
                       bzlmodEnabled: true
                     # TODO: un-exclude the following bzlmod tests once they work
-                    - folder: .
-                      bzlmodEnabled: true
                     - folder: e2e/js_image_docker
                       bzlmodEnabled: true
                     - folder: e2e/js_image_oci
@@ -236,17 +234,24 @@ jobs:
                   ENGFLOW_CLIENT_CRT: ${{ secrets.ENGFLOW_CLIENT_CRT }}
                   ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
 
-            - name: Set bzlmod flag
+            - name: Set bzlmod flag (for integration tests)
               # Store the --enable_bzlmod flag that we add to the test command below
               # only when we're running bzlmod in our test matrix.
               id: set_bzlmod_flag
-              if: matrix.bzlmodEnabled
+              if: ${{ matrix.bzlmodEnabled && matrix.folder != '.'}}
               run: echo "bzlmod_flag=--enable_bzlmod" >> $GITHUB_OUTPUT
+
+            - name: Set bzlmod configuration (for test //...)
+              # Store the --config=bzlmod flag that we add to the test command below
+              # only when we're running bzlmod in our test matrix.
+              id: set_bzlmod_config
+              if: ${{ matrix.bzlmodEnabled && matrix.folder == '.'}}
+              run: echo "bzlmod_config=--config=bzlmod" >> $GITHUB_OUTPUT
 
             - name: bazel test //...
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} //...
+                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
               env:
                   # Bazelisk will download bazel to here
@@ -274,7 +279,7 @@ jobs:
               if: matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} --instrument_test_targets //...
+                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} --instrument_test_targets //...
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo

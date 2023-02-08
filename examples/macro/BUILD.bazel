@@ -1,5 +1,5 @@
 load("//examples/macro:mocha.bzl", "mocha_test")
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load("//docs:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
@@ -27,4 +27,6 @@ stardoc_with_diff_test(
     bzl_library_target = ":mocha",
 )
 
-update_docs(name = "docs")
+update_docs(
+    name = "docs",
+)

@@ -38,6 +38,10 @@ write_source_files(
         "package_json_checked.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
         "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
     },
+    target_compatible_with = select({
+        "//:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 build_test(
