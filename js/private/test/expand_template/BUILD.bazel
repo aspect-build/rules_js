@@ -21,7 +21,10 @@ expand_template(
 diff_test(
     name = "a_stamp_test",
     file1 = ":a_stamp",
-    file2 = "a_stamp_expected",
+    file2 = select({
+        "//:bzlmod": "a_stamp_expected_bzlmod",
+        "//conditions:default": "a_stamp_expected",
+    }),
 )
 
 expand_template(
@@ -43,7 +46,10 @@ expand_template(
 diff_test(
     name = "a_test",
     file1 = ":a",
-    file2 = "a_expected",
+    file2 = select({
+        "//:bzlmod": "a_expected_bzlmod",
+        "//conditions:default": "a_expected",
+    }),
 )
 
 # This test requires that DefaultInfo be returned with the proper outputs.

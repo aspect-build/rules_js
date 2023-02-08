@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load(":docs.bzl", "stardoc_with_diff_test", "update_docs")
 
 stardoc_with_diff_test(
     name = "js_binary",
@@ -45,4 +45,6 @@ stardoc_with_diff_test(
     bzl_library_target = "//npm:npm_import",
 )
 
-update_docs(name = "update")
+update_docs(
+    name = "update",
+)

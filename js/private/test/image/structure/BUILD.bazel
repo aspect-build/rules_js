@@ -74,4 +74,8 @@ write_source_files(
     # mode bit on files aren't stable between RBE and Local since RBE isn't aware of git which tracks permissions for files.
     # we don't care about unstable inputs because it's not our responsibility to keep them stable which would expand api surface for js_image_layer
     tags = ["no-remote-exec"],
+    target_compatible_with = select({
+        "//:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )

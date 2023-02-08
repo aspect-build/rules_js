@@ -926,7 +926,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                         name = _import.package,
                         src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
                         dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
-                            repo_name = _import.name,
+                            repo_name = _to_apparent_repo_name(_import.name),
                             link_package = link_package,
                             package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
                         ),

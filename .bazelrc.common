@@ -70,3 +70,7 @@ build --incompatible_strict_action_env
 
 # Enable with --config=release
 build:release --stamp --workspace_status_command=$(pwd)/workspace_status.sh
+
+# Config to enable building and testing with bzlmod
+common:bzlmod --enable_bzlmod
+common:bzlmod --//:flag_bzlmod

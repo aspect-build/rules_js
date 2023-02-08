@@ -1,5 +1,5 @@
 load(":tsc.bzl", "tsc")
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load("//docs:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
@@ -37,4 +37,6 @@ stardoc_with_diff_test(
     bzl_library_target = ":tsc",
 )
 
-update_docs(name = "docs")
+update_docs(
+    name = "docs",
+)
