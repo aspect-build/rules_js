@@ -1,0 +1,33 @@
+lockfileVersion: 5.4
+
+importers:
+
+  .:
+    specifiers: {}
+
+  lib:
+    specifiers:
+      '@aspect-test/e': 1.0.0
+      '@aspect-test/f': 1.0.0
+    dependencies:
+      '@aspect-test/e': 1.0.0
+    devDependencies:
+      '@aspect-test/f': 1.0.0
+
+  tests:
+    specifiers:
+      '@lib/test': workspace:*
+    dependencies:
+      '@lib/test': link:../lib
+
+packages:
+
+  /@aspect-test/e/1.0.0:
+    resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
+    hasBin: true
+    dev: false
+
+  /@aspect-test/f/1.0.0:
+    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
+    hasBin: true
+    dev: true

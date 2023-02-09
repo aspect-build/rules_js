@@ -14,5 +14,6 @@ NpmPackageStoreInfo = provider(
         "virtual_store_directory": "the TreeArtifact of this npm package's virtual store location",
         "files": "depset of files that are part of the npm package",
         "transitive_files": "depset of the files that are part of the npm package and its transitive deps",
+        "dev": "whether or not this npm package is a dev dependency",
     },
 )

@@ -488,6 +488,7 @@ def npm_import(
         npm_auth_username = "",
         npm_auth_password = "",
         bins = {},
+        dev = False,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
         # TODO(2.0): remove run_lifecycle_hooks from npm_import
@@ -710,6 +711,8 @@ def npm_import(
             from information in the pnpm lock file. That feature is currently blocked on
             https://github.com/pnpm/pnpm/issues/5131.
 
+        dev: Whether this npm package is a dev dependency
+
         register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
 
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
@@ -782,6 +785,7 @@ def npm_import(
         name = "{}{}".format(name, _utils.links_repo_suffix),
         package = package,
         version = version,
+        dev = dev,
         root_package = root_package,
         link_packages = link_packages,
         deps = deps,

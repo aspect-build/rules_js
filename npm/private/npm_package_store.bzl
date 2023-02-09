@@ -120,6 +120,9 @@ If unset, the package version in the NpmPackageInfo src must be set.
 If set, takes precendance over the package version in the NpmPackageInfo src.
 """,
     ),
+    "dev": attr.bool(
+        doc = """Whether this npm package is a dev dependency""",
+    ),
     "use_declare_symlink": attr.bool(
         mandatory = True,
         doc = """Whether to use ctx.actions.declare_symlink to create symlinks.
@@ -299,6 +302,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             virtual_store_directory = virtual_store_directory,
             files = files_depset,
             transitive_files = transitive_files_depset,
+            dev = ctx.attr.dev,
         ),
     ]
     if virtual_store_directory:

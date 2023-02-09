@@ -16,6 +16,7 @@ load(
 )
 load(
     "//js/private:js_library_helpers.bzl",
+    _DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING = "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING",
     _JS_LIBRARY_DATA_ATTR = "JS_LIBRARY_DATA_ATTR",
     _gather_npm_linked_packages = "gather_npm_linked_packages",
     _gather_npm_package_store_deps = "gather_npm_package_store_deps",
@@ -36,6 +37,7 @@ js_lib_helpers = struct(
     gather_transitive_declarations = _gather_transitive_declarations,
     gather_transitive_sources = _gather_transitive_sources,
     JS_LIBRARY_DATA_ATTR = _JS_LIBRARY_DATA_ATTR,
+    DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING = _DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING,
 )
 
 js_lib_constants = struct(

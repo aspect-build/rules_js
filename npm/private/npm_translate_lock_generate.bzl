@@ -17,7 +17,7 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
     )
 """
 
@@ -260,7 +260,7 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
     # make a lookup table of package to link name for each importer
     importer_links = {}
     for import_path, importer in importers.items():
-        dependencies = importer.get("dependencies")
+        dependencies = importer.get("all_deps")
         if type(dependencies) != "dict":
             msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
             fail(msg)
@@ -478,6 +478,7 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             version = version,
             bins = bins,
             package_info = package_info,
+            dev = dev,
         ))
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too
@@ -682,7 +683,7 @@ sh_binary(
 
     # Look for first-party links in importers
     for import_path, importer in importers.items():
-        dependencies = importer.get("dependencies")
+        dependencies = importer.get("all_deps")
         if type(dependencies) != "dict":
             msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
             fail(msg)
@@ -708,7 +709,7 @@ sh_binary(
                     transitive_deps = {}
                     raw_deps = {}
                     if dep_importer in importers.keys():
-                        raw_deps = importers.get(dep_importer).get("dependencies")
+                        raw_deps = importers.get(dep_importer).get("transitive_deps")
                     for raw_package, raw_version in raw_deps.items():
                         if raw_version.startswith("link:") or raw_version.startswith("file:"):
                             dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
@@ -833,6 +834,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         npm_auth_username = "%s",""" % _import.npm_auth_username) if _import.npm_auth_username else ""
         maybe_npm_auth_password = ("""
         npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
+        maybe_dev = ("""
+        dev = True,""") if _import.dev else ""
 
         repositories_bzl.append(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -841,6 +844,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             maybe_commit = maybe_commit,
             maybe_custom_postinstall = maybe_custom_postinstall,
             maybe_deps = maybe_deps,
+            maybe_dev = maybe_dev,
             maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
             maybe_integrity = maybe_integrity,
             maybe_lifecycle_hooks = maybe_lifecycle_hooks,

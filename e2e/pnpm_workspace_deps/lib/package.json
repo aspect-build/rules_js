@@ -1,0 +1,10 @@
+{
+    "name": "@lib/test",
+    "private": true,
+    "dependencies": {
+        "@aspect-test/e": "1.0.0"
+    },
+    "devDependencies": {
+        "@aspect-test/f": "1.0.0"
+    }
+}

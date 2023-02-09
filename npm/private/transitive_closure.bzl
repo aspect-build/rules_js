@@ -101,11 +101,11 @@ def _gather_package_info(package_path, package_snapshot):
         "resolution": resolution,
         "dependencies": package_snapshot.get("dependencies", {}),
         "optional_dependencies": package_snapshot.get("optionalDependencies", {}),
-        "dev": "dev" in package_snapshot.keys(),
-        "optional": "optional" in package_snapshot.keys(),
+        "dev": package_snapshot.get("dev", False),
+        "optional": package_snapshot.get("optional", False),
         "patched": package_snapshot.get("patched", False),
-        "has_bin": "hasBin" in package_snapshot.keys(),
-        "requires_build": "requiresBuild" in package_snapshot.keys(),
+        "has_bin": package_snapshot.get("hasBin", False),
+        "requires_build": package_snapshot.get("requiresBuild", False),
     }
 
 def translate_to_transitive_closure(lock_importers, lock_packages, prod = False, dev = False, no_optional = False):
@@ -137,14 +137,23 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
         prod_deps = {} if dev else lock_importer.get("dependencies", {})
         dev_deps = {} if prod else lock_importer.get("devDependencies", {})
         opt_deps = {} if no_optional else lock_importer.get("optionalDependencies", {})
-        dependencies = dicts.add(prod_deps, dev_deps, opt_deps)
+
+        transitive_deps = dicts.add(prod_deps, opt_deps)
+        all_deps = dicts.add(prod_deps, dev_deps, opt_deps)
 
         for info in tar_packages.values():
-            if info["name"] in dependencies:
-                dependencies[info["name"]] = info["version"]
+            if info["name"] in transitive_deps:
+                transitive_deps[info["name"]] = info["version"]
+            if info["name"] in all_deps:
+                all_deps[info["name"]] = info["version"]
 
         importers[importPath] = {
-            "dependencies": dependencies,
+            # deps this importer should pass on if it is linked as a first-party package; this does
+            # not include devDependencies
+            "transitive_deps": transitive_deps,
+            # all deps of this importer to link in the node_modules folder of that Bazel package and
+            # make available to all build targets; this includes devDependencies
+            "all_deps": all_deps,
         }
 
     for package in packages.keys():
