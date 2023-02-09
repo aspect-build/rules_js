@@ -25,8 +25,8 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](#npm_import) does this.
 """
 
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//npm/private:npm_import.bzl", _npm_import_lib = "npm_import", _npm_import_links_lib = "npm_import_links")
+load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 load("//npm/private:utils.bzl", _utils = "utils")
 load("//npm/private:npm_translate_lock.bzl", _npm_translate_lock = "npm_translate_lock")
@@ -413,24 +413,13 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
     if not update_pnpm_lock and preupdate:
         fail("expected update_pnpm_lock to be True when preupdate are specified")
 
-    # lifecycle_hooks_exclude is a convenience attribute to set `<value>: []` in `lifecycle_hooks`
-    lifecycle_hooks = dict(lifecycle_hooks)
-    for p in lifecycle_hooks_exclude:
-        if p in lifecycle_hooks:
-            fail("expected '{}' to be in only one of lifecycle_hooks or lifecycle_hooks_exclude".format(p))
-        lifecycle_hooks[p] = []
-
-    # run_lifecycle_hooks is a convenience attribute to set `"*": ["preinstall", "install", "postinstall"]` in `lifecycle_hooks`
-    if run_lifecycle_hooks:
-        if "*" not in lifecycle_hooks:
-            lifecycle_hooks = dicts.add(lifecycle_hooks, {"*": ["preinstall", "install", "postinstall"]})
-
-    # lifecycle_hooks_no_sandbox is a convenience attribute to set `"*": ["no-sandbox"]` in `lifecycle_hooks_execution_requirements`
-    if lifecycle_hooks_no_sandbox:
-        if "*" not in lifecycle_hooks_execution_requirements:
-            lifecycle_hooks_execution_requirements = dicts.add(lifecycle_hooks_execution_requirements, {"*": []})
-        if "no-sandbox" not in lifecycle_hooks_execution_requirements["*"]:
-            lifecycle_hooks_execution_requirements["*"].append("no-sandbox")
+    lifecycle_hooks, lifecycle_hooks_execution_requirements = macro_helpers.macro_lifecycle_args_to_rule_attrs(
+        lifecycle_hooks,
+        lifecycle_hooks_exclude,
+        run_lifecycle_hooks,
+        lifecycle_hooks_no_sandbox,
+        lifecycle_hooks_execution_requirements,
+    )
 
     _npm_translate_lock(
         name = name,

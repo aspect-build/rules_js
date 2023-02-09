@@ -5,6 +5,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 load("//npm/private:utils.bzl", "utils")
 load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
+load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import", npm_import_links_lib = "npm_import_links")
 load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock", "pnpm_repository")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
@@ -21,8 +22,15 @@ def _extension_impl(module_ctx):
             npm_translate_lock(
                 name = attr.name,
                 bins = attr.bins,
+                custom_postinstalls = attr.custom_postinstalls,
                 data = attr.data,
                 external_repository_action_cache = attr.external_repository_action_cache,
+                lifecycle_hooks = attr.lifecycle_hooks,
+                lifecycle_hooks_envs = attr.lifecycle_hooks_envs,
+                lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
+                lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
+                lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
+                link_workspace = attr.link_workspace,
                 npmrc = attr.npmrc,
                 npm_package_lock = attr.npm_package_lock,
                 patches = attr.patches,
@@ -34,6 +42,8 @@ def _extension_impl(module_ctx):
                 quiet = attr.quiet,
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
+                root_package = attr.root_package,
+                run_lifecycle_hooks = attr.run_lifecycle_hooks,
                 update_pnpm_lock = attr.update_pnpm_lock,
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
                 verify_patches = attr.verify_patches,
@@ -53,7 +63,28 @@ def _extension_impl(module_ctx):
             if attr.npmrc:
                 npmrc = parse_npmrc(module_ctx.read(attr.npmrc))
                 (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
-            imports = npm_translate_lock_helpers.gen_npm_imports(importers, packages, lock_patched_dependencies, attr.pnpm_lock.package, attr.name, attr, registries, utils.default_registry(), npm_auth)
+
+            lifecycle_hooks, lifecycle_hooks_execution_requirements = macro_helpers.macro_lifecycle_args_to_rule_attrs(
+                lifecycle_hooks = attr.lifecycle_hooks,
+                lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
+                run_lifecycle_hooks = attr.run_lifecycle_hooks,
+                lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
+                lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
+            )
+            imports = npm_translate_lock_helpers.gen_npm_imports(
+                importers = importers,
+                packages = packages,
+                patched_dependencies = lock_patched_dependencies,
+                root_package = attr.pnpm_lock.package,
+                rctx_name = attr.name,
+                attr = attr,
+                all_lifecycle_hooks = lifecycle_hooks,
+                all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+                registries = registries,
+                default_registry = utils.default_registry(),
+                npm_auth = npm_auth,
+            )
+
             for i in imports:
                 npm_import(
                     name = i.name,
@@ -62,9 +93,10 @@ def _extension_impl(module_ctx):
                     custom_postinstall = i.custom_postinstall,
                     deps = i.deps,
                     integrity = i.integrity,
-                    lifecycle_hooks = i.lifecycle_hooks,
+                    lifecycle_hooks = i.run_lifecycle_hooks if i.run_lifecycle_hooks and i.lifecycle_hooks else [],
                     lifecycle_hooks_env = i.lifecycle_hooks_env,
                     link_packages = i.link_packages,
+                    link_workspace = attr.link_workspace if attr.link_workspace else attr.pnpm_lock.workspace_name,
                     npm_auth = i.npm_auth,
                     npm_auth_basic = i.npm_auth_basic,
                     npm_auth_password = i.npm_auth_password,
@@ -107,7 +139,10 @@ def _npm_translate_lock_attrs():
 
     # Add macro attrs that aren't in the rule attrs.
     attrs["name"] = attr.string()
+    attrs["lifecycle_hooks_exclude"] = attr.string_list(default = [])
+    attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = True)
     attrs["pnpm_version"] = attr.string(default = LATEST_PNPM_VERSION)
+    attrs["run_lifecycle_hooks"] = attr.bool(default = True)
 
     return attrs
 

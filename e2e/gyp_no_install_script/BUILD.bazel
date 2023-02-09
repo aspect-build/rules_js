@@ -1,0 +1,12 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+npm_link_all_packages(name = "node_modules")
+
+js_test(
+    name = "test",
+    data = [
+        ":node_modules/segfault-handler",
+    ],
+    entry_point = "test.js",
+)
