@@ -252,9 +252,8 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
     return (registries, auth)
 
 ################################################################################
-def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx_name, attr, registries, default_registry, npm_auth):
+def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
-
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
 
@@ -399,9 +398,9 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        lifecycle_hooks, _ = _gather_values_from_matching_names(False, attr.lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
         lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, attr.lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
+        lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
         run_lifecycle_hooks = requires_build and lifecycle_hooks
 
         bins = {}
@@ -611,7 +610,7 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patch
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    npm_imports = _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, npm_registries, default_registry, npm_auth)
+    npm_imports = _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, npm_registries, default_registry, npm_auth)
 
     fp_links = {}
     rctx_files = {

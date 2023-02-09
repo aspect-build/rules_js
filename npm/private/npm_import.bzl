@@ -684,7 +684,10 @@ def _impl_links(rctx):
             "@@" if bzlmod_supported else "@",
             npm_import_sources_repo_name,
         )
-    npm_package_target_lc = "@{}//:pkg".format(npm_import_sources_repo_name)
+    npm_package_target_lc = "{}{}//:pkg".format(
+        "@@" if bzlmod_supported else "@",
+        npm_import_sources_repo_name,
+    )
 
     link_packages = {}
     for package, link_aliases in rctx.attr.link_packages.items():
