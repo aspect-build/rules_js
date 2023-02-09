@@ -137,7 +137,7 @@ importers:
       '@types/node': 18.11.18
       google-protobuf: 3.21.2
       rollup: 2.79.1
-      tslib: 2.4.1
+      tslib: 2.5.0
       typescript: 4.9.4
     dependencies:
       google-protobuf: 3.21.2
@@ -146,11 +146,11 @@ importers:
       '@rollup/plugin-json': 5.0.0_rollup@2.79.1
       '@rollup/plugin-node-resolve': 15.0.0_rollup@2.79.1
       '@rollup/plugin-terser': 0.2.0_rollup@2.79.1
-      '@rollup/plugin-typescript': 10.0.1_sbiskyiysxhldmns7rmnvoiszu
+      '@rollup/plugin-typescript': 10.0.1_bgwi2fgwyi362qsw25gfipc3ca
       '@types/google-protobuf': registry.npmjs.org/@types/google-protobuf/3.15.6
       '@types/node': registry.npmjs.org/@types/node/18.11.18
       rollup: 2.79.1
-      tslib: 2.4.1
+      tslib: 2.5.0
       typescript: 4.9.4
 
   npm/private/test:
@@ -826,7 +826,7 @@ packages:
       terser: 5.15.1
     dev: true
 
-  /@rollup/plugin-typescript/10.0.1_sbiskyiysxhldmns7rmnvoiszu:
+  /@rollup/plugin-typescript/10.0.1_bgwi2fgwyi362qsw25gfipc3ca:
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -842,7 +842,7 @@ packages:
       '@rollup/pluginutils': 5.0.2_rollup@2.79.1
       resolve: 1.22.1
       rollup: 2.79.1
-      tslib: 2.4.1
+      tslib: 2.5.0
       typescript: 4.9.4
     dev: true
 
@@ -5599,8 +5599,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib/2.4.1:
-    resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
+  /tslib/2.5.0:
+    resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
     dev: true
 
   /tunnel-agent/0.6.0:
@@ -6243,7 +6243,7 @@ packages:
       stream-buffers: 3.0.2
       tar: 6.1.11
       tmp-promise: 3.0.3
-      tslib: 2.4.1
+      tslib: 2.5.0
       typescript: 4.9.4
       underscore: 1.13.6
       ws: 8.12.0_bufferutil@4.0.1
