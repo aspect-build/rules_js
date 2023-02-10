@@ -131,3 +131,21 @@ container_image(
 | <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional | <code>""</code> |
 
 
+<a id="js_image_layer_lib.implementation"></a>
+
+## js_image_layer_lib.implementation
+
+<pre>
+js_image_layer_lib.implementation(<a href="#js_image_layer_lib.implementation-ctx">ctx</a>)
+</pre>
+
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :------------- | :------------- | :------------- |
+| <a id="js_image_layer_lib.implementation-ctx"></a>ctx |  <p align="center"> - </p>   |  none |
+
+

@@ -76,8 +76,6 @@ jobs:
               run: echo "folder=e2e/git_dep_metadata" >> $GITHUB_OUTPUT
               # Don't run e2e/git_dep_metadata if there is no ssh key secret which is the case on forks.
               if: ${{ env.SSH_PRIVATE_KEY != '' }}
-            - id: js_image
-              run: echo "folder=e2e/js_image" >> $GITHUB_OUTPUT
             - id: js_image_docker
               run: echo "folder=e2e/js_image_docker" >> $GITHUB_OUTPUT
             - id: js_image_oci
