@@ -60,7 +60,7 @@ _ATTRS = {
             # ../.. segments to re-relative paths from the chdir back to workspace;
             # add an additional 3 segments to account for running js_binary running
             # in the root of the output tree
-            args = ["/".join([".."] * len(package_name().split("/")) + "$(rootpath //path/to/some:file)"],
+            args = ["/".join([".."] * len(package_name().split("/"))) + "$(rootpath //path/to/some:file)"],
         )
         ```""",
     ),
