@@ -6,7 +6,7 @@ load(":package_json_checked.bzl", rollup_bin = "bin")
 load("@bazel_skylib//lib:unittest.bzl", "loadingtest")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
-_TEST_TARGET_PREFIX="__rollup"
+_TEST_TARGET_PREFIX = "__rollup"
 
 def _get_functions_under_test_and_their_args():
     return {
@@ -42,6 +42,7 @@ def test_only_expected_bin_struct_methods(env, bin_struct):
     # to be updated to call those macros.
     loadingtest.equals(env, "only_expected_methods", sorted(_get_functions_under_test_and_their_args().keys()), sorted(relevant_methods))
 
+# buildifier: disable=function-docstring-args
 def test_intermediate_targets_tagged_manual(env):
     """Ensure all targets besides the final output target are tagged manual"""
 
@@ -58,6 +59,7 @@ def test_intermediate_targets_tagged_manual(env):
         tagged_manual = "manual" in existing_rules[generated_target]["tags"]
         loadingtest.equals(env, generated_target + "_tagged_manual", tagged_manual, True)
 
+# buildifier: disable=function-docstring
 def generated_pkg_json_test(name):
     # Call each of our methods to construct targets as needed by the tests
     for function_name, kwargs in _get_functions_under_test_and_their_args().items():

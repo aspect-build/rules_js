@@ -5,6 +5,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:utils.bzl", "utils")
 
+# buildifier: disable=function-docstring
 def test_strip_peer_dep_or_patched_version(ctx):
     env = unittest.begin(ctx)
     asserts.equals(

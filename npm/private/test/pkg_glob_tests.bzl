@@ -1,3 +1,5 @@
+"Unit tests for pkg_glob"
+
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pkg_glob.bzl", "pkg_glob")
 
