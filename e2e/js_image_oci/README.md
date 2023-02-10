@@ -1,6 +1,8 @@
-# An example/e2e for rules_js + rules_oci
+# An example for rules_js + bazel-contrib/rules_oci
 
-The rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `oci_image` rule from rules_oci.
+The `js_image_layer` rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `oci_image` rule from rules_oci.
+
+For an example using rules_docker rather than rules_oci, see the js_image_docker folder next to this one.
 
 ## Fine-grained layering
 

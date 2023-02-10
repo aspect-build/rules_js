@@ -1,8 +1,12 @@
-# An example/e2e for rules_js + rules_docker
+# An example for rules_js + rules_docker
 
-The rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `container_image` rule from rules_docker. You can `bazel run` the target to get the image to load into your Docker daemon. See the [rules_docker documentation](https://github.com/bazelbuild/rules_docker/blob/a8aff4076f75c4dfb39bd768dd9870b5d263e70d/README.md#using-with-docker-locally)
+The `js_image_layer` rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `container_image` rule from rules_docker.
+You can `bazel run` the target to get the image to load into your Docker daemon.
+See the [rules_docker documentation](https://github.com/bazelbuild/rules_docker/blob/a8aff4076f75c4dfb39bd768dd9870b5d263e70d/README.md#using-with-docker-locally)
 
 > Like all lang_image rules in rules_docker, the nodejs_image rule has different behavior under `bazel run` where the container is booted and executes.
+
+For an example using rules_oci rather than rules_docker, see the js_image_oci folder next to this one.
 
 ## Fine-grained layering
 

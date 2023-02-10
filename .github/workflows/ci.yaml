@@ -261,17 +261,18 @@ jobs:
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
 
-            - name: upload bazel-bin
-              if: failure() && matrix.folder == '.'
-              uses: actions/upload-artifact@v3
-              with:
-                  name: bazel-bin-${{ matrix.bazelversion }}
-                  path: |
-                      ${{ matrix.folder }}/bazel-bin/js/private/test/image
-                      !**/node_modules
-                      !**/*.runfiles
-                      !**/*.sh
-                  retention-days: 5
+            # Uncomment for debugging, see https://github.com/aspect-build/rules_js/pull/771
+            # - name: upload bazel-bin
+            #   if: failure() && matrix.folder == '.'
+            #   uses: actions/upload-artifact@v3
+            #   with:
+            #       name: bazel-bin-${{ matrix.bazelversion }}
+            #       path: |
+            #           ${{ matrix.folder }}/bazel-bin/js/private/test/image
+            #           !**/node_modules
+            #           !**/*.runfiles
+            #           !**/*.sh
+            #       retention-days: 5
 
             - name: bazel coverage //...
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.

@@ -37,11 +37,6 @@ nodejs_register_toolchains(
     node_version = "16.13.1",
 )
 
-nodejs_register_toolchains(
-    name = "node18",
-    node_version = "18.12.0",
-)
-
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
 
 register_unittest_toolchains()
