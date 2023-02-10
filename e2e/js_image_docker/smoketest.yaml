@@ -3,5 +3,5 @@ schemaVersion: 2.0.0
 commandTests:
     - name: 'smoke'
       command: 'bash'
-      args: ['/app/main.sh']
+      args: ['/app/main']
       expectedOutput: ['.*WORKSPACE.*__main__', '.*main.*', '.*ARCH.*']

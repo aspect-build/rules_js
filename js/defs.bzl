@@ -21,6 +21,10 @@ load(
     "//js/private:js_run_devserver.bzl",
     _js_run_devserver = "js_run_devserver",
 )
+load(
+    "//js/private:js_image_layer.bzl",
+    _js_image_layer = "js_image_layer",
+)
 
 def js_binary(**kwargs):
     _js_binary(
@@ -55,3 +59,4 @@ def js_run_devserver(**kwargs):
 js_filegroup = _js_filegroup
 js_library = _js_library
 js_run_binary = _js_run_binary
+js_image_layer = _js_image_layer

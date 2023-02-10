@@ -76,8 +76,10 @@ jobs:
               run: echo "folder=e2e/git_dep_metadata" >> $GITHUB_OUTPUT
               # Don't run e2e/git_dep_metadata if there is no ssh key secret which is the case on forks.
               if: ${{ env.SSH_PRIVATE_KEY != '' }}
-            - id: js_image
-              run: echo "folder=e2e/js_image" >> $GITHUB_OUTPUT
+            - id: js_image_docker
+              run: echo "folder=e2e/js_image_docker" >> $GITHUB_OUTPUT
+            - id: js_image_oci
+              run: echo "folder=e2e/js_image_oci" >> $GITHUB_OUTPUT
             - id: js_run_devserver
               run: echo "folder=e2e/js_run_devserver" >> $GITHUB_OUTPUT
             - id: npm_link_package-esm
@@ -172,7 +174,11 @@ jobs:
                     # TODO: un-exclude the following bzlmod tests once they work
                     - folder: .
                       bzlmodEnabled: true
-                    - folder: e2e/js_image
+                    - folder: e2e/js_image_docker
+                      bzlmodEnabled: true
+                    - folder: e2e/js_image_oci
+                      bzlmodEnabled: true
+                    - folder: e2e/js_run_devserver
                       bzlmodEnabled: true
                     - folder: e2e/npm_link_package-esm
                       bzlmodEnabled: true
@@ -252,6 +258,19 @@ jobs:
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+
+            # Uncomment for debugging, see https://github.com/aspect-build/rules_js/pull/771
+            # - name: upload bazel-bin
+            #   if: failure() && matrix.folder == '.'
+            #   uses: actions/upload-artifact@v3
+            #   with:
+            #       name: bazel-bin-${{ matrix.bazelversion }}
+            #       path: |
+            #           ${{ matrix.folder }}/bazel-bin/js/private/test/image
+            #           !**/node_modules
+            #           !**/*.runfiles
+            #           !**/*.sh
+            #       retention-days: 5
 
             - name: bazel coverage //...
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
