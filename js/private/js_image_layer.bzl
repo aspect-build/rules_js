@@ -16,7 +16,7 @@ js_image_layer(
 load("@aspect_bazel_lib//lib:paths.bzl", "to_manifest_path")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-_doc = """Create container image layers from js_binary targets.
+_DOC = """Create container image layers from js_binary targets.
 
 js_image_layer supports transitioning to specific platform for cross-compiling.
 
@@ -210,17 +210,38 @@ _js_image_layer_transition = transition(
     outputs = ["//command_line_option:platforms"],
 )
 
-js_image_layer = rule(
+js_image_layer_lib = struct(
     implementation = _js_image_layer_impl,
-    doc = _doc,
     attrs = {
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
-        "binary": attr.label(mandatory = True, cfg = _js_image_layer_transition, doc = "Label to an js_binary target"),
-        "root": attr.string(doc = "Path where the files from js_binary will reside in. eg: /apps/app1 or /app"),
-        "compression": attr.string(doc = "Compression algorithm. Can be one of `gzip`, `none`.", values = ["gzip", "none"], default = "gzip"),
-        "platform": attr.label(doc = "Platform to transition."),
-        "_builder": attr.label(default = "//js/private:js_image_layer_builder", executable = True, cfg = "exec"),
+        "_builder": attr.label(
+            default = "//js/private:js_image_layer_builder",
+            executable = True,
+            cfg = "exec",
+        ),
+        "binary": attr.label(
+            mandatory = True,
+            cfg = _js_image_layer_transition,
+            doc = "Label to an js_binary target",
+        ),
+        "root": attr.string(
+            doc = "Path where the files from js_binary will reside in. eg: /apps/app1 or /app",
+        ),
+        "compression": attr.string(
+            doc = "Compression algorithm. Can be one of `gzip`, `none`.",
+            values = ["gzip", "none"],
+            default = "gzip",
+        ),
+        "platform": attr.label(
+            doc = "Platform to transition.",
+        ),
     },
+)
+
+js_image_layer = rule(
+    implementation = js_image_layer_lib.implementation,
+    attrs = js_image_layer_lib.attrs,
+    doc = _DOC,
 )
