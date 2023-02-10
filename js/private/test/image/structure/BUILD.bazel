@@ -49,15 +49,16 @@ genrule(
     outs = [
         "app_structure_generated.mf",
         "node_modules_structure_generated.mf",
-        "digests_generated.sum",
+        # "digests_generated.sum",
     ],
-    cmd = """
-    tar -tf ./$(location :app_layer) > $(location :app_structure_generated.mf) &&
-    tar -tf ./$(location :node_modules_layer) > $(location :node_modules_structure_generated.mf) && 
-    $(COREUTILS_BIN) sha256sum ./$(location :app_layer) ./$(location :node_modules_layer) | $(COREUTILS_BIN) cut -f1 -d " " > $(location digests_generated.sum)
-    """,
+    cmd = " && ".join([
+        "tar -tf ./$(location :app_layer) > $(location :app_structure_generated.mf)",
+        "tar -tf ./$(location :node_modules_layer) > $(location :node_modules_structure_generated.mf)",
+        # See TODO below
+        # $(COREUTILS_BIN) sha256sum ./$(location :app_layer) ./$(location :node_modules_layer) | $(COREUTILS_BIN) cut -f1 -d " " > $(location digests_generated.sum)
+    ]),
     output_to_bindir = True,
-    toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
+    # toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
 )
 
 write_source_files(
@@ -65,7 +66,8 @@ write_source_files(
     files = {
         "app_structure.mf": ":app_structure_generated.mf",
         "node_modules_structure.mf": ":node_modules_structure_generated.mf",
-        # TODO(thesayyn): re-enable this assertion, right now the sums aren't stable and cause
+        # TODO(thesayyn): https://github.com/aspect-build/rules_js/issues/863
+        # re-enable this assertion, right now the sums aren't stable and cause
         # CI failures. Looks like a non-determinism like a timestamp is getting in there.
         # "digests.sum": ":digests_generated.sum",
     },

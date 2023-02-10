@@ -165,11 +165,7 @@ def _js_image_layer_impl(ctx):
     entries = ctx.actions.declare_file("{}_entries.json".format(ctx.label.name))
     ctx.actions.write(entries, content = json.encode(files))
 
-    extension = ".tar"
-
-    if ctx.attr.compression == "gzip":
-        extension = ".tar.gz"
-
+    extension = ".tar.gz" if ctx.attr.compression == "gzip" else ".tar"
     app = ctx.actions.declare_file("{name}_app{extension}".format(name = ctx.label.name, extension = extension))
     node_modules = ctx.actions.declare_file("{name}_node_modules{extension}".format(name = ctx.label.name, extension = extension))
 

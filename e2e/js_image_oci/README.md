@@ -20,7 +20,7 @@ By default `js_binary` gets the nodejs interpreter for the host platform. Howeve
 Toolchain selection is controlled by `platform` attribute on `js_image_layer`.
 NodeJS interpreter for a different platform can be obtained by changing `platform`.
 
-Here is what the final image looks like when the platform is `linux/arm64`
+Here is what the final image looks like when `platform = "linux/arm64"`:
 
 ```
 app

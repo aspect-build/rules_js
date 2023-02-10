@@ -1,6 +1,7 @@
 """A repository rule fetching container images using crane.
 
-See https://github.com/bazel-contrib/rules_oci/issues/63
+This ought to come with rules_oci, see
+https://github.com/bazel-contrib/rules_oci/issues/63
 """
 _PULL_TMPL = """\
 # based on https://github.com/bazel-contrib/rules_oci/blob/b900a6322ae4e68b431f7d65ebfef604657bd030/example/BUILD.bazel#L19-L43
