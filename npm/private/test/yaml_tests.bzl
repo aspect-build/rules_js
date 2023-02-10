@@ -127,23 +127,23 @@ def _parse_basic_test_impl(ctx):
 """))
 
     # Literal multiline strings (|), strip (-) and keep (+)
-    asserts.equals(env, {"foo":"bar\n" }, parse("""\
+    asserts.equals(env, {"foo": "bar\n"}, parse("""\
 foo: |
     bar
 """))
-    asserts.equals(env, {"foo":"bar\n", "moo": "cow\n" }, parse("""\
+    asserts.equals(env, {"foo": "bar\n", "moo": "cow\n"}, parse("""\
 foo: |
     bar
 moo: |
     cow
 """))
-    asserts.equals(env, {"foo":{"bar": "baz  \n faz\n"} }, parse("""\
+    asserts.equals(env, {"foo": {"bar": "baz  \n faz\n"}}, parse("""\
 foo:
     bar: |
      baz  
       faz
 """))
-    asserts.equals(env, {"a":"b\nc\nd\n" }, parse("""\
+    asserts.equals(env, {"a": "b\nc\nd\n"}, parse("""\
 a: |
     b
     c
@@ -151,7 +151,7 @@ a: |
 
 
 """))
-    asserts.equals(env, {"a":"\n\nb\n\nc\n\nd\n" }, parse("""\
+    asserts.equals(env, {"a": "\n\nb\n\nc\n\nd\n"}, parse("""\
 a: |
 
 
@@ -163,21 +163,21 @@ a: |
 
 
 """))
-    asserts.equals(env, {"foo":"bar" }, parse("""\
+    asserts.equals(env, {"foo": "bar"}, parse("""\
 foo: |-
     bar
 """))
-    asserts.equals(env, {"foo":"bar", "moo": "cow" }, parse("""\
+    asserts.equals(env, {"foo": "bar", "moo": "cow"}, parse("""\
 foo: |-
     bar
 moo: |-
     cow
 """))
-    asserts.equals(env, {"foo":"bar\n" }, parse("""\
+    asserts.equals(env, {"foo": "bar\n"}, parse("""\
 foo: |+
     bar
 """))
-    asserts.equals(env, {"a":"\n\nb\n\nc\n\nd\n\n\n" }, parse("""\
+    asserts.equals(env, {"a": "\n\nb\n\nc\n\nd\n\n\n"}, parse("""\
 a: |+
 
 
@@ -189,7 +189,7 @@ a: |+
 
 
 """))
-    asserts.equals(env, {"foo":"bar\n", "moo": "cow", "faz": "baz\n\n" }, parse("""\
+    asserts.equals(env, {"foo": "bar\n", "moo": "cow", "faz": "baz\n\n"}, parse("""\
 foo: |
     bar
 moo: |-
@@ -199,7 +199,6 @@ faz: |+
     baz
 
 """))
-
 
     # Mixed sequence and map flows
     asserts.equals(env, {"foo": ["moo"]}, parse("{foo: [moo]}"))

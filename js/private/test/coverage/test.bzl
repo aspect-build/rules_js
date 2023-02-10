@@ -1,3 +1,5 @@
+"Helper rule for checking coverage"
+
 load("//js/private:js_binary.bzl", "js_binary_lib")
 
 coverage_fail_test = rule(

@@ -3,7 +3,7 @@ set -o errexit -o nounset -o pipefail
 
 print_step() {
   printf "\n\n+----------------------------------------------------------------------+"
-  printf "\n  $@"
+  echo "$@"
   printf "\n+----------------------------------------------------------------------+\n"
 }
 
@@ -22,15 +22,15 @@ _sedi () {
 BZLMOD_FLAG="${BZLMOD_FLAG:-}"
 
 print_step "Should initially succeed"
-if ! bazel build $BZLMOD_FLAG //...; then
-  printf "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+if ! bazel build "$BZLMOD_FLAG" //...; then
+  printf "ERROR: expected 'bazel build %s //...' to pass" "$BZLMOD_FLAG"
   exit 1
 fi
 
 print_step "Should pass the generated patch list test when adding an excluded patch format"
 touch patches/foo.diff
-if ! bazel test $BZLMOD_FLAG //patches:patches_update_test; then
-  printf "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to pass"
+if ! bazel test "$BZLMOD_FLAG" //patches:patches_update_test; then
+  printf "ERROR: expected 'bazel test %s //patches:patches_update_test' to pass" "$BZLMOD_FLAG"
   exit 1
 fi
 rm patches/foo.diff
@@ -47,39 +47,40 @@ index bdc8c4e..4f9c0fb 100755
 +console.log(\"foobar\")"
 echo "$patch" > patches/foo.patch
 
-if bazel test $BZLMOD_FLAG //patches:patches_update_test; then
-  printf "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to fail"
+if bazel test "$BZLMOD_FLAG" //patches:patches_update_test; then
+  printf "ERROR: expected 'bazel test %s //patches:patches_update_test' to fail" "$BZLMOD_FLAG"
   exit 1
 fi
 
 print_step "Should succeed running the patches update target"
+# shellcheck disable=SC2086
 if ! bazel run $BZLMOD_FLAG //patches:patches_update; then
-  printf "ERROR: expected 'bazel run $BZLMOD_FLAG //patches:patches_update' to pass"
+  printf "ERROR: expected 'bazel run %s //patches:patches_update' to pass" "$BZLMOD_FLAG"
   exit 1
 fi
 
 print_step "Should fail the build because the new patch isn't in 'patches'"
-if bazel build $BZLMOD_FLAG //...; then
-  printf "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to fail"
+if bazel build "$BZLMOD_FLAG" //...; then
+  printf "ERROR: expected 'bazel build %s //...' to fail" "$BZLMOD_FLAG"
   exit 1
 fi
 
 print_step "Should pass the build after adding the new patch to 'patches'"
-if [ $BZLMOD_FLAG ]; then
+if [ "$BZLMOD_FLAG" ]; then
   _sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' MODULE.bazel
 else
   _sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' WORKSPACE
 fi
 
-if ! bazel build $BZLMOD_FLAG //...; then
-  printf "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+if ! bazel build "$BZLMOD_FLAG" //...; then
+  printf "ERROR: expected 'bazel build %s //...' to pass" "$BZLMOD_FLAG"
   exit 1
 fi
 
 print_step "Should succeed the generated patch list test"
 
-if ! bazel test $BZLMOD_FLAG //patches:patches_update_test; then
-  printf "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to pass"
+if ! bazel test "$BZLMOD_FLAG" //patches:patches_update_test; then
+  printf "ERROR: expected 'bazel test %s //patches:patches_update_test' to pass" "$BZLMOD_FLAG"
   exit 1
 fi
 

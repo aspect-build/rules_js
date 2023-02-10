@@ -10,11 +10,11 @@ typescript_bin.tsc(
     outs = [
         "fs.js",
     ],
-    chdir = package_name(),
     args = [
         "-p",
         "tsconfig.json",
     ],
+    chdir = package_name(),
     visibility = ["//js/private/test/node-patches:__pkg__"],
 )
 

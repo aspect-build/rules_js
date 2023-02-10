@@ -37,7 +37,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     // protects against sandbox escaping that occurs through module resolution
     // in the Go binary. See
     // https://github.com/aspect-build/rules_esbuild/issues/58.
-    fs._unpatched = {...fs};
+    fs._unpatched = { ...fs }
     roots = roots || []
     roots = roots.filter((root) => fs.existsSync(root))
     if (!roots.length) {

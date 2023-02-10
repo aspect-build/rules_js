@@ -5,6 +5,7 @@ BZLMOD_FLAG="${BZLMOD_FLAG:-}"
 
 # Integration test for js_run_devserver run with ibazel
 
+# shellcheck disable=SC2086
 bazel run $BZLMOD_FLAG -- @pnpm//:pnpm --dir "$PWD" install
 
 ./serve_test.sh //src:serve

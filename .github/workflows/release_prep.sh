@@ -8,8 +8,8 @@ TAG=${GITHUB_REF_NAME}
 # The prefix is chosen to match what GitHub generates for source archives
 PREFIX="rules_js-${TAG:1}"
 ARCHIVE="rules_js-$TAG.tar.gz"
-git archive --format=tar --prefix=${PREFIX}/ ${TAG} | gzip > $ARCHIVE
-SHA=$(shasum -a 256 $ARCHIVE | awk '{print $1}')
+git archive --format=tar --prefix="${PREFIX}/" "${TAG}" | gzip > "$ARCHIVE"
+SHA=$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')
 
 cat << EOF
 

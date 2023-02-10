@@ -1,5 +1,5 @@
 load("//npm:npm_import.bzl", "list_patches")
 
 list_patches(
-    name = "patches"
+    name = "patches",
 )
