@@ -49,6 +49,14 @@ load("@aspect_rules_js//npm:npm_import.bzl", "pnpm_repository")
 pnpm_repository(name = "pnpm")
 ```
 
+Or, if you're using [bzlmod](https://bazel.build/external/overview#bzlmod), add these lines to your MODULE.bazel:
+
+```starlark
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
+
+use_repo(pnpm, "pnpm")
+```
+
 This defines the `@pnpm` repository so that you can create the lockfile with
 `bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only`, and then once the file exists you'll
 be able to add the `pnpm_translate_lock` to the `WORKSPACE` which requires the lockfile.
