@@ -14,14 +14,16 @@ _sedi () {
 
 print_step() {
   printf "\n\n+----------------------------------------------------------------------+"
-  echo "$@"
+  # shellcheck disable=SC2059,SC2145
+  printf "\n  $@"
   printf "\n+----------------------------------------------------------------------+\n"
 }
 
 BZLMOD_FLAG="${BZLMOD_FLAG:-}"
 
 print_step "It should initially pass"
-if ! bazel test "$BZLMOD_FLAG" //...; then
+# shellcheck disable=SC2086
+if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
@@ -38,7 +40,8 @@ _sedi 's#"@types/node": "18.11.18"#"@types/node": "16"#' package.json
 
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 
-if bazel test "$BZLMOD_FLAG" //...; then
+# shellcheck disable=SC2086
+if bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1 bazel test $BZLMOD_FLAG //...' to fail"
   exit 1
 fi
@@ -67,7 +70,8 @@ fi
 
 print_step "It should pass a bazel test run"
 
-if ! bazel test "$BZLMOD_FLAG" //...; then
+# shellcheck disable=SC2086
+if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
@@ -76,13 +80,15 @@ print_step "It should bootstrap the lockfile when pnpm_lock is missing"
 
 rm pnpm-lock.yaml
 
-if [ ! "$BZLMOD_FLAG" ]; then
+# shellcheck disable=SC2086
+if [ ! $BZLMOD_FLAG ]; then
   _sedi 's#pnpm_lock = "//:pnpm-lock.yaml"#\# pnpm_lock = "//:pnpm-lock.yaml"#' WORKSPACE
 else
   _sedi 's#pnpm_lock = "//:pnpm-lock.yaml"#\# pnpm_lock = "//:pnpm-lock.yaml"#' MODULE.bazel
 fi
 
-if bazel test "$BZLMOD_FLAG" //...; then
+# shellcheck disable=SC2086
+if bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to fail"
   exit 1
 fi
@@ -97,13 +103,15 @@ fi
 # restored due to the module extension needing to explicitly parse the the pnpm lockfile.
 # By the time the read occurs the bootstrapping logic will not have executed so the file
 # doesn't exist.
-if [ "$BZLMOD_FLAG" ]; then
+# shellcheck disable=SC2086
+if [ $BZLMOD_FLAG ]; then
   _sedi 's#\# pnpm_lock = "//:pnpm-lock.yaml"#pnpm_lock = "//:pnpm-lock.yaml"#' MODULE.bazel
 fi
 
 print_step "It should pass a test after the lockfile has been bootstrapped"
 
-if ! bazel test "$BZLMOD_FLAG" //...; then
+# shellcheck disable=SC2086
+if ! bazel test $BZLMOD_FLAG //...; then
   echo "ERROR: expected 'bazel test $BZLMOD_FLAG //...' to pass"
   exit 1
 fi
