@@ -36,3 +36,12 @@ def rules_js_dev_dependencies():
         sha256 = "3fd8fec4ddec3c670bd810904e2e33170bedfe12f90adf943508184be458c8bb",
         urls = ["https://github.com/bazelbuild/stardoc/releases/download/0.5.3/stardoc-0.5.3.tar.gz"],
     )
+
+    http_archive(
+        name = "buildifier_prebuilt",
+        sha256 = "95387c9dded7f8e3bdd4c598bc2ca4fbb6366cb214fa52e7d7b689eb2f421e01",
+        strip_prefix = "buildifier-prebuilt-6.0.0",
+        urls = [
+            "https://github.com/keith/buildifier-prebuilt/archive/6.0.0.tar.gz",
+        ],
+    )
