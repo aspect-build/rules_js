@@ -6,7 +6,7 @@ JsInfo = provider(
         "declarations": "A depset of declaration files produced by the target",
         "npm_linked_package_files": "A depset of files in npm linked package dependencies of this target",
         "npm_linked_packages": "A depset of NpmLinkedPackageInfo providers that are dependencies of this target",
-        "npm_package_store_deps": "A depset of NpmPackageStoreInfo providers from npm dependencies of this target and the target's transitive dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package",
+        "npm_package_store_deps": "A depset of NpmPackageStoreInfo providers from non-dev npm dependencies of this target and the target's transitive dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package",
         "sources": "A depset of source files produced by the target",
         "transitive_declarations": "A depset of declaration files produced by the target and the target's transitive deps",
         "transitive_npm_linked_package_files": "A depset of files in npm linked package dependencies of this target and the target's transitive deps",

@@ -25,7 +25,7 @@ js_library(
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_library_helpers.bzl", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_library_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
@@ -82,7 +82,9 @@ _ATTRS = {
         The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
         runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
         runtime dependency on this target.
-        """,
+
+        {downstream_linked_npm_deps}
+        """.format(downstream_linked_npm_deps = DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING),
         providers = [JsInfo],
     ),
     "data": JS_LIBRARY_DATA_ATTR,
@@ -216,7 +218,7 @@ def _js_library_impl(ctx):
     )
 
     npm_package_store_deps = gather_npm_package_store_deps(
-        targets = ctx.attr.data,
+        targets = ctx.attr.data + ctx.attr.deps,
     )
 
     runfiles = gather_runfiles(

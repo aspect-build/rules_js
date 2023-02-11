@@ -131,7 +131,8 @@ def _impl(ctx):
             transitive_declarations = transitive_files_depset,
             npm_linked_package_files = files_depset,
             npm_linked_packages = depset([npm_linked_package_info]),
-            npm_package_store_deps = depset([store_info]),
+            # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
+            npm_package_store_deps = depset([store_info]) if not store_info.dev else depset(),
             transitive_npm_linked_package_files = transitive_files_depset,
             transitive_npm_linked_packages = depset([npm_linked_package_info]),
         ),

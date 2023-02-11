@@ -49,6 +49,7 @@ def npm_imported_package_store(
         name = "{{}}/ref".format(store_target_name),
         package = "{package}",
         version = "{version}",
+        dev = {dev},
         tags = ["manual"],
         use_declare_symlink = select({{
             "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
@@ -62,6 +63,7 @@ def npm_imported_package_store(
         src = "{{}}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
+        dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({{
@@ -76,6 +78,7 @@ def npm_imported_package_store(
         src = None if {transitive_closure_pattern} else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
+        dev = {dev},
         deps = deps,
         visibility = visibility,
         tags = ["manual"],
@@ -101,6 +104,7 @@ def npm_imported_package_store(
             name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
             package = "{package}",
             version = "{version}",
+            dev = {dev},
             deps = ref_deps,
             tags = ["manual"],
             use_declare_symlink = select({{
@@ -114,6 +118,7 @@ def npm_imported_package_store(
             name = "{{}}/pkg_pre_lc".format(store_target_name),
             package = "{package}",
             version = "{version}",
+            dev = {dev},
             deps = lc_deps,
             tags = ["manual"],
             use_declare_symlink = select({{
@@ -741,6 +746,7 @@ def _impl_links(rctx):
         virtual_store_name = virtual_store_name,
         virtual_store_root = utils.virtual_store_root,
         maybe_bins = maybe_bins,
+        dev = rctx.attr.dev,
     )]
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
@@ -759,6 +765,7 @@ _COMMON_ATTRS = {
 _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
+    "dev": attr.bool(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),

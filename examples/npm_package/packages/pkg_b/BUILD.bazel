@@ -13,7 +13,7 @@ js_library(
         "package.json",
     ],
     data = [
-        # Runtime dependencies propagate to downstream js_library and npm_link_package (via npm_package) targets
+        # Runtime non-dev dependencies propagate to downstream binary and npm_link_package (via npm_package) targets
         ":node_modules/acorn",
         ":node_modules/uuid",
     ],

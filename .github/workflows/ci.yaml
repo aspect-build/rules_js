@@ -102,6 +102,8 @@ jobs:
               run: echo "folder=e2e/pnpm_workspace_rerooted" >> $GITHUB_OUTPUT
             - id: pnpm_workspace
               run: echo "folder=e2e/pnpm_workspace" >> $GITHUB_OUTPUT
+            - id: pnpm_workspace_deps
+              run: echo "folder=e2e/pnpm_workspace_deps" >> $GITHUB_OUTPUT
             - id: rules_foo
               run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
             - id: update_pnpm_lock
