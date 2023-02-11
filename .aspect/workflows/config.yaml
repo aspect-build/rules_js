@@ -5,49 +5,79 @@ workspaces:
         label: rules_js
     e2e/bzlmod:
         icon: bazel
+        tasks:
+            buildifier:
+                without: true
     e2e/js_image_docker:
         icon: docker
+        tasks:
+            buildifier:
+                without: true
     e2e/js_image_oci:
         icon: linux
+        tasks:
+            buildifier:
+                without: true
     # No test targets. Requires running test.sh.
     # - e2e/js_run_devserver:
-    #       group:
-    #           icon: js
     e2e/npm_link_package:
         icon: npm
+        tasks:
+            buildifier:
+                without: true
     e2e/npm_link_package-esm:
         icon: npm
+        tasks:
+            buildifier:
+                without: true
     e2e/npm_translate_lock:
         icon: npm
-    # Requires an auth token?
+        tasks:
+            buildifier:
+                without: true
+    # Requires an auth token
     # - e2e/npm_translate_lock_auth:
-    #     group:
-    #       icon: npm
     e2e/npm_translate_package_lock:
         icon: npm
+        tasks:
+            buildifier:
+                without: true
     e2e/npm_translate_yarn_lock:
         icon: yarn
+        tasks:
+            buildifier:
+                without: true
     e2e/package_json_module:
         icon: npm
+        tasks:
+            buildifier:
+                without: true
     e2e/pnpm_workspace:
         icon: pnpm
+        tasks:
+            buildifier:
+                without: true
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
+        tasks:
+            buildifier:
+                without: true
     e2e/rules_foo:
         icon: js
+        tasks:
+            buildifier:
+                without: true
     e2e/vendored_node:
         icon: js
+        tasks:
+            buildifier:
+                without: true
     # No test targets. Requires running test.sh.
     # - e2e/webpack_devserver:
-    #       group:
-    #           icon: js
     # - e2e/webpack_devserver_esm:
-    #       group:
-    #           icon: js
 
 tasks:
-    warming:
-    branch_freshness:
+    buildifier:
     test:
         flags:
             - --remote_default_exec_properties=cache-silo-key="74aed5f7"
