@@ -194,7 +194,7 @@ importers:
       '@figma/nodegit': ^0.28.0-figma.2
       '@kubernetes/client-node': https://github.com/kubernetes-client/javascript#fc681991e61c6808dd26012a2331f83671a11218
       '@plotly/regl': 2.1.2
-      bufferutil: 4.0.1
+      bufferutil: 4.0.7
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
       handlebars-helpers/helper-date: github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55
@@ -213,9 +213,9 @@ importers:
     devDependencies:
       '@blockprotocol/type-system-web': '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e'
       '@figma/nodegit': 0.28.0-figma.2
-      '@kubernetes/client-node': github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.1
+      '@kubernetes/client-node': github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.7
       '@plotly/regl': 2.1.2
-      bufferutil: 4.0.1
+      bufferutil: 4.0.7
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.14.38
       handlebars-helpers/helper-date: github.com/coda/helper-date/a2cb4284148cbba7d36173dff4c7c60ce59eae55
@@ -230,7 +230,7 @@ importers:
       semver-first-satisfied: 1.1.0
       typescript: 4.9.4
       unused: 0.2.2
-      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.1
+      webpack-bundle-analyzer: 4.5.0_bufferutil@4.0.7
 
   npm/private/test/npm_package:
     specifiers:
@@ -1547,11 +1547,12 @@ packages:
       ieee754: 1.2.1
     dev: false
 
-  /bufferutil/4.0.1:
-    resolution: {integrity: sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==}
+  /bufferutil/4.0.7:
+    resolution: {integrity: sha512-kukuqc39WOHtdxtw4UScxF/WVnMFVSQVKhtx3AjZJzhd0RGZZldcrfSEbVsWWe6KNH253574cq5F+wpv0G9pJw==}
+    engines: {node: '>=6.14.2'}
     requiresBuild: true
     dependencies:
-      node-gyp-build: 3.7.0
+      node-gyp-build: 4.6.0
     dev: true
 
   /builtin-modules/3.3.0:
@@ -3526,7 +3527,7 @@ packages:
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.12.0_bufferutil@4.0.1
+      ws: 8.12.0_bufferutil@4.0.7
     dev: true
 
   /isstream/0.1.2:
@@ -4254,8 +4255,8 @@ packages:
       whatwg-url: 5.0.0
     dev: true
 
-  /node-gyp-build/3.7.0:
-    resolution: {integrity: sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==}
+  /node-gyp-build/4.6.0:
+    resolution: {integrity: sha512-NTZVKn9IylLwUzaKjkas1e4u2DLNcV4rdYagA4PWdPwW87Bi7z+BznyKSRwS/761tV/lzCGXplWsiaMjLqP2zQ==}
     hasBin: true
     dev: true
 
@@ -6024,7 +6025,7 @@ packages:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
     dev: true
 
-  /webpack-bundle-analyzer/4.5.0_bufferutil@4.0.1:
+  /webpack-bundle-analyzer/4.5.0_bufferutil@4.0.7:
     resolution: {integrity: sha512-GUMZlM3SKwS8Z+CKeIFx7CVoHn3dXFcUAjT/dcZQQmfSZGvitPfMob2ipjai7ovFFqPvTqkEZ/leL4O0YOdAYQ==}
     engines: {node: '>= 10.13.0'}
     hasBin: true
@@ -6037,7 +6038,7 @@ packages:
       lodash: 4.17.21
       opener: 1.5.2
       sirv: 1.0.19
-      ws: 7.5.9_bufferutil@4.0.1
+      ws: 7.5.9_bufferutil@4.0.7
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -6180,7 +6181,7 @@ packages:
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  /ws/7.5.9_bufferutil@4.0.1:
+  /ws/7.5.9_bufferutil@4.0.7:
     resolution: {integrity: sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==}
     engines: {node: '>=8.3.0'}
     peerDependencies:
@@ -6192,10 +6193,10 @@ packages:
       utf-8-validate:
         optional: true
     dependencies:
-      bufferutil: 4.0.1
+      bufferutil: 4.0.7
     dev: true
 
-  /ws/8.12.0_bufferutil@4.0.1:
+  /ws/8.12.0_bufferutil@4.0.7:
     resolution: {integrity: sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
@@ -6207,7 +6208,7 @@ packages:
       utf-8-validate:
         optional: true
     dependencies:
-      bufferutil: 4.0.1
+      bufferutil: 4.0.7
     dev: true
 
   /xml/1.0.1:
@@ -6346,7 +6347,7 @@ packages:
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
 
-  github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.1:
+  github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.7:
     resolution: {tarball: https://codeload.github.com/kubernetes-client/javascript/tar.gz/fc681991e61c6808dd26012a2331f83671a11218}
     id: github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218
     name: '@kubernetes/client-node'
@@ -6371,7 +6372,7 @@ packages:
       tslib: 2.5.0
       typescript: 4.9.4
       underscore: 1.13.6
-      ws: 8.12.0_bufferutil@4.0.1
+      ws: 8.12.0_bufferutil@4.0.7
     optionalDependencies:
       openid-client: 5.3.1
     transitivePeerDependencies:

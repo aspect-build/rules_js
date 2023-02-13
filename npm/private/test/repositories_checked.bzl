@@ -5216,25 +5216,25 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__bufferutil__4.0.1",
+        name = "npm__bufferutil__4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["bufferutil"],
         },
         package = "bufferutil",
-        version = "4.0.1",
-        url = "https://registry.npmjs.org/bufferutil/-/bufferutil-4.0.1.tgz",
+        version = "4.0.7",
+        url = "https://registry.npmjs.org/bufferutil/-/bufferutil-4.0.7.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-xowrxvpxojqkagPcWRQVXZl0YXhRhAtBEIq3VoER1NH5Mw1n1o0ojdspp+GS2J//2gCVyrzQDApQ4unGF+QOoA==",
+        integrity = "sha512-kukuqc39WOHtdxtw4UScxF/WVnMFVSQVKhtx3AjZJzhd0RGZZldcrfSEbVsWWe6KNH253574cq5F+wpv0G9pJw==",
         deps = {
-            "node-gyp-build": "3.7.0",
+            "node-gyp-build": "4.6.0",
         },
         transitive_closure = {
-            "bufferutil": ["4.0.1"],
-            "node-gyp-build": ["3.7.0"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -12107,13 +12107,13 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==",
         deps = {
-            "ws": "8.12.0_bufferutil@4.0.1",
+            "ws": "8.12.0_bufferutil@4.0.7",
         },
         transitive_closure = {
             "isomorphic-ws": ["5.0.0_ws@8.12.0"],
-            "ws": ["8.12.0_bufferutil@4.0.1"],
-            "bufferutil": ["4.0.1"],
-            "node-gyp-build": ["3.7.0"],
+            "ws": ["8.12.0_bufferutil@4.0.7"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
         },
     )
 
@@ -14766,19 +14766,19 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__node-gyp-build__3.7.0",
+        name = "npm__node-gyp-build__4.6.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "node-gyp-build",
-        version = "3.7.0",
-        url = "https://registry.npmjs.org/node-gyp-build/-/node-gyp-build-3.7.0.tgz",
+        version = "4.6.0",
+        url = "https://registry.npmjs.org/node-gyp-build/-/node-gyp-build-4.6.0.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==",
+        integrity = "sha512-NTZVKn9IylLwUzaKjkas1e4u2DLNcV4rdYagA4PWdPwW87Bi7z+BznyKSRwS/761tV/lzCGXplWsiaMjLqP2zQ==",
         transitive_closure = {
-            "node-gyp-build": ["3.7.0"],
+            "node-gyp-build": ["4.6.0"],
         },
     )
 
@@ -21682,14 +21682,14 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.1",
+        name = "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["webpack-bundle-analyzer"],
         },
         package = "webpack-bundle-analyzer",
-        version = "4.5.0_bufferutil@4.0.1",
+        version = "4.5.0_bufferutil@4.0.7",
         url = "https://registry.npmjs.org/webpack-bundle-analyzer/-/webpack-bundle-analyzer-4.5.0.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
@@ -21704,10 +21704,10 @@ def npm_repositories():
             "lodash": "4.17.21",
             "opener": "1.5.2",
             "sirv": "1.0.19",
-            "ws": "7.5.9_bufferutil@4.0.1",
+            "ws": "7.5.9_bufferutil@4.0.7",
         },
         transitive_closure = {
-            "webpack-bundle-analyzer": ["4.5.0_bufferutil@4.0.1"],
+            "webpack-bundle-analyzer": ["4.5.0_bufferutil@4.0.7"],
             "acorn": ["8.8.2"],
             "acorn-walk": ["8.2.0"],
             "chalk": ["4.1.2"],
@@ -21716,9 +21716,9 @@ def npm_repositories():
             "lodash": ["4.17.21"],
             "opener": ["1.5.2"],
             "sirv": ["1.0.19"],
-            "ws": ["7.5.9_bufferutil@4.0.1"],
-            "bufferutil": ["4.0.1"],
-            "node-gyp-build": ["3.7.0"],
+            "ws": ["7.5.9_bufferutil@4.0.7"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
             "@polka/url": ["1.0.0-next.21"],
             "mrmime": ["1.0.1"],
             "totalist": ["1.1.0"],
@@ -22282,46 +22282,46 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ws__7.5.9__bufferutil_4.0.1",
+        name = "npm__ws__7.5.9__bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "ws",
-        version = "7.5.9_bufferutil@4.0.1",
+        version = "7.5.9_bufferutil@4.0.7",
         url = "https://registry.npmjs.org/ws/-/ws-7.5.9.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==",
         deps = {
-            "bufferutil": "4.0.1",
+            "bufferutil": "4.0.7",
         },
         transitive_closure = {
-            "ws": ["7.5.9_bufferutil@4.0.1"],
-            "bufferutil": ["4.0.1"],
-            "node-gyp-build": ["3.7.0"],
+            "ws": ["7.5.9_bufferutil@4.0.7"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
         },
     )
 
     npm_import(
-        name = "npm__ws__8.12.0__bufferutil_4.0.1",
+        name = "npm__ws__8.12.0__bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "ws",
-        version = "8.12.0_bufferutil@4.0.1",
+        version = "8.12.0_bufferutil@4.0.7",
         url = "https://registry.npmjs.org/ws/-/ws-8.12.0.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==",
         deps = {
-            "bufferutil": "4.0.1",
+            "bufferutil": "4.0.7",
         },
         transitive_closure = {
-            "ws": ["8.12.0_bufferutil@4.0.1"],
-            "bufferutil": ["4.0.1"],
-            "node-gyp-build": ["3.7.0"],
+            "ws": ["8.12.0_bufferutil@4.0.7"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
         },
     )
 
@@ -22712,14 +22712,14 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_fc681991e61c6808dd26012a2331f83671a11218__bufferutil_4.0.1",
+        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_fc681991e61c6808dd26012a2331f83671a11218__bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["@kubernetes/client-node"],
         },
         package = "@kubernetes/client-node",
-        version = "github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.1",
+        version = "github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.7",
         url = "https://codeload.github.com/kubernetes-client/javascript/tar.gz/fc681991e61c6808dd26012a2331f83671a11218",
         npm_translate_lock_repo = "npm",
         dev = True,
@@ -22743,10 +22743,10 @@ def npm_repositories():
             "tslib": "2.5.0",
             "typescript": "4.9.4",
             "underscore": "1.13.6",
-            "ws": "8.12.0_bufferutil@4.0.1",
+            "ws": "8.12.0_bufferutil@4.0.7",
         },
         transitive_closure = {
-            "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.1"],
+            "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.7"],
             "@types/js-yaml": ["registry.npmjs.org/@types/js-yaml/4.0.5"],
             "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "@types/request": ["registry.npmjs.org/@types/request/2.48.8"],
@@ -22764,15 +22764,15 @@ def npm_repositories():
             "tslib": ["2.5.0"],
             "typescript": ["4.9.4"],
             "underscore": ["1.13.6"],
-            "ws": ["8.12.0_bufferutil@4.0.1"],
+            "ws": ["8.12.0_bufferutil@4.0.7"],
             "openid-client": ["5.3.1"],
             "jose": ["4.11.2"],
             "lru-cache": ["6.0.0"],
             "object-hash": ["2.2.0"],
             "oidc-token-hash": ["5.0.1"],
             "yallist": ["4.0.0"],
-            "bufferutil": ["4.0.1"],
-            "node-gyp-build": ["3.7.0"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
             "tmp": ["0.2.1"],
             "rimraf": ["3.0.2"],
             "glob": ["7.2.3"],
