@@ -22,7 +22,7 @@ genrule(
     name = "shell_launcher_sed",
     srcs = [":shellcheck_launcher"],
     outs = ["shellcheck_launcher_sed.sh"],
-    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" > $@" % (
+    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#JS_BINARY__TARGET_CPU=\\\"$(TARGET_CPU)\\\"#JS_BINARY__TARGET_CPU=\\\"k8\\\"#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" > $@" % (
         host.platform,
         host.os,
     ),
