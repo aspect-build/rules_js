@@ -34,6 +34,12 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_common_labels(rctx, label_store)
 
+    _init_patches_labels(priv, rctx, label_store)
+
+    root_package_json_declared = label_store.has("package_json_root")
+    if root_package_json_declared:
+        _init_patched_dependencies_labels(priv, rctx, label_store)
+
     if _should_update_pnpm_lock(priv) or not rctx.attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
         _init_pnpm_labels(label_store, rctx)
@@ -50,10 +56,14 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if pnpm_lock_exists:
         _load_lockfile(priv, rctx, label_store)
 
+    if not root_package_json_declared:
+        # If a root package.json label wasn't declared then we didn't load pnpm.patchedDependencies
+        # above. Try again now that the lockfile has been read so that we can derive the root
+        # package.json from the `importers` field.
+        _init_patched_dependencies_labels(priv, rctx, label_store)
+
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
-
-    _init_patch_labels(priv, rctx, label_store)
 
     _init_root_package(priv, rctx, label_store)
 
@@ -89,10 +99,23 @@ def _validate_attrs(attr, is_windows):
 def _init_common_labels(rctx, label_store):
     attr = rctx.attr
 
+    # data files
+    for i, d in enumerate(attr.data):
+        label_store.add("data_{}".format(i), d)
+
     # lock files
     if attr.pnpm_lock:
         label_store.add("pnpm_lock", attr.pnpm_lock, seed_root = True)
         label_store.add("lock", attr.pnpm_lock)
+
+        # root package.json file
+        # Because label syntax for repo rules can vary, check the paths of all `data` labels
+        # to see if one sits beside the pnpm lockfile
+        root_package_json_path = label_store.relative_path("pnpm_lock").replace(PNPM_LOCK_FILENAME, PACKAGE_JSON_FILENAME)
+        for i in range(len(rctx.attr.data)):
+            if label_store.relative_path("data_{}".format(i)) == root_package_json_path:
+                label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
+
     else:
         if attr.npm_package_lock:
             label_store.add("lock", attr.npm_package_lock, seed_root = True)
@@ -107,9 +130,6 @@ def _init_common_labels(rctx, label_store):
 
     # pnpm-workspace.yaml file
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
-
-    # root package.json file
-    label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
 
 ################################################################################
 def _init_pnpm_labels(label_store, rctx):
@@ -136,8 +156,6 @@ def _init_update_labels(priv, rctx, label_store):
     label_store.add_root("action_cache", action_cache_path)
     for i, d in enumerate(attr.preupdate):
         label_store.add("preupdate_{}".format(i), d)
-    for i, d in enumerate(attr.data):
-        label_store.add("data_{}".format(i), d)
 
     if attr.npm_package_lock:
         label_store.add("npm_package_lock", attr.npm_package_lock, seed_root = True)
@@ -145,28 +163,34 @@ def _init_update_labels(priv, rctx, label_store):
         label_store.add("yarn_lock", attr.yarn_lock, seed_root = True)
 
 ################################################################################
-def _init_patch_labels(priv, rctx, label_store):
+def _init_patches_labels(priv, rctx, label_store):
     if rctx.attr.verify_patches:
         label_store.add("verify_patches", rctx.attr.verify_patches)
 
     patches = []
-
-    # Add patches from `pnpm.patchedDependencies`
-    root_package_json = _read_root_package_json(priv, rctx, label_store)
-    for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values():
-        patches.append("//:%s" % patch)
-
-    # Add patches in `patches` attribute
     for pkg_patches in rctx.attr.patches.values():
         patches.extend(pkg_patches)
 
-    # Convert patch label strings to labels
     patches = [rctx.attr.pnpm_lock.relative(p) for p in patches]
 
     for i, d in enumerate(patches):
         label_store.add("patches_{}".format(i), d)
 
     priv["num_patches"] = len(patches)
+
+################################################################################
+def _init_patched_dependencies_labels(priv, rctx, label_store):
+    # Add patches from `pnpm.patchedDependencies`
+    root_package_json = _load_root_package_json(priv, rctx, label_store)
+    patches = ["//:%s" % patch for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
+
+    # Convert patch label strings to labels
+    patches = [rctx.attr.pnpm_lock.relative(p) for p in patches]
+
+    for i, d in enumerate(patches):
+        label_store.add("patches_{}".format(i + priv["num_patches"]), d)
+
+    priv["num_patches"] += len(patches)
 
 ################################################################################
 def _init_importer_labels(priv, label_store):
@@ -304,27 +328,27 @@ WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lo
             _copy_input_file(priv, rctx, label_store, package_json_key)
 
     # pnpm.patchedDependencies patch files
-    root_package_json = _read_root_package_json(priv, rctx, label_store)
+    root_package_json = _load_root_package_json(priv, rctx, label_store)
     pnpm_patches = root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()
-    root_package_json_label = label_store.label("package_json_root")
+    num_patches = priv["num_patches"]
 
     for i, _ in enumerate(pnpm_patches):
-        # The key for pnpm.patchesDependencies patches are indexed before other patches and start at 0
-        patch_key = "patches_{}".format(i)
+        # The key for pnpm.patchesDependencies patches are indexed after patches in the `patches` attr
+        patch_key = "patches_{}".format(i + num_patches - len(pnpm_patches))
         if not _has_input_hash(priv, label_store.relative_path(patch_key)):
             # buildifier: disable=print
             print("""
 WARNING: Implicitly using patch file `{patch}` since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.
     Add '{patch}' to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
 """.format(
-                package_json = root_package_json_label,
+                package_json = label_store.label("package_json_root"),
                 patch = label_store.label(patch_key),
                 rctx_name = rctx.name,
             ))
             if not utils.exists(rctx, label_store.path(patch_key)):
                 msg = "ERROR: expected {path} to exist since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.".format(
                     path = label_store.path(patch_key),
-                    package_json = root_package_json_label,
+                    package_json = label_store.label("package_json_root"),
                 )
                 fail(msg)
             _copy_input_file(priv, rctx, label_store, patch_key)
@@ -433,15 +457,34 @@ def _has_workspaces(priv):
     return importer_paths and (len(importer_paths) > 1 or importer_paths[0] != ".")
 
 ################################################################################
-def _read_root_package_json(priv, rctx, label_store):
-    has_root_importer = "." in priv["importers"].keys()
-    if not has_root_importer:
-        # if there is no root importer that means there is no root package.json to read; pnpm allows
-        # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
-        return {}
-    if "root_package_json" not in priv:
+def _load_root_package_json(priv, rctx, label_store):
+    if "root_package_json" in priv:
+        return priv["root_package_json"]
+
+    # Load a declared root package.json
+    if label_store.has("package_json_root"):
         root_package_json_path = label_store.path("package_json_root")
         priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
+        return priv["root_package_json"]
+
+    lockfile_is_loaded = "importers" in priv
+    if lockfile_is_loaded:
+        # Load an undeclared package.json derived from the root importer in the lockfile
+        has_root_importer = "." in priv["importers"].keys()
+        if has_root_importer:
+            label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
+            root_package_json_path = label_store.path("package_json_root")
+            priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
+        else:
+            # if there is no root importer that means there is no root package.json to read; pnpm allows
+            # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
+            priv["root_package_json"] = {}
+    else:
+        # The lockfile hasn't been loaded yet so we can't check for a root importer.
+        # Don't cache anything so that this method doesn't short-circuit when run again
+        # after the lockfile has been loaded.
+        return {}
+
     return priv["root_package_json"]
 
 ################################################################################
