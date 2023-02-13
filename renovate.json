@@ -11,7 +11,7 @@
         "workarounds:all"
     ],
 
-    "labels": ["cleanup", "prioritize"],
+    "labels": ["deps"],
     "dependencyDashboard": true,
 
     "packageRules": [
