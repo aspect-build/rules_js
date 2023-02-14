@@ -94,6 +94,7 @@ def npm_translate_lock(
         pnpm_version = LATEST_PNPM_VERSION,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
+        npm_package_target_name = "{dirname}",
         # TODO(2.0): remove package_json
         package_json = None,
         # TODO(2.0): remove warn_on_unqualified_tarball_url
@@ -355,6 +356,15 @@ def npm_translate_lock(
 
         warn_on_unqualified_tarball_url: Deprecated. Will be removed in next major release.
 
+        npm_package_target_name: The name of linked `npm_package` targets. When `npm_package` targets are linked as pnpm workspace
+            packages, the name of the target must align with this value.
+
+            The `{dirname}` placeholder is replaced with the directory name of the target.
+
+            By default the directory name of the target is used.
+
+            Default: `{dirname}`
+
         **kwargs: Internal use only
     """
 
@@ -452,6 +462,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         data = data,
         preupdate = preupdate,
         quiet = quiet,
+        npm_package_target_name = npm_package_target_name,
     )
 
 _npm_import_links = repository_rule(

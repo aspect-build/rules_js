@@ -212,7 +212,7 @@ npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_tr
                    <a href="#npm_translate_lock-verify_node_modules_ignored">verify_node_modules_ignored</a>, <a href="#npm_translate_lock-verify_patches">verify_patches</a>, <a href="#npm_translate_lock-quiet">quiet</a>,
                    <a href="#npm_translate_lock-external_repository_action_cache">external_repository_action_cache</a>, <a href="#npm_translate_lock-link_workspace">link_workspace</a>, <a href="#npm_translate_lock-pnpm_version">pnpm_version</a>,
                    <a href="#npm_translate_lock-register_copy_directory_toolchains">register_copy_directory_toolchains</a>, <a href="#npm_translate_lock-register_copy_to_directory_toolchains">register_copy_to_directory_toolchains</a>,
-                   <a href="#npm_translate_lock-package_json">package_json</a>, <a href="#npm_translate_lock-warn_on_unqualified_tarball_url">warn_on_unqualified_tarball_url</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
+                   <a href="#npm_translate_lock-npm_package_target_name">npm_package_target_name</a>, <a href="#npm_translate_lock-package_json">package_json</a>, <a href="#npm_translate_lock-warn_on_unqualified_tarball_url">warn_on_unqualified_tarball_url</a>, <a href="#npm_translate_lock-kwargs">kwargs</a>)
 </pre>
 
 Repository macro to generate starlark code from a lock file.
@@ -270,6 +270,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 | <a id="npm_translate_lock-pnpm_version"></a>pnpm_version |  pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.   |  <code>"7.25.0"</code> |
 | <a id="npm_translate_lock-register_copy_directory_toolchains"></a>register_copy_directory_toolchains |  if True, <code>@aspect_bazel_lib//lib:repositories.bzl</code> <code>register_copy_directory_toolchains()</code> is called if the toolchain is not already registered   |  <code>True</code> |
 | <a id="npm_translate_lock-register_copy_to_directory_toolchains"></a>register_copy_to_directory_toolchains |  if True, <code>@aspect_bazel_lib//lib:repositories.bzl</code> <code>register_copy_to_directory_toolchains()</code> is called if the toolchain is not already registered   |  <code>True</code> |
+| <a id="npm_translate_lock-npm_package_target_name"></a>npm_package_target_name |  The name of linked <code>npm_package</code> targets. When <code>npm_package</code> targets are linked as pnpm workspace packages, the name of the target must align with this value.<br><br>The <code>{dirname}</code> placeholder is replaced with the directory name of the target.<br><br>By default the directory name of the target is used.<br><br>Default: <code>{dirname}</code>   |  <code>"{dirname}"</code> |
 | <a id="npm_translate_lock-package_json"></a>package_json |  Deprecated.<br><br>Add all <code>package.json</code> files that are part of the workspace to <code>data</code> instead.   |  <code>None</code> |
 | <a id="npm_translate_lock-warn_on_unqualified_tarball_url"></a>warn_on_unqualified_tarball_url |  Deprecated. Will be removed in next major release.   |  <code>None</code> |
 | <a id="npm_translate_lock-kwargs"></a>kwargs |  Internal use only   |  none |

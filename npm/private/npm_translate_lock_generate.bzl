@@ -958,7 +958,10 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         fp_link_packages = fp_link.get("link_packages")
         fp_deps = fp_link.get("deps")
         fp_bazel_name = utils.bazel_name(fp_package, fp_path)
-        fp_target = "//{}:{}".format(fp_path, paths.basename(fp_path))
+        fp_target = "//{}:{}".format(
+            fp_path,
+            rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
+        )
 
         defs_bzl_body.append(_FP_STORE_TMPL.format(
             bazel_name = fp_bazel_name,

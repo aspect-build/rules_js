@@ -34,6 +34,7 @@ npm_translate_lock(
             "requires-network",
         ],
     },
+    npm_package_target_name = "{dirname}_pkg",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )

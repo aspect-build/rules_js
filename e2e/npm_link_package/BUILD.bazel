@@ -6,12 +6,12 @@ npm_link_all_packages(name = "node_modules")
 
 npm_link_package(
     name = "node_modules/@e2e/lib",
-    src = "//lib",
+    src = "//lib:lib_pkg",
 )
 
 npm_link_package(
     name = "node_modules/@e2e/wrapper-lib",
-    src = "//wrapper-lib",
+    src = "//wrapper-lib:wrapper-lib_pkg",
 )
 
 aspect_test_a_bin.bin_a_test(
