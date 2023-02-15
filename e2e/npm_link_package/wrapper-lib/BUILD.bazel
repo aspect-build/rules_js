@@ -7,7 +7,7 @@ js_library(
     name = "js",
     srcs = ["index.js"],
     data = [
-        "//lib",
+        "//lib:lib_pkg",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -16,7 +16,7 @@ js_library(
 )
 
 npm_package(
-    name = "wrapper-lib",
+    name = "wrapper-lib_pkg",
     srcs = [":js"],
     include_runfiles = False,
     package = "@e2e/wrapper-lib",

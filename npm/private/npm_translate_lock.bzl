@@ -42,6 +42,7 @@ _ATTRS = {
     "use_home_npmrc": attr.bool(),
     "verify_node_modules_ignored": attr.label(),
     "verify_patches": attr.label(),
+    "npm_package_target_name": attr.string(),
     "yarn_lock": attr.label(),
 }
 
