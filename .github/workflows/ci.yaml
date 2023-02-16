@@ -188,10 +188,6 @@ jobs:
                       bzlmodEnabled: true
                     - folder: e2e/rules_foo
                       bzlmodEnabled: true
-                    - folder: e2e/webpack_devserver
-                      bzlmodEnabled: true
-                    - folder: e2e/webpack_devserver_esm
-                      bzlmodEnabled: true
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
