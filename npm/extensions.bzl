@@ -24,20 +24,25 @@ def _extension_impl(module_ctx):
                 bins = attr.bins,
                 custom_postinstalls = attr.custom_postinstalls,
                 data = attr.data,
+                dev = attr.dev,
                 external_repository_action_cache = attr.external_repository_action_cache,
+                generate_bzl_library_targets = attr.generate_bzl_library_targets,
                 lifecycle_hooks = attr.lifecycle_hooks,
                 lifecycle_hooks_envs = attr.lifecycle_hooks_envs,
                 lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
                 lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
                 lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
                 link_workspace = attr.link_workspace,
+                no_optional = attr.no_optional,
                 npmrc = attr.npmrc,
                 npm_package_lock = attr.npm_package_lock,
+                npm_package_target_name = attr.npm_package_target_name,
                 patches = attr.patches,
                 patch_args = attr.patch_args,
                 pnpm_lock = attr.pnpm_lock,
                 pnpm_version = attr.pnpm_version,
                 preupdate = attr.preupdate,
+                prod = attr.prod,
                 public_hoist_packages = attr.public_hoist_packages,
                 quiet = attr.quiet,
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
@@ -45,6 +50,7 @@ def _extension_impl(module_ctx):
                 root_package = attr.root_package,
                 run_lifecycle_hooks = attr.run_lifecycle_hooks,
                 update_pnpm_lock = attr.update_pnpm_lock,
+                use_home_npmrc = attr.use_home_npmrc,
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
                 verify_patches = attr.verify_patches,
                 yarn_lock = attr.yarn_lock,
@@ -94,8 +100,10 @@ def _extension_impl(module_ctx):
                     deps = i.deps,
                     dev = i.dev,
                     integrity = i.integrity,
+                    generate_bzl_library_targets = attr.generate_bzl_library_targets,
                     lifecycle_hooks = i.run_lifecycle_hooks if i.run_lifecycle_hooks and i.lifecycle_hooks else [],
-                    lifecycle_hooks_env = i.lifecycle_hooks_env,
+                    lifecycle_hooks_env = i.lifecycle_hooks_env if i.run_lifecycle_hooks and i.lifecycle_hooks_env else {},
+                    lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements if i.run_lifecycle_hooks else [],
                     link_packages = i.link_packages,
                     link_workspace = attr.link_workspace if attr.link_workspace else attr.pnpm_lock.workspace_name,
                     npm_auth = i.npm_auth,
@@ -120,16 +128,26 @@ def _extension_impl(module_ctx):
                 bins = i.bins,
                 commit = i.commit,
                 custom_postinstall = i.custom_postinstall,
+                deps = i.deps,
                 dev = i.dev,
+                extra_build_content = i.extra_build_content,
                 integrity = i.integrity,
                 lifecycle_hooks = i.lifecycle_hooks,
                 lifecycle_hooks_env = i.lifecycle_hooks_env,
+                lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements,
+                lifecycle_hooks_no_sandbox = i.lifecycle_hooks_no_sandbox,
                 link_packages = i.link_packages,
                 link_workspace = i.link_workspace,
+                npm_auth = i.npm_auth,
+                npm_auth_basic = i.npm_auth_basic,
+                npm_auth_username = i.npm_auth_username,
+                npm_auth_password = i.npm_auth_password,
                 package = i.package,
                 patch_args = i.patch_args,
                 patches = i.patches,
                 root_package = i.root_package,
+                run_lifecycle_hooks = i.run_lifecycle_hooks,
+                transitive_closure = i.transitive_closure,
                 url = i.url,
                 version = i.version,
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
@@ -146,6 +164,9 @@ def _npm_translate_lock_attrs():
     attrs["pnpm_version"] = attr.string(default = LATEST_PNPM_VERSION)
     attrs["run_lifecycle_hooks"] = attr.bool(default = True)
 
+    # Args defaulted differently by the macro
+    attrs["npm_package_target_name"] = attr.string(default = "{dirname}")
+
     return attrs
 
 def _npm_import_attrs():
@@ -154,6 +175,12 @@ def _npm_import_attrs():
 
     # Add macro attrs that aren't in the rule attrs.
     attrs["name"] = attr.string()
+    attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = False)
+    attrs["run_lifecycle_hooks"] = attr.bool(default = False)
+
+    # Args defaulted differently by the macro
+    attrs["lifecycle_hooks_execution_requirements"] = attr.string_list(default = ["no-sandbox"])
+    attrs["patch_args"] = attr.string_list(default = ["-p0"])
 
     return attrs
 
