@@ -180,8 +180,6 @@ jobs:
                       bzlmodEnabled: true
                     - folder: e2e/js_image_oci
                       bzlmodEnabled: true
-                    - folder: e2e/js_run_devserver
-                      bzlmodEnabled: true
                     - folder: e2e/npm_link_package-esm
                       bzlmodEnabled: true
                     - folder: e2e/npm_link_package
