@@ -119,6 +119,8 @@ _exit() {
         rm "$STDOUT_CAPTURE"
     fi
 
+    logf_debug "exit code: %s" "$EXIT_CODE"
+
     exit $EXIT_CODE
 }
 
