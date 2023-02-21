@@ -177,7 +177,10 @@ with a rule like [`copy_to_bin`](https://docs.aspect.build/aspect-build/bazel-li
 rules_js automatically mirrors the `bin` field from the `package.json` file of your npm dependencies
 to a Starlark API you can load from in your BUILD file or macro.
 
-The format of the generated starlark file is `@<npm external repo name>//<package name where npm binary is loaded>:<npm package name>/package_json.bzl`.
+The format of the generated starlark file is `@<npm external repo name>//<package name where npm package is linked>:<npm package name>/package_json.bzl`.
+
+`<package name where npm package is linked>` is the name of the *bazel* package where the npm package is linked. Linking npm packages happens with `npm_link_package` or
+`npm_link_all_packages`. When [`npm_link_package`](./npm_link_package.md) is used, the `root_package` parameter specifies the bazel package. When `npm_link_all_packages` is used, the bazel package is the location where `npm_link_all_packages` was called.
 
 For example, let's imagine you have this folder structure:
 
@@ -197,42 +200,50 @@ npm_translate_lock(
     ...
 )
 ```
+and you have linked the `typescript` npm package in your root `BUILD` file:
+
+```starlark=
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+```
 
 To use the `typescript` npm package in the root bazel package of your project, you write this in the `BUILD` file:
+
+```diff
+load("@npm//:defs.bzl", "npm_link_all_packages")
++ load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
+
+npm_link_all_packages()
+
++ typescript_bin.tsc(
++     name = "compile",
++     srcs = [
++         "fs.ts",
++         "tsconfig.json",
++         "//:node_modules/@types/node",
++     ],
++     outs = ["fs.js"],
++     chdir = package_name(),
++     args = ["-p", "tsconfig.json"],
++ )
+```
+
+Note: the order of the load statements is not important as all the targets are evaluated in the [loading phase of bazel](https://bazel.build/extending/concepts#evaluation-model).
+
+To use the `typescript` npm package in the `//app` bazel package of your project, you
+would write the same code as above in the `app/BUILD` file:
 
 ```starlark=
 load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
 
 typescript_bin.tsc(
     name = "compile",
-    srcs = [
-        "fs.ts",
-        "tsconfig.json",
-        "//:node_modules/@types/node",
-    ],
-    outs = ["fs.js"],
-    chdir = package_name(),
-    args = ["-p", "tsconfig.json"],
+    ...
 )
 ```
 
-To use the `typescript` npm package in the `//app` bazel package of your project, you write this in the `app/BUILD` file:
-
-```starlark=
-load("@npm//app:typescript/package_json.bzl", typescript_bin = "bin")
-
-typescript_bin.tsc(
-    name = "compile",
-    srcs = [
-        "fs.ts",
-        "tsconfig.json",
-        "//:node_modules/@types/node",
-    ],
-    outs = ["fs.js"],
-    chdir = package_name(),
-    args = ["-p", "tsconfig.json"],
-)
-```
+this is because the `typescript` npm package is linked in the root bazel package of your project.
 
 > Note: this doesn't cause an eager fetch!
 > Bazel doesn't download the typescript package when loading this file, so you can safely write this
