@@ -216,7 +216,7 @@ if [ "${node:0:1}" = "/" ]; then
         exit 1
     fi
 else
-    export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node}}"
+    export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/{{node}}"
     if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
         logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
         exit 1
@@ -238,7 +238,7 @@ if [ "$npm" ]; then
             exit 1
         fi
     else
-        export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{npm}}"
+        export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/{{npm}}"
         if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
             logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
             exit 1
