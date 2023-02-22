@@ -9580,7 +9580,26 @@ function findKeyByValue(entries, value) {
 async function* walk(dir, accumulate = '') {
     const dirents = await readdir(dir, { withFileTypes: true });
     for (const dirent of dirents) {
-        if (dirent.isDirectory()) {
+        let isDirectory = dirent.isDirectory();
+        if (dirent.isSymbolicLink() && !dirent.isDirectory() && !dirent.isFile()) {
+            // On OSX we sometimes encounter this bug: https://github.com/nodejs/node/issues/30646
+            // The entry is apparently a symlink, but it's ambiguous whether it's a symlink to a
+            // file or to a directory, and lstat doesn't tell us either. Determine the type by
+            // attempting to read it as a directory.
+            try {
+                await readdir(path.join(dir, dirent.name));
+                isDirectory = true;
+            }
+            catch (error) {
+                if (error.code === 'ENOTDIR') {
+                    isDirectory = false;
+                }
+                else {
+                    throw error;
+                }
+            }
+        }
+        if (isDirectory) {
             yield* walk(path.join(dir, dirent.name), path.join(accumulate, dirent.name));
         }
         else {
