@@ -136,7 +136,15 @@ def _runfile_path(ctx, file, runfiles_dir):
 def _runfiles_dir(root, default_info):
     manifest = default_info.files_to_run.runfiles_manifest
 
-    runfiles = manifest.short_path.replace(manifest.basename, "")[:-1]
+    nobuild_runfile_links_is_set = manifest.short_path.endswith("_manifest")
+
+    if nobuild_runfile_links_is_set:
+        # When `--nobuild_runfile_links` is set, runfiles_manifest points to the manifest
+        # file sitting adjacent to the runfiles tree rather than within it.
+        runfiles = default_info.files_to_run.runfiles_manifest.short_path.replace("_manifest", "")
+    else:
+        runfiles = manifest.short_path.replace(manifest.basename, "")[:-1]
+
     return paths.join(root, runfiles.replace(".sh", ""))
 
 def _js_image_layer_impl(ctx):
