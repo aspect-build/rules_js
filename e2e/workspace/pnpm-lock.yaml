@@ -1,10 +1,12 @@
 lockfileVersion: 5.4
 
-specifiers:
-  color: '*'
+importers:
 
-dependencies:
-  color: 4.2.3
+  .:
+    specifiers:
+      color: ^4.2.3
+    dependencies:
+      color: 4.2.3
 
 packages:
 

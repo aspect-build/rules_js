@@ -9347,22 +9347,22 @@ function requireSource () {
 	   * @return {{count?: number, start?: boolean, stop?: boolean}|undefined}
 	   */
 	  _parseIgnore (lineStr) {
-	    const testIgnoreNextLines = lineStr.match(/^\W*\/\* c8 ignore next (?<count>[0-9]+) *\*\/\W*$/);
+	    const testIgnoreNextLines = lineStr.match(/^\W*\/\* c8 ignore next (?<count>[0-9]+)/);
 	    if (testIgnoreNextLines) {
 	      return { count: Number(testIgnoreNextLines.groups.count) }
 	    }
 
 	    // Check if comment is on its own line.
-	    if (lineStr.match(/^\W*\/\* c8 ignore next *\*\/\W*$/)) {
+	    if (lineStr.match(/^\W*\/\* c8 ignore next/)) {
 	      return { count: 1 }
 	    }
 
-	    if (lineStr.match(/\/\* c8 ignore next \*\//)) {
+	    if (lineStr.match(/\/\* c8 ignore next/)) {
 	      // Won't ignore successive lines, but the current line will be ignored.
 	      return { count: 0 }
 	    }
 
-	    const testIgnoreStartStop = lineStr.match(/\/\* c8 ignore (?<mode>start|stop) *\*\//);
+	    const testIgnoreStartStop = lineStr.match(/\/\* c8 ignore (?<mode>start|stop)/);
 	    if (testIgnoreStartStop) {
 	      if (testIgnoreStartStop.groups.mode === 'start') return { start: true }
 	      if (testIgnoreStartStop.groups.mode === 'stop') return { stop: true }
@@ -9543,7 +9543,7 @@ function requireSource () {
 }
 
 var name = "v8-to-istanbul";
-var version = "9.0.1";
+var version = "9.1.0";
 var description = "convert from v8 coverage format to istanbul's format";
 var main = "index.js";
 var types = "index.d.ts";
@@ -9573,7 +9573,7 @@ var dependencies = {
 	"convert-source-map": "^1.6.0"
 };
 var devDependencies = {
-	"@types/node": "^16.0.0",
+	"@types/node": "^18.0.0",
 	c8: "^7.2.1",
 	semver: "^7.3.2",
 	should: "13.2.3",
