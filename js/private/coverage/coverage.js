@@ -10704,6 +10704,7 @@ let Report$1 = class Report {
     excludeAfterRemap,
     include,
     reporter,
+    reporterOptions,
     reportsDirectory,
     tempDirectory,
     watermarks,
@@ -10717,6 +10718,7 @@ let Report$1 = class Report {
     excludeNodeModules
   }) {
     this.reporter = reporter;
+    this.reporterOptions = reporterOptions || {};
     this.reportsDirectory = reportsDirectory;
     this.tempDirectory = tempDirectory;
     this.watermarks = watermarks;
@@ -10759,7 +10761,8 @@ let Report$1 = class Report {
       reports.create(_reporter, {
         skipEmpty: false,
         skipFull: this.skipFull,
-        maxCols: process.stdout.columns || 100
+        maxCols: process.stdout.columns || 100,
+        ...this.reporterOptions[_reporter]
       }).execute(context);
     }
   }
