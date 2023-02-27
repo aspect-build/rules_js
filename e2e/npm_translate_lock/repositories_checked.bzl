@@ -21,7 +21,7 @@ def npm_repositories():
             "@rollup/pluginutils": "5.0.2",
             "commondir": "registry.npmjs.org/commondir/1.0.1",
             "estree-walker": "registry.npmjs.org/estree-walker/2.0.2",
-            "glob": "registry.npmjs.org/glob/8.0.3",
+            "glob": "registry.npmjs.org/glob/8.1.0",
             "is-reference": "registry.npmjs.org/is-reference/1.2.1",
             "magic-string": "registry.npmjs.org/magic-string/0.26.7",
         },
@@ -30,7 +30,7 @@ def npm_repositories():
             "@rollup/pluginutils": ["5.0.2"],
             "commondir": ["registry.npmjs.org/commondir/1.0.1"],
             "estree-walker": ["registry.npmjs.org/estree-walker/2.0.2"],
-            "glob": ["registry.npmjs.org/glob/8.0.3"],
+            "glob": ["registry.npmjs.org/glob/8.1.0"],
             "is-reference": ["registry.npmjs.org/is-reference/1.2.1"],
             "magic-string": ["registry.npmjs.org/magic-string/0.26.7"],
             "sourcemap-codec": ["registry.npmjs.org/sourcemap-codec/1.4.8"],
@@ -38,7 +38,7 @@ def npm_repositories():
             "fs.realpath": ["registry.npmjs.org/fs.realpath/1.0.0"],
             "inflight": ["registry.npmjs.org/inflight/1.0.6"],
             "inherits": ["registry.npmjs.org/inherits/2.0.4"],
-            "minimatch": ["registry.npmjs.org/minimatch/5.1.1"],
+            "minimatch": ["registry.npmjs.org/minimatch/5.1.6"],
             "once": ["registry.npmjs.org/once/1.4.0"],
             "wrappy": ["registry.npmjs.org/wrappy/1.0.2"],
             "brace-expansion": ["registry.npmjs.org/brace-expansion/2.0.1"],
@@ -88,8 +88,8 @@ def npm_repositories():
         deps = {
             "@rollup/pluginutils": "5.0.2",
             "@types/resolve": "registry.npmjs.org/@types/resolve/1.20.2",
-            "deepmerge": "registry.npmjs.org/deepmerge/4.2.2",
-            "is-builtin-module": "registry.npmjs.org/is-builtin-module/3.2.0",
+            "deepmerge": "registry.npmjs.org/deepmerge/4.3.0",
+            "is-builtin-module": "registry.npmjs.org/is-builtin-module/3.2.1",
             "is-module": "registry.npmjs.org/is-module/1.0.0",
             "resolve": "registry.npmjs.org/resolve/1.22.1",
         },
@@ -97,8 +97,8 @@ def npm_repositories():
             "@rollup/plugin-node-resolve": ["15.0.1"],
             "@rollup/pluginutils": ["5.0.2"],
             "@types/resolve": ["registry.npmjs.org/@types/resolve/1.20.2"],
-            "deepmerge": ["registry.npmjs.org/deepmerge/4.2.2"],
-            "is-builtin-module": ["registry.npmjs.org/is-builtin-module/3.2.0"],
+            "deepmerge": ["registry.npmjs.org/deepmerge/4.3.0"],
+            "is-builtin-module": ["registry.npmjs.org/is-builtin-module/3.2.1"],
             "is-module": ["registry.npmjs.org/is-module/1.0.0"],
             "resolve": ["registry.npmjs.org/resolve/1.22.1"],
             "is-core-module": ["registry.npmjs.org/is-core-module/2.11.0"],
@@ -295,18 +295,18 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__deepmerge__registry.npmjs.org_deepmerge_4.2.2",
+        name = "npm__deepmerge__registry.npmjs.org_deepmerge_4.3.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "deepmerge",
-        version = "registry.npmjs.org/deepmerge/4.2.2",
-        url = "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.2.2.tgz",
+        version = "registry.npmjs.org/deepmerge/4.3.0",
+        url = "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.3.0.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
-        integrity = "sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==",
+        integrity = "sha512-z2wJZXrmeHdvYJp/Ux55wIjqo81G5Bp4c+oELTW+7ar6SogWHajt5a9gO3s3IDaGSAXjDk0vlQKN3rms8ab3og==",
         transitive_closure = {
-            "deepmerge": ["registry.npmjs.org/deepmerge/4.2.2"],
+            "deepmerge": ["registry.npmjs.org/deepmerge/4.3.0"],
         },
     )
 
@@ -359,29 +359,29 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__glob__registry.npmjs.org_glob_8.0.3",
+        name = "npm__glob__registry.npmjs.org_glob_8.1.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "glob",
-        version = "registry.npmjs.org/glob/8.0.3",
-        url = "https://registry.yarnpkg.com/glob/-/glob-8.0.3.tgz",
+        version = "registry.npmjs.org/glob/8.1.0",
+        url = "https://registry.yarnpkg.com/glob/-/glob-8.1.0.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
-        integrity = "sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==",
+        integrity = "sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==",
         deps = {
             "fs.realpath": "registry.npmjs.org/fs.realpath/1.0.0",
             "inflight": "registry.npmjs.org/inflight/1.0.6",
             "inherits": "registry.npmjs.org/inherits/2.0.4",
-            "minimatch": "registry.npmjs.org/minimatch/5.1.1",
+            "minimatch": "registry.npmjs.org/minimatch/5.1.6",
             "once": "registry.npmjs.org/once/1.4.0",
         },
         transitive_closure = {
-            "glob": ["registry.npmjs.org/glob/8.0.3"],
+            "glob": ["registry.npmjs.org/glob/8.1.0"],
             "fs.realpath": ["registry.npmjs.org/fs.realpath/1.0.0"],
             "inflight": ["registry.npmjs.org/inflight/1.0.6"],
             "inherits": ["registry.npmjs.org/inherits/2.0.4"],
-            "minimatch": ["registry.npmjs.org/minimatch/5.1.1"],
+            "minimatch": ["registry.npmjs.org/minimatch/5.1.6"],
             "once": ["registry.npmjs.org/once/1.4.0"],
             "wrappy": ["registry.npmjs.org/wrappy/1.0.2"],
             "brace-expansion": ["registry.npmjs.org/brace-expansion/2.0.1"],
@@ -448,21 +448,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__is-builtin-module__registry.npmjs.org_is-builtin-module_3.2.0",
+        name = "npm__is-builtin-module__registry.npmjs.org_is-builtin-module_3.2.1",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "is-builtin-module",
-        version = "registry.npmjs.org/is-builtin-module/3.2.0",
-        url = "https://registry.yarnpkg.com/is-builtin-module/-/is-builtin-module-3.2.0.tgz",
+        version = "registry.npmjs.org/is-builtin-module/3.2.1",
+        url = "https://registry.yarnpkg.com/is-builtin-module/-/is-builtin-module-3.2.1.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
-        integrity = "sha512-phDA4oSGt7vl1n5tJvTWooWWAsXLY+2xCnxNqvKhGEzujg+A43wPlPOyDg3C8XQHN+6k/JTQWJ/j0dQh/qr+Hw==",
+        integrity = "sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==",
         deps = {
             "builtin-modules": "registry.npmjs.org/builtin-modules/3.3.0",
         },
         transitive_closure = {
-            "is-builtin-module": ["registry.npmjs.org/is-builtin-module/3.2.0"],
+            "is-builtin-module": ["registry.npmjs.org/is-builtin-module/3.2.1"],
             "builtin-modules": ["registry.npmjs.org/builtin-modules/3.3.0"],
         },
     )
@@ -600,21 +600,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__minimatch__registry.npmjs.org_minimatch_5.1.1",
+        name = "npm__minimatch__registry.npmjs.org_minimatch_5.1.6",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "minimatch",
-        version = "registry.npmjs.org/minimatch/5.1.1",
-        url = "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.1.tgz",
+        version = "registry.npmjs.org/minimatch/5.1.6",
+        url = "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.6.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
-        integrity = "sha512-362NP+zlprccbEt/SkxKfRMHnNY85V74mVnpUpNyr3F35covl09Kec7/sEFLt3RA4oXmewtoaanoIf67SE5Y5g==",
+        integrity = "sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==",
         deps = {
             "brace-expansion": "registry.npmjs.org/brace-expansion/2.0.1",
         },
         transitive_closure = {
-            "minimatch": ["registry.npmjs.org/minimatch/5.1.1"],
+            "minimatch": ["registry.npmjs.org/minimatch/5.1.6"],
             "brace-expansion": ["registry.npmjs.org/brace-expansion/2.0.1"],
             "balanced-match": ["registry.npmjs.org/balanced-match/1.0.2"],
         },

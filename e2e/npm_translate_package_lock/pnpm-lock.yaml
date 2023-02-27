@@ -4,12 +4,12 @@ overrides:
   '@types/node': 18.11.18
 
 specifiers:
-  botframework-connector: 4.19.0
+  botframework-connector: 4.19.1
   karma-typescript: 5.5.3
   lodash: 4.17.21
 
 dependencies:
-  botframework-connector: 4.19.0
+  botframework-connector: 4.19.1
   karma-typescript: 5.5.3
   lodash: 4.17.21
 
@@ -529,20 +529,20 @@ packages:
     resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
     dev: false
 
-  /botbuilder-stdlib/4.19.0-internal:
-    resolution: {integrity: sha512-uqIFgtiKptvmXGeqtiD62MWXs+F5ne1MyKiltJN5Nm1DfKDx2AmNoH483nhavenEPaDr1MfR7JdXjpRbEjoqvw==}
+  /botbuilder-stdlib/4.19.1-internal:
+    resolution: {integrity: sha512-JCv/fjeupUvxvwFEaS8HC8X7w9pg3Z+ULb3XfXchQDRNugNQHgGQ5gmB6HV+2XWobs9PsR0MbvQ62DP1HygiqQ==}
     dev: false
 
-  /botframework-connector/4.19.0:
-    resolution: {integrity: sha512-ngwWX9pzr0FiNNVfMkk9cOu9yX3DPmdGLxWVyAfxW4qgKDZx80AumRhTkVIvRR2VCkoFSIuWV+q0wa7Mnz/Qpg==}
+  /botframework-connector/4.19.1:
+    resolution: {integrity: sha512-PhbCynWfQKIGQGBXIcnMmMfrWbSunzMACMJF2NwmKzOl61nBXrGV3IUVjLJhJWQppr1VZ3uYCYbUyVC0GiuAzA==}
     dependencies:
       '@azure/identity': 2.1.0
       '@azure/ms-rest-js': 2.6.4
       adal-node: 0.2.3
       axios: 0.25.0
       base64url: 3.0.1
-      botbuilder-stdlib: 4.19.0-internal
-      botframework-schema: 4.19.0
+      botbuilder-stdlib: 4.19.1-internal
+      botframework-schema: 4.19.1
       cross-fetch: 3.1.5
       jsonwebtoken: 9.0.0
       rsa-pem-from-mod-exp: 0.8.5
@@ -553,8 +553,8 @@ packages:
       - supports-color
     dev: false
 
-  /botframework-schema/4.19.0:
-    resolution: {integrity: sha512-vFizvdNuNzZKGNJQVblyb9xzxWiE8gJtlPy8+pENXZf54PLY0IO0RqVAsakMH+MMePJ4UeE98++8Z3mstfwkiQ==}
+  /botframework-schema/4.19.1:
+    resolution: {integrity: sha512-unCeIw8PBhBCLyu6VUIpi42s4vKGvzWpYtOjW1cp27mkZIrAeXrZZ/eNBKhu30xuAOZkr3sORsTxKeu42F1pZQ==}
     dependencies:
       uuid: 8.3.2
       zod: 1.11.17
