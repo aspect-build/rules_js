@@ -136,19 +136,19 @@ importers:
       '@types/tar-stream': 2.2.2
       rollup: 2.79.1
       tar-stream: 3.0.0
-      tslib: 2.4.1
+      tslib: 2.5.0
       typescript: 4.9.5
     dependencies:
       tar-stream: 3.0.0
     devDependencies:
       '@rollup/plugin-commonjs': 23.0.0_rollup@2.79.1
       '@rollup/plugin-node-resolve': 15.0.0_rollup@2.79.1
-      '@rollup/plugin-typescript': 10.0.1_p4zxjh3csaan62zu4p3amdofcm
+      '@rollup/plugin-typescript': 10.0.1_bhcmvni67fkldpaxrtldxbogce
       '@types/archiver': registry.npmjs.org/@types/archiver/5.3.1
       '@types/node': registry.npmjs.org/@types/node/18.11.11
       '@types/tar-stream': registry.npmjs.org/@types/tar-stream/2.2.2
       rollup: 2.79.1
-      tslib: 2.4.1
+      tslib: 2.5.0
       typescript: 4.9.5
 
   js/private/test/image:
@@ -1062,26 +1062,6 @@ packages:
       resolve: 1.22.1
       rollup: 2.79.1
       tslib: 2.5.0
-      typescript: 4.9.5
-    dev: true
-
-  /@rollup/plugin-typescript/10.0.1_p4zxjh3csaan62zu4p3amdofcm:
-    resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.14.0||^3.0.0
-      tslib: '*'
-      typescript: '>=3.7.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      tslib:
-        optional: true
-    dependencies:
-      '@rollup/pluginutils': 5.0.2_rollup@2.79.1
-      resolve: 1.22.1
-      rollup: 2.79.1
-      tslib: 2.4.1
       typescript: 4.9.5
     dev: true
 
@@ -3804,7 +3784,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -5992,10 +5972,6 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib/2.4.1:
-    resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
-    dev: true
-
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
     dev: true
@@ -6619,7 +6595,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@types/js-yaml': registry.npmjs.org/@types/js-yaml/4.0.5
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
       '@types/request': registry.npmjs.org/@types/request/2.48.8
       '@types/underscore': registry.npmjs.org/@types/underscore/1.11.4
       '@types/ws': registry.npmjs.org/@types/ws/8.5.4
@@ -6671,7 +6647,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics/4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv/3.1.4
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
       '@types/responselike': registry.npmjs.org/@types/responselike/1.0.0
     dev: true
 
@@ -6757,7 +6733,7 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
     dev: true
 
   registry.npmjs.org/@types/minimatch/5.1.2:
@@ -6782,12 +6758,6 @@ packages:
     resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
     name: '@types/node'
     version: 18.11.18
-    dev: true
-
-  registry.npmjs.org/@types/node/18.14.2:
-    resolution: {integrity: sha512-1uEQxww3DaghA0RxqHx0O0ppVlo43pJhepY51OxuQIKHpjbnYLA7vcdwioNPzIqmC2u3I/dmylcqjlh0e7AyUA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.14.2.tgz}
-    name: '@types/node'
-    version: 18.14.2
 
   registry.npmjs.org/@types/request/2.48.8:
     resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/request/-/request-2.48.8.tgz}
@@ -6795,7 +6765,7 @@ packages:
     version: 2.48.8
     dependencies:
       '@types/caseless': registry.npmjs.org/@types/caseless/0.12.2
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
       '@types/tough-cookie': registry.npmjs.org/@types/tough-cookie/4.0.2
       form-data: 2.5.1
     dev: true
@@ -6811,7 +6781,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
     dev: true
 
   registry.npmjs.org/@types/tar-stream/2.2.2:
@@ -6839,5 +6809,5 @@ packages:
     name: '@types/ws'
     version: 8.5.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/18.14.2
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
     dev: true
