@@ -6303,7 +6303,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz",
         npm_translate_lock_repo = "npm",
         generate_bzl_library_targets = True,
-        integrity = "sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=",
+        integrity = "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==",
         transitive_closure = {
             "concat-map": ["0.0.1"],
         },
@@ -20851,29 +20851,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__typescript__4.8.4",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "": ["typescript"],
-        },
-        package = "typescript",
-        version = "4.8.4",
-        url = "https://registry.npmjs.org/typescript/-/typescript-4.8.4.tgz",
-        npm_translate_lock_repo = "npm",
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==",
-        transitive_closure = {
-            "typescript": ["4.8.4"],
-        },
-        bins = {
-            "tsc": "./bin/tsc",
-            "tsserver": "./bin/tsserver",
-        },
-    )
-
-    npm_import(
         name = "npm__typescript__4.9.4",
         root_package = "",
         link_workspace = "",
@@ -20891,6 +20868,29 @@ def npm_repositories():
         integrity = "sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==",
         transitive_closure = {
             "typescript": ["4.9.4"],
+        },
+        bins = {
+            "tsc": "./bin/tsc",
+            "tsserver": "./bin/tsserver",
+        },
+    )
+
+    npm_import(
+        name = "npm__typescript__4.9.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["typescript"],
+        },
+        package = "typescript",
+        version = "4.9.5",
+        url = "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==",
+        transitive_closure = {
+            "typescript": ["4.9.5"],
         },
         bins = {
             "tsc": "./bin/tsc",
@@ -22741,7 +22741,7 @@ def npm_repositories():
             "tar": "6.1.13",
             "tmp-promise": "3.0.3",
             "tslib": "2.5.0",
-            "typescript": "4.9.4",
+            "typescript": "4.9.5",
             "underscore": "1.13.6",
             "ws": "8.12.0_bufferutil@4.0.7",
         },
@@ -22762,7 +22762,7 @@ def npm_repositories():
             "tar": ["6.1.13"],
             "tmp-promise": ["3.0.3"],
             "tslib": ["2.5.0"],
-            "typescript": ["4.9.4"],
+            "typescript": ["4.9.5"],
             "underscore": ["1.13.6"],
             "ws": ["8.12.0_bufferutil@4.0.7"],
             "openid-client": ["5.3.1"],
@@ -22888,7 +22888,7 @@ def npm_repositories():
             "@types/archiver": ["registry.npmjs.org/@types/archiver/5.3.1"],
             "@types/glob": ["registry.npmjs.org/@types/glob/8.0.0"],
             "@types/minimatch": ["registry.npmjs.org/@types/minimatch/5.1.2"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.11.11"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
 
@@ -23044,12 +23044,12 @@ def npm_repositories():
         integrity = "sha512-l6NQsDDyQUVeoTynNpC9uRvCUint/gSUXQA2euwmTuWGvPY5LSDUu6tkCtJB2SvGQlJQzLaKqcGZP4//7EDveA==",
         deps = {
             "@types/minimatch": "registry.npmjs.org/@types/minimatch/5.1.2",
-            "@types/node": "registry.npmjs.org/@types/node/18.11.11",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
         },
         transitive_closure = {
             "@types/glob": ["registry.npmjs.org/@types/glob/8.0.0"],
             "@types/minimatch": ["registry.npmjs.org/@types/minimatch/5.1.2"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.11.11"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
 

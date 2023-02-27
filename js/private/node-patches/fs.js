@@ -387,18 +387,25 @@ const patcher = (fs = _fs, roots) => {
         const origRead = dir.read.bind(dir);
         dir[Symbol.asyncIterator] = function () {
             return __asyncGenerator(this, arguments, function* () {
-                var e_1, _a;
+                var _a, e_1, _b, _c;
                 try {
-                    for (var _b = __asyncValues(origIterator()), _c; _c = yield __await(_b.next()), !_c.done;) {
-                        const entry = _c.value;
-                        yield __await(handleDirent(p, entry));
-                        yield yield __await(entry);
+                    for (var _d = true, _f = __asyncValues(origIterator()), _g; _g = yield __await(_f.next()), _a = _g.done, !_a;) {
+                        _c = _g.value;
+                        _d = false;
+                        try {
+                            const entry = _c;
+                            yield __await(handleDirent(p, entry));
+                            yield yield __await(entry);
+                        }
+                        finally {
+                            _d = true;
+                        }
                     }
                 }
                 catch (e_1_1) { e_1 = { error: e_1_1 }; }
                 finally {
                     try {
-                        if (_c && !_c.done && (_a = _b.return)) yield __await(_a.call(_b));
+                        if (!_d && !_a && (_b = _f.return)) yield __await(_b.call(_f));
                     }
                     finally { if (e_1) throw e_1.error; }
                 }

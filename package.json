@@ -4,7 +4,7 @@
         "@types/node": "16.18.11",
         "inline-fixtures": "1.1.0",
         "jsonpath-plus": "7.2.0",
-        "typescript": "4.8.4"
+        "typescript": "4.9.5"
     },
     "pnpm": {
         "packageExtensions": {

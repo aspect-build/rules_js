@@ -19,12 +19,12 @@ importers:
       '@types/node': 16.18.11
       inline-fixtures: 1.1.0
       jsonpath-plus: 7.2.0
-      typescript: 4.8.4
+      typescript: 4.9.5
     devDependencies:
       '@types/node': registry.npmjs.org/@types/node/16.18.11
       inline-fixtures: 1.1.0
       jsonpath-plus: 7.2.0
-      typescript: 4.8.4
+      typescript: 4.9.5
 
   examples/js_binary:
     specifiers:
@@ -1844,7 +1844,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concat-stream/1.6.2:
     resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
@@ -5792,14 +5792,14 @@ packages:
       kind-of: 3.2.2
     dev: true
 
-  /typescript/4.8.4:
-    resolution: {integrity: sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==}
+  /typescript/4.9.4:
+    resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
 
-  /typescript/4.9.4:
-    resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}
+  /typescript/4.9.5:
+    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
@@ -6370,7 +6370,7 @@ packages:
       tar: 6.1.13
       tmp-promise: 3.0.3
       tslib: 2.5.0
-      typescript: 4.9.4
+      typescript: 4.9.5
       underscore: 1.13.6
       ws: 8.12.0_bufferutil@4.0.7
     optionalDependencies:
@@ -6456,7 +6456,7 @@ packages:
     version: 8.0.0
     dependencies:
       '@types/minimatch': registry.npmjs.org/@types/minimatch/5.1.2
-      '@types/node': registry.npmjs.org/@types/node/18.11.11
+      '@types/node': registry.npmjs.org/@types/node/18.11.18
     dev: true
 
   registry.npmjs.org/@types/google-protobuf/3.15.6:
