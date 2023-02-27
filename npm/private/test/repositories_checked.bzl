@@ -1642,7 +1642,7 @@ def npm_repositories():
             "keyv": ["4.5.2"],
             "normalize-url": ["6.1.0"],
             "json-buffer": ["3.0.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "@types/http-cache-semantics": ["registry.npmjs.org/@types/http-cache-semantics/4.0.1"],
             "defer-to-connect": ["2.0.1"],
             "jsonfile": ["4.0.0"],
@@ -2700,6 +2700,7 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
+            "js/private/image": ["@rollup/plugin-typescript"],
             "js/private/worker/src": ["@rollup/plugin-typescript"],
         },
         package = "@rollup/plugin-typescript",
@@ -2722,46 +2723,6 @@ def npm_repositories():
             "resolve": ["1.22.1"],
             "rollup": ["2.79.1"],
             "tslib": ["2.5.0"],
-            "typescript": ["4.9.5"],
-            "fsevents": ["2.3.2"],
-            "is-core-module": ["2.11.0"],
-            "path-parse": ["1.0.7"],
-            "supports-preserve-symlinks-flag": ["1.0.0"],
-            "has": ["1.0.3"],
-            "function-bind": ["1.1.1"],
-            "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
-            "estree-walker": ["2.0.2"],
-            "picomatch": ["2.3.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_plugin-typescript__10.0.1__p4zxjh3csaan62zu4p3amdofcm",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/image": ["@rollup/plugin-typescript"],
-        },
-        package = "@rollup/plugin-typescript",
-        version = "10.0.1_p4zxjh3csaan62zu4p3amdofcm",
-        url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-10.0.1.tgz",
-        npm_translate_lock_repo = "npm",
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==",
-        deps = {
-            "@rollup/pluginutils": "5.0.2_rollup@2.79.1",
-            "resolve": "1.22.1",
-            "rollup": "2.79.1",
-            "tslib": "2.4.1",
-            "typescript": "4.9.5",
-        },
-        transitive_closure = {
-            "@rollup/plugin-typescript": ["10.0.1_p4zxjh3csaan62zu4p3amdofcm"],
-            "@rollup/pluginutils": ["5.0.2_rollup@2.79.1"],
-            "resolve": ["1.22.1"],
-            "rollup": ["2.79.1"],
-            "tslib": ["2.4.1"],
             "typescript": ["4.9.5"],
             "fsevents": ["2.3.2"],
             "is-core-module": ["2.11.0"],
@@ -3473,7 +3434,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["5.5.0", "7.2.0", "8.1.1"],
             "has-flag": ["3.0.0", "4.0.0"],
@@ -4068,7 +4029,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -4202,7 +4163,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -4336,7 +4297,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -5967,7 +5928,7 @@ def npm_repositories():
             "@types/keyv": ["registry.npmjs.org/@types/keyv/3.1.4"],
             "keyv": ["4.5.2"],
             "json-buffer": ["3.0.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
 
@@ -7245,7 +7206,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -11250,7 +11211,7 @@ def npm_repositories():
             "keyv": ["4.5.2"],
             "normalize-url": ["6.1.0"],
             "json-buffer": ["3.0.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "@types/http-cache-semantics": ["registry.npmjs.org/@types/http-cache-semantics/4.0.1"],
             "defer-to-connect": ["2.0.1"],
         },
@@ -12801,13 +12762,13 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
             "merge-stream": "2.0.0",
             "supports-color": "8.1.1",
         },
         transitive_closure = {
             "jest-worker": ["27.5.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -14069,7 +14030,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -20750,7 +20711,7 @@ def npm_repositories():
             "json-schema-traverse": ["0.4.1"],
             "uri-js": ["4.4.1"],
             "punycode": ["2.3.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -21268,29 +21229,11 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__tslib__2.4.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/image": ["tslib"],
-        },
-        package = "tslib",
-        version = "2.4.1",
-        url = "https://registry.npmjs.org/tslib/-/tslib-2.4.1.tgz",
-        npm_translate_lock_repo = "npm",
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==",
-        transitive_closure = {
-            "tslib": ["2.4.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__tslib__2.5.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
+            "js/private/image": ["tslib"],
             "js/private/worker/src": ["tslib"],
         },
         package = "tslib",
@@ -22474,7 +22417,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -22695,7 +22638,7 @@ def npm_repositories():
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "randombytes": ["2.1.0"],
             "safe-buffer": ["5.2.1"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
             "has-flag": ["4.0.0"],
@@ -23383,7 +23326,7 @@ def npm_repositories():
         deps = {
             "openid-client": "5.4.0",
             "@types/js-yaml": "registry.npmjs.org/@types/js-yaml/4.0.5",
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
             "@types/request": "registry.npmjs.org/@types/request/2.48.8",
             "@types/underscore": "registry.npmjs.org/@types/underscore/1.11.4",
             "@types/ws": "registry.npmjs.org/@types/ws/8.5.4",
@@ -23404,7 +23347,7 @@ def npm_repositories():
         transitive_closure = {
             "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil@4.0.7"],
             "@types/js-yaml": ["registry.npmjs.org/@types/js-yaml/4.0.5"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "@types/request": ["registry.npmjs.org/@types/request/2.48.8"],
             "@types/underscore": ["registry.npmjs.org/@types/underscore/1.11.4"],
             "@types/ws": ["registry.npmjs.org/@types/ws/8.5.4"],
@@ -23563,14 +23506,14 @@ def npm_repositories():
         deps = {
             "@types/http-cache-semantics": "registry.npmjs.org/@types/http-cache-semantics/4.0.1",
             "@types/keyv": "registry.npmjs.org/@types/keyv/3.1.4",
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
             "@types/responselike": "registry.npmjs.org/@types/responselike/1.0.0",
         },
         transitive_closure = {
             "@types/cacheable-request": ["registry.npmjs.org/@types/cacheable-request/6.0.3"],
             "@types/http-cache-semantics": ["registry.npmjs.org/@types/http-cache-semantics/4.0.1"],
             "@types/keyv": ["registry.npmjs.org/@types/keyv/3.1.4"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "@types/responselike": ["registry.npmjs.org/@types/responselike/1.0.0"],
         },
     )
@@ -23808,11 +23751,11 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
         },
         transitive_closure = {
             "@types/keyv": ["registry.npmjs.org/@types/keyv/3.1.4"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
 
@@ -23882,27 +23825,10 @@ def npm_repositories():
         version = "registry.npmjs.org/@types/node/18.11.18",
         url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz",
         npm_translate_lock_repo = "npm",
-        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==",
         transitive_closure = {
             "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__registry.npmjs.org_at_types_node_18.14.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/node",
-        version = "registry.npmjs.org/@types/node/18.14.2",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-18.14.2.tgz",
-        npm_translate_lock_repo = "npm",
-        generate_bzl_library_targets = True,
-        integrity = "sha512-1uEQxww3DaghA0RxqHx0O0ppVlo43pJhepY51OxuQIKHpjbnYLA7vcdwioNPzIqmC2u3I/dmylcqjlh0e7AyUA==",
-        transitive_closure = {
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
         },
     )
 
@@ -23920,14 +23846,14 @@ def npm_repositories():
         integrity = "sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==",
         deps = {
             "@types/caseless": "registry.npmjs.org/@types/caseless/0.12.2",
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
             "@types/tough-cookie": "registry.npmjs.org/@types/tough-cookie/4.0.2",
             "form-data": "2.5.1",
         },
         transitive_closure = {
             "@types/request": ["registry.npmjs.org/@types/request/2.48.8"],
             "@types/caseless": ["registry.npmjs.org/@types/caseless/0.12.2"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
             "@types/tough-cookie": ["registry.npmjs.org/@types/tough-cookie/4.0.2"],
             "form-data": ["2.5.1"],
             "asynckit": ["0.4.0"],
@@ -23968,11 +23894,11 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
         },
         transitive_closure = {
             "@types/responselike": ["registry.npmjs.org/@types/responselike/1.0.0"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
 
@@ -24046,10 +23972,10 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==",
         deps = {
-            "@types/node": "registry.npmjs.org/@types/node/18.14.2",
+            "@types/node": "registry.npmjs.org/@types/node/18.11.18",
         },
         transitive_closure = {
             "@types/ws": ["registry.npmjs.org/@types/ws/8.5.4"],
-            "@types/node": ["registry.npmjs.org/@types/node/18.14.2"],
+            "@types/node": ["registry.npmjs.org/@types/node/18.11.18"],
         },
     )
