@@ -39,9 +39,9 @@ npm_repositories()
 
 http_archive(
     name = "contrib_rules_oci",
-    sha256 = "85197657c25b5769664c6413988b415a14d35b6dab1754b00d8ae60019936777",
-    strip_prefix = "rules_oci-0.2.1",
-    url = "https://github.com/bazel-contrib/rules_oci/archive/v0.2.1.tar.gz",
+    sha256 = "d11b6e5646c4897fde03e7704ab97305691d871fb8d9e09443384122582e70ff",
+    strip_prefix = "rules_oci-0.3.0",
+    url = "https://github.com/bazel-contrib/rules_oci/releases/download/v0.3.0/rules_oci-v0.3.0.tar.gz",
 )
 
 load("@contrib_rules_oci//oci:dependencies.bzl", "rules_oci_dependencies")
@@ -57,10 +57,11 @@ oci_register_toolchains(
 )
 
 ## Pull base images
-load(":pull.bzl", "oci_pull")
+load("@contrib_rules_oci//oci:pull.bzl", "oci_pull")
 
 oci_pull(
     name = "debian_amd64",
-    architecture = "amd64",
-    image = "thesayyn/debian:oci",
+    image = "index.docker.io/thesayyn/debian",
+    # platforms = "amd64",
+    tag = "oci",
 )
