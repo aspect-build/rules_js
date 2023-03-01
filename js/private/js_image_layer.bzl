@@ -122,7 +122,7 @@ source {executable_path}
 
 def _write_laucher(ctx, executable_path):
     "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
-    launcher = ctx.actions.declare_file("%s_launcher.sh" % ctx.label.package)
+    launcher = ctx.actions.declare_file("%s_launcher.sh" % ctx.label.name)
     ctx.actions.write(
         output = launcher,
         content = _LAUNCHER_TMPL.format(executable_path = executable_path),
