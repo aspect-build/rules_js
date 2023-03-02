@@ -19,14 +19,13 @@ Add to your \`MODULE.bazel\` file:
 \`\`\`starlark
 bazel_dep(name = "aspect_rules_js", version = "${TAG:1}")
 
-###
-# By default you get the node version from DEFAULT_NODE_VERSION in @rules_node//nodejs:repositories.bzl
-# Optionally you can pin a node version:
+####### Node.js version #########
+# By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
+# Optionally you can pin a different node version:
 bazel_dep(name = "rules_nodejs", version = "5.8.2")
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "16.9.0")
-# End pinning node version
-################
+#################################
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 
