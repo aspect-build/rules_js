@@ -247,6 +247,18 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 def _target_tool_short_path(path):
     return ("../" + path[len("external/"):]) if path.startswith("external/") else path
 
+# Generate a consistent label string between Bazel versions.
+# TODO: hoist this function to bazel-lib and use from there (as well as the dup in npm/private/utils.bzl)
+def _consistent_label_str(workspace_name, label):
+    # Starting in Bazel 6, the workspace name is empty for the local workspace and there's no other way to determine it.
+    # This behavior differs from Bazel 5 where the local workspace name was fully qualified in str(label).
+    workspace_name = "" if label.workspace_name == workspace_name else label.workspace_name
+    return "@{}//{}:{}".format(
+        workspace_name,
+        label.package,
+        label.name,
+    )
+
 def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     envs = []
     for (key, value) in dicts.add(fixed_env, ctx.attr.env).items():
@@ -348,6 +360,9 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         toolchain_files.append(npm_wrapper)
 
     launcher_subst = {
+        "{{target_label}}": _consistent_label_str(ctx.workspace_name, ctx.label),
+        "{{template_label}}": _consistent_label_str(ctx.workspace_name, ctx.attr._launcher_template.label),
+        "{{entry_point_label}}": _consistent_label_str(ctx.workspace_name, ctx.attr.entry_point.label),
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args_expanded),

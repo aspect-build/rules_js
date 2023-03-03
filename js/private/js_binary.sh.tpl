@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# This bash script is a wrapper around the NodeJS JavaScript file
+# entry point with the following bazel label:
+#     {{entry_point_label}}
+#
+# The script's was generated to execute the js_binary target
+#     {{target_label}}
+#
+# The template used to generate this script is
+#     {{template_label}}
+
 set -o pipefail -o errexit -o nounset
 
 {{envs}}

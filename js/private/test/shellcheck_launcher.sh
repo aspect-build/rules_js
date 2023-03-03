@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# This bash script is a wrapper around the NodeJS JavaScript file
+# entry point with the following bazel label:
+#     @//js/private/test:shellcheck.js
+#
+# The script's was generated to execute the js_binary target
+#     @//js/private/test:shellcheck_launcher
+#
+# The template used to generate this script is
+#     @//js/private:js_binary.sh.tpl
+
 set -o pipefail -o errexit -o nounset
 
 export JS_BINARY__BINDIR="bazel-out/k8-fastbuild/bin"
