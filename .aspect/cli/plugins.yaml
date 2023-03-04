@@ -1,3 +1,0 @@
-- name: plugin-aspect-buildkite
-  from: https://static.aspect.build/aspect
-  version: 5.1.6
