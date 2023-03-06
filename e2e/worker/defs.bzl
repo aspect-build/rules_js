@@ -23,7 +23,7 @@ def _pi_impl(ctx):
         },
     )
 
-    return DefaultInfo(files = depset([output]))
+    return DefaultInfo(files = depset([output]), runfiles = ctx.runfiles([output]))
 
 pi_rule = rule(
     implementation = _pi_impl,
