@@ -1,0 +1,33 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
+load(":defs.bzl", "pi_rule")
+
+copy_file(
+    name = "copy_worker_js",
+    src = "@aspect_rules_js//js/private/worker:worker.js",
+    out = "worker.js",
+)
+
+copy_file(
+    name = "copy_dummy_worker",
+    src = ":dummy_worker.js",
+    out = "worker_program.js",
+)
+
+js_binary(
+    name = "worker",
+    data = [":copy_worker_js"],
+    entry_point = ":copy_dummy_worker",
+    visibility = ["//visibility:public"],
+)
+
+pi_rule(
+    name = "my_pi",
+)
+
+assert_contains(
+    name = "test_pi",
+    actual = "my_pi",
+    expected = """3.141592653589793""",
+)
