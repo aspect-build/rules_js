@@ -4407,6 +4407,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__abortcontroller-polyfill__1.7.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/worker/src": ["abortcontroller-polyfill"],
+        },
+        package = "abortcontroller-polyfill",
+        version = "1.7.5",
+        url = "https://registry.npmjs.org/abortcontroller-polyfill/-/abortcontroller-polyfill-1.7.5.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-JMJ5soJWP18htbbxJjG7bG6yuI6pRhgJ0scHHTfkUjf6wjP912xZWvM+A4sJK3gqd9E8fcPbDnOefbA9Th/FIQ==",
+        transitive_closure = {
+            "abortcontroller-polyfill": ["1.7.5"],
+        },
+    )
+
+    npm_import(
         name = "npm__abs-svg-path__0.1.1",
         root_package = "",
         link_workspace = "",
