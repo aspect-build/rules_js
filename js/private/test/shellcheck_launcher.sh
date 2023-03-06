@@ -324,7 +324,7 @@ if [ ! -f "$entry_point" ]; then
     exit 1
 fi
 
-node="$(_normalize_path "../nodejs_linux_amd64/bin/nodejs/bin/node")"
+node="$(_normalize_path "aspect_rules_js/../nodejs_linux_amd64/bin/nodejs/bin/node")"
 if [ "${node:0:1}" = "/" ]; then
     # A user may specify an absolute path to node using target_tool_path in node_toolchain
     export JS_BINARY__NODE_BINARY="$node"
@@ -355,7 +355,7 @@ if [ "$npm" ]; then
             exit 1
         fi
     else
-        export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/aspect_rules_js/"
+        export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/"
         if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
             logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
             exit 1

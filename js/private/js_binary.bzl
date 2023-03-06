@@ -244,8 +244,8 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
 # to get back to the short_path.
 # TODO: fix toolchain so we don't have to do this
-def _target_tool_short_path(path):
-    return ("../" + path[len("external/"):]) if path.startswith("external/") else path
+def _target_tool_short_path(workspace_name, path):
+    return (workspace_name + "/../" + path[len("external/"):]) if path.startswith("external/") else path
 
 # Generate a consistent label string between Bazel versions.
 # TODO: hoist this function to bazel-lib and use from there (as well as the dup in npm/private/utils.bzl)
@@ -340,7 +340,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
 
     npm_path = ""
     if ctx.attr.include_npm:
-        npm_path = _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_path)
+        npm_path = _target_tool_short_path(ctx.workspace_name, ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_path)
         if is_windows:
             npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
             ctx.actions.expand_template(
@@ -359,6 +359,8 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             )
         toolchain_files.append(npm_wrapper)
 
+    node_path = _target_tool_short_path(ctx.workspace_name, ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path)
+
     launcher_subst = {
         "{{target_label}}": _consistent_label_str(ctx.workspace_name, ctx.label),
         "{{template_label}}": _consistent_label_str(ctx.workspace_name, ctx.attr._launcher_template.label),
@@ -372,7 +374,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{node_options}}": "\n".join(node_options),
         "{{node_patches}}": ctx.file._node_patches.short_path,
         "{{node_wrapper}}": node_wrapper.short_path,
-        "{{node}}": _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path),
+        "{{node}}": node_path,
         "{{npm}}": npm_path,
         "{{workspace_name}}": ctx.workspace_name,
     }

@@ -17,8 +17,8 @@ _ATTRS = {
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
 # to get back to the short_path.
 # TODO: fix toolchain so we don't have to do this
-def _target_tool_short_path(path):
-    return ("../" + path[len("external/"):]) if path.startswith("external/") else path
+def _target_tool_short_path(workspace_name, path):
+    return (workspace_name + "/../" + path[len("external/"):]) if path.startswith("external/") else path
 
 def _impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -26,13 +26,14 @@ def _impl(ctx):
 
     # Create launcher
     bash_launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
+    node_path = _target_tool_short_path(ctx.workspace_name, ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path)
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = bash_launcher,
         substitutions = {
             "{{entry_point_path}}": ctx.file.entry_point.short_path,
             "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
-            "{{node}}": _target_tool_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path),
+            "{{node}}": node_path,
             "{{workspace_name}}": ctx.workspace_name,
         },
         is_executable = True,
