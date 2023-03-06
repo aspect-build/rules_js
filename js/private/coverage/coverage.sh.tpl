@@ -2,6 +2,8 @@
 
 set -o pipefail -o errexit -o nounset
 
+export JS_BINARY__LOG_PREFIX="{{log_prefix_rule_set}}[{{log_prefix_rule}}]"
+
 function logf_stderr {
     local format_string="$1\n"
     shift
