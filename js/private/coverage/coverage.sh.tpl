@@ -30,7 +30,7 @@ if [ ! -f "$entry_point" ]; then
     exit 1
 fi
 
-node="$RUNFILES/{{workspace_name}}/{{node}}"
+node="$RUNFILES/{{node}}"
 if [ ! -f "$node" ]; then
     logf_fatal "node binary '%s' not found in runfiles" "$node"
     exit 1
