@@ -4,6 +4,7 @@ load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")
 
 def npm_repositories():
     "Generated npm_import repository rules corresponding to npm packages in //:pnpm-lock.yaml"
+
     npm_import(
         name = "npm__at_rollup_plugin-commonjs__23.0.4",
         root_package = "",
