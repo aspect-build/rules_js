@@ -4,103 +4,20 @@ load(":js_binary.bzl", "js_binary_lib")
 load(":js_binary_helpers.bzl", _gather_files_from_js_providers = "gather_files_from_js_providers")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
-_DOC = """Runs a devserver via binary target or command.
-
-A simple http-server, for example, can be setup as follows,
-
-```
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
-load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
-
-http_server_bin.http_server_binary(
-    name = "http_server",
-)
-
-js_run_devserver(
-    name = "serve",
-    args = ["."],
-    data = ["index.html"],
-    tool = ":http_server",
-)
-```
-
-A Next.js devserver can be setup as follows,
-
-```
-js_run_devserver(
-    name = "dev",
-    args = ["dev"],
-    command = "./node_modules/.bin/next",
-    data = [
-        "next.config.js",
-        "package.json",
-        ":node_modules/next",
-        ":node_modules/react",
-        ":node_modules/react-dom",
-        ":node_modules/typescript",
-        "//pages",
-        "//public",
-        "//styles",
-    ],
-)
-```
-
-where the `./node_modules/.bin/next` bin entry of Next.js is configured in
-`npm_translate_lock` as such,
-
-```
-npm_translate_lock(
-    name = "npm",
-    bins = {
-        # derived from "bin" attribute in node_modules/next/package.json
-        "next": {
-            "next": "./dist/bin/next",
-        },
-    },
-    pnpm_lock = "//:pnpm-lock.yaml",
-)
-```
-
-and run in watch mode using [ibazel](https://github.com/bazelbuild/bazel-watcher) with
-`ibazel run //:dev`.
-
-The devserver specified by either `tool` or `command` is run in a custom sandbox that is more
-compatible with devserver watch modes in Node.js tools such as Webpack and Next.js.
-
-The custom sandbox is populated with the default outputs of all targets in `data`
-as well as transitive sources & npm links.
-
-An an optimization, virtual store files are explicitly excluded from the sandbox since the npm
-links will point to the virtual store in the execroot and Node.js will follow those links as it
-does within the execroot. As a result, rules_js npm package link targets such as
-`//:node_modules/next` are handled efficiently. Since these targets are symlinks in the output
-tree, they are recreated as symlinks in the custom sandbox and do not incur a fully copy of the
-underlying npm packages.
-
-Supports running with [ibazel](https://github.com/bazelbuild/bazel-watcher).
-Only `data` files that change on incremental builds are synchronized when running with ibazel.
-"""
-
 _attrs = dicts.add(js_binary_lib.attrs, {
-    "tool": attr.label(
-        doc = """The devserver binary target to run.
-        
-Only one of `command` or `tool` may be specified.""",
+    "tool_exec_cfg": attr.label(
         executable = True,
         cfg = "exec",
     ),
-    "command": attr.string(
-        doc = """The devserver command to run.
-
-For example, this could be the bin entry of an npm package that is included
-in data such as `./node_modules/.bin/next`.
-
-Using the bin entry of next, for example, resolves issues with Next.js and React
-being found in multiple node_modules trees when next is run as an encapsulated
-`js_binary` tool.
-
-Only one of `command` or `tool` may be specified.""",
+    "tool_target_cfg": attr.label(
+        executable = True,
+        cfg = "target",
     ),
+    "use_execroot_entry_point": attr.bool(
+        default = True,
+    ),
+    "allow_execroot_entry_point_with_no_copy_data_to_bin": attr.bool(),
+    "command": attr.string(),
 })
 
 def _impl(ctx):
@@ -113,9 +30,13 @@ def _impl(ctx):
         fixed_args = [config_file.short_path],
     )
 
-    if not ctx.attr.tool and not ctx.attr.command:
+    use_tool = ctx.attr.tool_target_cfg or ctx.attr.tool_exec_cfg
+    if use_tool and (not ctx.attr.tool_exec_cfg or not ctx.attr.tool_target_cfg):
+        fail("Internal error")
+
+    if not use_tool and not ctx.attr.command:
         fail("Either tool or command must be specified")
-    if ctx.attr.tool and ctx.attr.command:
+    if use_tool and ctx.attr.command:
         fail("Only one of tool or command may be specified")
 
     transitive_runfiles = [_gather_files_from_js_providers(
@@ -137,15 +58,23 @@ def _impl(ctx):
     config = {
         "data_files": [f.short_path for f in data_files],
     }
-    if ctx.attr.tool:
-        config["tool"] = ctx.executable.tool.short_path
+
+    runfiles_merge_targets = ctx.attr.data[:]
+
+    if use_tool:
+        if ctx.attr.use_execroot_entry_point:
+            config["tool"] = ctx.executable.tool_target_cfg.short_path
+            config["use_execroot_entry_point"] = "1"
+            config["bazel_bindir"] = ctx.bin_dir.path
+            if ctx.attr.allow_execroot_entry_point_with_no_copy_data_to_bin:
+                config["allow_execroot_entry_point_with_no_copy_data_to_bin"] = "1"
+            runfiles_merge_targets.append(ctx.attr.tool_target_cfg)
+        else:
+            config["tool"] = ctx.executable.tool_exec_cfg.short_path
+            runfiles_merge_targets.append(ctx.attr.tool_exec_cfg)
     if ctx.attr.command:
         config["command"] = ctx.attr.command
     ctx.actions.write(config_file, json.encode(config))
-
-    runfiles_merge_targets = ctx.attr.data[:]
-    if ctx.attr.tool:
-        runfiles_merge_targets.append(ctx.attr.tool)
 
     runfiles = ctx.runfiles(
         files = ctx.files.data + [config_file],
@@ -162,10 +91,153 @@ def _impl(ctx):
         ),
     ]
 
-js_run_devserver = rule(
-    doc = _DOC,
+_js_run_devserver = rule(
     attrs = _attrs,
     implementation = _impl,
     toolchains = js_binary_lib.toolchains,
     executable = True,
 )
+
+def js_run_devserver(
+        name,
+        tool = None,
+        command = None,
+        use_execroot_entry_point = True,
+        allow_execroot_entry_point_with_no_copy_data_to_bin = False,
+        **kwargs):
+    """Runs a devserver via binary target or command.
+
+    A simple http-server, for example, can be setup as follows,
+
+    ```
+    load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+    load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
+
+    http_server_bin.http_server_binary(
+        name = "http_server",
+    )
+
+    js_run_devserver(
+        name = "serve",
+        args = ["."],
+        data = ["index.html"],
+        tool = ":http_server",
+    )
+    ```
+
+    A Next.js devserver can be setup as follows,
+
+    ```
+    js_run_devserver(
+        name = "dev",
+        args = ["dev"],
+        command = "./node_modules/.bin/next",
+        data = [
+            "next.config.js",
+            "package.json",
+            ":node_modules/next",
+            ":node_modules/react",
+            ":node_modules/react-dom",
+            ":node_modules/typescript",
+            "//pages",
+            "//public",
+            "//styles",
+        ],
+    )
+    ```
+
+    where the `./node_modules/.bin/next` bin entry of Next.js is configured in
+    `npm_translate_lock` as such,
+
+    ```
+    npm_translate_lock(
+        name = "npm",
+        bins = {
+            # derived from "bin" attribute in node_modules/next/package.json
+            "next": {
+                "next": "./dist/bin/next",
+            },
+        },
+        pnpm_lock = "//:pnpm-lock.yaml",
+    )
+    ```
+
+    and run in watch mode using [ibazel](https://github.com/bazelbuild/bazel-watcher) with
+    `ibazel run //:dev`.
+
+    The devserver specified by either `tool` or `command` is run in a custom sandbox that is more
+    compatible with devserver watch modes in Node.js tools such as Webpack and Next.js.
+
+    The custom sandbox is populated with the default outputs of all targets in `data`
+    as well as transitive sources & npm links.
+
+    An an optimization, virtual store files are explicitly excluded from the sandbox since the npm
+    links will point to the virtual store in the execroot and Node.js will follow those links as it
+    does within the execroot. As a result, rules_js npm package link targets such as
+    `//:node_modules/next` are handled efficiently. Since these targets are symlinks in the output
+    tree, they are recreated as symlinks in the custom sandbox and do not incur a fully copy of the
+    underlying npm packages.
+
+    Supports running with [ibazel](https://github.com/bazelbuild/bazel-watcher).
+    Only `data` files that change on incremental builds are synchronized when running with ibazel.
+
+    Args:
+        name: A unique name for this target.
+
+        tool: The devserver binary target to run.
+
+            Only one of `command` or `tool` may be specified.
+
+        command: The devserver command to run.
+
+            For example, this could be the bin entry of an npm package that is included
+            in data such as `./node_modules/.bin/next`.
+
+            Using the bin entry of next, for example, resolves issues with Next.js and React
+            being found in multiple node_modules trees when next is run as an encapsulated
+            `js_binary` tool.
+
+            Only one of `command` or `tool` may be specified.
+
+        use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
+            instead of the copy that is in runfiles.
+
+            Using the entry point script that is in the execroot output tree means that there will be no conflicting
+            runfiles `node_modules` in the node_modules resolution path which can confuse npm packages such as next and
+            react that don't like being resolved in multiple node_modules trees. This more closely emulates the
+            environment that tools such as Next.js see when they are run outside of Bazel.
+
+            When True, the `js_binary` tool must have `copy_data_to_bin` set to True (the default) so that all data files
+            needed by the binary are available in the execroot output tree. This requirement can be turned off with by
+            setting `allow_execroot_entry_point_with_no_copy_data_to_bin` to True.
+
+        allow_execroot_entry_point_with_no_copy_data_to_bin: Turn off validation that the `js_binary` tool
+            has `copy_data_to_bin` set to True when `use_execroot_entry_point` is set to True.
+
+            See `use_execroot_entry_point` doc for more info.
+
+        **kwargs: All other args from `js_binary` except for `entry_point` which is set implicitly.
+
+            `entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.
+
+            See https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary
+    """
+    if kwargs.get("entry_point", None):
+        fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
+
+    _js_run_devserver(
+        name = name,
+        enable_runfiles = select({
+            "@aspect_rules_js//js/private:enable_runfiles": True,
+            "//conditions:default": False,
+        }),
+        entry_point = "@aspect_rules_js//js/private:js_devserver_entrypoint",
+        # This rule speaks the ibazel protocol
+        tags = kwargs.pop("tags", []) + ["ibazel_notify_changes"],
+        tool_exec_cfg = tool,
+        tool_target_cfg = tool,
+        command = command,
+        use_execroot_entry_point = use_execroot_entry_point,
+        allow_execroot_entry_point_with_no_copy_data_to_bin = allow_execroot_entry_point_with_no_copy_data_to_bin,
+        **kwargs
+    )
