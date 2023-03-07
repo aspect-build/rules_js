@@ -92,6 +92,8 @@ jobs:
               if: ${{ env.ASPECT_NPM_AUTH_TOKEN != '' }}
             - id: npm_translate_lock
               run: echo "folder=e2e/npm_translate_lock" >> $GITHUB_OUTPUT
+            - id: npm_translate_lock_empty
+              run: echo "folder=e2e/npm_translate_lock_empty" >> $GITHUB_OUTPUT
             - id: npm_translate_package_lock
               run: echo "folder=e2e/npm_translate_package_lock" >> $GITHUB_OUTPUT
             - id: npm_translate_yarn_lock

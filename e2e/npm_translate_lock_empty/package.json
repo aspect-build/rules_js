@@ -1,0 +1,6 @@
+{
+    "private": true,
+    "devDependencies": {
+        "debug": "^4.3.4"
+    }
+}

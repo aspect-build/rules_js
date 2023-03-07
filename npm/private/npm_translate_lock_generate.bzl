@@ -599,19 +599,22 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patch
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-    repositories_bzl = [
-        """load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")""",
-        "",
-        "def npm_repositories():",
-        "    \"Generated npm_import repository rules corresponding to npm packages in {}\"".format(utils.consistent_label_str(pnpm_lock_label)),
-    ]
+    npm_imports = _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, npm_registries, default_registry, npm_auth)
+
+    repositories_bzl = []
+
+    if len(npm_imports) > 0:
+        repositories_bzl.append("""load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")""")
+        repositories_bzl.append("")
+
+    repositories_bzl.append("def npm_repositories():")
+    repositories_bzl.append("""    "Generated npm_import repository rules corresponding to npm packages in {}\"""".format(utils.consistent_label_str(pnpm_lock_label)))
+    repositories_bzl.append("")
 
     link_packages = [_link_package(root_package, import_path) for import_path in importers.keys()]
 
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
-
-    npm_imports = _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, npm_registries, default_registry, npm_auth)
 
     fp_links = {}
     rctx_files = {
@@ -944,13 +947,15 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                     ),
                 ]))
 
-    defs_bzl_body.append("""    if is_root:""")
-    defs_bzl_body.extend(stores_bzl)
+    if len(stores_bzl) > 0:
+        defs_bzl_body.append("""    if is_root:""")
+        defs_bzl_body.extend(stores_bzl)
 
-    defs_bzl_body.append("""    if link:""")
-    for link_package, bzl in links_bzl.items():
-        defs_bzl_body.append("""        if native.package_name() == "{}":""".format(link_package))
-        defs_bzl_body.extend(bzl)
+    if len(links_bzl) > 0:
+        defs_bzl_body.append("""    if link:""")
+        for link_package, bzl in links_bzl.items():
+            defs_bzl_body.append("""        if native.package_name() == "{}":""".format(link_package))
+            defs_bzl_body.extend(bzl)
 
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
