@@ -268,36 +268,46 @@ if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
 fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
-    # We in runfiles
-    bazel_out="/bazel-out/"
-    rest="${PWD#*"$bazel_out"}"
-    index=$(( ${#PWD} - ${#rest} - ${#bazel_out} ))
-    if [ ${index} -lt 0 ]; then
-        printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
-        exit 1
+    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    else
+        # We in runfiles and we don't yet know the execroot
+        bazel_out="/bazel-out/"
+        rest="${PWD#*"$bazel_out"}"
+        index=$(( ${#PWD} - ${#rest} - ${#bazel_out} ))
+        if [ ${index} -lt 0 ]; then
+            printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
+            exit 1
+        fi
+        JS_BINARY__EXECROOT="${PWD:0:$index}"
     fi
-    JS_BINARY__EXECROOT="${PWD:0:$index}"
 else
-    # We are in execroot or in some other context all together such as a nodejs_image or a manually
-    # run js_binary.
-    JS_BINARY__EXECROOT="$PWD"
-    if [ -z "${BAZEL_BINDIR:-}" ]; then
-        logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
+    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    else
+        # We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
+        JS_BINARY__EXECROOT="$PWD"
+    fi
+
+    if [ -z "${JS_BINARY__NO_CD_BINDIR:-}" ]; then
+        if [ -z "${BAZEL_BINDIR:-}" ]; then
+            logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
 run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
 tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set \
 by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended \
 rule to use for using a js_binary as the tool of a build action. If this is not a build action you can set the \
 BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the \
 aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs."
-        exit 1
-    fi
+            exit 1
+        fi
 
-    # Since the process was launched in the execroot, we automatically change directory into the root of the
-    # output tree (which we expect to be set in BAZEL_BIN). See
-    # https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
-    # for more context on why we do this.
-    logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
-    cd "$BAZEL_BINDIR"
+        # Since the process was launched in the execroot, we automatically change directory into the root of the
+        # output tree (which we expect to be set in BAZEL_BIN). See
+        # https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
+        # for more context on why we do this.
+        logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
+        cd "$BAZEL_BINDIR"
+    fi
 fi
 export JS_BINARY__EXECROOT
 
@@ -475,8 +485,8 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
         logf_info "BAZEL_TARGET %s" "${BAZEL_TARGET:-}"
     fi
     logf_info "js_binary TARGET %s" "${JS_BINARY__TARGET:-}"
-    logf_info "js_binary RUNFILES %s" "$JS_BINARY__RUNFILES"
-    logf_info "js_binary EXECROOT %s" "$JS_BINARY__EXECROOT"
+    logf_info "js_binary RUNFILES %s" "${JS_BINARY__RUNFILES:-}"
+    logf_info "js_binary EXECROOT %s" "${JS_BINARY__EXECROOT:-}"
     logf_info "PWD %s" "$PWD"
 fi
 

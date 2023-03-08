@@ -141,14 +141,32 @@ async function main(args, sandbox) {
 
         console.error(`Running '${tool} ${toolArgs.join(' ')}' in ${cwd}\n\n`)
 
+        const env = {
+            ...process.env,
+            BAZEL_BINDIR: '.', // no load bearing but it may be depended on by users
+            JS_BINARY__CHDIR: '',
+            JS_BINARY__NO_CD_BINDIR: '1',
+        }
+
+        if (config.use_execroot_entry_point) {
+            // Configure a potential js_binary tool to use the execroot entry_point.
+            // js_run_devserver is a special case where we need to set the BAZEL_BINDIR
+            // to determine the execroot entry point but since the tool is running
+            // in a custom sandbox we don't want to cd into the BAZEL_BINDIR in the launcher
+            // (JS_BINARY__NO_CD_BINDIR is set above)
+            env['JS_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
+            env['BAZEL_BINDIR'] = config.bazel_bindir
+            if (config.allow_execroot_entry_point_with_no_copy_data_to_bin) {
+                env[
+                    'JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN'
+                ] = '1'
+            }
+        }
+
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
             stdio: 'inherit',
-            env: {
-                ...process.env,
-                BAZEL_BINDIR: '.',
-                JS_BINARY__CHDIR: '',
-            },
+            env: env,
         })
 
         proc.on('close', (code) => {
