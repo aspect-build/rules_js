@@ -71,6 +71,12 @@ _FP_DIRECT_TMPL = \
                 tags = ["manual"],
             )"""
 
+_FP_DIRECT_TARGET_TMPL = \
+    """
+    for link_package in {link_packages}:
+        if link_package == bazel_package:
+            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))"""
+
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
     name = "{name}_bzl_library",
@@ -752,7 +758,30 @@ sh_binary(
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
-    defs_bzl_body = [
+    npm_link_targets_bzl = [
+        """def npm_link_targets(name = "node_modules", package = None):
+    \"\"\"Generated list of target names that are linked by npm_link_all_packages()
+
+    Args:
+        name: name of catch all target to generate for all packages linked
+        package: Bazel package to generate targets names for.
+
+            Set to an empty string "" to specify the root package.
+
+            If unspecified, the current package (`native.package_name()`) is used.
+
+    Returns:
+        A list of target names that are linked by npm_link_all_packages()
+    \"\"\"
+    link_packages = {link_packages}
+    bazel_package = package if package != None else native.package_name()
+    link = bazel_package in link_packages
+
+    link_targets = []
+""".format(link_packages = str(link_packages)),
+    ]
+
+    npm_link_all_packages_bzl = [
         """def npm_link_all_packages(name = "node_modules", imported_links = []):
     \"\"\"Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
 
@@ -804,6 +833,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
     stores_bzl = []
     links_bzl = {}
+    links_targets_bzl = {}
     for (i, _import) in enumerate(npm_imports):
         maybe_integrity = """
         integrity = "%s",""" % _import.integrity if _import.integrity else ""
@@ -909,7 +939,13 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             for link_alias in link_aliases:
                 if link_package not in links_bzl:
                     links_bzl[link_package] = []
+                if link_package not in links_targets_bzl:
+                    links_targets_bzl[link_package] = []
                 links_bzl[link_package].append("""            link_targets.append(link_{i}(name = "{{}}/{name}".format(name)))""".format(
+                    i = i,
+                    name = link_alias,
+                ))
+                links_targets_bzl[link_package].append("""            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))""".format(
                     i = i,
                     name = link_alias,
                 ))
@@ -948,14 +984,20 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                 ]))
 
     if len(stores_bzl) > 0:
-        defs_bzl_body.append("""    if is_root:""")
-        defs_bzl_body.extend(stores_bzl)
+        npm_link_all_packages_bzl.append("""    if is_root:""")
+        npm_link_all_packages_bzl.extend(stores_bzl)
 
     if len(links_bzl) > 0:
-        defs_bzl_body.append("""    if link:""")
+        npm_link_all_packages_bzl.append("""    if link:""")
         for link_package, bzl in links_bzl.items():
-            defs_bzl_body.append("""        if native.package_name() == "{}":""".format(link_package))
-            defs_bzl_body.extend(bzl)
+            npm_link_all_packages_bzl.append("""        if native.package_name() == "{}":""".format(link_package))
+            npm_link_all_packages_bzl.extend(bzl)
+
+    if len(links_targets_bzl) > 0:
+        npm_link_targets_bzl.append("""    if link:""")
+        for link_package, bzl in links_targets_bzl.items():
+            npm_link_targets_bzl.append("""        if bazel_package == "{}":""".format(link_package))
+            npm_link_targets_bzl.extend(bzl)
 
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
@@ -968,7 +1010,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
 
-        defs_bzl_body.append(_FP_STORE_TMPL.format(
+        npm_link_all_packages_bzl.append(_FP_STORE_TMPL.format(
             bazel_name = fp_bazel_name,
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
@@ -977,7 +1019,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             virtual_store_root = utils.virtual_store_root,
         ))
 
-        defs_bzl_body.append(_FP_DIRECT_TMPL.format(
+        npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
             bazel_name = fp_bazel_name,
             link_packages = fp_link_packages.keys(),
             name = fp_package,
@@ -987,14 +1029,19 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
             virtual_store_root = utils.virtual_store_root,
         ))
 
+        npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
+            link_packages = fp_link_packages.keys(),
+            name = fp_package,
+        ))
+
         if len(fp_package.split("/", 1)) > 1:
             package_scope = fp_package.split("/", 1)[0]
-            defs_bzl_body.append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
+            npm_link_all_packages_bzl.append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                 package_scope = package_scope,
             ))
 
     # Generate catch all & scoped npm_linked_packages target
-    defs_bzl_body.append("""
+    npm_link_all_packages_bzl.append("""
     for scope, scoped_targets in scope_targets.items():
         _js_library(
             name = "{}/{}".format(name, scope),
@@ -1010,7 +1057,9 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
         visibility = ["//visibility:public"],
     )""")
 
-    rctx_files[rctx.attr.defs_bzl_filename] = ["\n".join(defs_bzl_header + [""] + defs_bzl_body + [""])]
+    npm_link_targets_bzl.append("""    return link_targets""")
+
+    rctx_files[rctx.attr.defs_bzl_filename] = ["\n".join(defs_bzl_header + [""] + npm_link_all_packages_bzl + [""] + npm_link_targets_bzl + [""])]
     rctx_files[rctx.attr.repositories_bzl_filename] = ["\n".join(repositories_bzl)]
 
     for filename, contents in rctx.attr.additional_file_contents.items():
