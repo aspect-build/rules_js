@@ -41,8 +41,8 @@ while ! nc -z localhost 8081; do
   sleep 0.5 # wait before check again
 done
 
-echo "Waiting 5 seconds for devservers to settle..."
-sleep 5
+echo "Waiting 10 seconds for devservers to settle to mitigate flakiness..."
+sleep 10
 
 echo "Devservers ready"
 
@@ -88,8 +88,8 @@ fi
 
 echo "<div>A second line</div>" >> src/index.html
 
-echo "Waiting 5 seconds for ibazel rebuild after change to src/index.html..."
-sleep 5
+echo "Waiting 10 seconds for ibazel rebuild after change to src/index.html..."
+sleep 10
 
 if ! curl http://localhost:8080/index.html --fail 2>/dev/null | grep "A second line"; then
   echo "ERROR: Expected http://localhost:8080/index.html to contain 'A second line'"

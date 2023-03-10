@@ -37,7 +37,7 @@ function mkdirpSync(p) {
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
-async function syncRecursive(src, dst) {
+async function syncRecursive(src, dst, writePerm) {
     try {
         const lstat = await fs.promises.lstat(src)
         const last = synced.get(src)
@@ -71,7 +71,8 @@ async function syncRecursive(src, dst) {
                         async (entry) =>
                             await syncRecursive(
                                 path.join(src, entry),
-                                path.join(dst, entry)
+                                path.join(dst, entry),
+                                writePerm
                             )
                     )
                 )
@@ -88,6 +89,16 @@ async function syncRecursive(src, dst) {
                 mkdirpSync(path.dirname(dst))
             }
             await fs.promises.copyFile(src, dst)
+            if (writePerm) {
+                const s = await fs.promises.stat(dst)
+                const mode = s.mode | fs.constants.S_IWUSR
+                console.error(
+                    `Adding write permissions to file ${src.slice(
+                        RUNFILES_ROOT.length + 1
+                    )}: ${(mode & parseInt('777', 8)).toString(8)}`
+                )
+                await fs.promises.chmod(dst, mode)
+            }
             return 1
         }
     } catch (e) {
@@ -97,7 +108,7 @@ async function syncRecursive(src, dst) {
 }
 
 // Sync list of files to the sandbox
-async function sync(files, sandbox) {
+async function sync(files, sandbox, writePerm) {
     console.error('Syncing...')
     const startTime = perf_hooks.performance.now()
     const totalSynced = (
@@ -105,7 +116,7 @@ async function sync(files, sandbox) {
             files.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst)
+                return await syncRecursive(src, dst, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -126,7 +137,11 @@ async function main(args, sandbox) {
 
     const config = JSON.parse(await fs.promises.readFile(configPath))
 
-    await sync(config.data_files, sandbox)
+    await sync(
+        config.data_files,
+        sandbox,
+        config.grant_sandbox_write_permissions
+    )
 
     return new Promise((resolve) => {
         const cwd = process.env.JS_BINARY__CHDIR
@@ -188,7 +203,8 @@ async function main(args, sandbox) {
                         sync(
                             // Re-parse the config file to get the latest list of data files to copy
                             JSON.parse(fs.readFileSync(configPath)).data_files,
-                            sandbox
+                            sandbox,
+                            config.grant_sandbox_write_permissions
                         )
                     )
                     // Await promise to catch any exceptions
