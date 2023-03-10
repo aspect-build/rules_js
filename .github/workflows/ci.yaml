@@ -140,6 +140,7 @@ jobs:
               run: echo "hash=${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'MODULE.bazel', '**/*.js', '!e2e') }}" >> $GITHUB_OUTPUT
         outputs:
             hash: ${{ steps.root.outputs.hash }}
+
     test:
         runs-on: ubuntu-latest
 
@@ -255,7 +256,20 @@ jobs:
             - name: bazel test //...
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
+                  bazel \
+                    --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc \
+                    --bazelrc=.bazelrc \
+                    test \
+                    --config=${{ matrix.config }} \
+                    ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} \
+                    ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} \
+                    --profile=profile.gz \
+                    --experimental_execution_log_spawn_metrics \
+                    --experimental_execution_graph_log_dep_type=all \
+                    --experimental_profile_include_target_label \
+                    --disk_cache= \
+                    --noremote_accept_cached \
+                    //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
               env:
                   # Bazelisk will download bazel to here
@@ -263,6 +277,15 @@ jobs:
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+
+            # Uncomment to upload profile
+            - name: upload profile
+              if: matrix.folder == '.'
+              uses: actions/upload-artifact@v3
+              with:
+                  name: profile-${{ matrix.config }}-${{ matrix.bazelversion }}-${{ matrix.bzlmodEnabled }}
+                  path: profile.gz
+                  retention-days: 5
 
             # Uncomment for debugging, see https://github.com/aspect-build/rules_js/pull/771
             # - name: upload bazel-bin
