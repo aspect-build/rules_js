@@ -5,7 +5,6 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_imported_package")
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("//npm:defs.bzl", "npm_link_package")
 load("//js:defs.bzl", "js_library")
 
@@ -101,21 +100,4 @@ buildifier(
     ],
     lint_mode = "warn",
     mode = "diff",
-)
-
-# Add a flag indicating that bzlmod is enabled so that we can use select()
-# to skip bzlmod-incompatible targets. Note that Bazel does not currently
-# support declaring a config_setting directly on --enable_bzlmod, so we
-# must use set this flag instead.
-
-config_setting(
-    name = "bzlmod",
-    flag_values = {
-        ":flag_bzlmod": "true",
-    },
-)
-
-bool_flag(
-    name = "flag_bzlmod",
-    build_setting_default = False,
 )
