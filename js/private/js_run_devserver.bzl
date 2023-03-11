@@ -16,6 +16,7 @@ _attrs = dicts.add(js_binary_lib.attrs, {
     "use_execroot_entry_point": attr.bool(
         default = True,
     ),
+    "grant_sandbox_write_permissions": attr.bool(),
     "allow_execroot_entry_point_with_no_copy_data_to_bin": attr.bool(),
     "command": attr.string(),
 })
@@ -74,6 +75,9 @@ def _impl(ctx):
             runfiles_merge_targets.append(ctx.attr.tool_exec_cfg)
     if ctx.attr.command:
         config["command"] = ctx.attr.command
+    if ctx.attr.grant_sandbox_write_permissions:
+        config["grant_sandbox_write_permissions"] = "1"
+
     ctx.actions.write(config_file, json.encode(config))
 
     runfiles = ctx.runfiles(
@@ -102,6 +106,7 @@ def js_run_devserver(
         name,
         tool = None,
         command = None,
+        grant_sandbox_write_permissions = False,
         use_execroot_entry_point = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         **kwargs):
@@ -199,6 +204,13 @@ def js_run_devserver(
 
             Only one of `command` or `tool` may be specified.
 
+        grant_sandbox_write_permissions: If set, write permissions is set on all files copied to the custom sandbox.
+
+            This can be useful to support some devservers such as Next.js which may, under some
+            circumstances, try to modify files when running.
+
+            See https://github.com/aspect-build/rules_js/issues/935 for more context.
+
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
 
@@ -237,6 +249,7 @@ def js_run_devserver(
         tool_exec_cfg = tool,
         tool_target_cfg = tool,
         command = command,
+        grant_sandbox_write_permissions = grant_sandbox_write_permissions,
         use_execroot_entry_point = use_execroot_entry_point,
         allow_execroot_entry_point_with_no_copy_data_to_bin = allow_execroot_entry_point_with_no_copy_data_to_bin,
         **kwargs
