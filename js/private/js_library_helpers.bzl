@@ -23,12 +23,14 @@ intentional to mimic how `devDependencies` work in published npm packages.
 JS_LIBRARY_DATA_ATTR = attr.label_list(
     doc = """Runtime dependencies to include in binaries/tests that depend on this target.
 
-    The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the `data` attribute
-    are added to the runfiles of this target. They should appear in the '*.runfiles' area of any executable which has
-    a runtime dependency on this target.
+The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the `data` attribute
+are added to the runfiles of this target. They should appear in the '*.runfiles' area of any executable which has
+a runtime dependency on this target.
 
-    {downstream_linked_npm_deps}
-    """.format(downstream_linked_npm_deps = DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING),
+{downstream_linked_npm_deps}
+""".format(
+        downstream_linked_npm_deps = DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING,
+    ),
     allow_files = True,
 )
 
