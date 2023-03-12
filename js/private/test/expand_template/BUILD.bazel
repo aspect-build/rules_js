@@ -22,7 +22,7 @@ diff_test(
     name = "a_stamp_test",
     file1 = ":a_stamp",
     file2 = select({
-        "//:bzlmod": "a_stamp_expected_bzlmod",
+        "@aspect_bazel_lib//lib:bzlmod": "a_stamp_expected_bzlmod",
         "//conditions:default": "a_stamp_expected",
     }),
 )
@@ -47,7 +47,7 @@ diff_test(
     name = "a_test",
     file1 = ":a",
     file2 = select({
-        "//:bzlmod": "a_expected_bzlmod",
+        "@aspect_bazel_lib//lib:bzlmod": "a_expected_bzlmod",
         "//conditions:default": "a_expected",
     }),
 )

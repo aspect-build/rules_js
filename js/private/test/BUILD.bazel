@@ -34,7 +34,7 @@ write_source_files(
         "shellcheck_launcher.sh": ":shell_launcher_sed",
     },
     target_compatible_with = select({
-        "//:bzlmod": ["@platforms//:incompatible"],
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )
