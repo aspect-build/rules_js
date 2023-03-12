@@ -19,7 +19,9 @@ Known issues:
 
 rules_js is just a part of what Aspect provides:
 
--   _Need help?_ This ruleset has support provided by https://aspect.dev.
+-   _Need help?_
+    -   Community support is available on the #javascript channel on [Bazel Slack](https://slack.bazel.build/)
+    -   This ruleset has commercial support provided by https://aspect.dev.
 -   See our other Bazel rules, especially those built for rules_js:
     -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
     -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
