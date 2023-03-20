@@ -6,35 +6,35 @@ def npm_repositories():
     "Generated npm_import repository rules corresponding to npm packages in //:pnpm-lock.yaml"
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.4",
+        name = "npm__at_rollup_plugin-commonjs__23.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "23.0.4",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.4.tgz",
+        version = "23.0.7",
+        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.7.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
-        integrity = "sha512-bOPJeTZg56D2MCm+TT4psP8e8Jmf1Jsi7pFUMl8BN5kOADNzofNHe47+84WVCt7D095xPghC235/YKuNDEhczg==",
+        integrity = "sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==",
         deps = {
             "@rollup/pluginutils": "5.0.2",
             "commondir": "registry.npmjs.org/commondir/1.0.1",
             "estree-walker": "registry.npmjs.org/estree-walker/2.0.2",
             "glob": "registry.npmjs.org/glob/8.1.0",
             "is-reference": "registry.npmjs.org/is-reference/1.2.1",
-            "magic-string": "registry.npmjs.org/magic-string/0.26.7",
+            "magic-string": "registry.npmjs.org/magic-string/0.27.0",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.4"],
+            "@rollup/plugin-commonjs": ["23.0.7"],
             "@rollup/pluginutils": ["5.0.2"],
             "commondir": ["registry.npmjs.org/commondir/1.0.1"],
             "estree-walker": ["registry.npmjs.org/estree-walker/2.0.2"],
             "glob": ["registry.npmjs.org/glob/8.1.0"],
             "is-reference": ["registry.npmjs.org/is-reference/1.2.1"],
-            "magic-string": ["registry.npmjs.org/magic-string/0.26.7"],
-            "sourcemap-codec": ["registry.npmjs.org/sourcemap-codec/1.4.8"],
+            "magic-string": ["registry.npmjs.org/magic-string/0.27.0"],
+            "@jridgewell/sourcemap-codec": ["registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14"],
             "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "fs.realpath": ["registry.npmjs.org/fs.realpath/1.0.0"],
             "inflight": ["registry.npmjs.org/inflight/1.0.6"],
@@ -135,6 +135,22 @@ def npm_repositories():
             "@types/estree": ["registry.npmjs.org/@types/estree/1.0.0"],
             "estree-walker": ["registry.npmjs.org/estree-walker/2.0.2"],
             "picomatch": ["registry.npmjs.org/picomatch/2.3.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_sourcemap-codec__registry.npmjs.org_at_jridgewell_sourcemap-codec_1.4.14",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/sourcemap-codec",
+        version = "registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14",
+        url = "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.14.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        integrity = "sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==",
+        transitive_closure = {
+            "@jridgewell/sourcemap-codec": ["registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14"],
         },
     )
 
@@ -581,22 +597,22 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__magic-string__registry.npmjs.org_magic-string_0.26.7",
+        name = "npm__magic-string__registry.npmjs.org_magic-string_0.27.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "magic-string",
-        version = "registry.npmjs.org/magic-string/0.26.7",
-        url = "https://registry.yarnpkg.com/magic-string/-/magic-string-0.26.7.tgz",
+        version = "registry.npmjs.org/magic-string/0.27.0",
+        url = "https://registry.yarnpkg.com/magic-string/-/magic-string-0.27.0.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
-        integrity = "sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==",
+        integrity = "sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==",
         deps = {
-            "sourcemap-codec": "registry.npmjs.org/sourcemap-codec/1.4.8",
+            "@jridgewell/sourcemap-codec": "registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14",
         },
         transitive_closure = {
-            "magic-string": ["registry.npmjs.org/magic-string/0.26.7"],
-            "sourcemap-codec": ["registry.npmjs.org/sourcemap-codec/1.4.8"],
+            "magic-string": ["registry.npmjs.org/magic-string/0.27.0"],
+            "@jridgewell/sourcemap-codec": ["registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14"],
         },
     )
 
@@ -733,22 +749,6 @@ def npm_repositories():
             "semver": ["registry.npmjs.org/semver/7.3.8"],
             "lru-cache": ["registry.npmjs.org/lru-cache/6.0.0"],
             "yallist": ["registry.npmjs.org/yallist/4.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__sourcemap-codec__registry.npmjs.org_sourcemap-codec_1.4.8",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "sourcemap-codec",
-        version = "registry.npmjs.org/sourcemap-codec/1.4.8",
-        url = "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz",
-        npm_translate_lock_repo = "npm",
-        dev = True,
-        integrity = "sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==",
-        transitive_closure = {
-            "sourcemap-codec": ["registry.npmjs.org/sourcemap-codec/1.4.8"],
         },
     )
 

@@ -13,9 +13,16 @@ import require$$0$2 from 'fs';
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function getAugmentedNamespace(n) {
+  if (n.__esModule) return n;
   var f = n.default;
 	if (typeof f == "function") {
-		var a = function () {
+		var a = function a () {
+			if (this instanceof a) {
+				var args = [null];
+				args.push.apply(args, arguments);
+				var Ctor = Function.bind.apply(f, args);
+				return new Ctor();
+			}
 			return f.apply(this, arguments);
 		};
 		a.prototype = f.prototype;
@@ -33,11 +40,23 @@ function getAugmentedNamespace(n) {
 	return a;
 }
 
-var bl = {exports: {}};
+var blExports = {};
+var bl = {
+  get exports(){ return blExports; },
+  set exports(v){ blExports = v; },
+};
 
-var ours = {exports: {}};
+var oursExports = {};
+var ours = {
+  get exports(){ return oursExports; },
+  set exports(v){ oursExports = v; },
+};
 
-var stream = {exports: {}};
+var streamExports = {};
+var stream = {
+  get exports(){ return streamExports; },
+  set exports(v){ streamExports = v; },
+};
 
 var primordials;
 var hasRequiredPrimordials;
@@ -147,12 +166,16 @@ function requirePrimordials () {
 	return primordials;
 }
 
-var util = {exports: {}};
+var utilExports = {};
+var util = {
+  get exports(){ return utilExports; },
+  set exports(v){ utilExports = v; },
+};
 
 var hasRequiredUtil;
 
 function requireUtil () {
-	if (hasRequiredUtil) return util.exports;
+	if (hasRequiredUtil) return utilExports;
 	hasRequiredUtil = 1;
 	(function (module) {
 
@@ -283,7 +306,7 @@ function requireUtil () {
 		};
 		module.exports.promisify.custom = Symbol.for('nodejs.util.promisify.custom');
 } (util));
-	return util.exports;
+	return utilExports;
 }
 
 var operators = {};
@@ -2022,7 +2045,11 @@ function requireValidators () {
 	return validators;
 }
 
-var endOfStream = {exports: {}};
+var endOfStreamExports = {};
+var endOfStream = {
+  get exports(){ return endOfStreamExports; },
+  set exports(v){ endOfStreamExports = v; },
+};
 
 var process$1;
 var hasRequiredProcess;
@@ -2343,7 +2370,7 @@ function requireUtils () {
 var hasRequiredEndOfStream;
 
 function requireEndOfStream () {
-	if (hasRequiredEndOfStream) return endOfStream.exports;
+	if (hasRequiredEndOfStream) return endOfStreamExports;
 	hasRequiredEndOfStream = 1;
 	const process = requireProcess()
 
@@ -2565,8 +2592,8 @@ function requireEndOfStream () {
 	  })
 	}
 	endOfStream.exports = eos;
-	endOfStream.exports.finished = finished;
-	return endOfStream.exports;
+	endOfStreamExports.finished = finished;
+	return endOfStreamExports;
 }
 
 var hasRequiredOperators;
@@ -3404,12 +3431,16 @@ function requireLegacy () {
 	return legacy;
 }
 
-var addAbortSignal = {exports: {}};
+var addAbortSignalExports = {};
+var addAbortSignal = {
+  get exports(){ return addAbortSignalExports; },
+  set exports(v){ addAbortSignalExports = v; },
+};
 
 var hasRequiredAddAbortSignal;
 
 function requireAddAbortSignal () {
-	if (hasRequiredAddAbortSignal) return addAbortSignal.exports;
+	if (hasRequiredAddAbortSignal) return addAbortSignalExports;
 	hasRequiredAddAbortSignal = 1;
 	(function (module) {
 
@@ -3455,7 +3486,7 @@ function requireAddAbortSignal () {
 		  return stream
 		};
 } (addAbortSignal));
-	return addAbortSignal.exports;
+	return addAbortSignalExports;
 }
 
 var buffer_list;
@@ -7081,7 +7112,7 @@ function requirePromises () {
 var hasRequiredStream;
 
 function requireStream () {
-	if (hasRequiredStream) return stream.exports;
+	if (hasRequiredStream) return streamExports;
 	hasRequiredStream = 1;
 	const { Buffer } = require$$0
 
@@ -7215,7 +7246,7 @@ function requireStream () {
 	Stream._uint8ArrayToBuffer = function _uint8ArrayToBuffer(chunk) {
 	  return Buffer.from(chunk.buffer, chunk.byteOffset, chunk.byteLength)
 	};
-	return stream.exports;
+	return streamExports;
 }
 
 (function (module) {
@@ -7285,14 +7316,22 @@ function requireStream () {
 	module.exports.default = module.exports;
 } (ours));
 
-var inherits$1 = {exports: {}};
+var inheritsExports = {};
+var inherits$1 = {
+  get exports(){ return inheritsExports; },
+  set exports(v){ inheritsExports = v; },
+};
 
-var inherits_browser = {exports: {}};
+var inherits_browserExports = {};
+var inherits_browser = {
+  get exports(){ return inherits_browserExports; },
+  set exports(v){ inherits_browserExports = v; },
+};
 
 var hasRequiredInherits_browser;
 
 function requireInherits_browser () {
-	if (hasRequiredInherits_browser) return inherits_browser.exports;
+	if (hasRequiredInherits_browser) return inherits_browserExports;
 	hasRequiredInherits_browser = 1;
 	if (typeof Object.create === 'function') {
 	  // implementation from standard node.js 'util' module
@@ -7321,7 +7360,7 @@ function requireInherits_browser () {
 	    }
 	  };
 	}
-	return inherits_browser.exports;
+	return inherits_browserExports;
 }
 
 (function (module) {
@@ -7735,8 +7774,8 @@ BufferList$1.isBufferList = function isBufferList (b) {
 
 var BufferList_1 = BufferList$1;
 
-const DuplexStream = ours.exports.Duplex;
-const inherits = inherits$1.exports;
+const DuplexStream = oursExports.Duplex;
+const inherits = inheritsExports;
 const BufferList = BufferList_1;
 
 function BufferListStream (callback) {
@@ -7815,8 +7854,8 @@ BufferListStream.prototype._isBufferList = function _isBufferList (b) {
 BufferListStream.isBufferList = BufferList.isBufferList;
 
 bl.exports = BufferListStream;
-bl.exports.BufferListStream = BufferListStream;
-bl.exports.BufferList = BufferList;
+blExports.BufferListStream = BufferListStream;
+blExports.BufferList = BufferList;
 
 var queueMicrotask_1;
 var hasRequiredQueueMicrotask;

@@ -13,9 +13,16 @@ var require$$12 = require('module');
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function getAugmentedNamespace(n) {
+  if (n.__esModule) return n;
   var f = n.default;
 	if (typeof f == "function") {
-		var a = function () {
+		var a = function a () {
+			if (this instanceof a) {
+				var args = [null];
+				args.push.apply(args, arguments);
+				var Ctor = Function.bind.apply(f, args);
+				return new Ctor();
+			}
 			return f.apply(this, arguments);
 		};
 		a.prototype = f.prototype;
@@ -1627,14 +1634,22 @@ function regExpEscape (s) {
   return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-var inherits = {exports: {}};
+var inheritsExports = {};
+var inherits = {
+  get exports(){ return inheritsExports; },
+  set exports(v){ inheritsExports = v; },
+};
 
-var inherits_browser = {exports: {}};
+var inherits_browserExports = {};
+var inherits_browser = {
+  get exports(){ return inherits_browserExports; },
+  set exports(v){ inherits_browserExports = v; },
+};
 
 var hasRequiredInherits_browser;
 
 function requireInherits_browser () {
-	if (hasRequiredInherits_browser) return inherits_browser.exports;
+	if (hasRequiredInherits_browser) return inherits_browserExports;
 	hasRequiredInherits_browser = 1;
 	if (typeof Object.create === 'function') {
 	  // implementation from standard node.js 'util' module
@@ -1663,7 +1678,7 @@ function requireInherits_browser () {
 	    }
 	  };
 	}
-	return inherits_browser.exports;
+	return inherits_browserExports;
 }
 
 (function (module) {
@@ -1678,7 +1693,11 @@ function requireInherits_browser () {
 	}
 } (inherits));
 
-var pathIsAbsolute = {exports: {}};
+var pathIsAbsoluteExports = {};
+var pathIsAbsolute = {
+  get exports(){ return pathIsAbsoluteExports; },
+  set exports(v){ pathIsAbsoluteExports = v; },
+};
 
 function posix(path) {
 	return path.charAt(0) === '/';
@@ -1696,8 +1715,8 @@ function win32(path) {
 }
 
 pathIsAbsolute.exports = process.platform === 'win32' ? win32 : posix;
-pathIsAbsolute.exports.posix = posix;
-pathIsAbsolute.exports.win32 = win32;
+pathIsAbsoluteExports.posix = posix;
+pathIsAbsoluteExports.win32 = win32;
 
 var common = {};
 
@@ -1716,7 +1735,7 @@ function ownProp (obj, field) {
 var fs$3 = require$$0$1;
 var path$4 = require$$0;
 var minimatch$1 = minimatch_1;
-var isAbsolute$2 = pathIsAbsolute.exports;
+var isAbsolute$2 = pathIsAbsoluteExports;
 var Minimatch = minimatch$1.Minimatch;
 
 function alphasort (a, b) {
@@ -1955,7 +1974,7 @@ function requireSync () {
 	requireGlob().Glob;
 	var path = require$$0;
 	var assert = require$$5;
-	var isAbsolute = pathIsAbsolute.exports;
+	var isAbsolute = pathIsAbsoluteExports;
 	var common$1 = common;
 	var setopts = common$1.setopts;
 	var ownProp = common$1.ownProp;
@@ -2464,11 +2483,15 @@ function wrappy$2 (fn, cb) {
   }
 }
 
-var once$2 = {exports: {}};
+var onceExports = {};
+var once$2 = {
+  get exports(){ return onceExports; },
+  set exports(v){ onceExports = v; },
+};
 
 var wrappy$1 = wrappy_1;
 once$2.exports = wrappy$1(once$1);
-once$2.exports.strict = wrappy$1(onceStrict);
+onceExports.strict = wrappy$1(onceStrict);
 
 once$1.proto = once$1(function () {
   Object.defineProperty(Function.prototype, 'once', {
@@ -2511,7 +2534,7 @@ function onceStrict (fn) {
 
 var wrappy = wrappy_1;
 var reqs = Object.create(null);
-var once = once$2.exports;
+var once = onceExports;
 
 var inflight_1 = wrappy(inflight);
 
@@ -2615,11 +2638,11 @@ function requireGlob () {
 	var rp = fs_realpath;
 	var minimatch = minimatch_1;
 	minimatch.Minimatch;
-	var inherits$1 = inherits.exports;
+	var inherits = inheritsExports;
 	var EE = require$$3.EventEmitter;
 	var path = require$$0;
 	var assert = require$$5;
-	var isAbsolute = pathIsAbsolute.exports;
+	var isAbsolute = pathIsAbsoluteExports;
 	var globSync = requireSync();
 	var common$1 = common;
 	var setopts = common$1.setopts;
@@ -2628,7 +2651,7 @@ function requireGlob () {
 	var childrenIgnored = common$1.childrenIgnored;
 	var isIgnored = common$1.isIgnored;
 
-	var once = once$2.exports;
+	var once = onceExports;
 
 	function glob (pattern, options, cb) {
 	  if (typeof options === 'function') cb = options, options = {};
@@ -2684,7 +2707,7 @@ function requireGlob () {
 	};
 
 	glob.Glob = Glob;
-	inherits$1(Glob, EE);
+	inherits(Glob, EE);
 	function Glob (pattern, options, cb) {
 	  if (typeof options === 'function') {
 	    cb = options;
@@ -3854,7 +3877,11 @@ var schema = {
 	)
 };
 
-var isOutsideDir$1 = {exports: {}};
+var isOutsideDirExports = {};
+var isOutsideDir$1 = {
+  get exports(){ return isOutsideDirExports; },
+  set exports(v){ isOutsideDirExports = v; },
+};
 
 var isOutsideDirWin32;
 var hasRequiredIsOutsideDirWin32;
@@ -3903,7 +3930,7 @@ const { promisify: promisify$1 } = require$$2;
 const glob = promisify$1(requireGlob());
 const minimatch = minimatch_1;
 const { defaults } = schema;
-const isOutsideDir = isOutsideDir$1.exports;
+const isOutsideDir = isOutsideDirExports;
 
 class TestExclude {
     constructor(opts = {}) {
@@ -4058,7 +4085,11 @@ function getExtensionPattern(extension) {
 
 var testExclude = TestExclude;
 
-var istanbulLibCoverage = {exports: {}};
+var istanbulLibCoverageExports = {};
+var istanbulLibCoverage = {
+  get exports(){ return istanbulLibCoverageExports; },
+  set exports(v){ istanbulLibCoverageExports = v; },
+};
 
 /*
  Copyright 2012-2015, Yahoo Inc.
@@ -4138,7 +4169,7 @@ let CoverageSummary$3 = class CoverageSummary {
     constructor(obj) {
         if (!obj) {
             this.data = blankSummary();
-        } else if (obj instanceof CoverageSummary$3) {
+        } else if (obj instanceof CoverageSummary) {
             this.data = obj.data;
         } else {
             this.data = obj;
@@ -4308,7 +4339,7 @@ let FileCoverage$2 = class FileCoverage {
         }
         if (typeof pathOrObj === 'string') {
             this.data = emptyCoverage(pathOrObj, reportLogic);
-        } else if (pathOrObj instanceof FileCoverage$2) {
+        } else if (pathOrObj instanceof FileCoverage) {
             this.data = pathOrObj.data;
         } else if (typeof pathOrObj === 'object') {
             this.data = pathOrObj;
@@ -4580,7 +4611,7 @@ let CoverageMap$1 = class CoverageMap {
      * map's contents. This can be the raw global coverage object.
      */
     constructor(obj) {
-        if (obj instanceof CoverageMap$1) {
+        if (obj instanceof CoverageMap) {
             this.data = obj.data;
         } else {
             this.data = loadMap(obj);
@@ -4594,7 +4625,7 @@ let CoverageMap$1 = class CoverageMap {
      *  as needed.
      */
     merge(obj) {
-        const other = maybeConstruct(obj, CoverageMap$1);
+        const other = maybeConstruct(obj, CoverageMap);
         Object.values(other.data).forEach(fc => {
             this.addFileCoverage(fc);
         });
@@ -4734,16 +4765,24 @@ istanbulLibCoverage.exports = {
 };
 
 /** classes exported for reuse */
-istanbulLibCoverage.exports.classes = {
+istanbulLibCoverageExports.classes = {
     /**
      * the file coverage constructor
      */
     FileCoverage
 };
 
-var makeDir$1 = {exports: {}};
+var makeDirExports = {};
+var makeDir$1 = {
+  get exports(){ return makeDirExports; },
+  set exports(v){ makeDirExports = v; },
+};
 
-var semver$1 = {exports: {}};
+var semverExports = {};
+var semver$1 = {
+  get exports(){ return semverExports; },
+  set exports(v){ semverExports = v; },
+};
 
 (function (module, exports) {
 	exports = module.exports = SemVer;
@@ -6342,12 +6381,12 @@ var semver$1 = {exports: {}};
 	    '.' + (match[3] || '0') +
 	    '.' + (match[4] || '0'), options)
 	}
-} (semver$1, semver$1.exports));
+} (semver$1, semverExports));
 
 const fs$2 = require$$0$1;
 const path$2 = require$$0;
 const {promisify} = require$$2;
-const semver = semver$1.exports;
+const semver = semverExports;
 
 const useNativeRecursiveOption = semver.satisfies(process.version, '>=10.12.0');
 
@@ -6449,7 +6488,7 @@ const makeDir = async (input, options) => {
 
 makeDir$1.exports = makeDir;
 
-makeDir$1.exports.sync = (input, options) => {
+makeDirExports.sync = (input, options) => {
 	checkPath(input);
 	options = processOptions(options);
 
@@ -6648,7 +6687,7 @@ var supportsColor_1 = {
  */
 const path$1 = require$$0;
 const fs$1 = require$$0$1;
-const mkdirp = makeDir$1.exports;
+const mkdirp = makeDirExports;
 const supportsColor = supportsColor_1;
 
 /**
@@ -6785,7 +6824,7 @@ let FileWriter$1 = class FileWriter {
                 `Cannot create subdir writer for absolute path: ${subdir}`
             );
         }
-        return new FileWriter$1(`${this.baseDir}/${subdir}`);
+        return new FileWriter(`${this.baseDir}/${subdir}`);
     }
 
     /**
@@ -7150,7 +7189,7 @@ let Path$1 = class Path {
         }
         const p = this.v.slice();
         p.pop();
-        return new Path$1(p);
+        return new Path(p);
     }
 
     elements() {
@@ -7194,7 +7233,7 @@ let Path$1 = class Path {
                 break;
             }
         }
-        return new Path$1(ret);
+        return new Path(ret);
     }
 
     static compare(a, b) {
@@ -7247,7 +7286,7 @@ Path$1.tester = {
  Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
  */
 
-const coverage = istanbulLibCoverage.exports;
+const coverage = istanbulLibCoverageExports;
 const Path = path_1;
 const { BaseNode, BaseTree } = tree$1;
 
@@ -8270,14 +8309,22 @@ function requireRange () {
 	return range;
 }
 
-var traceMapping_umd = {exports: {}};
+var traceMapping_umdExports = {};
+var traceMapping_umd = {
+  get exports(){ return traceMapping_umdExports; },
+  set exports(v){ traceMapping_umdExports = v; },
+};
 
-var sourcemapCodec_umd = {exports: {}};
+var sourcemapCodec_umdExports = {};
+var sourcemapCodec_umd = {
+  get exports(){ return sourcemapCodec_umdExports; },
+  set exports(v){ sourcemapCodec_umdExports = v; },
+};
 
 var hasRequiredSourcemapCodec_umd;
 
 function requireSourcemapCodec_umd () {
-	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umd.exports;
+	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umdExports;
 	hasRequiredSourcemapCodec_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
@@ -8452,16 +8499,20 @@ function requireSourcemapCodec_umd () {
 
 		}));
 		
-} (sourcemapCodec_umd, sourcemapCodec_umd.exports));
-	return sourcemapCodec_umd.exports;
+} (sourcemapCodec_umd, sourcemapCodec_umdExports));
+	return sourcemapCodec_umdExports;
 }
 
-var resolveUri_umd = {exports: {}};
+var resolveUri_umdExports = {};
+var resolveUri_umd = {
+  get exports(){ return resolveUri_umdExports; },
+  set exports(v){ resolveUri_umdExports = v; },
+};
 
 var hasRequiredResolveUri_umd;
 
 function requireResolveUri_umd () {
-	if (hasRequiredResolveUri_umd) return resolveUri_umd.exports;
+	if (hasRequiredResolveUri_umd) return resolveUri_umdExports;
 	hasRequiredResolveUri_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
@@ -8712,13 +8763,13 @@ function requireResolveUri_umd () {
 		}));
 		
 } (resolveUri_umd));
-	return resolveUri_umd.exports;
+	return resolveUri_umdExports;
 }
 
 var hasRequiredTraceMapping_umd;
 
 function requireTraceMapping_umd () {
-	if (hasRequiredTraceMapping_umd) return traceMapping_umd.exports;
+	if (hasRequiredTraceMapping_umd) return traceMapping_umdExports;
 	hasRequiredTraceMapping_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
@@ -9284,8 +9335,8 @@ function requireTraceMapping_umd () {
 
 		}));
 		
-} (traceMapping_umd, traceMapping_umd.exports));
-	return traceMapping_umd.exports;
+} (traceMapping_umd, traceMapping_umdExports));
+	return traceMapping_umdExports;
 }
 
 var source;
@@ -10664,27 +10715,27 @@ function nextChild(openRange, parentToNested) {
 
 var lib = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	emitForest: emitForest,
-	emitForestLines: emitForestLines,
-	parseFunctionRanges: parseFunctionRanges,
-	parseOffsets: parseOffsets,
+	RangeTree: RangeTree,
 	cloneFunctionCov: cloneFunctionCov,
 	cloneProcessCov: cloneProcessCov,
-	cloneScriptCov: cloneScriptCov,
 	cloneRangeCov: cloneRangeCov,
-	compareScriptCovs: compareScriptCovs,
+	cloneScriptCov: cloneScriptCov,
 	compareFunctionCovs: compareFunctionCovs,
 	compareRangeCovs: compareRangeCovs,
+	compareScriptCovs: compareScriptCovs,
+	emitForest: emitForest,
+	emitForestLines: emitForestLines,
 	mergeFunctionCovs: mergeFunctionCovs,
 	mergeProcessCovs: mergeProcessCovs,
 	mergeScriptCovs: mergeScriptCovs,
-	RangeTree: RangeTree
+	parseFunctionRanges: parseFunctionRanges,
+	parseOffsets: parseOffsets
 });
 
 var require$$11 = /*@__PURE__*/getAugmentedNamespace(lib);
 
 const Exclude = testExclude;
-const libCoverage = istanbulLibCoverage.exports;
+const libCoverage = istanbulLibCoverageExports;
 const libReport = istanbulLibReport;
 const reports = istanbulReports;
 const { readdirSync, readFileSync, statSync } = require$$0$1;
