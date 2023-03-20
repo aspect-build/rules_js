@@ -13,7 +13,7 @@ set -o errexit -o nounset
 # This avoids users having to fetch all those packages just to run the postinstall hooks.
 
 npm install
-npx -y @vercel/ncc@0.33.4 build lifecycle-hooks.js -o min
+npx -y rollup -c
 # ascii_only avoids bad unicode conversions, fixing
 # https://github.com/aspect-build/rules_js/issues/45
 npx -y terser@5.12.1 min/index.js -b ascii_only=true > min/index.min.js
