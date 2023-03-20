@@ -23,12 +23,12 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
     const packages = await fs.promises.readdir(
         path.join(nodeModulesPath, scope)
     )
-    for (package of packages) {
-        if (!scope && package.startsWith('@')) {
-            await makeBins(nodeModulesPath, package, segmentsUp)
+    for (const _package of packages) {
+        if (!scope && _package.startsWith('@')) {
+            await makeBins(nodeModulesPath, _package, segmentsUp)
             continue
         }
-        const packageName = path.join(scope, package)
+        const packageName = path.join(scope, _package)
         const packageJsonPath = path.join(
             nodeModulesPath,
             packageName,
@@ -51,16 +51,16 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
                 await mkdirp(path.join(nodeModulesPath, '.bin'))
                 let bin = packageJson.bin
                 if (typeof bin == 'string') {
-                    bin = { [package]: bin }
+                    bin = { [_package]: bin }
                 }
-                for (binName of Object.keys(bin)) {
-                    binPath = normalizeBinPath(bin[binName])
-                    binBash = `#!/usr/bin/env bash\nexec node "${path.join(
+                for (const binName of Object.keys(bin)) {
+                    const binPath = normalizeBinPath(bin[binName])
+                    const binBash = `#!/usr/bin/env bash\nexec node "${path.join(
                         ...segmentsUp,
                         packageName,
                         binPath
                     )}" "$@"`
-                    binEntryPath = path.join(nodeModulesPath, '.bin', binName)
+                    const binEntryPath = path.join(nodeModulesPath, '.bin', binName)
                     await fs.promises.writeFile(binEntryPath, binBash)
                     await fs.promises.chmod(binEntryPath, '755') // executable
                 }
