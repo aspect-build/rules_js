@@ -512,14 +512,19 @@ def _normalize_bazelignore(lines):
 
     - strip trailing slash so that users can have either of equivalent
         foo/node_modules or foo/node_modules/
+    - strip trailing carriage return on Windows
     - strip leading ./ so users can have node_modules or ./node_modules
     """
     result = []
+
+    # N.B. from https://bazel.build/rules/lib/string#rstrip:
+    # Note that chars is not a suffix: all combinations of its value are removed
+    strip_trailing_chars = "/\r"
     for line in lines:
         if line.startswith("./"):
-            result.append(line[2:].rstrip("/"))
+            result.append(line[2:].rstrip(strip_trailing_chars))
         else:
-            result.append(line.rstrip("/"))
+            result.append(line.rstrip(strip_trailing_chars))
     return result
 
 def _find_missing_bazel_ignores(root_package, importer_paths, bazelignore):
