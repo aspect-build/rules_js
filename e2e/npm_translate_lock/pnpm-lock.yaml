@@ -4,7 +4,7 @@ importers:
 
   .:
     specifiers:
-      '@rollup/plugin-commonjs': 23.0.4
+      '@rollup/plugin-commonjs': 23.0.7
       '@rollup/plugin-json': 5.0.2
       '@rollup/plugin-node-resolve': 15.0.1
       '@types/node': 18.11.18
@@ -17,7 +17,7 @@ importers:
       is-odd: registry.npmjs.org/is-odd/3.0.1
       semver: registry.npmjs.org/semver/7.3.8
     devDependencies:
-      '@rollup/plugin-commonjs': 23.0.4
+      '@rollup/plugin-commonjs': 23.0.7
       '@rollup/plugin-json': 5.0.2
       '@rollup/plugin-node-resolve': 15.0.1
       '@types/node': registry.npmjs.org/@types/node/18.11.18
@@ -25,8 +25,8 @@ importers:
 
 packages:
 
-  /@rollup/plugin-commonjs/23.0.4:
-    resolution: {integrity: sha512-bOPJeTZg56D2MCm+TT4psP8e8Jmf1Jsi7pFUMl8BN5kOADNzofNHe47+84WVCt7D095xPghC235/YKuNDEhczg==}
+  /@rollup/plugin-commonjs/23.0.7:
+    resolution: {integrity: sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.68.0||^3.0.0
@@ -39,7 +39,7 @@ packages:
       estree-walker: registry.npmjs.org/estree-walker/2.0.2
       glob: registry.npmjs.org/glob/8.1.0
       is-reference: registry.npmjs.org/is-reference/1.2.1
-      magic-string: registry.npmjs.org/magic-string/0.26.7
+      magic-string: registry.npmjs.org/magic-string/0.27.0
     dev: true
 
   /@rollup/plugin-json/5.0.2:
@@ -83,6 +83,12 @@ packages:
       '@types/estree': registry.npmjs.org/@types/estree/1.0.0
       estree-walker: registry.npmjs.org/estree-walker/2.0.2
       picomatch: registry.npmjs.org/picomatch/2.3.1
+    dev: true
+
+  registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14:
+    resolution: {integrity: sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.14.tgz}
+    name: '@jridgewell/sourcemap-codec'
+    version: 1.4.14
     dev: true
 
   registry.npmjs.org/@types/estree/1.0.0:
@@ -268,13 +274,13 @@ packages:
       yallist: registry.npmjs.org/yallist/4.0.0
     dev: false
 
-  registry.npmjs.org/magic-string/0.26.7:
-    resolution: {integrity: sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz}
+  registry.npmjs.org/magic-string/0.27.0:
+    resolution: {integrity: sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/magic-string/-/magic-string-0.27.0.tgz}
     name: magic-string
-    version: 0.26.7
+    version: 0.27.0
     engines: {node: '>=12'}
     dependencies:
-      sourcemap-codec: registry.npmjs.org/sourcemap-codec/1.4.8
+      '@jridgewell/sourcemap-codec': registry.npmjs.org/@jridgewell/sourcemap-codec/1.4.14
     dev: true
 
   registry.npmjs.org/minimatch/5.1.6:
@@ -333,13 +339,6 @@ packages:
     dependencies:
       lru-cache: registry.npmjs.org/lru-cache/6.0.0
     dev: false
-
-  registry.npmjs.org/sourcemap-codec/1.4.8:
-    resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz}
-    name: sourcemap-codec
-    version: 1.4.8
-    deprecated: Please use @jridgewell/sourcemap-codec instead
-    dev: true
 
   registry.npmjs.org/supports-preserve-symlinks-flag/1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz}
