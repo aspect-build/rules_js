@@ -1,7 +1,7 @@
 {
     "private": true,
     "dependencies": {
-        "botframework-connector": "4.19.1",
+        "botframework-connector": "4.19.2",
         "karma-typescript": "5.5.3",
         "lodash": "4.17.21"
     },
