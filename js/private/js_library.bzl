@@ -46,45 +46,45 @@ _ATTRS = {
     "srcs": attr.label_list(
         doc = """Source files that are included in this library.
 
-        This includes all your checked-in code and any generated source files.
+This includes all your checked-in code and any generated source files.
 
-        The transitive npm dependencies, transitive sources & runfiles of targets in the `srcs` attribute are added to the
-        runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
-        runtime dependency on this target.
+The transitive npm dependencies, transitive sources & runfiles of targets in the `srcs` attribute are added to the
+runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
+runtime dependency on this target.
 
-        Source files that are JSON files, declaration files or directory artifacts will be automatically provided as
-        "declarations" available to downstream rules for type checking. To explicitly provide source files as "declarations"
-        available to downstream rules for type checking that do not match these criteria, move those files to the `declarations`
-        attribute instead.
-        """,
+Source files that are JSON files, declaration files or directory artifacts will be automatically provided as
+"declarations" available to downstream rules for type checking. To explicitly provide source files as "declarations"
+available to downstream rules for type checking that do not match these criteria, move those files to the `declarations`
+attribute instead.
+""",
         allow_files = True,
     ),
     "declarations": attr.label_list(
         doc = """Same as `srcs` except all files are also provided as "declarations" available to downstream rules for type checking.
 
-        For example, a js_library with only `.js` files that are intended to be imported as `.js` files by downstream type checking
-        rules such as `ts_project` would list those files in `declarations`:
+For example, a js_library with only `.js` files that are intended to be imported as `.js` files by downstream type checking
+rules such as `ts_project` would list those files in `declarations`:
 
-        ```
-        js_library(
-            name = "js_lib",
-            declarations = ["index.js"],
-        )
-        ```
-        """,
+```
+js_library(
+    name = "js_lib",
+    declarations = ["index.js"],
+)
+```
+""",
         allow_files = True,
     ),
     "deps": attr.label_list(
         doc = """Dependencies of this target.
 
-        This may include other js_library targets or other targets that provide JsInfo
+This may include other js_library targets or other targets that provide JsInfo
 
-        The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
-        runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
-        runtime dependency on this target.
+The transitive npm dependencies, transitive sources & runfiles of targets in the `deps` attribute are added to the
+runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
+runtime dependency on this target.
 
-        {downstream_linked_npm_deps}
-        """.format(downstream_linked_npm_deps = DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING),
+{downstream_linked_npm_deps}
+""".format(downstream_linked_npm_deps = DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING),
         providers = [JsInfo],
     ),
     "data": JS_LIBRARY_DATA_ATTR,
