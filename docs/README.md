@@ -210,12 +210,9 @@ Each bin exposes three rules, one for each Bazel command ("verb"):
 To inspect what's in the `@npm` workspace, start with a `bazel query` like the following:
 
 ```shell
-$ bazel query @npm//... --output=location
-/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/BUILD.bazel:24:12: bzl_library rule @npm//:@types/node
-/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/BUILD.bazel:17:12: bzl_library rule @npm//:typescript
-/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/examples/macro/BUILD.bazel:19:12: bzl_library rule @npm//examples/macro:mocha
-/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/examples/macro/BUILD.bazel:5:12: bzl_library rule @npm//examples/macro:mocha-junit-reporter
-/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/examples/macro/BUILD.bazel:12:12: bzl_library rule @npm//examples/macro:mocha-multi-reporters
+$ bazel query @npm//... --output=location | grep bzl_library
+/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/BUILD.bazel:5095:12: bzl_library rule @npm//:typescript_bzl_library
+/shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/examples/macro/BUILD.bazel:4:12: bzl_library rule @npm//examples/macro:mocha_bzl_library
 ```
 
 This shows locations on disk where the npm packages can be loaded.
@@ -223,13 +220,13 @@ This shows locations on disk where the npm packages can be loaded.
 To see the definition of one of these targets, you can run another `bazel query`:
 
 ```shell
-$ bazel query --output=build @npm//:typescript
-# /shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/BUILD.bazel:17:12
+$ bazel query --output=build @npm//:typescript_bzl_library
+# /shared/cache/bazel/user_base/581b2ac03dd093577e8a6ba6b6509be5/external/npm/BUILD.bazel:5095:12
 bzl_library(
-  name = "typescript",
+  name = "typescript_bzl_library",
   visibility = ["//visibility:public"],
   srcs = ["@npm//:typescript/package_json.bzl"],
-  deps = ["@npm__typescript__4.7.2//:typescript"],
+  deps = ["@npm__typescript__4.9.5//:typescript_bzl_library"],
 )
 ```
 
