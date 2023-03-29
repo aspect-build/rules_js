@@ -48,17 +48,8 @@ jobs:
               run: echo "bazelversion=$(head -n 1 .bazelversion)" >> $GITHUB_OUTPUT
             - id: bazel_5_3
               run: echo "bazelversion=5.3.2" >> $GITHUB_OUTPUT
-            - id: bazel_5_1
-              run: echo "bazelversion=5.1.1" >> $GITHUB_OUTPUT
-            # 5.0.0 will not build due to bazel dependency:
-            # ```
-            # ERROR: Traceback (most recent call last):
-            #   File "/home/runner/.cache/bazel/_bazel_runner/8d53428c79e05e77d1e55522fa21a0fd/external/bazel_gazelle/internal/go_repository.bzl", line 17, column 56, in <toplevel>
-            #     load("@bazel_tools//tools/build_defs/repo:utils.bzl", "read_user_netrc", "use_netrc")
-            # Error: file '@bazel_tools//tools/build_defs/repo:utils.bzl' does not contain symbol 'read_user_netrc'
-            # ```
         outputs:
-            # Will look like ["<version from .bazelversion>", "5.3.2", "5.0.0"]
+            # Will look like ["<version from .bazelversion>", "5.3.2"]
             bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
 
     matrix-prep-folder:
@@ -160,12 +151,8 @@ jobs:
                     # Don't test RBE with Bazel 5 (not supported)
                     - config: rbe
                       bazelversion: 5.3.2
-                    - config: rbe
-                      bazelversion: 5.1.1
                     # Don't run bzlmod smoke test with Bazel 5 (not supported) or without bzlmod enabled
                     - bazelversion: 5.3.2
-                      folder: e2e/bzlmod
-                    - bazelversion: 5.1.1
                       folder: e2e/bzlmod
                     - bzlmodEnabled: false
                       folder: e2e/bzlmod
@@ -174,8 +161,6 @@ jobs:
                       bzlmodEnabled: true
                     # Don't run bzlmod e2e tests with Bazel 5
                     - bazelversion: 5.3.2
-                      bzlmodEnabled: true
-                    - bazelversion: 5.1.1
                       bzlmodEnabled: true
                     # TODO: un-exclude the following bzlmod tests once they work
                     - folder: e2e/js_image_docker
