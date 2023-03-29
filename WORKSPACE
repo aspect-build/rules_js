@@ -21,7 +21,7 @@ load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
     name = "nodejs",
-    node_version = "16.9.0",
+    node_version = "16.14.2",
 )
 
 # Alternate toolchains for testing across versions

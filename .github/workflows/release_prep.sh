@@ -24,7 +24,7 @@ bazel_dep(name = "aspect_rules_js", version = "${TAG:1}")
 # Optionally you can pin a different node version:
 bazel_dep(name = "rules_nodejs", version = "5.8.2")
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
-node.toolchain(node_version = "16.9.0")
+node.toolchain(node_version = "16.14.2")
 #################################
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)

@@ -506,32 +506,32 @@ bn.js@^5.0.0, bn.js@^5.1.1:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.1.tgz#0bc527a6a0d18d0aa8d5b0538ce4a77dccfa7b70"
   integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
 
-botbuilder-stdlib@4.19.1-internal:
-  version "4.19.1-internal"
-  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.19.1-internal.tgz#2a53685531c09c12be53f5efe5b6f1b37eb972e7"
-  integrity sha512-JCv/fjeupUvxvwFEaS8HC8X7w9pg3Z+ULb3XfXchQDRNugNQHgGQ5gmB6HV+2XWobs9PsR0MbvQ62DP1HygiqQ==
+botbuilder-stdlib@4.19.3-internal:
+  version "4.19.3-internal"
+  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.19.3-internal.tgz#781a7671f4e07ae0efdf84035ca93c7973a2876d"
+  integrity sha512-iaJr+EwOhQDO2gYYijVXiH4ztJSXMtmJcezhoCS0f+i4yy49flSVdJlBw3bYknJFsZcRub8842ESPHwDiu6cZw==
 
-botframework-connector@4.19.1:
-  version "4.19.1"
-  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.19.1.tgz#1658e9b318ccd0c083a73a5e08a6160979180a6a"
-  integrity sha512-PhbCynWfQKIGQGBXIcnMmMfrWbSunzMACMJF2NwmKzOl61nBXrGV3IUVjLJhJWQppr1VZ3uYCYbUyVC0GiuAzA==
+botframework-connector@4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.19.3.tgz#b652ea4a6c762f3b56bac604b2abe606781d586f"
+  integrity sha512-WjzNHioJpOigfuEJ20PqQjNMc7KeBRgFjWMIqW5A+xmiMHqxVUIU57tUdE2Xe7yI7glDsLDHTjY0tFQxAKXHdQ==
   dependencies:
     "@azure/identity" "^2.0.4"
     "@azure/ms-rest-js" "^2.6.1"
     adal-node "0.2.3"
     axios "^0.25.0"
     base64url "^3.0.0"
-    botbuilder-stdlib "4.19.1-internal"
-    botframework-schema "4.19.1"
+    botbuilder-stdlib "4.19.3-internal"
+    botframework-schema "4.19.3"
     cross-fetch "^3.0.5"
     jsonwebtoken "^9.0.0"
     rsa-pem-from-mod-exp "^0.8.4"
     zod "~1.11.17"
 
-botframework-schema@4.19.1:
-  version "4.19.1"
-  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.19.1.tgz#2c6c7a5bffb7f4b353897cbc8f4063beb39e2090"
-  integrity sha512-unCeIw8PBhBCLyu6VUIpi42s4vKGvzWpYtOjW1cp27mkZIrAeXrZZ/eNBKhu30xuAOZkr3sORsTxKeu42F1pZQ==
+botframework-schema@4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.19.3.tgz#4f3992f09d468299f8bd6263a01a1bbaf3cd8d01"
+  integrity sha512-MjAJe4Y2nYsyDIiVeA4YLKbzzZTGesdyV7paI4ojbVS9vWR3i8eXQWKaCYcXUN3FC4+BCv8K/P5pTg99w0Y6Ag==
   dependencies:
     uuid "^8.3.2"
     zod "~1.11.17"
