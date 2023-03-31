@@ -86,7 +86,7 @@ If stamp attribute is True, stamp variable substitutions are supported with {{ST
             There are overlayed on top of substitutions when stamping is enabled
             for the target.
             
-            Subtitutions can contain $(execpath :target) and $(rootpath :target)
+            Substitutions can contain $(execpath :target) and $(rootpath :target)
             expansions, $(MAKEVAR) expansions and {{STAMP_VAR}} expansions when
             stamping is enabled for the target.
             """,
@@ -94,7 +94,7 @@ If stamp attribute is True, stamp variable substitutions are supported with {{ST
         "substitutions": attr.string_dict(
             doc = """Mapping of strings to substitutions.
             
-            Subtitutions can contain $(execpath :target) and $(rootpath :target)
+            Substitutions can contain $(execpath :target) and $(rootpath :target)
             expansions, $(MAKEVAR) expansions and {{STAMP_VAR}} expansions when
             stamping is enabled for the target.
             """,
