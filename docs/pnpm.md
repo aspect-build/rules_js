@@ -86,7 +86,7 @@ NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `r
 For now, you can emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute
 of `npm_translate_lock`.
 
-## Creating and the pnpm-lock.yaml file
+## Creating and updating the pnpm-lock.yaml file
 
 ### Manual (typical)
 
