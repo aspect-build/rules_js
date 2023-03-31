@@ -32,6 +32,10 @@ def js_binary(**kwargs):
             "@aspect_rules_js//js/private:enable_runfiles": True,
             "//conditions:default": False,
         }),
+        is_windows_host = select({
+            str(Label("@bazel_tools//src/conditions:host_windows")): True,
+            "//conditions:default": False,
+        }),
         **kwargs
     )
 
@@ -41,11 +45,23 @@ def js_test(**kwargs):
             "@aspect_rules_js//js/private:enable_runfiles": True,
             "//conditions:default": False,
         }),
+        is_windows_host = select({
+            str(Label("@bazel_tools//src/conditions:host_windows")): True,
+            "//conditions:default": False,
+        }),
+        **kwargs
+    )
+
+def js_library(**kwargs):
+    _js_library(
+        is_windows_host = select({
+            str(Label("@bazel_tools//src/conditions:host_windows")): True,
+            "//conditions:default": False,
+        }),
         **kwargs
     )
 
 js_run_devserver = _js_run_devserver
 js_filegroup = _js_filegroup
-js_library = _js_library
 js_run_binary = _js_run_binary
 js_image_layer = _js_image_layer

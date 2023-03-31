@@ -205,6 +205,14 @@ _ATTRS = {
         to use npm.
         """,
     ),
+    "is_windows_host": attr.bool(
+        mandatory = True,
+        doc = """Whether running on windows or not.
+
+        Typical usage of this rule is via a macro which automatically sets this
+        attribute based on a `config_setting` rule.
+        """,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -225,7 +233,6 @@ _ATTRS = {
         default = Label("//js/private:npm_wrapper.bat"),
         allow_single_file = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
         default = ["@aspect_rules_js//js/private/node-patches:fs.js"],
@@ -390,7 +397,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
     return launcher, toolchain_files
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+    is_windows = ctx.attr.is_windows_host
 
     if is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")

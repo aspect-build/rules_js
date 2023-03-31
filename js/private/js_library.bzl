@@ -88,7 +88,14 @@ runtime dependency on this target.
         providers = [JsInfo],
     ),
     "data": JS_LIBRARY_DATA_ATTR,
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
+    "is_windows_host": attr.bool(
+        mandatory = True,
+        doc = """Whether running on windows or not.
+
+        Typical usage of this rule is via a macro which automatically sets this
+        attribute based on a `config_setting` rule.
+        """,
+    ),
 }
 
 def _gather_sources_and_declarations(ctx, targets, files, is_windows = False):
@@ -183,7 +190,7 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
     return (sources, declarations)
 
 def _js_library_impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+    is_windows = ctx.attr.is_windows_host
 
     sources, declarations = _gather_sources_and_declarations(
         ctx = ctx,

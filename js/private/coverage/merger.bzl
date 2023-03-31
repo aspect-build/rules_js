@@ -6,11 +6,18 @@ load("//js/private:bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _ATTRS = {
     "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
+    "is_windows_host": attr.bool(
+        mandatory = True,
+        doc = """Whether running on windows or not.
+
+        Typical usage of this rule is via a macro which automatically sets this
+        attribute based on a `config_setting` rule.
+        """,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private/coverage:coverage.sh.tpl"),
         allow_single_file = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
 # Do the opposite of _to_manifest_path in
@@ -21,7 +28,7 @@ def _target_tool_short_path(workspace_name, path):
     return (workspace_name + "/../" + path[len("external/"):]) if path.startswith("external/") else path
 
 def _impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+    is_windows = ctx.attr.is_windows_host
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
     # Create launcher
@@ -50,7 +57,7 @@ def _impl(ctx):
         runfiles = runfiles,
     )
 
-coverage_merger = rule(
+_coverage_merger = rule(
     implementation = _impl,
     attrs = _ATTRS,
     executable = True,
@@ -59,3 +66,12 @@ coverage_merger = rule(
         "@rules_nodejs//nodejs:toolchain_type",
     ],
 )
+
+def coverage_merger(**kwargs):
+    _coverage_merger(
+        is_windows_host = select({
+            str(Label("@bazel_tools//src/conditions:host_windows")): True,
+            "//conditions:default": False,
+        }),
+        **kwargs
+    )
