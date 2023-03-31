@@ -51,12 +51,68 @@ def _pnpm_name(name, version):
 
 def _parse_pnpm_name(pnpmName):
     # Parse a name/version or @scope/name/version string and return
-    # a (name, version) tuple
+    # a (name, version) tuple. This format is found in pnpm lock file v5.
     segments = pnpmName.rsplit("/", 1)
     if len(segments) != 2:
         msg = "unexpected pnpm versioned name {}".format(pnpmName)
         fail(msg)
     return (segments[0], segments[1])
+
+def _convert_pnpm_v6_version_peer_dep(version):
+    # Covert a pnpm lock file v6 version string of the format
+    # version(@scope/peer@version)(@scope/peer@version)
+    # to a version_peer_version that is compatible with rules_js.
+    if version[-1] == ")":
+        # There is a peer dep if the string ends with ")"
+        peer_dep_index = version.find("(")
+        peer_dep = version[peer_dep_index:]
+        version = version[0:peer_dep_index] + _sanitize_string(peer_dep)
+        version = version.rstrip("_")
+    return version
+
+def _convert_pnpm_v6_package_name(package_name):
+    # Covert a pnpm lock file v6 name/version string of the format
+    # @scope/name@version(@scope/name@version)(@scope/name@version)
+    # to a @scope/name/version_peer_version that is compatible with rules_js.
+    if package_name[0].isdigit():
+        return _convert_pnpm_v6_version_peer_dep(package_name)
+    elif package_name.startswith("/"):
+        package_name = _convert_pnpm_v6_version_peer_dep(package_name)
+        segments = package_name.rsplit("@", 1)
+        if len(segments) != 2:
+            msg = "unexpected pnpm versioned name {}".format(package_name)
+            fail(msg)
+        return "%s/%s" % (segments[0], segments[1])
+    else:
+        return _convert_pnpm_v6_version_peer_dep(package_name)
+
+def _convert_v6_importers(importers):
+    # Convert pnpm lockfile v6 importers to a rules_js compatible format.
+    result = {}
+    for import_path, importer in importers.items():
+        result[import_path] = {
+            "specifiers": {},
+            "dependencies": {},
+            "optionalDependencies": {},
+            "devDependencies": {},
+        }
+        for key in ["dependencies", "optionalDependencies", "devDependencies"]:
+            deps = importer.get(key, {})
+            for name, attributes in deps.items():
+                result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
+    return result
+
+def _convert_v6_packages(packages):
+    # Convert pnpm lockfile v6 importers to a rules_js compatible format.
+    result = {}
+    for package, package_info in packages.items():
+        new_deps = {}
+        deps = package_info.get("dependencies", {})
+        for dep_name, dep_version in deps.items():
+            new_deps[dep_name] = _convert_pnpm_v6_package_name(dep_version)
+        package_info["dependencies"] = new_deps
+        result[_convert_pnpm_v6_package_name(package)] = package_info
+    return result
 
 def _parse_pnpm_lock(content):
     """Parse the content of a pnpm-lock.yaml file.
@@ -73,7 +129,15 @@ def _parse_pnpm_lock(content):
         fail("lockfile should be a starlark dict")
     if "lockfileVersion" not in parsed.keys():
         fail("expected lockfileVersion key in lockfile")
-    _assert_lockfile_version(parsed["lockfileVersion"])
+
+    # Lockfile version may be a float such as 5.4 or a string such as '6.0'
+    lockfile_version = str(parsed["lockfileVersion"])
+    lockfile_version = lockfile_version.lstrip("'")
+    lockfile_version = lockfile_version.rstrip("'")
+    lockfile_version = lockfile_version.lstrip("\"")
+    lockfile_version = lockfile_version.rstrip("\"")
+    lockfile_version = float(lockfile_version)
+    _assert_lockfile_version(lockfile_version)
 
     importers = parsed.get("importers", {
         ".": {
@@ -86,6 +150,11 @@ def _parse_pnpm_lock(content):
 
     packages = parsed.get("packages", {})
 
+    if lockfile_version >= 6.0:
+        # special handling for lockfile v6 which had breaking changes
+        importers = _convert_v6_importers(importers)
+        packages = _convert_v6_packages(packages)
+
     patched_dependencies = parsed.get("patchedDependencies", {})
 
     return importers, packages, patched_dependencies
@@ -97,8 +166,9 @@ def _assert_lockfile_version(version, testonly = False):
     # Restrict the supported lock file versions to what this code has been tested with:
     #   5.3 - pnpm v6.x.x
     #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
+    #   6.0 - pnpm v8.0.0 bumped the lockfile version to 6.0; this included breaking changes
     min_lock_version = 5.3
-    max_lock_version = 5.4
+    max_lock_version = 6.0
     msg = None
 
     if version < min_lock_version:
