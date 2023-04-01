@@ -88,10 +88,9 @@ runtime dependency on this target.
         providers = [JsInfo],
     ),
     "data": JS_LIBRARY_DATA_ATTR,
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-def _gather_sources_and_declarations(ctx, targets, files, is_windows = False):
+def _gather_sources_and_declarations(ctx, targets, files):
     """Gathers sources and declarations from a list of targets
 
     Args:
@@ -104,8 +103,6 @@ def _gather_sources_and_declarations(ctx, targets, files, is_windows = False):
         files: List of files to gather as sources and declarations.
 
             These typically come from the `srcs` and/or `data` attributes of a rule
-
-        is_windows: If true, an cmd.exe actions are created when copying files to the output tree so there is no bash dependency
 
     Returns:
         Sources & declaration files depsets in the sequence (sources, declarations)
@@ -143,7 +140,7 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
                     this_target = ctx.label,
                 )
                 fail(msg)
-            file = copy_file_to_bin_action(ctx, file, is_windows = is_windows)
+            file = copy_file_to_bin_action(ctx, file)
 
         if file.is_directory:
             # assume a directory contains declarations since we can't know that it doesn't
@@ -183,20 +180,16 @@ target in {file_basename}'s package and add that target to the deps of {this_tar
     return (sources, declarations)
 
 def _js_library_impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
-
     sources, declarations = _gather_sources_and_declarations(
         ctx = ctx,
         targets = ctx.attr.srcs,
         files = ctx.files.srcs,
-        is_windows = is_windows,
     )
 
     additional_sources, additional_declarations = _gather_sources_and_declarations(
         ctx = ctx,
         targets = ctx.attr.declarations,
         files = ctx.files.declarations,
-        is_windows = is_windows,
     )
 
     sources = depset(transitive = [sources, additional_sources])
