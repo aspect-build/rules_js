@@ -176,7 +176,7 @@ jobs:
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
-            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            # Checks-out your repository under github.workspace, so your job can access it
             - uses: actions/checkout@v3
 
             # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
@@ -208,7 +208,12 @@ jobs:
               # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
               # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
               # then use .bazelversion to determine which Bazel version to use
-              run: echo "${{ matrix.bazelversion }}" > .bazelversion
+              run: |
+                  echo "${{ matrix.bazelversion }}" > .bazelversion
+                  BAZEL_VERSION=${{ matrix.bazelversion }}
+                  if [ ${BAZEL_VERSION::1} != "6" ]; then
+                    cat ${{ github.workspace }}/.github/workflows/ci.bazel5.bazelrc >> ${{ github.workspace }}/.github/workflows/ci.bazelrc
+                  fi
 
             - name: Write EngFlow credentials
               # Writes EngFlow credential files for RBE configurations
@@ -240,7 +245,7 @@ jobs:
             - name: bazel test //...
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
+                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
               env:
                   # Bazelisk will download bazel to here
@@ -268,7 +273,7 @@ jobs:
               if: matrix.config == 'local'
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=$GITHUB_WORKSPACE/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} --instrument_test_targets //...
+                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} --instrument_test_targets //...
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo

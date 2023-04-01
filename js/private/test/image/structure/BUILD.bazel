@@ -71,9 +71,13 @@ write_source_files(
         # CI failures. Looks like a non-determinism like a timestamp is getting in there.
         # "digests.sum": ":digests_generated.sum",
     },
-    # mode bit on files aren't stable between RBE and Local since RBE isn't aware of git which tracks permissions for files.
-    # we don't care about unstable inputs because it's not our responsibility to keep them stable which would expand api surface for js_image_layer
-    tags = ["no-remote-exec"],
+    tags = [
+        # mode bit on files aren't stable between RBE and Local since RBE isn't aware of git which tracks permissions for files.
+        # we don't care about unstable inputs because it's not our responsibility to keep them stable which would expand api surface for js_image_layer
+        "no-remote-exec",
+        # node-patches_legacy is used with Bazel 5 which changes the output; no need for that test coverage
+        "no-bazel-5",
+    ],
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],

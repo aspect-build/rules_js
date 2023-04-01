@@ -4,6 +4,9 @@ import %workspace%/.bazelrc.common
 # import bazelrc settings that are needed for testing in this repository
 import %workspace%/.bazelrc.testing
 
+# Use a try-import for Bazel 6 settings since this repository is also tested against Bazel 5 on CI
+try-import %workspace%/.bazelrc.bazel6
+
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
 # This needs to be last statement in this
