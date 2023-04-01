@@ -440,8 +440,8 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     files = [bash_launcher] + toolchain_files
     if ctx.attr.copy_data_to_bin:
-        files.append(copy_file_to_bin_action(ctx, entry_point, is_windows = is_windows))
-        files.extend(copy_files_to_bin_actions(ctx, ctx.files.data, is_windows = is_windows))
+        files.append(copy_file_to_bin_action(ctx, entry_point))
+        files.extend(copy_files_to_bin_actions(ctx, ctx.files.data))
     else:
         files.append(entry_point)
         files.extend(ctx.files.data)
