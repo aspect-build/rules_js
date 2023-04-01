@@ -634,23 +634,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             }
             if (isEscape(loc, next)) {
                 // this hop takes us out of the guard
-                return nextHop(next, (next2: string | false) => {
-                    if (!next2) {
-                        // the chain is done
-                        return cb(loc)
-                    }
-                    const maybe = path.resolve(
-                        path.dirname(loc),
-                        path.relative(path.dirname(next), next2)
-                    )
-                    if (!isEscape(loc, maybe)) {
-                        // outside of the guard is a symlink but it is a relative link path
-                        // we can map within the guard so return that
-                        return cb(maybe)
-                    }
-                    // outside of the guard is a symlink that is not mappable inside the guard
-                    return cb(loc)
-                })
+                return cb(loc)
             }
             return cb(next)
         })
@@ -666,21 +650,6 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         }
         if (isEscape(loc, next)) {
             // this hop takes us out of the guard
-            const next2: string | false = nextHopSync(next)
-            if (!next2) {
-                // the chain is done
-                return loc
-            }
-            const maybe = path.resolve(
-                path.dirname(loc),
-                path.relative(path.dirname(next), next2)
-            )
-            if (!isEscape(loc, maybe)) {
-                // outside of the guard is a symlink but it is a relative link path
-                // we can map within the guard so return that
-                return maybe
-            }
-            // outside of the guard is a symlink that is not mappable inside the guard
             return loc
         }
         return next
@@ -735,26 +704,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                         : isEscape(loc, next)
                 ) {
                     // this hop takes us out of the guard
-                    return nextHop(next, (next2) => {
-                        if (!next2) {
-                            // the chain is done
-                            return cb(null, loc)
-                        }
-                        const maybe = path.resolve(
-                            path.dirname(loc),
-                            path.relative(path.dirname(next), next2)
-                        )
-                        if (isEscape(loc, maybe)) {
-                            // outside of the guard is a symlink that is not mappable inside the guard;
-                            // call the unguarded realpath which will throw if the link is dangling;
-                            // if it doesn't throw then return the last path within the guard
-                            return origRealpath(start, (err, _) => {
-                                if (err) return cb(err)
-                                return cb(null, loc)
-                            })
-                        }
-                        return oneHop(maybe, cb)
-                    })
+                    return cb(null, loc)
                 }
                 oneHop(next, cb)
             })
@@ -799,25 +749,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     : isEscape(loc, next)
             ) {
                 // this hop takes us out of the guard
-                const next2: string | false = nextHopSync(next)
-                if (!next2) {
-                    // the chain is done
-                    return loc
-                }
-                const maybe = path.resolve(
-                    path.dirname(loc),
-                    path.relative(path.dirname(next), next2)
-                )
-                if (isEscape(loc, maybe)) {
-                    // outside of the guard is a symlink that is not mappable inside the guard;
-                    // call the unguarded realpath which will throw if the link is dangling;
-                    // if it doesn't throw then return the last path within the guard
-                    origRealpathSync(start)
-                    return loc
-                }
-                next = maybe
-                // outside of the guard is a symlink but it is a relative link path
-                // we can map within the guard so lets iterate one more time
+                return loc
             }
         }
     }
