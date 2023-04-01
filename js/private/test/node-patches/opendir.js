@@ -202,18 +202,18 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'execroot', 'link')
                 )
 
-                // create sandbox
+                // create sandbox; relative symlinks are maintained (assume Bazel 6 with allow unresolved symlinks)
                 fs.symlinkSync(
                     path.join(fixturesDir, 'execroot', 'file'),
                     path.join(fixturesDir, 'sandbox', 'file')
                 )
                 fs.symlinkSync(
-                    path.join(fixturesDir, 'execroot', 'link'),
-                    path.join(fixturesDir, 'sandbox', 'link')
+                    path.join(fixturesDir, 'sandbox', 'file'),
+                    path.join(fixturesDir, 'sandbox', 'link2')
                 )
                 fs.symlinkSync(
-                    path.join(fixturesDir, 'execroot', 'link2'),
-                    path.join(fixturesDir, 'sandbox', 'link2')
+                    path.join(fixturesDir, 'sandbox', 'link2'),
+                    path.join(fixturesDir, 'sandbox', 'link')
                 )
 
                 const patchedFs = Object.assign({}, fs)
