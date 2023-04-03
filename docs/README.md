@@ -195,17 +195,19 @@ typescript_bin.tsc(
 )
 ```
 
+Each bin exposes three rules, one for each Bazel command ("verb"): build, test and run - each aligning with the corresponding [js_run_binary](./js_run_binary.md), [js_test](#js_test) and [js_binary](./js_binary.md) rule APIs.
+
+For example:
+
+| Rule         | Underlying Rule | Invoked with  | To              |
+| ------------ | --------------- | ------------- | --------------- |
+| `foo`        | `js_run_binary` | `bazel build` | produce outputs |
+| `foo_binary` | `js_binary`     | `bazel run`   | side-effects    |
+| `foo_test`   | `js_test`       | `bazel test`  | assert exit `0` |
+
 > Note: this doesn't cause an eager fetch!
 > Bazel doesn't download the typescript package when loading this file, so you can safely write this
 > even in a BUILD.bazel file that includes unrelated rules.
-
-Each bin exposes three rules, one for each Bazel command ("verb"):
-
-| Use          | With          | To              |
-| ------------ | ------------- | --------------- |
-| `foo`        | `bazel build` | produce outputs |
-| `foo_binary` | `bazel run`   | side-effects    |
-| `foo_test`   | `bazel test`  | assert exit `0` |
 
 To inspect what's in the `@npm` workspace, start with a `bazel query` like the following:
 
