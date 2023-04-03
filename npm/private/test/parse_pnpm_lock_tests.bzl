@@ -87,26 +87,27 @@ packages:
     expected = (
         {
             ".": {
+                "specifiers": {},
                 "dependencies": {
                     "@aspect-test/a": "5.0.0",
                 },
-                "devDependencies": {},
                 "optionalDependencies": {},
-                "specifiers": {},
+                "devDependencies": {},
             },
         },
         {
             "/@aspect-test/a/5.0.0": {
+                "resolution": {
+                    "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
+                },
+                "hasBin": True,
                 "dependencies": {
                     "@aspect-test/b": "5.0.0",
                     "@aspect-test/c": "1.0.0",
                     "@aspect-test/d": "2.0.0_at_aspect-test_c_1.0.0",
                 },
                 "dev": False,
-                "hasBin": True,
-                "resolution": {
-                    "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
-                },
+                "optionalDependencies": {},
             },
         },
         {},

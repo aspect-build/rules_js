@@ -66,6 +66,11 @@ def _convert_pnpm_v6_version_peer_dep(version):
         # There is a peer dep if the string ends with ")"
         peer_dep_index = version.find("(")
         peer_dep = version[peer_dep_index:]
+        if len(peer_dep) > 32:
+            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
+            # peer deps so we must hash here to prevent extremely long file paths that lead to
+            # "File name too long) build failures.
+            peer_dep = "_" + _hash(peer_dep)
         version = version[0:peer_dep_index] + _sanitize_string(peer_dep)
         version = version.rstrip("_")
     return version
@@ -106,11 +111,17 @@ def _convert_v6_packages(packages):
     # Convert pnpm lockfile v6 importers to a rules_js compatible format.
     result = {}
     for package, package_info in packages.items():
-        new_deps = {}
-        deps = package_info.get("dependencies", {})
-        for dep_name, dep_version in deps.items():
-            new_deps[dep_name] = _convert_pnpm_v6_package_name(dep_version)
-        package_info["dependencies"] = new_deps
+        # dependencies
+        dependencies = {}
+        for dep_name, dep_version in package_info.get("dependencies", {}).items():
+            dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
+        package_info["dependencies"] = dependencies
+
+        # optionalDependencies
+        optional_dependencies = {}
+        for dep_name, dep_version in package_info.get("optionalDependencies", {}).items():
+            optional_dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
+        package_info["optionalDependencies"] = optional_dependencies
         result[_convert_pnpm_v6_package_name(package)] = package_info
     return result
 
