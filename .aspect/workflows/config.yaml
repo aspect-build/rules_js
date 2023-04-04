@@ -40,6 +40,11 @@ workspaces:
         tasks:
             buildifier:
                 without: true
+    e2e/npm_translate_lock_subdir_patch:
+        icon: npm
+        tasks:
+            buildifier:
+                without: true
     # Requires an auth token
     # - e2e/npm_translate_lock_auth:
     e2e/npm_translate_package_lock:
