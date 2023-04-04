@@ -352,7 +352,7 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
 
         # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
-            patch_path = "//:%s" % patched_dependencies.get(friendly_name).get("path")
+            patch_path = "//%s:%s" % (attr.pnpm_lock.package, patched_dependencies.get(friendly_name).get("path"))
             patches.insert(0, patch_path)
 
         # Prevent the patch string labels from going through further repo mapping:

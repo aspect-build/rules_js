@@ -182,7 +182,7 @@ def _init_patches_labels(priv, rctx, label_store):
 def _init_patched_dependencies_labels(priv, rctx, label_store):
     # Add patches from `pnpm.patchedDependencies`
     root_package_json = _load_root_package_json(priv, rctx, label_store)
-    patches = ["//:%s" % patch for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
+    patches = ["//%s:%s" % (label_store.label("pnpm_lock").package, patch) for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
 
     # Convert patch label strings to labels
     patches = [rctx.attr.pnpm_lock.relative(p) for p in patches]
