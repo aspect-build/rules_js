@@ -119,6 +119,8 @@ jobs:
               run: echo "folder=e2e/vendored_tarfile" >> $GITHUB_OUTPUT
             - id: worker
               run: echo "folder=e2e/worker" >> $GITHUB_OUTPUT
+            - id: split_coverage
+              run: echo "folder=e2e/split_coverage" >> $GITHUB_OUTPUT
         outputs:
             # Will look like [".", "e2e/bzlmod", ...]
             folders: ${{ toJSON(steps.*.outputs.folder) }}

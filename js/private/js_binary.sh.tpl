@@ -308,6 +308,10 @@ export JS_BINARY__FS_PATCH_ROOTS
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
   logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
+	if [ ${SPLIT_COVERAGE_POST_PROCESSING:0} == 1 ]; then
+	  logf_debug "split coverage post processing is requested. writing pwd to ${COVERAGE_DIR}/pwd"
+		echo -n "$PWD" > "${COVERAGE_DIR}/pwd"
+	fi
   export NODE_V8_COVERAGE=${COVERAGE_DIR}
 fi
 

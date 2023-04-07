@@ -1,0 +1,7 @@
+# import common bazelrc shared with e2e workspaces
+import %workspace%/../../.bazelrc.common
+
+coverage --sandbox_debug
+coverage --experimental_split_coverage_postprocessing
+coverage --experimental_fetch_all_coverage_outputs
+coverage --instrument_test_targets
