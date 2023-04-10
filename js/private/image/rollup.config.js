@@ -8,7 +8,12 @@ export default {
         resolve(),
         commonjs(),
         ts({
+            sourceMap: true,
+            inlineSourceMap: true,
             target: 'es2022',
         }),
     ],
+    output: {
+        sourcemap: 'inline',
+    },
 }
