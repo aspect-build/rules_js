@@ -19,6 +19,7 @@ ext = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "ext")
 ext.host()
 
 use_repo(ext, "aspect_bazel_lib_host")
+use_repo(ext, "coreutils_toolchains")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 
