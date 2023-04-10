@@ -9569,6 +9569,9 @@ var pack$1 = function pack (opts) {
 var pack = pack$1;
 
 const MTIME = new Date(0);
+const MODE_FOR_DIR = 0o755;
+const MODE_FOR_FILE = 0o555;
+const MODE_FOR_SYMLINK = 0o775;
 function findKeyByValue(entries, value) {
     for (const [key, { dest: val }] of Object.entries(entries)) {
         if (val == value) {
@@ -9613,7 +9616,7 @@ function add_parents(name, pkg, existing_paths) {
     const stats = {
         // this is an intermediate directory and bazel does not allow specifying
         // modes for intermediate directories.
-        mode: 0o755,
+        mode: MODE_FOR_DIR,
         mtime: MTIME,
     };
     for (const part of segments) {
@@ -9698,7 +9701,9 @@ async function build(entries, appLayerPath, nodeModulesLayerPath, compression) {
         add_parents(key, output, existing_paths);
         // A source file from workspace, not an output of a target.
         if (is_source) {
-            const stats = await stat(dest);
+            const originalStat = await stat(dest);
+            // use stable mode bits instead of preserving the one from file.
+            const stats = { mode: MODE_FOR_FILE, mtime: MTIME, size: originalStat.size };
             await add_file(key, createReadStream(dest), output, stats);
             continue;
         }
@@ -9715,12 +9720,17 @@ async function build(entries, appLayerPath, nodeModulesLayerPath, compression) {
             // well use `0o755` to allow owner&group to `rwx` and others `rx`
             // see: https://chmodcommand.com/chmod-775/
             // const stats = await stat(dest)
-            const stats = { mode: 0o775, mtime: MTIME };
+            const stats = { mode: MODE_FOR_SYMLINK, mtime: MTIME };
             const linkname = findKeyByValue(entries, output_path);
             add_symlink(key, linkname, output, stats);
         }
         else {
-            const stats = await stat(dest);
+            // Due to filesystems setting different bits depending on the os we have to opt-in 
+            // to use a stable mode for files.
+            // In the future, we might want to hand off fine-grained control of these to users
+            // see: https://chmodcommand.com/chmod-0555/
+            const originalStat = await stat(dest);
+            const stats = { mode: MODE_FOR_FILE, mtime: MTIME, size: originalStat.size };
             let stream = createReadStream(dest);
             if (remove_non_hermetic_lines) {
                 const content = await readFile(dest);
