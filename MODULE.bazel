@@ -10,17 +10,20 @@ bazel_dep(name = "aspect_bazel_lib", version = "1.29.2")
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 bazel_dep(name = "rules_nodejs", version = "5.8.2")
 bazel_dep(name = "platforms", version = "0.0.4")
+
+####### Dev dependencies ########
+
 bazel_dep(name = "gazelle", version = "0.28.0", repo_name = "bazel_gazelle", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "6.0.0.1", dev_dependency = True)
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
 
-ext = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "ext")
+ext = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "ext", dev_dependency = True)
 
 ext.host()
 
 use_repo(ext, "aspect_bazel_lib_host")
 
-node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
 
 node.toolchain(
     node_version = "16.14.2"
@@ -36,7 +39,7 @@ use_repo(node, "nodejs_linux_s390x")
 use_repo(node, "nodejs_linux_ppc64le")
 use_repo(node, "nodejs_windows_amd64")
 
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
 
 pnpm.pnpm(
     name = "pnpm",
@@ -46,7 +49,7 @@ use_repo(pnpm, "pnpm")
 use_repo(pnpm, "pnpm__links")
 
 ############################################
-# Example npm dependencies
+# npm dependencies used by examples
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 
