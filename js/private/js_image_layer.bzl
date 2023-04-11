@@ -19,12 +19,9 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 _DOC = """Create container image layers from js_binary targets.
 
 By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
-However, this comes with a few quirks; the downstream rule, `oci_image` or `container_image` in this case,
-has to set proper `workdir` and `cmd` to make the container work.
-
-Usually, `cmd` needs to be set to **/** `[ root of <js_image_layer> ]` **/** `[ relative path to BUILD file from WORKSPACE or package_name() ] / [ name of <js_binary> ]`, 
-unless you have a launcher script that invokes the entry_point of the `js_binary`.
-
+This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
+A proper `cmd` usually looks like /`[ root of <js_image_layer> ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of <js_binary> ]`, 
+unless you have a launcher script that invokes the entry_point of the `js_binary` in a different path.
 On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles` suffix**. If `workdir` is not set correctly, some
 attributes such as `chdir` might not work properly.
 
