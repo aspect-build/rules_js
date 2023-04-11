@@ -18,7 +18,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """Create container image layers from js_binary targets.
 
-By design, js_image_layer doesn't have any preference over rule which assembles the container image. 
+By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
 However, this comes with a few quirks; the downstream rule, `oci_image` or `container_image` in this case,
 has to set proper `workdir` and `cmd` to make the container work.
 
