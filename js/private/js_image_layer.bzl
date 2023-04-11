@@ -23,7 +23,7 @@ However, this comes with a few quirks; the downstream rule, `oci_image` or `cont
 has to set proper `workdir` and `cmd` to make the container work.
 
 Usually, `cmd` needs to be set to **/** `[ root of <js_image_layer> ]` **/** `[ relative path to BUILD file from WORKSPACE or package_name() ] / [ name of <js_binary> ]`, 
-unless you have some other launcher script that invokes entrypoint of the `js_binary`.
+unless you have a launcher script that invokes the entry_point of the `js_binary`.
 
 On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles` suffix**. If `workdir` is not set correctly, some
 attributes such as `chdir` might not work properly.
