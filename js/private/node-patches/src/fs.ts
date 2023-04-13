@@ -63,7 +63,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     const origRealpathSync = fs.realpathSync.bind(fs)
     const origRealpathSyncNative = fs.realpathSync.native
 
-    const isEscape = escapeFunction(roots)
+    const { canEscape, isEscape } = escapeFunction(roots)
 
     // =========================================================================
     // fs.lstat
@@ -89,6 +89,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             }
 
             args[0] = path.resolve(args[0])
+
+            if (!canEscape(args[0])) {
+                // the file can not escaped the sandbox so there is nothing more to do
+                return cb(null, stats)
+            }
+
             return guardedReadLink(args[0], (str: string) => {
                 if (str != args[0]) {
                     // there are one or more hops within the guards so there is nothing more to do
@@ -123,6 +129,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         }
 
         args[0] = path.resolve(args[0])
+
+        if (!canEscape(args[0])) {
+            // the file can not escaped the sandbox so there is nothing more to do
+            return stats
+        }
+
         const guardedReadLink: string = guardedReadLinkSync(args[0])
         if (guardedReadLink != args[0]) {
             // there are one or more hops within the guards so there is nothing more to do
@@ -762,48 +774,65 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 // =========================================================================
 
 export function isSubPath(parent: string, child: string): boolean {
-    return !path.relative(parent, child).startsWith('..')
+    return (
+        parent === child ||
+        (child[parent.length] === path.sep && child.startsWith(parent))
+    )
 }
 
-export const escapeFunction = (_roots: string[]) => {
-    // ensure roots are always absolute
-    _roots = _roots.map((root) => path.resolve(root))
-    function _isEscape(
+export function escapeFunction(_roots: string[]) {
+    // Ensure roots are always absolute.
+    // Sort to ensure escaping multiple roots chooses the longest one.
+    const defaultRoots = _roots
+        .map((root) => path.resolve(root))
+        .sort((a, b) => b.length - a.length)
+
+    function fs_isEscape(
         linkPath: string,
         linkTarget: string,
-        roots = _roots
+        roots = defaultRoots
     ): false | string {
         // linkPath is the path of the symlink file itself
         // linkTarget is a path that the symlink points to one or more hops away
+        // linkTarget must already be normalized
 
         if (!path.isAbsolute(linkPath)) {
             linkPath = path.resolve(linkPath)
+        } else {
+            linkPath = path.normalize(linkPath)
         }
 
-        if (!path.isAbsolute(linkTarget)) {
-            linkTarget = path.resolve(linkTarget)
-        }
-
-        let escapedRoot = undefined
         for (const root of roots) {
             // If the link is in the root check if the realPath has escaped
-            if (isSubPath(root, linkPath) || linkPath == root) {
-                if (!isSubPath(root, linkTarget) && linkTarget != root) {
-                    if (!escapedRoot || escapedRoot.length < root.length) {
-                        // if escaping multiple roots then choose the longest one
-                        escapedRoot = root
-                    }
-                }
+            if (isSubPath(root, linkPath) && !isSubPath(root, linkTarget)) {
+                return root
             }
-        }
-        if (escapedRoot) {
-            return escapedRoot
         }
 
         return false
     }
 
-    return _isEscape
+    function fs_canEscape(
+        maybeLinkPath: string,
+        roots = defaultRoots
+    ): boolean {
+        // maybeLinkPath is the path which may be a symlink
+        // maybeLinkPath must already be normalized
+
+        for (const root of roots) {
+            // If the link is in the root check if the realPath has escaped
+            if (isSubPath(root, maybeLinkPath)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    return {
+        isEscape: fs_isEscape,
+        canEscape: fs_canEscape,
+    }
 }
 
 function once<T>(fn: (...args: unknown[]) => T) {
@@ -832,7 +861,7 @@ function once<T>(fn: (...args: unknown[]) => T) {
 function patchDirent(dirent: Dirent | any, stat: Stats | any): void {
     // add all stat is methods to Dirent instances with their result.
     for (const i in stat) {
-        if (i.indexOf('is') === 0 && typeof stat[i] === 'function') {
+        if (i.startsWith('is') && typeof stat[i] === 'function') {
             //
             const result = stat[i]()
             if (result) dirent[i] = () => true
