@@ -151,9 +151,20 @@ describe('testing lstat', async () => {
                     brokenLinkPath
                 )
 
-                let stat = await patchedFs.promises.lstat(brokenLinkPath)
                 assert.ok(
-                    stat.isSymbolicLink(),
+                    patchedFs.lstatSync(brokenLinkPath).isSymbolicLink(),
+                    'if a symlink is broken but is escaping return it as a link.'
+                )
+                assert.ok(
+                    (
+                        await util.promisify(patchedFs.lstat)(brokenLinkPath)
+                    ).isSymbolicLink(),
+                    'if a symlink is broken but is escaping return it as a link.'
+                )
+                assert.ok(
+                    (
+                        await patchedFs.promises.lstat(brokenLinkPath)
+                    ).isSymbolicLink(),
                     'if a symlink is broken but is escaping return it as a link.'
                 )
 
