@@ -25,6 +25,11 @@ def _get_functions_under_test_and_their_args():
         },
     }
 
+def _get_properties_under_test():
+    return {
+        "rollup_path": "dist/bin/rollup",
+    }
+
 def _target_names_used_for_test():
     return [kwargs["name"] for _, kwargs in _get_functions_under_test_and_their_args().items()]
 
@@ -36,11 +41,17 @@ def test_only_expected_bin_struct_methods(env, bin_struct):
     a new example usecase or removed.
     """
 
-    relevant_methods = [m for m in sorted(dir(bin_struct)) if m.startswith("rollup")]
+    relevant_methods = [m for m in sorted(dir(bin_struct)) if m.startswith("rollup") and not m.endswith("_path")]
+    relavent_properties = {
+        k: getattr(bin_struct, k)
+        for k in sorted(dir(bin_struct))
+        if k.endswith("_path")
+    }
 
     # If new generated methods are added to the package_json.bzl file, then the tests here will need
     # to be updated to call those macros.
     loadingtest.equals(env, "only_expected_methods", sorted(_get_functions_under_test_and_their_args().keys()), sorted(relevant_methods))
+    loadingtest.equals(env, "only_expected_properties", _get_properties_under_test(), relavent_properties)
 
 # buildifier: disable=function-docstring-args
 def test_intermediate_targets_tagged_manual(env):
