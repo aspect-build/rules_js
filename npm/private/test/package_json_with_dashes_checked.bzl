@@ -70,6 +70,7 @@ def bin_factory(link_root_name):
         webpack_bundle_analyzer = lambda name, **kwargs: _webpack_bundle_analyzer_internal(name, link_root_name = link_root_name, **kwargs),
         webpack_bundle_analyzer_test = lambda name, **kwargs: _webpack_bundle_analyzer_test_internal(name, link_root_name = link_root_name, **kwargs),
         webpack_bundle_analyzer_binary = lambda name, **kwargs: _webpack_bundle_analyzer_binary_internal(name, link_root_name = link_root_name, **kwargs),
+        webpack_bundle_analyzer_path = "lib/bin/analyzer.js",
     )
 
 bin = bin_factory("node_modules")

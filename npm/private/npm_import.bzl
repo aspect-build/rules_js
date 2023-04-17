@@ -529,8 +529,10 @@ def _impl(rctx):
                 bin_struct_fields.append(
                     """        {bin_name} = lambda name, **kwargs: _{bin_name}_internal(name, link_root_name = link_root_name, **kwargs),
         {bin_name}_test = lambda name, **kwargs: _{bin_name}_test_internal(name, link_root_name = link_root_name, **kwargs),
-        {bin_name}_binary = lambda name, **kwargs: _{bin_name}_binary_internal(name, link_root_name = link_root_name, **kwargs),""".format(
+        {bin_name}_binary = lambda name, **kwargs: _{bin_name}_binary_internal(name, link_root_name = link_root_name, **kwargs),
+        {bin_name}_path = "{bin_path}",""".format(
                         bin_name = sanitized_bin_name,
+                        bin_path = bins[bin_name],
                     ),
                 )
 
