@@ -18,7 +18,7 @@ js_binary(
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action", "copy_files_to_bin_actions")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_binary_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
@@ -72,11 +72,8 @@ _ATTRS = {
         The transitive closure of the `data` dependencies will be available in
         the .runfiles folder for this binary/test.
 
-        You can use the `@bazel/runfiles` npm library to access these files
-        at runtime.
-
-        npm packages are also linked into the `.runfiles/node_modules` folder
-        so they may be resolved directly from runfiles.
+        NB: `data` files are copied to the Bazel output tree before being passed
+        as inputs to runfiles. See `copy_data_to_bin` docstring for more info.
         """,
     ),
     "entry_point": attr.label(
@@ -178,6 +175,15 @@ _ATTRS = {
         See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.
         """,
         default = True,
+    ),
+    "no_copy_to_bin": attr.label_list(
+        allow_files = True,
+        doc = """List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
+
+        This is useful for exceptional cases where a `copy_to_bin` is not possible or not suitable for an input
+        file such as a file in an external repository. In most cases, this option is not needed.
+        See `copy_data_to_bin` docstring for more info.
+        """,
     ),
     "copy_data_to_bin": attr.bool(
         doc = """When True, `data` files and the `entry_point` file are copied to the Bazel output tree before being passed
@@ -440,8 +446,15 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     files = [bash_launcher] + toolchain_files
     if ctx.attr.copy_data_to_bin:
-        files.append(copy_file_to_bin_action(ctx, entry_point))
-        files.extend(copy_files_to_bin_actions(ctx, ctx.files.data))
+        if entry_point not in ctx.files.no_copy_to_bin:
+            files.append(copy_file_to_bin_action(ctx, entry_point))
+        else:
+            files.append(entry_point)
+        for d in ctx.files.data:
+            if d not in ctx.files.no_copy_to_bin:
+                files.append(copy_file_to_bin_action(ctx, d))
+            else:
+                files.append(d)
     else:
         files.append(entry_point)
         files.extend(ctx.files.data)
