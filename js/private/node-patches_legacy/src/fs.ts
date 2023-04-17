@@ -589,17 +589,27 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     }
 
     function readHopLink(p: string, cb: (l: HopResults) => void) {
+        if (hopLinkCache[p]) {
+            return cb(hopLinkCache[p])
+        }
+
         origReadlink(p, (err: Error, link: string) => {
             if (err) {
+                let result: HopResults
+
                 if ((err as any).code === 'ENOENT') {
                     // file does not exist
-                    return cb(HOP_NOT_FOUND)
+                    result = HOP_NOT_FOUND
+                } else {
+                    result = HOP_NON_LINK
                 }
 
-                return cb(HOP_NON_LINK)
+                hopLinkCache[p] = result
+                return cb(result)
             }
 
             if (link === undefined) {
+                hopLinkCache[p] = HOP_NON_LINK
                 return cb(HOP_NON_LINK)
             }
 
@@ -607,6 +617,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 link = path.resolve(path.dirname(p), link)
             }
 
+            hopLinkCache[p] = link
             cb(link)
         })
     }
