@@ -44,6 +44,7 @@ const util = require("util");
 // es modules
 const _fs = require('fs');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
+const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
 const patcher = (fs = _fs, roots) => {
     fs = fs || _fs;
     // Make the original version of the library available for when access to the
@@ -550,9 +551,11 @@ const patcher = (fs = _fs, roots) => {
         catch (err) {
             if (err.code === 'ENOENT') {
                 // file does not exist
-                return undefined;
+                link = HOP_NOT_FOUND;
             }
-            link = HOP_NON_LINK;
+            else {
+                link = HOP_NON_LINK;
+            }
         }
         hopLinkCache[p] = link;
         return link;

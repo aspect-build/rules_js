@@ -29,6 +29,9 @@ type Dirent = any
 const _fs = require('fs')
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
+const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
+
+type HopResults = string | typeof HOP_NON_LINK | typeof HOP_NOT_FOUND
 
 export const patcher = (fs: any = _fs, roots: string[]) => {
     fs = fs || _fs
@@ -571,15 +574,13 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         oneHop(loc, cb)
     }
 
-    const hopLinkCache = Object.create(null) as {
-        [f: string]: string | typeof HOP_NON_LINK
-    }
-    function readHopLinkSync(p: string) {
+    const hopLinkCache = Object.create(null) as { [f: string]: HopResults }
+    function readHopLinkSync(p: string): HopResults {
         if (hopLinkCache[p]) {
             return hopLinkCache[p]
         }
 
-        let link: string | typeof HOP_NON_LINK
+        let link: HopResults
 
         try {
             link = origReadlinkSync(p) as string
@@ -593,10 +594,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         } catch (err) {
             if (err.code === 'ENOENT') {
                 // file does not exist
-                return undefined
+                link = HOP_NOT_FOUND
+            } else {
+                link = HOP_NON_LINK
             }
-
-            link = HOP_NON_LINK
         }
 
         hopLinkCache[p] = link
@@ -612,7 +613,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             let link = readHopLinkSync(maybe)
 
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, ...nested.reverse())
+                link = path.join(link as string, ...nested.reverse())
 
                 if (!isEscape(loc, link)) {
                     return link
