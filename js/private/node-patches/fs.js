@@ -522,10 +522,10 @@ const patcher = (fs = _fs, roots) => {
         };
         oneHop(loc, cb);
     }
-    const hopLinkCache = new Map();
+    const hopLinkCache = Object.create(null);
     function readHopLinkSync(p) {
-        if (hopLinkCache.has(p)) {
-            return hopLinkCache.get(p);
+        if (hopLinkCache[p]) {
+            return hopLinkCache[p];
         }
         let link;
         try {
@@ -546,7 +546,7 @@ const patcher = (fs = _fs, roots) => {
             }
             link = HOP_NON_LINK;
         }
-        hopLinkCache.set(p, link);
+        hopLinkCache[p] = link;
         return link;
     }
     function nextHopSync(loc) {

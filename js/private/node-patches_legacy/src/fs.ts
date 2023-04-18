@@ -559,10 +559,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         oneHop(loc, cb)
     }
 
-    const hopLinkCache = new Map<string, string | typeof HOP_NON_LINK>()
+    const hopLinkCache = Object.create(null) as {
+        [f: string]: string | typeof HOP_NON_LINK
+    }
     function readHopLinkSync(p: string) {
-        if (hopLinkCache.has(p)) {
-            return hopLinkCache.get(p)
+        if (hopLinkCache[p]) {
+            return hopLinkCache[p]
         }
 
         let link: string | typeof HOP_NON_LINK
@@ -585,7 +587,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             link = HOP_NON_LINK
         }
 
-        hopLinkCache.set(p, link)
+        hopLinkCache[p] = link
         return link
     }
 
