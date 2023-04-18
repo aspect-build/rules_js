@@ -29,6 +29,9 @@ type Dirent = any
 const _fs = require('fs')
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
+const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
+
+type HopResults = string | typeof HOP_NON_LINK | typeof HOP_NOT_FOUND
 
 export const patcher = (fs: any = _fs, roots: string[]) => {
     fs = fs || _fs
@@ -63,7 +66,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     const origRealpathSync = fs.realpathSync.bind(fs)
     const origRealpathSyncNative = fs.realpathSync.native
 
-    const isEscape = escapeFunction(roots)
+    const { canEscape, isEscape } = escapeFunction(roots)
 
     // =========================================================================
     // fs.lstat
@@ -89,6 +92,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             }
 
             args[0] = path.resolve(args[0])
+
+            if (!canEscape(args[0])) {
+                // the file can not escaped the sandbox so there is nothing more to do
+                return cb(null, stats)
+            }
+
             return guardedReadLink(args[0], (str: string) => {
                 if (str != args[0]) {
                     // there are one or more hops within the guards so there is nothing more to do
@@ -123,6 +132,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         }
 
         args[0] = path.resolve(args[0])
+
+        if (!canEscape(args[0])) {
+            // the file can not escaped the sandbox so there is nothing more to do
+            return stats
+        }
+
         const guardedReadLink: string = guardedReadLinkSync(args[0])
         if (guardedReadLink != args[0]) {
             // there are one or more hops within the guards so there is nothing more to do
@@ -508,70 +523,58 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
     function nextHop(loc: string, cb: (next: string | false) => void): void {
         let nested: string[] = []
+        let maybe = loc
         let escapedHop: string | false = false
-        const oneHop = (maybe, cb: (next: string | false) => void) => {
-            origReadlink(maybe, (err: Error, str: string) => {
-                if (err) {
-                    if ((err as any).code === 'ENOENT') {
-                        // file does not exist
-                        return cb(undefined)
-                    }
-                    nested.push(path.basename(maybe))
-                    const dirname = path.dirname(maybe)
-                    if (
-                        !dirname ||
-                        dirname == maybe ||
-                        dirname == '.' ||
-                        dirname == '/'
-                    ) {
-                        // not a link
-                        return cb(escapedHop)
-                    }
-                    maybe = dirname
-                    return oneHop(maybe, cb)
+
+        readHopLink(maybe, function readNextHop(link) {
+            if (link === HOP_NOT_FOUND) {
+                return cb(undefined)
+            }
+
+            if (link !== HOP_NON_LINK) {
+                link = path.join(link, ...nested.reverse())
+
+                if (!isEscape(loc, link)) {
+                    return cb(link)
                 }
-                if (!path.isAbsolute(str)) {
-                    str = path.resolve(path.dirname(maybe), str)
+                if (!escapedHop) {
+                    escapedHop = link
                 }
-                str = path.join(str, ...nested.reverse())
-                if (isEscape(loc, str)) {
-                    if (!escapedHop) {
-                        escapedHop = str
-                    }
-                    nested.push(path.basename(maybe))
-                    const dirname = path.dirname(maybe)
-                    if (
-                        !dirname ||
-                        dirname == maybe ||
-                        dirname == '.' ||
-                        dirname == '/'
-                    ) {
-                        // not a link
-                        return cb(escapedHop)
-                    }
-                    maybe = dirname
-                    return oneHop(maybe, cb)
-                } else {
-                    return cb(str)
-                }
-            })
-        }
-        oneHop(loc, cb)
+            }
+
+            const dirname = path.dirname(maybe)
+            if (
+                !dirname ||
+                dirname == maybe ||
+                dirname == '.' ||
+                dirname == '/'
+            ) {
+                // not a link
+                return cb(escapedHop)
+            }
+            nested.push(path.basename(maybe))
+            maybe = dirname
+            readHopLink(maybe, readNextHop)
+        })
     }
 
-    const hopLinkCache = new Map<string, string | typeof HOP_NON_LINK>()
-    function readHopLinkSync(p: string) {
-        if (hopLinkCache.has(p)) {
-            return hopLinkCache.get(p)
+    const hopLinkCache = Object.create(null) as { [f: string]: HopResults }
+    function readHopLinkSync(p: string): HopResults {
+        if (hopLinkCache[p]) {
+            return hopLinkCache[p]
         }
 
-        let link: string | typeof HOP_NON_LINK
+        let link: HopResults
 
         try {
             if (origLstatSync(p).isSymbolicLink()) {
                 link = origReadlinkSync(p) as string
-                if (!path.isAbsolute(link)) {
-                    link = path.resolve(path.dirname(p), link)
+                if (link) {
+                    if (!path.isAbsolute(link)) {
+                        link = path.resolve(path.dirname(p), link)
+                    }
+                } else {
+                    link = HOP_NON_LINK
                 }
             } else {
                 link = HOP_NON_LINK
@@ -579,14 +582,48 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         } catch (err) {
             if (err.code === 'ENOENT') {
                 // file does not exist
-                return undefined
+                link = HOP_NOT_FOUND
+            } else {
+                link = HOP_NON_LINK
             }
-
-            link = HOP_NON_LINK
         }
 
-        hopLinkCache.set(p, link)
+        hopLinkCache[p] = link
         return link
+    }
+
+    function readHopLink(p: string, cb: (l: HopResults) => void) {
+        if (hopLinkCache[p]) {
+            return cb(hopLinkCache[p])
+        }
+
+        origReadlink(p, (err: Error, link: string) => {
+            if (err) {
+                let result: HopResults
+
+                if ((err as any).code === 'ENOENT') {
+                    // file does not exist
+                    result = HOP_NOT_FOUND
+                } else {
+                    result = HOP_NON_LINK
+                }
+
+                hopLinkCache[p] = result
+                return cb(result)
+            }
+
+            if (link === undefined) {
+                hopLinkCache[p] = HOP_NON_LINK
+                return cb(HOP_NON_LINK)
+            }
+
+            if (!path.isAbsolute(link)) {
+                link = path.resolve(path.dirname(p), link)
+            }
+
+            hopLinkCache[p] = link
+            cb(link)
+        })
     }
 
     function nextHopSync(loc: string): string | false {
@@ -596,6 +633,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
         for (;;) {
             let link = readHopLinkSync(maybe)
+
+            if (link === HOP_NOT_FOUND) {
+                return undefined
+            }
 
             if (link !== HOP_NON_LINK) {
                 link = path.join(link, ...nested.reverse())
@@ -760,48 +801,65 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 // =========================================================================
 
 export function isSubPath(parent: string, child: string): boolean {
-    return !path.relative(parent, child).startsWith('..')
+    return (
+        parent === child ||
+        (child[parent.length] === path.sep && child.startsWith(parent))
+    )
 }
 
-export const escapeFunction = (_roots: string[]) => {
-    // ensure roots are always absolute
-    _roots = _roots.map((root) => path.resolve(root))
-    function _isEscape(
+export function escapeFunction(_roots: string[]) {
+    // Ensure roots are always absolute.
+    // Sort to ensure escaping multiple roots chooses the longest one.
+    const defaultRoots = _roots
+        .map((root) => path.resolve(root))
+        .sort((a, b) => b.length - a.length)
+
+    function fs_isEscape(
         linkPath: string,
         linkTarget: string,
-        roots = _roots
+        roots = defaultRoots
     ): false | string {
         // linkPath is the path of the symlink file itself
         // linkTarget is a path that the symlink points to one or more hops away
+        // linkTarget must already be normalized
 
         if (!path.isAbsolute(linkPath)) {
             linkPath = path.resolve(linkPath)
+        } else {
+            linkPath = path.normalize(linkPath)
         }
 
-        if (!path.isAbsolute(linkTarget)) {
-            linkTarget = path.resolve(linkTarget)
-        }
-
-        let escapedRoot = undefined
         for (const root of roots) {
             // If the link is in the root check if the realPath has escaped
-            if (isSubPath(root, linkPath) || linkPath == root) {
-                if (!isSubPath(root, linkTarget) && linkTarget != root) {
-                    if (!escapedRoot || escapedRoot.length < root.length) {
-                        // if escaping multiple roots then choose the longest one
-                        escapedRoot = root
-                    }
-                }
+            if (isSubPath(root, linkPath) && !isSubPath(root, linkTarget)) {
+                return root
             }
-        }
-        if (escapedRoot) {
-            return escapedRoot
         }
 
         return false
     }
 
-    return _isEscape
+    function fs_canEscape(
+        maybeLinkPath: string,
+        roots = defaultRoots
+    ): boolean {
+        // maybeLinkPath is the path which may be a symlink
+        // maybeLinkPath must already be normalized
+
+        for (const root of roots) {
+            // If the link is in the root check if the realPath has escaped
+            if (isSubPath(root, maybeLinkPath)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    return {
+        isEscape: fs_isEscape,
+        canEscape: fs_canEscape,
+    }
 }
 
 function once<T>(fn: (...args: unknown[]) => T) {
@@ -830,7 +888,7 @@ function once<T>(fn: (...args: unknown[]) => T) {
 function patchDirent(dirent: Dirent | any, stat: Stats | any): void {
     // add all stat is methods to Dirent instances with their result.
     for (const i in stat) {
-        if (i.indexOf('is') === 0 && typeof stat[i] === 'function') {
+        if (i.startsWith('is') && typeof stat[i] === 'function') {
             //
             const result = stat[i]()
             if (result) dirent[i] = () => true
