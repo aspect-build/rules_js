@@ -570,8 +570,8 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         let link: string | typeof HOP_NON_LINK
 
         try {
-            if (origLstatSync(p).isSymbolicLink()) {
-                link = origReadlinkSync(p) as string
+            link = origReadlinkSync(p) as string
+            if (link) {
                 if (!path.isAbsolute(link)) {
                     link = path.resolve(path.dirname(p), link)
                 }
