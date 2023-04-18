@@ -567,10 +567,14 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         let link: HopResults
 
         try {
-            link = origReadlinkSync(p) as string
-            if (link) {
-                if (!path.isAbsolute(link)) {
-                    link = path.resolve(path.dirname(p), link)
+            if (origLstatSync(p).isSymbolicLink()) {
+                link = origReadlinkSync(p) as string
+                if (link) {
+                    if (!path.isAbsolute(link)) {
+                        link = path.resolve(path.dirname(p), link)
+                    }
+                } else {
+                    link = HOP_NON_LINK
                 }
             } else {
                 link = HOP_NON_LINK
