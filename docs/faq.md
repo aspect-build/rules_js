@@ -33,6 +33,12 @@ include the `pnpm-workspace.yaml` if it exists and all `package.json` files in y
 To list all local `package.json` files that pnpm needs to read, you can run
 `pnpm recursive ls --depth -1 --porcelain`.
 
+## Can a tool run outside of Bazel write to the `node_modules` in `bazel-out`?
+
+Some tools such as the AWS SDK write to `node_modules` when they are run. Ideally this should be avoided or fixed in an upstream package. Bazel write-protects the files in the `bazel-out` output tree so they can be reliably cached and reused.
+
+If necessary the `node_modules` directory permissions can be manually modified, however these changes will be detected and overwritten next time Bazel runs. To maintain these edits across Bazel runs, you can use the `--experimental_check_output_files=false` flag.
+
 ## Can I edit files in `node_modules` for debugging?
 
 Try running Bazel with `--experimental_check_output_files=false` so that your edits inside the `bazel-out/node_modules` tree are preserved.
