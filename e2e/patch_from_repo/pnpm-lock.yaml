@@ -1,0 +1,15 @@
+lockfileVersion: 5.4
+
+importers:
+
+  .:
+    specifiers:
+      meaning-of-life: 1.0.0
+    dependencies:
+      meaning-of-life: 1.0.0
+
+packages:
+
+  /meaning-of-life/1.0.0:
+    resolution: {integrity: sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==}
+    dev: false

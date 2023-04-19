@@ -1,0 +1,4 @@
+exports_files(
+    ["meaning-of-life@1.0.0.patch"],
+    visibility = ["//visibility:public"],
+)

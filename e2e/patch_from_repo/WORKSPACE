@@ -1,0 +1,41 @@
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+local_repository(
+    name = "local_repo",
+    path = "./local_repo",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
+
+nodejs_register_toolchains(
+    name = "nodejs",
+    node_version = DEFAULT_NODE_VERSION,
+)
+
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
+
+npm_translate_lock(
+    name = "npm",
+    data = [
+        "//:package.json",
+        "//:pnpm-workspace.yaml",
+    ],
+    patch_args = {
+        "meaning-of-life": ["-p1"],
+    },
+    patches = {
+        "meaning-of-life@1.0.0": ["@local_repo//:meaning-of-life@1.0.0.patch"],
+    },
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+
+load("@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
