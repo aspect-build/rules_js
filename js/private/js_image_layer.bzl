@@ -18,9 +18,16 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """Create container image layers from js_binary targets.
 
-js_image_layer supports transitioning to specific platform for cross-compiling.
+By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
+This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
+A proper `cmd` usually looks like /`[ root of js_image_layer ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of js_binary ]`, 
+unless you have a launcher script that invokes the entry_point of the `js_binary` in a different path.
+On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace or __main__ if empty ]` suffix**. If `workdir` is not set correctly, some
+attributes such as `chdir` might not work properly.
 
-A partial example using rules_oci with transition to linux/amd64 platform.
+js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
+
+**A partial example using rules_oci with transition to linux/amd64 platform.**
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
@@ -56,7 +63,54 @@ oci_image(
 )
 ```
 
-An example using legacy rules_docker
+**A partial example using rules_oci to create multi-platform images.**
+
+
+```starlark
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@contrib_rules_oci//oci:defs.bzl", "oci_image", "oci_image_index")
+
+js_binary(
+    name = "binary",
+    entry_point = "main.js",
+)
+
+[
+    platform(
+        name = "linux_{}".format(arch),
+        constraint_values = [
+            "@platforms//os:linux",
+            "@platforms//cpu:{}".format(arch if arch != "amd64" else "x86_64"),
+        ],
+    )
+    js_image_layer(
+        name = "{}_layers".format(arch),
+        binary = ":binary",
+        platform = ":linux_{arch}",
+        root = "/app"
+    )
+    oci_image(
+        name = "{}_image".format(arch),
+        cmd = ["/app/main"],
+        entrypoint = ["bash"],
+        tars = [
+            ":{}_layers".format(arch)
+        ]
+    )
+    for arch in ["amd64", "arm64"]
+]
+
+oci_image_index(
+    name = "image",
+    images = [
+        ":arm64_image",
+        ":amd64_image"
+    ]
+)
+
+```
+
+**An example using legacy rules_docker**
 
 See `e2e/js_image_rules_docker` for full example.
 
