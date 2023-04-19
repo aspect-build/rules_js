@@ -29,7 +29,7 @@ By design, js_image_layer doesn't have any preference over which rule assembles 
 This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
 A proper `cmd` usually looks like /`[ root of js_image_layer ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of js_binary ]`, 
 unless you have a launcher script that invokes the entry_point of the `js_binary` in a different path.
-On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles` suffix**. If `workdir` is not set correctly, some
+On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace or __main__ if empty ]` suffix**. If `workdir` is not set correctly, some
 attributes such as `chdir` might not work properly.
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
