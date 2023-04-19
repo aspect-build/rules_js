@@ -70,6 +70,7 @@ def bin_factory(link_root_name):
         rollup = lambda name, **kwargs: _rollup_internal(name, link_root_name = link_root_name, **kwargs),
         rollup_test = lambda name, **kwargs: _rollup_test_internal(name, link_root_name = link_root_name, **kwargs),
         rollup_binary = lambda name, **kwargs: _rollup_binary_internal(name, link_root_name = link_root_name, **kwargs),
+        rollup_path = "dist/bin/rollup",
     )
 
 bin = bin_factory("node_modules")

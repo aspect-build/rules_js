@@ -18,6 +18,15 @@ function logf_fatal {
 # Initialize RUNFILES environment variable
 # ==============================================================================
 {{initialize_runfiles}}
+
+# When --experimental_split_coverage_postprocessing is enabled, bazel creates
+# separate runfiles directory for the coverage merger. 
+# When --experimental_split_coverage_postprocessing is disabled we observe the issue 
+# in https://github.com/bazelbuild/bazel/issues/4033
+if [ $SPLIT_COVERAGE_POST_PROCESSING == 1 ]; then
+    RUNFILES=$(_normalize_path "$LCOV_MERGER.runfiles")
+fi
+
 export RUNFILES
 
 # ==============================================================================

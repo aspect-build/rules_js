@@ -28,6 +28,10 @@ coverage_fail_test(
         "//conditions:default": False,
     }),
     entry_point = "lib.js",
+    unresolved_symlinks_enabled = select({
+        "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
+        "//conditions:default": False,
+    }),
 )
 
 PASS_CMD = """\
@@ -56,4 +60,8 @@ coverage_pass_test(
         "//conditions:default": False,
     }),
     entry_point = "lib.js",
+    unresolved_symlinks_enabled = select({
+        "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
+        "//conditions:default": False,
+    }),
 )

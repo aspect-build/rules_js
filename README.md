@@ -14,7 +14,6 @@ Google does not fund development of rules_js. If your company benefits, please c
 Known issues:
 
 -   Remote Execution (RBE) requires the latest version of Bazel, [6.0](https://blog.bazel.build/2022/12/19/bazel-6.0.html).
--   No examples yet for stamping and publishing npm packages.
 -   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
 
 rules_js is just a part of what Aspect provides:
