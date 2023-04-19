@@ -7,6 +7,9 @@ import { createGzip } from 'node:zlib'
 import { pack, Pack } from 'tar-stream'
 
 const MTIME = new Date(0)
+const MODE_FOR_DIR = 0o755
+const MODE_FOR_FILE = 0o555
+const MODE_FOR_SYMLINK = 0o775
 
 type HermeticStat = {
     mtime: Date
@@ -39,22 +42,26 @@ function findKeyByValue(entries: Entries, value: string): string {
 async function* walk(dir: string, accumulate = '') {
     const dirents = await readdir(dir, { withFileTypes: true })
     for (const dirent of dirents) {
-        let isDirectory = dirent.isDirectory();
+        let isDirectory = dirent.isDirectory()
 
-        if (dirent.isSymbolicLink() && !dirent.isDirectory() && !dirent.isFile()) {
+        if (
+            dirent.isSymbolicLink() &&
+            !dirent.isDirectory() &&
+            !dirent.isFile()
+        ) {
             // On OSX we sometimes encounter this bug: https://github.com/nodejs/node/issues/30646
             // The entry is apparently a symlink, but it's ambiguous whether it's a symlink to a
             // file or to a directory, and lstat doesn't tell us either. Determine the type by
             // attempting to read it as a directory.
 
             try {
-                await readdir(path.join(dir, dirent.name));
-                isDirectory = true;
+                await readdir(path.join(dir, dirent.name))
+                isDirectory = true
             } catch (error) {
                 if (error.code === 'ENOTDIR') {
-                    isDirectory = false;
+                    isDirectory = false
                 } else {
-                    throw error;
+                    throw error
                 }
             }
         }
@@ -76,7 +83,7 @@ function add_parents(name: string, pkg: Pack, existing_paths: Set<string>) {
     const stats: HermeticStat = {
         // this is an intermediate directory and bazel does not allow specifying
         // modes for intermediate directories.
-        mode: 0o755,
+        mode: MODE_FOR_DIR,
         mtime: MTIME,
     }
     for (const part of segments) {
@@ -207,7 +214,13 @@ export async function build(
 
         // A source file from workspace, not an output of a target.
         if (is_source) {
-            const stats = await stat(dest)
+            const originalStat = await stat(dest)
+            // use stable mode bits instead of preserving the one from file.
+            const stats: HermeticStat = {
+                mode: MODE_FOR_FILE,
+                mtime: MTIME,
+                size: originalStat.size,
+            }
             await add_file(key, createReadStream(dest), output, stats)
             continue
         }
@@ -230,11 +243,20 @@ export async function build(
             // well use `0o755` to allow owner&group to `rwx` and others `rx`
             // see: https://chmodcommand.com/chmod-775/
             // const stats = await stat(dest)
-            const stats: HermeticStat = { mode: 0o775, mtime: MTIME }
+            const stats: HermeticStat = { mode: MODE_FOR_SYMLINK, mtime: MTIME }
             const linkname = findKeyByValue(entries, output_path)
             add_symlink(key, linkname, output, stats)
         } else {
-            const stats = await stat(dest)
+            // Due to filesystems setting different bits depending on the os we have to opt-in
+            // to use a stable mode for files.
+            // In the future, we might want to hand off fine-grained control of these to users
+            // see: https://chmodcommand.com/chmod-0555/
+            const originalStat = await stat(dest)
+            const stats: HermeticStat = {
+                mode: MODE_FOR_FILE,
+                mtime: MTIME,
+                size: originalStat.size,
+            }
             let stream: Readable = createReadStream(dest)
 
             if (remove_non_hermetic_lines) {

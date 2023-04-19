@@ -41,6 +41,7 @@ ext = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "ext", dev_dependen
 ext.host()
 
 use_repo(ext, "aspect_bazel_lib_host")
+use_repo(ext, "coreutils_toolchains")
 
 node_dev = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
 
@@ -167,4 +168,3 @@ npm.npm_import(
 
 use_repo(npm, "acorn__8.4.0")
 use_repo(npm, "acorn__8.4.0__links")
-

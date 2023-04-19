@@ -235,7 +235,7 @@ def _js_image_layer_impl(ctx):
     args.add(entries)
     args.add(app)
     args.add(node_modules)
-    args.add(ctx.attr.compression if ctx.attr.compression else "none")
+    args.add(ctx.attr.compression)
 
     ctx.actions.run(
         inputs = depset([executable, launcher, entries], transitive = [default_info.files, default_info.default_runfiles.files]),
