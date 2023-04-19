@@ -355,11 +355,13 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
             patch_path = "//%s:%s" % (attr.pnpm_lock.package, patched_dependencies.get(friendly_name).get("path"))
             patches.insert(0, patch_path)
 
-        # Prevent the patch string labels from going through further repo mapping:
+        # Resolve string patch labels relative to the root respository rather than relative to rules_js.
         # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
-        # Further, prepend the optional '@' for earlier versions of Bazel so that checked in
-        # repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
-        patches = [("" if utils.bzlmod_supported else "@") + str(attr.pnpm_lock.relative(patch)) for patch in patches]
+        patches = [str(attr.pnpm_lock.relative(patch)) for patch in patches]
+
+        # Prepend the optional '@' to patch labels in the root repository for earlier versions of Bazel so
+        # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
+        patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
         patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
 

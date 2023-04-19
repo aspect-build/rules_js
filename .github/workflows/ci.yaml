@@ -93,6 +93,8 @@ jobs:
               run: echo "folder=e2e/npm_translate_yarn_lock" >> $GITHUB_OUTPUT
             - id: package_json_module
               run: echo "folder=e2e/package_json_module" >> $GITHUB_OUTPUT
+            - id: patch_from_repo
+              run: echo "folder=e2e/patch_from_repo" >> $GITHUB_OUTPUT
             - id: pnpm_workspace_rerooted
               run: echo "folder=e2e/pnpm_workspace_rerooted" >> $GITHUB_OUTPUT
             - id: pnpm_workspace
