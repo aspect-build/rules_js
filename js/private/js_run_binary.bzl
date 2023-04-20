@@ -204,10 +204,11 @@ def js_run_binary(
         **kwargs: Additional arguments
     """
 
-    # Friendly fail if user has specified data instead of srcs
-    data = kwargs.pop("data", None)
-    if data != None:
-        fail("Use srcs instead of data in js_run_binary: https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md#js_run_binary-srcs.")
+    # Friendly fail if user has specified invalid parameters
+    if "data" in kwargs.keys():
+        fail("Use srcs instead of data in js_run_binary: https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_binary#srcs")
+    if "deps" in kwargs.keys():
+        fail("Use srcs instead of deps in js_run_binary: https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_binary#srcs")
 
     extra_srcs = []
 
