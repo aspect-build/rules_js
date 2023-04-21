@@ -22,6 +22,11 @@ def _parse_basic_test_impl(ctx):
     asserts.equals(env, "-foo", parse("-foo"))
     asserts.equals(env, "foo{[]}", parse("foo{[]}"))
 
+    return unittest.end(env)
+
+def _parse_sequences_test_impl(ctx):
+    env = unittest.begin(ctx)
+
     # Sequences (- notation)
     asserts.equals(env, ["foo"], parse("- foo"))
     asserts.equals(env, ["foo - bar"], parse("- foo - bar"))
@@ -90,6 +95,11 @@ def _parse_basic_test_impl(ctx):
 ]
 """))
 
+    return unittest.end(env)
+
+def _parse_maps_test_impl(ctx):
+    env = unittest.begin(ctx)
+
     # Maps - scalar properties
     asserts.equals(env, {"foo": "bar"}, parse("foo: bar"))
     asserts.equals(env, {"foo": "bar"}, parse("foo: 'bar'"))
@@ -125,6 +135,11 @@ def _parse_basic_test_impl(ctx):
         }
 }
 """))
+
+    return unittest.end(env)
+
+def _parse_multiline_test_impl(ctx):
+    env = unittest.begin(ctx)
 
     # Literal multiline strings (|), strip (-) and keep (+)
     asserts.equals(env, {"foo": "bar\n"}, parse("""\
@@ -199,6 +214,11 @@ faz: |+
     baz
 
 """))
+
+    return unittest.end(env)
+
+def _parse_mixed_test_impl(ctx):
+    env = unittest.begin(ctx)
 
     # Mixed sequence and map flows
     asserts.equals(env, {"foo": ["moo"]}, parse("{foo: [moo]}"))
@@ -292,6 +312,98 @@ baz: 5
 
     return unittest.end(env)
 
+def _parse_complex_map_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    # Basic complex-object
+    asserts.equals(env, {"a": True}, parse("""\
+? a
+: true
+"""))
+
+    # Multiple bsic complex-object
+    asserts.equals(env, {"a": True, "b": False}, parse("""\
+? a
+: true
+? b
+: false
+"""))
+
+    # Whitespace in various places
+    asserts.equals(env, {"a": True, "b": False, "c": "foo", "  d  ": "  e  "}, parse("""\
+?   a
+: true  
+  
+? b  
+  
+:   false  
+
+? 'c'
+:  foo  
+
+? "  d  "  
+:   "  e  "
+"""))
+
+    # Object in complex mapping key
+    asserts.equals(env, {"a": {"b": {"c": 1, "d": True}}}, parse("""\
+a:
+  ? b
+  : c: 1
+    d: true
+"""))
+
+    # Array in complex mapping key
+    asserts.equals(env, {"a": {"b": [1, True]}}, parse("""\
+a:
+  ? b
+  : [1, true]
+"""))
+
+    # Arrays in complex mapping key
+    asserts.equals(env, {"a": [1, 2]}, parse("""\
+? a
+: - 1
+  - 2
+"""))
+
+    # Multiple nesting, arrays in objects
+    asserts.equals(env, {"a": {"b": {"c": [1, 2]}}, "d": 3}, parse("""\
+? a
+: ? b
+  : ? c
+    : - 1
+      - 2
+? d
+: 3
+"""))
+
+    # Popping in/out of nested maps
+    asserts.equals(env, {
+        "a": {
+            "b": {
+                "c": 1,
+                "d": {
+                    "e": "f",
+                },
+                "g": 3,
+            },
+            "e": 3,
+        },
+    }, parse("""\
+a:
+  ? b
+  : c: 1
+    d:
+       ? e
+       : f
+    g: 3
+  ? e
+  : 3
+"""))
+
+    return unittest.end(env)
+
 def _parse_lockfile_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -339,10 +451,60 @@ packages:
         dev: false
 """))
 
+    asserts.equals(env, {
+        "lockfileVersion": "6.0",
+        "packages": {
+            "/pkg-a@1.2.3": {
+                "resolution": {
+                    "integrity": "sha512-asdf",
+                },
+                "dev": False,
+            },
+            "/pkg-c@3.2.1": {
+                "resolution": {
+                    "integrity": "sha512-fdsa",
+                },
+                "dev": True,
+            },
+        },
+    }, parse("""\
+lockfileVersion: '6.0'
+
+packages:
+  ? /pkg-a@1.2.3
+  : resolution: {integrity: sha512-asdf}
+    dev: false
+
+  ? /pkg-c@3.2.1
+  : resolution: {integrity: sha512-fdsa}
+    dev: true
+"""))
+
     return unittest.end(env)
 
 parse_basic_test = unittest.make(
     _parse_basic_test_impl,
+    attrs = {},
+)
+parse_sequences_test = unittest.make(
+    _parse_sequences_test_impl,
+    attrs = {},
+)
+parse_maps_test = unittest.make(
+    _parse_maps_test_impl,
+    attrs = {},
+)
+parse_multiline_test = unittest.make(
+    _parse_multiline_test_impl,
+    attrs = {},
+)
+
+parse_mixed_test = unittest.make(
+    _parse_mixed_test_impl,
+    attrs = {},
+)
+parse_complex_map_test = unittest.make(
+    _parse_complex_map_test_impl,
     attrs = {},
 )
 parse_lockfile_test = unittest.make(
@@ -351,4 +513,13 @@ parse_lockfile_test = unittest.make(
 )
 
 def yaml_tests(name):
-    unittest.suite(name, parse_basic_test, parse_lockfile_test)
+    unittest.suite(
+        name,
+        parse_basic_test,
+        parse_sequences_test,
+        parse_maps_test,
+        parse_multiline_test,
+        parse_mixed_test,
+        parse_complex_map_test,
+        parse_lockfile_test,
+    )
