@@ -127,7 +127,7 @@ def _handle_PARSE_NEXT(state, input, stack, starlark):
             # We just parsed a key
             _pop_higher_indented_states(stack, state["indent"])
 
-            if len(stack) < 1 or len(state["indent"]) > len(_peek(stack)["indent"]):
+            if len(stack) < 1 or len(state["indent"]) > len(_peek(stack, _STATE.KEY)["indent"]):
                 # The key is part of a new map
                 stack.append(_new_KEY(
                     key = _parse_key(state["buffer"][0:-1]),
@@ -136,7 +136,7 @@ def _handle_PARSE_NEXT(state, input, stack, starlark):
                 ))
             else:
                 # The key is a sibling in the map
-                _peek(stack)["key"] = _parse_key(state["buffer"][0:-1])
+                _peek(stack, _STATE.KEY)["key"] = _parse_key(state["buffer"][0:-1])
 
             _initialize_result_value(starlark, stack)
 
@@ -268,7 +268,7 @@ def _handle_CONSUME_SPACE_FLOW(_, input, stack, starlark):
     elif input == "]" and _in_flow_sequence(stack):
         # We are at the end of a flow sequence
         stack.pop()
-        stack.pop()
+        _pop(stack, _STATE.SEQUENCE)
 
         # Consume any space before the next thing to parse and escape the flow if needed
         stack.append(_new_CONSUME_SPACE_FLOW() if _in_flow(stack) else _new_CONSUME_SPACE(
@@ -277,7 +277,7 @@ def _handle_CONSUME_SPACE_FLOW(_, input, stack, starlark):
     elif input == "}" and _in_flow_map(stack):
         # We are at the end of a flow map
         stack.pop()
-        stack.pop()
+        _pop(stack, _STATE.KEY)
 
         # Consume any space before the next thing to parse and escape the flow if needed
         stack.append(_new_CONSUME_SPACE_FLOW() if _in_flow(stack) else _new_CONSUME_SPACE(
@@ -306,7 +306,7 @@ def _handle_PARSE_NEXT_FLOW(state, input, stack, starlark):
         _set_result_value(starlark, stack, _parse_scalar(state["buffer"]))
         stack.pop()
 
-        sequence_flow_state = _peek(stack)
+        sequence_flow_state = _peek(stack, _STATE.SEQUENCE)
         sequence_flow_state["index"] += 1
 
         # Consume any space before the next sequence value
@@ -317,7 +317,7 @@ def _handle_PARSE_NEXT_FLOW(state, input, stack, starlark):
         stack.pop()
 
         # Reset the key
-        map_flow_state = _peek(stack)
+        map_flow_state = _peek(stack, _STATE.KEY)
         map_flow_state["key"] = ""
 
         # Consume any space before the next sequence value
@@ -326,7 +326,7 @@ def _handle_PARSE_NEXT_FLOW(state, input, stack, starlark):
         # We are at the end of a flow sequence
         _set_result_value(starlark, stack, _parse_scalar(state["buffer"]))
         stack.pop()
-        stack.pop()
+        _pop(stack, _STATE.SEQUENCE)
 
         # Consume any space before the next thing to parse and escape the flow if needed
         stack.append(_new_CONSUME_SPACE_FLOW() if _in_flow(stack) else _new_CONSUME_SPACE(
@@ -336,7 +336,7 @@ def _handle_PARSE_NEXT_FLOW(state, input, stack, starlark):
         # We are at the end of a flow map
         _set_result_value(starlark, stack, _parse_scalar(state["buffer"]))
         stack.pop()
-        stack.pop()
+        _pop(stack, _STATE.KEY)
 
         # Consume any space before the next thing to parse and escape the flow if needed
         stack.append(_new_CONSUME_SPACE_FLOW() if _in_flow(stack) else _new_CONSUME_SPACE(
@@ -345,7 +345,7 @@ def _handle_PARSE_NEXT_FLOW(state, input, stack, starlark):
     elif input.isspace() and state["buffer"].endswith(":") and _in_flow_map(stack):
         # We just parsed a key
         stack.pop()
-        _peek(stack)["key"] = _parse_key(state["buffer"][0:-1])
+        _peek(stack, _STATE.KEY)["key"] = _parse_key(state["buffer"][0:-1])
 
         stack.append(_new_CONSUME_SPACE_FLOW())
     else:
@@ -452,8 +452,12 @@ def _empty_value_for_state(state):
         msg = "State {} has no empty type".format(state["id"])
         fail(msg)
 
-def _peek(stack):
-    return stack[-1]
+def _peek(stack, expected = False):
+    top = stack[-1]
+    if expected and top and top["id"] != expected:
+        fail("Expected state {} but got {}".format(expected, top["id"]))
+
+    return top
 
 def _parse_scalar(value):
     value = value.strip()
@@ -477,6 +481,12 @@ def _finalize_multiline_string(value, keep, strip):
         value = value.rstrip(" \t\n")
 
     return value
+
+def _pop(stack, *types):
+    for t in types:
+        if _peek(stack)["id"] != t:
+            fail("Expected state {} but found {}".format(t, _peek(stack)["id"]))
+        stack.pop()
 
 def _is_float(value):
     return value.replace(".", "", 1).isdigit()
