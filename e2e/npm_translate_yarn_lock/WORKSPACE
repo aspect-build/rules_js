@@ -14,7 +14,7 @@ nodejs_register_toolchains(
     node_version = DEFAULT_NODE_VERSION,
 )
 
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 
 # Validate that we can use a yarn.lock file in place of pnpm-lock.yaml
 npm_translate_lock(

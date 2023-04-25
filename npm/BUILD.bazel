@@ -40,17 +40,12 @@ bzl_library(
 )
 
 bzl_library(
-    name = "npm_import",
-    srcs = ["npm_import.bzl"],
+    name = "repositories",
+    srcs = ["repositories.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//npm/private:list_sources",
         "//npm/private:npm_import",
         "//npm/private:npm_translate_lock",
-        "//npm/private:npm_translate_lock_macro_helpers",
-        "//npm/private:utils",
-        "//npm/private:versions",
-        "@aspect_bazel_lib//lib:repositories",
-        "@aspect_bazel_lib//lib:write_source_files",
+        "//npm/private:pnpm_repository",
     ],
 )

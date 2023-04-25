@@ -1,18 +1,17 @@
-"""Adapt repository rules in npm_import.bzl to be called from MODULE.bazel
+"""Adapt npm repository rules to be called from MODULE.bazel
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
-load("//npm/private:utils.bzl", "utils")
-load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
+load("//npm:repositories.bzl", "npm_import", "npm_translate_lock", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
+load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
-load("//npm/private:npm_import.bzl", npm_import_lib = "npm_import", npm_import_links_lib = "npm_import_links")
-load("//npm:npm_import.bzl", "npm_import", "npm_translate_lock", "pnpm_repository")
-load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
-load("//npm/private:versions.bzl", "PNPM_VERSIONS")
+load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
+load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
+load("//npm/private:utils.bzl", "utils")
 
-LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
+LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 
 def _extension_impl(module_ctx):
     for mod in module_ctx.modules:
