@@ -52,8 +52,7 @@ build_test(
     targets = [
         ":node_modules/@blockprotocol/type-system-web",
         ":node_modules/@figma/nodegit",
-        # @kubernetes/client-node has a "prepare" lifecycle hook that runs tsc
-        ":node_modules/@kubernetes/client-node",
+        ":node_modules/@kubernetes/client-node",  # @kubernetes/client-node has a "prepare" lifecycle hook that runs tsc
         ":node_modules/@plotly/regl",
         ":node_modules/bufferutil",
         ":node_modules/debug",
@@ -61,18 +60,17 @@ build_test(
         ":node_modules/handlebars-helpers/helper-date",
         ":node_modules/inline-fixtures",
         ":node_modules/json-stable-stringify",
-        # a vendored .tgz file
-        ":node_modules/lodash",
+        ":node_modules/lodash",  # lodash is brought in as a vendored .tgz file: vendored/lodash-4.17.21.tgz
         ":node_modules/node-gyp",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
         ":node_modules/regl",
-        # segfault-handler has a node-gyp install step
-        ":node_modules/segfault-handler",
+        ":node_modules/puppeteer",  # has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
+        ":node_modules/segfault-handler",  # segfault-handler has a node-gyp install step
         ":node_modules/semver-first-satisfied",
         ":node_modules/typescript",
-        # intentionally don't include node_modules/unused
         ":node_modules/webpack-bundle-analyzer",
+        # intentionally don't include :node_modules/unused
     ],
 )
 

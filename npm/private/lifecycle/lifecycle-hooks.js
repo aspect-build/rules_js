@@ -54,13 +54,22 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
                     bin = { [_package]: bin }
                 }
                 for (const binName of Object.keys(bin)) {
+                    if (binName.includes('/') || binName.includes('\\')) {
+                        // multi-segment bin names are not supported; pnpm itself
+                        // also does not make .bin entries in this case as of pnpm v8.3.1
+                        continue
+                    }
                     const binPath = normalizeBinPath(bin[binName])
                     const binBash = `#!/usr/bin/env bash\nexec node "${path.join(
                         ...segmentsUp,
                         packageName,
                         binPath
                     )}" "$@"`
-                    const binEntryPath = path.join(nodeModulesPath, '.bin', binName)
+                    const binEntryPath = path.join(
+                        nodeModulesPath,
+                        '.bin',
+                        binName
+                    )
                     await fs.promises.writeFile(binEntryPath, binBash)
                     await fs.promises.chmod(binEntryPath, '755') // executable
                 }
