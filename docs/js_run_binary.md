@@ -28,6 +28,20 @@ Wrapper around @aspect_bazel_lib `run_binary` that adds convienence attributes f
 
 This rule does not require Bash `native.genrule`.
 
+The following environment variables are made available to the Node.js runtime based on available bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
+
+* BAZEL_BINDIR: the WORKSPACE-relative bazel bin directory; equivalent to `$(BINDIR)` from the  of the `js_binary` target
+* BAZEL_COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` from the [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables) of the `js_binary` target
+* BAZEL_TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` from the [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables) of the `js_binary` target
+
+The following environment variables are made available to the Node.js runtime based on the rule context:
+
+* BAZEL_BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target
+* BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target
+* BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label`
+* BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target
+* BAZEL_WORKSPACE: the bazel workspace name; equivalent to `ctx.workspace_name`
+
 
 **PARAMETERS**
 

@@ -35,6 +35,28 @@ Bazel option to see more detail about the selection.
 All [common binary attributes](https://bazel.build/reference/be/common-definitions#common-attributes-binaries) are supported
 including `args` as the list of arguments passed Node.js.
 
+The following environment variables are made available to the Node.js runtime based on available bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
+
+* JS_BINARY__BINDIR: the WORKSPACE-relative bazel bin directory; equivalent to `$(BINDIR)` from the  of the `js_binary` target
+* JS_BINARY__COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` from the [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables) of the `js_binary` target
+* JS_BINARY__TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` from the [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables) of the `js_binary` target
+
+The following environment variables are made available to the Node.js runtime based on the rule context:
+
+* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target
+* JS_BINARY__PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target
+* JS_BINARY__TARGET: the full label of the bazel target being run; a stringified version of `ctx.label`
+* JS_BINARY__TARGET_NAME: the name of the bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target
+* JS_BINARY__WORKSPACE: the bazel workspace name; equivalent to `ctx.workspace_name`
+
+The following environment variables are made available to the Node.js runtime based the runtime environment:
+
+* JS_BINARY__NODE_BINARY: the Node.js binary path run by the `js_binary` target
+* JS_BINARY__NPM_BINARY: the npm binary path; this is available when [`include_npm`](https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary#include_npm) is `True` on the `js_binary` target
+* JS_BINARY__NODE_WRAPPER: the Node.js wrapper script used to run Node.js which is available as `node` on the `PATH`
+* JS_BINARY__RUNFILES: the absolute path to the Bazel runfiles directory
+* JS_BINARY__EXECROOT: the absolute path to the root of the execution root for the action; if in the sandbox, this path absolulte path to the root of the execution root within the sandbox
+
 This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
 """
