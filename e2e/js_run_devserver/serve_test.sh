@@ -22,6 +22,7 @@ ibazel_pid="$!"
 function _exit {
   echo "Cleanup..."
   kill "$ibazel_pid"
+  wait "$ibazel_pid"
   git checkout src/index.html src/BUILD.bazel
   rm -f src/new.html
 }
