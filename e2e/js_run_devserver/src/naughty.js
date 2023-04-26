@@ -21,4 +21,9 @@ http.createServer(function (req, res) {
         console.log(require.resolve('chalk'))
         return res.end()
     })
-}).listen(8080)
+})
+    .on('error', (e) => {
+        console.error(e)
+        process.exit(1)
+    })
+    .listen(8080)
