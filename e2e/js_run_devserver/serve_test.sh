@@ -30,9 +30,14 @@ trap _exit EXIT
 
 echo "Waiting for $1 devserver to launch on 8080..."
 
+n=0
 while ! nc -z localhost 8080; do
-  echo "."
-  sleep 0.5 # wait before check again
+  if [ $n -gt 100 ]; then
+    echo "ERROR: Expected http://localhost:8080 to be available"
+    exit 1
+  fi
+  sleep 1 # wait before check again
+  ((n=n+1))
 done
 
 echo "Waiting 5 seconds for devservers to settle..."
@@ -73,12 +78,14 @@ fi
 echo "<div>A new file</div>" > src/new.html
 _sedi 's#"other.html"#"other.html", "new.html"#' src/BUILD.bazel
 
-echo "Waiting 10 seconds for ibazel rebuild after change to src/BUILD.bazel..."
-sleep 10
-
-if ! curl http://localhost:8080/new.html --fail 2>/dev/null | grep "A new file"; then
-  echo "ERROR: Expected http://localhost:8080/new.html to contain 'A new file'"
-  exit 1
-fi
+n=0
+while ! curl http://localhost:8080/new.html --fail 2>/dev/null | grep "A new file"; do
+  if [ $n -gt 60 ]; then
+    echo "ERROR: Expected http://localhost:8080/new.html to contain 'A new file'"
+    exit 1
+  fi
+  sleep 1 # wait before check again
+  ((n=n+1))
+done
 
 echo "All tests passed"
