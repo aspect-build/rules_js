@@ -23,7 +23,7 @@ You may wish to read the [generated API documentation](/docs/npm_import.md#npm_t
 
 ## Rules overview
 
-As a high level overview, the primary rules and targets used by developers are:
+As a high level overview, the primary rules and targets used by developers to fetch and link npm package dependencies are:
 
 -   [`npm_translate_lock()`](/docs/npm_import.md#npm_translate_lock) - generate targets representing packages from a lockfile (normally a pnpm-lock.yaml).
 -   [`npm_link_all_packages()`](/docs/npm_link_all_packages.md#npm_link_all_packages) - defines a `node_modules` tree and the associated `node_modules/{package}` targets. This is normally done alongside each package.json file (normally projects within a pnpm workspace).
