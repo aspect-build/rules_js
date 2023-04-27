@@ -410,12 +410,37 @@ def _copy_input_file(priv, rctx, label_store, key):
             utils.hash(rctx.read(label_store.path(key))),
         )
 
-    # use rctx.download to copy the file instead of rctx.read + rctx.file so that
-    # binary files are handled correctly
-    rctx.download(
-        output = label_store.repository_path(key),
-        url = "file:" + label_store.path(key),
+    # Copy the file using cp (linux/macos) or xcopy (windows). Don't use the rctx.template
+    # trick with empty substitution as this does not copy over binary files properly. Also do not
+    # use the rctx.download with `file:` url trick since that messes with the
+    # experimental_remote_downloader option. rctx.read follows by rctx.file also does not
+    # work since it can't handle binary files.
+    _copy_input_file_action(rctx, label_store.path(key), label_store.repository_path(key))
+
+def _copy_input_file_action(rctx, src, dst):
+    is_windows = repo_utils.is_windows(rctx)
+
+    # ensure the destination directory exists
+    dst_segments = dst.split("/")
+    if len(dst_segments) > 1:
+        dirname = "/".join(dst_segments[:-1])
+        args = ["mkdir", "-p", dirname] if not is_windows else ["cmd", "/c", "if not exist {dir} (mkdir {dir})".format(dir = dirname.replace("/", "\\"))]
+        result = rctx.execute(
+            args,
+            quiet = rctx.attr.quiet,
+        )
+        if result.return_code:
+            msg = "'{}' failed: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(args), result.stdout, result.stderr)
+            fail(msg)
+
+    cp_args = ["cp", "-f", src, dst] if not is_windows else ["xcopy", "/Y", src.replace("/", "\\"), "\\".join(dst_segments) + "*"]
+    result = rctx.execute(
+        cp_args,
+        quiet = rctx.attr.quiet,
     )
+    if result.return_code:
+        msg = "'{}' failed: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(cp_args), result.stdout, result.stderr)
+        fail(msg)
 
 ################################################################################
 def _load_npmrc(priv, rctx, npmrc_path):
