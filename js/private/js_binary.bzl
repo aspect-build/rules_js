@@ -553,8 +553,7 @@ js_binary = rule(
 js_test = rule(
     doc = """Identical to js_binary, but usable under `bazel test`.
 
-All [common binary attributes](https://bazel.build/reference/be/common-definitions#common-attributes-binaries)
-and [common test attributes](https://bazel.build/reference/be/common-definitions#common-attributes-tests) are
+All [common test attributes](https://bazel.build/reference/be/common-definitions#common-attributes-tests) are
 supported including `args` as the list of arguments passed node.js.
 
 Bazel will set environment variables when a test target is run under `bazel test` and `bazel run`
