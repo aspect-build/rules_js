@@ -36,6 +36,9 @@ based on the requested target platform. Use the
 [`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
 Bazel option to see more detail about the selection.
 
+All [common binary attributes](https://bazel.build/reference/be/common-definitions#common-attributes-binaries) are supported
+including `args` as the list of arguments passed Node.js.
+
 This rules requires that Bazel was run with
 [`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
 
@@ -77,6 +80,9 @@ js_test(<a href="#js_test-name">name</a>, <a href="#js_test-chdir">chdir</a>, <a
 </pre>
 
 Identical to js_binary, but usable under `bazel test`.
+
+All [common test attributes](https://bazel.build/reference/be/common-definitions#common-attributes-tests) are
+supported including `args` as the list of arguments passed Node.js.
 
 Bazel will set environment variables when a test target is run under `bazel test` and `bazel run`
 that a test runner can use.
