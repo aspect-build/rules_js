@@ -6,7 +6,9 @@ const url = require('url')
 const fs = require('fs')
 const chalk = require('chalk')
 
-const port = Number(process.argv[process.argv.length - 1])
+const port = Number(process.env['PORT'])
+
+console.log(`${process.pid}: ${__filename} Serving port ${port}.`)
 
 process.on(
     'exit',
@@ -38,4 +40,6 @@ http.createServer(function (req, res) {
         console.error(e)
         process.exit(1)
     })
-    .listen(port)
+    .listen(port, () =>
+        console.log(`${process.pid}: HTTP server running @ ${port}.`)
+    )
