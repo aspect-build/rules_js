@@ -38,6 +38,10 @@ js_run_devserver(
 # can be used with `multirun` below.
 command(
     name = "serve",
+    args = [
+        "-p",
+        "8080",
+    ],
     arguments = ["."],
     command = ":devserver",
 )
@@ -72,6 +76,10 @@ js_run_devserver(
 # can be used with `multirun` below.
 command(
     name = "serve_alt",
+    args = [
+        "-p",
+        "8081",
+    ],
     arguments = ["http_root"],
     command = ":devserver_alt",
 )
@@ -103,6 +111,7 @@ js_library(
 # Another example but this time using a simple custom http-server js_library
 js_run_devserver(
     name = "serve_simple",
+    args = ["8082"],
     chdir = package_name(),
     command = "./simple.js",
     data = [
@@ -115,6 +124,7 @@ js_run_devserver(
 # Now the js_binary variant
 js_binary(
     name = "simple_bin",
+    args = ["8083"],
     data = [
         "//:node_modules/chalk",
     ],
@@ -124,6 +134,7 @@ js_binary(
 # Another example but this time using a simple custom http-server js_binary
 js_run_devserver(
     name = "serve_simple_bin",
+    args = ["8083"],
     chdir = package_name(),
     data = [
         ":web_files",
@@ -147,6 +158,7 @@ js_library(
 # Another example but this time using a naughty custom http-server js_library
 js_run_devserver(
     name = "serve_naughty",
+    args = ["8090"],
     chdir = package_name(),
     command = "./naughty.js",
     data = [
@@ -160,6 +172,7 @@ js_run_devserver(
 # Now the js_binary variant
 js_binary(
     name = "naughty_bin",
+    args = ["8091"],
     data = [
         "//:node_modules/chalk",
     ],
@@ -169,6 +182,7 @@ js_binary(
 # Another example but this time using a naughty custom http-server js_binary
 js_run_devserver(
     name = "serve_naughty_bin",
+    args = ["8091"],
     chdir = package_name(),
     data = [
         ":web_files",
