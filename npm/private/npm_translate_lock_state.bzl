@@ -37,8 +37,12 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     _init_patches_labels(priv, rctx, label_store)
 
     root_package_json_declared = label_store.has("package_json_root")
-    if root_package_json_declared:
+    if root_package_json_declared and _should_update_pnpm_lock(priv):
+        # If we need to read the patches list from the package.json since
+        # update_pnpm_lock is enabled and the user has declared the root package.json
+        # as an input file then we can read it right away.
         _init_patched_dependencies_labels(priv, rctx, label_store)
+        priv["patched_dependencies_labels_initialized"] = True
 
     if _should_update_pnpm_lock(priv) or not rctx.attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
@@ -56,10 +60,11 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if pnpm_lock_exists:
         _load_lockfile(priv, rctx, label_store)
 
-    if not root_package_json_declared:
-        # If a root package.json label wasn't declared then we didn't load pnpm.patchedDependencies
-        # above. Try again now that the lockfile has been read so that we can derive the root
-        # package.json from the `importers` field.
+    if not priv["patched_dependencies_labels_initialized"]:
+        # If we didn't initialize the patched dependency labels above then try again now. We'll either
+        # read the list of patches from the lock file now that it has been read or, if update_pnpm_lock
+        # is enabled, we can derive the existance of a root package.json by looking for a `.` importer
+        # in the `importers` list.
         _init_patched_dependencies_labels(priv, rctx, label_store)
 
     if _should_update_pnpm_lock(priv):
@@ -177,12 +182,19 @@ def _init_patches_labels(priv, rctx, label_store):
         label_store.add("patches_{}".format(i), d)
 
     priv["num_patches"] = len(patches)
+    priv["patched_dependencies_labels_initialized"] = False
 
 ################################################################################
 def _init_patched_dependencies_labels(priv, rctx, label_store):
-    # Add patches from `pnpm.patchedDependencies`
-    root_package_json = _load_root_package_json(priv, rctx, label_store)
-    patches = ["//%s:%s" % (label_store.label("pnpm_lock").package, patch) for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
+    if rctx.attr.update_pnpm_lock:
+        # Read patches from package.json `pnpm.patchedDependencies`
+        root_package_json = _load_root_package_json(priv, rctx, label_store)
+        patches = ["//%s:%s" % (label_store.label("pnpm_lock").package, patch) for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
+    else:
+        # Read patches from pnpm-lock.yaml `patchedDependencies`
+        patches = []
+        for patch_info in priv["patched_dependencies"].values():
+            patches.append("//%s:%s" % (label_store.label("pnpm_lock").package, patch_info.get("path")))
 
     # Convert patch label strings to labels
     patches = [rctx.attr.pnpm_lock.relative(p) for p in patches]
@@ -327,9 +339,16 @@ WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lo
                 fail(msg)
             _copy_input_file(priv, rctx, label_store, package_json_key)
 
-    # pnpm.patchedDependencies patch files
-    root_package_json = _load_root_package_json(priv, rctx, label_store)
-    pnpm_patches = root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()
+    if rctx.attr.update_pnpm_lock:
+        # Read patches from package.json `pnpm.patchedDependencies`
+        root_package_json = _load_root_package_json(priv, rctx, label_store)
+        pnpm_patches = root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()
+    else:
+        # Read patches from pnpm-lock.yaml `patchedDependencies`
+        pnpm_patches = []
+        for patch_info in priv["patched_dependencies"].values():
+            pnpm_patches.append(patch_info.get("path"))
+
     num_patches = priv["num_patches"]
 
     for i, _ in enumerate(pnpm_patches):
