@@ -617,7 +617,7 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patch
     repositories_bzl = []
 
     if len(npm_imports) > 0:
-        repositories_bzl.append("""load("@aspect_rules_js//npm:npm_import.bzl", "npm_import")""")
+        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
         repositories_bzl.append("")
 
     repositories_bzl.append("def npm_repositories():")

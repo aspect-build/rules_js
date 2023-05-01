@@ -65,7 +65,7 @@ The `:node_modules/{package}` targets accessible to a package align with how Nod
 In `WORKSPACE`, call the repository rule pointing to your `pnpm-lock.yaml` file:
 
 ```starlark
-load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 
 # Uses the pnpm-lock.yaml file to automate creation of npm_import rules
 npm_translate_lock(
