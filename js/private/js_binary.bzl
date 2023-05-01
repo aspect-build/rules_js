@@ -296,22 +296,32 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
         ))
 
-    # Automatically add common and useful make variables to the environment
-    builtin_envs = {
+    # Add common and useful make variables to the environment
+    makevars = {
         "JS_BINARY__BINDIR": "$(BINDIR)",
-        "JS_BINARY__BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
         "JS_BINARY__COMPILATION_MODE": "$(COMPILATION_MODE)",
-        "JS_BINARY__PACKAGE": ctx.label.package,
         "JS_BINARY__TARGET_CPU": "$(TARGET_CPU)",
-        "JS_BINARY__TARGET_NAME": ctx.label.name,
-        "JS_BINARY__TARGET": "$(TARGET)",
-        "JS_BINARY__WORKSPACE": "$(WORKSPACE)",
     }
-    for (key, value) in builtin_envs.items():
+    for (key, value) in makevars.items():
         envs.append(_ENV_SET.format(
             var = key,
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
+            value = ctx.expand_make_variables("env", value, {}),
         ))
+
+    # Add rule context variables to the environment
+    builtins = {
+        "JS_BINARY__BUILD_FILE_PATH": ctx.build_file_path,
+        "JS_BINARY__PACKAGE": ctx.label.package,
+        "JS_BINARY__TARGET_NAME": ctx.label.name,
+        "JS_BINARY__TARGET": "{}//{}:{}".format(
+            "@" + ctx.label.workspace_name if ctx.label.workspace_name else "",
+            ctx.label.package,
+            ctx.label.name,
+        ),
+        "JS_BINARY__WORKSPACE": ctx.workspace_name,
+    }
+    for (key, value) in builtins.items():
+        envs.append(_ENV_SET.format(var = key, value = value))
 
     if ctx.attr.patch_node_fs:
         # Set patch node fs API env if not already set to allow js_run_binary to override
