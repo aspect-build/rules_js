@@ -24,10 +24,6 @@ js_library(
 # as the tool
 js_run_devserver(
     name = "devserver",
-    args = [
-        "-p",
-        "8080",
-    ],
     chdir = package_name(),
     data = [":web_files"],
     log_level = "debug",
@@ -38,10 +34,6 @@ js_run_devserver(
 # can be used with `multirun` below.
 command(
     name = "serve",
-    args = [
-        "-p",
-        "8080",
-    ],
     arguments = ["."],
     command = ":devserver",
 )
@@ -59,29 +51,40 @@ copy_to_directory(
 # entry point
 js_run_devserver(
     name = "devserver_alt",
-    args = [
-        "-p",
-        "8081",
-    ],
     chdir = package_name(),
     command = "../node_modules/.bin/http-server",
     data = [
         ":http_root",
+        ":web_files",
         "//:node_modules/http-server",
     ],
     log_level = "debug",
 )
 
+command(
+    name = "serve_alt",
+    arguments = ["."],
+    command = ":devserver_alt",
+)
+
 # Use command to bake-in the arguments into the runnable binary so that the target
 # can be used with `multirun` below.
 command(
-    name = "serve_alt",
-    args = [
-        "-p",
-        "8081",
-    ],
+    name = "serve-multi-1",
     arguments = ["http_root"],
     command = ":devserver_alt",
+    environment = {
+        "PORT": "8080",
+    },
+)
+
+command(
+    name = "serve-multi-2",
+    arguments = ["http_root"],
+    command = ":devserver_alt",
+    environment = {
+        "PORT": "8081",
+    },
 )
 
 # Example of using multi-run to run two binaries at the same time.
@@ -90,8 +93,8 @@ command(
 multirun(
     name = "serve_multi",
     commands = [
-        ":serve",
-        ":serve_alt",
+        ":serve-multi-1",
+        ":serve-multi-2",
     ],
     jobs = 0,
 )
@@ -111,7 +114,6 @@ js_library(
 # Another example but this time using a simple custom http-server js_library
 js_run_devserver(
     name = "serve_simple",
-    args = ["8082"],
     chdir = package_name(),
     command = "./simple.js",
     data = [
@@ -124,7 +126,6 @@ js_run_devserver(
 # Now the js_binary variant
 js_binary(
     name = "simple_bin",
-    args = ["8083"],
     data = [
         "//:node_modules/chalk",
     ],
@@ -134,7 +135,6 @@ js_binary(
 # Another example but this time using a simple custom http-server js_binary
 js_run_devserver(
     name = "serve_simple_bin",
-    args = ["8083"],
     chdir = package_name(),
     data = [
         ":web_files",
@@ -158,7 +158,6 @@ js_library(
 # Another example but this time using a naughty custom http-server js_library
 js_run_devserver(
     name = "serve_naughty",
-    args = ["8090"],
     chdir = package_name(),
     command = "./naughty.js",
     data = [
@@ -172,7 +171,6 @@ js_run_devserver(
 # Now the js_binary variant
 js_binary(
     name = "naughty_bin",
-    args = ["8091"],
     data = [
         "//:node_modules/chalk",
     ],
@@ -182,7 +180,6 @@ js_binary(
 # Another example but this time using a naughty custom http-server js_binary
 js_run_devserver(
     name = "serve_naughty_bin",
-    args = ["8091"],
     chdir = package_name(),
     data = [
         ":web_files",

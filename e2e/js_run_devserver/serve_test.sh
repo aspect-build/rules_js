@@ -2,8 +2,7 @@
 set -o errexit -o nounset -o pipefail
 
 BZLMOD_FLAG="${BZLMOD_FLAG:-}"
-PORT="$1"
-TARGET="$2"
+TARGET="$1"
 
 # sedi makes `sed -i` work on both OSX & Linux
 # See https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd
@@ -16,7 +15,14 @@ _sedi () {
   sed "${sedi[@]}" "$@"
 }
 
-echo "$$: TEST - $0: $TARGET"
+# Find a random unused port to use
+PORT=$((4080 + $RANDOM))
+while netstat -a | grep $PORT ; do
+  PORT=$((4080 + $RANDOM))
+done
+export PORT
+
+echo "$$: TEST - $0: $TARGET @ $PORT"
 
 ./node_modules/.bin/ibazel run "$TARGET" "$BZLMOD_FLAG" 2>&1 &
 ibazel_pid="$!"
@@ -42,9 +48,6 @@ while ! nc -z localhost $PORT; do
   sleep 1 # wait before check again
   ((n=n+1))
 done
-
-echo "$$: Waiting 5 seconds for devserver to settle..."
-sleep 5
 
 echo "$$: Devserver ready"
 
