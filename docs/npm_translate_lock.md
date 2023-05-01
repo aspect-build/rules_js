@@ -1,11 +1,11 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-Repository rules to fetch third-party npm packages
+Repository rule to fetch npm packages for a lockfile.
 
-Load these with,
+Load this with,
 
 ```starlark
-load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock", "npm_import")
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 ```
 
 These use Bazel's downloader to fetch the packages.
@@ -128,28 +128,5 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 | <a id="npm_translate_lock-package_json"></a>package_json |  Deprecated.<br><br>Add all <code>package.json</code> files that are part of the workspace to <code>data</code> instead.   |  <code>None</code> |
 | <a id="npm_translate_lock-warn_on_unqualified_tarball_url"></a>warn_on_unqualified_tarball_url |  Deprecated. Will be removed in next major release.   |  <code>None</code> |
 | <a id="npm_translate_lock-kwargs"></a>kwargs |  Internal use only   |  none |
-
-
-<a id="pnpm_repository"></a>
-
-## pnpm_repository
-
-<pre>
-pnpm_repository(<a href="#pnpm_repository-name">name</a>, <a href="#pnpm_repository-pnpm_version">pnpm_version</a>)
-</pre>
-
-Import https://npmjs.com/package/pnpm and provide a js_binary to run the tool.
-
-Useful as a way to run exactly the same pnpm as Bazel does, for example with:
-bazel run -- @pnpm//:pnpm --dir $PWD
-
-
-**PARAMETERS**
-
-
-| Name  | Description | Default Value |
-| :------------- | :------------- | :------------- |
-| <a id="pnpm_repository-name"></a>name |  name of the resulting external repository   |  none |
-| <a id="pnpm_repository-pnpm_version"></a>pnpm_version |  version of pnpm, see https://www.npmjs.com/package/pnpm?activeTab=versions   |  <code>"8.1.0"</code> |
 
 

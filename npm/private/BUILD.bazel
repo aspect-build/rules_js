@@ -79,7 +79,10 @@ bzl_library(
 bzl_library(
     name = "npm_import",
     srcs = ["npm_import.bzl"],
-    visibility = ["//npm:__subpackages__"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//npm:__subpackages__",
+    ],
     deps = [
         ":starlark_codegen_utils",
         ":utils",
@@ -153,7 +156,10 @@ bzl_library(
 bzl_library(
     name = "npm_translate_lock",
     srcs = ["npm_translate_lock.bzl"],
-    visibility = ["//npm:__subpackages__"],
+    visibility = [
+        "//docs:__subpackages__",
+        "//npm:__subpackages__",
+    ],
     deps = [
         ":list_sources",
         ":npm_translate_lock_generate",
@@ -161,8 +167,10 @@ bzl_library(
         ":npm_translate_lock_macro_helpers",
         ":npm_translate_lock_state",
         ":npmrc",
+        ":pnpm_repository",
         ":transitive_closure",
         ":utils",
+        "@aspect_bazel_lib//lib:repositories",
         "@aspect_bazel_lib//lib:write_source_files",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:paths",

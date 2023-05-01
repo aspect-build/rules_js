@@ -1,4 +1,21 @@
-"Repository rules for importing packages from npm"
+"""
+Repository rule to fetch npm packages.
+
+Load this with,
+
+```starlark
+load("@aspect_rules_js//npm:repositories.bzl", "npm_import")
+```
+
+This uses Bazel's downloader to fetch the packages.
+You can use this to redirect all fetches through a store like Artifactory.
+
+See &lt;https://blog.aspect.dev/configuring-bazels-downloader&gt; for more info about how it works
+and how to configure it.
+
+See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API to fetch npm packages
+for a given lockfile.
+"""
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")

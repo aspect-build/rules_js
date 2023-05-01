@@ -42,7 +42,7 @@ stardoc_with_diff_test(
 
 stardoc_with_diff_test(
     name = "npm_import",
-    bzl_library_target = "//npm:repositories",
+    bzl_library_target = "//npm/private:npm_import",
     symbol_names = [
         "npm_import",
     ],
@@ -50,10 +50,9 @@ stardoc_with_diff_test(
 
 stardoc_with_diff_test(
     name = "npm_translate_lock",
-    bzl_library_target = "//npm:repositories",
+    bzl_library_target = "//npm/private:npm_translate_lock",
     symbol_names = [
         "list_patches",
-        "pnpm_repository",
         "npm_translate_lock",
     ],
 )
