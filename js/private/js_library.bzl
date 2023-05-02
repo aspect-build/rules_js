@@ -186,6 +186,12 @@ def _js_library_impl(ctx):
         files = ctx.files.srcs,
     )
 
+    data_sources, data_declarations = _gather_sources_and_declarations(
+        ctx = ctx,
+        targets = ctx.attr.data,
+        files = ctx.files.data,
+    )
+
     additional_sources, additional_declarations = _gather_sources_and_declarations(
         ctx = ctx,
         targets = ctx.attr.declarations,
@@ -193,10 +199,10 @@ def _js_library_impl(ctx):
     )
 
     sources = depset(transitive = [sources, additional_sources])
-    declarations = depset(transitive = [declarations, additional_sources, additional_declarations])
+    declarations = depset(transitive = [declarations, additional_sources, additional_declarations, data_declarations])
 
     transitive_sources = gather_transitive_sources(
-        sources = sources,
+        sources = depset(transitive = [sources, data_sources]),
         targets = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
     )
 
