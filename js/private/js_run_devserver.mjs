@@ -48,10 +48,26 @@ async function syncRecursive(src, dst, writePerm) {
         const exists = synced.has(src) || fs.existsSync(dst)
         synced.set(src, lstat.mtimeMs)
         if (lstat.isSymbolicLink()) {
+            const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
             if (process.env.JS_BINARY__LOG_DEBUG) {
-                console.error(
-                    `Syncing symlink ${src.slice(RUNFILES_ROOT.length + 1)}`
+                console.error(`Syncing symlink ${srcWorkspacePath}`)
+            }
+            if (path.basename(path.dirname(src)) == 'node_modules') {
+                // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
+                // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
+                const maybeBinSrc = path.join(
+                    process.env.JS_BINARY__EXECROOT,
+                    process.env.JS_BINARY__BINDIR,
+                    srcWorkspacePath
                 )
+                if (fs.existsSync(maybeBinSrc)) {
+                    if (process.env.JS_BINARY__LOG_DEBUG) {
+                        console.error(
+                            `Syncing to bazel-out copy of symlink ${srcWorkspacePath}`
+                        )
+                    }
+                    src = maybeBinSrc
+                }
             }
             if (exists) {
                 await fs.promises.unlink(dst)
