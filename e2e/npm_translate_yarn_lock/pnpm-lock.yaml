@@ -1,7 +1,7 @@
 lockfileVersion: '6.0'
 
 overrides:
-  '@types/node': 18.11.18
+  '@types/node': 18.16.3
 
 dependencies:
   botframework-connector:
@@ -9,7 +9,7 @@ dependencies:
     version: 4.19.3
   karma-typescript:
     specifier: 5.5.3
-    version: 5.5.3(karma@6.4.1)(typescript@4.9.5)
+    version: 5.5.3(karma@6.4.2)(typescript@4.9.5)
   lodash:
     specifier: 4.17.21
     version: 4.17.21
@@ -419,11 +419,11 @@ packages:
   /@types/cors@2.8.13:
     resolution: {integrity: sha512-RG8AStHlUiV5ysZQKq97copd2UmVYw3/pRMLefISZ3S1hK104Cwm7iLQ3fTKx+lsUH2CE8FlLaYeEA2LSeqYUA==}
     dependencies:
-      '@types/node': 18.11.18
+      '@types/node': 18.16.3
     dev: false
 
-  /@types/node@18.11.18:
-    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==}
+  /@types/node@18.16.3:
+    resolution: {integrity: sha512-OPs5WnnT1xkCBiuQrZA4+YAV4HEJejmHneyraIaxsbev5yCEr6KMwINNFP9wQeFIw8FWcoTqF3vQsa5CDaI+8Q==}
     dev: false
 
   /@xmldom/xmldom@0.7.9:
@@ -1101,13 +1101,13 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: false
 
-  /engine.io@6.4.1:
-    resolution: {integrity: sha512-JFYQurD/nbsA5BSPmbaOSLa3tSVj8L6o4srSwXXY3NqE+gGUNmmPTbhn8tjzcCtSqhFgIeqef81ngny8JM25hw==}
+  /engine.io@6.4.2:
+    resolution: {integrity: sha512-FKn/3oMiJjrOEOeUub2WCox6JhxBXq/Zn3fZOMCBxKnNYtsdKjxhl7yR3fZhM9PV+rdE75SU5SYMc+2PGzo+Tg==}
     engines: {node: '>=10.0.0'}
     dependencies:
       '@types/cookie': 0.4.1
       '@types/cors': 2.8.13
-      '@types/node': 18.11.18
+      '@types/node': 18.16.3
       accepts: 1.3.8
       base64id: 2.0.0
       cookie: 0.4.2
@@ -1650,7 +1650,7 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /karma-typescript@5.5.3(karma@6.4.1)(typescript@4.9.5):
+  /karma-typescript@5.5.3(karma@6.4.2)(typescript@4.9.5):
     resolution: {integrity: sha512-l1FHurolXEBIzRa9ExpNtjzysAhsi/vLpTazpwLHWWK86mknvVpqor6pRZ5Nid7jvOPrTBqAq0JRuLgiCdRkFw==}
     peerDependencies:
       karma: 1 || 2 || 3 || 4 || 5 || 6
@@ -1679,7 +1679,7 @@ packages:
       istanbul-lib-source-maps: 4.0.1
       istanbul-reports: 3.1.5
       json-stringify-safe: 5.0.1
-      karma: 6.4.1
+      karma: 6.4.2
       lodash: 4.17.21
       log4js: 6.9.1
       minimatch: 3.1.2
@@ -1705,8 +1705,8 @@ packages:
       - supports-color
     dev: false
 
-  /karma@6.4.1:
-    resolution: {integrity: sha512-Cj57NKOskK7wtFWSlMvZf459iX+kpYIPXmkNUzP2WAFcA7nhr/ALn5R7sw3w+1udFDcpMx/tuB8d5amgm3ijaA==}
+  /karma@6.4.2:
+    resolution: {integrity: sha512-C6SU/53LB31BEgRg+omznBEMY4SjHU3ricV6zBcAe1EeILKkeScr+fZXtaI5WyDbkVowJxxAI6h73NcFPmXolQ==}
     engines: {node: '>= 10'}
     hasBin: true
     dependencies:
@@ -1732,7 +1732,7 @@ packages:
       socket.io: 4.6.1
       source-map: 0.6.1
       tmp: 0.2.1
-      ua-parser-js: 0.7.34
+      ua-parser-js: 0.7.35
       yargs: 16.2.0
     transitivePeerDependencies:
       - bufferutil
@@ -2221,7 +2221,7 @@ packages:
       accepts: 1.3.8
       base64id: 2.0.0
       debug: 4.3.4
-      engine.io: 6.4.1
+      engine.io: 6.4.2
       socket.io-adapter: 2.5.2
       socket.io-parser: 4.2.2
     transitivePeerDependencies:
@@ -2403,8 +2403,8 @@ packages:
     hasBin: true
     dev: false
 
-  /ua-parser-js@0.7.34:
-    resolution: {integrity: sha512-cJMeh/eOILyGu0ejgTKB95yKT3zOenSe9UGE3vj6WfiOwgGYnmATUsnDixMFvdU+rNMvWih83hrUP8VwhF9yXQ==}
+  /ua-parser-js@0.7.35:
+    resolution: {integrity: sha512-veRf7dawaj9xaWEu9HoTVn5Pggtc/qj+kqTOFvNiN1l0YdxwC1kvel57UCjThjGa3BHBihE8/UJAHI+uQHmd/g==}
     dev: false
 
   /underscore@1.13.6:

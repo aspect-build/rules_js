@@ -1,34 +1,32 @@
 lockfileVersion: '6.0'
 
-importers:
+dependencies:
+  debug:
+    specifier: 4.3.4
+    version: registry.npmjs.org/debug@4.3.4
+  is-odd:
+    specifier: 3.0.1
+    version: registry.npmjs.org/is-odd@3.0.1
+  semver:
+    specifier: 7.3.8
+    version: registry.npmjs.org/semver@7.3.8
 
-  .:
-    dependencies:
-      debug:
-        specifier: 4.3.4
-        version: registry.npmjs.org/debug@4.3.4
-      is-odd:
-        specifier: 3.0.1
-        version: registry.npmjs.org/is-odd@3.0.1
-      semver:
-        specifier: 7.3.8
-        version: registry.npmjs.org/semver@7.3.8
-    devDependencies:
-      '@rollup/plugin-commonjs':
-        specifier: 23.0.4
-        version: 23.0.4
-      '@rollup/plugin-json':
-        specifier: 5.0.2
-        version: 5.0.2
-      '@rollup/plugin-node-resolve':
-        specifier: 15.0.1
-        version: 15.0.1
-      '@types/node':
-        specifier: 18.16.3
-        version: registry.npmjs.org/@types/node@18.16.3
-      '@types/semver':
-        specifier: 7.3.13
-        version: registry.npmjs.org/@types/semver@7.3.13
+devDependencies:
+  '@rollup/plugin-commonjs':
+    specifier: 23.0.4
+    version: 23.0.4
+  '@rollup/plugin-json':
+    specifier: 5.0.2
+    version: 5.0.2
+  '@rollup/plugin-node-resolve':
+    specifier: 15.0.1
+    version: 15.0.1
+  '@types/node':
+    specifier: 18.16.3
+    version: registry.npmjs.org/@types/node@18.16.3
+  '@types/semver':
+    specifier: 7.3.13
+    version: registry.npmjs.org/@types/semver@7.3.13
 
 packages:
 
