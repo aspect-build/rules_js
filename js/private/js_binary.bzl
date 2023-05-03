@@ -268,7 +268,6 @@ _ATTRS = {
         default = Label("//js/private:npm_wrapper.bat"),
         allow_single_file = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_legacy_files": attr.label_list(
         allow_files = True,
         default = ["@aspect_rules_js//js/private/node-patches_legacy:fs.js"],
@@ -450,8 +449,13 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
 
     return launcher, toolchain_files
 
+def _is_windows(nodeinfo):
+    target_tool_path = nodeinfo.target_tool_path
+    return target_tool_path.endswith('.exe') or target_tool_path.endswith('.cmd') or target_tool_path.endswith('.bat')
+
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+    toolchain = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"]
+    is_windows = _is_windows(toolchain.nodeinfo)
     is_bazel_6 = is_bazel_6_or_greater()
     unresolved_symlinks_enabled = False
     if hasattr(ctx.attr, "unresolved_symlinks_enabled"):
@@ -461,7 +465,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     if is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")
 
-    if ctx.attr.include_npm and not hasattr(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo, "npm_files"):
+    if ctx.attr.include_npm and not hasattr(toolchain.nodeinfo, "npm_files"):
         fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
 
     if DirectoryPathInfo in ctx.attr.entry_point:
@@ -497,9 +501,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         files.extend(ctx.files._node_patches_legacy_files + [ctx.file._node_patches_legacy])
     else:
         files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
-    files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+    files.extend(toolchain.nodeinfo.tool_files)
     if ctx.attr.include_npm:
-        files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_files)
+        files.extend(toolchain.nodeinfo.npm_files)
 
     runfiles = ctx.runfiles(
         files = files,

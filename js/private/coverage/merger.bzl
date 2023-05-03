@@ -10,7 +10,6 @@ _ATTRS = {
         default = Label("//js/private/coverage:coverage.sh.tpl"),
         allow_single_file = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
 # Do the opposite of _to_manifest_path in
@@ -20,9 +19,13 @@ _ATTRS = {
 def _target_tool_short_path(workspace_name, path):
     return (workspace_name + "/../" + path[len("external/"):]) if path.startswith("external/") else path
 
+def _is_windows(nodeinfo):
+    target_tool_path = nodeinfo.target_tool_path
+    return target_tool_path.endswith('.exe') or target_tool_path.endswith('.cmd') or target_tool_path.endswith('.bat')
+
 def _impl(ctx):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
+    is_windows = _is_windows(node_bin)
 
     # Create launcher
     bash_launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
