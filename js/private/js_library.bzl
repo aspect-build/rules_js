@@ -25,7 +25,7 @@ js_library(
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_library_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.

@@ -21,7 +21,7 @@ load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":js_binary_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _DOC = """Execute a program in the Node.js runtime.

@@ -1,6 +1,6 @@
 """Helper rule to gather files from JsInfo providers of targets and provide them as default outputs"""
 
-load("//js/private:js_binary_helpers.bzl", _gather_files_from_js_providers = "gather_files_from_js_providers")
+load("//js/private:js_helpers.bzl", _gather_files_from_js_providers = "gather_files_from_js_providers")
 
 _DOC = """Gathers files from the JsInfo providers from targets in srcs and provides them as default outputs.
 
