@@ -88,6 +88,19 @@ runtime dependency on this target.
         providers = [JsInfo],
     ),
     "data": JS_LIBRARY_DATA_ATTR,
+    "no_copy_to_bin": attr.label_list(
+        allow_files = True,
+        doc = """List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
+
+        This is useful for exceptional cases where a `copy_to_bin` is not possible or not suitable for an input
+        file such as a file in an external repository. In most cases, this option is not needed.
+        See `copy_data_to_bin` docstring for more info.
+        """,
+    ),
+    "copy_data_to_bin": attr.bool(
+        doc = """When True, `data` files are copied to the Bazel output tree before being passed as inputs to runfiles.""",
+        default = True,
+    ),
 }
 
 def _gather_sources_and_declarations(ctx, targets, files):
@@ -219,6 +232,12 @@ def _js_library_impl(ctx):
         sources = transitive_sources,
         data = ctx.attr.data,
         deps = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
+        data_files = ctx.files.data,
+        copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+        no_copy_to_bin = ctx.files.no_copy_to_bin,
+        include_transitive_sources = True,
+        include_declarations = False,
+        include_npm_linked_packages = True,
     )
 
     return [

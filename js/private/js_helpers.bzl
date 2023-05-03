@@ -1,6 +1,7 @@
 """`js_library` helper functions.
 """
 
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load("//npm:providers.bzl", "NpmPackageStoreInfo")
 load(":js_info.bzl", "JsInfo")
 
@@ -137,7 +138,7 @@ def gather_npm_package_store_deps(targets):
 
     return depset([], transitive = npm_package_store_deps)
 
-def gather_runfiles(ctx, sources, data, deps):
+def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_to_bin = False, no_copy_to_bin = [], include_transitive_sources = True, include_declarations = False, include_npm_linked_packages = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
@@ -151,13 +152,23 @@ def gather_runfiles(ctx, sources, data, deps):
 
         sources: list or depset of files which should be included in runfiles
 
+        deps: list of dependency targets; only transitive runfiles are gather from these targets
+
         data: list of data targets; default outputs and transitive runfiles are gather from these targets
 
             See https://bazel.build/reference/be/common-definitions#typical.data and
             https://bazel.build/concepts/dependencies#data-dependencies for more info and guidance
             on common usage of the `data` attribute in build rules.
 
-        deps: list of dependency targets; only transitive runfiles are gather from these targets
+        data_files: a list of files which should be included in runfiles
+
+        copy_data_files_to_bin: whether to copy files to the bin directory
+
+        no_copy_to_bin: a list of files which should not be copied to the bin directory and instead
+
+        include_transitive_sources: see js_filegroup documentation
+        include_declarations: see js_filegroup documentation
+        include_npm_linked_packages: see js_filegroup documentation
 
     Returns:
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
@@ -178,13 +189,24 @@ def gather_runfiles(ctx, sources, data, deps):
     # NpmPackageStoreInfo providers of data & deps targets.
     transitive_files_depsets.append(gather_files_from_js_providers(
         targets = data + deps,
-        include_transitive_sources = True,
-        include_declarations = False,
-        include_npm_linked_packages = True,
+        include_transitive_sources = include_transitive_sources,
+        include_declarations = include_declarations,
+        include_npm_linked_packages = include_npm_linked_packages,
     ))
+
+    files_runfiles = []
+    for d in data_files:
+        if copy_data_files_to_bin and d not in no_copy_to_bin:
+            files_runfiles.append(copy_file_to_bin_action(ctx, d))
+        else:
+            files_runfiles.append(d)
+
+    if len(files_runfiles) > 0:
+        transitive_files_depsets.append(depset(files_runfiles))
 
     # Merge the above with the transitive runfiles of data & deps.
     return ctx.runfiles(
+        files = files_runfiles,
         transitive_files = depset(transitive = transitive_files_depsets),
     ).merge_all([
         target[DefaultInfo].default_runfiles
