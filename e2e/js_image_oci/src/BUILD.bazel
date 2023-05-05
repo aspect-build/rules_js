@@ -1,6 +1,7 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
-load("@contrib_rules_oci//oci:defs.bzl", "oci_image", "structure_test")
+load("@rules_oci//oci:defs.bzl", "oci_image")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@container_structure_test//:defs.bzl", "container_structure_test")
 
 js_binary(
     name = "main",
@@ -20,37 +21,48 @@ js_image_layer(
     visibility = ["//visibility:__pkg__"],
 )
 
+oci_image(
+    name = "image",
+    # Since js_binary depends on bash we have to bring in a base image that has bash
+    base = "@debian",
+    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
+    cmd = ["/app/src/main"],
+    entrypoint = ["bash"],
+    tars = [
+        ":layers",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 platform(
-    name = "amd64_linux",
+    name = "linux_amd64",
     constraint_values = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
 )
 
-platform_transition_filegroup(
-    name = "transitioned_layers",
-    srcs = [":layers"],
-    target_platform = ":amd64_linux",
-)
-
-oci_image(
-    name = "image",
-    # Since js_binary depends on bash we have to bring in a base image that has bash
-    base = "@debian_amd64//:image",
-    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
-    cmd = ["/app/src/main"],
-    entrypoint = ["bash"],
-    tars = [
-        ":transitioned_layers",
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
     ],
-    visibility = ["//visibility:public"],
 )
 
-structure_test(
+platform_transition_filegroup(
+    name = "transitioned_image",
+    srcs = [":image"],
+    target_platform = select({
+        "@platforms//cpu:arm64": ":linux_arm64",
+        "@platforms//cpu:x86_64": ":linux_amd64",
+    }),
+)
+
+container_structure_test(
     name = "image_test",
-    config = ["test.yaml"],
-    image = ":image",
+    configs = ["test.yaml"],
+    image = ":transitioned_image",
     # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
     tags = ["no-remote-exec"],
 )

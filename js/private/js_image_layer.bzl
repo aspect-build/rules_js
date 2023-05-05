@@ -31,7 +31,7 @@ js_image_layer supports transitioning to specific `platform` to allow building m
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
-load("@contrib_rules_oci//oci:defs.bzl", "oci_image")
+load("@rules_oci//oci:defs.bzl", "oci_image")
 
 js_binary(
     name = "binary",
@@ -68,7 +68,7 @@ oci_image(
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
-load("@contrib_rules_oci//oci:defs.bzl", "oci_image", "oci_image_index")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index")
 
 js_binary(
     name = "binary",
