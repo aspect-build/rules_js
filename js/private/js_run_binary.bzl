@@ -14,7 +14,7 @@ load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":js_binary_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
+load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_filegroup.bzl", _js_filegroup = "js_filegroup")
 load(":js_library.bzl", _js_library = "js_library")
 

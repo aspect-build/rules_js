@@ -18,10 +18,9 @@ js_binary(
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":js_binary_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_providers")
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _DOC = """Execute a program in the Node.js runtime.
@@ -479,40 +478,27 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     bash_launcher, toolchain_files = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    files = [bash_launcher] + toolchain_files
-    if ctx.attr.copy_data_to_bin:
-        if entry_point not in ctx.files.no_copy_to_bin:
-            files.append(copy_file_to_bin_action(ctx, entry_point))
-        else:
-            files.append(entry_point)
-        for d in ctx.files.data:
-            if d not in ctx.files.no_copy_to_bin:
-                files.append(copy_file_to_bin_action(ctx, d))
-            else:
-                files.append(d)
-    else:
-        files.append(entry_point)
-        files.extend(ctx.files.data)
+    launcher_files = [bash_launcher] + toolchain_files
     if use_legacy_node_patches:
-        files.extend(ctx.files._node_patches_legacy_files + [ctx.file._node_patches_legacy])
+        launcher_files.extend(ctx.files._node_patches_legacy_files + [ctx.file._node_patches_legacy])
     else:
-        files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
-    files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+        launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
+    launcher_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
     if ctx.attr.include_npm:
-        files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_files)
+        launcher_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_files)
 
-    runfiles = ctx.runfiles(
-        files = files,
-        transitive_files = gather_files_from_js_providers(
-            targets = ctx.attr.data,
-            include_transitive_sources = ctx.attr.include_transitive_sources,
-            include_declarations = ctx.attr.include_declarations,
-            include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
-        ),
-    ).merge_all([
-        target[DefaultInfo].default_runfiles
-        for target in ctx.attr.data
-    ])
+    runfiles = gather_runfiles(
+        ctx = ctx,
+        sources = [],
+        data = ctx.attr.data,
+        data_files = [entry_point] + ctx.files.data,
+        deps = [],
+        copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+        no_copy_to_bin = ctx.files.no_copy_to_bin,
+        include_transitive_sources = ctx.attr.include_transitive_sources,
+        include_declarations = ctx.attr.include_declarations,
+        include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
+    ).merge(ctx.runfiles(files = launcher_files))
 
     return struct(
         executable = launcher,
