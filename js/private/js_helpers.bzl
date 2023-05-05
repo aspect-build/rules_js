@@ -160,14 +160,24 @@ def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_t
             https://bazel.build/concepts/dependencies#data-dependencies for more info and guidance
             on common usage of the `data` attribute in build rules.
 
-        data_files: a list of files which should be included in runfiles
+        data_files: a list of data files which should be included in runfiles
 
-        copy_data_files_to_bin: whether to copy files to the bin directory
+            Data files that are source files are copied to the Bazel output tree when
+            `copy_data_files_to_bin` is set to `True`.
 
-        no_copy_to_bin: a list of files which should not be copied to the bin directory and instead
+        copy_data_files_to_bin: When True, `data` files that are source files and are copied to the
+            Bazel output tree before being passed to returned runfiles.
+
+        no_copy_to_bin: List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
+
+            This is useful for exceptional cases where a `copy_to_bin` is not possible or not suitable for an input
+            file such as a file in an external repository. In most cases, this option is not needed.
+            See `copy_data_to_bin` docstring for more info.
 
         include_transitive_sources: see js_filegroup documentation
+
         include_declarations: see js_filegroup documentation
+
         include_npm_linked_packages: see js_filegroup documentation
 
     Returns:
