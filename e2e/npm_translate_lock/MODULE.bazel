@@ -5,7 +5,7 @@ module(
 )
 
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
-bazel_dep(name = "aspect_bazel_lib", version = "1.31.0")
+bazel_dep(name = "aspect_bazel_lib", version = "1.29.2")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 
 
