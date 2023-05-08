@@ -406,7 +406,7 @@ def npm_translate_lock(
             touch patches/patches.list
             ```
             
-            Finally, write the patches file at least once to make sure all patches are listed. This can be done by running `bazel run //patches:patches_update`
+            Finally, write the patches file at least once to make sure all patches are listed. This can be done by running `bazel run //patches:patches_update`.
 
             See the `list_patches` documentation for further info.
 
