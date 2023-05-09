@@ -33,10 +33,10 @@ function logf_stderr {
     shift
     if [ "${STDERR_CAPTURE:-}" ]; then
         # shellcheck disable=SC2059
-        printf "$format_string" "$@" >>"$STDERR_CAPTURE"
+        echo -e $(printf "$format_string" "$@") >>"$STDERR_CAPTURE"
     else
         # shellcheck disable=SC2059
-        printf "$format_string" "$@" >&2
+        echo -e $(printf "$format_string" "$@") >&2
     fi
 }
 
