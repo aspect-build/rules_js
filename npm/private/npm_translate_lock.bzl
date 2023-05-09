@@ -409,6 +409,13 @@ def npm_translate_lock(
             Finally, write the patches file at least once to make sure all patches are listed. This can be done by running `bazel run //patches:patches_update`.
 
             See the `list_patches` documentation for further info.
+            NOTE: if you would like to customize the patches directory location, you can set a flag in the `.npmrc`. Here is an example of what this might look like
+            ```
+            # Set the directory for pnpm when patching
+            # https://github.com/pnpm/pnpm/issues/6508#issuecomment-1537242124
+            patches-dir=bazel/js/patches
+            ```
+            If you do this, you will have to update the `verify_patches` path to be this path instead of `//patches` like above.
 
         quiet: Set to False to print info logs and output stdout & stderr of pnpm lock update actions to the console.
 
