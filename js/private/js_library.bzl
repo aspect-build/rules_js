@@ -23,9 +23,8 @@ js_library(
 | Python sources and provides a `PyInfo`.
 """
 
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
@@ -125,35 +124,7 @@ def _gather_sources_and_declarations(ctx, targets, files):
 
     for file in files:
         if file.is_source:
-            if ctx.label.package != file.owner.package:
-                msg = """
-
-Expected to find source file {file_basename} in {this_package}, but instead it is in {file_package}.
-
-All source files in rules_js rules must be in the same package as the target.
-
-See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155/docs#javascript
-for more context on why this is required.
-
-Either move {file_basename} to {this_package}, or add a 'js_library'
-target in {file_basename}'s package and add that target to the deps of {this_target}:
-
-    buildozer 'new_load @aspect_rules_js//js:defs.bzl js_library' {file_package}:__pkg__
-    buildozer 'new js_library {new_target_name}' {file_package}:__pkg__
-    buildozer 'add srcs {file_basename}' {file_package}:{new_target_name}
-    buildozer 'add visibility {this_package}:__pkg__' {file_package}:{new_target_name}
-    buildozer 'remove srcs {file_package}:{file_basename}' {this_target}
-    buildozer 'add srcs {file_package}:{new_target_name}' {this_target}
-
-""".format(
-                    file_basename = file.basename,
-                    file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
-                    new_target_name = file.basename.replace(".", "_"),
-                    this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
-                    this_target = ctx.label,
-                )
-                fail(msg)
-            file = copy_file_to_bin_action(ctx, file)
+            file = copy_js_file_to_bin_action(ctx, file)
 
         if file.is_directory:
             # assume a directory contains declarations since we can't know that it doesn't

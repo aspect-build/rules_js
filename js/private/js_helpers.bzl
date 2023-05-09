@@ -138,6 +138,42 @@ def gather_npm_package_store_deps(targets):
 
     return depset([], transitive = npm_package_store_deps)
 
+def copy_js_file_to_bin_action(ctx, file):
+    if ctx.label.workspace_name != file.owner.workspace_name or ctx.label.package != file.owner.package:
+        msg = """
+
+Expected to find source file {file_basename} in '{this_package}', but instead it is in '{file_package}'.
+
+All source and data files that are not in the Bazel output tree must be in the same package as the
+target so that they can be copied to the output tree in an action.
+
+See https://docs.aspect.build/rules/aspect_rules_js/docs/#javascript for more context on why this is required.
+
+Either move {file_basename} to '{this_package}', or add a 'js_library'
+target in {file_basename}'s package and add that target to the deps of {this_target}:
+
+buildozer 'new_load @aspect_rules_js//js:defs.bzl js_library' {file_package}:__pkg__
+buildozer 'new js_library {new_target_name}' {file_package}:__pkg__
+buildozer 'add srcs {file_basename}' {file_package}:{new_target_name}
+buildozer 'add visibility {this_package}:__pkg__' {file_package}:{new_target_name}
+buildozer 'remove srcs {file_package}:{file_basename}' {this_target}
+buildozer 'add srcs {file_package}:{new_target_name}' {this_target}
+
+For exceptional cases where copying is not possible or not suitable for an input file such as
+a file in an external repository, exceptions can be added to 'no_copy_to_bin'. In most cases,
+this option is not needed.
+
+""".format(
+            file_basename = file.basename,
+            file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
+            new_target_name = file.basename.replace(".", "_"),
+            this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
+            this_target = ctx.label,
+        )
+        fail(msg)
+
+    return copy_file_to_bin_action(ctx, file)
+
 def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_to_bin = False, no_copy_to_bin = [], include_transitive_sources = True, include_declarations = False, include_npm_linked_packages = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
@@ -170,9 +206,9 @@ def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_t
 
         no_copy_to_bin: List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
 
-            This is useful for exceptional cases where a `copy_to_bin` is not possible or not suitable for an input
+            This is useful for exceptional cases where a `copy_data_files_to_bin` is not possible or not suitable for an input
             file such as a file in an external repository. In most cases, this option is not needed.
-            See `copy_data_to_bin` docstring for more info.
+            See `copy_data_files_to_bin` docstring for more info.
 
         include_transitive_sources: see js_filegroup documentation
 
@@ -206,8 +242,8 @@ def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_t
 
     files_runfiles = []
     for d in data_files:
-        if copy_data_files_to_bin and d not in no_copy_to_bin:
-            files_runfiles.append(copy_file_to_bin_action(ctx, d))
+        if copy_data_files_to_bin and d.is_source and d not in no_copy_to_bin:
+            files_runfiles.append(copy_js_file_to_bin_action(ctx, d))
         else:
             files_runfiles.append(d)
 
