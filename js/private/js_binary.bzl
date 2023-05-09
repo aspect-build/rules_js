@@ -247,6 +247,16 @@ _ATTRS = {
         # TODO(2.0): make this mandatory so that downstream binary rules that inherit these attributes are required to set it
         mandatory = False,
     ),
+    "node_toolchain": attr.label(
+        doc = """The Node.js toolchain to use for this target.
+
+        See https://bazelbuild.github.io/rules_nodejs/Toolchains.html
+
+        Typically this is left unset so that Bazel automatically selects the right Node.js toolchain
+        for the target platform. See https://bazel.build/extending/toolchains#toolchain-resolution
+        for more information.
+        """,
+    ),
     "_launcher_template": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
@@ -309,7 +319,7 @@ def _consistent_label_str(workspace_name, label):
         label.name,
     )
 
-def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches):
+def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches):
     envs = []
     for (key, value) in dicts.add(fixed_env, ctx.attr.env).items():
         envs.append(_ENV_SET.format(
@@ -400,7 +410,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
 
     npm_path = ""
     if ctx.attr.include_npm:
-        npm_path = _target_tool_short_path(ctx.workspace_name, ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_path)
+        npm_path = _target_tool_short_path(ctx.workspace_name, node_toolchain.nodeinfo.npm_path)
         if is_windows:
             npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
             ctx.actions.expand_template(
@@ -419,7 +429,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             )
         toolchain_files.append(npm_wrapper)
 
-    node_path = _target_tool_short_path(ctx.workspace_name, ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path)
+    node_path = _target_tool_short_path(ctx.workspace_name, node_toolchain.nodeinfo.target_tool_path)
 
     launcher_subst = {
         "{{target_label}}": _consistent_label_str(ctx.workspace_name, ctx.label),
@@ -457,10 +467,15 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         unresolved_symlinks_enabled = ctx.attr.unresolved_symlinks_enabled
     use_legacy_node_patches = not is_bazel_6 or not unresolved_symlinks_enabled
 
+    if ctx.attr.node_toolchain:
+        node_toolchain = ctx.attr.node_toolchain[platform_common.ToolchainInfo]
+    else:
+        node_toolchain = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"]
+
     if is_windows and not ctx.attr.enable_runfiles:
         fail("need --enable_runfiles on Windows for to support rules_js")
 
-    if ctx.attr.include_npm and not hasattr(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo, "npm_files"):
+    if ctx.attr.include_npm and not hasattr(node_toolchain.nodeinfo, "npm_files"):
         fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
 
     if DirectoryPathInfo in ctx.attr.entry_point:
@@ -475,7 +490,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches)
+    bash_launcher, toolchain_files = _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
     launcher_files = [bash_launcher] + toolchain_files
@@ -483,9 +498,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         launcher_files.extend(ctx.files._node_patches_legacy_files + [ctx.file._node_patches_legacy])
     else:
         launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
-    launcher_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.tool_files)
+
+    launcher_files.extend(node_toolchain.nodeinfo.tool_files)
     if ctx.attr.include_npm:
-        launcher_files.extend(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.npm_files)
+        launcher_files.extend(node_toolchain.nodeinfo.npm_files)
 
     runfiles = gather_runfiles(
         ctx = ctx,
