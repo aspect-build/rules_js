@@ -74,6 +74,13 @@ js_test(
     entry_point = "test.js",
 )
 
+js_test(
+    name = "from-parent-js_library-data",
+    args = ["../data-parent.json"],
+    data = ["//js/private/test:data-js_library-data"],
+    entry_point = "test.js",
+)
+
 # TEST: js_test(data = filegroup(srcs)) -------------------
 js_test(
     name = "from-filegroup-srcs",
@@ -87,6 +94,14 @@ js_test(
     args = ["./data-generated.json"],
     chdir = package_name(),
     data = [":data-genrule"],
+    entry_point = "test.js",
+)
+
+js_test(
+    name = "from-parent-genrule",
+    args = ["../data-parent-generated.json"],
+    chdir = package_name(),
+    data = ["//js/private/test:data-genrule"],
     entry_point = "test.js",
 )
 
