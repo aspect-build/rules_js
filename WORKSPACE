@@ -28,13 +28,13 @@ nodejs_register_toolchains(
 
 # Alternate toolchains for testing across versions
 nodejs_register_toolchains(
-    name = "node14",
-    node_version = "14.17.1",
+    name = "node16",
+    node_version = "16.13.1",
 )
 
 nodejs_register_toolchains(
-    name = "node16",
-    node_version = "16.13.1",
+    name = "node18",
+    node_version = "18.13.0",
 )
 
 load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
