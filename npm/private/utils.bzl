@@ -136,6 +136,9 @@ def _parse_pnpm_lock(content):
     """
     parsed = _parse_yaml(content)
 
+    if parsed == None:
+        return {}, {}, {}
+
     if not types.is_dict(parsed):
         fail("lockfile should be a starlark dict")
     if "lockfileVersion" not in parsed.keys():

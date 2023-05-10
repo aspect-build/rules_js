@@ -3,6 +3,14 @@
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:utils.bzl", "utils")
 
+def _parse_empty_lock_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    parsed = utils.parse_pnpm_lock("")
+    expected = ({}, {}, {})
+
+    asserts.equals(env, expected, parsed)
+
 def _parse_lockfile_v5_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -119,6 +127,11 @@ packages:
 
 parse_lockfile_v5_test = unittest.make(
     _parse_lockfile_v5_test_impl,
+    attrs = {},
+)
+
+parse_empty_lock_test = unittest.make(
+    _parse_empty_lock_test_impl,
     attrs = {},
 )
 
