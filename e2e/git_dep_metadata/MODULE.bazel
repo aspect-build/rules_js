@@ -29,8 +29,8 @@ npm.npm_import(
     commit = "c245af8ea73ce3345d92bbda6c684092a841e262",
     package = "syncpack",
     root_package = "",
-    url = "git+ssh://git@github.com/gregmagolan-codaio/protoc-gen-grpc-ts.git",
-    version = "github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f",
+    url = "https://codeload.github.com/JamieMason/syncpack/tar.gz/c245af8ea73ce3345d92bbda6c684092a841e262",
+    version = "github.com/JamieMason/syncpack/c245af8ea73ce3345d92bbda6c684092a841e262",
 )
 
 use_repo(npm, "syncpack")
