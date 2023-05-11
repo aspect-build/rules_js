@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
@@ -105,4 +106,47 @@ assert_contains(
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+)
+
+# js_binary with interesting args: https://github.com/aspect-build/rules_js/issues/1045
+write_file(
+    name = "write_regexy",
+    out = "regexy.js",
+    content = ["""
+        console.log(`${process.argv[2]} + ${process.argv[3]}`);
+    """],
+)
+
+js_binary(
+    name = "regexy",
+    entry_point = "regexy.js",
+)
+
+js_run_binary(
+    name = "_regexy-args",
+    args = [
+        "--arg1='/{{[{]?(.*?)[}]?}}/'",
+        "--arg2='/{%(.*?)%}/'",
+    ],
+    log_level = "debug",
+    silent_on_success = False,
+    stdout = "regexy-stdout",
+    tool = ":regexy",
+)
+
+build_test(
+    name = "regexy-args",
+    targets = [":_regexy-args"],
+)
+
+assert_contains(
+    name = "regexy-args-1",
+    actual = ":regexy-stdout",
+    expected = "--arg1='/{{[{]?(.*?)[}]?}}/'",
+)
+
+assert_contains(
+    name = "regexy-args-2",
+    actual = ":regexy-stdout",
+    expected = "--arg2='/{%(.*?)%}/'",
 )
