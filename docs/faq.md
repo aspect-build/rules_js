@@ -50,7 +50,7 @@ Yes, just run `bazel run -- @pnpm//:pnpm --dir $PWD` followed by the usual argum
 If you're bootstrapping a new project, you'll need to add this to your WORKSPACE:
 
 ```starlark
-load("@aspect_rules_js//npm:repository.bzl", "pnpm_repository")
+load("@aspect_rules_js//npm:repositories.bzl", "pnpm_repository")
 
 pnpm_repository(name = "pnpm")
 ```
