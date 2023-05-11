@@ -1998,7 +1998,7 @@ def npm_repositories():
             "nopt": "5.0.0",
             "npmlog": "5.0.1",
             "rimraf": "3.0.2",
-            "semver": "7.3.8",
+            "semver": "7.5.0",
             "tar": "6.1.13",
         },
         transitive_closure = {
@@ -2010,7 +2010,7 @@ def npm_repositories():
             "nopt": ["5.0.0"],
             "npmlog": ["5.0.1"],
             "rimraf": ["3.0.2"],
-            "semver": ["6.3.0", "7.3.8"],
+            "semver": ["6.3.0", "7.5.0"],
             "tar": ["6.1.13"],
             "chownr": ["2.0.0"],
             "fs-minipass": ["2.1.0"],
@@ -2163,12 +2163,12 @@ def npm_repositories():
         integrity = "sha512-yOJKRvohFOaLqipNtwYB9WugyZKhC/DZC4VYPmpaCzDBrA8YpK3qHZ8/HGscMnE4GqbkLNuVcCnxkeQEdGt6LQ==",
         deps = {
             "@gar/promisify": "1.1.3",
-            "semver": "7.3.8",
+            "semver": "7.5.0",
         },
         transitive_closure = {
             "@npmcli/fs": ["2.1.2"],
             "@gar/promisify": ["1.1.3"],
-            "semver": ["7.3.8"],
+            "semver": ["7.5.0"],
             "lru-cache": ["6.0.0"],
             "yallist": ["4.0.0"],
         },
@@ -6072,7 +6072,7 @@ def npm_repositories():
             "clean-stack": ["2.2.0"],
             "indent-string": ["4.0.0"],
             "@gar/promisify": ["1.1.3"],
-            "semver": ["7.3.8"],
+            "semver": ["7.5.0"],
         },
     )
 
@@ -6871,6 +6871,23 @@ def npm_repositories():
         transitive_closure = {
             "combined-stream": ["1.0.8"],
             "delayed-stream": ["1.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__commander__10.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "commander",
+        version = "10.0.1",
+        url = "https://registry.npmjs.org/commander/-/commander-10.0.1.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==",
+        transitive_closure = {
+            "commander": ["10.0.1"],
         },
     )
 
@@ -10410,6 +10427,31 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__fs-extra__11.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fs-extra",
+        version = "11.1.1",
+        url = "https://registry.npmjs.org/fs-extra/-/fs-extra-11.1.1.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==",
+        deps = {
+            "graceful-fs": "4.2.10",
+            "jsonfile": "6.1.0",
+            "universalify": "2.0.0",
+        },
+        transitive_closure = {
+            "fs-extra": ["11.1.1"],
+            "graceful-fs": ["4.2.10"],
+            "jsonfile": ["6.1.0"],
+            "universalify": ["2.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__fs-extra__7.0.1",
         root_package = "",
         link_workspace = "",
@@ -13489,6 +13531,29 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__jsonfile__6.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "jsonfile",
+        version = "6.1.0",
+        url = "https://registry.npmjs.org/jsonfile/-/jsonfile-6.1.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==",
+        deps = {
+            "graceful-fs": "4.2.10",
+            "universalify": "2.0.0",
+        },
+        transitive_closure = {
+            "jsonfile": ["6.1.0"],
+            "universalify": ["2.0.0"],
+            "graceful-fs": ["4.2.10"],
+        },
+    )
+
+    npm_import(
         name = "npm__jsonpath-plus__7.2.0",
         root_package = "",
         link_workspace = "",
@@ -14088,7 +14153,7 @@ def npm_repositories():
             "clean-stack": ["2.2.0"],
             "indent-string": ["4.0.0"],
             "@gar/promisify": ["1.1.3"],
-            "semver": ["7.3.8"],
+            "semver": ["7.5.0"],
             "depd": ["1.1.2"],
             "humanize-ms": ["1.2.1"],
         },
@@ -14596,6 +14661,28 @@ def npm_repositories():
         },
         transitive_closure = {
             "minimatch": ["5.1.6"],
+            "brace-expansion": ["2.0.1"],
+            "balanced-match": ["1.0.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minimatch__6.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minimatch",
+        version = "6.2.0",
+        url = "https://registry.npmjs.org/minimatch/-/minimatch-6.2.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-sauLxniAmvnhhRjFwPNnJKaPFYyddAgbYdeUpHULtCT/GhzdCx/MDNy+Y40lBxTQUrMzDE8e0S43Z5uqfO0REg==",
+        deps = {
+            "brace-expansion": "2.0.1",
+        },
+        transitive_closure = {
+            "minimatch": ["6.2.0"],
             "brace-expansion": ["2.0.1"],
             "balanced-match": ["1.0.2"],
         },
@@ -16018,7 +16105,7 @@ def npm_repositories():
             "nopt": ["6.0.0"],
             "npmlog": ["6.0.2"],
             "rimraf": ["3.0.2"],
-            "semver": ["7.3.8"],
+            "semver": ["7.5.0", "7.3.8"],
             "tar": ["6.1.13"],
             "which": ["2.0.2"],
             "isexe": ["2.0.0"],
@@ -18733,6 +18820,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__read-yaml-file__2.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "read-yaml-file",
+        version = "2.1.0",
+        url = "https://registry.npmjs.org/read-yaml-file/-/read-yaml-file-2.1.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-UkRNRIwnhG+y7hpqnycCL/xbTk7+ia9VuVTC0S+zVbwd65DI9eUpRMfsWIGrCWxTU/mi+JW8cHQCrv+zfCbEPQ==",
+        deps = {
+            "js-yaml": "4.1.0",
+            "strip-bom": "4.0.0",
+        },
+        transitive_closure = {
+            "read-yaml-file": ["2.1.0"],
+            "js-yaml": ["4.1.0"],
+            "strip-bom": ["4.0.0"],
+            "argparse": ["2.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__readable-stream__1.0.34",
         root_package = "",
         link_workspace = "",
@@ -20102,7 +20213,7 @@ def npm_repositories():
             "nopt": ["6.0.0"],
             "npmlog": ["6.0.2"],
             "rimraf": ["3.0.2"],
-            "semver": ["7.3.8"],
+            "semver": ["7.5.0", "7.3.8"],
             "tar": ["6.1.13"],
             "which": ["2.0.2"],
             "isexe": ["2.0.0"],
@@ -20266,6 +20377,28 @@ def npm_repositories():
         },
         transitive_closure = {
             "semver": ["7.3.8"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__semver__7.5.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "semver",
+        version = "7.5.0",
+        url = "https://registry.npmjs.org/semver/-/semver-7.5.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-+XC0AD/R7Q2mPSRuy2Id0+CGTZ98+8f+KvwirxOKIEyid+XSx6HbC63p+O4IndTHuX5Z+JxQ0TghCkO5Cg/2HA==",
+        deps = {
+            "lru-cache": "6.0.0",
+        },
+        transitive_closure = {
+            "semver": ["7.5.0"],
             "lru-cache": ["6.0.0"],
             "yallist": ["4.0.0"],
         },
@@ -20997,6 +21130,23 @@ def npm_repositories():
         transitive_closure = {
             "strip-ansi": ["6.0.1"],
             "ansi-regex": ["5.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__strip-bom__4.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "strip-bom",
+        version = "4.0.0",
+        url = "https://registry.npmjs.org/strip-bom/-/strip-bom-4.0.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-3xurFv5tEgii33Zi8Jtp55wEIILR9eh34FAW00PZf+JnSsTmV/ioewSgQl97JHvgjoRGwPShsWm+IdrxB35d0w==",
+        transitive_closure = {
+            "strip-bom": ["4.0.0"],
         },
     )
 
@@ -21809,6 +21959,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__tightrope__0.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tightrope",
+        version = "0.1.0",
+        url = "https://registry.npmjs.org/tightrope/-/tightrope-0.1.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-HHHNYdCAIYwl1jOslQBT455zQpdeSo8/A346xpIb/uuqhSg+tCvYNsP5f11QW+z9VZ3vSX8YIfzTApjjuGH63w==",
+        transitive_closure = {
+            "tightrope": ["0.1.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__tiny-emitter__2.1.0",
         root_package = "",
         link_workspace = "",
@@ -22561,6 +22728,23 @@ def npm_repositories():
         integrity = "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==",
         transitive_closure = {
             "universalify": ["0.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__universalify__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "universalify",
+        version = "2.0.0",
+        url = "https://registry.npmjs.org/universalify/-/universalify-2.0.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==",
+        transitive_closure = {
+            "universalify": ["2.0.0"],
         },
     )
 
@@ -24213,6 +24397,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__zod__3.21.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "zod",
+        version = "3.21.4",
+        url = "https://registry.npmjs.org/zod/-/zod-3.21.4.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==",
+        transitive_closure = {
+            "zod": ["3.21.4"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz",
         root_package = "",
         link_workspace = "",
@@ -24270,6 +24471,81 @@ def npm_repositories():
             "os-tmpdir": ["1.0.2"],
             "pify": ["4.0.1"],
             "semver": ["5.7.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__syncpack__github.com_JamieMason_syncpack_c245af8ea73ce3345d92bbda6c684092a841e262",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["syncpack"],
+        },
+        package = "syncpack",
+        version = "github.com/JamieMason/syncpack/c245af8ea73ce3345d92bbda6c684092a841e262",
+        url = "https://codeload.github.com/JamieMason/syncpack/tar.gz/c245af8ea73ce3345d92bbda6c684092a841e262",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        deps = {
+            "chalk": "4.1.2",
+            "commander": "10.0.1",
+            "cosmiconfig": "8.1.3",
+            "fs-extra": "11.1.1",
+            "glob": "8.1.0",
+            "minimatch": "6.2.0",
+            "read-yaml-file": "2.1.0",
+            "semver": "7.5.0",
+            "tightrope": "0.1.0",
+            "zod": "3.21.4",
+        },
+        transitive_closure = {
+            "syncpack": ["github.com/JamieMason/syncpack/c245af8ea73ce3345d92bbda6c684092a841e262"],
+            "chalk": ["2.4.2", "4.1.2"],
+            "commander": ["10.0.1"],
+            "cosmiconfig": ["8.1.3"],
+            "fs-extra": ["11.1.1"],
+            "glob": ["8.1.0"],
+            "minimatch": ["5.1.6", "6.2.0"],
+            "read-yaml-file": ["2.1.0"],
+            "semver": ["7.5.0"],
+            "tightrope": ["0.1.0"],
+            "zod": ["3.21.4"],
+            "lru-cache": ["6.0.0"],
+            "yallist": ["4.0.0"],
+            "js-yaml": ["4.1.0"],
+            "strip-bom": ["4.0.0"],
+            "argparse": ["2.0.1"],
+            "brace-expansion": ["2.0.1"],
+            "balanced-match": ["1.0.2"],
+            "fs.realpath": ["1.0.0"],
+            "inflight": ["1.0.6"],
+            "inherits": ["2.0.4"],
+            "once": ["1.4.0"],
+            "wrappy": ["1.0.2"],
+            "graceful-fs": ["4.2.10"],
+            "jsonfile": ["6.1.0"],
+            "universalify": ["2.0.0"],
+            "import-fresh": ["3.3.0"],
+            "parse-json": ["5.2.0"],
+            "path-type": ["4.0.0"],
+            "@babel/code-frame": ["7.18.6"],
+            "error-ex": ["1.3.2"],
+            "json-parse-even-better-errors": ["2.3.1"],
+            "lines-and-columns": ["1.2.4"],
+            "is-arrayish": ["0.2.1"],
+            "@babel/highlight": ["7.18.6"],
+            "@babel/helper-validator-identifier": ["7.19.1"],
+            "js-tokens": ["4.0.0"],
+            "ansi-styles": ["4.3.0", "3.2.1"],
+            "escape-string-regexp": ["1.0.5"],
+            "supports-color": ["7.2.0", "5.5.0"],
+            "has-flag": ["4.0.0", "3.0.0"],
+            "color-convert": ["2.0.1", "1.9.3"],
+            "color-name": ["1.1.4", "1.1.3"],
+            "parent-module": ["1.0.1"],
+            "resolve-from": ["4.0.0"],
+            "callsites": ["3.1.0"],
         },
     )
 
@@ -24333,7 +24609,7 @@ def npm_repositories():
             "nopt": ["5.0.0"],
             "npmlog": ["5.0.1"],
             "rimraf": ["3.0.2"],
-            "semver": ["6.3.0", "7.3.8"],
+            "semver": ["6.3.0", "7.5.0"],
             "tar": ["6.1.13"],
             "chownr": ["2.0.0"],
             "fs-minipass": ["2.1.0"],
