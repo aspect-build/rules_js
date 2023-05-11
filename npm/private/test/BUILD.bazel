@@ -68,6 +68,7 @@ build_test(
         ":node_modules/puppeteer",  # has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
         ":node_modules/segfault-handler",  # segfault-handler has a node-gyp install step
         ":node_modules/semver-first-satisfied",
+        ":node_modules/syncpack",
         ":node_modules/typescript",
         ":node_modules/webpack-bundle-analyzer",
         # intentionally don't include :node_modules/unused

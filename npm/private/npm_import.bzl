@@ -1041,7 +1041,7 @@ def npm_import(
         url: Optional url for this package. If unset, a default npm registry url is generated from
             the package name and version.
 
-            May start with `git+ssh://` to indicate a git repository. For example,
+            May start with `git+ssh://` or `git+https://` to indicate a git repository. For example,
 
             ```
             git+ssh://git@github.com/org/repo.git

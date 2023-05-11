@@ -5,8 +5,10 @@ sh_test(
     srcs = ["no_git_metadata_test.sh"],
     args = [
         "$(rootpath @protoc-gen-grpc//:pkg)",
+        "$(rootpath @syncpack//:pkg)",
     ],
     data = [
         "@protoc-gen-grpc//:pkg",
+        "@syncpack//:pkg",
     ],
 )
