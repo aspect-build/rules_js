@@ -4,6 +4,7 @@
     "devDependencies": {
         "@blockprotocol/type-system-web": "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
         "@figma/nodegit": "^0.28.0-figma.2",
+        "@isaacs/cliui": "8.0.2",
         "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#fc681991e61c6808dd26012a2331f83671a11218",
         "@plotly/regl": "2.1.2",
         "bufferutil": "4.0.7",

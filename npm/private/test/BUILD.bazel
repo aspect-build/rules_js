@@ -52,6 +52,7 @@ build_test(
     targets = [
         ":node_modules/@blockprotocol/type-system-web",
         ":node_modules/@figma/nodegit",
+        ":node_modules/@isaacs/cliui",
         ":node_modules/@kubernetes/client-node",  # @kubernetes/client-node has a "prepare" lifecycle hook that runs tsc
         ":node_modules/@plotly/regl",
         ":node_modules/bufferutil",
@@ -64,8 +65,8 @@ build_test(
         ":node_modules/node-gyp",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
-        ":node_modules/regl",
         ":node_modules/puppeteer",  # has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
+        ":node_modules/regl",
         ":node_modules/segfault-handler",  # segfault-handler has a node-gyp install step
         ":node_modules/semver-first-satisfied",
         ":node_modules/syncpack",
