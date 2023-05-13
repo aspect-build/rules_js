@@ -171,4 +171,17 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
 
         package_info["transitive_closure"] = transitive_closure
 
+        # final_transitive_closure = {}
+        # for package_name in transitive_closure.keys():
+        #     found = False
+        #     for package in packages.keys():
+        #         if package_name == packages[package]["name"]:
+        #             found = True
+        #     if found:
+        #         final_transitive_closure[package_name] = transitive_closure[package_name]
+        #     else:
+        #         print("filtered out {}".format(package_name))
+
+        # package_info["transitive_closure"] = final_transitive_closure
+
     return (importers, packages)
