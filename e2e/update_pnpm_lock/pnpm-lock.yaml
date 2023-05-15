@@ -11,8 +11,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1
       semver:
-        specifier: 7.3.8
-        version: 7.3.8
+        specifier: 7.5.1
+        version: 7.5.1
     devDependencies:
       '@types/node':
         specifier: 18.11.18
@@ -272,8 +272,8 @@ packages:
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
 
-  /semver@7.3.8:
-    resolution: {integrity: sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==}
+  /semver@7.5.1:
+    resolution: {integrity: sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==}
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
