@@ -38,7 +38,6 @@ load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_packag
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
 load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
-load("@bazel_skylib//lib:paths.bzl", _paths = "paths")
 
 def npm_imported_package_store(
     name,
@@ -502,7 +501,6 @@ def _npm_import_rule_impl(rctx):
     rctx_files = {
         "BUILD.bazel": generated_by_lines + [
             """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
-            """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
         ],
     }
 
