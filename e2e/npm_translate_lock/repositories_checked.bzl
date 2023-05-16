@@ -715,22 +715,22 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__semver__registry.npmjs.org_semver_7.3.8",
+        name = "npm__semver__registry.npmjs.org_semver_7.5.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "": ["semver"],
         },
         package = "semver",
-        version = "registry.npmjs.org/semver@7.3.8",
-        url = "https://registry.yarnpkg.com/semver/-/semver-7.3.8.tgz",
+        version = "registry.npmjs.org/semver@7.5.1",
+        url = "https://registry.yarnpkg.com/semver/-/semver-7.5.1.tgz",
         npm_translate_lock_repo = "npm",
-        integrity = "sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==",
+        integrity = "sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==",
         deps = {
             "lru-cache": "registry.npmjs.org/lru-cache@6.0.0",
         },
         transitive_closure = {
-            "semver": ["registry.npmjs.org/semver@7.3.8"],
+            "semver": ["registry.npmjs.org/semver@7.5.1"],
             "lru-cache": ["registry.npmjs.org/lru-cache@6.0.0"],
             "yallist": ["registry.npmjs.org/yallist@4.0.0"],
         },
