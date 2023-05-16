@@ -8,8 +8,8 @@ dependencies:
     specifier: 3.0.1
     version: registry.npmjs.org/is-odd@3.0.1
   semver:
-    specifier: 7.3.8
-    version: registry.npmjs.org/semver@7.3.8
+    specifier: 7.5.1
+    version: registry.npmjs.org/semver@7.5.1
 
 devDependencies:
   '@rollup/plugin-commonjs':
@@ -329,10 +329,10 @@ packages:
       supports-preserve-symlinks-flag: registry.npmjs.org/supports-preserve-symlinks-flag@1.0.0
     dev: true
 
-  registry.npmjs.org/semver@7.3.8:
-    resolution: {integrity: sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/semver/-/semver-7.3.8.tgz}
+  registry.npmjs.org/semver@7.5.1:
+    resolution: {integrity: sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/semver/-/semver-7.5.1.tgz}
     name: semver
-    version: 7.3.8
+    version: 7.5.1
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
