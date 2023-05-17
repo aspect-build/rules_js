@@ -155,17 +155,11 @@ sh_binary(
                         virtual_store_name = utils.virtual_store_name(raw_package, "0.0.0"),
                         virtual_store_root = utils.virtual_store_root,
                     )
-                elif raw_version.startswith("/"):
-                    store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
+                else:
+                    store_package, store_version = utils.parse_pnpm_package_key(raw_package, raw_version)
                     dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                         root_package = root_package,
                         virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                else:
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                        root_package = root_package,
-                        virtual_store_name = utils.virtual_store_name(raw_package, raw_version),
                         virtual_store_root = utils.virtual_store_root,
                     )
                 if dep_store_target not in transitive_deps:
@@ -219,17 +213,11 @@ sh_binary(
                                 virtual_store_name = utils.virtual_store_name(raw_package, "0.0.0"),
                                 virtual_store_root = utils.virtual_store_root,
                             )
-                        elif raw_version.startswith("/"):
-                            store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
+                        else:
+                            store_package, store_version = utils.parse_pnpm_package_key(raw_package, raw_version)
                             dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
                                 root_package = root_package,
                                 virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                                virtual_store_root = utils.virtual_store_root,
-                            )
-                        else:
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                                root_package = root_package,
-                                virtual_store_name = utils.virtual_store_name(raw_package, raw_version),
                                 virtual_store_root = utils.virtual_store_root,
                             )
                         if dep_store_target not in transitive_deps:

@@ -49,12 +49,24 @@ def _pnpm_name(name, version):
     "Make a name/version pnpm-style name for a package name and version"
     return "%s/%s" % (name, version)
 
-def _parse_pnpm_name(pnpmName):
-    # Parse a name/version or @scope/name/version string and return
-    # a (name, version) tuple. This format is found in pnpm lock file v5.
-    segments = pnpmName.rsplit("/", 1)
+def _parse_pnpm_package_key(pnpm_name, pnpm_version):
+    if not pnpm_version.startswith("/"):
+        if not pnpm_name:
+            fail("parse_pnpm_package_key: pnpm_name is empty for non-versioned package %s" % pnpm_version)
+
+        return pnpm_name, pnpm_version
+
+    # Parse a package key such as:
+    #    /name/version
+    #    /@scope/name/version
+    #    registry.com/name/version
+    #
+    # return a (name, version) tuple. This format is found in pnpm lock file v5.
+    _, pnpm_version = pnpm_version.split("/", 1)
+
+    segments = pnpm_version.rsplit("/", 1)
     if len(segments) != 2:
-        msg = "unexpected pnpm versioned name {}".format(pnpmName)
+        msg = "unexpected pnpm versioned name {}".format(pnpm_version)
         fail(msg)
     return (segments[0], segments[1])
 
@@ -405,7 +417,7 @@ utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
     assert_lockfile_version = _assert_lockfile_version,
-    parse_pnpm_name = _parse_pnpm_name,
+    parse_pnpm_package_key = _parse_pnpm_package_key,
     parse_pnpm_lock = _parse_pnpm_lock,
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,

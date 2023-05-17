@@ -644,11 +644,7 @@ def _impl_links(rctx):
                 virtual_store_root = utils.virtual_store_root,
             )
         else:
-            if dep_version.startswith("/"):
-                store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
-            else:
-                store_package = dep_name
-                store_version = dep_version
+            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
             dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
                 virtual_store_name = utils.virtual_store_name(store_package, store_version),
                 virtual_store_root = utils.virtual_store_root,
@@ -671,11 +667,7 @@ def _impl_links(rctx):
                     lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
                     deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
                 else:
-                    if dep_version.startswith("/"):
-                        store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
-                    else:
-                        store_package = dep_name
-                        store_version = dep_version
+                    store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                     dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
                         virtual_store_name = utils.virtual_store_name(store_package, store_version),
                         virtual_store_root = utils.virtual_store_root,
@@ -702,11 +694,7 @@ def _impl_links(rctx):
                     virtual_store_root = utils.virtual_store_root,
                 )
             else:
-                if dep_version.startswith("/"):
-                    store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
-                else:
-                    store_package = dep_name
-                    store_version = dep_version
+                store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,

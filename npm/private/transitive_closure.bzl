@@ -38,9 +38,8 @@ def gather_transitive_closure(packages, package, no_optional):
                 package_key = utils.pnpm_name(name, version)
             elif version.startswith("/"):
                 # an aliased dependency
-                version = version[1:]
-                package_key = version
-                name, version = utils.parse_pnpm_name(version)
+                package_key = version[1:]
+                name, version = utils.parse_pnpm_package_key(name, version)
             else:
                 package_key = version
             transitive_closure[name] = transitive_closure.get(name, [])
@@ -68,7 +67,7 @@ def _gather_package_info(package_path, package_snapshot):
     if package_path.startswith("/"):
         # an aliased dependency
         package = package_path[1:]
-        name, version = utils.parse_pnpm_name(package)
+        name, version = utils.parse_pnpm_package_key("", package_path)
         friendly_version = utils.strip_peer_dep_or_patched_version(version)
         package_key = package
     elif package_path.startswith("file:") and utils.is_vendored_tarfile(package_snapshot):
