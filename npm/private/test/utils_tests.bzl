@@ -31,10 +31,13 @@ def test_bazel_name(ctx):
     )
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
 def test_pnpm_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope/y/1.1.1", utils.pnpm_name("@scope/y", "1.1.1"))
-    asserts.equals(env, ("@scope/y", "1.1.1"), utils.parse_pnpm_name("@scope/y/1.1.1"))
+    asserts.equals(env, ("@scope/y", "1.1.1"), utils.parse_pnpm_package_key("@scope/y", "/@scope/y/1.1.1"))
+    asserts.equals(env, ("@scope/y", "registry/@scope/y/1.1.1"), utils.parse_pnpm_package_key("@scope/y", "registry/@scope/y/1.1.1"))
+    asserts.equals(env, ("@scope/y", "1.1.1"), utils.parse_pnpm_package_key("@scope/y", "1.1.1"))
     return unittest.end(env)
 
 def test_friendly_name(ctx):
