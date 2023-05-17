@@ -1,0 +1,5 @@
+{
+    "devDependencies": {
+        "npm-aliases-test": "workspace:*"
+    }
+}

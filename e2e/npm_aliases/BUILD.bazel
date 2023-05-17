@@ -1,0 +1,28 @@
+# A test to reproduce https://github.com/aspect-build/rules_js/issues/1062
+# Using a minimal lockfile specific to this test scenario.
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+build_test(
+    name = "aliases",
+    targets = [
+        ":node_modules",
+        ":node_modules/npm-aliases-test",
+        # "//lib:node_modules/@aspect-test/a",
+        # "//lib:node_modules/@aspect-test/a-alias",
+
+        # Indirect aliases within a dep
+        # ":node_modules/@isaacs/cliui",
+    ],
+)
+
+write_source_files(
+    name = "write_npm_translate_lock",
+    files = {
+        "repositories_checked.bzl": "@npm//:repositories.bzl",
+    },
+)

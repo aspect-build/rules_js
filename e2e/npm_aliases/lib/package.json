@@ -1,0 +1,7 @@
+{
+    "name": "npm-aliases-test",
+    "dependencies": {
+        "@aspect-test/c": "2.0.2",
+        "@aspect-test/c-alias": "npm:@aspect-test/c@2.0.0"
+    }
+}
