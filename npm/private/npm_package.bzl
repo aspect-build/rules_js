@@ -14,6 +14,7 @@ load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:libs.bzl", "js_lib_helpers")
+load("//js:defs.bzl", "js_binary")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
@@ -483,29 +484,25 @@ def _publish_target(name, package, args = [], visibility = None, tags = [], test
     # Always tag the target manual since we should only build it when the final target is built.
     tags = tags + ["manual"]
 
-    data = [
-        package,
-        "@pnpm//:pnpm",
-    ]
-
     expand_template(
-        name = "{}_sh".format(name),
-        template = "@aspect_rules_js//npm/private:npm_package.sh",
-        out = "{}.sh".format(name),
+        name = "{}_mjs".format(name),
+        template = "@aspect_rules_js//npm/private:npm_package.mjs",
+        out = "{}.mjs".format(name),
         substitutions = {
             "{{PACKAGE_DIR}}": "$(rlocationpaths :{})".format(package),
         },
-        data = data,
+        data = [package],
         tags = tags,
         testonly = testonly,
         visibility = visibility,
     )
 
-    native.sh_binary(
+    js_binary(
         name = name,
-        srcs = ["{}.sh".format(name)],
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        data = data,
+        entry_point = "{}.mjs".format(name),
+        data = [package],
+        # required to make npm to be available in PATH
+        include_npm = True,
         args = args,
         tags = tags,
         testonly = testonly,

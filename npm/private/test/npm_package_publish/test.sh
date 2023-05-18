@@ -3,16 +3,16 @@
 readonly PUBLISH_A="$1"
 readonly PUBLISH_B="$2"
 
-$PUBLISH_A | grep 'ERR_PNPM_PACKAGE_VERSION_NOT_FOUND  Package version is not defined in the package.json.'
+$PUBLISH_A 2>&1 | grep 'npm notice package: @mycorp/pkg-b@'
 
 if [ $? != 0 ]; then
-    echo "FAIL: expected ERR_PNPM_PACKAGE_VERSION_NOT_FOUND  error"
+    echo "FAIL: expected 'npm notice package: @mycorp/pkg-b@' error"
     exit 1
 fi
 
-$PUBLISH_B | grep 'ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND  No package.json (or package.yaml, or package.json5) was found in '
+$PUBLISH_B 2>&1 | grep 'npm ERR! enoent This is related to npm not being able to find a file.'
 
 if [ $? != 0 ]; then
-   echo "FAIL: expected ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND  error"
+   echo "FAIL: expected 'npm ERR! enoent This is related to npm not being able to find a file.' error"
    exit 1
 fi

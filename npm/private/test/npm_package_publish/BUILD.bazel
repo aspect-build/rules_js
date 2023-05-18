@@ -28,4 +28,5 @@ sh_test(
         ":pkg_a.publish",
         ":pkg_b.publish",
     ],
+    tags = ["no-sandbox"],
 )
