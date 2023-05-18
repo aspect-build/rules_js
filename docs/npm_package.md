@@ -27,7 +27,7 @@ A rule that packages sources into a directory (a tree artifact) and provides an 
 This target can be used as the `src` attribute to `npm_link_package`.
 
 Every npm_package target has a sub target named after its name, which is `&lt;name&gt;.publish`, that can be run
-to publish to an npm registry. 
+to publish to an npm registry.
 
 You can pass arguments to npm by escaping them from Bazel using a double-hyphen, for example:
 `bazel run my_package.publish -- --tag=next`
