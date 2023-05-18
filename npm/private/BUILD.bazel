@@ -24,6 +24,7 @@ bzl_library(
     ],
     deps = [
         ":npm_package_info",
+        "//js:defs",
         "//js:libs",
         "//js:providers",
         "@aspect_bazel_lib//lib:copy_to_directory",
