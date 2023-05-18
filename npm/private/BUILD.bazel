@@ -8,7 +8,10 @@ exports_files(
 )
 
 exports_files(
-    ["noop.sh"],
+    [
+        "noop.sh",
+        "npm_package.sh",
+    ],
     visibility = ["//visibility:public"],
 )
 

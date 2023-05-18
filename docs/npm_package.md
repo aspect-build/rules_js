@@ -15,16 +15,23 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 ## npm_package
 
 <pre>
-npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-srcs">srcs</a>, <a href="#npm_package-data">data</a>, <a href="#npm_package-out">out</a>, <a href="#npm_package-package">package</a>, <a href="#npm_package-version">version</a>, <a href="#npm_package-root_paths">root_paths</a>, <a href="#npm_package-include_external_repositories">include_external_repositories</a>,
-            <a href="#npm_package-include_srcs_packages">include_srcs_packages</a>, <a href="#npm_package-exclude_srcs_packages">exclude_srcs_packages</a>, <a href="#npm_package-include_srcs_patterns">include_srcs_patterns</a>,
-            <a href="#npm_package-exclude_srcs_patterns">exclude_srcs_patterns</a>, <a href="#npm_package-replace_prefixes">replace_prefixes</a>, <a href="#npm_package-allow_overwrites">allow_overwrites</a>, <a href="#npm_package-include_sources">include_sources</a>,
-            <a href="#npm_package-include_transitive_sources">include_transitive_sources</a>, <a href="#npm_package-include_declarations">include_declarations</a>, <a href="#npm_package-include_transitive_declarations">include_transitive_declarations</a>,
-            <a href="#npm_package-include_runfiles">include_runfiles</a>, <a href="#npm_package-hardlink">hardlink</a>, <a href="#npm_package-verbose">verbose</a>, <a href="#npm_package-kwargs">kwargs</a>)
+npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-srcs">srcs</a>, <a href="#npm_package-data">data</a>, <a href="#npm_package-args">args</a>, <a href="#npm_package-out">out</a>, <a href="#npm_package-package">package</a>, <a href="#npm_package-version">version</a>, <a href="#npm_package-root_paths">root_paths</a>,
+            <a href="#npm_package-include_external_repositories">include_external_repositories</a>, <a href="#npm_package-include_srcs_packages">include_srcs_packages</a>, <a href="#npm_package-exclude_srcs_packages">exclude_srcs_packages</a>,
+            <a href="#npm_package-include_srcs_patterns">include_srcs_patterns</a>, <a href="#npm_package-exclude_srcs_patterns">exclude_srcs_patterns</a>, <a href="#npm_package-replace_prefixes">replace_prefixes</a>, <a href="#npm_package-allow_overwrites">allow_overwrites</a>,
+            <a href="#npm_package-include_sources">include_sources</a>, <a href="#npm_package-include_transitive_sources">include_transitive_sources</a>, <a href="#npm_package-include_declarations">include_declarations</a>,
+            <a href="#npm_package-include_transitive_declarations">include_transitive_declarations</a>, <a href="#npm_package-include_runfiles">include_runfiles</a>, <a href="#npm_package-hardlink">hardlink</a>, <a href="#npm_package-verbose">verbose</a>, <a href="#npm_package-kwargs">kwargs</a>)
 </pre>
 
 A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
 This target can be used as the `src` attribute to `npm_link_package`.
+
+Every npm_package target has a sub target named after its name, which is `&lt;name&gt;.publish`, that can be run
+to publish to an npm registry. 
+
+You can pass arguments to npm by escaping them from Bazel using a double-hyphen, for example:
+`bazel run my_package.publish -- --tag=next`
+
 
 Files and directories can be arranged as needed in the output directory using
 the `root_paths`, `include_srcs_patters`, `exclude_srcs_patters` and `replace_prefixes` attributes.
@@ -82,6 +89,7 @@ To stamp the current git tag as the "version" in the package.json file, see
 | <a id="npm_package-name"></a>name |  Unique name for this target.   |  none |
 | <a id="npm_package-srcs"></a>srcs |  Files and/or directories or targets that provide <code>DirectoryPathInfo</code> to copy into the output directory.   |  <code>[]</code> |
 | <a id="npm_package-data"></a>data |  Runtime / linktime npm dependencies of this npm package.<br><br><code>NpmPackageStoreInfo</code> providers are gathered from <code>JsInfo</code> of the targets specified. Targets can be linked npm packages, npm package store targets or other targets that provide <code>JsInfo</code>. This is done directly from the <code>npm_package_store_deps</code> field of these. For linked npm package targets, the underlying npm_package_store target(s) that back the links is used.<br><br>Gathered <code>NpmPackageStoreInfo</code> providers are used downstream as direct dependencies of this npm package when linking with <code>npm_link_package</code>.   |  <code>[]</code> |
+| <a id="npm_package-args"></a>args |  Arguments that are passed down to &lt;name&gt;.publish target and <code>pnpm publish</code> command.   |  <code>[]</code> |
 | <a id="npm_package-out"></a>out |  Path of the output directory, relative to this package.   |  <code>None</code> |
 | <a id="npm_package-package"></a>package |  The package name. If set, should match the <code>name</code> field in the <code>package.json</code> file for this package.<br><br>If set, the package name set here will be used for linking if a npm_link_package does not specify a package name. A npm_link_package that specifies a package name will override the value here when linking.<br><br>If unset, a npm_link_package that references this npm_package must define the package name must be for linking.   |  <code>""</code> |
 | <a id="npm_package-version"></a>version |  The package version. If set, should match the <code>version</code> field in the <code>package.json</code> file for this package.<br><br>If set, a npm_link_package may omit the package version and the package version set here will be used for linking. A npm_link_package that specifies a package version will override the value here when linking.<br><br>If unset, a npm_link_package that references this npm_package must define the package version must be for linking.   |  <code>"0.0.0"</code> |

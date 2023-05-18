@@ -10,6 +10,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:libs.bzl", "js_lib_helpers")
@@ -148,6 +149,7 @@ def npm_package(
         name,
         srcs = [],
         data = [],
+        args = [],
         out = None,
         package = "",
         version = "0.0.0",
@@ -171,6 +173,13 @@ def npm_package(
     """A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
     This target can be used as the `src` attribute to `npm_link_package`.
+
+    Every npm_package target has a sub target named after its name, which is `<name>.publish`, that can be run
+    to publish to an npm registry.
+
+    You can pass arguments to npm by escaping them from Bazel using a double-hyphen, for example:
+    `bazel run my_package.publish -- --tag=next`
+
 
     Files and directories can be arranged as needed in the output directory using
     the `root_paths`, `include_srcs_patters`, `exclude_srcs_patters` and `replace_prefixes` attributes.
@@ -223,6 +232,8 @@ def npm_package(
         name: Unique name for this target.
 
         srcs: Files and/or directories or targets that provide `DirectoryPathInfo` to copy into the output directory.
+
+        args: Arguments that are passed down to <name>.publish target and `pnpm publish` command.
 
         data: Runtime / linktime npm dependencies of this npm package.
 
@@ -439,6 +450,15 @@ def npm_package(
         )
         srcs = srcs + [files_target]
 
+    _publish_target(
+        name = "{}.publish".format(name),
+        package = name,
+        args = args,
+        tags = kwargs.get("tags", []),
+        testonly = kwargs.get("testonly", False),
+        visibility = kwargs.get("visibility", None),
+    )
+
     _npm_package(
         name = name,
         srcs = srcs,
@@ -457,6 +477,39 @@ def npm_package(
         hardlink = hardlink,
         verbose = verbose,
         **kwargs
+    )
+
+def _publish_target(name, package, args = [], visibility = None, tags = [], testonly = False):
+    # Always tag the target manual since we should only build it when the final target is built.
+    tags = tags + ["manual"]
+
+    data = [
+        package,
+        "@pnpm//:pnpm",
+    ]
+
+    expand_template(
+        name = "{}_sh".format(name),
+        template = "@aspect_rules_js//npm/private:npm_package.sh",
+        out = "{}.sh".format(name),
+        substitutions = {
+            "{{PACKAGE_DIR}}": "$(rlocationpaths :{})".format(package),
+        },
+        data = data,
+        tags = tags,
+        testonly = testonly,
+        visibility = visibility,
+    )
+
+    native.sh_binary(
+        name = name,
+        srcs = ["{}.sh".format(name)],
+        deps = ["@bazel_tools//tools/bash/runfiles"],
+        data = data,
+        args = args,
+        tags = tags,
+        testonly = testonly,
+        visibility = visibility,
     )
 
 def stamped_package_json(name, stamp_var, **kwargs):
