@@ -125,7 +125,28 @@ _ATTRS = {
     "env": attr.string_dict(
         doc = """Environment variables of the action.
 
-        Subject to `$(location)` and make variable expansion.""",
+        Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution.
+        """,
+    ),
+    "fixed_args": attr.string_list(
+        doc = """Fixed command line arguments to pass to the Node.js when this
+        binary target is executed.
+
+        Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution.
+
+        Unlike the built-in `args`, which are only passed to the target when it is
+        executed either by the `bazel run` command or as a test, `fixed_args` are baked
+        into the generated launcher script so are always passed even when the binary
+        target is run outside of Bazel directly from the launcher script.
+
+        `fixed_args` are passed before the ones specified in `args` and before ones
+        that are specified on the `bazel run` or `bazel test` command line.
+
+        See https://bazel.build/reference/be/common-definitions#common-attributes-binaries
+        for more info on the built-in `args` attribute.
+        """,
     ),
     "node_options": attr.string_list(
         doc = """Options to pass to the node invocation on the command line.
@@ -526,6 +547,7 @@ def _impl(ctx):
         ctx,
         log_prefix_rule_set = "aspect_rules_js",
         log_prefix_rule = "js_test" if ctx.attr.testonly else "js_binary",
+        fixed_args = ctx.attr.fixed_args,
     )
     runfiles = launcher.runfiles
 
