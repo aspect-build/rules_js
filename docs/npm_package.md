@@ -29,7 +29,7 @@ This target can be used as the `src` attribute to `npm_link_package`.
 Every npm_package target has a sub target named after its name, which is `&lt;name&gt;.publish`, that can be run
 to publish to an npm registry.
 
-Under the hood, this target runs `npm publish`. You can pass arguments to npm by escaping them from Bazel using a double-hyphen, 
+Under the hood, this target runs `npm publish`. You can pass arguments to npm by escaping them from Bazel using a double-hyphen,
 for example: `bazel run my_package.publish -- --tag=next`
 
 
