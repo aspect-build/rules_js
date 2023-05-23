@@ -147,6 +147,7 @@ bzl_library(
     ],
     deps = [
         "@aspect_bazel_lib//lib:paths",
+        "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:paths",
     ],
 )

@@ -1,6 +1,7 @@
 const chalk = require('chalk')
 const fs = require('fs')
 const os = require('os')
+const path = require('path')
 
 const space = ' '
 const art = fs.readFileSync(__dirname + '/ascii.art')
@@ -25,4 +26,48 @@ console.log(
     chalk.bold.bgRed(' OS '),
     space,
     chalk.redBright(process.platform, os.version(), os.arch())
+)
+console.log('')
+
+console.log(
+    chalk.bold.bgYellow(' SOURCE CHECK '),
+    space,
+    chalk.yellowBright(
+        fs.existsSync(
+            path.join(process.env.JS_BINARY__RUNFILES, 'repo/source.txt')
+        )
+    )
+)
+
+console.log(
+    chalk.bold.bgMagenta(' DIRECTORY CHECK '),
+    space,
+    chalk.magentaBright(
+        fs.existsSync(
+            path.join(process.env.JS_BINARY__RUNFILES, 'repo/dir/source.txt')
+        )
+    )
+)
+
+console.log(
+    chalk.bold.bgMagenta(' SOURCE DIRECTORY CHECK '),
+    space,
+    chalk.magentaBright(
+        fs.existsSync(
+            path.join(process.env.JS_BINARY__RUNFILES, 'repo/srcdir/source.txt')
+        )
+    )
+)
+
+console.log(
+    chalk.bold.bgWhite(' PROTO CHECK '),
+    space,
+    chalk.whiteBright(
+        fs.existsSync(
+            path.join(
+                process.env.JS_BINARY__RUNFILES,
+                'com_google_googleapis/google/cloud/speech/v1p1beta1/speech_proto-descriptor-set.proto.bin'
+            )
+        )
+    )
 )

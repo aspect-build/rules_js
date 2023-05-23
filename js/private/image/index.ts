@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream } from 'node:fs'
-import { readdir, readFile, realpath, stat } from 'node:fs/promises'
+import { readdir, readFile, readlink, realpath, stat } from 'node:fs/promises'
 import * as path from 'node:path'
 import { Readable, Stream } from 'node:stream'
 import { pathToFileURL } from 'node:url'
@@ -20,6 +20,7 @@ type HermeticStat = {
 type Entry = {
     is_source: boolean
     is_directory: boolean
+    is_external: boolean
     dest: string
     root?: string
     remove_non_hermetic_lines?: boolean
@@ -28,15 +29,83 @@ type Entries = { [path: string]: Entry }
 
 type Compression = 'gzip' | 'none'
 
-function findKeyByValue(entries: Entries, value: string): string {
+function findKeyByValue(entries: Entries, value: string): string | undefined {
     for (const [key, { dest: val }] of Object.entries(entries)) {
         if (val == value) {
             return key
         }
     }
-    throw new Error(
-        `couldn't map ${value} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose`
-    )
+    return undefined
+}
+
+function leftStrip(p: string, p1: string, p2: string) {
+    if (p.startsWith(p1)) {
+        return p.slice(p1.length)
+    } else if (p.startsWith(p2)) {
+        return p.slice(p2.length)
+    }
+    return p
+}
+
+async function readlinkSafe(p: string) {
+    try {
+        const link = await readlink(p);
+        return path.resolve(path.dirname(p), link);
+    } catch (e) {
+        if (e.code == "EINVAL") {
+            return p;
+        }
+        throw e;
+    }
+}
+
+// TODO: drop once we no longer support bazel 5
+async function resolveSymlinkLegacy(relativeP: string) {
+    let prevHop = path.resolve(relativeP);
+    let hopped = false;
+    let execrootOutOfSandbox = "";
+    let execroot = process.env.JS_BINARY__EXECROOT!;
+    while (true) {
+        let nextHop = await readlinkSafe(prevHop);
+
+        if (!execrootOutOfSandbox && !nextHop.startsWith(execroot)) {
+            execrootOutOfSandbox = nextHop.replace(relativeP, "");
+        }
+
+        let relativeNextHop = leftStrip(nextHop, execroot, execrootOutOfSandbox);
+        let relativePrevHop = leftStrip(prevHop, execroot, execrootOutOfSandbox);
+
+        if (relativeNextHop != relativePrevHop) {
+            prevHop = nextHop;
+            hopped = true;
+        } else if(!hopped) {
+            return undefined;
+        } else {
+            return nextHop;
+        }
+    }
+}
+
+async function resolveSymlink(p: string) {
+    let prevHop = path.resolve(p);
+    let hopped = false;
+ 
+    while (true) {
+        // /output-base/sandbox/4/execroot/wksp/bazel-out
+        // /output-base/execroot/wksp/bazel-out
+        let nextHop = await readlinkSafe(prevHop);
+        if (!nextHop.startsWith(process.env.JS_BINARY__EXECROOT!)) {
+            return hopped ? prevHop : undefined;  
+        }
+        if (nextHop != prevHop) {
+            prevHop = nextHop;
+            hopped = true;
+        } else if(!hopped) {
+            return undefined;
+        } else {
+            return nextHop;
+        }
+    }
 }
 
 async function* walk(dir: string, accumulate = '') {
@@ -116,7 +185,7 @@ function add_symlink(
     pkg: Pack,
     stats: HermeticStat
 ) {
-    const link_parent = path.dirname(name);
+    const link_parent = path.dirname(name)
     pkg.entry({
         type: 'symlink',
         name: name.replace(/^\//, ''),
@@ -157,8 +226,11 @@ export async function build(
     entries: Entries,
     appLayerPath: string,
     nodeModulesLayerPath: string,
-    compression: Compression
-) {
+    compression: Compression,
+    useLegacySymlinkDetection: boolean
+) { 
+    const resolveSymlinkFn = useLegacySymlinkDetection ? resolveSymlinkLegacy  : resolveSymlink;
+
     const app = pack()
     const nm = pack()
 
@@ -181,6 +253,7 @@ export async function build(
             dest,
             is_directory,
             is_source,
+            is_external,
             root,
             remove_non_hermetic_lines,
         } = entries[key]
@@ -237,15 +310,28 @@ export async function build(
             )
         }
 
-        const realp = await realpath(dest)
-        const output_path = realp.slice(realp.indexOf(root))
-        if (output_path != dest) {
+        const realp = await resolveSymlinkFn(dest)
+
+        // it's important that we don't treat any symlink pointing out of execroot since
+        // bazel symlinks external files into sandbox to make them available to us.
+        if (realp && !is_external) {
+            const output_path = realp.slice(realp.indexOf(root))
             // interestingly, bazel 5 and 6 sets different mode bits on symlinks.
             // well use `0o755` to allow owner&group to `rwx` and others `rx`
             // see: https://chmodcommand.com/chmod-775/
             // const stats = await stat(dest)
             const stats: HermeticStat = { mode: MODE_FOR_SYMLINK, mtime: MTIME }
             const linkname = findKeyByValue(entries, output_path)
+            if (linkname == undefined) {
+                throw new Error(
+                    `Couldn't map symbolic link ${output_path} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
+                        `dest: ${dest}\n` +
+                        `realpath: ${realp}\n` +
+                        `outputpath: ${output_path}\n` +
+                        `root: ${root}\n` +
+                        `runfiles: ${key}\n\n`
+                )
+            }
             add_symlink(key, linkname, output, stats)
         } else {
             // Due to filesystems setting different bits depending on the os we have to opt-in
@@ -287,15 +373,15 @@ export async function build(
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [entriesPath, appLayerPath, nodeModulesLayerPath, compression] =
+    const [entriesPath, appLayerPath, nodeModulesLayerPath, compression, useLegacySymlinkDetection] =
         process.argv.slice(2)
-
     const raw_entries = await readFile(entriesPath)
     const entries: Entries = JSON.parse(raw_entries.toString())
     build(
         entries,
         appLayerPath,
         nodeModulesLayerPath,
-        compression as Compression
+        compression as Compression,
+        !!useLegacySymlinkDetection
     )
 }

@@ -15,6 +15,7 @@ js_image_layer(
 
 load("@aspect_bazel_lib//lib:paths.bzl", "to_manifest_path")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 
 _DOC = """Create container image layers from js_binary targets.
 
@@ -220,7 +221,13 @@ def _js_image_layer_impl(ctx):
 
     for file in depset(transitive = [default_info.files, default_info.default_runfiles.files]).to_list():
         destination = _runfile_path(ctx, file, runfiles_dir)
-        entry = {"dest": file.path, "root": file.root.path, "is_source": file.is_source, "is_directory": file.is_directory}
+        entry = {
+            "dest": file.path,
+            "root": file.root.path,
+            "is_external": file.owner.workspace_name != "",
+            "is_source": file.is_source,
+            "is_directory": file.is_directory,
+        }
         if destination == real_executable_path:
             entry["remove_non_hermetic_lines"] = True
         files[destination] = entry
@@ -237,6 +244,9 @@ def _js_image_layer_impl(ctx):
     args.add(app)
     args.add(node_modules)
     args.add(ctx.attr.compression)
+
+    if not is_bazel_6_or_greater():
+        args.add("true")
 
     ctx.actions.run(
         inputs = depset([executable, launcher, entries], transitive = [default_info.files, default_info.default_runfiles.files]),

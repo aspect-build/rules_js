@@ -4,4 +4,14 @@ commandTests:
     - name: 'smoke'
       command: 'bash'
       args: ['/app/src/main']
-      expectedOutput: ['.*WORKSPACE.*js_image_oci', '.*main.*', '.*ARCH.*']
+      expectedOutput:
+          [
+              'OS',
+              'ARCH/CPU',
+              ' WORKSPACE    js_image_oci',
+              ' TARGET    //src:main',
+              ' SOURCE CHECK    true',
+              ' DIRECTORY CHECK    true',
+              ' PROTO CHECK    true',
+              ' SOURCE DIRECTORY CHECK    true',
+          ]
