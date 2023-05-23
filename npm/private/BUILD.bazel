@@ -10,7 +10,7 @@ exports_files(
 exports_files(
     [
         "noop.sh",
-        "npm_package.mjs",
+        "npm_publish.mjs",
     ],
     visibility = ["//visibility:public"],
 )

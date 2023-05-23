@@ -178,8 +178,8 @@ def npm_package(
     Every npm_package target has a sub target named after its name, which is `<name>.publish`, that can be run
     to publish to an npm registry.
 
-    You can pass arguments to npm by escaping them from Bazel using a double-hyphen, for example:
-    `bazel run my_package.publish -- --tag=next`
+    Under the hood, this target runs `npm publish`. You can pass arguments to npm by escaping them from Bazel using a double-hyphen,
+    for example: `bazel run my_package.publish -- --tag=next`
 
 
     Files and directories can be arranged as needed in the output directory using
@@ -234,7 +234,7 @@ def npm_package(
 
         srcs: Files and/or directories or targets that provide `DirectoryPathInfo` to copy into the output directory.
 
-        args: Arguments that are passed down to <name>.publish target and `pnpm publish` command.
+        args: Arguments that are passed down to <name>.publish target and `npm publish` command.
 
         data: Runtime / linktime npm dependencies of this npm package.
 
@@ -486,7 +486,7 @@ def _publish_target(name, package, args = [], visibility = None, tags = [], test
 
     expand_template(
         name = "{}_mjs".format(name),
-        template = "@aspect_rules_js//npm/private:npm_package.mjs",
+        template = "@aspect_rules_js//npm/private:npm_publish.mjs",
         out = "{}.mjs".format(name),
         substitutions = {
             "{{PACKAGE_DIR}}": "$(rlocationpaths :{})".format(package),
