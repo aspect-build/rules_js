@@ -177,4 +177,7 @@ js_binary(
     name = "js_image_layer_builder",
     entry_point = "js_image_layer.mjs",
     visibility = ["//visibility:public"],
+    node_options = [
+        "--enable-source-maps"
+    ]
 )
