@@ -1,6 +1,13 @@
 "Internal implementation details"
 
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+js_library(
+    name = "npm_publish_mjs",
+    srcs = ["npm_publish.mjs"],
+    visibility = ["//visibility:public"],
+)
 
 exports_files(
     glob(["*.bzl"]),
@@ -21,6 +28,7 @@ bzl_library(
     ],
     deps = [
         ":npm_package_info",
+        "//js:defs",
         "//js:libs",
         "//js:providers",
         "@aspect_bazel_lib//lib:copy_to_directory",
