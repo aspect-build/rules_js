@@ -10,7 +10,6 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//js:libs.bzl", "js_lib_helpers")
@@ -451,11 +450,17 @@ def npm_package(
         )
         srcs = srcs + [files_target]
 
-    _publish_target(
+    js_binary(
         name = "{}.publish".format(name),
-        package = name,
+        entry_point = "@aspect_rules_js//npm/private:npm_publish_mjs",
+        fixed_args = [
+            "$(rootpath :{})".format(name),
+        ],
+        data = [name],
+        # required to make npm to be available in PATH
+        include_npm = True,
         args = args,
-        tags = kwargs.get("tags", []),
+        tags = kwargs.get("tags", []) + ["manual"],
         testonly = kwargs.get("testonly", False),
         visibility = kwargs.get("visibility", None),
     )
@@ -478,35 +483,6 @@ def npm_package(
         hardlink = hardlink,
         verbose = verbose,
         **kwargs
-    )
-
-def _publish_target(name, package, args = [], visibility = None, tags = [], testonly = False):
-    # Always tag the target manual since we should only build it when the final target is built.
-    tags = tags + ["manual"]
-
-    expand_template(
-        name = "{}_mjs".format(name),
-        template = "@aspect_rules_js//npm/private:npm_publish.mjs",
-        out = "{}.mjs".format(name),
-        substitutions = {
-            "{{PACKAGE_DIR}}": "$(rlocationpaths :{})".format(package),
-        },
-        data = [package],
-        tags = tags,
-        testonly = testonly,
-        visibility = visibility,
-    )
-
-    js_binary(
-        name = name,
-        entry_point = "{}.mjs".format(name),
-        data = [package],
-        # required to make npm to be available in PATH
-        include_npm = True,
-        args = args,
-        tags = tags,
-        testonly = testonly,
-        visibility = visibility,
     )
 
 def stamped_package_json(name, stamp_var, **kwargs):
