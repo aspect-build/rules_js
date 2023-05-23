@@ -40,3 +40,24 @@ assert_contains(
     actual = "args_out",
     expected = "undefined",
 )
+
+js_binary(
+    name = "locations_bin",
+    data = ["test.txt"],
+    entry_point = "fixed_args.mjs",
+    fixed_args = [
+        "$(rootpaths :test.txt)",
+    ],
+)
+
+js_run_binary(
+    name = "run_locations",
+    stdout = "locations_out",
+    tool = ":locations_bin",
+)
+
+assert_contains(
+    name = "locations_test",
+    actual = "locations_out",
+    expected = "js/private/test/fixed_args/test.txt",
+)
