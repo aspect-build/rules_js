@@ -69,7 +69,9 @@ async function resolveSymlinkLegacy(relativeP: string) {
         let nextHop = await readlinkSafe(prevHop);
 
         if (!execrootOutOfSandbox && !nextHop.startsWith(execroot)) {
-            execrootOutOfSandbox = nextHop.replace(relativeP, "");
+            execrootOutOfSandbox = nextHop.replace(relativeP, "").replace(/\/$/, '');
+            prevHop = nextHop;
+            continue;
         }
 
         let relativeNextHop = leftStrip(nextHop, execroot, execrootOutOfSandbox);
