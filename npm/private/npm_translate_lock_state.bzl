@@ -400,6 +400,7 @@ def _action_cache_miss(priv, rctx, label_store):
 ################################################################################
 def _write_action_cache(priv, rctx, label_store):
     contents = [
+        "# @generated",
         "# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").".format(helpers.to_apparent_repo_name(rctx.name), utils.consistent_label_str(label_store.label("pnpm_lock"))),
         "# This file should be checked into version control along with the pnpm-lock.yaml file.",
     ]
