@@ -468,7 +468,7 @@ def _download_and_extract_archive(rctx):
     if _is_gnu_tar(rctx):
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
         # extracting files into the directory. Delay permission restoration for directories until all files
-        # have been extracted. We assume that any linux platform is using GNU tar and has this flag available.
+        # have been extracted.
         untar_args.append("--delay-directory-restore")
 
     result = rctx.execute(untar_args)
