@@ -398,6 +398,14 @@ def _fetch_git_repository(rctx):
     if not rctx.delete(git_metadata_folder):
         fail("Failed to delete .git folder in %s" % str(git_repo.directory))
 
+def _is_gnu_tar(rctx):
+    # We assume that any linux platform is using GNU tar.
+    if repo_utils.is_linux(rctx):
+        return True
+
+    result = rctx.execute(["tar", "--version"])
+    return "GNU tar" in result.stdout
+
 def _download_and_extract_archive(rctx):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
@@ -457,10 +465,10 @@ def _download_and_extract_archive(rctx):
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
     untar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
-    if repo_utils.is_linux(rctx):
+    if _is_gnu_tar(rctx):
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
         # extracting files into the directory. Delay permission restoration for directories until all files
-        # have been extracted. We assume that any linux platform is using GNU tar and has this flag available.
+        # have been extracted.
         untar_args.append("--delay-directory-restore")
 
     result = rctx.execute(untar_args)
