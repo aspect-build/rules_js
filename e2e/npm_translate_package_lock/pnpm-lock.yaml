@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 overrides:
   '@types/node': 18.11.18
@@ -8,8 +12,8 @@ dependencies:
     specifier: 4.19.3
     version: 4.19.3
   karma-typescript:
-    specifier: 5.5.3
-    version: 5.5.3(karma@6.4.1)(typescript@4.9.5)
+    specifier: 5.5.4
+    version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
   lodash:
     specifier: 4.17.21
     version: 4.17.21
@@ -1650,11 +1654,11 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /karma-typescript@5.5.3(karma@6.4.1)(typescript@4.9.5):
-    resolution: {integrity: sha512-l1FHurolXEBIzRa9ExpNtjzysAhsi/vLpTazpwLHWWK86mknvVpqor6pRZ5Nid7jvOPrTBqAq0JRuLgiCdRkFw==}
+  /karma-typescript@5.5.4(karma@6.4.1)(typescript@4.9.5):
+    resolution: {integrity: sha512-D7nQ96xu/UekuqCmiPimnCuOFqp8+BxiND6MU6IJVN37E7DgXzr7SUeTzwuTHtKSYpgxKv4iOTUteYTxpeZL9A==}
     peerDependencies:
       karma: 1 || 2 || 3 || 4 || 5 || 6
-      typescript: 1 || 2 || 3 || 4
+      typescript: 1 || 2 || 3 || 4 || 5
     dependencies:
       acorn: 8.8.2
       acorn-walk: 8.2.0
