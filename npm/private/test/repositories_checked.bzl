@@ -2780,7 +2780,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-typescript__10.0.1__-1755950914",
+        name = "npm__at_rollup_plugin-typescript__10.0.1__1721367932",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -2788,7 +2788,7 @@ def npm_repositories():
             "js/private/worker/src": ["@rollup/plugin-typescript"],
         },
         package = "@rollup/plugin-typescript",
-        version = "10.0.1_-1755950914",
+        version = "10.0.1_1721367932",
         url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-10.0.1.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
@@ -2798,15 +2798,15 @@ def npm_repositories():
             "@rollup/pluginutils": "5.0.2_rollup_2.79.1",
             "resolve": "1.22.1",
             "rollup": "2.79.1",
-            "tslib": "2.5.0",
+            "tslib": "2.5.2",
             "typescript": "4.9.5",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": ["10.0.1_-1755950914"],
+            "@rollup/plugin-typescript": ["10.0.1_1721367932"],
             "@rollup/pluginutils": ["5.0.2_rollup_2.79.1"],
             "resolve": ["1.22.1"],
             "rollup": ["2.79.1"],
-            "tslib": ["2.5.0"],
+            "tslib": ["2.5.2"],
             "typescript": ["4.9.5"],
             "fsevents": ["2.3.2"],
             "is-core-module": ["2.11.0"],
@@ -22365,7 +22365,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__tslib__2.5.0",
+        name = "npm__tslib__2.5.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -22373,14 +22373,14 @@ def npm_repositories():
             "js/private/worker/src": ["tslib"],
         },
         package = "tslib",
-        version = "2.5.0",
-        url = "https://registry.npmjs.org/tslib/-/tslib-2.5.0.tgz",
+        version = "2.5.2",
+        url = "https://registry.npmjs.org/tslib/-/tslib-2.5.2.tgz",
         npm_translate_lock_repo = "npm",
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==",
+        integrity = "sha512-5svOrSA2w3iGFDs1HibEVBGbDrAY82bFQ3HZ3ixB+88nsbsWQoKqDRb5UBYAUPEzbBn6dAp5gRNXglySbx1MlA==",
         transitive_closure = {
-            "tslib": ["2.5.0"],
+            "tslib": ["2.5.2"],
         },
     )
 
@@ -24693,7 +24693,7 @@ def npm_repositories():
             "stream-buffers": "3.0.2",
             "tar": "6.1.13",
             "tmp-promise": "3.0.3",
-            "tslib": "2.5.0",
+            "tslib": "2.5.2",
             "typescript": "4.9.5",
             "underscore": "1.13.6",
             "ws": "8.13.0_bufferutil_4.0.7",
@@ -24714,7 +24714,7 @@ def npm_repositories():
             "stream-buffers": ["3.0.2"],
             "tar": ["6.1.13"],
             "tmp-promise": ["3.0.3"],
-            "tslib": ["2.5.0"],
+            "tslib": ["2.5.2"],
             "typescript": ["4.9.5"],
             "underscore": ["1.13.6"],
             "ws": ["8.13.0_bufferutil_4.0.7"],
@@ -24841,7 +24841,7 @@ def npm_repositories():
             "@types/archiver": ["registry.npmjs.org/@types/archiver@5.3.1"],
             "@types/glob": ["registry.npmjs.org/@types/glob@8.1.0"],
             "@types/minimatch": ["registry.npmjs.org/@types/minimatch@5.1.2"],
-            "@types/node": ["registry.npmjs.org/@types/node@18.11.11"],
+            "@types/node": ["registry.npmjs.org/@types/node@18.11.18"],
         },
     )
 
@@ -24997,12 +24997,12 @@ def npm_repositories():
         integrity = "sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==",
         deps = {
             "@types/minimatch": "registry.npmjs.org/@types/minimatch@5.1.2",
-            "@types/node": "registry.npmjs.org/@types/node@18.11.11",
+            "@types/node": "registry.npmjs.org/@types/node@18.11.18",
         },
         transitive_closure = {
             "@types/glob": ["registry.npmjs.org/@types/glob@8.1.0"],
             "@types/minimatch": ["registry.npmjs.org/@types/minimatch@5.1.2"],
-            "@types/node": ["registry.npmjs.org/@types/node@18.11.11"],
+            "@types/node": ["registry.npmjs.org/@types/node@18.11.18"],
         },
     )
 
