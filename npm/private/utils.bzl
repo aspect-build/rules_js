@@ -181,8 +181,9 @@ def _assert_lockfile_version(version, testonly = False):
     #   5.3 - pnpm v6.x.x
     #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
     #   6.0 - pnpm v8.0.0 bumped the lockfile version to 6.0; this included breaking changes
+    #   6.1 - pnpm v8.6.0 bumped the lockfile version to 6.1
     min_lock_version = 5.3
-    max_lock_version = 6.0
+    max_lock_version = 6.1
     msg = None
 
     if version < min_lock_version:
