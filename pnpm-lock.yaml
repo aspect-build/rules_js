@@ -172,7 +172,7 @@ importers:
         version: 15.0.0(rollup@2.79.1)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.1)(tslib@2.5.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5)
       '@types/archiver':
         specifier: 5.3.1
         version: registry.npmjs.org/@types/archiver@5.3.1
@@ -186,8 +186,8 @@ importers:
         specifier: 2.79.1
         version: 2.79.1
       tslib:
-        specifier: 2.5.0
-        version: 2.5.0
+        specifier: 2.5.2
+        version: 2.5.2
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -224,7 +224,7 @@ importers:
         version: 0.2.0(rollup@2.79.1)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.1)(tslib@2.5.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5)
       '@types/google-protobuf':
         specifier: 3.15.6
         version: registry.npmjs.org/@types/google-protobuf@3.15.6
@@ -238,8 +238,8 @@ importers:
         specifier: 2.79.1
         version: 2.79.1
       tslib:
-        specifier: 2.5.0
-        version: 2.5.0
+        specifier: 2.5.2
+        version: 2.5.2
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -1149,7 +1149,7 @@ packages:
       terser: 5.16.5
     dev: true
 
-  /@rollup/plugin-typescript@10.0.1(rollup@2.79.1)(tslib@2.5.0)(typescript@4.9.5):
+  /@rollup/plugin-typescript@10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5):
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1165,7 +1165,7 @@ packages:
       '@rollup/pluginutils': 5.0.2(rollup@2.79.1)
       resolve: 1.22.1
       rollup: 2.79.1
-      tslib: 2.5.0
+      tslib: 2.5.2
       typescript: 4.9.5
     dev: true
 
@@ -6360,8 +6360,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib@2.5.0:
-    resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
+  /tslib@2.5.2:
+    resolution: {integrity: sha512-5svOrSA2w3iGFDs1HibEVBGbDrAY82bFQ3HZ3ixB+88nsbsWQoKqDRb5UBYAUPEzbBn6dAp5gRNXglySbx1MlA==}
     dev: true
 
   /tunnel-agent@0.6.0:
@@ -7056,7 +7056,7 @@ packages:
       stream-buffers: 3.0.2
       tar: 6.1.13
       tmp-promise: 3.0.3
-      tslib: 2.5.0
+      tslib: 2.5.2
       typescript: 4.9.5
       underscore: 1.13.6
       ws: 8.13.0(bufferutil@4.0.7)
@@ -7143,7 +7143,7 @@ packages:
     version: 8.1.0
     dependencies:
       '@types/minimatch': registry.npmjs.org/@types/minimatch@5.1.2
-      '@types/node': registry.npmjs.org/@types/node@18.11.11
+      '@types/node': registry.npmjs.org/@types/node@18.11.18
     dev: true
 
   registry.npmjs.org/@types/google-protobuf@3.15.6:
