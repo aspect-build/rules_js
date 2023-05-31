@@ -171,7 +171,9 @@ _ATTRS = {
 
         Log from are written to stderr. They will be supressed on success when running as the tool
         of a js_run_binary when silent_on_success is True. In that case, they will be shown
-        only on a build failure along with the stdout & stderr of the node tool being run.""",
+        only on a build failure along with the stdout & stderr of the node tool being run.
+
+        Log levels: {}""".format(", ".join(LOG_LEVELS.keys())),
         values = LOG_LEVELS.keys(),
         default = "error",
     ),
