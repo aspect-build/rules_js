@@ -317,6 +317,7 @@ export PATH
 
 # Debug logs
 if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
+    logf_debug "PATH %s" "$PATH"
     if [ "${BAZEL_BINDIR:-}" ]; then
         logf_debug "BAZEL_BINDIR %s" "$BAZEL_BINDIR"
     fi
