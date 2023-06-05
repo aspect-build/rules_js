@@ -5,6 +5,7 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 """
 
 load("//js/private:maybe.bzl", http_archive = "maybe_http_archive")
+load("//js/private:repository_utils.bzl", _config_settings = "config_settings")
 
 def rules_js_dependencies():
     http_archive(
@@ -25,3 +26,5 @@ def rules_js_dependencies():
         strip_prefix = "bazel-lib-1.32.1",
         url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.32.1/bazel-lib-v1.32.1.tar.gz",
     )
+
+    _config_settings(name = "aspect_rules_js_config_settings")

@@ -24,9 +24,9 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
-config_setting(
+alias(
     name = "experimental_allow_unresolved_symlinks",
-    values = {"experimental_allow_unresolved_symlinks": "true"},
+    actual = "@aspect_rules_js_config_settings//:allow_unresolved_symlinks",
     visibility = ["//visibility:public"],
 )
 
