@@ -46,10 +46,12 @@ jobs:
             - uses: actions/checkout@v3
             - id: bazel_6
               run: echo "bazelversion=$(head -n 1 .bazelversion)" >> $GITHUB_OUTPUT
-            - id: bazel_4_1
+            - id: bazel_7
+              run: echo "bazelversion=7.0.0-pre.20230524.3" >> $GITHUB_OUTPUT
+            - id: bazel_5
               run: echo "bazelversion=5.4.1" >> $GITHUB_OUTPUT
         outputs:
-            # Will look like ["<version from .bazelversion>", "5.4.1"]
+            # Will look like ["<version from .bazelversion>", "7.0.0-pre.*", "5.4.1"]
             bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
 
     matrix-prep-folder:
@@ -152,6 +154,8 @@ jobs:
                 folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folders) }}
                 bzlmodEnabled: [true, false]
                 exclude:
+                    # Exclude bazel 7 by default, will opt-in to includes
+                    - bazelversion: 7.0.0-pre.20230524.3
                     # Don't test RBE with Bazel 5 (not supported)
                     - config: rbe
                       bazelversion: 5.4.1
@@ -176,6 +180,15 @@ jobs:
                     - folder: e2e/npm_link_package
                       bzlmodEnabled: true
                     - folder: e2e/rules_foo
+                      bzlmodEnabled: true
+                include:
+                    - config: local
+                      bazelversion: 7.0.0-pre.20230524.3
+                      folder: .
+                      bzlmodEnabled: false
+                    - config: local
+                      bazelversion: 7.0.0-pre.20230524.3
+                      folder: .
                       bzlmodEnabled: true
 
         # Steps represent a sequence of tasks that will be executed as part of the job
