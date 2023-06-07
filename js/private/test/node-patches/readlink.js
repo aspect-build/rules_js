@@ -58,6 +58,12 @@ describe('testing readlink', async () => {
                 )
 
                 assert.deepStrictEqual(
+                    patchedFs.readlinkSync(new URL(`file://${linkPath}`)),
+                    path.join(fixturesDir, 'b', 'file'),
+                    'SYNC: should read the symlink because its within root'
+                )
+
+                assert.deepStrictEqual(
                     await util.promisify(patchedFs.readlink)(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'CB: should read the symlink because its within root'
@@ -155,6 +161,12 @@ describe('testing readlink', async () => {
 
                 assert.deepStrictEqual(
                     patchedFs.readlinkSync(linkPath),
+                    filePath,
+                    'SYNC: should read the symlink in the sandbox'
+                )
+
+                assert.deepStrictEqual(
+                    patchedFs.readlinkSync(new URL(`file://${linkPath}`)),
                     filePath,
                     'SYNC: should read the symlink in the sandbox'
                 )

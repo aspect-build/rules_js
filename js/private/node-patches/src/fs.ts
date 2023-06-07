@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-import { Stats } from 'fs'
+import type { PathLike, Stats } from 'fs'
+import type * as FsType from 'fs'
+import type * as UrlType from 'url'
 import * as path from 'path'
 import * as util from 'util'
 
@@ -26,7 +28,8 @@ type Dirent = any
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('fs')
+const _fs = require('node:fs') as typeof FsType
+const url = require('node:url') as typeof UrlType
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
@@ -52,19 +55,25 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         return
     }
 
-    const origLstat = fs.lstat.bind(fs)
-    const origLstatSync = fs.lstatSync.bind(fs)
+    const origLstat = fs.lstat.bind(fs) as typeof FsType.lstat
+    const origLstatSync = fs.lstatSync.bind(fs) as typeof FsType.lstatSync
 
-    const origReaddir = fs.readdir.bind(fs)
-    const origReaddirSync = fs.readdirSync.bind(fs)
+    const origReaddir = fs.readdir.bind(fs) as typeof FsType.readdir
+    const origReaddirSync = fs.readdirSync.bind(fs) as typeof FsType.readdirSync
 
-    const origReadlink = fs.readlink.bind(fs)
-    const origReadlinkSync = fs.readlinkSync.bind(fs)
+    const origReadlink = fs.readlink.bind(fs) as typeof FsType.readlink
+    const origReadlinkSync = fs.readlinkSync.bind(
+        fs
+    ) as typeof FsType.readlinkSync
 
-    const origRealpath = fs.realpath.bind(fs)
-    const origRealpathNative = fs.realpath.native
-    const origRealpathSync = fs.realpathSync.bind(fs)
-    const origRealpathSyncNative = fs.realpathSync.native
+    const origRealpath = fs.realpath.bind(fs) as typeof FsType.realpath
+    const origRealpathNative = fs.realpath
+        .native as typeof FsType.realpath.native
+    const origRealpathSync = fs.realpathSync.bind(
+        fs
+    ) as typeof FsType.realpathSync
+    const origRealpathSyncNative = fs.realpathSync
+        .native as typeof FsType.realpathSync.native
 
     const { canEscape, isEscape } = escapeFunction(roots)
 
@@ -72,15 +81,13 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     // fs.lstat
     // =========================================================================
 
-    fs.lstat = (...args: any[]) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined
-
+    fs.lstat = function lstat(...args: Parameters<typeof FsType.lstat>) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origLstat(...args)
         }
 
-        cb = once(cb)
+        const cb = once(args[args.length - 1] as any)
 
         // override the callback
         args[args.length - 1] = (err: Error, stats: Stats) => {
@@ -91,7 +98,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 return cb(null, stats)
             }
 
-            args[0] = path.resolve(args[0])
+            args[0] = resolvePathLike(args[0])
 
             if (!canEscape(args[0])) {
                 // the file can not escaped the sandbox so there is nothing more to do
@@ -123,7 +130,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origLstat(...args)
     }
 
-    fs.lstatSync = function lstatSync(...args: any[]) {
+    fs.lstatSync = function lstatSync(
+        ...args: Parameters<typeof FsType.lstatSync>
+    ) {
         const stats = origLstatSync(...args)
 
         if (!stats.isSymbolicLink()) {
@@ -131,7 +140,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             return stats
         }
 
-        args[0] = path.resolve(args[0])
+        args[0] = resolvePathLike(args[0])
 
         if (!canEscape(args[0])) {
             // the file can not escaped the sandbox so there is nothing more to do
@@ -145,13 +154,12 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         }
 
         try {
+            args[0] = unguardedRealPathSync(args[0])
+
             // there are no hops so lets report the stats of the real file;
             // we can't use origRealPathSync here since that function calls lstat internally
             // which can result in an infinite loop
-            return origLstatSync(
-                unguardedRealPathSync(args[0]),
-                ...args.slice(1)
-            )
+            return origLstatSync(...args)
         } catch (err) {
             if (err.code === 'ENOENT') {
                 // broken link so there is nothing more to do
@@ -165,15 +173,13 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     // fs.realpath
     // =========================================================================
 
-    fs.realpath = (...args: any[]) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined
-
+    fs.realpath = function realpath(...args: Parameters<typeof origRealpath>) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origRealpath(...args)
         }
 
-        cb = once(cb)
+        const cb = once(args[args.length - 1] as any)
 
         args[args.length - 1] = (err: Error, str: string) => {
             if (err) return cb(err)
@@ -192,15 +198,15 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origRealpath(...args)
     }
 
-    fs.realpath.native = (...args: any[]) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined
-
+    fs.realpath.native = function realpath_native(
+        ...args: Parameters<typeof origRealpathNative>
+    ) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origRealpathNative(...args)
         }
 
-        cb = once(cb)
+        const cb = once(args[args.length - 1] as any)
 
         args[args.length - 1] = (err: Error, str: string) => {
             if (err) return cb(err)
@@ -219,7 +225,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origRealpathNative(...args)
     }
 
-    fs.realpathSync = function realpathSync(...args: any[]) {
+    fs.realpathSync = function realpathSync(
+        ...args: Parameters<typeof origRealpathSync>
+    ) {
         const str = origRealpathSync(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
@@ -228,7 +236,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         return str
     }
 
-    fs.realpathSync.native = function native_realpathSync(...args: any[]) {
+    fs.realpathSync.native = function native_realpathSync(
+        ...args: Parameters<typeof origRealpathSyncNative>
+    ) {
         const str = origRealpathSyncNative(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
@@ -241,18 +251,17 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     // fs.readlink
     // =========================================================================
 
-    fs.readlink = (...args: any[]) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined
-
+    fs.readlink = function readlink(...args: Parameters<typeof origReadlink>) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origReadlink(...args)
         }
 
-        cb = once(cb)
+        const cb = once(args[args.length - 1] as any)
+
         args[args.length - 1] = (err: Error, str: string) => {
             if (err) return cb(err)
-            const resolved = path.resolve(args[0])
+            const resolved = resolvePathLike(args[0])
             str = path.resolve(path.dirname(resolved), str)
             const escapedRoot: string | false = isEscape(resolved, str)
             if (escapedRoot) {
@@ -292,8 +301,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origReadlink(...args)
     }
 
-    fs.readlinkSync = function readlinkSync(...args: any[]) {
-        const resolved = path.resolve(args[0])
+    fs.readlinkSync = function readlinkSync(
+        ...args: Parameters<typeof origReadlinkSync>
+    ) {
+        const resolved = resolvePathLike(args[0])
 
         const str = path.resolve(
             path.dirname(resolved),
@@ -329,16 +340,14 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     // fs.readdir
     // =========================================================================
 
-    fs.readdir = (...args: any[]) => {
-        const p = path.resolve(args[0])
-
-        let cb = args[args.length - 1]
-        if (typeof cb !== 'function') {
-            // this will likely throw callback required error.
+    fs.readdir = function readdir(...args: Parameters<typeof origReaddir>) {
+        // preserve error when calling function without required callback
+        if (typeof args[args.length - 1] !== 'function') {
             return origReaddir(...args)
         }
 
-        cb = once(cb)
+        const cb = once(args[args.length - 1] as any)
+        const p = resolvePathLike(args[0])
 
         args[args.length - 1] = (err: Error, result: Dirent[]) => {
             if (err) return cb(err)
@@ -360,9 +369,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         origReaddir(...args)
     }
 
-    fs.readdirSync = function readdirSync(...args: any[]) {
+    fs.readdirSync = function readdirSync(
+        ...args: Parameters<typeof origReaddirSync>
+    ) {
         const res = origReaddirSync(...args)
-        const p = path.resolve(args[0])
+        const p = resolvePathLike(args[0])
         res.forEach((v: Dirent | any) => {
             handleDirentSync(p, v)
         })
@@ -375,12 +386,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
     if (fs.opendir) {
         const origOpendir = fs.opendir.bind(fs)
-        fs.opendir = (...args: any[]) => {
-            let cb = args[args.length - 1]
+        fs.opendir = function opendir(...args: Parameters<typeof origOpendir>) {
             // if this is not a function opendir should throw an error.
             // we call it so we don't have to throw a mock
-            if (typeof cb === 'function') {
-                cb = once(cb)
+            if (typeof args[args.length - 1] === 'function') {
+                const cb = once(args[args.length - 1] as any)
                 args[args.length - 1] = async (err: Error, dir: Dir) => {
                     try {
                         cb(null, await handleDir(dir))
@@ -700,7 +710,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         start: string,
         cb: (err: Error, str?: string) => void
     ): void {
-        start = String(start) // handle the "undefined" case (matches behavior as fs.realpath)
+        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpath)
         const oneHop = (loc, cb) => {
             nextHop(loc, (next) => {
                 if (next == undefined) {
@@ -717,11 +727,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     }
 
     function guardedRealPath(
-        start: string,
+        start: PathLike,
         cb: (err: Error, str?: string) => void,
         escapedRoot: string = undefined
     ): void {
-        start = String(start) // handle the "undefined" case (matches behavior as fs.realpath)
+        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpath)
         const oneHop = (
             loc: string,
             cb: (err: Error, str?: string) => void
@@ -754,7 +764,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     }
 
     function unguardedRealPathSync(start: string): string {
-        start = String(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
+        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
         for (let loc = start, next; ; loc = next) {
             next = nextHopSync(loc)
             if (next == undefined) {
@@ -768,10 +778,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     }
 
     function guardedRealPathSync(
-        start: string,
+        start: PathLike,
         escapedRoot: string = undefined
     ): string {
-        start = String(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
+        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
         for (let loc = start, next: string | false; ; loc = next as string) {
             next = nextHopSync(loc)
             if (!next) {
@@ -807,6 +817,29 @@ export function isSubPath(parent: string, child: string): boolean {
     )
 }
 
+function stringifyPathLike(p: PathLike): string {
+    if (p instanceof URL) {
+        return url.fileURLToPath(p)
+    } else {
+        return String(p)
+    }
+}
+
+function resolvePathLike(p: PathLike): string {
+    return path.resolve(stringifyPathLike(p))
+}
+
+function normalizePathLike(p: PathLike): string {
+    const s = stringifyPathLike(p)
+
+    // TODO: are URLs always absolute?
+    if (!path.isAbsolute(s)) {
+        return path.resolve(s)
+    } else {
+        return path.normalize(s)
+    }
+}
+
 export function escapeFunction(_roots: string[]) {
     // Ensure roots are always absolute.
     // Sort to ensure escaping multiple roots chooses the longest one.
@@ -815,7 +848,7 @@ export function escapeFunction(_roots: string[]) {
         .sort((a, b) => b.length - a.length)
 
     function fs_isEscape(
-        linkPath: string,
+        linkPath: PathLike,
         linkTarget: string,
         roots = defaultRoots
     ): false | string {
@@ -823,11 +856,7 @@ export function escapeFunction(_roots: string[]) {
         // linkTarget is a path that the symlink points to one or more hops away
         // linkTarget must already be normalized
 
-        if (!path.isAbsolute(linkPath)) {
-            linkPath = path.resolve(linkPath)
-        } else {
-            linkPath = path.normalize(linkPath)
-        }
+        linkPath = normalizePathLike(linkPath)
 
         for (const root of roots) {
             // If the link is in the root check if the realPath has escaped
@@ -897,7 +926,7 @@ function patchDirent(dirent: Dirent | any, stat: Stats | any): void {
     }
 }
 
-function enoent(s: string, p: string): Error {
+function enoent(s: string, p: PathLike): Error {
     let err = new Error(`ENOENT: no such file or directory, ${s} '${p}'`)
     ;(err as any).errno = -2
     ;(err as any).syscall = s
@@ -906,7 +935,7 @@ function enoent(s: string, p: string): Error {
     return err
 }
 
-function einval(s: string, p: string): Error {
+function einval(s: string, p: PathLike): Error {
     let err = new Error(`EINVAL: invalid argument, ${s} '${p}'`)
     ;(err as any).errno = -22
     ;(err as any).syscall = s

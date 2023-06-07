@@ -208,6 +208,13 @@ describe('testing lstat', async () => {
                     'lstatSync should find symbolic link if link is out of the root'
                 )
 
+                assert.ok(
+                    patchedFs
+                        .lstatSync(new URL(`file://${linkPath}`))
+                        .isSymbolicLink(),
+                    'lstatSync should find symbolic link if link is out of the root'
+                )
+
                 const stat = await util.promisify(patchedFs.lstat)(linkPath)
                 assert.ok(
                     stat.isSymbolicLink(),
