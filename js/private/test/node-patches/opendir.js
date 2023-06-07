@@ -65,6 +65,12 @@ describe('testing opendir', async () => {
                 assert.ok(maybeLink.isSymbolicLink())
 
                 assert.ok(!empty, 'last read should be falsey')
+
+                // Assert reading via URL produces the same (first) result.
+                dir = await util.promisify(patchedFs.opendir)(
+                    new URL(`file://${path.join(fixturesDir, 'a')}`)
+                )
+                assert.equal(entry1.name, (await dir.read()).name)
             }
         )
     })

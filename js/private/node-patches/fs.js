@@ -42,7 +42,8 @@ const util = require("util");
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('fs');
+const _fs = require('node:fs');
+const url = require('node:url');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
 const patcher = (fs = _fs, roots) => {
@@ -68,20 +69,21 @@ const patcher = (fs = _fs, roots) => {
     const origReadlink = fs.readlink.bind(fs);
     const origReadlinkSync = fs.readlinkSync.bind(fs);
     const origRealpath = fs.realpath.bind(fs);
-    const origRealpathNative = fs.realpath.native;
+    const origRealpathNative = fs.realpath
+        .native;
     const origRealpathSync = fs.realpathSync.bind(fs);
-    const origRealpathSyncNative = fs.realpathSync.native;
+    const origRealpathSyncNative = fs.realpathSync
+        .native;
     const { canEscape, isEscape } = escapeFunction(roots);
     // =========================================================================
     // fs.lstat
     // =========================================================================
-    fs.lstat = (...args) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined;
+    fs.lstat = function lstat(...args) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origLstat(...args);
         }
-        cb = once(cb);
+        const cb = once(args[args.length - 1]);
         // override the callback
         args[args.length - 1] = (err, stats) => {
             if (err)
@@ -90,7 +92,7 @@ const patcher = (fs = _fs, roots) => {
                 // the file is not a symbolic link so there is nothing more to do
                 return cb(null, stats);
             }
-            args[0] = path.resolve(args[0]);
+            args[0] = resolvePathLike(args[0]);
             if (!canEscape(args[0])) {
                 // the file can not escaped the sandbox so there is nothing more to do
                 return cb(null, stats);
@@ -123,7 +125,7 @@ const patcher = (fs = _fs, roots) => {
             // the file is not a symbolic link so there is nothing more to do
             return stats;
         }
-        args[0] = path.resolve(args[0]);
+        args[0] = resolvePathLike(args[0]);
         if (!canEscape(args[0])) {
             // the file can not escaped the sandbox so there is nothing more to do
             return stats;
@@ -134,10 +136,11 @@ const patcher = (fs = _fs, roots) => {
             return stats;
         }
         try {
+            args[0] = unguardedRealPathSync(args[0]);
             // there are no hops so lets report the stats of the real file;
             // we can't use origRealPathSync here since that function calls lstat internally
             // which can result in an infinite loop
-            return origLstatSync(unguardedRealPathSync(args[0]), ...args.slice(1));
+            return origLstatSync(...args);
         }
         catch (err) {
             if (err.code === 'ENOENT') {
@@ -150,13 +153,12 @@ const patcher = (fs = _fs, roots) => {
     // =========================================================================
     // fs.realpath
     // =========================================================================
-    fs.realpath = (...args) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined;
+    fs.realpath = function realpath(...args) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origRealpath(...args);
         }
-        cb = once(cb);
+        const cb = once(args[args.length - 1]);
         args[args.length - 1] = (err, str) => {
             if (err)
                 return cb(err);
@@ -170,13 +172,12 @@ const patcher = (fs = _fs, roots) => {
         };
         origRealpath(...args);
     };
-    fs.realpath.native = (...args) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined;
+    fs.realpath.native = function realpath_native(...args) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origRealpathNative(...args);
         }
-        cb = once(cb);
+        const cb = once(args[args.length - 1]);
         args[args.length - 1] = (err, str) => {
             if (err)
                 return cb(err);
@@ -209,17 +210,16 @@ const patcher = (fs = _fs, roots) => {
     // =========================================================================
     // fs.readlink
     // =========================================================================
-    fs.readlink = (...args) => {
-        let cb = args.length > 1 ? args[args.length - 1] : undefined;
+    fs.readlink = function readlink(...args) {
         // preserve error when calling function without required callback
-        if (!cb) {
+        if (typeof args[args.length - 1] !== 'function') {
             return origReadlink(...args);
         }
-        cb = once(cb);
+        const cb = once(args[args.length - 1]);
         args[args.length - 1] = (err, str) => {
             if (err)
                 return cb(err);
-            const resolved = path.resolve(args[0]);
+            const resolved = resolvePathLike(args[0]);
             str = path.resolve(path.dirname(resolved), str);
             const escapedRoot = isEscape(resolved, str);
             if (escapedRoot) {
@@ -256,7 +256,7 @@ const patcher = (fs = _fs, roots) => {
         origReadlink(...args);
     };
     fs.readlinkSync = function readlinkSync(...args) {
-        const resolved = path.resolve(args[0]);
+        const resolved = resolvePathLike(args[0]);
         const str = path.resolve(path.dirname(resolved), origReadlinkSync(...args));
         const escapedRoot = isEscape(resolved, str);
         if (escapedRoot) {
@@ -283,14 +283,13 @@ const patcher = (fs = _fs, roots) => {
     // =========================================================================
     // fs.readdir
     // =========================================================================
-    fs.readdir = (...args) => {
-        const p = path.resolve(args[0]);
-        let cb = args[args.length - 1];
-        if (typeof cb !== 'function') {
-            // this will likely throw callback required error.
+    fs.readdir = function readdir(...args) {
+        // preserve error when calling function without required callback
+        if (typeof args[args.length - 1] !== 'function') {
             return origReaddir(...args);
         }
-        cb = once(cb);
+        const cb = once(args[args.length - 1]);
+        const p = resolvePathLike(args[0]);
         args[args.length - 1] = (err, result) => {
             if (err)
                 return cb(err);
@@ -313,7 +312,7 @@ const patcher = (fs = _fs, roots) => {
     };
     fs.readdirSync = function readdirSync(...args) {
         const res = origReaddirSync(...args);
-        const p = path.resolve(args[0]);
+        const p = resolvePathLike(args[0]);
         res.forEach((v) => {
             handleDirentSync(p, v);
         });
@@ -324,12 +323,11 @@ const patcher = (fs = _fs, roots) => {
     // =========================================================================
     if (fs.opendir) {
         const origOpendir = fs.opendir.bind(fs);
-        fs.opendir = (...args) => {
-            let cb = args[args.length - 1];
+        fs.opendir = function opendir(...args) {
             // if this is not a function opendir should throw an error.
             // we call it so we don't have to throw a mock
-            if (typeof cb === 'function') {
-                cb = once(cb);
+            if (typeof args[args.length - 1] === 'function') {
+                const cb = once(args[args.length - 1]);
                 args[args.length - 1] = async (err, dir) => {
                     try {
                         cb(null, await handleDir(dir));
@@ -634,7 +632,7 @@ const patcher = (fs = _fs, roots) => {
         return next;
     }
     function unguardedRealPath(start, cb) {
-        start = String(start); // handle the "undefined" case (matches behavior as fs.realpath)
+        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpath)
         const oneHop = (loc, cb) => {
             nextHop(loc, (next) => {
                 if (next == undefined) {
@@ -651,7 +649,7 @@ const patcher = (fs = _fs, roots) => {
         oneHop(start, cb);
     }
     function guardedRealPath(start, cb, escapedRoot = undefined) {
-        start = String(start); // handle the "undefined" case (matches behavior as fs.realpath)
+        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpath)
         const oneHop = (loc, cb) => {
             nextHop(loc, (next) => {
                 if (!next) {
@@ -679,7 +677,7 @@ const patcher = (fs = _fs, roots) => {
         oneHop(start, cb);
     }
     function unguardedRealPathSync(start) {
-        start = String(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
+        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
         for (let loc = start, next;; loc = next) {
             next = nextHopSync(loc);
             if (next == undefined) {
@@ -693,7 +691,7 @@ const patcher = (fs = _fs, roots) => {
         }
     }
     function guardedRealPathSync(start, escapedRoot = undefined) {
-        start = String(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
+        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
         for (let loc = start, next;; loc = next) {
             next = nextHopSync(loc);
             if (!next) {
@@ -725,6 +723,27 @@ function isSubPath(parent, child) {
         (child[parent.length] === path.sep && child.startsWith(parent)));
 }
 exports.isSubPath = isSubPath;
+function stringifyPathLike(p) {
+    if (p instanceof URL) {
+        return url.fileURLToPath(p);
+    }
+    else {
+        return String(p);
+    }
+}
+function resolvePathLike(p) {
+    return path.resolve(stringifyPathLike(p));
+}
+function normalizePathLike(p) {
+    const s = stringifyPathLike(p);
+    // TODO: are URLs always absolute?
+    if (!path.isAbsolute(s)) {
+        return path.resolve(s);
+    }
+    else {
+        return path.normalize(s);
+    }
+}
 function escapeFunction(_roots) {
     // Ensure roots are always absolute.
     // Sort to ensure escaping multiple roots chooses the longest one.
@@ -735,12 +754,7 @@ function escapeFunction(_roots) {
         // linkPath is the path of the symlink file itself
         // linkTarget is a path that the symlink points to one or more hops away
         // linkTarget must already be normalized
-        if (!path.isAbsolute(linkPath)) {
-            linkPath = path.resolve(linkPath);
-        }
-        else {
-            linkPath = path.normalize(linkPath);
-        }
+        linkPath = normalizePathLike(linkPath);
         for (const root of roots) {
             // If the link is in the root check if the realPath has escaped
             if (isSubPath(root, linkPath) && !isSubPath(root, linkTarget)) {

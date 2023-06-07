@@ -77,6 +77,18 @@ describe('testing readdir', async () => {
                 assert.deepStrictEqual(dirents[1].name, 'link')
                 assert.ok(dirents[0].isFile())
                 assert.ok(dirents[1].isSymbolicLink())
+
+                // Assert the same with URL file references
+                dirents = patchedFs.readdirSync(
+                    new URL(`file://${path.join(fixturesDir, 'a')}`),
+                    {
+                        withFileTypes: true,
+                    }
+                )
+                assert.deepStrictEqual(dirents[0].name, 'apples')
+                assert.deepStrictEqual(dirents[1].name, 'link')
+                assert.ok(dirents[0].isFile())
+                assert.ok(dirents[1].isSymbolicLink())
             }
         )
     })
