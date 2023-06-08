@@ -18,13 +18,37 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
 
+  lib-dupes:
+    dependencies:
+      '@aspect-test/c':
+        specifier: 2.0.0
+        version: 2.0.0
+      '@aspect-test/c1':
+        specifier: npm:@aspect-test/c@1.0.0
+        version: /@aspect-test/c@1.0.0
+
   tests:
     dependencies:
       '@lib/test':
         specifier: workspace:*
         version: link:../lib
+      '@lib/test-dupes':
+        specifier: workspace:*
+        version: link:../lib-dupes
 
 packages:
+
+  /@aspect-test/c@1.0.0:
+    resolution: {integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
+
+  /@aspect-test/c@2.0.0:
+    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
 
   /@aspect-test/e@1.0.0:
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}

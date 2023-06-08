@@ -23,6 +23,7 @@
         "syncpack": "git+https://github.com/JamieMason/syncpack.git#c245af8ea73ce3345d92bbda6c684092a841e262",
         "typescript": "*",
         "unused": "latest",
+        "test-npm_package": "workspace:*",
         "webpack-bundle-analyzer": "4.5.0"
     }
 }

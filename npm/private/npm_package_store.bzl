@@ -178,7 +178,7 @@ def _impl(ctx):
     transitive_files = []
     direct_ref_deps = {}
 
-    npm_package_store_deps = ctx.attr.src[NpmPackageInfo].npm_package_store_deps.to_list() if ctx.attr.src else []
+    npm_package_store_deps = []
 
     if ctx.attr.src:
         # output the package as a TreeArtifact to its virtual store location
@@ -206,14 +206,7 @@ def _impl(ctx):
                 verbose = ctx.attr.verbose,
             )
 
-        for store in npm_package_store_deps:
-            dep_package = store.package
-            dep_virtual_store_directory = store.virtual_store_directory
-
-            # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-            dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
-            transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
-
+        linked_virtual_store_directories = []
         for dep, _dep_aliases in ctx.attr.deps.items():
             # symlink the package's direct deps to its virtual store location
             if dep[NpmPackageStoreInfo].root_package != ctx.label.package:
@@ -224,16 +217,29 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
             dep_virtual_store_directory = dep[NpmPackageStoreInfo].virtual_store_directory
             if dep_virtual_store_directory:
+                linked_virtual_store_directories.append(dep_virtual_store_directory)
                 for dep_alias in dep_aliases:
                     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                     dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_alias)
                     transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
-                # for this npm depedency will create the dep symlinks for this dep;
+                # for this npm dependency will create the dep symlinks for this dep;
                 # this pattern is used to break circular dependencies between 3rd
                 # party npm deps; it is not recommended for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
+
+        for store in ctx.attr.src[NpmPackageInfo].npm_package_store_deps.to_list():
+            dep_package = store.package
+            dep_virtual_store_directory = store.virtual_store_directory
+
+            # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
+            # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
+            if dep_virtual_store_directory not in linked_virtual_store_directories:
+                # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
+                dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
+                transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+                npm_package_store_deps.append(store)
     else:
         # if ctx.attr.src is _not_ set and ctx.attr.deps is, this is a terminal
         # package with deps being the transitive closure of deps;

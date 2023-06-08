@@ -13,19 +13,22 @@ js_library(
         ":package.json",
     ],
     deps = [
-        # node_modules deps should be excluded from the contents of the npm_package
+        # 1. node_modules deps should be excluded from the contents of the npm_package
+        # 2. include 2 versions of chalk to test cases such as https://github.com/aspect-build/rules_js/issues/1110
         ":node_modules/chalk",
+        "//:node_modules/chalk",
     ],
 )
 
 npm_package(
-    name = "pkg_a",
+    name = "npm_package",
     srcs = [":lib_a"],
     include_runfiles = False,
+    visibility = ["//visibility:public"],
 )
 
 copy_to_directory(
-    name = "expected_pkg_a",
+    name = "expected_npm_package",
     srcs = [
         "index.js",
         ":package.json",
@@ -34,6 +37,6 @@ copy_to_directory(
 
 diff_test(
     name = "test",
-    file1 = ":pkg_a",
-    file2 = ":expected_pkg_a",
+    file1 = ":npm_package",
+    file2 = ":expected_npm_package",
 )
