@@ -16,7 +16,7 @@ then run
 pre-commit install
 ```
 
-Otherwise later tooling on CI may yell at you about formatting/linting violations.
+Otherwise later tooling on CI will yell at you about formatting/linting violations.
 
 ## Updating BUILD files
 
