@@ -1,27 +1,25 @@
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 bazel_dep(name = "rules_go", version = "0.35.0")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
-
 npm.npm_translate_lock(
     name = "npm",
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
-
 use_repo(npm, "npm", "pnpm")
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
-
-go_sdk.download(name = "go_sdk", version = "1.19.3")
-
+go_sdk.download(
+    name = "go_sdk",
+    version = "1.19.3",
+)
 use_repo(go_sdk, "go_sdk")
 
 register_toolchains("@go_sdk//:all")

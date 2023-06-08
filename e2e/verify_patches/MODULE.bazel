@@ -6,20 +6,19 @@ module(
 
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
-
 npm.npm_translate_lock(
     name = "npm",
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
     ],
+    npmrc = "//:.npmrc",
     patch_args = {
         "*": ["-p1"],
         "@gregmagolan/test-a": ["-p4"],
@@ -29,11 +28,8 @@ npm.npm_translate_lock(
         "@gregmagolan/test-a@0.0.1": ["//:patches/test-a@0.0.1.patch"],
         "@gregmagolan/test-b": ["//:patches/test-b.patch"],
     },
-    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_patches = "//patches:patches.list",
 )
-
 use_repo(npm, "npm")
-

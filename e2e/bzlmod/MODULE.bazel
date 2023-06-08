@@ -12,14 +12,16 @@ local_path_override(
     path = "../..",
 )
 
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
-
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
 npm.npm_translate_lock(
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
-
 use_repo(npm, "npm")
 
 # The following is just a demonstration that you can skip the npm_translate_lock feature
@@ -31,6 +33,5 @@ npm.npm_import(
     package = "meaning-of-life",
     version = "1.0.0",
 )
-
 use_repo(npm, "npm_meaning-of-life")
 use_repo(npm, "npm_meaning-of-life__links")
