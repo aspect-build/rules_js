@@ -4,14 +4,16 @@ module(
 )
 
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
 
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
-
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
 npm.npm_import(
     name = "protoc-gen-grpc",
     commit = "be5580b06348d3eb9b4610a4a94065154a0df41f",
@@ -20,10 +22,8 @@ npm.npm_import(
     url = "git+ssh://git@github.com/gregmagolan-codaio/protoc-gen-grpc-ts.git",
     version = "github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f",
 )
-
 use_repo(npm, "protoc-gen-grpc")
 use_repo(npm, "protoc-gen-grpc__links")
-
 npm.npm_import(
     name = "syncpack",
     commit = "c245af8ea73ce3345d92bbda6c684092a841e262",
@@ -32,6 +32,5 @@ npm.npm_import(
     url = "https://codeload.github.com/JamieMason/syncpack/tar.gz/c245af8ea73ce3345d92bbda6c684092a841e262",
     version = "github.com/JamieMason/syncpack/c245af8ea73ce3345d92bbda6c684092a841e262",
 )
-
 use_repo(npm, "syncpack")
 use_repo(npm, "syncpack__links")

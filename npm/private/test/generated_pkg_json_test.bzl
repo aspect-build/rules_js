@@ -39,6 +39,10 @@ def test_only_expected_bin_struct_methods(env, bin_struct):
     If new methods were added or removed, the above struct defining how to
     construct a target using each method will need to be updated to add
     a new example usecase or removed.
+
+    Args:
+        env: the environment to test
+        bin_struct: the expected bin entries
     """
 
     relevant_methods = [m for m in sorted(dir(bin_struct)) if m.startswith("rollup") and not m.endswith("_path")]

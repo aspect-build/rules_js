@@ -400,12 +400,12 @@ def npm_translate_lock(
                 out = "patches.list",
             )
             ```
-            
+
             Once you have created this file, you need to create an empty `patches.list` file before generating the first list. You can do this by running
             ```
             touch patches/patches.list
             ```
-            
+
             Finally, write the patches file at least once to make sure all patches are listed. This can be done by running `bazel run //patches:patches_update`.
 
             See the `list_patches` documentation for further info.

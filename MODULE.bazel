@@ -12,7 +12,6 @@ bazel_dep(name = "rules_nodejs", version = "5.8.2")
 bazel_dep(name = "platforms", version = "0.0.4")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
-
 use_repo(node, "nodejs_linux_amd64")
 use_repo(node, "nodejs_darwin_arm64")
 use_repo(node, "nodejs_darwin_amd64")
@@ -22,31 +21,33 @@ use_repo(node, "nodejs_linux_ppc64le")
 use_repo(node, "nodejs_windows_amd64")
 
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
-
 pnpm.pnpm(
     name = "pnpm",
 )
-
 use_repo(pnpm, "pnpm")
 use_repo(pnpm, "pnpm__links")
 
 ####### Dev dependencies ########
 
-bazel_dep(name = "gazelle", version = "0.28.0", repo_name = "bazel_gazelle", dev_dependency = True)
+bazel_dep(name = "gazelle", version = "0.28.0", dev_dependency = True, repo_name = "bazel_gazelle")
 bazel_dep(name = "buildifier_prebuilt", version = "6.0.0.1", dev_dependency = True)
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
 
-ext = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "ext", dev_dependency = True)
-
+ext = use_extension(
+    "@aspect_bazel_lib//lib:extensions.bzl",
+    "ext",
+    dev_dependency = True,
+)
 ext.host()
-
 use_repo(ext, "aspect_bazel_lib_host")
 use_repo(ext, "coreutils_toolchains")
 
-node_dev = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
-
+node_dev = use_extension(
+    "@rules_nodejs//nodejs:extensions.bzl",
+    "node",
+    dev_dependency = True,
+)
 use_repo(node_dev, "nodejs_toolchains")
-
 use_repo(node_dev, "node18_linux_amd64")
 use_repo(node_dev, "node18_darwin_arm64")
 use_repo(node_dev, "node18_darwin_amd64")
@@ -54,7 +55,6 @@ use_repo(node_dev, "node18_linux_arm64")
 use_repo(node_dev, "node18_linux_s390x")
 use_repo(node_dev, "node18_linux_ppc64le")
 use_repo(node_dev, "node18_windows_amd64")
-
 use_repo(node_dev, "node16_linux_amd64")
 use_repo(node_dev, "node16_darwin_arm64")
 use_repo(node_dev, "node16_darwin_amd64")
@@ -62,16 +62,24 @@ use_repo(node_dev, "node16_linux_arm64")
 use_repo(node_dev, "node16_linux_s390x")
 use_repo(node_dev, "node16_linux_ppc64le")
 use_repo(node_dev, "node16_windows_amd64")
-
 node_dev.toolchain(node_version = "16.14.2")
-node_dev.toolchain(name = "node16", node_version = "16.13.1")
-node_dev.toolchain(name = "node18", node_version = "18.13.0")
+node_dev.toolchain(
+    name = "node16",
+    node_version = "16.13.1",
+)
+node_dev.toolchain(
+    name = "node18",
+    node_version = "18.13.0",
+)
 
 ############################################
 # npm dependencies used by examples
 
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
-
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
 npm.npm_translate_lock(
     name = "npm",
     bins = {
@@ -79,7 +87,7 @@ npm.npm_translate_lock(
         "typescript": [
             "tsc=./bin/tsc",
             "tsserver=./bin/tsserver",
-        ]
+        ],
     },
     custom_postinstalls = {
         "@aspect-test/c": "echo moo > cow.txt",
@@ -175,7 +183,6 @@ npm.npm_translate_lock(
     verify_node_modules_ignored = "//:.bazelignore",
     verify_patches = "//examples/npm_deps/patches:patches",
 )
-
 use_repo(npm, "npm", "npm__rollup__2.70.2", "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7")
 
 # As an example, manually import a package using explicit coordinates.
@@ -189,6 +196,5 @@ npm.npm_import(
     root_package = "",
     version = "8.4.0",
 )
-
 use_repo(npm, "acorn__8.4.0")
 use_repo(npm, "acorn__8.4.0__links")
