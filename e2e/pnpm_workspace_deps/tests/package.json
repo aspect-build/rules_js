@@ -1,6 +1,7 @@
 {
     "name": "tests",
     "dependencies": {
-        "@lib/test": "workspace:*"
+        "@lib/test": "workspace:*",
+        "@lib/test-dupes": "workspace:*"
     }
 }

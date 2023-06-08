@@ -17,6 +17,7 @@ npm.npm_translate_lock(
         "//:package.json",
         "//:pnpm-workspace.yaml",
         "//lib:package.json",
+        "//lib-dupes:package.json",
         "//tests:package.json",
     ],
     pnpm_lock = "//:pnpm-lock.yaml",

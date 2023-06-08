@@ -1,3 +1,4 @@
 node_modules/
 lib/node_modules
+lib-dupes/node_modules
 tests/node_modules

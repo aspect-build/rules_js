@@ -62,6 +62,7 @@ build_test(
         ":node_modules/json-stable-stringify",
         ":node_modules/lodash",  # lodash is brought in as a vendored .tgz file: vendored/lodash-4.17.21.tgz
         ":node_modules/node-gyp",
+        ":node_modules/test-npm_package",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
         ":node_modules/regl",

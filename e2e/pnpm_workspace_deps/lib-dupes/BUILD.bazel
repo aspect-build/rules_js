@@ -1,0 +1,27 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+# A library with 2 aliases to one simple dependency (package with no dependencies)
+js_library(
+    name = "js_lib_dupes",
+    srcs = ["index.js"],
+    data = [
+        # Two versions of the same package (via aliases), see https://github.com/aspect-build/rules_js/issues/1110
+        ":node_modules/@aspect-test/c",
+        ":node_modules/@aspect-test/c1",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Exposed via npm_package()
+npm_package(
+    name = "lib-dupes",
+    srcs = [
+        "package.json",
+        ":js_lib_dupes",
+    ],
+    visibility = ["//visibility:public"],
+)

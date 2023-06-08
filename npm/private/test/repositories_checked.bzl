@@ -6309,6 +6309,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__chalk__5.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "": ["chalk"],
+            "npm/private/test/npm_package": ["chalk-alt"],
+        },
+        package = "chalk",
+        version = "5.1.1",
+        url = "https://registry.npmjs.org/chalk/-/chalk-5.1.1.tgz",
+        npm_translate_lock_repo = "npm",
+        generate_bzl_library_targets = True,
+        integrity = "sha512-OItMegkSDU3P7OJRWBbNRsQsL8SzgwlIGXSZRVfHCLBYrDgzYDuozwDMwvEDpiZdjr50tdOTbTzuubirtEozsg==",
+        transitive_closure = {
+            "chalk": ["5.1.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__charenc__0.0.2",
         root_package = "",
         link_workspace = "",

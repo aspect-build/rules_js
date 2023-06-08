@@ -1,0 +1,8 @@
+{
+    "name": "@lib/test-dupes",
+    "private": true,
+    "dependencies": {
+        "@aspect-test/c": "2.0.0",
+        "@aspect-test/c1": "npm:@aspect-test/c@1.0.0"
+    }
+}

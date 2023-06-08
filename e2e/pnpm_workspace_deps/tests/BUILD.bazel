@@ -20,3 +20,11 @@ js_test(
     ],
     entry_point = "test_pkg_deps_linked.js",
 )
+
+js_test(
+    name = "dupes",
+    data = [
+        ":node_modules/@lib/test-dupes",
+    ],
+    entry_point = "test_pkg_dupe_deps_linked.js",
+)
