@@ -167,7 +167,12 @@ To update the `pnpm-lock.yaml` file manually, either
 
 If the `ASPECT_RULES_JS_FROZEN_PNPM_LOCK` environment variable is set and `update_pnpm_lock` is True,
 the build will fail if the pnpm lock file needs updating.
+
 It is recommended to set this environment variable on CI when `update_pnpm_lock` is True.
+
+If the `ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK` environment variable is set, `update_pnpm_lock` is disabled
+even if set to True. This can be useful for some CI uses cases where multiple jobs run Bazel by you
+only want one of the jobs checking that the pnpm lock file is up-to-date.
 
 ## Working with packages
 

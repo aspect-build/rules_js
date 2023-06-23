@@ -16,6 +16,7 @@ PNPM_LOCK_FILENAME = "pnpm-lock.yaml"
 PNPM_WORKSPACE_FILENAME = "pnpm-workspace.yaml"
 PNPM_LOCK_ACTION_CACHE_PREFIX = "npm_translate_lock_"
 DEFAULT_ROOT_PACKAGE = "."
+RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV = "ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK"
 
 ################################################################################
 def _init(priv, rctx, label_store):
@@ -567,6 +568,11 @@ def _root_package(priv):
 def _new(rctx):
     label_store = repository_label_store.new(rctx.path)
 
+    should_update_pnpm_lock = rctx.attr.update_pnpm_lock
+    if RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV in rctx.os.environ.keys() and rctx.os.environ[RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV]:
+        # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
+        should_update_pnpm_lock = False
+
     priv = {
         "default_registry": utils.default_registry(),
         "external_repository_action_cache": None,
@@ -577,7 +583,7 @@ def _new(rctx):
         "npm_registries": {},
         "packages": {},
         "root_package": None,
-        "should_update_pnpm_lock": rctx.attr.update_pnpm_lock,
+        "should_update_pnpm_lock": should_update_pnpm_lock,
     }
 
     _init(priv, rctx, label_store)
