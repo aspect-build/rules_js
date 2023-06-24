@@ -33,7 +33,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_external_repository_action_cache(priv, rctx)
 
-    _init_common_labels(rctx, label_store)
+    _init_common_labels(priv, rctx, label_store)
 
     _init_patches_labels(priv, rctx, label_store)
 
@@ -102,12 +102,14 @@ def _validate_attrs(attr, is_windows):
         fail("only one of npm_package_lock or yarn_lock may be set")
 
 ################################################################################
-def _init_common_labels(rctx, label_store):
+def _init_common_labels(priv, rctx, label_store):
     attr = rctx.attr
 
     # data files
-    for i, d in enumerate(attr.data):
-        label_store.add("data_{}".format(i), d)
+    # only initialize if update_pnpm_lock is set since data files are unused otherwise
+    if _should_update_pnpm_lock(priv):
+        for i, d in enumerate(attr.data):
+            label_store.add("data_{}".format(i), d)
 
     # lock files
     if attr.pnpm_lock:
@@ -118,9 +120,10 @@ def _init_common_labels(rctx, label_store):
         # Because label syntax for repo rules can vary, check the paths of all `data` labels
         # to see if one sits beside the pnpm lockfile
         root_package_json_path = label_store.relative_path("pnpm_lock").replace(PNPM_LOCK_FILENAME, PACKAGE_JSON_FILENAME)
-        for i in range(len(rctx.attr.data)):
-            if label_store.relative_path("data_{}".format(i)) == root_package_json_path:
-                label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
+        if _should_update_pnpm_lock(priv):
+            for i in range(len(rctx.attr.data)):
+                if label_store.relative_path("data_{}".format(i)) == root_package_json_path:
+                    label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
 
     else:
         if attr.npm_package_lock:
