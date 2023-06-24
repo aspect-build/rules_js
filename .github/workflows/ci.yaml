@@ -87,6 +87,8 @@ jobs:
               run: echo "folder=e2e/npm_translate_lock" >> $GITHUB_OUTPUT
             - id: npm_translate_lock_empty
               run: echo "folder=e2e/npm_translate_lock_empty" >> $GITHUB_OUTPUT
+            - id: npm_translate_lock_partial_clone
+              run: echo "folder=e2e/npm_translate_lock_partial_clone" >> $GITHUB_OUTPUT
             - id: npm_translate_lock_subdir_patch
               run: echo "folder=e2e/npm_translate_lock_subdir_patch" >> $GITHUB_OUTPUT
             - id: npm_translate_package_lock

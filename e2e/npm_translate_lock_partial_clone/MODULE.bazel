@@ -1,0 +1,31 @@
+module(
+    name = "e2e_npm_translate_lock",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "aspect_bazel_lib", version = "1.29.2")
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    data = [
+        "//project-a:package.json",
+        "//project-b:package.json",
+        "//root:package.json",
+        "//root:pnpm-workspace.yaml",
+    ],
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//root:pnpm-lock.yaml",
+    # Some users may have update_pnpm_lock set to True and set ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK on the env
+    # for a CI job with a partial clone. For this test, setting update_pnpm_lock to False tests the same thing.
+    update_pnpm_lock = False,
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")

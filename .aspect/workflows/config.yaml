@@ -40,6 +40,11 @@ workspaces:
         tasks:
             buildifier:
                 without: true
+    e2e/npm_translate_lock_partial_clone:
+        icon: npm
+        tasks:
+            buildifier:
+                without: true
     e2e/npm_translate_lock_subdir_patch:
         icon: npm
         tasks:
