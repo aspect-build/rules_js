@@ -174,6 +174,7 @@ def _impl(ctx):
 
     virtual_store_name = utils.virtual_store_name(package, version)
 
+    src_directory = None
     virtual_store_directory = None
     transitive_files = []
     direct_ref_deps = {}
@@ -305,6 +306,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             package = package,
             version = version,
             ref_deps = direct_ref_deps,
+            src_directory = src_directory,
             virtual_store_directory = virtual_store_directory,
             files = files_depset,
             transitive_files = transitive_files_depset,
