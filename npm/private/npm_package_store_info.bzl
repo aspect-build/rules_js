@@ -11,6 +11,7 @@ NpmPackageStoreInfo = provider(
         "package": "name of this npm package",
         "version": "version of this npm package",
         "ref_deps": "dictionary of dependency npm_package_store ref targets",
+        "src_directory": "the directory (typically a TreeArtifact) that contains the package sources",
         "virtual_store_directory": "the TreeArtifact of this npm package's virtual store location",
         "files": "depset of files that are part of the npm package",
         "transitive_files": "depset of the files that are part of the npm package and its transitive deps",
