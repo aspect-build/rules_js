@@ -1,10 +1,10 @@
 {
     "type": "module",
     "devDependencies": {
-        "html-webpack-plugin": "5.5.1",
-        "webpack": "5.81.0",
-        "webpack-cli": "5.0.2",
-        "webpack-dev-server": "4.13.3",
+        "html-webpack-plugin": "5.5.3",
+        "webpack": "5.88.1",
+        "webpack-cli": "5.1.4",
+        "webpack-dev-server": "4.15.1",
         "@bazel/ibazel": "0.16.2"
     },
     "dependencies": {
