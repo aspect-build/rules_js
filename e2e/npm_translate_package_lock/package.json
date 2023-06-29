@@ -6,6 +6,6 @@
         "lodash": "4.17.21"
     },
     "overrides": {
-        "@types/node": "18.11.18"
+        "@types/node": "18.16.18"
     }
 }

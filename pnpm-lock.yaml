@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -21,8 +21,8 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: 16.18.37
+        version: registry.npmjs.org/@types/node@16.18.37
       chalk:
         specifier: 5.1.1
         version: 5.1.1
@@ -177,11 +177,11 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5)
       '@types/archiver':
-        specifier: 5.3.1
-        version: registry.npmjs.org/@types/archiver@5.3.1
+        specifier: 5.3.2
+        version: registry.npmjs.org/@types/archiver@5.3.2
       '@types/node':
-        specifier: 18.11.11
-        version: registry.npmjs.org/@types/node@18.11.11
+        specifier: 18.16.18
+        version: registry.npmjs.org/@types/node@18.16.18
       '@types/tar-stream':
         specifier: 2.2.2
         version: registry.npmjs.org/@types/tar-stream@2.2.2
@@ -232,8 +232,8 @@ importers:
         specifier: 3.15.6
         version: registry.npmjs.org/@types/google-protobuf@3.15.6
       '@types/node':
-        specifier: 18.11.18
-        version: registry.npmjs.org/@types/node@18.11.18
+        specifier: 18.16.18
+        version: registry.npmjs.org/@types/node@18.16.18
       abortcontroller-polyfill:
         specifier: 1.7.5
         version: 1.7.5
@@ -4010,7 +4010,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -6977,7 +6977,6 @@ packages:
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
     name: is-odd
-    version: 3.0.1
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
@@ -6992,7 +6991,6 @@ packages:
   file:npm/private/test/vendored/semver-max:
     resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
     name: semver-max
-    version: 1.0.0
     dependencies:
       is-odd: file:npm/private/test/vendored/is-odd
       semver: 5.7.1
@@ -7056,7 +7054,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@types/js-yaml': registry.npmjs.org/@types/js-yaml@4.0.5
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
       '@types/request': registry.npmjs.org/@types/request@2.48.8
       '@types/underscore': registry.npmjs.org/@types/underscore@1.11.4
       '@types/ws': registry.npmjs.org/@types/ws@8.5.4
@@ -7093,12 +7091,12 @@ packages:
       ms: 0.7.3
     dev: true
 
-  registry.npmjs.org/@types/archiver@5.3.1:
-    resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
+  registry.npmjs.org/@types/archiver@5.3.2:
+    resolution: {integrity: sha512-IctHreBuWE5dvBDz/0WeKtyVKVRs4h75IblxOACL92wU66v+HGAfEYAOyXkOFphvRJMhuXdI9huDXpX0FC6lCw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.2.tgz}
     name: '@types/archiver'
-    version: 5.3.1
+    version: 5.3.2
     dependencies:
-      '@types/glob': registry.npmjs.org/@types/glob@8.1.0
+      '@types/readdir-glob': registry.npmjs.org/@types/readdir-glob@1.1.1
     dev: true
 
   registry.npmjs.org/@types/cacheable-request@6.0.3:
@@ -7108,7 +7106,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics@4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv@3.1.4
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
       '@types/responselike': registry.npmjs.org/@types/responselike@1.0.0
     dev: true
 
@@ -7150,15 +7148,6 @@ packages:
     name: '@types/estree'
     version: 1.0.0
 
-  registry.npmjs.org/@types/glob@8.1.0:
-    resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/glob/-/glob-8.1.0.tgz}
-    name: '@types/glob'
-    version: 8.1.0
-    dependencies:
-      '@types/minimatch': registry.npmjs.org/@types/minimatch@5.1.2
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
-    dev: true
-
   registry.npmjs.org/@types/google-protobuf@3.15.6:
     resolution: {integrity: sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/google-protobuf/-/google-protobuf-3.15.6.tgz}
     name: '@types/google-protobuf'
@@ -7193,31 +7182,27 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
     dev: true
 
-  registry.npmjs.org/@types/minimatch@5.1.2:
-    resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
-    name: '@types/minimatch'
-    version: 5.1.2
-    dev: true
-
-  registry.npmjs.org/@types/node@16.18.11:
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  registry.npmjs.org/@types/node@16.18.37:
+    resolution: {integrity: sha512-ql+4dw4PlPFBP495k8JzUX/oMNRI2Ei4PrMHgj8oT4VhGlYUzF4EYr0qk2fW+XBVGIrq8Zzk13m4cvyXZuv4pA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.37.tgz}
     name: '@types/node'
-    version: 16.18.11
+    version: 16.18.37
     dev: true
 
-  registry.npmjs.org/@types/node@18.11.11:
-    resolution: {integrity: sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.11.tgz}
+  registry.npmjs.org/@types/node@18.16.18:
+    resolution: {integrity: sha512-/aNaQZD0+iSBAGnvvN2Cx92HqE5sZCPZtx2TsK+4nvV23fFe09jVDvpArXr2j9DnYlzuU9WuoykDDc6wqvpNcw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.16.18.tgz}
     name: '@types/node'
-    version: 18.11.11
-    dev: true
+    version: 18.16.18
 
-  registry.npmjs.org/@types/node@18.11.18:
-    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
-    name: '@types/node'
-    version: 18.11.18
+  registry.npmjs.org/@types/readdir-glob@1.1.1:
+    resolution: {integrity: sha512-ImM6TmoF8bgOwvehGviEj3tRdRBbQujr1N+0ypaln/GWjaerOB26jb93vsRHmdMtvVQZQebOlqt2HROark87mQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/readdir-glob/-/readdir-glob-1.1.1.tgz}
+    name: '@types/readdir-glob'
+    version: 1.1.1
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
+    dev: true
 
   registry.npmjs.org/@types/request@2.48.8:
     resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/request/-/request-2.48.8.tgz}
@@ -7225,7 +7210,7 @@ packages:
     version: 2.48.8
     dependencies:
       '@types/caseless': registry.npmjs.org/@types/caseless@0.12.2
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
       '@types/tough-cookie': registry.npmjs.org/@types/tough-cookie@4.0.2
       form-data: 2.5.1
     dev: true
@@ -7241,7 +7226,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
     dev: true
 
   registry.npmjs.org/@types/tar-stream@2.2.2:
@@ -7249,7 +7234,7 @@ packages:
     name: '@types/tar-stream'
     version: 2.2.2
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.11
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
     dev: true
 
   registry.npmjs.org/@types/tough-cookie@4.0.2:
@@ -7269,7 +7254,7 @@ packages:
     name: '@types/ws'
     version: 8.5.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
     dev: true
 
   registry.npmjs.org/@types/yauzl@2.10.0:
@@ -7278,6 +7263,6 @@ packages:
     version: 2.10.0
     requiresBuild: true
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.16.18
     dev: true
     optional: true
