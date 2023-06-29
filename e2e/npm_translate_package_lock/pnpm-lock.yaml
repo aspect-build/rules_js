@@ -1,22 +1,22 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@types/node': 18.11.18
+importers:
 
-dependencies:
-  botframework-connector:
-    specifier: 4.19.3
-    version: 4.19.3
-  karma-typescript:
-    specifier: 5.5.4
-    version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
-  lodash:
-    specifier: 4.17.21
-    version: 4.17.21
+  .:
+    dependencies:
+      botframework-connector:
+        specifier: 4.20.0
+        version: 4.20.0
+      karma-typescript:
+        specifier: 5.5.4
+        version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
 
 packages:
 
@@ -617,20 +617,20 @@ packages:
       - supports-color
     dev: false
 
-  /botbuilder-stdlib@4.19.3-internal:
-    resolution: {integrity: sha512-iaJr+EwOhQDO2gYYijVXiH4ztJSXMtmJcezhoCS0f+i4yy49flSVdJlBw3bYknJFsZcRub8842ESPHwDiu6cZw==}
+  /botbuilder-stdlib@4.20.0-internal:
+    resolution: {integrity: sha512-WtMQkl1PHWX+GkdqufDC4nv+JZTUitvjLpdh56piQaakxozK6FQqQzJFdMvUdOMgfJ/mQMPmtojLhfbQOKYvfA==}
     dev: false
 
-  /botframework-connector@4.19.3:
-    resolution: {integrity: sha512-WjzNHioJpOigfuEJ20PqQjNMc7KeBRgFjWMIqW5A+xmiMHqxVUIU57tUdE2Xe7yI7glDsLDHTjY0tFQxAKXHdQ==}
+  /botframework-connector@4.20.0:
+    resolution: {integrity: sha512-3mP67NHOGdLeODxuXNchK9gzzTafzLdBGZDSWkJDRvIPORbfoxvA/kXsWU2USwMXBnu/M5YeDZn/eUPjDu1nvw==}
     dependencies:
       '@azure/identity': 2.1.0
       '@azure/ms-rest-js': 2.6.4
       adal-node: 0.2.3
       axios: 0.25.0
       base64url: 3.0.1
-      botbuilder-stdlib: 4.19.3-internal
-      botframework-schema: 4.19.3
+      botbuilder-stdlib: 4.20.0-internal
+      botframework-schema: 4.20.0
       cross-fetch: 3.1.5
       jsonwebtoken: 9.0.0
       rsa-pem-from-mod-exp: 0.8.5
@@ -641,8 +641,8 @@ packages:
       - supports-color
     dev: false
 
-  /botframework-schema@4.19.3:
-    resolution: {integrity: sha512-MjAJe4Y2nYsyDIiVeA4YLKbzzZTGesdyV7paI4ojbVS9vWR3i8eXQWKaCYcXUN3FC4+BCv8K/P5pTg99w0Y6Ag==}
+  /botframework-schema@4.20.0:
+    resolution: {integrity: sha512-Tda488691XFlkBKdMLdlGWRI8IebLprxqQf57LpuRQHqK2ttbvmfwjFiW5V3VcTBBz1SVzMhwJBAWVDG+MexLA==}
     dependencies:
       uuid: 8.3.2
       zod: 1.11.17
