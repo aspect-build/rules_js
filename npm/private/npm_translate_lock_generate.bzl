@@ -816,7 +816,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     is_root = native.package_name() == root_package
     link = native.package_name() in link_packages
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package '{root_package}' and pnpm workspace projects {link_packages_comma_separated}" % native.package_name()
+        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: {link_packages_comma_separated}" % native.package_name()
         fail(msg)
     link_targets = []
     scope_targets = {{}}
