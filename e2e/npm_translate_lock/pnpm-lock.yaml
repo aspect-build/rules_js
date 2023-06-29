@@ -1,32 +1,38 @@
 lockfileVersion: '6.0'
 
-dependencies:
-  debug:
-    specifier: 4.3.4
-    version: registry.npmjs.org/debug@4.3.4
-  is-odd:
-    specifier: 3.0.1
-    version: registry.npmjs.org/is-odd@3.0.1
-  semver:
-    specifier: 7.5.1
-    version: registry.npmjs.org/semver@7.5.1
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
-devDependencies:
-  '@rollup/plugin-commonjs':
-    specifier: 23.0.4
-    version: 23.0.4
-  '@rollup/plugin-json':
-    specifier: 5.0.2
-    version: 5.0.2
-  '@rollup/plugin-node-resolve':
-    specifier: 15.0.1
-    version: 15.0.1
-  '@types/node':
-    specifier: 18.11.18
-    version: registry.npmjs.org/@types/node@18.11.18
-  '@types/semver':
-    specifier: 7.3.13
-    version: registry.npmjs.org/@types/semver@7.3.13
+importers:
+
+  .:
+    dependencies:
+      debug:
+        specifier: 4.3.4
+        version: registry.npmjs.org/debug@4.3.4
+      is-odd:
+        specifier: 3.0.1
+        version: registry.npmjs.org/is-odd@3.0.1
+      semver:
+        specifier: 7.5.2
+        version: registry.npmjs.org/semver@7.5.2
+    devDependencies:
+      '@rollup/plugin-commonjs':
+        specifier: 23.0.4
+        version: 23.0.4
+      '@rollup/plugin-json':
+        specifier: 5.0.2
+        version: 5.0.2
+      '@rollup/plugin-node-resolve':
+        specifier: 15.0.1
+        version: 15.0.1
+      '@types/node':
+        specifier: 18.11.18
+        version: registry.npmjs.org/@types/node@18.11.18
+      '@types/semver':
+        specifier: 7.3.13
+        version: registry.npmjs.org/@types/semver@7.3.13
 
 packages:
 
@@ -329,10 +335,10 @@ packages:
       supports-preserve-symlinks-flag: registry.npmjs.org/supports-preserve-symlinks-flag@1.0.0
     dev: true
 
-  registry.npmjs.org/semver@7.5.1:
-    resolution: {integrity: sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/semver/-/semver-7.5.1.tgz}
+  registry.npmjs.org/semver@7.5.2:
+    resolution: {integrity: sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/semver/-/semver-7.5.2.tgz}
     name: semver
-    version: 7.5.1
+    version: 7.5.2
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
