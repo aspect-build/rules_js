@@ -1,22 +1,22 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@types/node': 18.11.18
+importers:
 
-dependencies:
-  botframework-connector:
-    specifier: 4.19.3
-    version: 4.19.3
-  karma-typescript:
-    specifier: 5.5.4
-    version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
-  lodash:
-    specifier: 4.17.21
-    version: 4.17.21
+  .:
+    dependencies:
+      botframework-connector:
+        specifier: 4.19.3
+        version: 4.19.3
+      karma-typescript:
+        specifier: 5.5.4
+        version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
 
 packages:
 
@@ -2204,8 +2204,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /socket.io-parser@4.2.2:
-    resolution: {integrity: sha512-DJtziuKypFkMMHCm2uIshOYC7QaylbtzQwiMYDuCKy3OPkjLzu4B2vAhTlqipRHHzrI0NJeBAizTK7X+6m1jVw==}
+  /socket.io-parser@4.2.4:
+    resolution: {integrity: sha512-/GbIKmo8ioc+NIWIhwdecY0ge+qVBSMdgxGygevmdHj24bsfgtCmcUUcQ5ZzcylGFHsN3k4HB4Cgkl96KVnuew==}
     engines: {node: '>=10.0.0'}
     dependencies:
       '@socket.io/component-emitter': 3.1.0
@@ -2223,7 +2223,7 @@ packages:
       debug: 4.3.4
       engine.io: 6.4.1
       socket.io-adapter: 2.5.2
-      socket.io-parser: 4.2.2
+      socket.io-parser: 4.2.4
     transitivePeerDependencies:
       - bufferutil
       - supports-color
