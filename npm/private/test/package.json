@@ -17,6 +17,7 @@
         "plotly.js": "2.12.1",
         "protoc-gen-grpc": "git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f",
         "puppeteer": "19.11.0",
+        "pyodide": "https://github.com/pyodide/pyodide/releases/download/0.23.3/pyodide-0.23.3.tar.bz2",
         "regl": "npm:@plotly/regl@2.1.2",
         "segfault-handler": "1.3.0",
         "semver-first-satisfied": "1.1.0",

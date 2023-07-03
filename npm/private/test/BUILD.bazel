@@ -65,6 +65,7 @@ build_test(
         ":node_modules/test-npm_package",
         ":node_modules/plotly.js",
         ":node_modules/protoc-gen-grpc",
+        ":node_modules/pyodide",
         ":node_modules/regl",
         ":node_modules/puppeteer",  # has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
         ":node_modules/segfault-handler",  # segfault-handler has a node-gyp install step

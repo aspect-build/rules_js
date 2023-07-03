@@ -5354,6 +5354,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__base-64__1.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "base-64",
+        version = "1.0.0",
+        url = "https://registry.npmjs.org/base-64/-/base-64-1.0.0.tgz",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-kwDPIFCGx0NZHog36dj+tHiwP4QMzsZ3AgMViUBKI0+V5n4U0ufTCUMhnQ04diaRI8EX/QcPfql7zlhZ7j4zgg==",
+        transitive_closure = {
+            "base-64": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__base64-js__1.5.1",
         root_package = "",
         link_workspace = "",
@@ -24448,6 +24465,37 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         transitive_closure = {
             "@foo/jsonify": ["@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"],
+        },
+    )
+
+    npm_import(
+        name = "npm__pyodide__at_github.com_pyodide_pyodide_releases_download_0.23.3_pyodide-0.23.3.tar.bz2__bufferutil_4.0.7",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["pyodide"],
+        },
+        package = "pyodide",
+        version = "@github.com/pyodide/pyodide/releases/download/0.23.3/pyodide-0.23.3.tar.bz2_bufferutil_4.0.7",
+        url = "https://github.com/pyodide/pyodide/releases/download/0.23.3/pyodide-0.23.3.tar.bz2",
+        npm_translate_lock_repo = "npm",
+        dev = True,
+        generate_bzl_library_targets = True,
+        deps = {
+            "base-64": "1.0.0",
+            "node-fetch": "2.6.9",
+            "ws": "8.13.0_bufferutil_4.0.7",
+        },
+        transitive_closure = {
+            "pyodide": ["@github.com/pyodide/pyodide/releases/download/0.23.3/pyodide-0.23.3.tar.bz2_bufferutil_4.0.7"],
+            "base-64": ["1.0.0"],
+            "node-fetch": ["2.6.9"],
+            "ws": ["8.13.0_bufferutil_4.0.7"],
+            "bufferutil": ["4.0.7"],
+            "node-gyp-build": ["4.6.0"],
+            "whatwg-url": ["5.0.0"],
+            "tr46": ["0.0.3"],
+            "webidl-conversions": ["3.0.1"],
         },
     )
 
