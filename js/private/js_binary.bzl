@@ -343,6 +343,11 @@ def _consistent_label_str(workspace_name, label):
     )
 
 def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches):
+    # Explicitly disable node fs patches on Windows:
+    # https://github.com/aspect-build/rules_js/issues/1137
+    if is_windows:
+        fixed_env = dict(fixed_env, **{"JS_BINARY__PATCH_NODE_FS": "0"})
+
     envs = []
     for (key, value) in dicts.add(fixed_env, ctx.attr.env).items():
         envs.append(_ENV_SET.format(
