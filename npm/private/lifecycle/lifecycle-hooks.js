@@ -1,5 +1,6 @@
 const fs = require('fs')
 const exists = require('path-exists')
+const os = require('os')
 const path = require('path')
 const { safeReadPackageJsonFromDir } = require('@pnpm/read-package-json')
 const { runLifecycleHook } = require('@pnpm/lifecycle')
@@ -60,17 +61,27 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
                         continue
                     }
                     const binPath = normalizeBinPath(bin[binName])
-                    const binBash = `#!/usr/bin/env bash\nexec node "${path.join(
-                        ...segmentsUp,
-                        packageName,
-                        binPath
-                    )}" "$@"`
-                    const binEntryPath = path.join(
+                    let binEntryPath = path.join(
                         nodeModulesPath,
                         '.bin',
                         binName
                     )
-                    await fs.promises.writeFile(binEntryPath, binBash)
+                    let binExec
+                    if (isWindows()) {
+                        binEntryPath += '.cmd'
+                        binExec = `node "${path.join(
+                            ...segmentsUp,
+                            packageName,
+                            binPath
+                        )}" "%*"`
+                    } else {
+                        binExec = `#!/usr/bin/env bash\nexec node "${path.join(
+                            ...segmentsUp,
+                            packageName,
+                            binPath
+                        )}" "$@"`
+                    }
+                    await fs.promises.writeFile(binEntryPath, binExec)
                     await fs.promises.chmod(binEntryPath, '755') // executable
                 }
             }
@@ -111,6 +122,10 @@ async function runLifecycleHooks(opts, hooks) {
             await runLifecycleHook(hook, pkg, opts)
         }
     }
+}
+
+function isWindows() {
+    return os.platform() === 'win32'
 }
 
 async function main(args) {
