@@ -69,6 +69,7 @@ _ATTRS = {
     "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
     "update_pnpm_lock": attr.bool(),
+    "update_pnpm_lock_node_toolchain_prefix": attr.string(),
     "use_home_npmrc": attr.bool(),
     "verify_node_modules_ignored": attr.label(),
     "verify_patches": attr.label(),
@@ -139,6 +140,7 @@ def npm_translate_lock(
         npm_package_lock = None,
         yarn_lock = None,
         update_pnpm_lock = None,
+        update_pnpm_lock_node_toolchain_prefix = "nodejs",
         preupdate = [],
         npmrc = None,
         use_home_npmrc = None,
@@ -210,6 +212,8 @@ def npm_translate_lock(
             Otherwise it defaults to False.
 
             Read more: [using update_pnpm_lock](/docs/pnpm.md#update_pnpm_lock)
+
+        update_pnpm_lock_node_toolchain_prefix: the prefix of the node toolchain to use when generating the pnpm lockfile.
 
         preupdate: Node.js scripts to run in this repository rule before auto-updating the pnpm lock file.
 
@@ -547,6 +551,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         data = data,
         preupdate = preupdate,
         quiet = quiet,
+        update_pnpm_lock_node_toolchain_prefix = update_pnpm_lock_node_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
     )
 

@@ -150,7 +150,7 @@ def _init_pnpm_labels(label_store, rctx):
     #
     # TODO: Try to understand this better and see if we can go back to using
     #  Label("@nodejs_host//:bin/node")
-    label_store.add("host_node", Label("@nodejs_%s//:bin/node" % repo_utils.platform(rctx)))
+    label_store.add("host_node", Label("@%s_%s//:bin/node" % (rctx.attr.update_pnpm_lock_node_toolchain_prefix, repo_utils.platform(rctx))))
 
     label_store.add("pnpm_entry", Label("@pnpm//:package/bin/pnpm.cjs"))
 
