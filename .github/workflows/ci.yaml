@@ -23,6 +23,25 @@ jobs:
     # inspired from
     # https://stackoverflow.com/questions/65384420/how-to-make-a-github-action-matrix-element-conditional
 
+    matrix-prep-os:
+        # Prepares the 'os' axis of the test matrix, to reduce costs since GitHub hosted runners cost more on some platforms.
+        # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
+        runs-on: ubuntu-latest
+        steps:
+            - id: linux
+              run: echo "os=ubuntu-latest" >> $GITHUB_OUTPUT
+            - id: windows
+              run: echo "os=windows-latest" >> $GITHUB_OUTPUT
+              # Only run on main branch (or PR branches that contain 'windows') to minimize Windows minutes (billed at 2X)
+              if: github.ref == 'refs/heads/main' || contains(github.head_ref, 'windows')
+            - id: macos
+              run: echo "os=macos-latest" >> $GITHUB_OUTPUT
+              # Only run on main branch (or PR branches that contain 'macos') to minimize macOS minutes (billed at 10X)
+              if: github.ref == 'refs/heads/main' || contains(github.head_ref, 'macos')
+        outputs:
+            # Will look like ["ubuntu-latest", "windows-latest", "macos-latest"]
+            os: ${{ toJSON(steps.*.outputs.os) }}
+
     matrix-prep-config:
         # Prepares the 'config' axis of the test matrix
         runs-on: ubuntu-latest
@@ -33,11 +52,12 @@ jobs:
               run: echo "config=local" >> $GITHUB_OUTPUT
             - id: rbe
               run: echo "config=rbe" >> $GITHUB_OUTPUT
+              # Only run on main branch (or PR branches that contain 'rbe') to reduce the matrix size for PRs
               # Don't run RBE if there are no EngFlow creds which is the case on forks
-              if: ${{ env.ENGFLOW_PRIVATE_KEY != '' }}
+              if: (github.ref == 'refs/heads/main' || contains(github.head_ref, 'rbe')) && env.ENGFLOW_PRIVATE_KEY != ''
         outputs:
             # Will look like ["local", "rbe"]
-            configs: ${{ toJSON(steps.*.outputs.config) }}
+            config: ${{ toJSON(steps.*.outputs.config) }}
 
     matrix-prep-bazelversion:
         # Prepares the 'bazelversion' axis of the test matrix
@@ -52,7 +72,7 @@ jobs:
               run: echo "bazelversion=5.4.1" >> $GITHUB_OUTPUT
         outputs:
             # Will look like ["<version from .bazelversion>", "7.0.0-pre.*", "5.4.1"]
-            bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
+            bazelversion: ${{ toJSON(steps.*.outputs.bazelversion) }}
 
     matrix-prep-folder:
         # Prepares the 'folder' axis of the test matrix
@@ -68,7 +88,7 @@ jobs:
             - id: git_dep_metadata
               run: echo "folder=e2e/git_dep_metadata" >> $GITHUB_OUTPUT
               # Don't run e2e/git_dep_metadata if there is no ssh key secret which is the case on forks.
-              if: ${{ env.SSH_PRIVATE_KEY != '' }}
+              if: env.SSH_PRIVATE_KEY != ''
             - id: js_image_docker
               run: echo "folder=e2e/js_image_docker" >> $GITHUB_OUTPUT
             - id: js_image_oci
@@ -82,7 +102,7 @@ jobs:
             - id: npm_translate_lock_auth
               run: echo "folder=e2e/npm_translate_lock_auth" >> $GITHUB_OUTPUT
               # Don't run e2e/npm_translate_lock_auth if there is no auth token secret which is the case on forks.
-              if: ${{ env.ASPECT_NPM_AUTH_TOKEN != '' }}
+              if: env.ASPECT_NPM_AUTH_TOKEN != ''
             - id: npm_translate_lock
               run: echo "folder=e2e/npm_translate_lock" >> $GITHUB_OUTPUT
             - id: npm_translate_lock_empty
@@ -127,7 +147,7 @@ jobs:
               run: echo "folder=e2e/worker" >> $GITHUB_OUTPUT
         outputs:
             # Will look like [".", "e2e/bzlmod", ...]
-            folders: ${{ toJSON(steps.*.outputs.folder) }}
+            folder: ${{ toJSON(steps.*.outputs.folder) }}
 
     matrix-prep-root-hash:
         # Prepares the 'folder' axis of the test matrix
@@ -140,9 +160,10 @@ jobs:
         outputs:
             hash: ${{ steps.root.outputs.hash }}
     test:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
 
         needs:
+            - matrix-prep-os
             - matrix-prep-config
             - matrix-prep-bazelversion
             - matrix-prep-folder
@@ -151,11 +172,16 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                config: ${{ fromJSON(needs.matrix-prep-config.outputs.configs) }}
-                bazelversion: ${{ fromJSON(needs.matrix-prep-bazelversion.outputs.bazelversions) }}
-                folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folders) }}
+                os: ${{ fromJSON(needs.matrix-prep-os.outputs.os) }}
+                config: ${{ fromJSON(needs.matrix-prep-config.outputs.config) }}
+                bazelversion: ${{ fromJSON(needs.matrix-prep-bazelversion.outputs.bazelversion) }}
+                folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folder) }}
                 bzlmodEnabled: [true, false]
                 exclude:
+                    # Exclude Windows default, will opt-in to includes
+                    - os: windows-latest
+                    # Exclude MacOS by default, will opt-in to includes
+                    - os: macos-latest
                     # Exclude bazel 7 by default, will opt-in to includes
                     - bazelversion: 7.0.0-pre.20230524.3
                     # Don't test RBE with Bazel 5 (not supported)
@@ -184,11 +210,23 @@ jobs:
                     - folder: e2e/rules_foo
                       bzlmodEnabled: true
                 include:
-                    - config: local
+                    - os: windows-latest
+                      config: local
+                      bazelversion: 6.2.0
+                      folder: e2e/bzlmod
+                      bzlmodEnabled: true
+                    - os: macos-latest
+                      config: local
+                      bazelversion: 6.2.0
+                      folder: e2e/bzlmod
+                      bzlmodEnabled: true
+                    - os: ubuntu-latest
+                      config: local
                       bazelversion: 7.0.0-pre.20230524.3
                       folder: .
                       bzlmodEnabled: false
-                    - config: local
+                    - os: ubuntu-latest
+                      config: local
                       bazelversion: 7.0.0-pre.20230524.3
                       folder: .
                       bzlmodEnabled: true
@@ -203,7 +241,7 @@ jobs:
             - uses: webfactory/ssh-agent@v0.8.0
               env:
                   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-              if: ${{ env.SSH_PRIVATE_KEY != '' }}
+              if: env.SSH_PRIVATE_KEY != ''
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
@@ -214,15 +252,16 @@ jobs:
                       ~/.cache/bazel
                       ~/.cache/bazel-repo
                   key: >-
-                      bazel-cache-
+                      bazel-cache-${{ matrix.os }}-
                       ${{ matrix.config }}-${{ matrix.bazelversion }}-
                       ${{ matrix.folder }}-${{ matrix.bzlmodEnabled }}-
                       ${{ needs.matrix-prep-root-hash.outputs.hash }}-
                       ${{ hashFiles( format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder),format('{0}/MODULE.bazel', matrix.folder), format('{0}/**/*.js', matrix.folder) ) }}
                   restore-keys: |
-                      bazel-cache-${{ matrix.config }}-${{ matrix.bazelversion }}-${{ matrix.folder }}-${{ matrix.bzlmodEnabled }}-
+                      bazel-cache-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.bazelversion }}-${{ matrix.folder }}-${{ matrix.bzlmodEnabled }}-
 
             - name: Configure Bazel version
+              if: matrix.os != 'windows-latest'
               working-directory: ${{ matrix.folder }}
               # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
               # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
@@ -234,8 +273,16 @@ jobs:
                     cat ${{ github.workspace }}/.github/workflows/ci.bazel5.bazelrc >> ${{ github.workspace }}/.github/workflows/ci.bazelrc
                   fi
 
-            - name: Write EngFlow credentials
-              # Writes EngFlow credential files for RBE configurations
+            - name: Configure Bazel version (Windows)
+              if: matrix.os == 'windows-latest'
+              working-directory: ${{ matrix.folder }}
+              # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
+              # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
+              # then use .bazelversion to determine which Bazel version to use.
+              run: echo "${{ matrix.bazelversion }}" > .bazelversion
+
+            - name: Write RBE credentials
+              # Writes RBE credential files
               if: matrix.config == 'rbe'
               working-directory: ${{ matrix.folder }}
               run: |
@@ -251,21 +298,34 @@ jobs:
               # Store the --enable_bzlmod flag that we add to the test command below
               # only when we're running bzlmod in our test matrix.
               id: set_bzlmod_flag
-              if: ${{ matrix.bzlmodEnabled && matrix.folder != '.'}}
+              if: matrix.bzlmodEnabled && matrix.folder != '.'
               run: echo "bzlmod_flag=--enable_bzlmod" >> $GITHUB_OUTPUT
 
             - name: Set bzlmod configuration (for test //...)
               # Store the --config=bzlmod flag that we add to the test command below
               # only when we're running bzlmod in our test matrix.
               id: set_bzlmod_config
-              if: ${{ matrix.bzlmodEnabled && matrix.folder == '.'}}
+              if: matrix.bzlmodEnabled && matrix.folder == '.'
               run: echo "bzlmod_config=--config=bzlmod" >> $GITHUB_OUTPUT
 
             - name: bazel test //...
+              if: matrix.os != 'windows-latest'
               working-directory: ${{ matrix.folder }}
               run: |
                   bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
+              env:
+                  # Bazelisk will download bazel to here
+                  XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+
+            - name: bazel test //... (Windows)
+              if: matrix.os == 'windows-latest'
+              working-directory: ${{ matrix.folder }}
+              run: |
+                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
               env:
                   # Bazelisk will download bazel to here
                   XDG_CACHE_HOME: ~/.cache/bazel-repo
@@ -289,7 +349,8 @@ jobs:
             - name: bazel coverage //...
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
-              if: matrix.config == 'local'
+              # Don't run coverage on Windows. It is currently broken.
+              if: matrix.config == 'local' && matrix.os != 'windows-latest'
               working-directory: ${{ matrix.folder }}
               run: |
                   bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} --instrument_test_targets //...
@@ -302,7 +363,7 @@ jobs:
 
             - name: ./test.sh
               # Run if there is a test.sh file in the folder.
-              if: ${{ hashFiles(format('{0}/test.sh', matrix.folder)) != '' }}
+              if: matrix.os != 'windows-latest' && hashFiles(format('{0}/test.sh', matrix.folder)) != ''
               working-directory: ${{ matrix.folder }}
               shell: bash
               # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod. All test.sh
