@@ -30,7 +30,7 @@ build:rbe --remote_cache=grpcs://tourmaline.cluster.engflow.com
 build:rbe --remote_cache=grpcs://tourmaline.cluster.engflow.com
 
 # EngFlow remote downloader
-common:rbe --experimental_remote_downloader=grpcs://tourmaline.cluster.engflow.com
+common:rbe --experimental_remote_downloader=grpcs://tourmaline.cluster.engflow.com-this-should-fail
 
 # EngFlow remote build execution
 build:rbe --remote_executor=grpcs://tourmaline.cluster.engflow.com
