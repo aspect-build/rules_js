@@ -27,6 +27,10 @@ build:rbe --jobs=32
 build:rbe --bes_backend=grpcs://tourmaline.cluster.engflow.com
 build:rbe --bes_results_url=https://tourmaline.cluster.engflow.com/invocation/
 build:rbe --remote_cache=grpcs://tourmaline.cluster.engflow.com
+build:rbe --remote_cache=grpcs://tourmaline.cluster.engflow.com
+
+# EngFlow remote downloader
+common:rbe --experimental_remote_downloader=grpcs://tourmaline.cluster.engflow.com
 
 # EngFlow remote build execution
 build:rbe --remote_executor=grpcs://tourmaline.cluster.engflow.com
