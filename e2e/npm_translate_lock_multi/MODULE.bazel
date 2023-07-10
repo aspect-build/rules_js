@@ -1,0 +1,28 @@
+module(
+    name = "e2e_npm_translate_lock_multi",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "app1_npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//app1:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "app1_npm")
+npm.npm_translate_lock(
+    name = "app2_npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//app2:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "app2_npm")
