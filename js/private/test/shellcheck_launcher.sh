@@ -268,13 +268,20 @@ if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
 fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
+    bazel_out_segment="/bazel-out/"
+elif [[ "$PWD" == *"/BAZEL-~1/"* ]]; then
+    bazel_out_segment="/BAZEL-~1/"
+elif [[ "$PWD" == *"/bazel-~1/"* ]]; then
+    bazel_out_segment="/bazel-~1/"
+fi
+
+if [[ "${bazel_out_segment:-}" ]]; then
     if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
         logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
     else
         # We in runfiles and we don't yet know the execroot
-        bazel_out="/bazel-out/"
-        rest="${PWD#*"$bazel_out"}"
-        index=$(( ${#PWD} - ${#rest} - ${#bazel_out} ))
+        rest="${PWD#*"$bazel_out_segment"}"
+        index=$(( ${#PWD} - ${#rest} - ${#bazel_out_segment} ))
         if [ ${index} -lt 0 ]; then
             printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
             exit 1
