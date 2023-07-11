@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -175,7 +175,7 @@ importers:
         version: 15.0.0(rollup@2.79.1)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5)
       '@types/archiver':
         specifier: 5.3.1
         version: registry.npmjs.org/@types/archiver@5.3.1
@@ -189,8 +189,8 @@ importers:
         specifier: 2.79.1
         version: 2.79.1
       tslib:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.6.0
+        version: 2.6.0
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -227,7 +227,7 @@ importers:
         version: 0.2.0(rollup@2.79.1)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5)
       '@types/google-protobuf':
         specifier: 3.15.6
         version: registry.npmjs.org/@types/google-protobuf@3.15.6
@@ -241,8 +241,8 @@ importers:
         specifier: 2.79.1
         version: 2.79.1
       tslib:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.6.0
+        version: 2.6.0
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -1158,7 +1158,7 @@ packages:
       terser: 5.16.5
     dev: true
 
-  /@rollup/plugin-typescript@10.0.1(rollup@2.79.1)(tslib@2.5.2)(typescript@4.9.5):
+  /@rollup/plugin-typescript@10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5):
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1174,7 +1174,7 @@ packages:
       '@rollup/pluginutils': 5.0.2(rollup@2.79.1)
       resolve: 1.22.1
       rollup: 2.79.1
-      tslib: 2.5.2
+      tslib: 2.6.0
       typescript: 4.9.5
     dev: true
 
@@ -6373,8 +6373,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib@2.5.2:
-    resolution: {integrity: sha512-5svOrSA2w3iGFDs1HibEVBGbDrAY82bFQ3HZ3ixB+88nsbsWQoKqDRb5UBYAUPEzbBn6dAp5gRNXglySbx1MlA==}
+  /tslib@2.6.0:
+    resolution: {integrity: sha512-7At1WUettjcSRHXCyYtTselblcHl9PJFFVKiCAy/bY97+BPZXSQ2wbq0P9s8tK2G7dFQfNnlJnPAiArVBVBsfA==}
     dev: true
 
   /tunnel-agent@0.6.0:
@@ -6977,7 +6977,6 @@ packages:
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
     name: is-odd
-    version: 3.0.1
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
@@ -6992,7 +6991,6 @@ packages:
   file:npm/private/test/vendored/semver-max:
     resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
     name: semver-max
-    version: 1.0.0
     dependencies:
       is-odd: file:npm/private/test/vendored/is-odd
       semver: 5.7.1
@@ -7069,7 +7067,7 @@ packages:
       stream-buffers: 3.0.2
       tar: 6.1.13
       tmp-promise: 3.0.3
-      tslib: 2.5.2
+      tslib: 2.6.0
       typescript: 4.9.5
       underscore: 1.13.6
       ws: 8.13.0(bufferutil@4.0.7)
