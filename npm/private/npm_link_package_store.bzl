@@ -64,14 +64,20 @@ If set, takes precendance over the package name in the src npm_package_store.
         attribute based on a `config_setting` rule.
         """,
     ),
+    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-_BIN_TMPL = """#!/bin/sh
+_BIN_SH_TMPL = """#!/bin/sh
 basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
 exec node "$basedir/{bin_path}" "$@"
 """
 
+_BIN_CMD_TMPL = """node  "%~dp0\\{bin_path}" %*
+"""
+
 def _impl(ctx):
+    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
+
     store_info = ctx.attr.src[NpmPackageStoreInfo]
 
     virtual_store_directory = store_info.virtual_store_directory
@@ -94,14 +100,23 @@ def _impl(ctx):
     files = utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)
 
     for bin_name, bin_path in ctx.attr.bins.items():
-        bin_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name))
         bin_path = paths.normalize(paths.join("..", package, bin_path))
-        ctx.actions.write(
-            bin_file,
-            _BIN_TMPL.format(bin_path = bin_path),
-            is_executable = True,
-        )
-        files.append(bin_file)
+        if is_windows:
+            bin_cmd_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name + ".cmd"))
+            ctx.actions.write(
+                bin_cmd_file,
+                _BIN_CMD_TMPL.format(bin_path = bin_path.replace("/", "\\")),
+                is_executable = True,
+            )
+            files.append(bin_cmd_file)
+        else:
+            bin_sh_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name))
+            ctx.actions.write(
+                bin_sh_file,
+                _BIN_SH_TMPL.format(bin_path = bin_path),
+                is_executable = True,
+            )
+            files.append(bin_sh_file)
 
     files_depset = depset(files)
 

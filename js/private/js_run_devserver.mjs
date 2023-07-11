@@ -48,15 +48,36 @@ function mkdirpSync(p) {
 // pointing to the source symlink.
 async function syncRecursive(src, dst, writePerm) {
     try {
-        const lstat = await fs.promises.lstat(src)
+        const isWindows = process.platform === 'win32'
+        if (isWindows && path.basename(src) == 'node_modules') {
+            // special handling on Windows for node_modules
+            const exists = synced.has(src) || (await fileExists(dst))
+            synced.set(src, 1)
+            if (!exists) {
+                // Intentionally synchronous; see comment on mkdirpSync
+                mkdirpSync(path.dirname(dst))
+                if (process.env.JS_BINARY__LOG_DEBUG) {
+                    console.error(`Syncing symlink node_modules`)
+                }
+                await fs.promises.symlink(src, dst, 'junction')
+                return 1
+            } else {
+                // the symlink is already created
+                return 0
+            }
+        }
+
+        const stat = isWindows
+            ? await fs.promises.stat(src)
+            : await fs.promises.lstat(src)
         const last = synced.get(src)
-        if (!lstat.isDirectory() && last && lstat.mtimeMs == last) {
+        if (!stat.isDirectory() && last && stat.mtimeMs == last) {
             // this file is already up-to-date
             return 0
         }
         const exists = synced.has(src) || (await fileExists(dst))
-        synced.set(src, lstat.mtimeMs)
-        if (lstat.isSymbolicLink()) {
+        synced.set(src, stat.mtimeMs)
+        if (stat.isSymbolicLink()) {
             const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
             if (process.env.JS_BINARY__LOG_DEBUG) {
                 console.error(`Syncing symlink ${srcWorkspacePath}`)
@@ -86,7 +107,7 @@ async function syncRecursive(src, dst, writePerm) {
             }
             await fs.promises.symlink(src, dst)
             return 1
-        } else if (lstat.isDirectory()) {
+        } else if (stat.isDirectory()) {
             const contents = await fs.promises.readdir(src)
             if (!exists) {
                 // Intentionally synchronous; see comment on mkdirpSync
@@ -139,6 +160,21 @@ async function syncRecursive(src, dst, writePerm) {
 async function sync(files, sandbox, writePerm) {
     console.error('Syncing...')
     const startTime = perf_hooks.performance.now()
+    const isWindows = process.platform === 'win32'
+    if (isWindows) {
+        // special handling on Windows for node_modules
+        files = files.map((file) => {
+            const nodeModulesIndex = file.indexOf('/node_modules/')
+            if (nodeModulesIndex != -1) {
+                file = file.substring(0, nodeModulesIndex + 13)
+            } else if (file.startsWith('node_modules/')) {
+                file = 'node_modules'
+            }
+            return file
+        })
+        files = [...new Set(files)]
+    }
+
     const totalSynced = (
         await Promise.all(
             files.map(async (file) => {
@@ -176,7 +212,7 @@ async function main(args, sandbox) {
             ? path.join(sandbox, process.env.JS_BINARY__CHDIR)
             : sandbox
 
-        const tool = config.tool
+        let tool = config.tool
             ? path.join(RUNFILES_ROOT, config.tool)
             : config.command
 
@@ -206,6 +242,10 @@ async function main(args, sandbox) {
             }
         }
 
+        if (tool.startsWith('.')) {
+            // ensure path to tool is not relative since this does not work on Windows
+            tool = path.join(cwd, tool)
+        }
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
             stdio: 'inherit',
