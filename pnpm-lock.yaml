@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -6977,6 +6977,7 @@ packages:
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
     name: is-odd
+    version: 3.0.1
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
@@ -6991,6 +6992,7 @@ packages:
   file:npm/private/test/vendored/semver-max:
     resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
     name: semver-max
+    version: 1.0.0
     dependencies:
       is-odd: file:npm/private/test/vendored/is-odd
       semver: 5.7.1
