@@ -53,6 +53,7 @@ def _extension_impl(module_ctx):
                 verify_node_modules_ignored = attr.verify_node_modules_ignored,
                 verify_patches = attr.verify_patches,
                 yarn_lock = attr.yarn_lock,
+                bzlmod = True,
             )
 
         for attr in mod.tags.npm_translate_lock:
