@@ -462,9 +462,18 @@ def _initialize_result_value(starlark, stack):
             if type(curr_result) == "dict":
                 curr_result = curr_result.setdefault(state["key"], _empty_value_for_state(kns_states[i + 1]))
             else:
+                if not "index" in state:
+                    fail("Invalid yaml state under {}".format(_stack_path(stack)))
+
                 if state["index"] >= len(curr_result):
                     curr_result.append(_empty_value_for_state(kns_states[i + 1]))
                 curr_result = curr_result[state["index"]]
+
+def _stack_path(stack):
+    p = []
+    for s in stack:
+        p.append(s["key"])
+    return p
 
 def _set_result_value(starlark, stack, value):
     "Add a new value to the starlark result corresponding to the last pseudostate in the stack"
