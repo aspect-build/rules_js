@@ -7,6 +7,8 @@ This ruleset is a high-performance and npm-compatible Bazel integration for Java
 -   Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
 -   Supports npm "workspaces": nested npm packages in a monorepo.
 
+Many companies are already successfully building with rules_js. Please add yours to the adoption discussion: #1000.
+
 <https://blog.aspect.dev/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 
 Google does not fund development of rules_js. If your company benefits, please consider donating to continue development and maintenance work: <https://opencollective.com/aspect-build/projects/rules_js>
