@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -21,8 +21,8 @@ importers:
   lib-dupes:
     dependencies:
       '@aspect-test/c':
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 2.0.2
+        version: 2.0.2
       '@aspect-test/c1':
         specifier: npm:@aspect-test/c@1.0.0
         version: /@aspect-test/c@1.0.0
@@ -44,8 +44,8 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@aspect-test/c@2.0.0:
-    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
+  /@aspect-test/c@2.0.2:
+    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
     requiresBuild: true
     dev: false
