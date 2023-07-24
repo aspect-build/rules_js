@@ -230,9 +230,9 @@ npm_translate_lock(
         "fum@0.0.1": ["//:patches/fum@0.0.1.patch"],
     },
     patch_args = {
-        "*": ["-p1"]
-        "@foo/bar": ["-p0"]
-        "fum@0.0.1": ["-p2"]
+        "*": ["-p1"],
+        "@foo/bar": ["-p0"],
+        "fum@0.0.1": ["-p2"],
     },
 )
 ```
