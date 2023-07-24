@@ -29,7 +29,7 @@ use_repo(pnpm, "pnpm__links")
 
 ####### Dev dependencies ########
 
-bazel_dep(name = "gazelle", version = "0.31.1", dev_dependency = True, repo_name = "bazel_gazelle")
+bazel_dep(name = "gazelle", version = "0.32.0", dev_dependency = True, repo_name = "bazel_gazelle")
 bazel_dep(name = "buildifier_prebuilt", version = "6.1.0", dev_dependency = True)
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
 
