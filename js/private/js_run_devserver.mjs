@@ -12,15 +12,6 @@ const RUNFILES_ROOT = path.join(
 const synced = new Map()
 const mkdirs = new Set()
 
-async function fileExists(p) {
-    // Node recommends using `access` to check for file existence; fs.exists is deprecated.
-    // https://nodejs.org/api/fs.html#fsexistspath-callback
-    await fs.promises
-        .access(p, fs.constants.F_OK)
-        .then(() => true)
-        .catch((_) => false)
-}
-
 // Ensure that a directory exists. If it has not been previously created or does not exist then it
 // creates the directory, first recursively ensuring that its parent directory exists. Intentionally
 // synchronous to avoid race conditions between async promises. If we use `await fs.promises.mkdir(p)`
@@ -54,7 +45,7 @@ async function syncRecursive(src, dst, writePerm) {
             // this file is already up-to-date
             return 0
         }
-        const exists = synced.has(src) || (await fileExists(dst))
+        const exists = synced.has(src) || fs.existsSync(dst)
         synced.set(src, lstat.mtimeMs)
         if (lstat.isSymbolicLink()) {
             const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
@@ -69,7 +60,7 @@ async function syncRecursive(src, dst, writePerm) {
                     process.env.JS_BINARY__BINDIR,
                     srcWorkspacePath
                 )
-                if (await fileExists(maybeBinSrc)) {
+                if (fs.existsSync(maybeBinSrc)) {
                     if (process.env.JS_BINARY__LOG_DEBUG) {
                         console.error(
                             `Syncing to bazel-out copy of symlink ${srcWorkspacePath}`
