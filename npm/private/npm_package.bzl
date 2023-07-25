@@ -233,7 +233,7 @@ def npm_package(
 
         srcs: Files and/or directories or targets that provide `DirectoryPathInfo` to copy into the output directory.
 
-        args: Arguments that are passed down to <name>.publish target and `npm publish` command.
+        args: Arguments that are passed down to `<name>.publish` target and `npm publish` command.
 
         data: Runtime / linktime npm dependencies of this npm package.
 
