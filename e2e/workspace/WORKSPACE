@@ -16,10 +16,10 @@ nodejs_register_toolchains(
     node_version = DEFAULT_NODE_VERSION,
 )
 
-# NB: you can skip these "bazel_features" lines, so long as you call `npm_translate_lock`.
-load("@bazel_features//:deps.bzl", "bazel_features_deps")
-
-bazel_features_deps()
+# For convenience, npm_translate_lock does this call automatically.
+# Uncomment if you don't call npm_translate_lock at all.
+#load("@bazel_features//:deps.bzl", "bazel_features_deps")
+#bazel_features_deps()
 
 load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 
