@@ -24,12 +24,6 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
-config_setting(
-    name = "experimental_allow_unresolved_symlinks",
-    values = {"experimental_allow_unresolved_symlinks": "true"},
-    visibility = ["//visibility:public"],
-)
-
 bzl_library(
     name = "js_filegroup",
     srcs = ["js_filegroup.bzl"],
