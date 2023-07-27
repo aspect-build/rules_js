@@ -3,6 +3,7 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bazel_features//:features.bzl", "bazel_features")
 load("//js:defs.bzl", "js_binary")
 
 exports_files(
@@ -25,8 +26,8 @@ config_setting(
 )
 
 config_setting(
-    name = "experimental_allow_unresolved_symlinks",
-    values = {"experimental_allow_unresolved_symlinks": "true"},
+    name = "allow_unresolved_symlinks",
+    values = {bazel_features.flags.allow_unresolved_symlinks: "true"},
     visibility = ["//visibility:public"],
 )
 

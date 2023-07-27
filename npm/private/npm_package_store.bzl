@@ -127,18 +127,12 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
         mandatory = True,
         doc = """Whether to use ctx.actions.declare_symlink to create symlinks.
 
-        In Bazel 5.x these are enabled with the --experimental_allow_unresolved_symlinks flag.
+        These are enabled with the `--allow_unresolved_symlinks` flag
+        (named `--experimental_allow_unresolved_symlinks in Bazel versions prior to 7.0).
 
         Typical usage of this rule is via a macro which automatically sets this
-        attribute with `select` based on a `config_setting` rule such as,
-
-        ```
-        config_setting(
-            name = "experimental_allow_unresolved_symlinks",
-            values = {"experimental_allow_unresolved_symlinks": "true"},
-            visibility = ["//visibility:public"],
-        )
-        ```
+        attribute with `select` based on a `config_setting` rule.
+        See /js/private/BUILD.bazel in rules_js for an example.
         """,
     ),
     "hardlink": attr.string(

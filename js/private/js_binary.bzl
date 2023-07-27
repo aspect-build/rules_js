@@ -262,10 +262,12 @@ _ATTRS = {
     "unresolved_symlinks_enabled": attr.bool(
         doc = """Whether unresolved symlinks are enabled in the current build configuration.
 
-        These are enabled with the --experimental_allow_unresolved_symlinks flag.
+        These are enabled with the `--allow_unresolved_symlinks` flag
+        (named `--experimental_allow_unresolved_symlinks in Bazel versions prior to 7.0).
 
         Typical usage of this rule is via a macro which automatically sets this
         attribute based on a `config_setting` rule.
+        See /js/private/BUILD.bazel in rules_js for an example.
         """,
         # TODO(2.0): make this mandatory so that downstream binary rules that inherit these attributes are required to set it
         mandatory = False,

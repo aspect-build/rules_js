@@ -2,8 +2,8 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
-load("//npm:repositories.bzl", "npm_import", "npm_translate_lock", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
-load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib")
+load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")

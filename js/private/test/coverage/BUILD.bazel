@@ -29,7 +29,7 @@ coverage_fail_test(
     }),
     entry_point = "lib.js",
     unresolved_symlinks_enabled = select({
-        "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
+        "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
         "//conditions:default": False,
     }),
 )
@@ -61,7 +61,7 @@ coverage_pass_test(
     }),
     entry_point = "lib.js",
     unresolved_symlinks_enabled = select({
-        "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
+        "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
         "//conditions:default": False,
     }),
 )
