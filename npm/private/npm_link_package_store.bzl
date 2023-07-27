@@ -58,7 +58,7 @@ If set, takes precendance over the package name in the src npm_package_store.
         mandatory = True,
         doc = """Whether unresolved symlinks are enabled in the current build configuration.
 
-        These are enabled with the --experimental_allow_unresolved_symlinks flag.
+        These are enabled with the --allow_unresolved_symlinks flag.
 
         Typical usage of this rule is via a macro which automatically sets this
         attribute based on a `config_setting` rule.

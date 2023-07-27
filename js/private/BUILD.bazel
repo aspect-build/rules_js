@@ -27,7 +27,7 @@ config_setting(
 
 config_setting(
     name = "allow_unresolved_symlinks",
-    values = {bazel_features.allow_unresolved_symlinks_flag: "true"},
+    values = {bazel_features.flags.allow_unresolved_symlinks: "true"},
     visibility = ["//visibility:public"],
 )
 
