@@ -51,7 +51,7 @@ def custom_test(**kwargs):
             "//conditions:default": False,
         }),
         unresolved_symlinks_enabled = select({
-            "@aspect_rules_js//js/private:experimental_allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }),
         **kwargs
