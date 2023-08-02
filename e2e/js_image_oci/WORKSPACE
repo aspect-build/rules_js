@@ -79,9 +79,9 @@ oci_pull(
 ###
 http_archive(
     name = "container_structure_test",
-    sha256 = "42edb647b51710cb917b5850380cc18a6c925ad195986f16e3b716887267a2d7",
-    strip_prefix = "container-structure-test-104a53ede5f78fff72172639781ac52df9f5b18f",
-    urls = ["https://github.com/GoogleContainerTools/container-structure-test/archive/104a53ede5f78fff72172639781ac52df9f5b18f.zip"],
+    sha256 = "6e5e3cbb15f2785c652822a56e0c86b14b630a6a3a410c889e718d580f2c19a7",
+    strip_prefix = "container-structure-test-18d9b2bcd2cbee1ab8df7c232ef6b7cddff9708a",
+    urls = ["https://github.com/GoogleContainerTools/container-structure-test/archive/18d9b2bcd2cbee1ab8df7c232ef6b7cddff9708a.zip"],
 )
 
 load("@container_structure_test//:repositories.bzl", "container_structure_test_register_toolchain")
