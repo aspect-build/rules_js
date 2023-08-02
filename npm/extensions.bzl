@@ -161,10 +161,6 @@ def _npm_translate_lock_attrs():
     attrs["name"] = attr.string()
     attrs["lifecycle_hooks_exclude"] = attr.string_list(default = [])
     attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = True)
-
-    # Note, pnpm_version can't be a tuple here, so we can't accept the integrity hash.
-    # This is okay since you can just call the pnpm module extension below first.
-    # TODO(2.0): drop pnpm_version from this module extension
     attrs["pnpm_version"] = attr.string(default = LATEST_PNPM_VERSION)
     attrs["run_lifecycle_hooks"] = attr.bool(default = True)
 
@@ -201,20 +197,12 @@ def _pnpm_impl(module_ctx):
         for attr in mod.tags.pnpm:
             pnpm_repository(
                 name = attr.name,
-                pnpm_version = (
-                    (attr.pnpm_version, attr.pnpm_version_integrity) if attr.pnpm_version_integrity else attr.pnpm_version
-                ),
+                pnpm_version = attr.pnpm_version,
             )
 
 pnpm = module_extension(
     implementation = _pnpm_impl,
     tag_classes = {
-        "pnpm": tag_class(
-            attrs = {
-                "name": attr.string(),
-                "pnpm_version": attr.string(default = LATEST_PNPM_VERSION),
-                "pnpm_version_integrity": attr.string(),
-            },
-        ),
+        "pnpm": tag_class(attrs = {"name": attr.string(), "pnpm_version": attr.string(default = LATEST_PNPM_VERSION)}),
     },
 )
