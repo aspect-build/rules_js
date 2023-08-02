@@ -26,9 +26,10 @@ use_repo(node, "nodejs_windows_amd64")
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
+    pnpm_version = "8.6.7",
+    pnpm_version_integrity = "sha512-vRIWpD/L4phf9Bk2o/O2TDR8fFoJnpYrp2TKqTIZF/qZ2/rgL3qKXzHofHgbXsinwMoSEigz28sqk3pQ+yMEQQ==",
 )
-use_repo(pnpm, "pnpm")
-use_repo(pnpm, "pnpm__links")
+use_repo(pnpm, "pnpm", "pnpm__links")
 
 ####### Dev dependencies ########
 
@@ -174,6 +175,7 @@ npm.npm_translate_lock(
         "meaning-of-life@1.0.0": ["//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
+    # NB: this is a no-op because we already installed a pnpm repo above
     pnpm_version = "7.25.0",
     public_hoist_packages = {
         # Instructs the linker to hoist the ms@2.1.3 npm package to `node_modules/ms` in the `examples/npm_deps` package.
