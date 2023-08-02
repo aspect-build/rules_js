@@ -47,11 +47,11 @@ _custom_test = rule(
 def custom_test(**kwargs):
     _custom_test(
         enable_runfiles = select({
-            "//js/private:enable_runfiles": True,
+            "//js:enable_runfiles": True,
             "//conditions:default": False,
         }),
         unresolved_symlinks_enabled = select({
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }),
         **kwargs

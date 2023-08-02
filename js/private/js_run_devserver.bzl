@@ -240,11 +240,11 @@ def js_run_devserver(
     _js_run_devserver(
         name = name,
         enable_runfiles = select({
-            "@aspect_rules_js//js/private:enable_runfiles": True,
+            "@aspect_rules_js//js:enable_runfiles": True,
             "//conditions:default": False,
         }),
         unresolved_symlinks_enabled = select({
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }),
         entry_point = "@aspect_rules_js//js/private:js_devserver_entrypoint",
