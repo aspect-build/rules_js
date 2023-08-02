@@ -155,9 +155,7 @@ npm_translate_lock(
         "meaning-of-life@1.0.0": ["//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
-    # Use a version that's not vendored into rules_js by providing a (version, integrity) tuple.
-    # curl --silent https://registry.npmjs.org/pnpm | jq '.versions["8.6.11"].dist.integrity'
-    pnpm_version = ("8.6.11", "sha512-jqknppuj45tDzJsLcLqkAxytBHZXIx9JTYkGNq0/7pSRggpio9wRxTDj4NA2ilOHPlJ5BVjB5Ij5dx65woMi5A=="),
+    pnpm_version = "8.6.0",
     public_hoist_packages = {
         # Instructs the linker to hoist the ms@2.1.3 npm package to `node_modules/ms` in the `examples/npm_deps` package.
         # Similar to adding `public-hoist-pattern[]=ms` in .npmrc but with control over which version to hoist and where
