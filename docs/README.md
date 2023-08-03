@@ -177,7 +177,7 @@ with a rule like [`copy_to_bin`](https://docs.aspect.build/aspect-build/bazel-li
 rules_js automatically mirrors the `bin` field from the `package.json` file of your npm dependencies
 to a Starlark API you can load from in your BUILD file or macro.
 
-For example, if you depend on the `typescript` npm package, you write this in `BUILD`:
+For example, if you depend on the `typescript` npm package in your root `package.json`, the `tsc` bin entry can be accessed in a `BUILD`:
 
 ```starlark=
 load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
@@ -193,6 +193,12 @@ typescript_bin.tsc(
     chdir = package_name(),
     args = ["-p", "tsconfig.json"],
 )
+```
+
+If you depend on the `typescript` npm package from a nested `package.json` such as `myapp/package.json`, the bin entry would be loaded from the nested package:
+
+```starlark=
+load("@npm//myapp:typescript/package_json.bzl", typescript_bin = "bin")
 ```
 
 Each bin exposes three rules, one for each Bazel command ("verb"): build, test and run - each aligning with the corresponding [js_run_binary](./js_run_binary.md), [js_test](#js_test) and [js_binary](./js_binary.md) rule APIs.
