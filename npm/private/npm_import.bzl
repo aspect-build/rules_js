@@ -69,7 +69,7 @@ def npm_imported_package_store(
         dev = {dev},
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )
@@ -84,7 +84,7 @@ def npm_imported_package_store(
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )
@@ -100,7 +100,7 @@ def npm_imported_package_store(
         visibility = visibility,
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),
     )
@@ -125,7 +125,7 @@ def npm_imported_package_store(
             deps = ref_deps,
             tags = ["manual"],
             use_declare_symlink = select({{
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }}),
         )
@@ -139,7 +139,7 @@ def npm_imported_package_store(
             deps = lc_deps,
             tags = ["manual"],
             use_declare_symlink = select({{
-                "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
                 "//conditions:default": False,
             }}),
         )
@@ -208,7 +208,7 @@ def npm_link_imported_package_store(
         visibility = visibility,
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js/private:allow_unresolved_symlinks": True,
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
             "//conditions:default": False,
         }}),{maybe_bins}
     )

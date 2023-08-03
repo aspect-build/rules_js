@@ -3,7 +3,6 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("@bazel_features//:features.bzl", "bazel_features")
 load("//js:defs.bzl", "js_binary")
 
 exports_files(
@@ -19,16 +18,16 @@ exports_files([
     "npm_wrapper.sh",
 ])
 
-config_setting(
+# rules_jest and friends refer to these two private targets via the js_binary lib (naughty)
+# TODO(2.0): remove
+alias(
     name = "enable_runfiles",
-    values = {"enable_runfiles": "true"},
-    visibility = ["//visibility:public"],
+    actual = "//js:enable_runfiles",
 )
 
-config_setting(
-    name = "allow_unresolved_symlinks",
-    values = {bazel_features.flags.allow_unresolved_symlinks: "true"},
-    visibility = ["//visibility:public"],
+alias(
+    name = "experimental_allow_unresolved_symlinks",
+    actual = "//js:allow_unresolved_symlinks",
 )
 
 bzl_library(
