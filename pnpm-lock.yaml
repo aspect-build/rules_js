@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 60d08949101fc004c7564f98037b7764
+packageExtensionsChecksum: 2748cb8b0b0bbbc1945ad41d572bc9af
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -24,8 +24,8 @@ importers:
         specifier: 16.18.11
         version: registry.npmjs.org/@types/node@16.18.11
       chalk:
-        specifier: 5.1.1
-        version: 5.1.1
+        specifier: 5.3.0
+        version: 5.3.0
       inline-fixtures:
         specifier: 1.1.0
         version: 1.1.0
@@ -2007,6 +2007,12 @@ packages:
   /chalk@5.1.1:
     resolution: {integrity: sha512-OItMegkSDU3P7OJRWBbNRsQsL8SzgwlIGXSZRVfHCLBYrDgzYDuozwDMwvEDpiZdjr50tdOTbTzuubirtEozsg==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+    dev: false
+
+  /chalk@5.3.0:
+    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+    dev: true
 
   /charenc@0.0.2:
     resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
@@ -3702,6 +3708,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     dev: true
@@ -4016,6 +4023,7 @@ packages:
 
   /jose@4.12.0:
     resolution: {integrity: sha512-wW1u3cK81b+SFcHjGC8zw87yuyUweEFe0UJirrXEw1NasW00eF7sZjeG3SLBGz001ozxQ46Y9sofDvhBmWFtXQ==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4925,6 +4933,7 @@ packages:
   /object-hash@2.2.0:
     resolution: {integrity: sha512-gScRMn0bS5fH+IuwyIFgnh9zBdo4DV+6GhygmWM9HyNJSgS0hScp1f5vjtm7oIIOiT9trXrShAkLFSc2IqKNgw==}
     engines: {node: '>= 6'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4936,6 +4945,7 @@ packages:
   /oidc-token-hash@5.0.1:
     resolution: {integrity: sha512-EvoOtz6FIEBzE+9q253HsLCVRiK/0doEJ2HCvvqMQb3dHZrP3WlJKYtJ55CRTw4jmYomzH4wkPuCj/I3ZvpKxQ==}
     engines: {node: ^10.13.0 || >=12.0.0}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -6977,7 +6987,6 @@ packages:
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
     name: is-odd
-    version: 3.0.1
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
@@ -6992,7 +7001,6 @@ packages:
   file:npm/private/test/vendored/semver-max:
     resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
     name: semver-max
-    version: 1.0.0
     dependencies:
       is-odd: file:npm/private/test/vendored/is-odd
       semver: 5.7.1
