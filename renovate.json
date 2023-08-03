@@ -13,7 +13,7 @@
 
     "labels": ["deps"],
     "dependencyDashboard": true,
-
+    "ignorePaths": ["**/node_modules/**", "**/bower_components/**", "e2e/**"],
     "packageRules": [
         {
             "matchPackagePatterns": ["npm"],
