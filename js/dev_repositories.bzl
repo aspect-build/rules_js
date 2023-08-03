@@ -23,8 +23,8 @@ def rules_js_dev_dependencies():
 
     http_archive(
         name = "bazel_skylib",
-        sha256 = "b8a1527901774180afc798aeb28c4634bdccf19c4d98e7bdd1ce79d1fe9aaad7",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.1/bazel-skylib-1.4.1.tar.gz"],
+        sha256 = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa",
+        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.2/bazel-skylib-1.4.2.tar.gz"],
     )
 
     http_archive(
@@ -35,15 +35,15 @@ def rules_js_dev_dependencies():
 
     http_archive(
         name = "io_bazel_stardoc",
-        sha256 = "3fd8fec4ddec3c670bd810904e2e33170bedfe12f90adf943508184be458c8bb",
-        urls = ["https://github.com/bazelbuild/stardoc/releases/download/0.5.3/stardoc-0.5.3.tar.gz"],
+        sha256 = "4441a965c97f8364c8eb901f951ca9a15c6e2c29ee0f10b56bf8b563463752ea",
+        urls = ["https://github.com/bazelbuild/stardoc/releases/download/0.6.0/stardoc-0.6.0.tar.gz"],
     )
 
     http_archive(
         name = "buildifier_prebuilt",
-        sha256 = "e46c16180bc49487bfd0f1ffa7345364718c57334fa0b5b67cb5f27eba10f309",
-        strip_prefix = "buildifier-prebuilt-6.1.0",
+        sha256 = "29a50ea545810dc077c408d520eb83e9de3eecfe6395e89cb07149d903fc31e5",
+        strip_prefix = "buildifier-prebuilt-6.1.2",
         urls = [
-            "https://github.com/keith/buildifier-prebuilt/archive/6.1.0.tar.gz",
+            "https://github.com/keith/buildifier-prebuilt/archive/6.1.2.tar.gz",
         ],
     )
