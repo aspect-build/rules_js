@@ -1,22 +1,22 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@types/node': 18.11.18
+importers:
 
-dependencies:
-  botframework-connector:
-    specifier: 4.19.3
-    version: 4.19.3
-  karma-typescript:
-    specifier: 5.5.4
-    version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
-  lodash:
-    specifier: 4.17.21
-    version: 4.17.21
+  .:
+    dependencies:
+      botframework-connector:
+        specifier: 4.19.3
+        version: 4.19.3
+      karma-typescript:
+        specifier: 5.5.4
+        version: 5.5.4(karma@6.4.1)(typescript@4.9.5)
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
 
 packages:
 
@@ -122,18 +122,17 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@azure/ms-rest-js@2.6.4:
-    resolution: {integrity: sha512-2sbOpGhlBfv9itWdF7Qlk0CmoQCARxe5unwjNOprU7OdgEgabQncZ35L5u1A+zgdkVtNYF9Eo6XAhXzTweIhag==}
+  /@azure/ms-rest-js@2.7.0:
+    resolution: {integrity: sha512-ngbzWbqF+NmztDOpLBVDxYM+XLcUj7nKhxGbSU9WtIsXfRB//cf2ZbAG5HkOrhU9/wd/ORRB6lM/d69RKVjiyA==}
     dependencies:
       '@azure/core-auth': 1.4.0
       abort-controller: 3.0.0
       form-data: 2.5.1
       node-fetch: 2.6.9
-      tough-cookie: 3.0.1
       tslib: 1.14.1
       tunnel: 0.0.6
       uuid: 8.3.2
-      xml2js: 0.4.23
+      xml2js: 0.5.0
     transitivePeerDependencies:
       - encoding
     dev: false
@@ -625,7 +624,7 @@ packages:
     resolution: {integrity: sha512-WjzNHioJpOigfuEJ20PqQjNMc7KeBRgFjWMIqW5A+xmiMHqxVUIU57tUdE2Xe7yI7glDsLDHTjY0tFQxAKXHdQ==}
     dependencies:
       '@azure/identity': 2.1.0
-      '@azure/ms-rest-js': 2.6.4
+      '@azure/ms-rest-js': 2.7.0
       adal-node: 0.2.3
       axios: 0.25.0
       base64url: 3.0.1
@@ -1446,11 +1445,6 @@ packages:
       source-map: 0.5.7
     dev: false
 
-  /ip-regex@2.1.0:
-    resolution: {integrity: sha512-58yWmlHpp7VYfcdTwMTvwMmqx/Elfxjd9RXTDyMsbL7lLWmhMylLEqiYVLKuLzOZqVgiWXD9MfR62Vv89VRxkw==}
-    engines: {node: '>=4'}
-    dev: false
-
   /is-arguments@1.1.1:
     resolution: {integrity: sha512-8Q7EARjzEnKpt/PCD7e1cgUS0a6X8u5tdSiMqXhojOdoV9TsMsiO+9VLC5vAmO8N7/GmXn7yjR8qnA6bVAEzfA==}
     engines: {node: '>= 0.4'}
@@ -2015,10 +2009,6 @@ packages:
     engines: {node: '>= 0.6.0'}
     dev: false
 
-  /psl@1.9.0:
-    resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
-    dev: false
-
   /public-encrypt@4.0.3:
     resolution: {integrity: sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q==}
     dependencies:
@@ -2359,15 +2349,6 @@ packages:
     engines: {node: '>=0.6'}
     dev: false
 
-  /tough-cookie@3.0.1:
-    resolution: {integrity: sha512-yQyJ0u4pZsv9D4clxO69OEjLWYw+jbgspjTue4lTQZLfV0c5l1VmK2y1JK8E9ahdpltPOaAThPcp5nKPUgSnsg==}
-    engines: {node: '>=6'}
-    dependencies:
-      ip-regex: 2.1.0
-      psl: 1.9.0
-      punycode: 2.3.0
-    dev: false
-
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
@@ -2538,8 +2519,8 @@ packages:
         optional: true
     dev: false
 
-  /xml2js@0.4.23:
-    resolution: {integrity: sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==}
+  /xml2js@0.5.0:
+    resolution: {integrity: sha512-drPFnkQJik/O+uPKpqSgr22mpuFHqKdbS835iAQrUC73L2F5WkboIRd63ai/2Yg6I1jzifPFKH2NTK+cfglkIA==}
     engines: {node: '>=4.0.0'}
     dependencies:
       sax: 1.2.4
