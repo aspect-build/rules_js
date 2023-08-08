@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 60d08949101fc004c7564f98037b7764
+packageExtensionsChecksum: 2748cb8b0b0bbbc1945ad41d572bc9af
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -289,8 +289,8 @@ importers:
         specifier: 2.12.1
         version: 2.12.1
       protoc-gen-grpc:
-        specifier: git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f
-        version: github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f
+        specifier: git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#53d52a9d0e1fe3cbe930dec5581eca89b3dde807
+        version: github.com/gregmagolan-codaio/protoc-gen-grpc-ts/53d52a9d0e1fe3cbe930dec5581eca89b3dde807
       puppeteer:
         specifier: 19.11.0
         version: 19.11.0(bufferutil@4.0.7)(typescript@4.9.5)
@@ -3702,6 +3702,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     dev: true
@@ -4016,6 +4017,7 @@ packages:
 
   /jose@4.12.0:
     resolution: {integrity: sha512-wW1u3cK81b+SFcHjGC8zw87yuyUweEFe0UJirrXEw1NasW00eF7sZjeG3SLBGz001ozxQ46Y9sofDvhBmWFtXQ==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4925,6 +4927,7 @@ packages:
   /object-hash@2.2.0:
     resolution: {integrity: sha512-gScRMn0bS5fH+IuwyIFgnh9zBdo4DV+6GhygmWM9HyNJSgS0hScp1f5vjtm7oIIOiT9trXrShAkLFSc2IqKNgw==}
     engines: {node: '>= 6'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4936,6 +4939,7 @@ packages:
   /oidc-token-hash@5.0.1:
     resolution: {integrity: sha512-EvoOtz6FIEBzE+9q253HsLCVRiK/0doEJ2HCvvqMQb3dHZrP3WlJKYtJ55CRTw4jmYomzH4wkPuCj/I3ZvpKxQ==}
     engines: {node: ^10.13.0 || >=12.0.0}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -6977,7 +6981,6 @@ packages:
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
     name: is-odd
-    version: 3.0.1
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
@@ -6992,7 +6995,6 @@ packages:
   file:npm/private/test/vendored/semver-max:
     resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
     name: semver-max
-    version: 1.0.0
     dependencies:
       is-odd: file:npm/private/test/vendored/is-odd
       semver: 5.7.1
@@ -7030,8 +7032,8 @@ packages:
       - supports-color
     dev: true
 
-  github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f:
-    resolution: {tarball: https://codeload.github.com/gregmagolan-codaio/protoc-gen-grpc-ts/tar.gz/be5580b06348d3eb9b4610a4a94065154a0df41f}
+  github.com/gregmagolan-codaio/protoc-gen-grpc-ts/53d52a9d0e1fe3cbe930dec5581eca89b3dde807:
+    resolution: {tarball: https://codeload.github.com/gregmagolan-codaio/protoc-gen-grpc-ts/tar.gz/53d52a9d0e1fe3cbe930dec5581eca89b3dde807}
     name: protoc-gen-grpc
     version: 2.0.3
     engines: {node: '>=8'}
