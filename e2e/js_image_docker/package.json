@@ -1,5 +1,6 @@
 {
     "name": "image",
+    "type": "module",
     "dependencies": {
         "chalk": "^5.0.0"
     }
