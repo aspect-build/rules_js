@@ -521,6 +521,15 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         lifecycle_hooks_execution_requirements,
     )
 
+    # The default `patch_args` of {"*": ["-p0"]} conflicts with the pnpm.patchedDependencies
+    # requirement of "-p1" for patches. When pnpm patches are used, it's highly likely that
+    # `patches` is unset, so when it is empty remove any strip prefixes from the default or
+    # any user-supplied argument as they won't have an effect anyway.
+    if len(patches) == 0 and patch_args:
+        patch_args = dict(**patch_args)
+        for matcher, args in patch_args.items():
+            patch_args[matcher] = _remove_strip_prefix_arg(args)
+
     npm_translate_lock_rule(
         name = name,
         pnpm_lock = pnpm_lock,
@@ -787,3 +796,14 @@ ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To 
             pnpm_lock = state.label_store.relative_path("pnpm_lock"),
             rctx_name = rctx.name,
         ))
+
+def _remove_strip_prefix_arg(patch_args):
+    patch_args = patch_args[:]
+    remove_arg = None
+    for arg in patch_args:
+        if arg.startswith("-p") or arg.startswith("--strip="):
+            remove_arg = arg
+            break
+    if remove_arg:
+        patch_args.remove(remove_arg)
+    return patch_args

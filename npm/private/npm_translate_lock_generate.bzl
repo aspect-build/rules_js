@@ -373,7 +373,9 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
                 msg = """\
 ERROR: patch_args for package {package} contains a strip prefix that is incompatible with a patch applied via `pnpm.patchedDependencies`.
 
-`pnpm.patchedDependencies` requires a strip prefix of `-p1`. All applied patches must use the same strip prefix.
+`pnpm.patchedDependencies` requires a strip prefix of `-p1`. All applied patches to a package must use the same strip prefix.
+
+Double check that the `patch_args` in `npm_translate_lock` does not declare a different strip prefix.
 
 """.format(package = friendly_name)
                 fail(msg)
