@@ -33,6 +33,7 @@ js_binary(
     data = [
         "transition",
         "//:node_modules/chalk",
+        "//:package.json",
     ],
     entry_point = "src/main.js",
 )
