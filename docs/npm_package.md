@@ -22,19 +22,16 @@ npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-srcs">sr
             <a href="#npm_package-include_transitive_declarations">include_transitive_declarations</a>, <a href="#npm_package-include_runfiles">include_runfiles</a>, <a href="#npm_package-hardlink">hardlink</a>, <a href="#npm_package-verbose">verbose</a>, <a href="#npm_package-kwargs">kwargs</a>)
 </pre>
 
-A rule that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
+A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
 
 This target can be used as the `src` attribute to `npm_link_package`.
 
-Every npm_package target has a sub target named after its name, which is `&lt;name&gt;.publish`, that can be run
-to publish to an npm registry.
-
+The macro also produces a target `[name].publish`, that can be run to publish to an npm registry.
 Under the hood, this target runs `npm publish`. You can pass arguments to npm by escaping them from Bazel using a double-hyphen,
-for example: `bazel run my_package.publish -- --tag=next`
-
+for example: `bazel run //path/to:my_package.publish -- --tag=next`
 
 Files and directories can be arranged as needed in the output directory using
-the `root_paths`, `include_srcs_patters`, `exclude_srcs_patters` and `replace_prefixes` attributes.
+the `root_paths`, `include_srcs_patterns`, `exclude_srcs_patterns` and `replace_prefixes` attributes.
 
 Filters and transformations are applied in the following order:
 
@@ -67,6 +64,11 @@ adopting its API and its copy action using composition. However, unlike `copy_to
 by default. The behavior of including sources and declarations from `JsInfo` can be configured
 using the `include_sources`, `include_transitive_sources`, `include_declarations`, `include_transitive_declarations`
 attributes.
+
+The two `include*_declarations` options may cause type-check actions to run, which slows down your
+development round-trip.
+You can pass the Bazel option `--@aspect_rules_js//npm:exclude_declarations_from_npm_packages`
+to override these two attributes for an individual `bazel` invocation, avoiding the type-check.
 
 `npm_package` also includes default runfiles from `srcs` by default which `copy_to_directory` does not. This behavior
 can be configured with the `include_runfiles` attribute.
