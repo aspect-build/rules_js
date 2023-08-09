@@ -27,8 +27,9 @@ Because `BUILD` files typically declare a finer-grained dependency graph than `p
 For example, Bazel might only need to fetch a single npm package for a simple build,
 where you might experience other tools installing the entire `package.json` file.
 
-On the other hand, authoring BUILD files is a chore that's required under Bazel and not in
-other tools like Rush or Nx. We plan a [Gazelle] extension soon which automates much of this toil.
+Authoring BUILD files by hand is a chore, so we recommend using the
+[`configure`](https://docs.aspect.build/v/cli/commands/aspect_configure) command from
+[Aspect CLI](https//aspect.build/cli) to automate 80% of this work.
 
 Other recommendations:
 
