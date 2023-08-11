@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const __esm_filename = fileURLToPath(import.meta.url)
 const __esm_dirname = path.dirname(__esm_filename)
 
-const child = spawn('node', ['./node_modules/chalk/source/index.js'], {
+const child = spawn('node', ['../node_modules/chalk/source/index.js'], {
   cwd: __esm_dirname,
 })
 
