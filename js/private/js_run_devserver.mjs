@@ -33,6 +33,27 @@ function mkdirpSync(p) {
     mkdirs.add(p)
 }
 
+// Determines if a file path refers to a node module.
+//
+// Examples:
+//     isNodeModulePath('/private/var/.../node_modules/@babel/core')  // true
+//     isNodeModulePath('/private/var/.../node_modules/lodash')       // true
+//     isNodeModulePath('/private/var/.../some-file.js')              // false
+function isNodeModulePath(srcPath) {
+    const parentDir = path.dirname(srcPath);
+    const parentDirName = path.basename(parentDir);
+
+    if (parentDirName === 'node_modules') {
+        // unscoped module like 'lodash'
+        return true;
+    } else if (parentDirName.startsWith('@')) {
+        // scoped module like '@babel/core'
+        const parentParentDir = path.dirname(parentDir);
+        return path.basename(parentParentDir) === 'node_modules';
+    }
+    return false;
+}
+
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
@@ -52,7 +73,7 @@ async function syncRecursive(src, dst, writePerm) {
             if (process.env.JS_BINARY__LOG_DEBUG) {
                 console.error(`Syncing symlink ${srcWorkspacePath}`)
             }
-            if (path.basename(path.dirname(src)) == 'node_modules') {
+            if (isNodeModulePath(src)) {
                 // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
                 // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
                 const maybeBinSrc = path.join(
