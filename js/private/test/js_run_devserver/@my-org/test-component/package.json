@@ -1,0 +1,11 @@
+
+{
+    "name": "@my-org/test-component",
+    "version": "0.0.0",
+    "main": "./index.jsx",
+    "module": "./index.jsx",
+    "sideEffects": false,
+    "dependencies": {
+        "react": "18.2.0"
+    }
+}

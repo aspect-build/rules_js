@@ -10,5 +10,7 @@ packages:
     - 'js/private/worker/src'
     - 'js/private/image'
     - 'js/private/test/image'
+    - 'js/private/test/js_run_devserver'
+    - 'js/private/test/js_run_devserver/@my-org/test-component'
     - 'npm/private/test'
     - 'npm/private/test/npm_package'

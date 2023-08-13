@@ -95,10 +95,16 @@ def _impl(ctx):
         ),
     ]
 
-_js_run_devserver = rule(
+js_run_devserver_lib = struct(
     attrs = _attrs,
     implementation = _impl,
     toolchains = js_binary_lib.toolchains,
+)
+
+_js_run_devserver = rule(
+    attrs = js_run_devserver_lib.attrs,
+    implementation = js_run_devserver_lib.implementation,
+    toolchains = js_run_devserver_lib.toolchains,
     executable = True,
 )
 
@@ -109,6 +115,7 @@ def js_run_devserver(
         grant_sandbox_write_permissions = False,
         use_execroot_entry_point = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
+        js_run_devserver_rule = _js_run_devserver,
         **kwargs):
     """Runs a devserver via binary target or command.
 
@@ -237,7 +244,7 @@ def js_run_devserver(
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
 
-    _js_run_devserver(
+    js_run_devserver_rule(
         name = name,
         enable_runfiles = select({
             "@aspect_rules_js//js:enable_runfiles": True,
