@@ -13,6 +13,10 @@ SHA=$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')
 
 cat << EOF
 
+Many companies are successfully building with rules_js.
+If you're getting value from the project, please let us know!
+Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_js/discussions/1000).
+
 ## Using Bzlmod with Bazel 6:
 
 Add to your \`MODULE.bazel\` file:
