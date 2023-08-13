@@ -8,7 +8,7 @@ npm_link_all_packages(name = "node_modules")
 # https://github.com/aspect-build/rules_js/issues/1204
 js_run_devserver_test(
     name = "single_node_modules_tree_test",
-    tool = ":test_single_node_modules_tree_binary",
+    tool = ":single_node_modules_tree_test_binary",
     chdir = "js/private/test/js_run_devserver",
     data = [
         "app.jsx",
@@ -26,6 +26,6 @@ js_run_devserver_test(
 )
 
 js_binary(
-    name = "test_single_node_modules_tree_binary",
-    entry_point = "test_single_node_modules_tree.mjs",
+    name = "single_node_modules_tree_test_binary",
+    entry_point = "single_node_modules_tree_test.mjs",
 )
