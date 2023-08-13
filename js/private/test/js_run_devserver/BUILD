@@ -1,5 +1,4 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_binary")
 load(":js_run_devserver_test.bzl", "js_run_devserver_test")
 
 npm_link_all_packages(name = "node_modules")
@@ -8,16 +7,19 @@ npm_link_all_packages(name = "node_modules")
 # https://github.com/aspect-build/rules_js/issues/1204
 js_run_devserver_test(
     name = "single_node_modules_tree_test",
-    tool = ":single_node_modules_tree_test_binary",
+    command = "./node_modules/.bin/jasmine",
     chdir = "js/private/test/js_run_devserver",
-    data = [
+    args = ["*.spec.mjs"],
+    data = glob(["*.spec.mjs"]) + [
         "app.jsx",
 
         # 1st-party package
         ":node_modules/@my-org/test-component",
 
+        ":node_modules/jasmine",
         ":node_modules/html-webpack-plugin",
         ":node_modules/http-server",
+        ":node_modules/http-terminator",
         ":node_modules/puppeteer",
         ":node_modules/react",
         ":node_modules/react-dom",
@@ -25,7 +27,3 @@ js_run_devserver_test(
     ],
 )
 
-js_binary(
-    name = "single_node_modules_tree_test_binary",
-    entry_point = "single_node_modules_tree_test.mjs",
-)
