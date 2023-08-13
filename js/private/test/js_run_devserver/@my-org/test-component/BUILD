@@ -1,7 +1,6 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 npm_link_all_packages(name = "node_modules")
 

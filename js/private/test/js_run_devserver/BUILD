@@ -16,7 +16,6 @@ js_run_devserver_test(
         # 1st-party package
         ":node_modules/@my-org/test-component",
 
-        ":node_modules/chalk",
         ":node_modules/html-webpack-plugin",
         ":node_modules/http-server",
         ":node_modules/puppeteer",
