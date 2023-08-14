@@ -51,6 +51,14 @@ config file to allow the `require` syntax.
 
 Once you've done this, it's handled like the "require appears in your code" case above.
 
+For example, the
+[documentation for the postcss-loader for Webpack](https://webpack.js.org/loaders/postcss-loader/#sugarss)
+suggests that you `npm install --save-dev sugarss`
+and then pass the string "sugarss" to the `options.postcssOptions.parser` property of the loader.
+However this violates symmetry and would require workarounds listed below.
+You can simply pass `require("sugarss")` instead of the bare string, then include the `sugarss`
+package in the `data` (runtime dependencies) of your `webpack.config.js`.
+
 #### It's a bug
 
 This is the case when a package has a `require` statement in its runtime code for some package, but
