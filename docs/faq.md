@@ -2,6 +2,10 @@
 title: FAQ
 ---
 
+## Why does my program fail with "Module not found"?
+
+See the [Troubleshooting guide](./troubleshooting.md).
+
 ## Making the editor happy
 
 Editors (and the language services they host) expect a couple of things:

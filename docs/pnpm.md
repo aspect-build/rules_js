@@ -116,14 +116,7 @@ in 3rd party npm packages when using `rules_js` will be reproducible with pnpm o
 packages to depend on undeclared dependencies.
 All dependencies between packages must be declared under `rules_js` in order to support lazy fetching and lazy linking of npm dependencies.
 
-If a 3rd party npm package is relying on "phantom" dependencies to work, the recommended fix for `rules_js` is to
-use [pnpm.packageExtensions](https://pnpm.io/package_json#pnpmpackageextensions) in your `package.json` to add the
-missing `dependencies` or `peerDependencies`. For example,
-https://github.com/aspect-build/rules_js/blob/a8c192eed0e553acb7000beee00c60d60a32ed82/package.json#L12.
-
-NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
-For now, you can emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute
-of `npm_translate_lock`.
+See [Troubleshooting](./troubleshooting.md) for suggestions on how to fix problems caused by hoisting.
 
 ## Creating and updating the pnpm-lock.yaml file
 
