@@ -10,7 +10,7 @@ npm.npm_translate_lock(
     patch_args = {
         "*": ["-p1"],
     },
-    pnpm_lock = "//:common/config/rush/pnpm-lock.yaml",
+    pnpm_lock = "//common/bazel:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")
