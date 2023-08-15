@@ -1,5 +1,6 @@
 load("//js/private:js_run_devserver.bzl", "js_run_devserver", "js_run_devserver_lib")
 
+# 'test' version of the _js_run_devserver` rule
 _js_run_devserver_test = rule(
     attrs = js_run_devserver_lib.attrs,
     implementation = js_run_devserver_lib.implementation,
@@ -7,18 +8,30 @@ _js_run_devserver_test = rule(
     test = True,
 )
 
-# 'test' version of js_run_devserver
 def js_run_devserver_test(
         name,
         tags = [],
         **kwargs):
+    """
+    'Test' version of the `js_run_devserver` macro. Provides the test rule to 
+    the macro, along with the 'no-sandbox' tag in order to properly simulate the 
+    js_run_devserver environment.
 
+    Args:
+        name: A unique name for this target.
+
+        tags: Additional Bazel tags to supply to the rule.
+
+        **kwargs: All other args for `js_run_devserver`.
+
+            See https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_devserver
+    """
     js_run_devserver(
         name,
         js_run_devserver_rule = _js_run_devserver_test,
         # 'no-sandbox' needed to simulate 'bazel run' command - normally tests 
-        # are sandboxed, and sandboxing doesn't exhibit the issue in 
+        # are sandboxed, but sandboxing doesn't exhibit the issue in 
         # https://github.com/aspect-build/rules_js/issues/1204
-        tags = tags + ['no-sandbox'], 
+        tags = tags + ['no-sandbox'],
         **kwargs,
     )
