@@ -30,8 +30,8 @@ For example,
 ```starlark
 js_library(
     name = "requires_foo",
-    srcs = ["config.js"],                  # contains "require('foo')"
-    data = ["//my/pkg:node_modules/foo"],  # satisfies that require
+    srcs = ["config.js"],          # contains "require('foo')"
+    data = [":node_modules/foo"],  # satisfies that require
 )
 ```
 
