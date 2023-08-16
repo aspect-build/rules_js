@@ -110,6 +110,11 @@ _js_run_devserver = rule(
 
 def js_run_devserver(
         name,
+        tool = None,
+        command = None,
+        grant_sandbox_write_permissions = False,
+        use_execroot_entry_point = True,
+        allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         **kwargs):
     """Runs a devserver via binary target or command.
 
