@@ -6,8 +6,9 @@ This is the most common error rules_js users encounter.
 These problems generally stem from a runtime `require` call of some library which was not declared as a dependency.
 
 Fortunately, these problems are not unique to Bazel.
-As described in https://github.com/aspect-build/rules_js/blob/main/docs/pnpm.md#hoisting, rules_js
-should behave the same way `pnpm` does with `hoist=false`.
+As described in [our documentation](./pnpm.md#hoisting),
+rules_js should behave the same way `pnpm` does with [`hoist=false`](https://pnpm.io/npmrc#hoist).
+
 These problems are also reproducible under [Yarn PnP](https://yarnpkg.com/features/pnp) because it
 also relies on correct dependencies.
 
@@ -79,8 +80,9 @@ Example,
 
 https://github.com/aspect-build/rules_js/blob/a8c192eed0e553acb7000beee00c60d60a32ed82/package.json#L12
 
-Make sure you run `pnpm install` after changing `package.json`, as rules_js only reads the
-`pnpm-lock.yaml` file to gather dependency information.
+> Make sure you pnpm install after changing `package.json`, as rules_js only reads the
+> `pnpm-lock.yaml` file to gather dependency information.
+> See [Fetch third-party packages](./README.md#fetch-third-party-packages-from-npm)
 
 #### It's a plugin
 
@@ -90,6 +92,9 @@ Sometimes the package intentionally doesn't list dependencies, because it discov
 The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#public-hoist-pattern).
 Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages). This makes the `require` statement appear in the
 "public" root of the `node_modules` tree, so the resolution algorithm will search sibling packages.
+
+Note that `public_hoist_packages` affects the layout of the `node_modules` tree, but you still need
+to depend on that hoisted package, e.g. with `deps = [":node_modules/hoisted_pkg"]`.
 
 Example:
 

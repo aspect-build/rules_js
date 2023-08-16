@@ -61,13 +61,12 @@ then we ask that you fix the issue there, and will close such issues filed on ru
 
 The typical usage is to import an entire `pnpm-lock.yaml` file.
 Create such a file if you don't have one. You could install pnpm on your machine, or use `npx` to run it.
-For example, this command creates a lockfile with minimal installation needed:
+We recommend this command, which creates a lockfile with minimal installation needed,
+using the identical version of pnpm that Bazel is configured with:
 
 ```shell
-$ npx pnpm install --lockfile-only
+$ bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only
 ```
-
-> If you want to use a hermetic, Bazel-managed pnpm and node rather than use whatever is on your machine or is installed by `npx`, see the [FAQ](./faq.md#can-i-use-bazel-managed-pnpm).
 
 Instead of checking in a `pnpm-lock.yaml` file, you could use a `package-lock.json` or `yarn.lock`
 file with the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`.
