@@ -426,13 +426,26 @@ def _copy_input_file(priv, rctx, label_store, key):
         fail("key not found '{}'".format(key))
 
     if _should_update_pnpm_lock(priv):
-        # NB: rctx.read will convert binary files to text but that is acceptable for
-        # the purposes of calculating a hash of the file
-        _set_input_hash(
-            priv,
-            label_store.relative_path(key),
-            utils.hash(rctx.read(label_store.path(key))),
-        )
+        path = label_store.path(key)
+        written = False
+        if path.endswith("package.json"):
+            content = json.decode(rctx.read(path))
+            if "version" in content.keys():
+                content.pop("version")
+                _set_input_hash(
+                    priv,
+                    label_store.relative_path(key),
+                    utils.hash(json.encode(content)),
+                )
+                written = True
+        if not written:
+            # NB: rctx.read will convert binary files to text but that is acceptable for
+            # the purposes of calculating a hash of the file
+            _set_input_hash(
+                priv,
+                label_store.relative_path(key),
+                utils.hash(rctx.read(path)),
+            )
 
     # Copy the file using cp (linux/macos) or xcopy (windows). Don't use the rctx.template
     # trick with empty substitution as this does not copy over binary files properly. Also do not
