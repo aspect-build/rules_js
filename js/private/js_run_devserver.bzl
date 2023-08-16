@@ -242,8 +242,13 @@ def js_run_devserver(
     """
     js_run_devserver_internal(
         name,
+        tool,
+        command,
+        grant_sandbox_write_permissions,
+        use_execroot_entry_point,
+        allow_execroot_entry_point_with_no_copy_data_to_bin,
         rule_to_execute = _js_run_devserver,
-        **kwargs,
+        **kwargs
     )
 
 def js_run_devserver_internal(
@@ -255,7 +260,6 @@ def js_run_devserver_internal(
         use_execroot_entry_point = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         **kwargs):
-    
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
 
