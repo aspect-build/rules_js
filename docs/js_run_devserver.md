@@ -102,21 +102,3 @@ Only `data` files that change on incremental builds are synchronized when runnin
 | <a id="js_run_devserver-kwargs"></a>kwargs |  All other args from <code>js_binary</code> except for <code>entry_point</code> which is set implicitly.<br><br><code>entry_point</code> is set implicitly by <code>js_run_devserver</code> and cannot be overridden.<br><br>See https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary   |  none |
 
 
-<a id="js_run_devserver_lib.implementation"></a>
-
-## js_run_devserver_lib.implementation
-
-<pre>
-js_run_devserver_lib.implementation(<a href="#js_run_devserver_lib.implementation-ctx">ctx</a>)
-</pre>
-
-
-
-**PARAMETERS**
-
-
-| Name  | Description | Default Value |
-| :------------- | :------------- | :------------- |
-| <a id="js_run_devserver_lib.implementation-ctx"></a>ctx |  <p align="center"> - </p>   |  none |
-
-
