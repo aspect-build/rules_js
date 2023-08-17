@@ -65,9 +65,6 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_import", "npm_translate_lock
 npm_translate_lock(
     name = "npm",
     bins = {
-        "jasmine": {
-            "jasmine": "./bin/jasmine.js",
-        },
         # derived from "bin" attribute in node_modules/typescript/package.json
         "typescript": {
             "tsc": "./bin/tsc",

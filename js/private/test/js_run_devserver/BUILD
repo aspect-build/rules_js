@@ -1,4 +1,5 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//js/private/test/js_run_devserver:jasmine/package_json.bzl", jasmine_bin = "bin")
 load(":js_run_devserver_test.bzl", "js_run_devserver_test")
 
 npm_link_all_packages(name = "node_modules")
@@ -11,7 +12,6 @@ js_run_devserver_test(
     name = "node_modules_symlink_to_execroot_test",
     args = ["node_modules_symlink_to_execroot.test.mjs"],
     chdir = "js/private/test/js_run_devserver",
-    command = "./node_modules/.bin/jasmine",
     data = [
         "node_modules_symlink_to_execroot.test.mjs",
 
@@ -21,4 +21,9 @@ js_run_devserver_test(
         ":node_modules/@types/node",
         ":node_modules/jasmine",
     ],
+    tool = ":jasmine",
+)
+
+jasmine_bin.jasmine_binary(
+    name = "jasmine",
 )

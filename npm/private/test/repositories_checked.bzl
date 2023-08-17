@@ -13508,9 +13508,6 @@ def npm_repositories():
             "isexe": ["2.0.0"],
             "shebang-regex": ["3.0.0"],
         },
-        bins = {
-            "jasmine": "./bin/jasmine.js",
-        },
     )
 
     npm_import(
