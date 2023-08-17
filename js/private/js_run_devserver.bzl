@@ -282,10 +282,9 @@ def js_run_devserver_internal(
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
 
-    # Highly confusingly, if 'rule_to_execute' is made into a named parameter of
-    # this macro, we get an error saying "js_run_devserver_internal() got
-    # multiple values for parameter 'rule_to_execute'." Popping it off kwargs
-    # instead
+    # Weirdly, if 'rule_to_execute' is made into a named parameter of this
+    # macro, we get an error saying "js_run_devserver_internal() got multiple
+    # values for parameter 'rule_to_execute'." Popping it off kwargs instead
     rule_to_execute = kwargs.pop("rule_to_execute", _js_run_devserver)
 
     rule_to_execute(
