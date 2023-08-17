@@ -1,6 +1,6 @@
 "Implementation of the js_run_devserver_test rule (the 'test' version of js_run_devserver)"
 
-load("//js/private:js_run_devserver.bzl", "js_run_devserver_internal", "js_run_devserver_lib")
+load("//js/private:js_run_devserver.bzl", "js_run_devserver", "js_run_devserver_lib")
 
 # 'test' version of the _js_run_devserver` rule
 _js_run_devserver_test = rule(
@@ -29,8 +29,9 @@ def js_run_devserver_test(
 
             See https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_devserver
     """
-    js_run_devserver_internal(
+    js_run_devserver(
         name,
+        # Override the rule to execute
         rule_to_execute = _js_run_devserver_test,
         # 'no-sandbox' needed to simulate 'bazel run' command - normally tests
         # are sandboxed, but sandboxing doesn't exhibit the issue in

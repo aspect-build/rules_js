@@ -240,51 +240,10 @@ def js_run_devserver(
 
             See https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary
     """
-    js_run_devserver_internal(
-        name,
-        tool,
-        command,
-        grant_sandbox_write_permissions,
-        use_execroot_entry_point,
-        allow_execroot_entry_point_with_no_copy_data_to_bin,
-        **kwargs
-    )
-
-def js_run_devserver_internal(
-        name,
-        tool = None,
-        command = None,
-        grant_sandbox_write_permissions = False,
-        use_execroot_entry_point = True,
-        allow_execroot_entry_point_with_no_copy_data_to_bin = False,
-        **kwargs):
-    """
-    Internal version of js_run_devserver.
-
-    This macro can be configured with the underlying js_run_devserver rule to
-    execute using the 'rule_to_execute' parameter, allowing for a test rule to
-    be used instead of the default '_js_run_devserver' rule.
-
-    However, confusingly, if 'rule_to_execute' is made into a named parameter of
-    this macro, we get an error saying "js_run_devserver_internal() got multiple
-    values for parameter 'rule_to_execute'." Hence, it is undocumented in the
-    args list below.
-
-    Args:
-        name: Name for the target.
-        tool: See js_run_devserver.
-        command: See js_run_devserver.
-        grant_sandbox_write_permissions: See js_run_devserver.
-        use_execroot_entry_point: See js_run_devserver.
-        allow_execroot_entry_point_with_no_copy_data_to_bin: See js_run_devserver.
-        **kwargs: See js_run_devserver.
-    """
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
 
-    # Weirdly, if 'rule_to_execute' is made into a named parameter of this
-    # macro, we get an error saying "js_run_devserver_internal() got multiple
-    # values for parameter 'rule_to_execute'." Popping it off kwargs instead
+    # Allow the js_run_devserver rule to execute to be overridden for tests
     rule_to_execute = kwargs.pop("rule_to_execute", _js_run_devserver)
 
     rule_to_execute(
