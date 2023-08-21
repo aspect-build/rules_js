@@ -87,6 +87,7 @@ _BZL_LIBRARY_TMPL = \
 """
 
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
+_RESOLVED_JSON_FILENAME = "resolved.json"
 
 ################################################################################
 # TODO: move to bazel-lib?
@@ -989,6 +990,14 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                         repo_package_json_bzl = repo_package_json_bzl,
                     ),
                 ]))
+                resolved_json_file_path = paths.normalize(paths.join(link_package, _import.package, _RESOLVED_JSON_FILENAME))
+                rctx.file(resolved_json_file_path, json.encode({
+                    # Allow consumers to auto-detect this filetype
+                    "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
+                    "version": _import.version,
+                    "integrity": _import.integrity,
+                }))
+                rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_file_path))
 
     if len(stores_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if is_root:""")
