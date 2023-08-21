@@ -963,10 +963,18 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                         package_scope = package_scope,
                     ))
         for link_package in _import.link_packages.keys():
+            build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
+            if build_file not in rctx_files:
+                rctx_files[build_file] = []
+            resolved_json_file_path = paths.normalize(paths.join(link_package, _import.package, _RESOLVED_JSON_FILENAME))
+            rctx.file(resolved_json_file_path, json.encode({
+                # Allow consumers to auto-detect this filetype
+                "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
+                "version": _import.version,
+                "integrity": _import.integrity,
+            }))
+            rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_file_path))
             if _import.package_info.get("has_bin"):
-                build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
-                if build_file not in rctx_files:
-                    rctx_files[build_file] = []
                 if rctx.attr.generate_bzl_library_targets:
                     rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
                     rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
@@ -990,14 +998,6 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
                         repo_package_json_bzl = repo_package_json_bzl,
                     ),
                 ]))
-                resolved_json_file_path = paths.normalize(paths.join(link_package, _import.package, _RESOLVED_JSON_FILENAME))
-                rctx.file(resolved_json_file_path, json.encode({
-                    # Allow consumers to auto-detect this filetype
-                    "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
-                    "version": _import.version,
-                    "integrity": _import.integrity,
-                }))
-                rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_file_path))
 
     if len(stores_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if is_root:""")
