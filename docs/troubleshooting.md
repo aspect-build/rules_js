@@ -87,12 +87,10 @@ https://github.com/aspect-build/rules_js/blob/a8c192eed0e553acb7000beee00c60d60a
 #### It's a plugin
 
 Sometimes the package intentionally doesn't list dependencies, because it discovers them at runtime.
-`eslint` and `prettier` are common typical examples.
+This is used for tools that locate their "plugins"; `eslint` and `prettier` are common typical examples.
 
 The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#public-hoist-pattern).
-Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages). This makes the `require` statement appear in the
-"public" root of the `node_modules` tree, so the resolution algorithm will search sibling packages.
-
+Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages).
 The documentation says the value provided to each element in the map is:
 
 >  a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
