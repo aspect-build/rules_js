@@ -115,6 +115,9 @@ npm_translate_lock(
 )
 ```
 
+Note that `public_hoist_packages` affects the layout of the `node_modules` tree, but you still need
+to depend on that hoisted package, e.g. with `deps = [":node_modules/hoisted_pkg"]`. Continuing the example:
+
 `BUILD`
 
 ```starlark
@@ -126,9 +129,6 @@ eslint_bin.eslint_test(
     ],
 )
 ```
-
-Note that `public_hoist_packages` affects the layout of the `node_modules` tree, but you still need
-to depend on that hoisted package, e.g. with `deps = [":node_modules/hoisted_pkg"]`.
 
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
