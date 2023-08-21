@@ -93,12 +93,42 @@ The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#pub
 Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages). This makes the `require` statement appear in the
 "public" root of the `node_modules` tree, so the resolution algorithm will search sibling packages.
 
+The documentation says the value provided to each element in the map is:
+
+>  a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
+
+To make plugins work, you should have the Bazel package containing the pnpm workspace root (the folder containing `pnpm-lock.yaml`) in this list.
+This ensures that the tool in the pnpm virtual store `node_modules/.aspect_rules_js` will be able to locate the plugins.
+If your lockfile is in the root of the Bazel workspace, this value should be an empty string: `""`.
+If the lockfile is in `some/subpkg/pnpm-lock.yaml` then `"some/subpkg"` should appear in the list.
+
+For example:
+
+`WORKSPACE`
+
+```starlark
+npm_translate_lock(
+    ...
+    public_hoist_packages = {
+        "eslint-config-react-app": [""],
+    },
+)
+```
+
+`BUILD`
+
+```starlark
+eslint_bin.eslint_test(
+    ...
+    data = [
+        ...
+        "//:node_modules/eslint-config-react-app",
+    ],
+)
+```
+
 Note that `public_hoist_packages` affects the layout of the `node_modules` tree, but you still need
 to depend on that hoisted package, e.g. with `deps = [":node_modules/hoisted_pkg"]`.
-
-Example:
-
-https://github.com/aspect-build/bazel-examples/blob/75bbf7b5f4ed9c9c0e4901e52c8fe610ea680621/react-cra/MODULE.bazel#L20-L23
 
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
