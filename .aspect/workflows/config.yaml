@@ -99,5 +99,3 @@ workspaces:
 tasks:
     buildifier:
     test:
-        flags:
-            - --remote_default_exec_properties=cache-silo-key="74aed5f7"
