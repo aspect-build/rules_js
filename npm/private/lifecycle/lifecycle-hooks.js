@@ -129,15 +129,29 @@ function isWindows() {
 }
 
 async function main(args) {
-    if (args.length !== 3) {
+    if (args.length < 3) {
         console.error(
-            'Usage: node lifecycle-hooks.js [packageName] [packageDir] [outputDir]'
+            'Usage: node lifecycle-hooks.js [packageName] [packageDir] [outputDir] [--arch=...]? [--platform=...]?'
         )
         process.exit(1)
     }
     const packageName = args[0]
     const packageDir = args[1]
     const outputDir = args[2]
+
+    let platform = null
+    let arch = null
+    // This is naive "parsing" of the argv, but allows to avoid bringing in additional dependencies:
+    for (let i = 3; i < args.length; ++i) {
+        let found = args[i].match(/--arch=(.*)/)
+        if (found) {
+            arch = found[1]
+        }
+        found = args[i].match(/--platform=(.*)/)
+        if (found) {
+            platform = found[1]
+        }
+    }
 
     await copyPackageContents(packageDir, outputDir)
 
@@ -173,6 +187,8 @@ async function main(args) {
         pkgRoot: path.resolve(outputDir),
         rawConfig: {
             stdio: 'inherit',
+            platform: platform,
+            arch: arch,
         },
         silent: false,
         stdio: 'inherit',

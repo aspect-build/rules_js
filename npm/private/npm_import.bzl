@@ -155,8 +155,16 @@ def npm_imported_package_store(
             args = [
                 "{package}",
                 "../../../$(execpath {npm_package_target_lc})",
-                "../../../$(@D)",
-            ],
+                "../../../$(@D)"] +
+                select({{
+                  "@platforms//os:osx": ["--platform=darwin"],
+                  "@platforms//os:linux": ["--platform=linux"],
+                  "@platforms//os:windows": ["--platform=win32"],
+                }}) +
+                select({{
+                  "@platforms//cpu:arm64": ["--arch=arm64"],
+                  "@platforms//cpu:x86_64": ["--arch=x64"],
+                }}),
             copy_srcs_to_bin = False,
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
             out_dirs = ["{lifecycle_output_dir}"],
