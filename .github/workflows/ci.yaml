@@ -52,9 +52,8 @@ jobs:
               run: echo "config=local" >> $GITHUB_OUTPUT
             - id: rbe
               run: echo "config=rbe" >> $GITHUB_OUTPUT
-              # Only run on main branch (or PR branches that contain 'rbe') to reduce the matrix size for PRs
               # Don't run RBE if there are no EngFlow creds which is the case on forks
-              if: (github.ref == 'refs/heads/main' || contains(github.head_ref, 'rbe')) && env.ENGFLOW_PRIVATE_KEY != ''
+              if: env.ENGFLOW_PRIVATE_KEY != ''
         outputs:
             # Will look like ["local", "rbe"]
             config: ${{ toJSON(steps.*.outputs.config) }}
@@ -186,9 +185,8 @@ jobs:
                     - os: macos-latest
                     # Exclude bazel 7 by default, will opt-in to includes
                     - bazelversion: 7.0.0-pre.20230524.3
-                    # Don't test RBE with Bazel 5 (not supported)
+                    # Exclude RBE by default, will opt-in to includes
                     - config: rbe
-                      bazelversion: 5.4.1
                     # Don't run bzlmod smoke test with Bazel 5 (not supported) or without bzlmod enabled
                     - bazelversion: 5.4.1
                       folder: e2e/bzlmod
@@ -232,6 +230,10 @@ jobs:
                       bazelversion: 7.0.0-pre.20230524.3
                       folder: .
                       bzlmodEnabled: true
+                    - os: ubuntu-latest
+                      config: rbe
+                      bazelversion: 6.2.0
+                      folder: .
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
