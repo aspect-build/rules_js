@@ -1,7 +1,7 @@
 {
     "dependencies": {
         "acorn": "8.8.2",
-        "tar": "6.1.13",
+        "tar": "6.1.15",
         "tar-stream": "3.0.0"
     }
 }

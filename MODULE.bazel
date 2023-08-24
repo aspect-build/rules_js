@@ -10,9 +10,9 @@ module(
 # Do not bump these unless rules_js requires a newer version to function.
 bazel_dep(name = "aspect_bazel_lib", version = "1.31.2")
 bazel_dep(name = "bazel_features", version = "0.1.0")
-bazel_dep(name = "bazel_skylib", version = "1.4.1")
-bazel_dep(name = "rules_nodejs", version = "5.8.2")
-bazel_dep(name = "platforms", version = "0.0.4")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+bazel_dep(name = "rules_nodejs", version = "5.8.3")
+bazel_dep(name = "platforms", version = "0.0.7")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(node, "nodejs_linux_amd64")
@@ -34,8 +34,8 @@ use_repo(pnpm, "pnpm", "pnpm__links")
 ####### Dev dependencies ########
 
 bazel_dep(name = "gazelle", version = "0.32.0", dev_dependency = True, repo_name = "bazel_gazelle")
-bazel_dep(name = "buildifier_prebuilt", version = "6.1.0", dev_dependency = True)
-bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "6.1.2", dev_dependency = True)
+bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.2", dev_dependency = True)
 
 ext = use_extension(
     "@aspect_bazel_lib//lib:extensions.bzl",

@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 60d08949101fc004c7564f98037b7764
+packageExtensionsChecksum: 2748cb8b0b0bbbc1945ad41d572bc9af
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -90,8 +90,8 @@ importers:
         specifier: 2.70.2
         version: 2.70.2
       uvu:
-        specifier: 0.5.3
-        version: 0.5.3
+        specifier: 0.5.6
+        version: 0.5.6
 
   examples/npm_package/libs/lib_a:
     dependencies:
@@ -133,8 +133,8 @@ importers:
         specifier: 2.2.0
         version: 2.2.0(webpack@5.76.3)
       mini-css-extract-plugin:
-        specifier: 2.7.5
-        version: 2.7.5(webpack@5.76.3)
+        specifier: 2.7.6
+        version: 2.7.6(webpack@5.76.3)
       webpack:
         specifier: 5.76.3
         version: 5.76.3(webpack-cli@5.0.1)
@@ -175,7 +175,7 @@ importers:
         version: 15.0.0(rollup@2.79.1)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.1)(tslib@2.6.2)(typescript@4.9.5)
       '@types/archiver':
         specifier: 5.3.1
         version: registry.npmjs.org/@types/archiver@5.3.1
@@ -189,8 +189,8 @@ importers:
         specifier: 2.79.1
         version: 2.79.1
       tslib:
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.6.2
+        version: 2.6.2
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -201,8 +201,8 @@ importers:
         specifier: 8.8.2
         version: 8.8.2
       tar:
-        specifier: 6.1.13
-        version: 6.1.13
+        specifier: 6.1.15
+        version: 6.1.15
       tar-stream:
         specifier: 3.0.0
         version: 3.0.0
@@ -227,7 +227,7 @@ importers:
         version: 0.2.0(rollup@2.79.1)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.1)(tslib@2.6.2)(typescript@4.9.5)
       '@types/google-protobuf':
         specifier: 3.15.6
         version: registry.npmjs.org/@types/google-protobuf@3.15.6
@@ -241,8 +241,8 @@ importers:
         specifier: 2.79.1
         version: 2.79.1
       tslib:
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.6.2
+        version: 2.6.2
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -277,8 +277,8 @@ importers:
         specifier: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662
         version: '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662'
       json-stable-stringify:
-        specifier: 1.0.1
-        version: 1.0.1
+        specifier: 1.0.2
+        version: 1.0.2
       lodash:
         specifier: file:vendored/lodash-4.17.21.tgz
         version: file:npm/private/test/vendored/lodash-4.17.21.tgz
@@ -292,8 +292,8 @@ importers:
         specifier: git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f
         version: github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f
       puppeteer:
-        specifier: 19.11.0
-        version: 19.11.0(bufferutil@4.0.7)(typescript@4.9.5)
+        specifier: 19.11.1
+        version: 19.11.1(bufferutil@4.0.7)(typescript@4.9.5)
       regl:
         specifier: npm:@plotly/regl@2.1.2
         version: /@plotly/regl@2.1.2
@@ -916,7 +916,7 @@ packages:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.5.0
-      tar: 6.1.13
+      tar: 6.1.15
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -1158,7 +1158,7 @@ packages:
       terser: 5.16.5
     dev: true
 
-  /@rollup/plugin-typescript@10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5):
+  /@rollup/plugin-typescript@10.0.1(rollup@2.79.1)(tslib@2.6.2)(typescript@4.9.5):
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1174,7 +1174,7 @@ packages:
       '@rollup/pluginutils': 5.0.2(rollup@2.79.1)
       resolve: 1.22.1
       rollup: 2.79.1
-      tslib: 2.6.0
+      tslib: 2.6.2
       typescript: 4.9.5
     dev: true
 
@@ -1933,7 +1933,7 @@ packages:
       promise-inflight: 1.0.1
       rimraf: 3.0.2
       ssri: 9.0.1
-      tar: 6.1.13
+      tar: 6.1.15
       unique-filename: 2.0.1
     transitivePeerDependencies:
       - bluebird
@@ -3702,6 +3702,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     dev: true
@@ -4016,6 +4017,7 @@ packages:
 
   /jose@4.12.0:
     resolution: {integrity: sha512-wW1u3cK81b+SFcHjGC8zw87yuyUweEFe0UJirrXEw1NasW00eF7sZjeG3SLBGz001ozxQ46Y9sofDvhBmWFtXQ==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4058,8 +4060,8 @@ packages:
     resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
     dev: true
 
-  /json-stable-stringify@1.0.1:
-    resolution: {integrity: sha512-i/J297TW6xyj7sDFa7AmBPkQvLIxWr2kKPWI26tXydnZrzVAocNqn5DMNT1Mzk0vit1V5UkRM7C1KdVNp7Lmcg==}
+  /json-stable-stringify@1.0.2:
+    resolution: {integrity: sha512-eunSSaEnxV12z+Z73y/j5N37/In40GK4GmsSy+tEHJMxknvqnA7/djeYtAgW0GsWHUfg+847WJjKaEylk2y09g==}
     dependencies:
       jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
     dev: true
@@ -4364,8 +4366,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /mini-css-extract-plugin@2.7.5(webpack@5.76.3):
-    resolution: {integrity: sha512-9HaR++0mlgom81s95vvNjxkg52n2b5s//3ZTI1EtzFb98awsLSivs2LMsVqnQ3ay0PVhqWcGNyDaTE961FOcjQ==}
+  /mini-css-extract-plugin@2.7.6(webpack@5.76.3):
+    resolution: {integrity: sha512-Qk7HcgaPkGG6eD77mLvZS1nmxlao3j+9PkrT9Uc7HAE1id3F41+DdBRYRYkbyfNRGzm8/YWtzhw7nVPmwhqTQw==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
       webpack: ^5.0.0
@@ -4460,8 +4462,8 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /minipass@4.2.4:
-    resolution: {integrity: sha512-lwycX3cBMTvcejsHITUgYj6Gy6A7Nh4Q6h9NP4sTHY1ccJlC7yKzDmiShEHsJ16Jf1nKGDEaiHxiltsJEvk0nQ==}
+  /minipass@5.0.0:
+    resolution: {integrity: sha512-3FnjYuehv9k6ovOEbyOswadCDPX1piCfhV8ncmYtHOjuPwylVWsghTLo7rabjC3Rx5xD4HDx8Wm1xnMF7S5qFQ==}
     engines: {node: '>=8'}
 
   /minizlib@1.3.3:
@@ -4765,7 +4767,7 @@ packages:
       request: 2.88.2
       rimraf: 3.0.2
       semver: 7.5.0
-      tar: 6.1.13
+      tar: 6.1.15
       which: 2.0.2
     dev: true
 
@@ -4782,7 +4784,7 @@ packages:
       npmlog: 6.0.2
       rimraf: 3.0.2
       semver: 7.3.8
-      tar: 6.1.13
+      tar: 6.1.15
       which: 2.0.2
     transitivePeerDependencies:
       - bluebird
@@ -4925,6 +4927,7 @@ packages:
   /object-hash@2.2.0:
     resolution: {integrity: sha512-gScRMn0bS5fH+IuwyIFgnh9zBdo4DV+6GhygmWM9HyNJSgS0hScp1f5vjtm7oIIOiT9trXrShAkLFSc2IqKNgw==}
     engines: {node: '>= 6'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4936,6 +4939,7 @@ packages:
   /oidc-token-hash@5.0.1:
     resolution: {integrity: sha512-EvoOtz6FIEBzE+9q253HsLCVRiK/0doEJ2HCvvqMQb3dHZrP3WlJKYtJ55CRTw4jmYomzH4wkPuCj/I3ZvpKxQ==}
     engines: {node: ^10.13.0 || >=12.0.0}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -5371,8 +5375,8 @@ packages:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
     engines: {node: '>=6'}
 
-  /puppeteer-core@19.11.0(bufferutil@4.0.7)(typescript@4.9.5):
-    resolution: {integrity: sha512-UBlwpyTEKcaOt7bIWWhlhIXDlFbR1wVBcxpMibBhImwagkwDB8ld8ehT5dOdfKIcCHjxXzVEaMtgDKzfwcf7Rg==}
+  /puppeteer-core@19.11.1(bufferutil@4.0.7)(typescript@4.9.5):
+    resolution: {integrity: sha512-qcuC2Uf0Fwdj9wNtaTZ2OvYRraXpAK+puwwVW8ofOhOgLPZyz1c68tsorfIZyCUOpyBisjr+xByu7BMbEYMepA==}
     engines: {node: '>=14.14.0'}
     peerDependencies:
       typescript: '>= 4.7.4'
@@ -5399,8 +5403,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /puppeteer@19.11.0(bufferutil@4.0.7)(typescript@4.9.5):
-    resolution: {integrity: sha512-xE0BTOFIR/fEXEHQNfGGMWGr3IQBB2AY760K+pE11kjBKe5P0jivzWG1LHr0TA1/xiHxu9nAhQzv5zh2Dy0YEQ==}
+  /puppeteer@19.11.1(bufferutil@4.0.7)(typescript@4.9.5):
+    resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
     requiresBuild: true
     dependencies:
       '@puppeteer/browsers': 0.5.0(typescript@4.9.5)
@@ -5408,7 +5412,7 @@ packages:
       https-proxy-agent: 5.0.1
       progress: 2.0.3
       proxy-from-env: 1.1.0
-      puppeteer-core: 19.11.0(bufferutil@4.0.7)(typescript@4.9.5)
+      puppeteer-core: 19.11.1(bufferutil@4.0.7)(typescript@4.9.5)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -6192,13 +6196,13 @@ packages:
       yallist: 3.1.1
     dev: true
 
-  /tar@6.1.13:
-    resolution: {integrity: sha512-jdIBIN6LTIe2jqzay/2vtYLlBHa3JF42ot3h1dW8Q0PaAG4v8rm0cvpVePtau5C6OKXGGcgO9q2AMNSWxiLqKw==}
+  /tar@6.1.15:
+    resolution: {integrity: sha512-/zKt9UyngnxIT/EAGYuxaMYgOIJiP81ab9ZfkILq4oNLPFX50qyYmu7jRj9qeXoxmJHjGlbH0+cm2uy1WCs10A==}
     engines: {node: '>=10'}
     dependencies:
       chownr: 2.0.0
       fs-minipass: 2.1.0
-      minipass: 4.2.4
+      minipass: 5.0.0
       minizlib: 2.1.2
       mkdirp: 1.0.4
       yallist: 4.0.0
@@ -6373,8 +6377,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib@2.6.0:
-    resolution: {integrity: sha512-7At1WUettjcSRHXCyYtTselblcHl9PJFFVKiCAy/bY97+BPZXSQ2wbq0P9s8tK2G7dFQfNnlJnPAiArVBVBsfA==}
+  /tslib@2.6.2:
+    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: true
 
   /tunnel-agent@0.6.0:
@@ -6560,8 +6564,8 @@ packages:
     hasBin: true
     dev: false
 
-  /uvu@0.5.3:
-    resolution: {integrity: sha512-brFwqA3FXzilmtnIyJ+CxdkInkY/i4ErvP7uV0DnUVxQcQ55reuHphorpF+tZoVHK2MniZ/VJzI7zJQoc9T9Yw==}
+  /uvu@0.5.6:
+    resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
     hasBin: true
     dependencies:
@@ -6977,7 +6981,6 @@ packages:
   file:npm/private/test/vendored/is-odd:
     resolution: {directory: npm/private/test/vendored/is-odd, type: directory}
     name: is-odd
-    version: 3.0.1
     engines: {node: '>=4'}
     dependencies:
       is-number: 6.0.0
@@ -6992,7 +6995,6 @@ packages:
   file:npm/private/test/vendored/semver-max:
     resolution: {directory: npm/private/test/vendored/semver-max, type: directory}
     name: semver-max
-    version: 1.0.0
     dependencies:
       is-odd: file:npm/private/test/vendored/is-odd
       semver: 5.7.1
@@ -7067,9 +7069,9 @@ packages:
       request: 2.88.2
       rfc4648: 1.5.2
       stream-buffers: 3.0.2
-      tar: 6.1.13
+      tar: 6.1.15
       tmp-promise: 3.0.3
-      tslib: 2.6.0
+      tslib: 2.6.2
       typescript: 4.9.5
       underscore: 1.13.6
       ws: 8.13.0(bufferutil@4.0.7)

@@ -9,7 +9,7 @@
     "devDependencies": {
         "@vanilla-extract/webpack-plugin": "2.2.0",
         "css-loader": "6.7.3",
-        "mini-css-extract-plugin": "2.7.5",
+        "mini-css-extract-plugin": "2.7.6",
         "webpack": "5.76.3",
         "webpack-cli": "5.0.1"
     }
