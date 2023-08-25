@@ -41,7 +41,7 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
-    name = "npm_translate_lock.generated",
+    name = "npm_link_all_packages",
     bzl_library_target = "//npm/private:npm_translate_lock_generate.docs",
 )
 

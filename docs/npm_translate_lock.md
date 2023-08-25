@@ -78,7 +78,7 @@ containing a helper starlark module `repositories.bzl`, which supplies a loadabl
 
 The generated repository also contains:
 
-- A `defs.bzl` file containing some rules such as `npm_link_all_packages`, which are [documented here](./npm_translate_lock.generated.md).
+- A `defs.bzl` file containing some rules such as `npm_link_all_packages`, which are [documented here](./npm_link_all_packages.md).
 - `BUILD` files declaring targets for the packages listed as `dependencies` or `devDependencies` in `package.json`,
   so you can declare dependencies on those packages without having to repeat version information.
 

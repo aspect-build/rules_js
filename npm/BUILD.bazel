@@ -56,40 +56,15 @@ bzl_library(
 
 bzl_library(
     name = "repositories",
-    srcs = ["repositories.bzl"],
+    srcs = [
+        "repositories.bzl",
+        # bazel_features does not provide bzl_library targets.
+        "@bazel_features//:bzl_files",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//npm/private:npm_import",
         "//npm/private:npm_translate_lock",
         "//npm/private:pnpm_repository",
     ],
-)
-
-bzl_library(
-    name = "extensions",
-    srcs = ["extensions.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":repositories",
-        "//npm/private:npm_import",
-        "//npm/private:npm_translate_lock",
-        "//npm/private:npm_translate_lock_generate",
-        "//npm/private:npm_translate_lock_macro_helpers",
-        "//npm/private:npmrc",
-        "//npm/private:transitive_closure",
-        "//npm/private:utils",
-    ],
-)
-
-bzl_library(
-    name = "npm_import",
-    srcs = ["npm_import.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [":repositories"],
-)
-
-bzl_library(
-    name = "generated",
-    srcs = ["generated.bzl"],
-    visibility = ["//visibility:public"],
 )
