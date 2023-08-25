@@ -76,9 +76,11 @@ of the [`npm_import`](./npm_import) rules. This helper generates an external rep
 containing a helper starlark module `repositories.bzl`, which supplies a loadable macro
 `npm_repositories`. That macro creates an `npm_import` for each package.
 
-The generated repository also contains `BUILD` files declaring targets for the packages
-listed as `dependencies` or `devDependencies` in `package.json`, so you can declare
-dependencies on those packages without having to repeat version information.
+The generated repository also contains:
+
+- A `defs.bzl` file containing some rules such as `npm_link_all_packages`, which are [documented here](./npm_translate_lock.generated.md).
+- `BUILD` files declaring targets for the packages listed as `dependencies` or `devDependencies` in `package.json`,
+  so you can declare dependencies on those packages without having to repeat version information.
 
 This macro creates a `pnpm` external repository, if the user didn't create a repository named
 "pnpm" prior to calling `npm_translate_lock`.

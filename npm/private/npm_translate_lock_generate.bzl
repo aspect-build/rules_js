@@ -767,20 +767,8 @@ sh_binary(
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
     npm_link_targets_bzl = [
-        """def npm_link_targets(name = "node_modules", package = None):
-    \"\"\"Generated list of target names that are linked by npm_link_all_packages()
-
-    Args:
-        name: name of catch all target to generate for all packages linked
-        package: Bazel package to generate targets names for.
-
-            Set to an empty string "" to specify the root package.
-
-            If unspecified, the current package (`native.package_name()`) is used.
-
-    Returns:
-        A list of target names that are linked by npm_link_all_packages()
-    \"\"\"
+        """\
+def npm_link_targets(name = "node_modules", package = None):
     link_packages = {link_packages}
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in link_packages
@@ -790,28 +778,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
     ]
 
     npm_link_all_packages_bzl = [
-        """def npm_link_all_packages(name = "node_modules", imported_links = []):
-    \"\"\"Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
-
-    Args:
-        name: name of catch all target to generate for all packages linked
-        imported_links: optional list link functions from manually imported packages
-            that were fetched with npm_import rules,
-
-            For example,
-
-            ```
-            load("@npm//:defs.bzl", "npm_link_all_packages")
-            load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
-
-            npm_link_all_packages(
-                name = "node_modules",
-                imported_links = [
-                    npm_link_meaning_of_life,
-                ],
-            )```
-    \"\"\"
-
+        """\
+def npm_link_all_packages(name = "node_modules", imported_links = []):
     root_package = "{root_package}"
     link_packages = {link_packages}
     is_root = native.package_name() == root_package
