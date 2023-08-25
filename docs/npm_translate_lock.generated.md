@@ -22,13 +22,28 @@ npm_link_all_packages(<a href="#npm_link_all_packages-name">name</a>, <a href="#
 
 Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
 
+    If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you can link these as well, for example,
+
+    ```
+    load("@npm//:defs.bzl", "npm_link_all_packages")
+    load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
+
+    npm_link_all_packages(
+        name = "node_modules",
+        imported_links = [
+            npm_link_meaning_of_life,
+        ],
+    )
+    ```
+
+
 **PARAMETERS**
 
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
 | <a id="npm_link_all_packages-name"></a>name |  name of catch all target to generate for all packages linked   |  <code>"node_modules"</code> |
-| <a id="npm_link_all_packages-imported_links"></a>imported_links |  optional list link functions from manually imported packages that were fetched with npm_import rules,<br><br>For example,<br><br><pre><code> load("@npm//:defs.bzl", "npm_link_all_packages") load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")<br><br>npm_link_all_packages(     name = "node_modules",     imported_links = [         npm_link_meaning_of_life,     ], )</code></pre>   |  <code>[]</code> |
+| <a id="npm_link_all_packages-imported_links"></a>imported_links |  optional list link functions from manually imported packages that were fetched with npm_import rules.   |  <code>[]</code> |
 
 
 <a id="npm_link_targets"></a>
