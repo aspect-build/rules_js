@@ -21,6 +21,11 @@ js_run_devserver_test(
         ":node_modules/@types/node",
         ":node_modules/jasmine",
     ],
+    tags = [
+        # devserver is meant to be `bazel run` locally.
+        # See https://github.com/aspect-build/rules_js/pull/1233
+        "no-remote-exec",
+    ],
     tool = ":jasmine",
 )
 
