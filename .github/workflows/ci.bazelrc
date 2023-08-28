@@ -23,16 +23,8 @@ build:rbe --genrule_strategy=remote,local
 build:rbe --host_platform=@aspect_rules_js//platforms:x86_64_linux_remote
 build:rbe --jobs=32
 
-# EngFlow remote cache
-build:rbe --bes_backend=grpcs://tourmaline.cluster.engflow.com
-build:rbe --bes_results_url=https://tourmaline.cluster.engflow.com/invocation/
-build:rbe --remote_cache=grpcs://tourmaline.cluster.engflow.com
-
-# EngFlow remote build execution
-build:rbe --remote_executor=grpcs://tourmaline.cluster.engflow.com
-
-# TODO: remove workaround for failure
-build:rbe --modify_execution_info=GoCompilePkg=+no-remote-exec
-
-# These files are written during CI setup, using secrets registered with the CI platforms
-build:rbe --tls_client_certificate=engflow.crt --tls_client_key=engflow.key
+# BuildBuddy remote exec
+build:rbe --bes_results_url=https://app.buildbuddy.io/invocation/
+build:rbe --bes_backend=grpcs://remote.buildbuddy.io
+build:rbe --remote_timeout=3600
+build:rbe --remote_executor=grpcs://remote.buildbuddy.io

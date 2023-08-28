@@ -46,15 +46,15 @@ jobs:
         # Prepares the 'config' axis of the test matrix
         runs-on: ubuntu-latest
         env:
-            ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
+            BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
         steps:
             - id: local
               run: echo "config=local" >> $GITHUB_OUTPUT
             - id: rbe
               run: echo "config=rbe" >> $GITHUB_OUTPUT
               # Only run on main branch (or PR branches that contain 'rbe') to reduce the matrix size for PRs
-              # Don't run RBE if there are no EngFlow creds which is the case on forks
-              if: (github.ref == 'refs/heads/main' || contains(github.head_ref, 'rbe')) && env.ENGFLOW_PRIVATE_KEY != ''
+              # Don't run RBE if there is no API key which is the case on forks
+              if: (github.ref == 'refs/heads/main' || contains(github.head_ref, 'rbe')) && env.BUILDBUDDY_API_KEY != ''
         outputs:
             # Will look like ["local", "rbe"]
             config: ${{ toJSON(steps.*.outputs.config) }}
@@ -288,13 +288,11 @@ jobs:
               if: matrix.config == 'rbe'
               working-directory: ${{ matrix.folder }}
               run: |
-                  touch engflow.crt engflow.key
-                  chmod 0600 engflow.crt engflow.key
-                  echo "$ENGFLOW_CLIENT_CRT" > engflow.crt
-                  echo "$ENGFLOW_PRIVATE_KEY" > engflow.key
+                  touch $HOME/.bazelrc
+                  chmod 0600 $HOME/.bazelrc
+                  echo "build --remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY" > $HOME/.bazelrc
               env:
-                  ENGFLOW_CLIENT_CRT: ${{ secrets.ENGFLOW_CLIENT_CRT }}
-                  ENGFLOW_PRIVATE_KEY: ${{ secrets.ENGFLOW_PRIVATE_KEY }}
+                  BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
 
             - name: Set bzlmod flag (for integration tests)
               # Store the --enable_bzlmod flag that we add to the test command below
