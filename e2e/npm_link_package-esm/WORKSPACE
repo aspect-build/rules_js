@@ -28,11 +28,7 @@ npm_translate_lock(
         "sharp": ["APPDATA=."],
     },
     lifecycle_hooks_execution_requirements = {
-        "sharp": [
-            # Workaround Engflow not honoring requires-network on build actions
-            "no-remote-exec",
-            "requires-network",
-        ],
+        "sharp": ["requires-network"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",

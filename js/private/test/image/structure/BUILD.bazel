@@ -26,6 +26,8 @@ js_image_layer(
     compression = "none",
     platform = ":amd64_linux",
     root = "/app",
+    # TODO: figure out why the digests_generated.sum is different on buildbuddy executors
+    tags = ["no-remote-exec"],
 )
 
 filegroup(

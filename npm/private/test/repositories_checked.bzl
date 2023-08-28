@@ -1650,7 +1650,7 @@ def npm_repositories():
             "universalify": ["0.1.2"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox", "no-remote-exec", "requires-network"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
     )
 
     npm_import(
@@ -9448,7 +9448,7 @@ def npm_repositories():
             "esbuild-windows-arm64": ["0.14.38"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox", "no-remote-exec", "requires-network"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
     )
 
     npm_import(
@@ -9513,7 +9513,7 @@ def npm_repositories():
             "@esbuild/win32-x64": ["0.16.17"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox", "no-remote-exec", "requires-network"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
     )
 
     npm_import(
@@ -18595,7 +18595,7 @@ def npm_repositories():
             "wrap-ansi": ["7.0.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox", "no-remote-exec", "requires-network"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
     )
 
     npm_import(
@@ -20318,7 +20318,7 @@ def npm_repositories():
             "file-uri-to-path": ["1.0.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox", "no-remote-exec", "requires-network"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
     )
 
     npm_import(

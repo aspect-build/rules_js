@@ -120,26 +120,18 @@ npm_translate_lock(
         "@kubernetes/client-node": [],
         "@figma/nodegit": [
             "no-sandbox",
-            # Workaround Engflow not honoring requires-network on build actions
-            "no-remote-exec",
             "requires-network",
         ],
         "esbuild": [
             "no-sandbox",
-            # Workaround Engflow not honoring requires-network on build actions
-            "no-remote-exec",
             "requires-network",
         ],
         "segfault-handler": [
             "no-sandbox",
-            # Workaround Engflow not honoring requires-network on build actions
-            "no-remote-exec",
             "requires-network",
         ],
         "puppeteer": [
             "no-sandbox",
-            # Workaround Engflow not honoring requires-network on build actions
-            "no-remote-exec",
             "requires-network",
         ],
     },
