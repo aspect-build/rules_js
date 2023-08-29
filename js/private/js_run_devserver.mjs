@@ -199,8 +199,17 @@ async function main(args, sandbox) {
 
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
-            stdio: 'inherit',
             env: env,
+
+            // Pipe stdin data to the child process rather than simply letting
+            // the child process inherit the stream and consume the data itself.
+            // If the child process consumes the data itself, then ibazel's
+            // messages like "IBAZEL_BUILD_COMPLETED SUCCESS" won't be seen by
+            // this 'js_run_devserver' process. Furthermore, we want to sync the
+            // files to the js_run_devserver's custom sandbox before alerting
+            // the child process of a successful build to allow it to read the
+            // latest files. This solves: https://github.com/aspect-build/rules_js/issues/1242
+            stdio: ['pipe', 'inherit', 'inherit'],
         })
 
         proc.on('close', (code) => {
@@ -226,13 +235,24 @@ async function main(args, sandbox) {
                             config.grant_sandbox_write_permissions
                         )
                     )
-                    // Await promise to catch any exceptions
+                    // Await promise to catch any exceptions, and wait for the
+                    // sync to be complete before writing to stdin of the child
+                    // process
                     await syncing
                 } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
                     if (process.env.JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_STARTED')
                     }
                 }
+
+                // Forward stdin to the subprocess. See comment about
+                // https://github.com/aspect-build/rules_js/issues/1242 where
+                // `proc` is spawned
+                await new Promise((resolve) => {
+                    // note: ignoring error - if this write to stdin fails,
+                    // it's probably okay. Can add error handling later if needed
+                    proc.stdin.write(chunk, resolve)
+                })
             } catch (e) {
                 console.error(
                     `An error has occurred while incrementally syncing files. Error: ${e}`
