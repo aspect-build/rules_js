@@ -95,10 +95,16 @@ def _impl(ctx):
         ),
     ]
 
-_js_run_devserver = rule(
+js_run_devserver_lib = struct(
     attrs = _attrs,
     implementation = _impl,
     toolchains = js_binary_lib.toolchains,
+)
+
+_js_run_devserver = rule(
+    attrs = js_run_devserver_lib.attrs,
+    implementation = js_run_devserver_lib.implementation,
+    toolchains = js_run_devserver_lib.toolchains,
     executable = True,
 )
 
@@ -237,7 +243,10 @@ def js_run_devserver(
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
 
-    _js_run_devserver(
+    # Allow the js_run_devserver rule to execute to be overridden for tests
+    rule_to_execute = kwargs.pop("rule_to_execute", _js_run_devserver)
+
+    rule_to_execute(
         name = name,
         enable_runfiles = select({
             "@aspect_rules_js//js:enable_runfiles": True,

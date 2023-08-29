@@ -89,6 +89,7 @@ npm_translate_lock(
         "//js/private/coverage/bundle:package.json",
         "//js/private/image:package.json",
         "//js/private/test/image:package.json",
+        "//js/private/test/js_run_devserver:package.json",
         "//js/private/worker/src:package.json",
         "//npm/private/test:package.json",
         "//npm/private/test:vendored/lodash-4.17.21.tgz",
