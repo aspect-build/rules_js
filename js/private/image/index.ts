@@ -116,10 +116,11 @@ function add_symlink(
     pkg: Pack,
     stats: HermeticStat
 ) {
+    const link_parent = path.dirname(name);
     pkg.entry({
         type: 'symlink',
         name: name.replace(/^\//, ''),
-        linkname: linkname,
+        linkname: path.relative(link_parent, linkname),
         mode: stats.mode,
         mtime: MTIME,
     }).end()

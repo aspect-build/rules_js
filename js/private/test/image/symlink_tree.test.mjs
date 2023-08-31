@@ -25,5 +25,5 @@ assert.equal(symlink.type, 'symlink')
 assert.equal(symlink.mtime.getTime(), new Date(0).getTime())
 assert.equal(
     symlink.linkname,
-    `/app/js/private/test/image/bin.runfiles/${process.env.TEST_WORKSPACE}/node_modules/.aspect_rules_js/acorn@8.8.2/node_modules/acorn`
+    `../../../../../node_modules/.aspect_rules_js/acorn@8.8.2/node_modules/acorn`
 )
