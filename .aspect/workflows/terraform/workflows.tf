@@ -11,7 +11,7 @@ data "google_compute_image" "runner_image" {
 
 module "aspect_workflows" {
   # Aspect Workflows terraform module
-  source = "gcs::https://storage.googleapis.com/storage/v1/aspect-artifacts/5.7.0/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "gcs::https://storage.googleapis.com/storage/v1/aspect-artifacts/5.7.1/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
@@ -53,12 +53,13 @@ module "aspect_workflows" {
   bk_runner_groups = {
     # The default runner group is use for the main build & test workflows.
     default = {
-      agent_idle_timeout_min = 1
-      max_runners            = 10
-      min_runners            = 0
-      queue                  = "aspect-default"
-      resource_type          = "default"
-      warming                = true
+      agent_idle_timeout_min    = 1
+      max_runners               = 10
+      min_runners               = 0
+      queue                     = "aspect-default"
+      resource_type             = "default"
+      scaling_polling_frequency = 3 # check for queued jobs every 20s
+      warming                   = true
     }
     # The warming runner group is used for the periodic warming job that creates
     # warming archives for use by other runner groups.
