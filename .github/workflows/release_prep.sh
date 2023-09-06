@@ -2,15 +2,19 @@
 
 set -o errexit -o nounset -o pipefail
 
+# Don't include e2e or examples in the distribution artifact, to reduce size
+echo >.git/info/attributes "examples export-ignore"
+# But **do** include e2e/bzlmod since the BCR wants to run presubmit test
+# and it only sees our release artifact.
+# shellcheck disable=2010
+ls e2e | grep -v bzlmod | awk 'NF{print "e2e/" $0 " export-ignore"}' >> .git/info/attributes
+
 # Set by GH actions, see
 # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 TAG=${GITHUB_REF_NAME}
 # The prefix is chosen to match what GitHub generates for source archives
 PREFIX="rules_js-${TAG:1}"
 ARCHIVE="rules_js-$TAG.tar.gz"
-# Don't include e2e or examples in the distribution artifact, to reduce size
-echo >>.git/info/attributes "e2e export-ignore"
-echo >>.git/info/attributes "examples export-ignore" 
 git archive --format=tar --prefix="${PREFIX}/" "${TAG}" | gzip > "$ARCHIVE"
 SHA=$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')
 
