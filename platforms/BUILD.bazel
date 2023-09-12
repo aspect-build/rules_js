@@ -10,33 +10,3 @@ platform(
     },
     visibility = ["//visibility:public"],
 )
-
-alias(
-    name = "os_osx",
-    actual = "@platforms//os:osx",
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "os_linux",
-    actual = "@platforms//os:linux",
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "os_windows",
-    actual = "@platforms//os:windows",
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "cpu_arm64",
-    actual = "@platforms//cpu:arm64",
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "cpu_x86_64",
-    actual = "@platforms//cpu:x86_64",
-    visibility = ["//visibility:public"],
-)
