@@ -157,13 +157,13 @@ def npm_imported_package_store(
                 "../../../$(execpath {npm_package_target_lc})",
                 "../../../$(@D)"] +
                 select({{
-                  "@platforms//os:osx": ["--platform=darwin"],
-                  "@platforms//os:linux": ["--platform=linux"],
-                  "@platforms//os:windows": ["--platform=win32"],
+                  "@aspect_rules_js//platforms:os_osx": ["--platform=darwin"],
+                  "@aspect_rules_js//platforms:os_linux": ["--platform=linux"],
+                  "@aspect_rules_js//platforms:os_windows": ["--platform=win32"],
                 }}) +
                 select({{
-                  "@platforms//cpu:arm64": ["--arch=arm64"],
-                  "@platforms//cpu:x86_64": ["--arch=x64"],
+                  "@aspect_rules_js//platforms:cpu_arm64": ["--arch=arm64"],
+                  "@aspect_rules_js//platforms:cpu_x86_64": ["--arch=x64"],
                 }}),
             copy_srcs_to_bin = False,
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
