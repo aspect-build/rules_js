@@ -66,7 +66,7 @@ To consume the downloaded package in rules, it must be "linked" into the link pa
 package's `BUILD.bazel` file:
 
 ```
-load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
+load("@npm__at_types_node_15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 
 npm_link_types_node(name = "node_modules")
 ```
