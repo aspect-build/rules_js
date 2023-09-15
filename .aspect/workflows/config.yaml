@@ -99,3 +99,11 @@ workspaces:
 tasks:
     buildifier:
     test:
+        targets:
+            - //...
+            - -//docs/...
+        bazel:
+            bazel_debug_assistance: true
+            flags:
+                - --bes_backend=grpcs://remote.buildbuddy.io
+                - --remote_header=x-buildbuddy-api-key=lsAijCKQsb4TCP8D1UvK

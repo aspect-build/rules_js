@@ -11,7 +11,7 @@ data "google_compute_image" "runner_image" {
 
 module "aspect_workflows" {
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0-rc4/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0-rc5/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
