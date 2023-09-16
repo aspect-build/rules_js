@@ -1,0 +1,29 @@
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "sources",
+    srcs = [
+        "source.txt",
+        "srcdir/source.txt",
+    ],
+)
+
+copy_to_directory(
+    name = "dir",
+    srcs = [
+        "source.txt",
+    ],
+    include_external_repositories = [
+        "repo",
+    ],
+)
+
+copy_to_bin(
+    name = "source_txt",
+    srcs = [
+        "source.txt",
+    ],
+)

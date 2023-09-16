@@ -87,3 +87,38 @@ http_archive(
 load("@container_structure_test//:repositories.bzl", "container_structure_test_register_toolchain")
 
 container_structure_test_register_toolchain(name = "container_structure_test_toolchain")
+
+## Test repo
+local_repository(
+    name = "repo",
+    path = "./repo",
+)
+
+# GRPC
+http_archive(
+    name = "rules_proto",
+    sha256 = "dc3fb206a2cb3441b485eb1e423165b231235a1ea9b031b4433cf7bc1fa460dd",
+    strip_prefix = "rules_proto-5.3.0-21.7",
+    urls = [
+        "https://github.com/bazelbuild/rules_proto/archive/refs/tags/5.3.0-21.7.tar.gz",
+    ],
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
+http_archive(
+    name = "com_google_googleapis",
+    sha256 = "65d053dbcde1b8722be785e639d69d66f245337a1bb6da716681bce2ae8d2a45",
+    strip_prefix = "googleapis-6adf7b1787284ca71b90439d886a88a239d115c4",
+    urls = ["https://github.com/googleapis/googleapis/archive/6adf7b1787284ca71b90439d886a88a239d115c4.tar.gz"],
+)
+
+load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
+
+switched_rules_by_language(
+    name = "com_google_googleapis_imports",
+)

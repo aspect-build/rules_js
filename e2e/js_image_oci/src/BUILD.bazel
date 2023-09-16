@@ -1,38 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image")
-load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
-
-js_binary(
-    name = "main",
-    args = ["foo"],
-    data = [
-        "ascii.art",
-        "//:node_modules/chalk",
-    ],
-    entry_point = "main.js",
-)
-
-# Image
-js_image_layer(
-    name = "layers",
-    binary = ":main",
-    root = "/app",
-    visibility = ["//visibility:__pkg__"],
-)
-
-oci_image(
-    name = "image",
-    # Since js_binary depends on bash we have to bring in a base image that has bash
-    base = "@debian",
-    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
-    cmd = ["/app/src/main"],
-    entrypoint = ["bash"],
-    tars = [
-        ":layers",
-    ],
-    visibility = ["//visibility:public"],
-)
 
 platform(
     name = "linux_amd64",
@@ -50,19 +18,56 @@ platform(
     ],
 )
 
-platform_transition_filegroup(
-    name = "transitioned_image",
-    srcs = [":image"],
-    target_platform = select({
+filegroup(
+    name = "proto",
+    data = ["@com_google_googleapis//google/cloud/speech/v1p1beta1:speech_proto"],
+)
+
+js_binary(
+    name = "main",
+    args = ["foo"],
+    # skip copying so we can test external source directories
+    copy_data_to_bin = False,
+    data = [
+        "ascii.art",
+        ":proto",
+        "//:node_modules/chalk",
+        "@repo//:dir",
+        "@repo//:source_txt",
+        "@repo//:sources",
+    ],
+    entry_point = "main.js",
+)
+
+# Image
+js_image_layer(
+    name = "layers",
+    binary = ":main",
+    platform = select({
         "@platforms//cpu:arm64": ":linux_arm64",
         "@platforms//cpu:x86_64": ":linux_amd64",
     }),
+    root = "/app",
+    visibility = ["//visibility:__pkg__"],
+)
+
+oci_image(
+    name = "image",
+    # Since js_binary depends on bash we have to bring in a base image that has bash
+    base = "@debian",
+    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
+    cmd = ["/app/src/main"],
+    entrypoint = ["bash"],
+    tars = [
+        ":layers",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 container_structure_test(
     name = "image_test",
     configs = ["test.yaml"],
-    image = ":transitioned_image",
+    image = ":image",
     # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
     tags = ["no-remote-exec"],
 )

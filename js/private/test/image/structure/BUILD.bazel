@@ -1,5 +1,6 @@
 load("//js:defs.bzl", "js_binary", "js_image_layer")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 
 js_binary(
     name = "bin",
@@ -62,19 +63,19 @@ genrule(
     toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
 )
 
+suffix = "" if is_bazel_6_or_greater() else "_legacy"
+
 write_source_files(
     name = "diff",
     files = {
-        "app_structure.mf": ":app_structure_generated.mf",
-        "node_modules_structure.mf": ":node_modules_structure_generated.mf",
-        "digests.sum": ":digests_generated.sum",
+        "app_structure{}.mf".format(suffix): ":app_structure_generated.mf",
+        "node_modules_structure{}.mf".format(suffix): ":node_modules_structure_generated.mf",
+        "digests{}.sum".format(suffix): ":digests_generated.sum",
     },
     tags = [
         # mode bit on files aren't stable between RBE and Local since RBE isn't aware of git which tracks permissions for files.
         # we don't care about unstable inputs because it's not our responsibility to keep them stable which would expand api surface for js_image_layer
         "no-remote-exec",
-        # node-patches_legacy is used with Bazel 5 which changes the output; no need for that test coverage
-        "no-bazel-5",
     ],
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
