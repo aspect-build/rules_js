@@ -49,63 +49,65 @@ function leftStrip(p: string, p1: string, p2: string) {
 
 async function readlinkSafe(p: string) {
     try {
-        const link = await readlink(p);
-        return path.resolve(path.dirname(p), link);
+        const link = await readlink(p)
+        return path.resolve(path.dirname(p), link)
     } catch (e) {
-        if (e.code == "EINVAL") {
-            return p;
+        if (e.code == 'EINVAL') {
+            return p
         }
-        throw e;
+        throw e
     }
 }
 
 // TODO: drop once we no longer support bazel 5
 async function resolveSymlinkLegacy(relativeP: string) {
-    let prevHop = path.resolve(relativeP);
-    let hopped = false;
-    let execrootOutOfSandbox = "";
-    let execroot = process.env.JS_BINARY__EXECROOT!;
+    let prevHop = path.resolve(relativeP)
+    let hopped = false
+    let execrootOutOfSandbox = ''
+    let execroot = process.env.JS_BINARY__EXECROOT!
     while (true) {
-        let nextHop = await readlinkSafe(prevHop);
+        let nextHop = await readlinkSafe(prevHop)
 
         if (!execrootOutOfSandbox && !nextHop.startsWith(execroot)) {
-            execrootOutOfSandbox = nextHop.replace(relativeP, "").replace(/\/$/, '');
-            prevHop = nextHop;
-            continue;
+            execrootOutOfSandbox = nextHop
+                .replace(relativeP, '')
+                .replace(/\/$/, '')
+            prevHop = nextHop
+            continue
         }
 
-        let relativeNextHop = leftStrip(nextHop, execroot, execrootOutOfSandbox);
-        let relativePrevHop = leftStrip(prevHop, execroot, execrootOutOfSandbox);
+        let relativeNextHop = leftStrip(nextHop, execroot, execrootOutOfSandbox)
+        let relativePrevHop = leftStrip(prevHop, execroot, execrootOutOfSandbox)
 
         if (relativeNextHop != relativePrevHop) {
-            prevHop = nextHop;
-            hopped = true;
-        } else if(!hopped) {
-            return undefined;
+            prevHop = nextHop
+            hopped = true
+        } else if (!hopped) {
+            return undefined
         } else {
-            return nextHop;
+            return nextHop
         }
     }
 }
 
 async function resolveSymlink(p: string) {
-    let prevHop = path.resolve(p);
-    let hopped = false;
- 
+    let prevHop = path.resolve(p)
+    let hopped = false
+
     while (true) {
         // /output-base/sandbox/4/execroot/wksp/bazel-out
         // /output-base/execroot/wksp/bazel-out
-        let nextHop = await readlinkSafe(prevHop);
+        let nextHop = await readlinkSafe(prevHop)
         if (!nextHop.startsWith(process.env.JS_BINARY__EXECROOT!)) {
-            return hopped ? prevHop : undefined;  
+            return hopped ? prevHop : undefined
         }
         if (nextHop != prevHop) {
-            prevHop = nextHop;
-            hopped = true;
-        } else if(!hopped) {
-            return undefined;
+            prevHop = nextHop
+            hopped = true
+        } else if (!hopped) {
+            return undefined
         } else {
-            return nextHop;
+            return nextHop
         }
     }
 }
@@ -226,29 +228,21 @@ function add_file(
 
 export async function build(
     entries: Entries,
-    appLayerPath: string,
-    nodeModulesLayerPath: string,
+    outputPath: string,
     compression: Compression,
     useLegacySymlinkDetection: boolean
-) { 
-    const resolveSymlinkFn = useLegacySymlinkDetection ? resolveSymlinkLegacy  : resolveSymlink;
+) {
+    const resolveSymlinkFn = useLegacySymlinkDetection
+        ? resolveSymlinkLegacy
+        : resolveSymlink
+    const output = pack()
+    const existing_paths = new Set<string>()
 
-    const app = pack()
-    const nm = pack()
-
-    const app_existing_paths = new Set<string>()
-    const nm_existing_paths = new Set<string>()
-
-    let app_output: Stream = app,
-        nm_output: Stream = nm
-
+    let write: Stream = output
     if (compression == 'gzip') {
-        app_output = app_output.pipe(createGzip())
-        nm_output = nm_output.pipe(createGzip())
+        write = write.pipe(createGzip())
     }
-
-    app_output.pipe(createWriteStream(appLayerPath))
-    nm_output.pipe(createWriteStream(nodeModulesLayerPath))
+    write.pipe(createWriteStream(outputPath))
 
     for (const key of Object.keys(entries).sort()) {
         const {
@@ -259,12 +253,6 @@ export async function build(
             root,
             remove_non_hermetic_lines,
         } = entries[key]
-
-        const output = dest.indexOf('node_modules') != -1 ? nm : app
-        const existing_paths =
-            dest.indexOf('node_modules') != -1
-                ? nm_existing_paths
-                : app_existing_paths
 
         // its a treeartifact. expand it and add individual entries.
         if (is_directory) {
@@ -370,19 +358,17 @@ export async function build(
         }
     }
 
-    app.finalize()
-    nm.finalize()
+    output.finalize()
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [entriesPath, appLayerPath, nodeModulesLayerPath, compression, useLegacySymlinkDetection] =
+    const [entriesPath, outputPath, compression, useLegacySymlinkDetection] =
         process.argv.slice(2)
     const raw_entries = await readFile(entriesPath)
     const entries: Entries = JSON.parse(raw_entries.toString())
     build(
         entries,
-        appLayerPath,
-        nodeModulesLayerPath,
+        outputPath,
         compression as Compression,
         !!useLegacySymlinkDetection
     )
