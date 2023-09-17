@@ -28,6 +28,8 @@ attributes such as `chdir` might not work properly.
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
 
+> WARNING: Structure of the resulting layers are not subject to semver guarantees and may change without a notice. However, it is guaranteed to work when provided together in the `app` and `node_modules` order
+
 **A partial example using rules_oci with transition to linux/amd64 platform.**
 
 ```starlark
@@ -203,6 +205,39 @@ def _runfiles_dir(root, default_info):
 
     return paths.join(root, runfiles.replace(".sh", ""))
 
+def _build_layer(ctx, type, entries, inputs):
+    entries_output = ctx.actions.declare_file("{}_{}_entries.json".format(ctx.label.name, type))
+    ctx.actions.write(entries_output, content = json.encode(entries))
+
+    extension = "tar.gz" if ctx.attr.compression == "gzip" else "tar"
+    output = ctx.actions.declare_file("{name}_{type}.{extension}".format(name = ctx.label.name, type = type, extension = extension))
+
+    args = ctx.actions.args()
+    args.add(entries_output)
+    args.add(output)
+    args.add(ctx.attr.compression)
+    if not is_bazel_6_or_greater():
+        args.add("true")
+
+    ctx.actions.run(
+        inputs = inputs + [entries_output],
+        outputs = [output],
+        arguments = [args],
+        executable = ctx.executable._builder,
+        progress_message = "JsImageLayer %{label}",
+        env = {
+            "BAZEL_BINDIR": ".",
+        },
+    )
+
+    return output
+
+def _should_be_in_node_modules_layer(destination, file):
+    is_node = file.owner.workspace_name != "" and "/bin/nodejs/" in destination
+    is_node_modules = "/node_modules/" in destination
+    is_js_patches = "/js/private/node-patches" in destination
+    return is_node or is_node_modules or is_js_patches
+
 def _js_image_layer_impl(ctx):
     if len(ctx.attr.binary) != 1:
         fail("binary attribute has more than one transition")
@@ -215,11 +250,15 @@ def _js_image_layer_impl(ctx):
     real_executable_path = _runfile_path(ctx, executable, runfiles_dir)
     launcher = _write_laucher(ctx, real_executable_path)
 
-    files = {}
+    all_files = depset(transitive = [default_info.files, default_info.default_runfiles.files])
 
-    files[executable_path] = {"dest": launcher.path, "root": launcher.root.path}
+    app_entries = {executable_path: {"dest": launcher.path, "root": launcher.root.path}}
+    app_inputs = [launcher]
 
-    for file in depset(transitive = [default_info.files, default_info.default_runfiles.files]).to_list():
+    node_modules_entries = {}
+    node_modules_inputs = []
+
+    for file in all_files.to_list():
         destination = _runfile_path(ctx, file, runfiles_dir)
         entry = {
             "dest": file.path,
@@ -230,34 +269,16 @@ def _js_image_layer_impl(ctx):
         }
         if destination == real_executable_path:
             entry["remove_non_hermetic_lines"] = True
-        files[destination] = entry
 
-    entries = ctx.actions.declare_file("{}_entries.json".format(ctx.label.name))
-    ctx.actions.write(entries, content = json.encode(files))
+        if _should_be_in_node_modules_layer(destination, file):
+            node_modules_entries[destination] = entry
+            node_modules_inputs.append(file)
+        else:
+            app_entries[destination] = entry
+            app_inputs.append(file)
 
-    extension = ".tar.gz" if ctx.attr.compression == "gzip" else ".tar"
-    app = ctx.actions.declare_file("{name}_app{extension}".format(name = ctx.label.name, extension = extension))
-    node_modules = ctx.actions.declare_file("{name}_node_modules{extension}".format(name = ctx.label.name, extension = extension))
-
-    args = ctx.actions.args()
-    args.add(entries)
-    args.add(app)
-    args.add(node_modules)
-    args.add(ctx.attr.compression)
-
-    if not is_bazel_6_or_greater():
-        args.add("true")
-
-    ctx.actions.run(
-        inputs = depset([executable, launcher, entries], transitive = [default_info.files, default_info.default_runfiles.files]),
-        outputs = [app, node_modules],
-        arguments = [args],
-        executable = ctx.executable._builder,
-        progress_message = "JsImageLayer %{label}",
-        env = {
-            "BAZEL_BINDIR": ".",
-        },
-    )
+    app = _build_layer(ctx, type = "app", entries = app_entries, inputs = app_inputs)
+    node_modules = _build_layer(ctx, type = "node_modules", entries = node_modules_entries, inputs = node_modules_inputs)
 
     return [
         DefaultInfo(files = depset([app, node_modules])),

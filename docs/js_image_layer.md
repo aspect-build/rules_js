@@ -34,6 +34,8 @@ attributes such as `chdir` might not work properly.
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
 
+&gt; WARNING: Structure of the resulting layers are not subject to semver guarantees and may change without a notice. However, it is guaranteed to work when provided together in the `app` and `node_modules` order
+
 **A partial example using rules_oci with transition to linux/amd64 platform.**
 
 ```starlark
