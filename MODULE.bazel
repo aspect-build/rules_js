@@ -8,7 +8,7 @@ module(
 
 # Lower-bounds for runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
-bazel_dep(name = "aspect_bazel_lib", version = "1.31.2")
+bazel_dep(name = "aspect_bazel_lib", version = "1.34.5")
 bazel_dep(name = "bazel_features", version = "0.1.0")
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 bazel_dep(name = "rules_nodejs", version = "5.8.2")
