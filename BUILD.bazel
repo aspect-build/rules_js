@@ -99,5 +99,6 @@ buildifier(
         "./.git/*",
     ],
     lint_mode = "warn",
+    lint_warnings = ["-out-of-order-load"],  #TODO: enable out-of-order-load
     mode = "diff",
 )
