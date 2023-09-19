@@ -44,6 +44,6 @@ def rules_js_dev_dependencies():
         sha256 = "72b5bb0853aac597cce6482ee6c62513318e7f2c0050bc7c319d75d03d8a3875",
         strip_prefix = "buildifier-prebuilt-6.3.3",
         urls = [
-            "http://github.com/keith/buildifier-prebuilt/archive/6.3.3.tar.gz",
+            "https://github.com/keith/buildifier-prebuilt/archive/6.3.3.tar.gz",
         ],
     )
