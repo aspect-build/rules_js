@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 2748cb8b0b0bbbc1945ad41d572bc9af
+packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -282,6 +282,9 @@ importers:
       handlebars-helpers/helper-date:
         specifier: github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55
         version: github.com/coda/helper-date/a2cb4284148cbba7d36173dff4c7c60ce59eae55
+      hot-shots:
+        specifier: 10.0.0
+        version: 10.0.0
       inline-fixtures:
         specifier: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662
         version: '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662'
@@ -3709,6 +3712,16 @@ packages:
     hasBin: true
     dev: true
 
+  /hot-shots@10.0.0:
+    resolution: {integrity: sha512-uy/uGpuJk7yuyiKRfZMBNkF1GAOX5O2ifO9rDCaX9jw8fu6eW9QeWC7WRPDI+O98frW1HQgV3+xwjWsZPECIzQ==}
+    engines: {node: '>=10.0.0'}
+    optionalDependencies:
+      unix-dgram: 2.0.6
+    transitivePeerDependencies:
+      - bluebird
+      - supports-color
+    dev: true
+
   /hsluv@0.0.3:
     resolution: {integrity: sha512-08iL2VyCRbkQKBySkSh6m8zMUa3sADAxGVWs3Z1aPcUkTJeK0ETG4Fc27tEmQBGUAXZjIsXOZqBvacuVNSC/fQ==}
     dev: true
@@ -6610,6 +6623,20 @@ packages:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
     dev: true
+
+  /unix-dgram@2.0.6:
+    resolution: {integrity: sha512-AURroAsb73BZ6CdAyMrTk/hYKNj3DuYYEuOaB8bYMOHGKupRNScw90Q5C71tWJc3uE7dIeXRyuwN0xLLq3vDTg==}
+    engines: {node: '>=0.10.48'}
+    requiresBuild: true
+    dependencies:
+      bindings: 1.5.0
+      nan: 2.17.0
+      node-gyp: 9.3.0
+    transitivePeerDependencies:
+      - bluebird
+      - supports-color
+    dev: true
+    optional: true
 
   /unquote@1.1.1:
     resolution: {integrity: sha512-vRCqFv6UhXpWxZPyGDh/F3ZpNv8/qo7w6iufLpQg9aKnQ71qM4B5KiI7Mia9COcjEhrO9LueHpMYjYzsWH3OIg==}

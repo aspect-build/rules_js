@@ -58,6 +58,7 @@ build_test(
         ":node_modules/debug",
         ":node_modules/esbuild",
         ":node_modules/handlebars-helpers/helper-date",
+        ":node_modules/hot-shots",
         ":node_modules/inline-fixtures",
         ":node_modules/json-stable-stringify",
         ":node_modules/lodash",  # lodash is brought in as a vendored .tgz file: vendored/lodash-4.17.21.tgz
