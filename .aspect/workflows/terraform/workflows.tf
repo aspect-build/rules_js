@@ -6,12 +6,12 @@ data "google_compute_image" "runner_image" {
   # https://github.com/aspect-build/workflows-images for example packer scripts and BUILD targets
   # for building GCP images for Workflows.
   project = "aspect-workflows-images"
-  name    = "aspect-workflows-ubuntu-2304-docker-gcc-make-1-1-0"
+  name    = "aspect-workflows-ubuntu-2304-docker-gcc-make-1-3-0"
 }
 
 module "aspect_workflows" {
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0-rc7/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0-rc8/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
