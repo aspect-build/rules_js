@@ -95,7 +95,10 @@ workspaces:
     # No test targets. Requires running test.sh.
     # - e2e/webpack_devserver:
     # - e2e/webpack_devserver_esm:
-
+bazel:
+    flags:
+        - --remote_download_minimal
+        - --nobuild_runfile_links
 tasks:
     buildifier:
     test:
