@@ -906,7 +906,7 @@ def npm_import(
 
     ```starlark
     npm_import(
-        name = "npm__at_types_node_15.12.2",
+        name = "npm__at_types_node__15.12.2",
         package = "@types/node",
         version = "15.12.2",
         integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
