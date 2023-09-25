@@ -24,6 +24,11 @@
                     "node-gyp": "*"
                 }
             },
+            "unix-dgram": {
+                "dependencies": {
+                    "node-gyp": "*"
+                }
+            },
             "@kubernetes/client-node": {
                 "//1": "these deps are from devDependencies of @kubernetes/client-node and needed for 'prepare' lifecycle hook",
                 "//2": "https://github.com/kubernetes-client/javascript/blob/fc681991e61c6808dd26012a2331f83671a11218/package.json",
