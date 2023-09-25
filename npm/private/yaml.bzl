@@ -31,7 +31,7 @@ def parse(yaml):
     """
     yaml = _normalize_yaml(yaml)
 
-    starlark = {"result": None}
+    starlark = {"result": None, "error": None}
     stack = []
     stack.append(_new_CONSUME_SPACE(indent = ""))
 
@@ -54,6 +54,11 @@ def parse(yaml):
         else:
             msg = "Unknown state {}".format(state["id"])
             fail(msg)
+
+        if starlark["error"] != None:
+            # buildifier: disable=print
+            print("YAML parse error: ", starlark["error"])
+            return None
 
     return starlark["result"]
 
@@ -278,6 +283,10 @@ def _handle_PARSE_MULTILINE_STRING(state, input, stack, starlark):
         state["buffer"] += input
 
 def _handle_CONSUME_SPACE_FLOW(_, input, stack, starlark):
+    if input == EOF:
+        starlark["error"] = "Unexpected EOF"
+        return
+
     if input.isspace():
         pass
     elif input == "[":
@@ -338,6 +347,10 @@ def _handle_CONSUME_SPACE_FLOW(_, input, stack, starlark):
         ))
 
 def _handle_PARSE_NEXT_FLOW(state, input, stack, starlark):
+    if input == EOF:
+        starlark["error"] = "Unexpected EOF"
+        return
+
     if input == "[":
         fail("Unhandled case")
     elif input == "," and _in_flow_sequence(stack):
@@ -461,13 +474,16 @@ def _initialize_result_value(starlark, stack):
         for (i, state) in enumerate(kns_states[0:-1]):
             if type(curr_result) == "dict":
                 curr_result = curr_result.setdefault(state["key"], _empty_value_for_state(kns_states[i + 1]))
-            else:
+            elif type(curr_result) == "list":
                 if not "index" in state:
                     fail("Invalid yaml state under {}".format(_stack_path(stack)))
 
                 if state["index"] >= len(curr_result):
                     curr_result.append(_empty_value_for_state(kns_states[i + 1]))
                 curr_result = curr_result[state["index"]]
+            else:
+                starlark["error"] = "Unknown result state: " + curr_result
+                return
 
 def _stack_path(stack):
     p = []
@@ -489,8 +505,11 @@ def _set_result_value(starlark, stack, value):
                 curr_result = curr_result[state["index"]]
         if type(curr_result) == "dict":
             curr_result[kns_states[-1]["key"]] = value
-        else:
+        elif type(curr_result) == "list":
             curr_result.append(value)
+        else:
+            starlark["error"] = "Unknown result state: " + curr_result + " for value " + value
+            return
 
 def _empty_value_for_state(state):
     if state["id"] == _STATE.KEY:

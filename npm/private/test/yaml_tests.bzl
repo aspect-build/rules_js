@@ -482,6 +482,50 @@ packages:
 
     return unittest.end(env)
 
+def _parse_conflict(ctx):
+    env = unittest.begin(ctx)
+
+    # Similar test to https://github.com/pnpm/pnpm/blob/37fffbefa5a9136f2e189c01a5edf3c00ac48018/packages/supi/test/lockfile.ts#L1237C1-L1249C13
+    asserts.equals(env, None, parse("""\
+importers:
+  .:
+    dependencies:
+<<<<< HEAD
+      dep-of-pkg-with-1-dep: 100.0.0
+=====
+      dep-of-pkg-with-1-dep: 100.1.0
+>>>>> next
+    specifiers:
+      dep-of-pkg-with-1-dep: '>100.0.0'
+lockfileVersion: 123
+packages:
+<<<<<<< HEAD
+"""))
+
+    return unittest.end(env)
+
+def _parse_errors(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(env, None, parse("""\
+asdljfk
+            sdlkfdslkjf
+    -
+    +
+    [-
+  -- sldkjf
+"""))
+
+    asserts.equals(env, None, parse("""\
+[asdljfk
+"""))
+
+    asserts.equals(env, None, parse("""\
+a: [
+"""))
+
+    return unittest.end(env)
+
 parse_basic_test = unittest.make(
     _parse_basic_test_impl,
     attrs = {},
@@ -511,6 +555,14 @@ parse_lockfile_test = unittest.make(
     _parse_lockfile_test_impl,
     attrs = {},
 )
+parse_conflict_test = unittest.make(
+    _parse_conflict,
+    attrs = {},
+)
+parse_errors_test = unittest.make(
+    _parse_errors,
+    attrs = {},
+)
 
 def yaml_tests(name):
     unittest.suite(
@@ -522,4 +574,6 @@ def yaml_tests(name):
         parse_mixed_test,
         parse_complex_map_test,
         parse_lockfile_test,
+        parse_conflict_test,
+        parse_errors_test,
     )
