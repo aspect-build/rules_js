@@ -1,6 +1,6 @@
 """Mirror npm registry metadata for the pnpm package.
 
-Update with: 
+Update with:
 curl --silent https://registry.npmjs.org/pnpm | jq '[.versions[] | select(.version | test("^[0-9.]+$")) | {key: .version, value: .dist.integrity}] | sort_by(.key | split(".") | map(tonumber)) | from_entries'
 """
 PNPM_VERSIONS = {
@@ -744,6 +744,9 @@ PNPM_VERSIONS = {
     "7.33.1": "sha512-+eL8qbdPEQVBhh7MHurn8Mx7c71zdYNVV47IHecz/5+ONEe7AX3xuSqbbQPgmJnU3EBEnCAZHOGhRJi7CCV0qA==",
     "7.33.2": "sha512-rDTWdW6vMPTI7B01byiA3rZa0tCnoMFwX8oT88R9ouvnBfQ10YZuAffcKln199Sw7Oes0t9TgbA/dFoDb6D1tQ==",
     "7.33.3": "sha512-OW5JLFmXpMqlbr3qb9wfBnJybZGtz0Y++VOGX37vNmvlQvk6kSWR0z2sPIH/TWtFC39nwBtxmvqC83gVURf6pQ==",
+    "7.33.4": "sha512-xEbf/tkwHpGM/GXq5U/sDSiE6ykLPho+o71PHNRWqkVLm6dJe4G/5Pg619Ow32ovekrr7pii5qtfamujB/+1bA==",
+    "7.33.5": "sha512-TkmfIv/+WEWqj5Rj4ThrLXLDE04OvvlAk2CthE/vApDoK0ebMusuwPMOVmB+GCDCIWeCn9YmVtQaj9DMSg9CZw==",
+    "7.33.6": "sha512-kOJ/04BH8YWD8zQveEzD8Yf01MqsievB//rhjc17Ld52eKC/I3SBvLj36OZhNfo0gDhW5OssRCzggv+rXZ0kHw==",
     "8.0.0": "sha512-Crsvd8LKb+SoEB/bQxRZrtSt5Ri8g9jmPg6MKyexMTI1pdLd44gPwVV6cZLq2jYYPv5q+gADPkYTbYr8SeFCeA==",
     "8.1.0": "sha512-e2H73wTRxmc5fWF/6QJqbuwU6O3NRVZC1G1WFXG8EqfN/+ZBu8XVHJZwPH6Xh0DxbEoZgw8/wy2utgCDwPu4Sg==",
     "8.1.1": "sha512-XLzcc4O8YrqfQ1+qjPtHGDFcdUeno2Zk+kuuSc9CagIiY8y4uhnqQ2B7jW8tgwQDNmehewGZuqrAoskgCkbTnw==",
@@ -761,4 +764,16 @@ PNPM_VERSIONS = {
     "8.6.5": "sha512-mztfvneJl4o9gCWfQlFKio6gVYhJbFazWUVBcomJ9u/yspwScHUxMyWvxOed1a543roo+aeIjp5VQkHOoTWFAg==",
     "8.6.6": "sha512-a51bIJyCmvstgCvsWf6SgZnsXfWmwAW1pHWEaH2gN3vqQGC58yLFL/oKBwcZWH0mjpMzBWRXdS9dLdN6GAK2Rw==",
     "8.6.7": "sha512-vRIWpD/L4phf9Bk2o/O2TDR8fFoJnpYrp2TKqTIZF/qZ2/rgL3qKXzHofHgbXsinwMoSEigz28sqk3pQ+yMEQQ==",
+    "8.6.8": "sha512-OtrCRUE7VqRyKly9E3gfExZHOAHtFDpmulyVFKrnl3v/n2xJckdueVumWJqUA5FHxcRP/T42r8P8CDr9duPP9w==",
+    "8.6.9": "sha512-LPEaCGvlV4dVGeJeHqi/pCR/SETooqmScv2wcr0gTqGUebpkt1w9TIEX0awLMhLO29p7pcXfz5ZO59B70Tnc0w==",
+    "8.6.10": "sha512-EBlPdgrAqmIDK6lflNm8M4lueWGM4PKJIDngt6vJ1+fmzh3e0482tg52nUjiuGvkzZ2sngA181GLqknXhAHgIg==",
+    "8.6.11": "sha512-jqknppuj45tDzJsLcLqkAxytBHZXIx9JTYkGNq0/7pSRggpio9wRxTDj4NA2ilOHPlJ5BVjB5Ij5dx65woMi5A==",
+    "8.6.12": "sha512-Eza4C5SO/Xl5IYozupbZ5NOA5leBRPYxmXmXfe7G4/4uCkRLhks84rB33aitxNZU/uMrnDGGjwrLktoKvPjqHA==",
+    "8.7.0": "sha512-HWH4wQ6KWl2/vd6g8fXvt9vVF3IjBzrslTzyMKpGQWiEuUJ6ZCHbp48orQ+T++3ji6VwgyN7NQJD3mseOoznHQ==",
+    "8.7.1": "sha512-Qbt3EhYUaXFS2k4FLQA7r2/eYz/JoDeG680/3UXG0Ga03LPuY4GgdvCLe+zO3M7ZnWG4VI4bAwk7QpJyfr5eqA==",
+    "8.7.2": "sha512-E0fFXdo0nltGZWv8zecqtfxSztAGBew1YCOIkEiwYDrWBsNp2ibSPsqlmxV3MDHn3FCMMAAl+19Zg6Sl59M1GQ==",
+    "8.7.3": "sha512-0Ao9S1gnw+3cjLDRfdrcoyyumaw5g8Qh22WIe7r+T81gf38kEqdIQy17v38CeDBIpS6OEb+JFBgdXd6CSlRfGA==",
+    "8.7.4": "sha512-/bQ5bXp8l7krhm2QXQVGuPjzNC/Z/p0fK4kw8aIrqG0YthTS9akRKGHiWyaHX623lntCriHBZZPqhbXczqSNVg==",
+    "8.7.5": "sha512-WI8WZb89Uiq5x2jdz4PcQMG9ovTnXcDCEpoEckPYIT2zD8/+dEhVozPlT7bu3WkBgE0uTARtgyIKAFt+IpW2cQ==",
+    "8.7.6": "sha512-ZJ/LpDy+IGYpCPYo2INfnw2MopUOTHQ3HcnhbiSqVLtV5rTmsrbFHe4i35ITLpcgvIWptWbzUTZ8efDYXWpFew=="
 }
