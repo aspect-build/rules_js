@@ -17,16 +17,17 @@ module "aspect_workflows" {
   network    = google_compute_network.workflows_network.id
   subnetwork = google_compute_subnetwork.workflows_subnet.id
 
-  # Number of nodes in the kubernetes cluster where the remote cache &
-  # observability services run.
-  cluster_standard_node_count = 3
+  # Number of nodes & machine type in the kubernetes cluster where the remote cache & observability
+  # services run.
+  cluster_standard_node_count        = 3
+  cluster_standard_node_machine_type = "e2-standard-2"
 
   # Remote cache configuration
   remote = {
-    cache_size_gb          = 384
     cache_shards           = 3
+    cache_size_gb          = 384
+    load_balancer_replicas = 2
     replicate_cache        = false
-    load_balancer_replicas = 1
   }
 
   # CI properties
