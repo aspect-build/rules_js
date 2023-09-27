@@ -11,7 +11,7 @@ data "google_compute_image" "runner_image" {
 
 module "aspect_workflows" {
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0-rc8/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0-rc9/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
@@ -19,8 +19,10 @@ module "aspect_workflows" {
 
   # Number of nodes & machine type in the kubernetes cluster where the remote cache & observability
   # services run.
-  cluster_standard_node_count        = 3
-  cluster_standard_node_machine_type = "e2-standard-2"
+  k8s_cluster = {
+    node_count   = 3
+    machine_type = "e2-standard-2"
+  }
 
   # Remote cache configuration
   remote = {

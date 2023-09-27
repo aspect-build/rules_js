@@ -3,6 +3,10 @@ workspaces:
     .:
         icon: js
         label: rules_js
+        tasks:
+            test:
+                coverage: true
+                upload_test_logs: executed
     e2e/bzlmod:
         icon: bazel
         tasks:
