@@ -160,10 +160,12 @@ def npm_imported_package_store(
                   "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
                   "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
                   "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
+                  "//conditions:default": [],
                 }}) +
                 select({{
                   "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
                   "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
+                  "//conditions:default": [],
                 }}),
             copy_srcs_to_bin = False,
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
