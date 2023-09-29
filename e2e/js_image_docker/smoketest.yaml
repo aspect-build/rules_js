@@ -5,3 +5,6 @@ commandTests:
       command: 'bash'
       args: ['/app/main']
       expectedOutput: ['.*WORKSPACE.*__main__', '.*main.*', '.*ARCH.*']
+    - name: 'smoke2'
+      command: '/app/main'
+      expectedOutput: ['.*WORKSPACE.*__main__', '.*main.*', '.*ARCH.*']
