@@ -17,6 +17,7 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
+        package_visibility = {package_visibility},
         npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
     )
 """
@@ -52,14 +53,13 @@ _FP_DIRECT_TMPL = \
             _npm_link_package_store(
                 name = "{{}}/{name}".format(name),
                 src = "//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
-                visibility = ["//visibility:public"],
+                visibility = {link_visibility},
                 tags = ["manual"],
                 use_declare_symlink = select({{
                     "@aspect_rules_js//js:allow_unresolved_symlinks": True,
                     "//conditions:default": False,
                 }}),
             )
-            link_targets.append(":{{}}/{name}".format(name))
 
             # filegroup target that provides a single file which is
             # package directory for use in $(execpath) and $(rootpath)
@@ -67,7 +67,7 @@ _FP_DIRECT_TMPL = \
                 name = "{{}}/{name}/dir".format(name),
                 srcs = [":{{}}/{name}".format(name)],
                 output_group = "{package_directory_output_group}",
-                visibility = ["//visibility:public"],
+                visibility = {link_visibility},
                 tags = ["manual"],
             )"""
 
@@ -391,6 +391,11 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
         if repo_name.startswith("aspect_rules_js.npm."):
             repo_name = repo_name[len("aspect_rules_js.npm."):]
 
+        # gather package visibility
+        package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
+        if len(package_visibility) == 0:
+            package_visibility = ["//visibility:public"]
+
         # gather all of the importers (workspace packages) that this npm package should be linked at which names
         link_packages = {}
         for import_path, links in importer_links.items():
@@ -470,6 +475,7 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             link_packages = link_packages,
             name = repo_name,
             package = name,
+            package_visibility = package_visibility,
             patch_args = patch_args,
             patches = patches,
             root_package = root_package,
@@ -621,9 +627,12 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patch
         repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
         repositories_bzl.append("")
 
+    repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(utils.consistent_label_str(pnpm_lock_label)))
+    repositories_bzl.append("# buildifier: disable=function-docstring")
     repositories_bzl.append("def npm_repositories():")
-    repositories_bzl.append("""    "Generated npm_import repository rules corresponding to npm packages in {}\"""".format(utils.consistent_label_str(pnpm_lock_label)))
-    repositories_bzl.append("")
+    if len(npm_imports) == 0:
+        repositories_bzl.append("    pass")
+        repositories_bzl.append("")
 
     link_packages = [_link_package(root_package, import_path) for import_path in importers.keys()]
 
@@ -768,6 +777,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
     npm_link_targets_bzl = [
         """\
+# buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None):
     link_packages = {link_packages}
     bazel_package = package if package != None else native.package_name()
@@ -779,11 +789,13 @@ def npm_link_targets(name = "node_modules", package = None):
 
     npm_link_all_packages_bzl = [
         """\
+# buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
     root_package = "{root_package}"
     link_packages = {link_packages}
-    is_root = native.package_name() == root_package
-    link = native.package_name() in link_packages
+    bazel_package = native.package_name()
+    is_root = bazel_package == root_package
+    link = bazel_package in link_packages
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: {link_packages_comma_separated}" % native.package_name()
         fail(msg)
@@ -869,6 +881,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             name = _to_apparent_repo_name(_import.name),
             npm_translate_lock_repo = _to_apparent_repo_name(rctx.name),
             package = _import.package,
+            package_visibility = _import.package_visibility,
             root_package = _import.root_package,
             url = _import.url,
             version = _import.version,
@@ -917,19 +930,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     links_bzl[link_package] = []
                 if link_package not in links_targets_bzl:
                     links_targets_bzl[link_package] = []
-                links_bzl[link_package].append("""            link_targets.append(link_{i}(name = "{{}}/{name}".format(name)))""".format(
+                links_bzl[link_package].append("""            link_{i}(name = "{{}}/{name}".format(name))""".format(
                     i = i,
                     name = link_alias,
                 ))
-                links_targets_bzl[link_package].append("""            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))""".format(
-                    i = i,
-                    name = link_alias,
-                ))
-                if len(link_alias.split("/", 1)) > 1:
-                    package_scope = link_alias.split("/", 1)[0]
-                    links_bzl[link_package].append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
-                        package_scope = package_scope,
-                    ))
+                if "//visibility:public" in _import.package_visibility:
+                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))""".format(name = link_alias)
+                    links_bzl[link_package].append(add_to_link_targets)
+                    links_targets_bzl[link_package].append(add_to_link_targets)
+                    if len(link_alias.split("/", 1)) > 1:
+                        package_scope = link_alias.split("/", 1)[0]
+                        add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(package_scope = package_scope)
+                        links_bzl[link_package].append(add_to_scoped_targets)
         for link_package in _import.link_packages.keys():
             build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
             if build_file not in rctx_files:
@@ -1003,9 +1015,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             virtual_store_root = utils.virtual_store_root,
         ))
 
+        package_visibility, _ = _gather_values_from_matching_names(True, rctx.attr.package_visibility, "*", fp_package)
+        if len(package_visibility) == 0:
+            package_visibility = ["//visibility:public"]
+
         npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
             bazel_name = fp_bazel_name,
             link_packages = fp_link_packages.keys(),
+            link_visibility = package_visibility,
             name = fp_package,
             package_directory_output_group = utils.package_directory_output_group,
             root_package = root_package,
@@ -1018,11 +1035,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             name = fp_package,
         ))
 
-        if len(fp_package.split("/", 1)) > 1:
-            package_scope = fp_package.split("/", 1)[0]
-            npm_link_all_packages_bzl.append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
-                package_scope = package_scope,
-            ))
+        if "//visibility:public" in package_visibility:
+            add_to_link_targets = """            link_targets.append(":{{}}/{name}".format(name))""".format(name = fp_package)
+            npm_link_all_packages_bzl.append(add_to_link_targets)
+            if len(fp_package.split("/", 1)) > 1:
+                package_scope = fp_package.split("/", 1)[0]
+                add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
+                    package_scope = package_scope,
+                    package_visibility = package_visibility,
+                )
+                npm_link_all_packages_bzl.append(add_to_scoped_targets)
 
     # Generate catch all & scoped npm_linked_packages target
     npm_link_all_packages_bzl.append("""

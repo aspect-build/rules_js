@@ -34,7 +34,7 @@ the package directory for creating entry points or accessing files in the packag
 | <a id="npm_link_package-deps"></a>deps |  list of npm_package_store; may only to be specified when linking in the root package   |  <code>{}</code> |
 | <a id="npm_link_package-fail_if_no_link"></a>fail_if_no_link |  whether or not to fail if this is called in a package that is not the root package and <code>link</code> is False   |  <code>True</code> |
 | <a id="npm_link_package-auto_manual"></a>auto_manual |  whether or not to automatically add a manual tag to the generated targets Links tagged "manual" dy default is desirable so that they are not built by <code>bazel build ...</code> if they are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are not fetched at all unless they are used.   |  <code>True</code> |
-| <a id="npm_link_package-visibility"></a>visibility |  the visibility of the generated targets   |  <code>["//visibility:public"]</code> |
+| <a id="npm_link_package-visibility"></a>visibility |  the visibility of the link target   |  <code>["//visibility:public"]</code> |
 | <a id="npm_link_package-kwargs"></a>kwargs |  see attributes of npm_package_store rule   |  none |
 
 **RETURNS**

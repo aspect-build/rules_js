@@ -137,6 +137,10 @@ npm_translate_lock(
         ],
     },
     npmrc = "//:.npmrc",
+    package_visibility = {
+        "unused": ["//visibility:private"],
+        "@mycorp/pkg-a": ["//examples:__subpackages__"],
+    },
     patch_args = {
         "*": ["-p1"],
         "@gregmagolan/test-a": ["-p4"],
