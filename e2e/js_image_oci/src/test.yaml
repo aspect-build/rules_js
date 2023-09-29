@@ -16,7 +16,7 @@ commandTests:
               ' SOURCE DIRECTORY CHECK    true',
           ]
     - name: 'smoke2'
-      entrypoint: '/app/src/main'
+      command: '/app/src/main'
       expectedOutput:
           [
               'OS',
