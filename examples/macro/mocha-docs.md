@@ -19,9 +19,9 @@ mocha_test(<a href="#mocha_test-name">name</a>, <a href="#mocha_test-srcs">srcs<
 | :------------- | :------------- | :------------- |
 | <a id="mocha_test-name"></a>name |  <p align="center"> - </p>   |  none |
 | <a id="mocha_test-srcs"></a>srcs |  <p align="center"> - </p>   |  none |
-| <a id="mocha_test-args"></a>args |  <p align="center"> - </p>   |  `[]` |
-| <a id="mocha_test-data"></a>data |  <p align="center"> - </p>   |  `[]` |
-| <a id="mocha_test-env"></a>env |  <p align="center"> - </p>   |  `{}` |
+| <a id="mocha_test-args"></a>args |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="mocha_test-data"></a>data |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="mocha_test-env"></a>env |  <p align="center"> - </p>   |  <code>{}</code> |
 | <a id="mocha_test-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 

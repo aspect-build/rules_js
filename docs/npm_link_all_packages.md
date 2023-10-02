@@ -11,6 +11,7 @@ For example, if you run `npm_translate_lock(name = "npm")` then these rules can 
 load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 ```
 
+
 <a id="npm_link_all_packages"></a>
 
 ## npm_link_all_packages
@@ -39,8 +40,8 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_all_packages-name"></a>name |  name of catch all target to generate for all packages linked   |  `"node_modules"` |
-| <a id="npm_link_all_packages-imported_links"></a>imported_links |  optional list link functions from manually imported packages that were fetched with npm_import rules.   |  `[]` |
+| <a id="npm_link_all_packages-name"></a>name |  name of catch all target to generate for all packages linked   |  <code>"node_modules"</code> |
+| <a id="npm_link_all_packages-imported_links"></a>imported_links |  optional list link functions from manually imported packages that were fetched with npm_import rules.   |  <code>[]</code> |
 
 
 <a id="npm_link_targets"></a>
@@ -58,8 +59,8 @@ Generated list of target names that are linked by npm_link_all_packages()
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_targets-name"></a>name |  name of catch all target to generate for all packages linked   |  `"node_modules"` |
-| <a id="npm_link_targets-package"></a>package |  Bazel package to generate targets names for.<br><br>Set to an empty string "" to specify the root package.<br><br>If unspecified, the current package (`native.package_name()`) is used.   |  `None` |
+| <a id="npm_link_targets-name"></a>name |  name of catch all target to generate for all packages linked   |  <code>"node_modules"</code> |
+| <a id="npm_link_targets-package"></a>package |  Bazel package to generate targets names for.<br><br>Set to an empty string "" to specify the root package.<br><br>If unspecified, the current package (<code>native.package_name()</code>) is used.   |  <code>None</code> |
 
 **RETURNS**
 
