@@ -14,6 +14,7 @@ js_image_layer(
 )
 ```
 
+
 <a id="js_image_layer"></a>
 
 ## js_image_layer
@@ -24,16 +25,16 @@ js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer
 
 Create container image layers from js_binary targets.
 
-By design, js_image_layer doesn't have any preference over which rule assembles the container image.
+By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
 This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
-A proper `cmd` usually looks like /`[ root of js_image_layer ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of js_binary ]`,
+A proper `cmd` usually looks like /`[ root of js_image_layer ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of js_binary ]`, 
 unless you have a launcher script that invokes the entry_point of the `js_binary` in a different path.
 On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace or __main__ if empty ]` suffix**. If `workdir` is not set correctly, some
 attributes such as `chdir` might not work properly.
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
 
-> WARNING: Structure of the resulting layers are not subject to semver guarantees and may change without a notice. However, it is guaranteed to work when provided together in the `app` and `node_modules` order
+&gt; WARNING: Structure of the resulting layers are not subject to semver guarantees and may change without a notice. However, it is guaranteed to work when provided together in the `app` and `node_modules` order
 
 **A partial example using rules_oci with transition to linux/amd64 platform.**
 
@@ -143,8 +144,8 @@ js_image_layer(
 )
 
 filegroup(
-    name = "app_tar",
-    srcs = [":layers"],
+    name = "app_tar", 
+    srcs = [":layers"], 
     output_group = "app"
 )
 container_layer(
@@ -153,8 +154,8 @@ container_layer(
 )
 
 filegroup(
-    name = "node_modules_tar",
-    srcs = [":layers"],
+    name = "node_modules_tar", 
+    srcs = [":layers"], 
     output_group = "node_modules"
 )
 container_layer(
@@ -173,6 +174,7 @@ container_image(
 )
 ```
 
+
 **ATTRIBUTES**
 
 
@@ -180,9 +182,9 @@ container_image(
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="js_image_layer-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="js_image_layer-binary"></a>binary |  Label to an js_binary target   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
-| <a id="js_image_layer-compression"></a>compression |  Compression algorithm. Can be one of `gzip`, `none`.   | String | optional |  `"gzip"`  |
-| <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
-| <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional |  `""`  |
+| <a id="js_image_layer-compression"></a>compression |  Compression algorithm. Can be one of <code>gzip</code>, <code>none</code>.   | String | optional | <code>"gzip"</code> |
+| <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional | <code>None</code> |
+| <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional | <code>""</code> |
 
 
 <a id="js_image_layer_lib.implementation"></a>
