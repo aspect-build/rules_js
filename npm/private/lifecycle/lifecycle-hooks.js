@@ -165,7 +165,6 @@ async function main(args) {
 
     // Create .bin entry point files for all packages in node_modules
     await makeBins(nodeModulesPath, '', segmentsUp)
-
     // export interface RunLifecycleHookOptions {
     //     args?: string[];
     //     depPath: string;
@@ -183,6 +182,29 @@ async function main(args) {
     //     stdio?: string;
     //     unsafePerm: boolean;
     // }
+
+    // We need to explicitly pass `npm_config_` prefixed env-variables as configuration to the lifecycle hook (or gyp).
+    // 1. rules_js allow to provide per action_type environment using `lifecycle_hooks_envs`.
+    // 2. One of the important use-cases is to able provide mirror where prebuild binaries are stored:
+    //    (see: https://github.com/mapbox/node-pre-gyp#download-binary-files-from-a-mirror
+    //    by {module_name}_binary_host_mirror)
+    // 3. Such flags are taken (by gyp) from environment variables:
+    //    https://github.com/mapbox/node-pre-gyp/blob/a74f5e367c0d71033620aa0112e7baf7f3515b9d/lib/util/versioning.js#L316
+    // 4. Unfortunetely pnpm/lifecycle drops all npm_ prefixed env-variables prior to calling lifecycle hook:
+    //      https://github.com/pnpm/npm-lifecycle/blob/99ac0429025bdf1303879723d3fbd57c585ae8a1/index.js#L351
+    //    and later recreates it based on explicitly given config:
+    //      https://github.com/pnpm/npm-lifecycle/blob/99ac0429025bdf1303879723d3fbd57c585ae8a1/index.js#L408
+    // 5. So we need to perform reversed process: generate rawConfig based on env-variables to preserve them.
+    let inherited_env = {}
+    const npm_config_prefix = 'npm_config_'
+    const config_regexp = new RegExp('^' + npm_config_prefix, 'i')
+    for (let e in process.env) {
+        if (e.match(config_regexp)) {
+            inherited_env[e.substring(npm_config_prefix.length)] =
+                process.env[e]
+        }
+    }
+
     const opts = {
         pkgRoot: path.resolve(outputDir),
 
@@ -196,11 +218,15 @@ async function main(args) {
         //   https://yarnpkg.com/package?name=prebuild-install:
         // "... you can set environment variables npm_config_build_from_source=true, npm_config_platform,
         // npm_config_arch, npm_config_target npm_config_runtime and npm_config_libc".
-        rawConfig: {
-            stdio: 'inherit',
-            platform: platform,
-            arch: arch,
-        },
+        rawConfig: Object.assign(
+            {},
+            {
+                stdio: 'inherit',
+                platform: platform,
+                arch: arch,
+            },
+            inherited_env
+        ),
         silent: false,
         stdio: 'inherit',
         rootModulesDir: nodeModulesPath,
