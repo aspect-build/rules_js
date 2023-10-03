@@ -38,7 +38,7 @@ def npm_link_package(
             Links tagged "manual" dy default is desirable so that they are not built by `bazel build ...` if they
             are unused downstream. For 3rd party deps, this is particularly important so that 3rd party deps are
             not fetched at all unless they are used.
-        visibility: the visibility of the generated targets
+        visibility: the visibility of the link target
         **kwargs: see attributes of npm_package_store rule
 
     Returns:
@@ -76,7 +76,7 @@ def npm_link_package(
             name = store_target_name,
             src = src,
             deps = deps,
-            visibility = visibility,
+            visibility = ["//visibility:public"],
             tags = tags,
             use_declare_symlink = select({
                 "@aspect_rules_js//js:allow_unresolved_symlinks": True,

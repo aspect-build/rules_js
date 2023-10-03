@@ -37,7 +37,10 @@ npm_auth_test_suite()
 write_source_files(
     name = "write_npm_translate_lock",
     files = {
+        "npm_defs_checked.bzl": "@npm//:defs.bzl",
         "repositories_checked.bzl": "@npm//:repositories.bzl",
+        "unused_links_defs_checked.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
+        "rollup_links_defs_checked.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
         "package_json_checked.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
         "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
     },
@@ -50,30 +53,11 @@ write_source_files(
 build_test(
     name = "node_modules_test",
     targets = [
-        ":node_modules/@blockprotocol/type-system-web",
-        ":node_modules/@figma/nodegit",
-        ":node_modules/@kubernetes/client-node",  # @kubernetes/client-node has a "prepare" lifecycle hook that runs tsc
-        ":node_modules/@plotly/regl",
-        ":node_modules/bufferutil",
-        ":node_modules/debug",
-        ":node_modules/esbuild",
-        ":node_modules/handlebars-helpers/helper-date",
-        ":node_modules/hot-shots",
-        ":node_modules/inline-fixtures",
-        ":node_modules/json-stable-stringify",
-        ":node_modules/lodash",  # lodash is brought in as a vendored .tgz file: vendored/lodash-4.17.21.tgz
-        ":node_modules/node-gyp",
-        ":node_modules/test-npm_package",
-        ":node_modules/plotly.js",
-        ":node_modules/protoc-gen-grpc",
-        ":node_modules/regl",
-        ":node_modules/puppeteer",  # has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
-        ":node_modules/segfault-handler",  # segfault-handler has a node-gyp install step
-        ":node_modules/semver-first-satisfied",
-        ":node_modules/syncpack",
-        ":node_modules/typescript",
-        ":node_modules/webpack-bundle-analyzer",
-        # intentionally don't include :node_modules/unused
+        # @kubernetes/client-node: has a "prepare" lifecycle hook that runs tsc
+        # lodash: brought in as a vendored .tgz file: vendored/lodash-4.17.21.tgz
+        # puppeteer: has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
+        # segfault-handler: has a node-gyp install step
+        ":node_modules",
     ],
 )
 

@@ -36,6 +36,7 @@ def _extension_impl(module_ctx):
                 npmrc = attr.npmrc,
                 npm_package_lock = attr.npm_package_lock,
                 npm_package_target_name = attr.npm_package_target_name,
+                package_visibility = attr.package_visibility,
                 patches = attr.patches,
                 patch_args = attr.patch_args,
                 pnpm_lock = attr.pnpm_lock,

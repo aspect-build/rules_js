@@ -59,6 +59,7 @@ _ATTRS = {
     "no_optional": attr.bool(),
     "npm_package_lock": attr.label(),
     "npmrc": attr.label(),
+    "package_visibility": attr.string_list_dict(),
     "patch_args": attr.string_list_dict(),
     "patches": attr.string_list_dict(),
     "pnpm_lock": attr.label(),
@@ -148,6 +149,7 @@ def npm_translate_lock(
         patches = {},
         patch_args = {"*": ["-p0"]},
         custom_postinstalls = {},
+        package_visibility = {},
         prod = False,
         public_hoist_packages = {},
         dev = False,
@@ -285,6 +287,11 @@ def npm_translate_lock(
 
             Custom postinstalls are additive and joined with ` && ` when there are multiple matches for a package.
             More specific matches are appended to previous matches.
+
+        package_visibility: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
+            to a visibility list to use for the package's generated node_modules link targets. Multiple matches are additive.
+            If there are no matches then the package's generated node_modules link targets default to public visibility
+            (`["//visibility:public"]`).
 
         prod: If True, only install `dependencies` but not `devDependencies`.
 
@@ -534,6 +541,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         patches = patches,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,
+        package_visibility = package_visibility,
         prod = prod,
         public_hoist_packages = public_hoist_packages,
         dev = dev,

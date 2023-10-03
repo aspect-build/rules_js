@@ -39,11 +39,9 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
 load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
 
-def npm_imported_package_store(
-    name,
-    visibility = ["//visibility:public"]):
-    "Generated npm_package_store targets for npm package {package}@{version}"
-
+# Generated npm_package_store targets for npm package {package}@{version}
+# buildifier: disable=function-docstring
+def npm_imported_package_store(name):
     root_package = "{root_package}"
     is_root = native.package_name() == root_package
     if not is_root:
@@ -97,7 +95,7 @@ def npm_imported_package_store(
         version = "{version}",
         dev = {dev},
         deps = deps,
-        visibility = visibility,
+        visibility = ["//visibility:public"],
         tags = ["manual"],
         use_declare_symlink = select({{
             "@aspect_rules_js//js:allow_unresolved_symlinks": True,
@@ -111,7 +109,7 @@ def npm_imported_package_store(
         name = "{{}}/dir".format(store_target_name),
         srcs = [":{{}}".format(store_target_name)],
         output_group = _utils.package_directory_output_group,
-        visibility = visibility,
+        visibility = ["//visibility:public"],
         tags = ["manual"],
     )
 
@@ -149,24 +147,25 @@ def npm_imported_package_store(
             name = "{{}}/lc".format(store_target_name),
             srcs = [
                 "{npm_package_target_lc}",
-                ":{{}}/pkg_pre_lc".format(store_target_name)
+                ":{{}}/pkg_pre_lc".format(store_target_name),
             ],
             # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
             args = [
-                "{package}",
-                "../../../$(execpath {npm_package_target_lc})",
-                "../../../$(@D)"] +
-                select({{
-                  "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
-                  "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
-                  "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
-                  "//conditions:default": [],
-                }}) +
-                select({{
-                  "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
-                  "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
-                  "//conditions:default": [],
-                }}),
+                       "{package}",
+                       "../../../$(execpath {npm_package_target_lc})",
+                       "../../../$(@D)",
+                   ] +
+                   select({{
+                       "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
+                       "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
+                       "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
+                       "//conditions:default": [],
+                   }}) +
+                   select({{
+                       "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
+                       "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
+                       "//conditions:default": [],
+                   }}),
             copy_srcs_to_bin = False,
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
             out_dirs = ["{lifecycle_output_dir}"],
@@ -186,11 +185,9 @@ def npm_imported_package_store(
             tags = ["manual"],
         )
 
-def npm_link_imported_package_store(
-    name,
-    visibility = ["//visibility:public"]):
-    "Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}"
-
+# Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
+# buildifier: disable=function-docstring
+def npm_link_imported_package_store(name):
     link_packages = {link_packages}
     if native.package_name() in link_packages:
         link_aliases = link_packages[native.package_name()]
@@ -215,7 +212,7 @@ def npm_link_imported_package_store(
         name = name,
         package = link_alias,
         src = "//{root_package}:{{}}".format(store_target_name),
-        visibility = visibility,
+        visibility = {link_visibility},
         tags = ["manual"],
         use_declare_symlink = select({{
             "@aspect_rules_js//js:allow_unresolved_symlinks": True,
@@ -229,19 +226,18 @@ def npm_link_imported_package_store(
         name = "{{}}/dir".format(name),
         srcs = [":{{}}".format(name)],
         output_group = _utils.package_directory_output_group,
-        visibility = visibility,
+        visibility = {link_visibility},
         tags = ["manual"],
     )
 
-    return ":{{}}".format(name)
+    return [":{{}}".format(name)] if {public_visibility} else []
 
+# Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
+# buildifier: disable=function-docstring
 def npm_link_imported_package(
-    name = "node_modules",
-    link = {link_default},
-    fail_if_no_link = True,
-    visibility = ["//visibility:public"]):
-    "Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}"
-
+        name = "node_modules",
+        link = {link_default},
+        fail_if_no_link = True):
     root_package = "{root_package}"
     link_packages = {link_packages}
 
@@ -266,22 +262,17 @@ def npm_link_imported_package(
             link_aliases = ["{package}"]
         for link_alias in link_aliases:
             link_target_name = "{{}}/{{}}".format(name, link_alias)
-            npm_link_imported_package_store(
-                name = link_target_name,
-                visibility = visibility,
-            )
-            link_targets.append(":{{}}".format(link_target_name))
-            if len(link_alias.split("/", 1)) > 1:
-                link_scope = link_alias.split("/", 1)[0]
-                if link_scope not in scoped_targets:
-                    scoped_targets[link_scope] = []
-                scoped_targets[link_scope].append(link_target_name)
+            npm_link_imported_package_store(name = link_target_name)
+            if {public_visibility}:
+                link_targets.append(":{{}}".format(link_target_name))
+                if len(link_alias.split("/", 1)) > 1:
+                    link_scope = link_alias.split("/", 1)[0]
+                    if link_scope not in scoped_targets:
+                        scoped_targets[link_scope] = []
+                    scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
-        npm_imported_package_store(
-            "{{}}/{package}".format(name),
-            visibility = visibility,
-        )
+        npm_imported_package_store("{{}}/{package}".format(name))
 
     return (link_targets, scoped_targets)
 """
@@ -760,22 +751,26 @@ def _impl_links(rctx):
 
     virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
 
+    public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
+
     npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
-        deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
+        deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
         npm_package_target_lc = npm_package_target_lc,
-        lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 2, quote_key = False),
+        lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 1, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
-        lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements),
+        lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 3),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
         lifecycle_output_dir = lifecycle_output_dir,
         npm_link_package_bzl = "@%s//:%s" % (rctx.name, _DEFS_BZL_FILENAME),
         link_packages = starlark_codegen_utils.to_dict_attr(link_packages, 1, quote_value = False),
+        link_visibility = rctx.attr.package_visibility,
+        public_visibility = str(public_visibility),
         package = rctx.attr.package,
         rctx_name = rctx.name,
-        ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 2, quote_key = False),
+        ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 1, quote_key = False),
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
@@ -807,6 +802,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "npm_translate_lock_repo": attr.string(),
     "transitive_closure": attr.string_list_dict(),
+    "package_visibility": attr.string_list(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
@@ -878,6 +874,7 @@ def npm_import(
         integrity = "",
         url = "",
         commit = "",
+        package_visibility = ["//visibility:public"],
         patch_args = ["-p0"],
         patches = [],
         custom_postinstall = "",
@@ -1068,6 +1065,8 @@ def npm_import(
 
         commit: Specific commit to be checked out if url is a git repository.
 
+        package_visibility: Visibility of generated node_module link targets.
+
         patch_args: Arguments to pass to the patch tool.
 
             `-p1` will usually be needed for patches generated by git.
@@ -1193,4 +1192,5 @@ def npm_import(
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         bins = bins,
         npm_translate_lock_repo = npm_translate_lock_repo,
+        package_visibility = package_visibility,
     )
