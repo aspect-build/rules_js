@@ -19,12 +19,9 @@ Since the resolution starts from the callsite, the remedy depends on where the `
 
 ### require appears in your code
 
-This is the case when you write a `config.js` file and pass it to a tool.
+This is the case when you write an `import` or `require` statement.
 
-> This is the "ideal" way for JavaScript libraries to be configured, because it allows an easy
-> "symmetry" where you `require` a library and declare your dependency on it in the same place.
-
-In this case you should add the runtime dependency to your BUILD file where the `config.js` is a source.
+In this case you should add the runtime dependency to your BUILD file alongside your source file:
 
 For example,
 
@@ -35,6 +32,16 @@ js_library(
     data = [":node_modules/foo"],  # satisfies that require
 )
 ```
+
+and also, the `foo` module should be listed in your `package.json#dependencies` since pnpm is strict
+about hoisting transitive dependencies to the root of `node_modules`.
+
+This case also includes when you run some other tool, passing it a `config.js` file.
+
+> This is the "ideal" way for JavaScript tools to be configured, because it allows an easy
+> "symmetry" where you `require` a library and declare your dependency on it in the same place.
+> When you pass a tool a `config.json` or other non-JavaScript file, and have string-typed references
+> to npm packages, you'll fall into the next case: "require appears in third-party code".
 
 ### require appears in third-party code
 
@@ -93,7 +100,7 @@ The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#pub
 Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages).
 The documentation says the value provided to each element in the map is:
 
->  a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
+> a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
 
 To make plugins work, you should have the Bazel package containing the pnpm workspace root (the folder containing `pnpm-lock.yaml`) in this list.
 This ensures that the tool in the pnpm virtual store `node_modules/.aspect_rules_js` will be able to locate the plugins.
