@@ -19,7 +19,11 @@ load(":npm_package_info.bzl", "NpmPackageInfo")
 
 # Pull in all copy_to_directory attributes except for exclude_prefixes
 copy_to_directory_lib_attrs = dict(copy_to_directory_lib.attrs)
-copy_to_directory_lib_attrs.pop("exclude_prefixes")
+copy_to_directory_lib_attrs.pop(
+    "exclude_prefixes",
+    # It was removed in bazel-lib 2.0, so default to ignoring.
+    None,
+)
 
 _NPM_PACKAGE_ATTRS = dicts.add(copy_to_directory_lib_attrs, {
     "data": attr.label_list(),

@@ -13,7 +13,7 @@ js_image_layer(
 ```
 """
 
-load("@aspect_bazel_lib//lib:paths.bzl", "to_manifest_path")
+load("@aspect_bazel_lib//lib:paths.bzl", "to_rlocation_path")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 
@@ -189,7 +189,7 @@ def _write_laucher(ctx, executable_path):
     return launcher
 
 def _runfile_path(ctx, file, runfiles_dir):
-    return paths.join(runfiles_dir, to_manifest_path(ctx, file))
+    return paths.join(runfiles_dir, to_rlocation_path(ctx, file))
 
 def _runfiles_dir(root, default_info):
     manifest = default_info.files_to_run.runfiles_manifest
