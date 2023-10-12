@@ -1,0 +1,6 @@
+sh_test(
+    name = "pnpm_install_test",
+    srcs = ["pnpm_install_test.sh"],
+    args = ["$(location @pnpm)"],
+    data = ["@pnpm"],
+)
