@@ -6,7 +6,7 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load(":repository_label_store.bzl", "repository_label_store")
-load(":npm_translate_lock_generate.bzl", "helpers")
+load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 load(":npmrc.bzl", "parse_npmrc")
 

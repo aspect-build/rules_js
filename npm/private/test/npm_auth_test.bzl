@@ -4,7 +4,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 
 load("@bazel_skylib//lib:partial.bzl", "partial")
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:npm_translate_lock_generate.bzl", "helpers")
+load("//npm/private:npm_translate_lock_helpers.bzl", "helpers")
 
 def _no_npmrc_test_impl(ctx):
     env = unittest.begin(ctx)
