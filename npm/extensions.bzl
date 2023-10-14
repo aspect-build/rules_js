@@ -4,7 +4,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
-load("//npm/private:npm_translate_lock_generate.bzl", npm_translate_lock_helpers = "helpers")
+load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
@@ -78,7 +78,7 @@ def _extension_impl(module_ctx):
                 lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
                 lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
             )
-            imports = npm_translate_lock_helpers.gen_npm_imports(
+            imports = npm_translate_lock_helpers.get_npm_imports(
                 importers = importers,
                 packages = packages,
                 patched_dependencies = lock_patched_dependencies,

@@ -29,7 +29,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load(":list_sources.bzl", "list_sources")
-load(":npm_translate_lock_generate.bzl", gen_helpers = "helpers")
+load(":npm_translate_lock_generate.bzl", "generate_repository_files")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
@@ -101,7 +101,7 @@ def _npm_translate_lock_impl(rctx):
                 # If the pnpm lock file was changed then reload it before translation
                 state.reload_lockfile()
 
-    gen_helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
+    helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
 
     helpers.verify_patches(rctx, state)
 
@@ -117,7 +117,7 @@ def _npm_translate_lock_impl(rctx):
 
     rctx.report_progress("Generating starlark for npm dependencies")
 
-    gen_helpers.generate_repository_files(
+    generate_repository_files(
         rctx,
         state.label_store.label("pnpm_lock"),
         importers,
