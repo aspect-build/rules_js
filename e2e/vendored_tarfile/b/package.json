@@ -1,0 +1,5 @@
+{
+    "dependencies": {
+        "lodash": "file:../a/lodash-4.17.21.tgz"
+    }
+}

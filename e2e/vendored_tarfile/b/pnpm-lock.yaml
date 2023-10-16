@@ -1,0 +1,18 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  lodash:
+    specifier: file:../a/lodash-4.17.21.tgz
+    version: file:../a/lodash-4.17.21.tgz
+
+packages:
+
+  file:../a/lodash-4.17.21.tgz:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:../a/lodash-4.17.21.tgz}
+    name: lodash
+    version: 4.17.21
+    dev: false
