@@ -123,8 +123,8 @@ importers:
         specifier: 1.9.2
         version: 1.9.2
       css-loader:
-        specifier: 6.7.3
-        version: 6.7.3(webpack@5.76.3)
+        specifier: 6.8.1
+        version: 6.8.1(webpack@5.76.3)
       mathjs:
         specifier: 11.4.0
         version: 11.4.0
@@ -260,7 +260,7 @@ importers:
     devDependencies:
       '@blockprotocol/type-system-web':
         specifier: https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e
-        version: '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e'
+        version: '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%252540blockprotocol/type-system-web?6526c0e'
       '@figma/nodegit':
         specifier: ^0.28.0-figma.2
         version: 0.28.0-figma.2
@@ -2348,8 +2348,8 @@ packages:
     resolution: {integrity: sha512-X1xgQhkZ9n94WDwntqst5D/FKkmiU0GlJSFZSV3kLvyJ1WC5VeyoXDOuleUD+SIuH9C7W05is++0Woh0CGfKjQ==}
     dev: true
 
-  /css-loader@6.7.3(webpack@5.76.3):
-    resolution: {integrity: sha512-qhOH1KlBMnZP8FzRO6YCH9UHXQhVMcEGLyNdb7Hv2cpcmJbW0YrddO+tG1ab5nT41KpHIYGsbeHqxB9xPu1pKQ==}
+  /css-loader@6.8.1(webpack@5.76.3):
+    resolution: {integrity: sha512-xDAXtEVGlD0gJ07iclwWVkLoZOpEvAWaSyf6W18S2pOC//K8+qUDIx8IIT3D+HjnmkJPQeesOPv5aiUaJsCM2g==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
       webpack: ^5.0.0
@@ -2357,11 +2357,11 @@ packages:
       icss-utils: 5.1.0(postcss@8.4.21)
       postcss: 8.4.21
       postcss-modules-extract-imports: 3.0.0(postcss@8.4.21)
-      postcss-modules-local-by-default: 4.0.0(postcss@8.4.21)
+      postcss-modules-local-by-default: 4.0.3(postcss@8.4.21)
       postcss-modules-scope: 3.0.0(postcss@8.4.21)
       postcss-modules-values: 4.0.0(postcss@8.4.21)
       postcss-value-parser: 4.2.0
-      semver: 7.3.8
+      semver: 7.5.0
       webpack: 5.76.3(webpack-cli@5.0.1)
     dev: false
 
@@ -5362,8 +5362,8 @@ packages:
       postcss: 8.4.21
     dev: false
 
-  /postcss-modules-local-by-default@4.0.0(postcss@8.4.21):
-    resolution: {integrity: sha512-sT7ihtmGSF9yhm6ggikHdV0hlziDTX7oFoXtuVWeDd3hHObNkcHRo9V3yg7vCAY7cONyxJC/XXCmmiHHcvX7bQ==}
+  /postcss-modules-local-by-default@4.0.3(postcss@8.4.21):
+    resolution: {integrity: sha512-2/u2zraspoACtrbFRnTijMiQtb4GW4BvatjaG/bCjYQo8kLTdevCUlwuBHx2sCnSyrI3x3qj4ZK1j5LQBgzmwA==}
     engines: {node: ^10 || ^12 || >= 14}
     peerDependencies:
       postcss: ^8.1.0
@@ -5950,6 +5950,7 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: true
 
   /semver@7.5.0:
     resolution: {integrity: sha512-+XC0AD/R7Q2mPSRuy2Id0+CGTZ98+8f+KvwirxOKIEyid+XSx6HbC63p+O4IndTHuX5Z+JxQ0TghCkO5Cg/2HA==}
@@ -5957,7 +5958,6 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
-    dev: true
 
   /serialize-javascript@6.0.0:
     resolution: {integrity: sha512-Qr3TosvguFt8ePWqsvRfrKyQXIiW+nGbYpy8XK24NQHE83caxWt+mIymTT19DGFbNWNLfEwsrkSmN64lVWB9ag==}
@@ -7126,14 +7126,14 @@ packages:
     version: 0.0.0
     dev: true
 
-  '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e':
-    resolution: {tarball: https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e}
+  '@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%252540blockprotocol/type-system-web?6526c0e':
+    resolution: {registry: https://registry.npmjs.org/, tarball: https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e}
     name: '@blockprotocol/type-system-web'
     version: 0.0.1
     dev: true
 
   '@registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662':
-    resolution: {tarball: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662}
+    resolution: {registry: https://registry.npmjs.org/, tarball: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662}
     name: inline-fixtures
     version: 1.1.0
     engines: {node: '>= 8.0.0'}
@@ -7218,7 +7218,6 @@ packages:
     id: github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218
     name: '@kubernetes/client-node'
     version: 0.18.1
-    prepare: true
     requiresBuild: true
     dependencies:
       '@types/js-yaml': registry.npmjs.org/@types/js-yaml@4.0.5
