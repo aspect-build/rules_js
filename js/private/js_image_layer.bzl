@@ -172,7 +172,8 @@ container_image(
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
 # See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
 # for why this is needed.
-_LAUNCHER_TMPL = """#!/usr/bin/env bash
+_LAUNCHER_TMPL = """\
+#!/usr/bin/env bash
 export BAZEL_BINDIR=.
 source {executable_path}
 """
