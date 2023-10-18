@@ -215,15 +215,20 @@ async function main(args) {
         // The lifecycle hooks can interpret the npm_config_arch and npm_config_platform env variables:
         //   e.g. sharp: https://github.com/lovell/sharp/blob/9c217ab580123ee14ad65d5043d74d8ea7c245e5/lib/platform.js#L12
         // The npm_config_arch & npm_config_platform conversion is obeyed by tools like prebuild-install:
-        //   https://yarnpkg.com/package?name=prebuild-install:
-        // "... you can set environment variables npm_config_build_from_source=true, npm_config_platform,
-        // npm_config_arch, npm_config_target npm_config_runtime and npm_config_libc".
+        //     https://yarnpkg.com/package?name=prebuild-install
+        //     ("... you can set environment variables npm_config_build_from_source=true, npm_config_platform"
+        //      npm_config_arch, npm_config_target npm_config_runtime and npm_config_libc").
+        // or node-pre-gyp:
+        //     https://github.com/mapbox/node-pre-gyp/blob/a74f5e367c0d71033620aa0112e7baf7f3515b9d/lib/node-pre-gyp.js#L188
+        //
         rawConfig: Object.assign(
             {},
             {
                 stdio: 'inherit',
                 platform: platform,
+                target_platform: platform, // Interpreted by https://github.com/mapbox/node-pre-gyp
                 arch: arch,
+                target_arch: arch, // node-pre-gyp
             },
             inherited_env
         ),
