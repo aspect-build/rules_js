@@ -9,7 +9,7 @@
         "debug": "3.2.7",
         "meaning-of-life": "1.0.0",
         "mobx-react": "7.3.0",
-        "mobx": "6.3.0",
+        "mobx": "6.10.2",
         "react": "17.0.2",
         "rollup": "2.70.2",
         "uvu": "0.5.3"
