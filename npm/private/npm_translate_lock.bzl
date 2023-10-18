@@ -386,6 +386,18 @@ def npm_translate_lock(
             In the future, this field may be automatically populated from information in the pnpm lock
             file. That feature is currently blocked on https://github.com/pnpm/pnpm/issues/5131.
 
+            Note: Bzlmod users must use an alternative syntax due to module extensions not supporting
+            dict-of-dict attributes:
+
+            ```
+            bins = {
+                "@foo/bar": [
+                    "foo=./foo.js",
+                    "bar=./bar.js"
+                ],
+            }
+            ```
+
         verify_node_modules_ignored: node_modules folders in the source tree should be ignored by Bazel.
 
             This points to a `.bazelignore` file to verify that all nested node_modules directories
