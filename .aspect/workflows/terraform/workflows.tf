@@ -16,7 +16,7 @@ module "aspect_workflows" {
   region  = local.region
 
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.0/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.8.2/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
@@ -66,6 +66,7 @@ module "aspect_workflows" {
       min_runners               = 0
       queue                     = "aspect-default"
       resource_type             = "default"
+      scale_out_factor          = 10
       scaling_polling_frequency = 3 # check for queued jobs every 20s
       warming                   = true
     }
