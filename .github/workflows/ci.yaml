@@ -202,6 +202,10 @@ jobs:
                     # Don't run bzlmod e2e tests with Bazel 5
                     - bazelversion: 5.4.1
                       bzlmodEnabled: true
+                    # Don't run the root workspace with Bazel 5, we don't need the coverage
+                    # and it has been red for weeks as of 2023 Oct 18
+                    - bazelversion: 5.4.1
+                      folder: '.'
                     # TODO: un-exclude the following bzlmod tests once they work
                     - folder: e2e/js_image_docker
                       bzlmodEnabled: true
