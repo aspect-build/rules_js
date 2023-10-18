@@ -15,3 +15,16 @@ commandTests:
               ' PROTO CHECK    true',
               ' SOURCE DIRECTORY CHECK    true',
           ]
+    - name: 'smoke2'
+      command: '/app/src/main'
+      expectedOutput:
+          [
+              'OS',
+              'ARCH/CPU',
+              ' WORKSPACE    js_image_oci',
+              ' TARGET    //src:main',
+              ' SOURCE CHECK    true',
+              ' DIRECTORY CHECK    true',
+              ' PROTO CHECK    true',
+              ' SOURCE DIRECTORY CHECK    true',
+          ]
