@@ -141,6 +141,7 @@ async function main(args) {
 
     let platform = null
     let arch = null
+    let libc = null
     // This is naive "parsing" of the argv, but allows to avoid bringing in additional dependencies:
     for (let i = 3; i < args.length; ++i) {
         let found = args[i].match(/--arch=(.*)/)
@@ -150,6 +151,10 @@ async function main(args) {
         found = args[i].match(/--platform=(.*)/)
         if (found) {
             platform = found[1]
+        }
+        found = args[i].match(/--libc=(.*)/)
+        if (found) {
+            libc = found[1]
         }
     }
 
@@ -229,6 +234,8 @@ async function main(args) {
                 target_platform: platform, // Interpreted by https://github.com/mapbox/node-pre-gyp
                 arch: arch,
                 target_arch: arch, // node-pre-gyp
+                libc: libc,
+                target_libc: libc, // node-pre-gyp
             },
             inherited_env
         ),
