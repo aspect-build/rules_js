@@ -140,6 +140,11 @@ def npm_imported_package_store(name):
                        "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
                        "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
                        "//conditions:default": [],
+                   }) +
+                   select({
+                       "@aspect_rules_js//platforms/libc:glibc": ["--libc=glibc"],
+                       "@aspect_rules_js//platforms/libc:musl": ["--libc=musl"],
+                       "//conditions:default": [],
                    }),
             copy_srcs_to_bin = False,
             tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
