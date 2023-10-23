@@ -20812,7 +20812,7 @@ def npm_repositories():
         integrity = "sha512-GxUu9YDXEgirwz7KQAYTXzO00w4kfF85J6gkRhGWsrKH/UGkInyai/Xoc5EVwblmWDUlZ2rPoaDE4i0NVgnT0w==",
         deps = {
             "semver": "5.7.1",
-            "semver-max": "file:npm/private/test/vendored/semver-max",
+            "semver-max": "0.0.0",
         },
         transitive_closure = {
             "semver-first-satisfied": ["1.1.0"],
@@ -25179,6 +25179,49 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__is-odd__0.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "is-odd",
+        version = "0.0.0",
+        npm_translate_lock_repo = "npm",
+        src = "//npm/private/test/vendored/is-odd",
+        dev = True,
+        generate_bzl_library_targets = True,
+        deps = {
+            "is-number": "6.0.0",
+        },
+        transitive_closure = {
+            "is-odd": ["file:npm/private/test/vendored/is-odd"],
+            "is-number": ["6.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__semver-max__0.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "semver-max",
+        version = "0.0.0",
+        npm_translate_lock_repo = "npm",
+        src = "//npm/private/test/vendored/semver-max",
+        dev = True,
+        generate_bzl_library_targets = True,
+        deps = {
+            "is-odd": "0.0.0",
+            "semver": "5.7.1",
+        },
+        transitive_closure = {
+            "semver-max": ["file:npm/private/test/vendored/semver-max"],
+            "is-odd": ["file:npm/private/test/vendored/is-odd"],
+            "semver": ["5.7.1"],
+            "is-number": ["6.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__syncpack__github.com_JamieMason_syncpack_c245af8ea73ce3345d92bbda6c684092a841e262",
         root_package = "",
         link_workspace = "",
@@ -25496,7 +25539,6 @@ def npm_repositories():
             "@types/tough-cookie": ["registry.npmjs.org/@types/tough-cookie@4.0.2"],
         },
         lifecycle_hooks = ["prepare"],
-        lifecycle_hooks_execution_requirements = [],
     )
 
     npm_import(
@@ -26055,4 +26097,41 @@ def npm_repositories():
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_mycorp_pkg-a__0.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "examples/js_binary": ["@mycorp/pkg-a"],
+            "examples/npm_deps": ["@mycorp/pkg-a"],
+        },
+        package = "@mycorp/pkg-a",
+        version = "0.0.0",
+        npm_translate_lock_repo = "npm",
+        src = "//examples/npm_package/packages/pkg_a",
+        generate_bzl_library_targets = True,
+        deps = {
+            "acorn": "8.7.1",
+            "uuid": "8.3.2",
+        },
+    )
+
+    npm_import(
+        name = "npm__test-npm_package__0.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["test-npm_package"],
+        },
+        package = "test-npm_package",
+        version = "0.0.0",
+        npm_translate_lock_repo = "npm",
+        src = "//npm/private/test/npm_package",
+        generate_bzl_library_targets = True,
+        deps = {
+            "chalk": "5.0.1",
+            "chalk-alt": "/chalk/5.1.1",
+        },
     )

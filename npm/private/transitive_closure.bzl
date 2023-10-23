@@ -44,8 +44,8 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
                 # we don't need to drill down through first-party links for the transitive closure since there are no cycles
                 # allowed in first-party links
                 continue
-            else:
-                package_info = packages[package_key]
+
+            package_info = packages[package_key]
             stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"]))
 
 def _gather_package_info(package_path, package_snapshot):
@@ -132,8 +132,8 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
         if info["resolution"].get("tarball") and info["resolution"]["tarball"].startswith("file:")
     }
     importers = {}
-    for importPath in lock_importers.keys():
-        lock_importer = lock_importers[importPath]
+    for importPath, lock_importer in lock_importers.items():
+        specifiers = {} if dev else lock_importer.get("specifiers", {})
         prod_deps = {} if dev else lock_importer.get("dependencies", {})
         dev_deps = {} if prod else lock_importer.get("devDependencies", {})
         opt_deps = {} if no_optional else lock_importer.get("optionalDependencies", {})
@@ -148,6 +148,7 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
                 all_deps[info["name"]] = info["version"]
 
         importers[importPath] = {
+            "specifiers": specifiers,
             # deps this importer should pass on if it is linked as a first-party package; this does
             # not include devDependencies
             "transitive_deps": transitive_deps,
@@ -156,8 +157,7 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
             "all_deps": all_deps,
         }
 
-    for package in packages.keys():
-        package_info = packages[package]
+    for package, package_info in packages.items():
         transitive_closure = {}
         transitive_closure[package_info["name"]] = [package_info["version"]]
         dependencies = package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])

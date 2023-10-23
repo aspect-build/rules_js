@@ -95,7 +95,9 @@ packages:
     expected = (
         {
             ".": {
-                "specifiers": {},
+                "specifiers": {
+                    "@aspect-test/a": "5.0.0"
+                },
                 "dependencies": {
                     "@aspect-test/a": "5.0.0",
                 },

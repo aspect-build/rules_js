@@ -16,8 +16,27 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
-        url = "{url}",
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}
+        {maybe_url}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",
+        {maybe_src}
+        {maybe_path}
+        {maybe_dev}
+        {maybe_commit}
+        {maybe_generate_bzl_library_targets}
+        {maybe_integrity}
+        {maybe_deps}
+        {maybe_transitive_closure}
+        {maybe_patches}
+        {maybe_patch_args}
+        {maybe_lifecycle_hooks}
+        {maybe_custom_postinstall}
+        {maybe_lifecycle_hooks_env}
+        {maybe_lifecycle_hooks_execution_requirements}
+        {maybe_bins}
+        {maybe_npm_auth}
+        {maybe_npm_auth_basic}
+        {maybe_npm_auth_username}
+        {maybe_npm_auth_password}
     )
 """
 
@@ -27,61 +46,19 @@ bin = _bin
 bin_factory = _bin_factory
 """
 
-_FP_STORE_TMPL = \
-    """
-    if is_root:
-        _npm_package_store(
-            name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
-            src = "{npm_package_target}",
-            package = "{package}",
-            version = "0.0.0",
-            deps = {deps},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-            use_declare_symlink = select({{
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }}),
-        )"""
-
-_FP_DIRECT_TMPL = \
-    """
-    for link_package in {link_packages}:
-        if link_package == native.package_name():
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{{}}/{name}".format(name),
-                src = "//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-                use_declare_symlink = select({{
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }}),
-            )
-            link_targets.append(":{{}}/{name}".format(name))
-
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{{}}/{name}/dir".format(name),
-                srcs = [":{{}}/{name}".format(name)],
-                output_group = "{package_directory_output_group}",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )"""
-
-_FP_DIRECT_TARGET_TMPL = \
-    """
-    for link_package in {link_packages}:
-        if link_package == bazel_package:
-            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))"""
-
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
     name = "{name}_bzl_library",
     srcs = ["{src}"],
     deps = ["{dep}"],
+    visibility = ["//visibility:public"],
+)
+"""
+
+_BUILD_TMPL = \
+    """alias(
+    name = "{name}",
+    actual = "{actual}",
     visibility = ["//visibility:public"],
 )
 """
@@ -97,9 +74,6 @@ def _to_apparent_repo_name(canonical_name):
 ################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
-    if link_package.startswith("../"):
-        msg = "Invalid link_package outside of the WORKSPACE: {}".format(link_package)
-        fail(msg)
     if link_package == ".":
         link_package = ""
     return link_package
@@ -258,38 +232,95 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
 
     return (registries, auth)
 
-################################################################################
-def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, registries, default_registry, npm_auth):
-    "Converts packages from the lockfile to a struct of attributes for npm_import"
-    if attr.prod and attr.dev:
-        fail("prod and dev attributes cannot both be set to true")
+def _join_path(*parts):
+    return paths.normalize(paths.join(*parts))
 
+def _get_link_path(dep_version):
+    is_link_or_file = dep_version.startswith("link:") or dep_version.startswith("file:")
+    if not is_link_or_file:
+        return None
+
+    return dep_version[5:]
+
+def _find_fp_deps(dep_version, import_path, importers):
+    if import_path in importers:
+        importer = importers.get(import_path)
+        return importer["transitive_deps"]
+
+    fail("Cannot link to external packages. Use a `file:` version protocol instead.")
+    # TODO parse third-party pnpm-lock.yaml?
+
+def _make_import_links_lookup(importers, rctx_workspace_root, root_package):
     # make a lookup table of package to link name for each importer
     importer_links = {}
+    npm_links = {}
     for import_path, importer in importers.items():
-        dependencies = importer.get("all_deps")
+        specifiers = importer["specifiers"]
+        if type(specifiers) != "dict":
+            msg = "expected dict of specifiers in processed importer '{}'".format(import_path)
+            fail(msg)
+        dependencies = importer["all_deps"]
         if type(dependencies) != "dict":
             msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
             fail(msg)
+
         links = {
             "link_package": _link_package(root_package, import_path),
         }
+
         linked_packages = {}
         for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
-                continue
             if dep_version[0].isdigit():
                 maybe_package = utils.pnpm_name(dep_package, dep_version)
             elif dep_version.startswith("/"):
                 maybe_package = dep_version[1:]
             else:
                 maybe_package = dep_version
+
             if maybe_package not in linked_packages:
                 linked_packages[maybe_package] = [dep_package]
             else:
                 linked_packages[maybe_package].append(dep_package)
+
+            if dep_version.startswith("link:"):
+                link_path = _join_path(root_package, import_path, _get_link_path(dep_version))
+                specifier = specifiers.get(dep_package)
+                link_to_workspace = specifier.startswith("workspace:")
+                if dep_version not in npm_links:
+                    deps = _find_fp_deps(dep_version, link_path, importers)
+                    if link_to_workspace:
+                        src = "//" + link_path
+                        npm_links[dep_version] = struct(
+                            dep_package = dep_package,
+                            src = src,
+                            path = None,
+                            import_paths = [],
+                            deps = deps,
+                        )
+                    else:
+                        path = _join_path(str(rctx_workspace_root), link_path)
+                        npm_links[dep_version] = struct(
+                            dep_package = dep_package,
+                            src = None,
+                            path = path,
+                            import_paths = [],
+                            deps = deps,
+                        )
+                npm_links[dep_version].import_paths.append(import_path)
+
         links["packages"] = linked_packages
         importer_links[import_path] = links
+
+    return importer_links, npm_links
+
+################################################################################
+def _gen_npm_imports(packages, importers, patched_dependencies, root_package, rctx_name, rctx_workspace_root, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, registries, default_registry, npm_auth):
+    "Converts packages from the lockfile to a struct of attributes for npm_import"
+    if attr.prod and attr.dev:
+        fail("prod and dev attributes cannot both be set to true")
+
+    # make a lookup table of package to link name for each importer
+    importer_links, npm_links = _make_import_links_lookup(importers, rctx_workspace_root, root_package)
 
     patches_used = []
     result = []
@@ -297,8 +328,14 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
         name = package_info.get("name")
         version = package_info.get("version")
         friendly_version = package_info.get("friendly_version")
-        deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optional_dependencies")
+        deps = {
+            name: "0.0.0" if version.startswith("file:") else version
+            for name, version in package_info.get("dependencies", {}).items()
+        }
+        optional_deps = {
+            name: "0.0.0" if version.startswith("file:") else version
+            for name, version in package_info.get("optional_dependencies", {}).items()
+        }
         dev = package_info.get("dev")
         optional = package_info.get("optional")
         pnpm_patched = package_info.get("patched")
@@ -306,14 +343,20 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
         transitive_closure = package_info.get("transitive_closure")
         resolution = package_info.get("resolution")
 
+        src = None
+        path = None
         if version.startswith("file:"):
-            # this package is treated as a first-party dep
-            continue
+            link_path = _get_link_path(package_info.get("id") or version)
+            version = "0.0.0"
+
+            if link_path.startswith("/") or link_path.startswith("../"):
+                src = None
+                path = _join_path(str(rctx_workspace_root), link_path)
+            else:
+                src = "//" + link_path
+                path = None
 
         resolution_type = resolution.get("type", None)
-        if resolution_type == "directory":
-            # this package is treated as a first-party dep
-            continue
 
         integrity = resolution.get("integrity", None)
         tarball = resolution.get("tarball", None)
@@ -325,7 +368,7 @@ def _gen_npm_imports(importers, packages, patched_dependencies, root_package, rc
             if not repo or not commit:
                 msg = "expected package {} resolution to have repo and commit fields when resolution type is git".format(package)
                 fail(msg)
-        elif not integrity and not tarball:
+        elif not integrity and not tarball and not resolution_type == "directory":
             msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package)
             fail(msg)
 
@@ -394,10 +437,11 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
         # gather all of the importers (workspace packages) that this npm package should be linked at which names
         link_packages = {}
         for import_path, links in importer_links.items():
+            link_package = links["link_package"]
             linked_packages = links["packages"]
             link_names = linked_packages.get(package, [])
             if link_names:
-                link_packages[links["link_package"]] = link_names
+                link_packages[link_package] = link_names
 
         # check if this package should be hoisted via public_hoist_packages
         public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
@@ -424,6 +468,8 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
 
         if resolution_type == "git":
             url = repo
+        elif resolution_type == "directory":
+            url = None
         elif tarball:
             if _is_url(tarball):
                 # pnpm sometimes prefixes the `tarball` url with the default npm registry `https://registry.npmjs.org/`
@@ -443,29 +489,33 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
         else:
             url = utils.npm_registry_download_url(name, version, registries, default_registry)
 
-        registry = url.split("//", 1)[-1]
         npm_auth_bearer = None
         npm_auth_basic = None
         npm_auth_username = None
         npm_auth_password = None
-        match_len = 0
-        for auth_registry, auth_info in npm_auth.items():
-            if auth_registry == "" and match_len == 0:
-                # global auth applied to all registries; will be overridden by a registry scoped auth
-                npm_auth_bearer = auth_info.get("bearer")
-                npm_auth_basic = auth_info.get("basic")
-                npm_auth_username = auth_info.get("username")
-                npm_auth_password = auth_info.get("password")
-            if registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                npm_auth_bearer = auth_info.get("bearer")
-                npm_auth_basic = auth_info.get("basic")
-                npm_auth_username = auth_info.get("username")
-                npm_auth_password = auth_info.get("password")
-                match_len = len(auth_registry)
+        if url:
+            registry = url.split("//", 1)[-1]
+            match_len = 0
+            for auth_registry, auth_info in npm_auth.items():
+                if auth_registry == "" and match_len == 0:
+                    # global auth applied to all registries; will be overridden by a registry scoped auth
+                    npm_auth_bearer = auth_info.get("bearer")
+                    npm_auth_basic = auth_info.get("basic")
+                    npm_auth_username = auth_info.get("username")
+                    npm_auth_password = auth_info.get("password")
+                if registry.startswith(auth_registry) and len(auth_registry) > match_len:
+                    npm_auth_bearer = auth_info.get("bearer")
+                    npm_auth_basic = auth_info.get("basic")
+                    npm_auth_username = auth_info.get("username")
+                    npm_auth_password = auth_info.get("password")
+                    match_len = len(auth_registry)
 
-        result.append(struct(
+        pkg = struct(
             custom_postinstall = custom_postinstall,
             deps = deps,
+            url = url,
+            src = src,
+            path = path,
             integrity = integrity,
             link_packages = link_packages,
             name = repo_name,
@@ -482,17 +532,67 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             npm_auth_username = npm_auth_username,
             npm_auth_password = npm_auth_password,
             transitive_closure = transitive_closure,
-            url = url,
             commit = commit,
             version = version,
             bins = bins,
             package_info = package_info,
             dev = dev,
-        ))
+        )
 
-    # Check that all patches files specified were used; this is a defense-in-depth since it is too
-    # easy to make a type in the patches keys or for a dep to change both of with could result
-    # in a patch file being silently ignored.
+        result.append(pkg)
+
+    # create additional npm_import targets for fp_links
+    for dep_version, npm_link in npm_links.items():
+        dep_package = npm_link.dep_package
+        version = "0.0.0"
+
+        repo_name = "{}__{}".format(attr.name, utils.bazel_name(dep_package, version))
+        if repo_name.startswith("aspect_rules_js.npm."):
+            repo_name = repo_name[len("aspect_rules_js.npm."):]
+
+        # gather all of the importers (workspace packages) that this npm package should be linked at which names
+        link_packages = {}
+        for import_path in npm_link.import_paths:
+            links = importer_links.get(import_path)
+            if links:
+                link_package = links["link_package"]
+                linked_packages = links["packages"]
+                link_names = linked_packages.get(dep_version, [])
+                if link_names:
+                    link_packages[link_package] = link_names
+
+        pkg = struct(
+            name = repo_name,
+            package = dep_package,
+            url = None,
+            src = npm_link.src,
+            path = npm_link.path,
+            version = version,
+            link_packages = link_packages,
+            root_package = root_package,
+            patches = None,
+            run_lifecycle_hooks = None,
+            lifecycle_hooks = None,
+            integrity = None,
+            deps = npm_link.deps,
+            transitive_closure = None,
+            custom_postinstall = None,
+            bins = None,
+            commit = None,
+            npm_auth = None,
+            npm_auth_basic = None,
+            npm_auth_username = None,
+            npm_auth_password = None,
+            dev = None,
+            package_info = {},
+        )
+
+        result.append(pkg)
+
+        # Check that all patches files specified were used; this is a defense-in-depth since it is too
+        # easy to make a type in the patches keys or for a dep to change both of with could result
+        # in a patch file being silently ignored.
+
     for key in attr.patches.keys():
         if key not in patches_used:
             msg = """
@@ -606,6 +706,103 @@ or disable this check by setting `verify_node_modules_ignored = None` in `npm_tr
             )
             fail(msg)
 
+def _write_build_alias_target(name):
+    return _BUILD_TMPL.format(
+        name = "{}_source_directory".format(name),
+        actual = "{}{}//:source_directory".format(
+            "@@" if utils.bzlmod_supported else "@",
+            name,
+        ),
+    )
+
+def _write_defs_link_packages(repo_name, i, link_packages = True):
+    if link_packages:
+        return """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
+            at = "@@" if utils.bzlmod_supported else "@",
+            i = i,
+            links_repo_suffix = utils.links_repo_suffix,
+            repo_name = repo_name,
+        )
+
+    return """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
+        at = "@@" if utils.bzlmod_supported else "@",
+        i = i,
+        links_repo_suffix = utils.links_repo_suffix,
+        repo_name = repo_name,
+    )
+
+def _write_store_bzl_store_invocation(name, i, indentation = 8):
+    return """{indent}store_{i}(name = "{{}}/{name}".format(name)) # store_bzl """.format(
+        name = name,
+        i = i,
+        indent = " " * indentation,
+    )
+
+def _write_link_package_links_bzl(link_aliases, i, indentation = 12):
+    bzl = []
+
+    for link_alias in link_aliases:
+        bzl.append("""{indentation}link_targets.append(link_{i}(name = "{{}}/{name}".format(name))) # links_bzl""".format(
+            i = i,
+            name = link_alias,
+            indentation = " " * indentation,
+        ))
+        if len(link_alias.split("/", 1)) > 1:
+            package_scope = link_alias.split("/", 1)[0]
+            bzl.append("""{indentation}scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
+                package_scope = package_scope,
+                indentation = " " * indentation,
+            ))
+
+    return bzl
+
+def _write_link_package_links_targets_bzl(link_aliases, i, indentation = 12):
+    bzl = []
+
+    for link_alias in link_aliases:
+        bzl.append("""{indentation}link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name)) # links_targets_bzl""".format(
+            i = i,
+            name = link_alias,
+            indentation = " " * indentation,
+        ))
+    return bzl
+
+################################################################################
+def _format_skylark_args(prefix = None, **kwargs):
+    result = {}
+
+    for key, value in kwargs.items():
+        key_with_prefix = (prefix or "") + key
+        if not value:
+            result[key_with_prefix] = ""
+            continue
+
+        if value == True:
+            _value = "True"
+        elif type(value) == "string":
+            _value = "\"{value}\"".format(key = key, value = value)
+        elif type(value) == "list" and type(value[0]) == "dict":
+            _value = starlark_codegen_utils.to_dict_list_attr(value, 2)
+        elif type(value) == "dict":
+            if key == "transitive_closure":
+                _value = starlark_codegen_utils.to_dict_list_attr(value, 2)
+            else:
+                _value = starlark_codegen_utils.to_dict_attr(value, 2)
+        else:
+            _value = value
+
+        _value = "{key} = {value},".format(key = key, value = _value)
+        result[key_with_prefix] = _value
+
+    return result
+
+################################################################################
+def _remove_lines(s):
+    lines = s.splitlines()
+    lines = [line.rstrip() for line in lines]
+    lines = [line for line in lines if line]
+    return "\n".join(lines) + "\n"
+
 ################################################################################
 def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patched_dependencies, root_package, default_registry, npm_registries, npm_auth, link_workspace):
     generated_by_lines = [
@@ -613,12 +810,17 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patch
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-    npm_imports = _gen_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, npm_registries, default_registry, npm_auth)
+    npm_imports = _gen_npm_imports(packages, importers, patched_dependencies, root_package, rctx.name, rctx.workspace_root, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, npm_registries, default_registry, npm_auth)
 
     repositories_bzl = []
 
+    repositories_imports = []
     if len(npm_imports) > 0:
-        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
+        repositories_imports.append("npm_import")
+
+    if len(repositories_imports) > 0:
+        imports_str = ", ".join(["\"{}\"".format(imp) for imp in repositories_imports])
+        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", {})""".format(imports_str))
         repositories_bzl.append("")
 
     repositories_bzl.append("def npm_repositories():")
@@ -630,7 +832,6 @@ def _generate_repository_files(rctx, pnpm_lock_label, importers, packages, patch
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
 
-    fp_links = {}
     rctx_files = {
         "BUILD.bazel": [
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
@@ -650,121 +851,6 @@ sh_binary(
             ])),
         ],
     }
-
-    # Look for first-party file: links in packages
-    for package_info in packages.values():
-        name = package_info.get("name")
-        version = package_info.get("version")
-        deps = package_info.get("dependencies")
-        if version.startswith("file:"):
-            if version in packages and packages[version]["id"]:
-                dep_path = _link_package(root_package, packages[version]["id"][len("file:"):])
-            else:
-                dep_path = _link_package(root_package, version[len("file:"):])
-            dep_key = "{}+{}".format(name, version)
-            transitive_deps = {}
-            for raw_package, raw_version in deps.items():
-                if raw_version.startswith("link:") or raw_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                        root_package = root_package,
-                        virtual_store_name = utils.virtual_store_name(raw_package, "0.0.0"),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                elif raw_version.startswith("/"):
-                    store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                        root_package = root_package,
-                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                else:
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                        root_package = root_package,
-                        virtual_store_name = utils.virtual_store_name(raw_package, raw_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                if dep_store_target not in transitive_deps:
-                    transitive_deps[dep_store_target] = [raw_package]
-                else:
-                    transitive_deps[dep_store_target].append(raw_package)
-
-            # collapse link aliases lists into to acomma separated strings
-            for dep_store_target in transitive_deps.keys():
-                transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
-            fp_links[dep_key] = {
-                "package": name,
-                "path": dep_path,
-                "link_packages": {},
-                "deps": transitive_deps,
-            }
-
-    # Look for first-party links in importers
-    for import_path, importer in importers.items():
-        dependencies = importer.get("all_deps")
-        if type(dependencies) != "dict":
-            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
-            fail(msg)
-        link_package = _link_package(root_package, import_path)
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("file:"):
-                if dep_version in packages and packages[dep_version]["id"]:
-                    dep_path = _link_package(root_package, packages[dep_version]["id"][len("file:"):])
-                else:
-                    dep_path = _link_package(root_package, dep_version[len("file:"):])
-                dep_key = "{}+{}".format(dep_package, dep_version)
-                if not dep_key in fp_links.keys():
-                    msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
-                    fail(msg)
-                fp_links[dep_key]["link_packages"][link_package] = []
-            elif dep_version.startswith("link:"):
-                dep_importer = paths.normalize(paths.join(import_path, dep_version[len("link:"):]))
-                dep_path = _link_package(root_package, import_path, dep_version[len("link:"):])
-                dep_key = "{}+{}".format(dep_package, dep_path)
-                if dep_key in fp_links.keys():
-                    fp_links[dep_key]["link_packages"][link_package] = []
-                else:
-                    transitive_deps = {}
-                    raw_deps = {}
-                    if dep_importer in importers.keys():
-                        raw_deps = importers.get(dep_importer).get("transitive_deps")
-                    for raw_package, raw_version in raw_deps.items():
-                        if raw_version.startswith("link:") or raw_version.startswith("file:"):
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                                root_package = root_package,
-                                virtual_store_name = utils.virtual_store_name(raw_package, "0.0.0"),
-                                virtual_store_root = utils.virtual_store_root,
-                            )
-                        elif raw_version.startswith("/"):
-                            store_package, store_version = utils.parse_pnpm_name(raw_version[1:])
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                                root_package = root_package,
-                                virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                                virtual_store_root = utils.virtual_store_root,
-                            )
-                        else:
-                            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
-                                root_package = root_package,
-                                virtual_store_name = utils.virtual_store_name(raw_package, raw_version),
-                                virtual_store_root = utils.virtual_store_root,
-                            )
-                        if dep_store_target not in transitive_deps:
-                            transitive_deps[dep_store_target] = [raw_package]
-                        else:
-                            transitive_deps[dep_store_target].append(raw_package)
-
-                    # collapse link aliases lists into to a comma separated strings
-                    for dep_store_target in transitive_deps.keys():
-                        transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
-                    fp_links[dep_key] = {
-                        "package": dep_package,
-                        "path": dep_path,
-                        "link_packages": {link_package: []},
-                        "deps": transitive_deps,
-                    }
-
-    if fp_links:
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
     npm_link_targets_bzl = [
         """\
@@ -811,125 +897,58 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     links_bzl = {}
     links_targets_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        maybe_integrity = """
-        integrity = "%s",""" % _import.integrity if _import.integrity else ""
-        maybe_deps = ("""
-        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
-        maybe_transitive_closure = ("""
-        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
-        maybe_patches = ("""
-        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
-        maybe_patch_args = ("""
-        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
-        maybe_custom_postinstall = ("""
-        custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
-        maybe_lifecycle_hooks = ("""
-        lifecycle_hooks = %s,""" % _import.lifecycle_hooks) if _import.run_lifecycle_hooks and _import.lifecycle_hooks else ""
-        maybe_lifecycle_hooks_env = ("""
-        lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
-        maybe_lifecycle_hooks_execution_requirements = ("""
-        lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks else ""
-        maybe_bins = ("""
-        bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
-        maybe_generate_bzl_library_targets = ("""
-        generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
-        maybe_commit = """
-        commit = "%s",""" % _import.commit if _import.commit else ""
-        maybe_npm_auth = ("""
-        npm_auth = "%s",""" % _import.npm_auth) if _import.npm_auth else ""
-        maybe_npm_auth_basic = ("""
-        npm_auth_basic = "%s",""" % _import.npm_auth_basic) if _import.npm_auth_basic else ""
-        maybe_npm_auth_username = ("""
-        npm_auth_username = "%s",""" % _import.npm_auth_username) if _import.npm_auth_username else ""
-        maybe_npm_auth_password = ("""
-        npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
-        maybe_dev = ("""
-        dev = True,""") if _import.dev else ""
+        has_patches = bool(_import.patches)
+        has_lc_hooks = _import.run_lifecycle_hooks and _import.lifecycle_hooks
+        kwargs = _format_skylark_args(
+            prefix = "maybe_",
+            url = _import.url,
+            src = _import.src,
+            path = _import.path,
+            integrity = _import.integrity,
+            deps = _import.deps,
+            transitive_closure = _import.transitive_closure,
+            patches = _import.patches,
+            patch_args = _import.patch_args if has_patches else None,
+            custom_postinstall = _import.custom_postinstall,
+            lifecycle_hooks = _import.lifecycle_hooks if has_lc_hooks else None,
+            lifecycle_hooks_env = _import.lifecycle_hooks_env if has_lc_hooks else None,
+            lifecycle_hooks_execution_requirements = _import.lifecycle_hooks_execution_requirements if has_lc_hooks else None,
+            bins = _import.bins,
+            generate_bzl_library_targets = rctx.attr.generate_bzl_library_targets,
+            commit = _import.commit,
+            npm_auth = _import.npm_auth,
+            npm_auth_basic = _import.npm_auth_basic,
+            npm_auth_username = _import.npm_auth_username,
+            npm_auth_password = _import.npm_auth_password,
+            dev = _import.dev,
+        )
 
-        repositories_bzl.append(_NPM_IMPORT_TMPL.format(
+        repositories_bzl.append(_remove_lines(_NPM_IMPORT_TMPL.format(
             link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
             link_workspace = link_workspace,
-            maybe_bins = maybe_bins,
-            maybe_commit = maybe_commit,
-            maybe_custom_postinstall = maybe_custom_postinstall,
-            maybe_deps = maybe_deps,
-            maybe_dev = maybe_dev,
-            maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
-            maybe_integrity = maybe_integrity,
-            maybe_lifecycle_hooks = maybe_lifecycle_hooks,
-            maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
-            maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
-            maybe_npm_auth = maybe_npm_auth,
-            maybe_npm_auth_basic = maybe_npm_auth_basic,
-            maybe_npm_auth_password = maybe_npm_auth_password,
-            maybe_npm_auth_username = maybe_npm_auth_username,
-            maybe_patch_args = maybe_patch_args,
-            maybe_patches = maybe_patches,
-            maybe_transitive_closure = maybe_transitive_closure,
             name = _to_apparent_repo_name(_import.name),
             npm_translate_lock_repo = _to_apparent_repo_name(rctx.name),
             package = _import.package,
             root_package = _import.root_package,
             url = _import.url,
             version = _import.version,
-        ))
+            **kwargs
+        )))
 
-        rctx_files["BUILD.bazel"].append("""alias(
-    name = "{name}",
-    actual = "{actual}",
-    visibility = ["//visibility:public"],
-)
-""".format(
-            name = "{}_source_directory".format(_import.name),
-            actual = "{}{}//:source_directory".format(
-                "@@" if utils.bzlmod_supported else "@",
-                _import.name,
-            ),
-        ))
+        rctx_files["BUILD.bazel"].append(_write_build_alias_target(_import.name))
+        defs_bzl_header.append(_write_defs_link_packages(_import.name, i, _import.link_packages))
+        stores_bzl.append(_write_store_bzl_store_invocation(_import.package, i))
 
-        if _import.link_packages:
-            defs_bzl_header.append(
-                """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
-                    at = "@@" if utils.bzlmod_supported else "@",
-                    i = i,
-                    links_repo_suffix = utils.links_repo_suffix,
-                    repo_name = _import.name,
-                ),
-            )
-        else:
-            defs_bzl_header.append(
-                """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
-                    at = "@@" if utils.bzlmod_supported else "@",
-                    i = i,
-                    links_repo_suffix = utils.links_repo_suffix,
-                    repo_name = _import.name,
-                ),
-            )
-
-        stores_bzl.append("""        store_{i}(name = "{{}}/{name}".format(name))""".format(
-            i = i,
-            name = _import.package,
-        ))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
-            for link_alias in link_aliases:
-                if link_package not in links_bzl:
-                    links_bzl[link_package] = []
-                if link_package not in links_targets_bzl:
-                    links_targets_bzl[link_package] = []
-                links_bzl[link_package].append("""            link_targets.append(link_{i}(name = "{{}}/{name}".format(name)))""".format(
-                    i = i,
-                    name = link_alias,
-                ))
-                links_targets_bzl[link_package].append("""            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))""".format(
-                    i = i,
-                    name = link_alias,
-                ))
-                if len(link_alias.split("/", 1)) > 1:
-                    package_scope = link_alias.split("/", 1)[0]
-                    links_bzl[link_package].append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
-                        package_scope = package_scope,
-                    ))
+            if link_package not in links_bzl:
+                links_bzl[link_package] = []
+            links_bzl[link_package] += _write_link_package_links_bzl(link_aliases, i)
+
+            if link_package not in links_targets_bzl:
+                links_targets_bzl[link_package] = []
+            links_targets_bzl[link_package] += _write_link_package_links_targets_bzl(link_aliases, i)
+
         for link_package in _import.link_packages.keys():
             build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
             if build_file not in rctx_files:
@@ -982,47 +1001,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         for link_package, bzl in links_targets_bzl.items():
             npm_link_targets_bzl.append("""        if bazel_package == "{}":""".format(link_package))
             npm_link_targets_bzl.extend(bzl)
-
-    for fp_link in fp_links.values():
-        fp_package = fp_link.get("package")
-        fp_path = fp_link.get("path")
-        fp_link_packages = fp_link.get("link_packages")
-        fp_deps = fp_link.get("deps")
-        fp_bazel_name = utils.bazel_name(fp_package, fp_path)
-        fp_target = "//{}:{}".format(
-            fp_path,
-            rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
-        )
-
-        npm_link_all_packages_bzl.append(_FP_STORE_TMPL.format(
-            bazel_name = fp_bazel_name,
-            deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
-            npm_package_target = fp_target,
-            package = fp_package,
-            virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
-            virtual_store_root = utils.virtual_store_root,
-        ))
-
-        npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
-            bazel_name = fp_bazel_name,
-            link_packages = fp_link_packages.keys(),
-            name = fp_package,
-            package_directory_output_group = utils.package_directory_output_group,
-            root_package = root_package,
-            virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
-            virtual_store_root = utils.virtual_store_root,
-        ))
-
-        npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
-            link_packages = fp_link_packages.keys(),
-            name = fp_package,
-        ))
-
-        if len(fp_package.split("/", 1)) > 1:
-            package_scope = fp_package.split("/", 1)[0]
-            npm_link_all_packages_bzl.append("""            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
-                package_scope = package_scope,
-            ))
 
     # Generate catch all & scoped npm_linked_packages target
     npm_link_all_packages_bzl.append("""

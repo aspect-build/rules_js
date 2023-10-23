@@ -384,6 +384,10 @@ _EXTRACT_TO_DIRNAME = "package"
 _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
+def _create_local_external_repository(rctx):
+    if rctx.attr.path.startswith("/"):
+        rctx.symlink(rctx.attr.path, _EXTRACT_TO_DIRNAME)
+
 def _fetch_git_repository(rctx):
     if not rctx.attr.commit:
         fail("commit required if url is a git repository")
@@ -499,6 +503,8 @@ def _download_and_extract_archive(rctx):
 def _npm_import_rule_impl(rctx):
     if utils.is_git_repository_url(rctx.attr.url):
         _fetch_git_repository(rctx)
+    elif rctx.attr.path:
+        _create_local_external_repository(rctx)
     else:
         _download_and_extract_archive(rctx)
 
@@ -628,22 +634,15 @@ def _impl_links(rctx):
     bzlmod_supported = is_bazel_6_or_greater()
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        if dep_version.startswith("link:") or dep_version.startswith("file:"):
-            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                root_package = rctx.attr.root_package,
-                virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
-                virtual_store_root = utils.virtual_store_root,
-            )
+        if dep_version.startswith("/"):
+            store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
         else:
-            if dep_version.startswith("/"):
-                store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
-            else:
-                store_package = dep_name
-                store_version = dep_version
-            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
-                virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                virtual_store_root = utils.virtual_store_root,
-            )
+            store_package = dep_name
+            store_version = dep_version
+        dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
+            virtual_store_name = utils.virtual_store_name(store_package, store_version),
+            virtual_store_root = utils.virtual_store_root,
+        )
         ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
@@ -653,55 +652,43 @@ def _impl_links(rctx):
         # party npm deps; it is not recommended for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
-                if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                        root_package = rctx.attr.root_package,
-                        virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                    lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
-                    deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
-                else:
-                    if dep_version.startswith("/"):
-                        store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
-                    else:
-                        store_package = dep_name
-                        store_version = dep_version
-                    dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
-                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                    if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
-                        dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
-                            virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                            virtual_store_root = utils.virtual_store_root,
-                        )
-
-                        # special case for lifecycle transitive closure deps; do not depend on
-                        # the __pkg of this package as that will be the output directory
-                        # of the lifecycle action
-                        lc_deps[dep_store_target_pkg_pre_lc_lite] = lc_deps[dep_store_target_pkg_pre_lc_lite] + [dep_name] if dep_store_target_pkg_pre_lc_lite in lc_deps else [dep_name]
-                    else:
-                        lc_deps[dep_store_target_pkg] = lc_deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in lc_deps else [dep_name]
-                    deps[dep_store_target_pkg] = deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in deps else [dep_name]
-    else:
-        for (dep_name, dep_version) in rctx.attr.deps.items():
-            if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                    root_package = rctx.attr.root_package,
-                    virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
-                    virtual_store_root = utils.virtual_store_root,
-                )
-            else:
                 if dep_version.startswith("/"):
                     store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
+                elif dep_version.startswith("link:") or dep_version.startswith("file:"):
+                    store_package = dep_name
+                    store_version = "0.0.0"
                 else:
                     store_package = dep_name
                     store_version = dep_version
-                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
+                dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
+                if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
+                    dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
+                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
+                        virtual_store_root = utils.virtual_store_root,
+                    )
+
+                    # special case for lifecycle transitive closure deps; do not depend on
+                    # the __pkg of this package as that will be the output directory
+                    # of the lifecycle action
+                    lc_deps[dep_store_target_pkg_pre_lc_lite] = lc_deps[dep_store_target_pkg_pre_lc_lite] + [dep_name] if dep_store_target_pkg_pre_lc_lite in lc_deps else [dep_name]
+                else:
+                    lc_deps[dep_store_target_pkg] = lc_deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in lc_deps else [dep_name]
+                deps[dep_store_target_pkg] = deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in deps else [dep_name]
+
+    else:
+        for (dep_name, dep_version) in rctx.attr.deps.items():
+            if dep_version.startswith("/"):
+                store_package, store_version = utils.parse_pnpm_name(dep_version[1:])
+            else:
+                store_package = dep_name
+                store_version = dep_version
+            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
+                virtual_store_name = utils.virtual_store_name(store_package, store_version),
+                virtual_store_root = utils.virtual_store_root,
+            )
             lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
             deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
 
@@ -715,7 +702,9 @@ def _impl_links(rctx):
     if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
         npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
-    if rctx.attr.npm_translate_lock_repo:
+    if rctx.attr.src:
+        npm_package_target = rctx.attr.src
+    elif rctx.attr.npm_translate_lock_repo:
         npm_package_target = "@{}//:{}_source_directory".format(
             rctx.attr.npm_translate_lock_repo,
             npm_import_sources_repo_name,
@@ -802,6 +791,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "dev": attr.bool(),
+    "src": attr.string(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
@@ -824,6 +814,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
+    "path": attr.string(),
 })
 
 def _get_bin_entries(pkg_json, package):
@@ -877,6 +868,8 @@ def npm_import(
         lifecycle_hooks_env = [],
         integrity = "",
         url = "",
+        src = "",
+        path = "",
         commit = "",
         patch_args = ["-p0"],
         patches = [],
@@ -889,6 +882,7 @@ def npm_import(
         dev = False,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
+        npm_translate_lock_repo = None,
         # TODO(2.0): remove run_lifecycle_hooks from npm_import
         run_lifecycle_hooks = None,
         # TODO(2.0): remove lifecycle_hooks_no_sandbox from npm_import
@@ -1133,7 +1127,6 @@ def npm_import(
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
 
-    npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
@@ -1144,31 +1137,33 @@ def npm_import(
     if run_lifecycle_hooks:
         lifecycle_hooks = ["preinstall", "install", "postinstall"]
 
-    # By convention, the `{name}` repository contains the actual npm
-    # package sources downloaded from the registry and extracted
-    npm_import_rule(
-        name = name,
-        package = package,
-        version = version,
-        root_package = root_package,
-        link_workspace = link_workspace,
-        link_packages = link_packages,
-        integrity = integrity,
-        url = url,
-        commit = commit,
-        patch_args = patch_args,
-        patches = patches,
-        custom_postinstall = custom_postinstall,
-        npm_auth = npm_auth,
-        npm_auth_basic = npm_auth_basic,
-        npm_auth_username = npm_auth_username,
-        npm_auth_password = npm_auth_password,
-        lifecycle_hooks = lifecycle_hooks,
-        extra_build_content = (
-            extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
-        ),
-        generate_bzl_library_targets = generate_bzl_library_targets,
-    )
+    if src == "":
+        # By convention, the `{name}` repository contains the actual npm
+        # package sources downloaded from the registry and extracted
+        npm_import_rule(
+            name = name,
+            package = package,
+            version = version,
+            root_package = root_package,
+            link_workspace = link_workspace,
+            link_packages = link_packages,
+            integrity = integrity,
+            url = url,
+            path = path,
+            commit = commit,
+            patch_args = patch_args,
+            patches = patches,
+            custom_postinstall = custom_postinstall,
+            npm_auth = npm_auth,
+            npm_auth_basic = npm_auth_basic,
+            npm_auth_username = npm_auth_username,
+            npm_auth_password = npm_auth_password,
+            lifecycle_hooks = lifecycle_hooks,
+            extra_build_content = (
+                extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
+            ),
+            generate_bzl_library_targets = generate_bzl_library_targets,
+        )
 
     if lifecycle_hooks_no_sandbox:
         if "no-sandbox" not in lifecycle_hooks_execution_requirements:
@@ -1184,11 +1179,12 @@ def npm_import(
         package = package,
         version = version,
         dev = dev,
+        src = src,
         root_package = root_package,
         link_packages = link_packages,
         deps = deps,
         transitive_closure = transitive_closure,
-        lifecycle_build_target = has_lifecycle_hooks or has_custom_postinstall,
+        lifecycle_build_target = src == "" and has_lifecycle_hooks or has_custom_postinstall,
         lifecycle_hooks_env = lifecycle_hooks_env,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         bins = bins,

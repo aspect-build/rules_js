@@ -105,6 +105,7 @@ def _convert_v6_importers(importers):
             deps = importer.get(key, {})
             for name, attributes in deps.items():
                 result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
+                result[import_path]["specifiers"][name] = _convert_pnpm_v6_package_name(attributes.get("specifier"))
     return result
 
 def _convert_v6_packages(packages):
