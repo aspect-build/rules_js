@@ -409,7 +409,7 @@ def _is_gnu_tar(rctx):
     if repo_utils.is_linux(rctx):
         return True
 
-    result = rctx.execute(["tar", "--version"])
+    result = rctx.execute([rctx.which("tar"), "--version"])
     return "GNU tar" in result.stdout
 
 def _download_and_extract_archive(rctx):
@@ -461,7 +461,7 @@ def _download_and_extract_archive(rctx):
         auth = auth,
     )
 
-    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
+    mkdir_args = [rctx.which("mkdir"), "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
         msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
@@ -469,7 +469,7 @@ def _download_and_extract_archive(rctx):
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    untar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
+    untar_args = [rctx.which("tar"), "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
     if _is_gnu_tar(rctx):
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
@@ -486,7 +486,7 @@ def _download_and_extract_archive(rctx):
         # Some packages have directory permissions missing executable which
         # make the directories not listable. Fix these cases in order to be able
         # to execute the copy action. https://stackoverflow.com/a/14634721
-        chmod_args = ["chmod", "-R", "a+X", _EXTRACT_TO_DIRNAME]
+        chmod_args = [rctx.which("chmod"), "-R", "a+X", _EXTRACT_TO_DIRNAME]
         result = rctx.execute(chmod_args)
         if result.return_code:
             msg = "chmod %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
