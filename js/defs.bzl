@@ -29,11 +29,11 @@ load(
 def js_binary(**kwargs):
     _js_binary(
         enable_runfiles = select({
-            "@aspect_rules_js//js:enable_runfiles": True,
+            Label("@aspect_rules_js//js:enable_runfiles"): True,
             "//conditions:default": False,
         }),
         unresolved_symlinks_enabled = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
         **kwargs
@@ -42,11 +42,11 @@ def js_binary(**kwargs):
 def js_test(**kwargs):
     _js_test(
         enable_runfiles = select({
-            "@aspect_rules_js//js:enable_runfiles": True,
+            Label("@aspect_rules_js//js:enable_runfiles"): True,
             "//conditions:default": False,
         }),
         unresolved_symlinks_enabled = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
         **kwargs
