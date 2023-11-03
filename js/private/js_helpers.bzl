@@ -55,11 +55,11 @@ def gather_transitive_sources(sources, targets):
     return depset([], transitive = [sources] + transitive)
 
 def gather_transitive_declarations(declarations, targets):
-    """Gathers transitive sources from a list of direct sources and targets
+    """Gathers transitive declarations from a list of direct declarations and targets
 
     Args:
         declarations: list or depset of direct sources which should be included in `transitive_declarations`
-        targets: List of targets to gather `transitive_declarations` from `JsInfo`
+        targets: list of targets to gather `transitive_declarations` from `JsInfo`
 
     Returns:
         A depset of transitive sources
