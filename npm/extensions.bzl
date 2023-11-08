@@ -71,6 +71,21 @@ def _extension_impl(module_ctx):
                 npmrc = parse_npmrc(module_ctx.read(attr.npmrc))
                 (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
 
+            if attr.use_home_npmrc:
+                home_directory = utils.home_directory(module_ctx)
+                if home_directory:
+                    home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
+                    home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
+
+                    (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx.os.environ)
+                    registries.update(registries2)
+                    npm_auth.update(npm_auth2)
+                else:
+                    # buildifier: disable=print
+                    print("""
+WARNING: Cannot determine home directory in order to load home `.npmrc` file in module extension `npm_translate_lock(name = "{attr_name}")`.
+""".format(attr_name = attr.name))
+
             lifecycle_hooks, lifecycle_hooks_execution_requirements = macro_helpers.macro_lifecycle_args_to_rule_attrs(
                 lifecycle_hooks = attr.lifecycle_hooks,
                 lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
