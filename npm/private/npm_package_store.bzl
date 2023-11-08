@@ -157,7 +157,7 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     ),
 }
 
-def _impl(ctx):
+def _npm_package_store_impl(ctx):
     package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
     version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
 
@@ -317,7 +317,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
 npm_package_store_lib = struct(
     attrs = _ATTRS,
-    implementation = _impl,
+    implementation = _npm_package_store_impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
     toolchains = ["@aspect_bazel_lib//lib:copy_directory_toolchain_type"],
 )

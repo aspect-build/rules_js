@@ -20,7 +20,7 @@ _ATTRS = {
 def _target_tool_short_path(workspace_name, path):
     return (workspace_name + "/../" + path[len("external/"):]) if path.startswith("external/") else path
 
-def _impl(ctx):
+def _coverage_merger_impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
@@ -51,7 +51,7 @@ def _impl(ctx):
     )
 
 coverage_merger = rule(
-    implementation = _impl,
+    implementation = _coverage_merger_impl,
     attrs = _ATTRS,
     executable = True,
     toolchains = [
