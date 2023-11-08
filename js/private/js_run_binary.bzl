@@ -109,16 +109,24 @@ def js_run_binary(
 
             You may need `../../` segments to re-relativize such paths to the new working directory.
 
-        stderr: set to capture the stderr of the binary to a file, which can later be used as an input to another target
-            subject to the same semantics as `outs`
+        stderr: Output file to capture the stderr of the binary to.
 
-        stdout: set to capture the stdout of the binary to a file, which can later be used as an input to another target
-            subject to the same semantics as `outs`
+            This can later be used as an input to another target subject to the same semantics as `outs`.
 
-        exit_code_out: set to capture the exit code of the binary to a file, which can later be used as an input to another target
-            subject to the same semantics as `outs`. Note that setting this will force the binary to exit 0.
+            If the binary creates outputs and these are declared, they must still be created.
 
-            If the binary creates outputs and these are declared, they must still be created
+        stdout: Output file to capture the stdout of the binary.
+
+            This can later be used as an input to another target subject to the same semantics as `outs`.
+
+            If the binary creates outputs and these are declared, they must still be created.
+
+        exit_code_out: Output file to capture the exit code of the binary to.
+
+            This can later be used as an input to another target subject to the same semantics as `outs`. Note that
+            setting this will force the binary to exit 0.
+
+            If the binary creates outputs and these are declared, they must still be created.
 
         silent_on_success: produce no output on stdout nor stderr when program exits with status code 0.
 
