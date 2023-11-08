@@ -18,7 +18,7 @@ _ATTRS = {
     ),
 }
 
-def _impl(ctx):
+def _npm_package_internal_impl(ctx):
     if ctx.file.src.is_source or ctx.file.src.is_directory:
         # pass the source directory or TreeArtifact through
         dst = ctx.file.src
@@ -39,7 +39,7 @@ def _impl(ctx):
     ]
 
 npm_package_internal = rule(
-    implementation = _impl,
+    implementation = _npm_package_internal_impl,
     attrs = _ATTRS,
     provides = [DefaultInfo, NpmPackageInfo],
 )

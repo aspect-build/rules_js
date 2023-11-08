@@ -21,7 +21,7 @@ _attrs = dicts.add(js_binary_lib.attrs, {
     "command": attr.string(),
 })
 
-def _impl(ctx):
+def _js_run_devserver_impl(ctx):
     config_file = ctx.actions.declare_file("{}_config.json".format(ctx.label.name))
 
     launcher = js_binary_lib.create_launcher(
@@ -97,7 +97,7 @@ def _impl(ctx):
 
 js_run_devserver_lib = struct(
     attrs = _attrs,
-    implementation = _impl,
+    implementation = _js_run_devserver_impl,
     toolchains = js_binary_lib.toolchains,
 )
 

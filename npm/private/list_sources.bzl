@@ -1,6 +1,6 @@
 "Output a list of source files to a file"
 
-def _impl(ctx):
+def _list_sources_impl(ctx):
     output = ctx.actions.declare_file(ctx.label.name)
     content = "\n".join([file.path for file in ctx.files.srcs]) + "\n"
 
@@ -15,5 +15,5 @@ list_sources = rule(
     attrs = {
         "srcs": attr.label_list(allow_files = True),
     },
-    implementation = _impl,
+    implementation = _list_sources_impl,
 )

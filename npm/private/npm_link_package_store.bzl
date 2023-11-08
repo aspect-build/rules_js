@@ -71,7 +71,7 @@ basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
 exec node "$basedir/{bin_path}" "$@"
 """
 
-def _impl(ctx):
+def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
 
     virtual_store_directory = store_info.virtual_store_directory
@@ -144,7 +144,7 @@ def _impl(ctx):
 
 npm_link_package_store = rule(
     doc = _DOC,
-    implementation = _impl,
+    implementation = _npm_link_package_store_impl,
     attrs = _ATTRS,
     provides = [DefaultInfo, JsInfo],
 )

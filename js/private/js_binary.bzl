@@ -551,7 +551,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         runfiles = runfiles,
     )
 
-def _impl(ctx):
+def _js_binary_impl(ctx):
     launcher = _create_launcher(
         ctx,
         log_prefix_rule_set = "aspect_rules_js",
@@ -599,7 +599,7 @@ def _impl(ctx):
 js_binary_lib = struct(
     attrs = _ATTRS,
     create_launcher = _create_launcher,
-    implementation = _impl,
+    implementation = _js_binary_impl,
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",

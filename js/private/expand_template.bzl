@@ -13,7 +13,7 @@ def _expand_substitutions(ctx, substitutions):
         ])
     return result
 
-def _impl(ctx):
+def _expand_template_impl(ctx):
     substitutions = _expand_substitutions(ctx, ctx.attr.substitutions)
 
     stamp = maybe_stamp(ctx)
@@ -67,7 +67,7 @@ such as `$(BINDIR)`, `$(TARGET_CPU)`, and `$(COMPILATION_MODE)` as documented in
 
 If stamp attribute is True, stamp variable substitutions are supported with {{STAMP_VAR}} tokens.
 """,
-    implementation = _impl,
+    implementation = _expand_template_impl,
     attrs = dict({
         "data": attr.label_list(
             doc = "List of targets for additional lookup information.",
