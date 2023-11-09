@@ -776,4 +776,11 @@ PNPM_VERSIONS = {
     "8.7.4": "sha512-/bQ5bXp8l7krhm2QXQVGuPjzNC/Z/p0fK4kw8aIrqG0YthTS9akRKGHiWyaHX623lntCriHBZZPqhbXczqSNVg==",
     "8.7.5": "sha512-WI8WZb89Uiq5x2jdz4PcQMG9ovTnXcDCEpoEckPYIT2zD8/+dEhVozPlT7bu3WkBgE0uTARtgyIKAFt+IpW2cQ==",
     "8.7.6": "sha512-ZJ/LpDy+IGYpCPYo2INfnw2MopUOTHQ3HcnhbiSqVLtV5rTmsrbFHe4i35ITLpcgvIWptWbzUTZ8efDYXWpFew==",
+    "8.8.0": "sha512-eY5rMiZpzmPI2oVr1irR97bzb036oKwCWvK91wDQndXcqUPlytPtrF0bO668Syw/uA+7hTf5NnM8Mr4ux4BRRA==",
+    "8.9.0": "sha512-74hZk44fBTe5/PAwkEQxE5Lzs4s0QXbmzU/e4hsiVSSwrCobCK4q4t3Vs/9LjKSW1neOlQ8+fJ9VW4EyWYJEHA==",
+    "8.9.1": "sha512-/ma2OuIl3ISym/T14A10j0TASAX/xdk4aDaUZj+4IwmrBCCkSpB1F9QNuPSeQs2POqEKtxa5BzbPE/mJQFWxaQ==",
+    "8.9.2": "sha512-udNf6RsqWFTa3EMDSj57LmdfpLVuIOjgnvB4+lU8GPiu1EBR57Nui43UNfl+sMRMT/O0T8fG+n0h4frBe75mHg==",
+    "8.10.0": "sha512-nCy4Pyts9qJdjFgwC/mRl8fvO+hM8+dm8pBUtAuDtC+Kq6b8wxSp7PJ8APfOgKdXu0xgiADnrb4tKdxccFb1vg==",
+    "8.10.1": "sha512-XK/sZs+dtsPr0+2hJbrdgSuMVL/vLjXcA9zC9lm1xO+oVeZBk3qs7mRLntFPsWb9w3iG7f72B0nQ3l+bRp2c8A==",
+    "8.10.2": "sha512-B4IJPVumx62UYggbwe8HdQFqS0EJ7KHh/tzqbxEBQ69fUJk9s2xCfU+oxivjkgoyJNsS2nGdJGyhndnxgEjDPA==",
 }
