@@ -269,7 +269,7 @@ def _npm_registry_download_url(package, version, registries, default_registry):
     )
 
 def _is_git_repository_url(url):
-    return url.startswith("git+ssh://") or url.startswith("git+https://")
+    return url.startswith("git+ssh://") or url.startswith("git+https://") or url.startswith("git@")
 
 def _to_registry_url(url):
     return "{}://{}".format(DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
