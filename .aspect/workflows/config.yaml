@@ -57,6 +57,8 @@ workspaces:
                 without: true
     # Requires an auth token
     # - e2e/npm_translate_lock_auth:
+    # Requires an SSH token
+    # - e2e/npm_translate_lock_git+ssh:
     e2e/npm_translate_package_lock:
         icon: npm
         tasks:
