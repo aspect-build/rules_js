@@ -34,6 +34,10 @@ Bazel option to see more detail about the selection.
 All [common binary attributes](https://bazel.build/reference/be/common-definitions#common-attributes-binaries) are supported
 including `args` as the list of arguments passed Node.js.
 
+`js_binary` always sets the `BAZEL` environment variable to `1`, if it is not already set, which can be used by Node.js
+programs to detect if they are running under Bazel. This can be useful for cases where a Node.js program is run both
+under Bazel and non-Bazel use cases and different code paths are required between the two.
+
 The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
 
 * JS_BINARY__BINDIR: the WORKSPACE-relative Bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_binary` target
