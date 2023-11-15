@@ -10,6 +10,11 @@ exports_files(
     visibility = ["//docs:__pkg__"],
 )
 
+exports_files(
+    ["bazel-lib-2.0-compat.patch"],
+    visibility = ["//visibility:public"],
+)
+
 exports_files([
     "js_binary.sh.tpl",
     "node_wrapper.bat",
@@ -57,6 +62,7 @@ bzl_library(
         "@aspect_bazel_lib//lib:expand_make_vars",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
+        "@aspect_bazel_lib//tools:version",
     ],
 )
 
@@ -85,6 +91,7 @@ bzl_library(
         ":js_helpers",
         ":js_info",
         "@aspect_bazel_lib//lib:copy_to_bin",
+        "@aspect_bazel_lib//tools:version",
         "@bazel_skylib//lib:dicts",
     ],
 )

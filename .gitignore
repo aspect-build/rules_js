@@ -1,4 +1,5 @@
 bazel-*
+!js/bazel-lib-2.0-compat.patch
 **/.terraform/*
 node_modules/
 .pnpm-*

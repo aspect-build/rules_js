@@ -1,0 +1,26 @@
+diff --git MODULE.bazel MODULE.bazel
+index 271bd09..d321835 100644
+--- MODULE.bazel
++++ MODULE.bazel
+@@ -40,6 +40,6 @@ use_repo(
+ 
+ # Development-only dependencies
+ 
+-bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
++bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1")
+ bazel_dep(name = "buildifier_prebuilt", version = "6.3.3", dev_dependency = True)
+-bazel_dep(name = "gazelle", version = "0.33.0", dev_dependency = True)
++bazel_dep(name = "gazelle", version = "0.33.0")
+diff --git tools/BUILD.bazel tools/BUILD.bazel
+index 6f86f0a..3058f94 100644
+--- tools/BUILD.bazel
++++ tools/BUILD.bazel
+@@ -17,7 +17,7 @@ bzl_library(
+ bzl_library(
+     name = "version",
+     srcs = [":version.bzl"],
+-    visibility = ["//lib/private/docs:__pkg__"],
++    visibility = ["//visibility:public"],
+ )
+ 
+ bzl_library(

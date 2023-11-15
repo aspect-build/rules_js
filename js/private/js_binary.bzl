@@ -19,6 +19,7 @@ load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
+load("@aspect_bazel_lib//tools:version.bzl", _BAZEL_LIB_VERSION = "VERSION")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
@@ -604,7 +605,9 @@ js_binary_lib = struct(
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
         "@rules_nodejs//nodejs:toolchain_type",
-    ],
+    ] + ([
+        "@aspect_bazel_lib//lib:coreutils_toolchain_type",
+    ] if _BAZEL_LIB_VERSION.startswith("2") else []),
 )
 
 js_binary = rule(

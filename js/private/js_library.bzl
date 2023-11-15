@@ -25,6 +25,7 @@ js_library(
 
 load(":js_info.bzl", "JsInfo", "js_info")
 load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_linked_packages", "gather_npm_package_store_deps", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load("@aspect_bazel_lib//tools:version.bzl", _BAZEL_LIB_VERSION = "VERSION")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
@@ -244,4 +245,5 @@ js_library = rule(
     implementation = js_library_lib.implementation,
     attrs = js_library_lib.attrs,
     provides = js_library_lib.provides,
+    toolchains = ["@aspect_bazel_lib//lib:coreutils_toolchain_type"] if _BAZEL_LIB_VERSION.startswith("2") else [],
 )
