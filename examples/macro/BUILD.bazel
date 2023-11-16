@@ -1,5 +1,4 @@
 load("//examples/macro:mocha.bzl", "mocha_test")
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
@@ -22,11 +21,15 @@ bzl_library(
     ],
 )
 
-stardoc_with_diff_test(
-    name = "mocha-docs",
-    bzl_library_target = ":mocha",
-)
-
-update_docs(
-    name = "docs",
-)
+# TODO(derek): stardoc doesn't work under bzlmod with these
+# targets when working against an overridden version of bazel-lib.
+# Remove comments of the released version of bazel-lib succeeds.
+#
+# stardoc_with_diff_test(
+#     name = "mocha-docs",
+#     bzl_library_target = ":mocha",
+# )
+#
+# update_docs(
+#     name = "docs",
+# )
