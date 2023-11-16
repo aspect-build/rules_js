@@ -1,5 +1,4 @@
 load(":tsc.bzl", "tsc")
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
@@ -32,11 +31,15 @@ bzl_library(
     ],
 )
 
-stardoc_with_diff_test(
-    name = "tsc-docs",
-    bzl_library_target = ":tsc",
-)
-
-update_docs(
-    name = "docs",
-)
+# TODO(derek): stardoc doesn't work under bzlmod with these
+# targets when working against an overridden version of bazel-lib.
+# Remove comments of the released version of bazel-lib succeeds.
+#
+# stardoc_with_diff_test(
+#     name = "tsc-docs",
+#     bzl_library_target = ":tsc",
+# )
+#
+# update_docs(
+#     name = "docs",
+# )
