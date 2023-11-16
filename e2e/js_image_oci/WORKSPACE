@@ -5,6 +5,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 ###
 # Setup rules_js
 ###
+
 local_repository(
     name = "aspect_rules_js",
     path = "../..",

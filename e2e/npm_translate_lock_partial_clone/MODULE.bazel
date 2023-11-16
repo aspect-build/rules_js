@@ -12,6 +12,14 @@ local_path_override(
     path = "../..",
 )
 
+# TODO: remove before landing
+archive_override(
+    module_name = "aspect_bazel_lib",
+    patches = ["//:version.patch"],
+    strip_prefix = "bazel-lib-eb6ae4bbc3386ee29aa378c2eebdf0c2dcd759a4",
+    urls = ["https://github.com/kormide/bazel-lib/archive/eb6ae4bbc3386ee29aa378c2eebdf0c2dcd759a4.zip"],
+)
+
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",

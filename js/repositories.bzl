@@ -20,11 +20,21 @@ def rules_js_dependencies():
         urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.8.2/rules_nodejs-core-5.8.2.tar.gz"],
     )
 
+    # http_archive(
+    #     name = "aspect_bazel_lib",
+    #     sha256 = "44f4f6d1ea1fc5a79ed6ca83f875038fee0a0c47db4f9c9beed097e56f8fad03",
+    #     strip_prefix = "bazel-lib-1.34.0",
+    #     url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.34.0/bazel-lib-v1.34.0.tar.gz",
+    # )
+
+    # TODO: remove before landing
     http_archive(
         name = "aspect_bazel_lib",
-        sha256 = "44f4f6d1ea1fc5a79ed6ca83f875038fee0a0c47db4f9c9beed097e56f8fad03",
-        strip_prefix = "bazel-lib-1.34.0",
-        url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.34.0/bazel-lib-v1.34.0.tar.gz",
+        strip_prefix = "bazel-lib-eb6ae4bbc3386ee29aa378c2eebdf0c2dcd759a4",
+        url = "https://github.com/kormide/bazel-lib/archive/eb6ae4bbc3386ee29aa378c2eebdf0c2dcd759a4.zip",
+        patches = [
+            "@aspect_rules_js//:version.patch",
+        ],
     )
 
     http_archive(

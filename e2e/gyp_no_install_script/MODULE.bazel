@@ -1,3 +1,12 @@
+# TODO: remove before landing
+bazel_dep(name = "aspect_bazel_lib", version = "0.0.0")
+archive_override(
+    module_name = "aspect_bazel_lib",
+    patches = ["//:version.patch"],
+    strip_prefix = "bazel-lib-eb6ae4bbc3386ee29aa378c2eebdf0c2dcd759a4",
+    urls = ["https://github.com/kormide/bazel-lib/archive/eb6ae4bbc3386ee29aa378c2eebdf0c2dcd759a4.zip"],
+)
+
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 local_path_override(
     module_name = "aspect_rules_js",

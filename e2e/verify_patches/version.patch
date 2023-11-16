@@ -1,0 +1,12 @@
+diff --git tools/version.bzl tools/version.bzl
+index d35e474..486d94f 100755
+--- tools/version.bzl
++++ tools/version.bzl
+@@ -2,6 +2,6 @@
+ 
+ # This is automagically replace by git during git archive using `git export-subst`
+ # See https://git-scm.com/docs/git-archive#Documentation/git-archive.txt-export-subst
+-_VERSION_PRIVATE = "v0.8.1-485-geb6ae4bb"
++_VERSION_PRIVATE = "v2.0.0"
+ 
+ VERSION = "0.0.0" if _VERSION_PRIVATE.startswith("$Format") else _VERSION_PRIVATE.replace("v", "", 1)
