@@ -1,0 +1,17 @@
+load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
+
+run_binary(
+    name = "run_with_bun",
+    srcs = ["a.ts"],
+    args = [
+        "build",
+        "$(execpath a.ts)",
+        "--outdir",
+        "./$(@D)",
+    ],
+    out_dirs = ["out"],
+    tool = select({
+        "@platforms//os:macos": "@bun_darwin_aarch64",
+        # FIXME: add more
+    }),
+)

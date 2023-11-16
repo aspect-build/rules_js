@@ -191,3 +191,42 @@ buildifier_prebuilt_deps()
 load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains")
 
 buildifier_prebuilt_register_toolchains()
+
+# TODO: convert to a toolchain
+# Content of https://github.com/oven-sh/bun/releases/download/bun-v1.0.11/SHASUMS256.txt
+_BUN_HASHES = {
+    "032e919c6304999931e5c029557905adb4b5932689983b521e9f5fcf457a9f2f": "bun-darwin-aarch64-profile.zip",
+    "c99a7f00594e551b59eb4f3ae6eb6bb55bf4ce57abc05321a6a061dba5a77cbf": "bun-darwin-aarch64.zip",
+    "7710e4ae8818e490dbb3d96f895c11a5a90b09af6e52e500dc4107ab74ef8839": "bun-darwin-x64-baseline-profile.zip",
+    "ecfa57cd58b73d2eb133fe414fd675e1ae42e1c4e71b9d8b7889579937a939ea": "bun-darwin-x64-baseline.zip",
+    "1eb233c759b4168c71be93abfd10dd3a52cb6864f4b1603ab98352d5db76f668": "bun-darwin-x64-profile.zip",
+    "f7013718bf841af3c7b5581f331d3d267f9653f56851fe71fd0aeb76585e3daf": "bun-darwin-x64.zip",
+    "c3fe9face160e607ef6e8acc0f6cb01624b50794850681ce0db3349ace92abe8": "bun-linux-aarch64-profile.zip",
+    "ffd30a0f6891a20ace2222a50823d45f92a80c3d2b33b2bcfa354bc7dc71b39b": "bun-linux-aarch64.zip",
+    "268e606e7fe07b30624d76d90e02270f9c48e461243cb05a5ae386d75015b151": "bun-linux-x64-baseline-profile.zip",
+    "6de3e07cf38c0d44654a886a99b78a97a615b563c717796ad44591a0c8304390": "bun-linux-x64-baseline.zip",
+    "6cc060fd9223a4567dd0364bcdab3242e585bbdd7d16e430674c9521414ebf91": "bun-linux-x64-profile.zip",
+    "a53f7e19c84d0b7be67858131741b3cf22f3581ac241c47f0c54552b60a71c2c": "bun-linux-x64.zip",
+}
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+[
+    http_archive(
+        name = file.strip(".zip").replace("-", "_"),
+        build_file_content = """\
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+package(default_visibility = ["//visibility:public"])
+native_binary(
+    name = "{}",
+    src = "bun",
+    out = "bun_exe",
+)
+""".format(file.strip(".zip").replace("-", "_")),
+        sha256 = sha,
+        strip_prefix = file.strip(".zip"),
+        url = "https://github.com/oven-sh/bun/releases/download/bun-v1.0.11/" + file,
+    )
+    for sha, file in _BUN_HASHES.items()
+    if file.find("-profile") == -1
+]
