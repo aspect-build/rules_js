@@ -224,12 +224,12 @@ jobs:
                 include:
                     - os: windows-latest
                       config: local
-                      bazelversion: 6.2.0
+                      bazelversion: 6.3.2
                       folder: e2e/bzlmod
                       bzlmodEnabled: true
                     - os: macos-latest
                       config: local
-                      bazelversion: 6.2.0
+                      bazelversion: 6.3.2
                       folder: e2e/bzlmod
                       bzlmodEnabled: true
                     - os: ubuntu-latest

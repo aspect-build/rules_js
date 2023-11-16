@@ -37,14 +37,16 @@ bazel_dep(name = "gazelle", version = "0.33.0", dev_dependency = True, repo_name
 bazel_dep(name = "buildifier_prebuilt", version = "6.3.3", dev_dependency = True)
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
 
-ext = use_extension(
+host = use_extension(
     "@aspect_bazel_lib//lib:extensions.bzl",
-    "ext",
+    "host",
     dev_dependency = True,
 )
-ext.host()
-use_repo(ext, "aspect_bazel_lib_host")
-use_repo(ext, "coreutils_toolchains")
+host.host()
+use_repo(host, "aspect_bazel_lib_host")
+
+bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+use_repo(bazel_lib_toolchains, "coreutils_toolchains")
 
 node_dev = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",

@@ -6,6 +6,7 @@ See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 
 load("//js/private:maybe.bzl", http_archive = "maybe_http_archive")
 
+# buildifier: disable=function-docstring
 def rules_js_dependencies():
     http_archive(
         name = "bazel_skylib",
