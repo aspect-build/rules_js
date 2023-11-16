@@ -315,14 +315,14 @@ jobs:
               # Store the --config=bzlmod flag that we add to the test command below
               # only when we're running bzlmod in our test matrix.
               id: set_bzlmod_config
-              if: matrix.bzlmodEnabled && matrix.folder == '.'
+              if: matrix.bzlmodEnabled
               run: echo "bzlmod_config=--config=bzlmod" >> $GITHUB_OUTPUT
 
             - name: bazel test //...
               if: matrix.os != 'windows-latest'
               working-directory: ${{ matrix.folder }}
               run: |
-                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
+                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
                   ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
               env:
                   # Bazelisk will download bazel to here
