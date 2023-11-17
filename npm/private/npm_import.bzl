@@ -405,10 +405,6 @@ def _fetch_git_repository(rctx):
         fail("Failed to delete .git folder in %s" % str(git_repo.directory))
 
 def _is_gnu_tar(rctx):
-    # We assume that any linux platform is using GNU tar.
-    if repo_utils.is_linux(rctx):
-        return True
-
     result = rctx.execute(["tar", "--version"])
     return "GNU tar" in result.stdout
 
