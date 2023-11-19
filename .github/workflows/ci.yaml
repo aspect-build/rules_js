@@ -85,6 +85,8 @@ jobs:
               run: echo "folder=." >> $GITHUB_OUTPUT
             - id: bzlmod
               run: echo "folder=e2e/bzlmod" >> $GITHUB_OUTPUT
+            - id: bzlmod_bazel_lib_2
+              run: echo "folder=e2e/bzlmod_bazel_lib_2" >> $GITHUB_OUTPUT
             - id: git_dep_metadata
               run: echo "folder=e2e/git_dep_metadata" >> $GITHUB_OUTPUT
               # Don't run e2e/git_dep_metadata if there is no ssh key secret which is the case on forks.
@@ -131,6 +133,8 @@ jobs:
               run: echo "folder=e2e/pnpm_workspace_rerooted" >> $GITHUB_OUTPUT
             - id: pnpm_workspace
               run: echo "folder=e2e/pnpm_workspace" >> $GITHUB_OUTPUT
+            - id: pnpm_workspace_bazel_lib_2
+              run: echo "folder=e2e/pnpm_workspace_bazel_lib_2" >> $GITHUB_OUTPUT
             - id: pnpm_workspace_deps
               run: echo "folder=e2e/pnpm_workspace_deps" >> $GITHUB_OUTPUT
             - id: rules_foo
@@ -279,7 +283,7 @@ jobs:
               # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
               # then use .bazelversion to determine which Bazel version to use
               run: |
-                  echo "${{ matrix.bazelversion }}" > .bazelversion
+                  find . -name ".bazelversion" -type f -exec sh -c "echo ${{ matrix.bazelversion }} > {}" \;
                   BAZEL_VERSION=${{ matrix.bazelversion }}
                   if [ ${BAZEL_VERSION::1} != "6" ]; then
                     cat ${{ github.workspace }}/.github/workflows/ci.bazel5.bazelrc >> ${{ github.workspace }}/.github/workflows/ci.bazelrc

@@ -25,6 +25,11 @@ def rules_js_dependencies():
         sha256 = "262e3d6693cdc16dd43880785cdae13c64e6a3f63f75b1993c716295093d117f",
         strip_prefix = "bazel-lib-1.38.1",
         url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.38.1/bazel-lib-v1.38.1.tar.gz",
+        # TODO: remove before landing
+        patches = [
+            "@aspect_rules_js//:hidden-files.patch",
+        ],
+        patch_args = ["-p1"],
     )
 
     http_archive(

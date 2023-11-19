@@ -1,5 +1,8 @@
 load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_imported_package")
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_bazel_lib//lib:testing.bzl", "assert_json_matches")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
@@ -7,6 +10,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_imported_package")
 load("//npm:defs.bzl", "npm_link_package")
 load("//js:defs.bzl", "js_library")
+load("//tools:e2e_with_bazel_lib_2.bzl", "e2e_with_bazel_lib_2")
 
 # Link all packages from the /WORKSPACE npm_translate_lock(name = "npm") and also packages from
 # manual /WORKSPACE npm_import rules to bazel-bin/node_modules as well as the virtual store
@@ -107,4 +111,60 @@ buildifier(
     lint_mode = "warn",
     lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "diff",
+)
+
+e2e_with_bazel_lib_2(
+    name = "e2e_bzlmod_bazel_lib_2",
+    src = "e2e/bzlmod",
+    workspace = False,
+)
+
+e2e_with_bazel_lib_2(
+    name = "e2e_pnpm_workspace_bazel_lib_2",
+    src = "e2e/pnpm_workspace",
+)
+
+write_source_files(
+    name = "update_e2es_with_bazel_lib_2",
+    additional_update_targets = [
+        "e2e_pnpm_workspace_bazel_lib_2",
+        "e2e_bzlmod_bazel_lib_2",
+    ],
+)
+
+genrule(
+    name = "e2e_list",
+    srcs = ["e2e"],
+    outs = ["e2e_list.txt"],
+    cmd = "ls $(SRCS) > $@",
+)
+
+jq(
+    name = "e2e_list_json",
+    srcs = [":e2e_list"],
+    args = [
+        "--raw-input",
+        "--slurp",
+    ],
+    # https://github.com/jqlang/jq/issues/563#issuecomment-404937479
+    filter = "split(\"\\n\") | map(select(. != \"\"))",
+)
+
+jq(
+    name = "e2e_list_bazelignore_json",
+    srcs = ["//:.bazelignore"],
+    args = [
+        "--raw-input",
+        "--slurp",
+    ],
+    filter = "split(\"\\n\") | map(select(. | startswith(\"e2e/\"))) | map(sub(\"^e2e/\"; \"\"))",
+)
+
+# Test that all e2es are included in .bazelignore
+assert_json_matches(
+    name = "e2es_ignored",
+    file1 = ":e2e_list_json",
+    file2 = ":e2e_list_bazelignore_json",
+    filter1 = ". | sort | unique",
+    filter2 = ". | sort | unique",
 )

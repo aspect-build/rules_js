@@ -1,0 +1,18 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+sh_test(
+    name = "node_test",
+    srcs = ["node_test.sh"],
+    args = ["$(NODE_PATH)"],
+    data = [
+        "//:node_modules/typescript",
+        # This eager toolchain fetching could be cleaned up in the future
+        "@nodejs_darwin_amd64//:node_files",
+        "@nodejs_darwin_arm64//:node_files",
+        "@nodejs_linux_amd64//:node_files",
+        "@nodejs_linux_arm64//:node_files",
+    ],
+    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+)

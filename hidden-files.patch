@@ -1,0 +1,15 @@
+diff --git a/lib/private/write_source_file.bzl b/lib/private/write_source_file.bzl
+index f177118..db25c72 100644
+--- a/lib/private/write_source_file.bzl
++++ b/lib/private/write_source_file.bzl
+@@ -219,8 +219,8 @@ else
+     echo "Copying directory $in to $out in $PWD"
+     rm -Rf "$out"/*
+     mkdir -p "$out"
+-    cp -fRL "$in"/* "$out"
+-    chmod -R ug+w "$out"/*
++    cp -r "$in"/* "$out"
++    chmod -R ug+w "$out"/*
+     {executable_dir}
+ fi
+ """.format(
