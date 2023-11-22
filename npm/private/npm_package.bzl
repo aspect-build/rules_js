@@ -530,7 +530,7 @@ def stamped_package_json(name, stamp_var, **kwargs):
             # This 'as' syntax results in $stamp being null in unstamped builds.
             "$ARGS.named.STAMP as $stamp",
             # Provide a default using the "alternative operator" in case $stamp is null.
-            ".version = ($stamp.{} // \"0.0.0\")".format(stamp_var),
+            ".version = ($stamp[0].{} // \"0.0.0\")".format(stamp_var),
         ]),
         **kwargs
     )
