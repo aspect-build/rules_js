@@ -1,0 +1,20 @@
+load("@aspect_rules_js//npm:defs.bzl", "stamped_package_json")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+load("@aspect_bazel_lib//lib:testing.bzl", "assert_json_matches")
+
+stamped_package_json(
+    name = "package",
+    stamp_var = "STABLE_SCM_TAG",
+)
+
+jq(
+    name = "expected",
+    srcs = [],
+    filter = "{private: true, version: \"0.0.0\"}",
+)
+
+assert_json_matches(
+    name = "stamp_test",
+    file1 = ":package",
+    file2 = ":expected",
+)
