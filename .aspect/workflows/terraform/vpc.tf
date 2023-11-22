@@ -45,4 +45,13 @@ resource "google_compute_router_nat" "nat" {
   router                             = google_compute_router.router.name
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  # Allow the ports assigned to each VM scale up and down as needed
+  # https://cloud.google.com/nat/docs/ports-and-addresses#dynamic-port
+  enable_dynamic_port_allocation = true
+  # Must be disabled when dynamic port allocation is enabled (default is true)
+  enable_endpoint_independent_mapping = false
+  # The min number of ports can be tuned by monitoring port usage:
+  # https://cloud.google.com/nat/docs/tune-nat-configuration#choose-minimum
+  min_ports_per_vm = 32
 }
