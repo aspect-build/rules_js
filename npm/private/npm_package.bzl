@@ -11,7 +11,9 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+load("@aspect_bazel_lib//tools:version.bzl", BAZEL_LIB_VERSION = "VERSION")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//lib:versions.bzl", "versions")
 load("//js:libs.bzl", "js_lib_helpers")
 load("//js:defs.bzl", "js_binary")
 load("//js:providers.bzl", "JsInfo")
@@ -530,7 +532,11 @@ def stamped_package_json(name, stamp_var, **kwargs):
             # This 'as' syntax results in $stamp being null in unstamped builds.
             "$ARGS.named.STAMP as $stamp",
             # Provide a default using the "alternative operator" in case $stamp is null.
-            ".version = ($stamp.{} // \"0.0.0\")".format(stamp_var),
+            ".version = ($stamp{}.{} // \"0.0.0\")".format(
+                # bazel-lib 1/2 require different syntax
+                "[0]" if versions.is_at_least("2.0.0", BAZEL_LIB_VERSION) else "",
+                stamp_var,
+            ),
         ]),
         **kwargs
     )

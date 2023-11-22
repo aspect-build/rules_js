@@ -135,6 +135,8 @@ jobs:
               run: echo "folder=e2e/pnpm_workspace_deps" >> $GITHUB_OUTPUT
             - id: rules_foo
               run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
+            - id: stamped_package_json
+              run: echo "folder=e2e/stamped_package_json" >> $GITHUB_OUTPUT
             - id: update_pnpm_lock
               run: echo "folder=e2e/update_pnpm_lock" >> $GITHUB_OUTPUT
             - id: update_pnpm_lock_with_import
