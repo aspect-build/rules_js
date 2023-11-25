@@ -6,17 +6,21 @@ load("//npm/private:utils.bzl", "utils")
 def _parse_empty_lock_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed = utils.parse_pnpm_lock("")
+    parsed_yaml = utils.parse_pnpm_lock_yaml("")
+    parsed_json_a = utils.parse_pnpm_lock_json("")
+    parsed_json_b = utils.parse_pnpm_lock_json("{}")
     expected = ({}, {}, {}, None)
 
-    asserts.equals(env, expected, parsed)
+    asserts.equals(env, expected, parsed_yaml)
+    asserts.equals(env, expected, parsed_json_a)
+    asserts.equals(env, expected, parsed_json_b)
 
     return unittest.end(env)
 
 def _parse_merge_conflict_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed = utils.parse_pnpm_lock("""
+    parsed = utils.parse_pnpm_lock_yaml("""
 importers:
   .:
     dependencies:
@@ -30,7 +34,7 @@ importers:
 def _parse_lockfile_v5_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed = utils.parse_pnpm_lock("""\
+    parsed_yaml = utils.parse_pnpm_lock_yaml("""\
 lockfileVersion: 5.4
 
 specifiers:
@@ -49,6 +53,32 @@ packages:
             '@aspect-test/c': 1.0.0
             '@aspect-test/d': 2.0.0_@aspect-test+c@1.0.0
         dev: false
+""")
+
+    parsed_json = utils.parse_pnpm_lock_json("""\
+{
+  "lockfileVersion": 5.4,
+  "specifiers": {
+    "@aspect-test/a": "5.0.0"
+  },
+  "dependencies": {
+    "@aspect-test/a": "5.0.0"
+  },
+  "packages": {
+    "/@aspect-test/a/5.0.0": {
+      "resolution": {
+        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
+      },
+      "hasBin": true,
+      "dependencies": {
+        "@aspect-test/b": "5.0.0",
+        "@aspect-test/c": "1.0.0",
+        "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0"
+      },
+      "dev": false
+    }
+  }
+}
 """)
 
     expected = (
@@ -82,14 +112,15 @@ packages:
         None,
     )
 
-    asserts.equals(env, expected, parsed)
+    asserts.equals(env, expected, parsed_yaml)
+    asserts.equals(env, expected, parsed_json)
 
     return unittest.end(env)
 
 def _parse_lockfile_v6_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed = utils.parse_pnpm_lock("""\
+    parsed_yaml = utils.parse_pnpm_lock_yaml("""\
 lockfileVersion: '6.0'
 
 dependencies:
@@ -107,6 +138,32 @@ packages:
       '@aspect-test/c': 1.0.0
       '@aspect-test/d': 2.0.0(@aspect-test/c@1.0.0)
     dev: false
+""")
+
+    parsed_json = utils.parse_pnpm_lock_json("""\
+{
+  "lockfileVersion": "6.0",
+  "dependencies": {
+    "@aspect-test/a": {
+      "specifier": "5.0.0",
+      "version": "5.0.0"
+    }
+  },
+  "packages": {
+    "/@aspect-test/a@5.0.0": {
+      "resolution": {
+        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
+      },
+      "hasBin": true,
+      "dependencies": {
+        "@aspect-test/b": "5.0.0",
+        "@aspect-test/c": "1.0.0",
+        "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
+      },
+      "dev": false
+    }
+  }
+}
 """)
 
     expected = (
@@ -139,29 +196,23 @@ packages:
         None,
     )
 
-    asserts.equals(env, expected, parsed)
+    asserts.equals(env, expected, parsed_yaml)
+    asserts.equals(env, expected, parsed_json)
 
     return unittest.end(env)
 
-parse_lockfile_v5_test = unittest.make(
-    _parse_lockfile_v5_test_impl,
-    attrs = {},
-)
+a_test = unittest.make(_parse_empty_lock_test_impl, attrs = {})
+b_test = unittest.make(_parse_lockfile_v5_test_impl, attrs = {})
+c_test = unittest.make(_parse_lockfile_v6_test_impl, attrs = {})
+d_test = unittest.make(_parse_merge_conflict_test_impl, attrs = {})
 
-parse_lockfile_v6_test = unittest.make(
-    _parse_lockfile_v6_test_impl,
-    attrs = {},
-)
-
-parse_empty_lock_test = unittest.make(
-    _parse_empty_lock_test_impl,
-    attrs = {},
-)
-
-parse_merge_conflict_test = unittest.make(
-    _parse_merge_conflict_test_impl,
-    attrs = {},
-)
+TESTS = [
+    a_test,
+    b_test,
+    c_test,
+    d_test,
+]
 
 def parse_pnpm_lock_tests(name):
-    unittest.suite(name, parse_empty_lock_test, parse_merge_conflict_test, parse_lockfile_v5_test, parse_lockfile_v6_test)
+    for index, test_rule in enumerate(TESTS):
+        test_rule(name = "{}_test_{}".format(name, index))

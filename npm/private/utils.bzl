@@ -137,7 +137,7 @@ def _convert_v6_packages(packages):
         result[_convert_pnpm_v6_package_name(package)] = package_info
     return result
 
-def _parse_pnpm_lock(content):
+def _parse_pnpm_lock_yaml(content):
     """Parse the content of a pnpm-lock.yaml file.
 
     Args:
@@ -147,8 +147,30 @@ def _parse_pnpm_lock(content):
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
     parsed, err = _parse_yaml(content)
+    return _parse_pnpm_lock_common(parsed, err)
 
-    if err != None or parsed == None:
+def _parse_pnpm_lock_json(content):
+    """Parse the content of a pnpm-lock.yaml file.
+
+    Args:
+        content: lockfile content as json
+
+    Returns:
+        A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
+    """
+    return _parse_pnpm_lock_common(json.decode(content) if content else None, None)
+
+def _parse_pnpm_lock_common(parsed, err):
+    """Helper function used by _parse_pnpm_lock_yaml and _parse_pnpm_lock_json.
+
+    Args:
+        parsed: lockfile content object
+        err: any errors from pasring
+
+    Returns:
+        A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
+    """
+    if err != None or parsed == None or parsed == {}:
         return {}, {}, {}, err
 
     if not types.is_dict(parsed):
@@ -418,7 +440,8 @@ utils = struct(
     pnpm_name = _pnpm_name,
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_package_key = _parse_pnpm_package_key,
-    parse_pnpm_lock = _parse_pnpm_lock,
+    parse_pnpm_lock_yaml = _parse_pnpm_lock_yaml,
+    parse_pnpm_lock_json = _parse_pnpm_lock_json,
     friendly_name = _friendly_name,
     virtual_store_name = _virtual_store_name,
     strip_peer_dep_or_patched_version = _strip_peer_dep_or_patched_version,

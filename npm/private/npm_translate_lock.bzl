@@ -26,7 +26,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 """
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains", _register_yq_toolchains = "register_yq_toolchains")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
@@ -46,6 +46,7 @@ DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 _ATTRS = {
     "additional_file_contents": attr.string_list_dict(),
     "bins": attr.string_list_dict(),
+    "bzlmod": attr.bool(),
     "custom_postinstalls": attr.string_dict(),
     "data": attr.label_list(),
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
@@ -57,7 +58,9 @@ _ATTRS = {
     "lifecycle_hooks": attr.string_list_dict(),
     "link_workspace": attr.string(),
     "no_optional": attr.bool(),
+    "node_toolchain_prefix": attr.string(default = "nodejs"),
     "npm_package_lock": attr.label(),
+    "npm_package_target_name": attr.string(),
     "npmrc": attr.label(),
     "package_visibility": attr.string_list_dict(),
     "patch_args": attr.string_list_dict(),
@@ -70,13 +73,12 @@ _ATTRS = {
     "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
     "update_pnpm_lock": attr.bool(),
-    "update_pnpm_lock_node_toolchain_prefix": attr.string(),
     "use_home_npmrc": attr.bool(),
+    "use_starlark_yaml_parser": attr.bool(),
     "verify_node_modules_ignored": attr.label(),
     "verify_patches": attr.label(),
-    "npm_package_target_name": attr.string(),
     "yarn_lock": attr.label(),
-    "bzlmod": attr.bool(),
+    "yq_toolchain_prefix": attr.string(default = "yq"),
 }
 
 npm_translate_lock_lib = struct(
@@ -151,7 +153,8 @@ def npm_translate_lock(
         npm_package_lock = None,
         yarn_lock = None,
         update_pnpm_lock = None,
-        update_pnpm_lock_node_toolchain_prefix = "nodejs",
+        node_toolchain_prefix = "nodejs",
+        yq_toolchain_prefix = "yq",
         preupdate = [],
         npmrc = None,
         use_home_npmrc = None,
@@ -179,7 +182,9 @@ def npm_translate_lock(
         pnpm_version = LATEST_PNPM_VERSION,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
+        register_yq_toolchains = True,
         npm_package_target_name = "{dirname}",
+        use_starlark_yaml_parser = False,
         # TODO(2.0): remove package_json
         package_json = None,
         # TODO(2.0): remove warn_on_unqualified_tarball_url
@@ -227,7 +232,9 @@ def npm_translate_lock(
 
             Read more: [using update_pnpm_lock](/docs/pnpm.md#update_pnpm_lock)
 
-        update_pnpm_lock_node_toolchain_prefix: the prefix of the node toolchain to use when generating the pnpm lockfile.
+        node_toolchain_prefix: the prefix of the node toolchain to use when generating the pnpm lockfile.
+
+        yq_toolchain_prefix: the prefix of the yq toolchain to use for parsing the pnpm lockfile.
 
         preupdate: Node.js scripts to run in this repository rule before auto-updating the pnpm lock file.
 
@@ -470,6 +477,8 @@ def npm_translate_lock(
 
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
 
+        register_yq_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_yq_toolchains()` is called if the toolchain is not already registered
+
         package_json: Deprecated.
 
             Add all `package.json` files that are part of the workspace to `data` instead.
@@ -485,14 +494,44 @@ def npm_translate_lock(
 
             Default: `{dirname}`
 
+        use_starlark_yaml_parser: Opt-out of using `yq` to parse the pnpm-lock file which was added
+            in https://github.com/aspect-build/rules_js/pull/1458 and use the legacy starlark yaml
+            parser instead.
+
+            This opt-out is a return safety in cases where yq is not able to parse the pnpm generated
+            yaml file. For example, this has been observed to happen due to a line such as the following
+            in the pnpm generated lock file:
+
+            ```
+            resolution: {tarball: https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e}
+            ```
+
+            where the `?` character in the `tarball` value causes `yq` to fail with:
+
+            ```
+            $ yq pnpm-lock.yaml -o=json
+            Error: bad file 'pnpm-lock.yaml': yaml: line 7129: did not find expected ',' or '}'
+            ```
+
+            If the tarball value is quoted or escaped then yq would accept it but as of this writing, the latest
+            version of pnpm (8.14.3) does not quote or escape such a value and the latest version of yq (4.40.5)
+            does not handle it as is.
+
+            Possibly related to https://github.com/pnpm/pnpm/issues/5414.
+
         **kwargs: Internal use only
     """
+
+    # TODO(2.0): remove backward compat support for update_pnpm_lock_node_toolchain_prefix
+    update_pnpm_lock_node_toolchain_prefix = kwargs.pop("update_pnpm_lock_node_toolchain_prefix", None)
 
     # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
     if register_copy_directory_toolchains and not native.existing_rule("copy_directory_toolchains"):
         _register_copy_directory_toolchains()
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
+    if register_yq_toolchains and not native.existing_rule("yq_toolchains"):
+        _register_yq_toolchains()
 
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)
@@ -590,8 +629,10 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         data = data,
         preupdate = preupdate,
         quiet = quiet,
-        update_pnpm_lock_node_toolchain_prefix = update_pnpm_lock_node_toolchain_prefix,
+        node_toolchain_prefix = update_pnpm_lock_node_toolchain_prefix if update_pnpm_lock_node_toolchain_prefix else node_toolchain_prefix,
+        yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
+        use_starlark_yaml_parser = use_starlark_yaml_parser,
         bzlmod = bzlmod,
     )
 

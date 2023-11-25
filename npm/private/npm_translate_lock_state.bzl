@@ -33,7 +33,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_external_repository_action_cache(priv, rctx)
 
-    _init_common_labels(priv, rctx, label_store)
+    _init_common_labels(priv, rctx, label_store, is_windows)
 
     _init_patches_labels(priv, rctx, label_store)
 
@@ -102,7 +102,7 @@ def _validate_attrs(attr, is_windows):
         fail("only one of npm_package_lock or yarn_lock may be set")
 
 ################################################################################
-def _init_common_labels(priv, rctx, label_store):
+def _init_common_labels(priv, rctx, label_store, is_windows):
     attr = rctx.attr
 
     # data files
@@ -140,6 +140,9 @@ def _init_common_labels(priv, rctx, label_store):
     # pnpm-workspace.yaml file
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
 
+    # yq is used for parsing the pnpm lock file
+    label_store.add("host_yq", Label("@{}_{}//:yq{}".format(rctx.attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else "")))
+
 ################################################################################
 def _init_pnpm_labels(label_store, rctx):
     # Note that we must reference the node binary under the platform-specific node
@@ -150,7 +153,7 @@ def _init_pnpm_labels(label_store, rctx):
     #
     # TODO: Try to understand this better and see if we can go back to using
     #  Label("@nodejs_host//:bin/node")
-    label_store.add("host_node", Label("@{}_{}//:bin/node".format(rctx.attr.update_pnpm_lock_node_toolchain_prefix, repo_utils.platform(rctx))))
+    label_store.add("host_node", Label("@{}_{}//:bin/node".format(rctx.attr.node_toolchain_prefix, repo_utils.platform(rctx))))
 
     label_store.add("pnpm_entry", Label("@pnpm//:package/bin/pnpm.cjs"))
 
@@ -495,17 +498,34 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
 ################################################################################
 def _load_lockfile(priv, rctx, label_store):
-    importers, packages, patched_dependencies, lock_parse_errors = utils.parse_pnpm_lock(rctx.read(label_store.path("pnpm_lock")))
+    importers = {}
+    packages = {}
+    patched_dependencies = {}
+    lock_parse_err = None
+    if rctx.attr.use_starlark_yaml_parser:
+        importers, packages, patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_yaml(rctx.read(label_store.path("pnpm_lock")))
+    else:
+        yq_args = [
+            str(label_store.path("host_yq")),
+            str(label_store.path("pnpm_lock")),
+            "-o=json",
+        ]
+        result = rctx.execute(yq_args)
+        if result.return_code:
+            lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
+        else:
+            importers, packages, patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+
     priv["importers"] = importers
     priv["packages"] = packages
     priv["patched_dependencies"] = patched_dependencies
 
-    if lock_parse_errors != None:
+    if lock_parse_err != None:
         should_update = _should_update_pnpm_lock(priv)
 
         msg = """
 {type}: pnpm-lock.yaml parse error {error}`.
-""".format(type = "WARNING" if should_update else "ERROR", error = lock_parse_errors)
+""".format(type = "WARNING" if should_update else "ERROR", error = lock_parse_err)
 
         if should_update:
             # buildifier: disable=print
