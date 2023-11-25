@@ -134,7 +134,7 @@ def _parse_pnpm_lock(content):
     Returns:
         A tuple of (importers dict, packages dict)
     """
-    parsed = _parse_yaml(content)
+    parsed = json.decode(content)
 
     if parsed == None:
         return {}, {}, {}

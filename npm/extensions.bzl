@@ -63,7 +63,11 @@ def _extension_impl(module_ctx):
             if not attr.pnpm_lock:
                 continue
 
-            lock_importers, lock_packages, lock_patched_dependencies = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
+            result = module_ctx.execute(["/opt/homebrew/bin/yq", attr.pnpm_lock, "-o=json"])
+            if result.return_code != 0:
+                fail(result.stderr)
+
+            lock_importers, lock_packages, lock_patched_dependencies = utils.parse_pnpm_lock(result.stdout)
             importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
             registries = {}
             npm_auth = {}

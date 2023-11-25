@@ -132,6 +132,9 @@ def _init_common_labels(priv, rctx, label_store):
             label_store.add("lock", attr.yarn_lock, seed_root = True)
         label_store.add_sibling("lock", "pnpm_lock", PNPM_LOCK_FILENAME)
 
+    # Needed to parse pnpm lockfile
+    label_store.add("yq", Label("@@yq"))
+
     # .npmrc files
     if attr.npmrc:
         label_store.add("npmrc", attr.npmrc)
@@ -495,7 +498,11 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
 ################################################################################
 def _load_lockfile(priv, rctx, label_store):
-    importers, packages, patched_dependencies = utils.parse_pnpm_lock(rctx.read(label_store.path("pnpm_lock")))
+    result = rctx.execute([label_store.path("yq"), label_store.path("pnpm_lock"), "-o=json"])
+    if result.return_code != 0:
+        fail(result.stderr)
+
+    importers, packages, patched_dependencies = utils.parse_pnpm_lock(result.stdout)
     priv["importers"] = importers
     priv["packages"] = packages
     priv["patched_dependencies"] = patched_dependencies

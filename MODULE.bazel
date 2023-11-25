@@ -46,7 +46,7 @@ host.host()
 use_repo(host, "aspect_bazel_lib_host")
 
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
-use_repo(bazel_lib_toolchains, "coreutils_toolchains")
+use_repo(bazel_lib_toolchains, "coreutils_toolchains", "yq_toolchains")
 
 node_dev = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",
