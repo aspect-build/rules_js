@@ -137,3 +137,12 @@ eslint_bin.eslint_test(
 
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
+
+#### Slower than expected builds (especially in CI)
+
+A lot of tooling in the JS ecosystem uses parallelism to speed up builds. This is great, but as Bazel also parallels builds this can lead to a lot of contention for resources.
+
+For example, the default WebPack configuration uses Terser for optimization. `terser-webpack-plugin` defaults to [parallelizing its work across os.cpus().length - 1](https://www.npmjs.com/package/terser-webpack-plugin#parallel).
+This can lead to builds performing slower due to IO throttling, or even failing if running in a virtualized environment where IO throughput is limited.
+
+If you are experiencing slower than expected builds, you can try disabling or reducing parallelism for the tools you are using.
