@@ -142,6 +142,8 @@ eslint_bin.eslint_test(
 
 A lot of tooling in the JS ecosystem uses parallelism to speed up builds. This is great, but as Bazel also parallels builds this can lead to a lot of contention for resources.
 
+Some rulesets configure tools to take this into account such as the [rules_jest](https://github.com/aspect-build/rules_jest) default [run_in_band](https://github.com/aspect-build/rules_jest/blob/main/docs/jest_test.md#jest_test-run_in_band), while other tools (especially those without dedicated rulesets) may need to be configured manually.
+
 For example, the default WebPack configuration uses Terser for optimization. `terser-webpack-plugin` defaults to [parallelizing its work across os.cpus().length - 1](https://www.npmjs.com/package/terser-webpack-plugin#parallel).
 This can lead to builds performing slower due to IO throttling, or even failing if running in a virtualized environment where IO throughput is limited.
 
