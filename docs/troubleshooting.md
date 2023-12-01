@@ -138,7 +138,11 @@ eslint_bin.eslint_test(
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
 
-#### Slower than expected builds (especially in CI)
+## Performance
+
+For general bazel performance tips see the [Aspect bazelrc guide](https://docs.aspect.build/guides/bazelrc/#performance-options).
+
+### Parallelism (build, test)
 
 A lot of tooling in the JS ecosystem uses parallelism to speed up builds. This is great, but as Bazel also parallels builds this can lead to a lot of contention for resources.
 
@@ -148,3 +152,7 @@ For example, the [default WebPack configuration](https://webpack.js.org/configur
 This can lead to builds performing slower due to IO throttling, or even failing if running in a virtualized environment where IO throughput is limited.
 
 If you are experiencing slower than expected builds, you can try disabling or reducing parallelism for the tools you are using.
+
+#### Jest
+
+See [rules_jest](https://github.com/aspect-build/rules_jest) specific [troubleshooting](https://docs.aspect.build/rulesets/aspect_rules_jest/docs/troubleshooting#performance).
