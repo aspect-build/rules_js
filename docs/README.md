@@ -399,3 +399,7 @@ to understand the basics of using the DevTools with Node.
 In this repository, we have added a VSCode the `.vscode/launch.json` configuration file
 so you can launch into a debugging session directly from the
 [Run & Debug](https://code.visualstudio.com/docs/editor/debugging) window.
+
+## Troubleshooting
+
+See [docs/troubleshooting.md](docs/troubleshooting.md).
