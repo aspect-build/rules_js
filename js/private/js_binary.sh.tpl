@@ -14,6 +14,12 @@ set -o pipefail -o errexit -o nounset
 
 {{envs}}
 
+# Set BAZEL as a comment env var for all rules_js programs to be able to detect
+# they are being run under Bazel
+if [ -z "${BAZEL:-}" ]; then
+    export BAZEL=1
+fi
+
 # ==============================================================================
 # Prepare stdout capture, stderr capture && logging
 # ==============================================================================
@@ -32,10 +38,10 @@ function logf_stderr {
     local format_string="$1\n"
     shift
     if [ "${STDERR_CAPTURE:-}" ]; then
-        # shellcheck disable=SC2059
+        # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >>"$STDERR_CAPTURE"
     else
-        # shellcheck disable=SC2059
+        # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >&2
     fi
 }
