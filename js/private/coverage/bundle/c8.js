@@ -22,17 +22,22 @@ const include = fs
 
 // TODO: can or should we instrument files from other repositories as well?
 // if so then the path.join call below will yield invalid paths since files will have external/wksp as their prefix.
-const pwd = path.join(process.env.RUNFILES, process.env.TEST_WORKSPACE)
-process.chdir(pwd)
+let resolve = path.join(process.env.RUNFILES, process.env.TEST_WORKSPACE)
+
+if (process.env.SPLIT_COVERAGE_POST_PROCESSING == '1') {
+    resolve = fs
+        .readFileSync(path.resolve(process.env.COVERAGE_DIR, 'pwd'))
+        .toString()
+}
+
+process.cwd = () => resolve
 
 new Report({
-    include: include,
+    include: include.map((f) => path.join(resolve, f)),
     exclude: include.length === 0 ? ['**'] : [],
     reportsDirectory: process.env.COVERAGE_DIR,
     tempDirectory: process.env.COVERAGE_DIR,
-    resolve: '',
-    src: pwd,
-    all: true,
+    resolve: resolve,
     reporter: ['lcovonly'],
 })
     .run()

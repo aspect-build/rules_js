@@ -9611,7 +9611,7 @@ const assert = require$$5;
 const convertSourceMap = convertSourceMap$1;
 const util$1 = require$$2;
 const debuglog$1 = util$1.debuglog('c8');
-const { dirname, isAbsolute: isAbsolute$1, join, resolve: resolve$1 } = require$$0;
+const { dirname, isAbsolute: isAbsolute$1, join, resolve: resolve$2 } = require$$0;
 const { fileURLToPath: fileURLToPath$1 } = require$$1$1;
 const CovBranch = requireBranch();
 const CovFunction = require_function();
@@ -9725,7 +9725,7 @@ var v8ToIstanbul$1 = class V8ToIstanbul {
     if (isAbsolute$1(candidatePath)) {
       return candidatePath
     } else {
-      return resolve$1(dirname(this.path), candidatePath)
+      return resolve$2(dirname(this.path), candidatePath)
     }
   }
 
@@ -10688,7 +10688,7 @@ const libCoverage = istanbulLibCoverage.exports;
 const libReport = istanbulLibReport;
 const reports = istanbulReports;
 const { readdirSync, readFileSync, statSync } = require$$0$1;
-const { isAbsolute, resolve, extname } = require$$0;
+const { isAbsolute, resolve: resolve$1, extname } = require$$0;
 const { pathToFileURL, fileURLToPath } = require$$1$1;
 const getSourceMapFromFile = sourceMapFromFile_1;
 // TODO: switch back to @c88/v8-coverage once patch is landed.
@@ -10782,7 +10782,7 @@ let Report$1 = class Report {
     for (const v8ScriptCov of v8ProcessCov.result) {
       try {
         const sources = this._getSourceMap(v8ScriptCov);
-        const path = resolve(this.resolve, v8ScriptCov.url);
+        const path = resolve$1(this.resolve, v8ScriptCov.url);
         const converter = v8toIstanbul(path, this.wrapperLength, sources, (path) => {
           if (this.excludeAfterRemap) {
             return !this._shouldInstrument(path)
@@ -10881,7 +10881,7 @@ let Report$1 = class Report {
       const { extension } = this.exclude;
       for (const workingDir of workingDirs) {
         this.exclude.globSync(workingDir).forEach((f) => {
-          const fullPath = resolve(workingDir, f);
+          const fullPath = resolve$1(workingDir, f);
           if (!fileIndex.has(fullPath)) {
             const ext = extname(fullPath);
             if (extension.includes(ext)) {
@@ -10892,7 +10892,7 @@ let Report$1 = class Report {
               }
               emptyReports.push({
                 scriptId: 0,
-                url: resolve(fullPath),
+                url: resolve$1(fullPath),
                 functions: [{
                   functionName: '(empty-report)',
                   ranges: [{
@@ -10933,7 +10933,7 @@ let Report$1 = class Report {
     for (const file of readdirSync(this.tempDirectory)) {
       try {
         reports.push(JSON.parse(readFileSync(
-          resolve(this.tempDirectory, file),
+          resolve$1(this.tempDirectory, file),
           'utf8'
         )));
       } catch (err) {
@@ -11046,17 +11046,20 @@ const include = require$$0$1
 
 // TODO: can or should we instrument files from other repositories as well?
 // if so then the path.join call below will yield invalid paths since files will have external/wksp as their prefix.
-const pwd = require$$0.join(process.env.RUNFILES, process.env.TEST_WORKSPACE);
-process.chdir(pwd);
+let resolve = require$$0.join(process.env.RUNFILES, process.env.TEST_WORKSPACE);
+
+if (process.env.SPLIT_COVERAGE_POST_PROCESSING == "1") {
+    resolve = require$$0$1.readFileSync(require$$0.resolve(process.env.COVERAGE_DIR, "pwd")).toString();
+}
+
+process.cwd = () => resolve;
 
 new Report({
-    include: include,
+    include: include.map(f => require$$0.join(resolve, f)),
     exclude: include.length === 0 ? ['**'] : [],
     reportsDirectory: process.env.COVERAGE_DIR,
     tempDirectory: process.env.COVERAGE_DIR,
-    resolve: '',
-    src: pwd,
-    all: true,
+    resolve: resolve,
     reporter: ['lcovonly'],
 })
     .run()
