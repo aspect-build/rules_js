@@ -1,6 +1,5 @@
 "Utility functions for npm rules"
 
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -442,7 +441,6 @@ utils = struct(
     hash = _hash,
     dicts_match = _dicts_match,
     consistent_label_str = _consistent_label_str,
-    bzlmod_supported = is_bazel_6_or_greater(),
     reverse_force_copy = _reverse_force_copy,
     exists = _exists,
     home_directory = _home_directory,

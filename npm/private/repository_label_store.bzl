@@ -7,7 +7,6 @@ resolve the underlying issue in the future https://github.com/bazelbuild/bazel/i
 """
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 
 ################################################################################
 def _make_sibling_label(sibling_label, path):
@@ -16,9 +15,9 @@ def _make_sibling_label(sibling_label, path):
     dirname = paths.dirname(sibling_label.name)
     if path.startswith("../"):
         # we have no idea what package this sibling is in so just assume the root package which works for repository rules
-        return Label("{}{}//:{}".format("@@" if is_bazel_6_or_greater() else "@", sibling_label.workspace_name, paths.normalize(paths.join(sibling_label.package, dirname, path))))
+        return Label("@@{}//:{}".format(sibling_label.workspace_name, paths.normalize(paths.join(sibling_label.package, dirname, path))))
     else:
-        return Label("{}{}//{}:{}".format("@@" if is_bazel_6_or_greater() else "@", sibling_label.workspace_name, sibling_label.package, paths.join(dirname, path)))
+        return Label("@@{}//{}:{}".format(sibling_label.workspace_name, sibling_label.package, paths.join(dirname, path)))
 
 ################################################################################
 def _seed_root(priv, rctx_path, label):
