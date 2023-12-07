@@ -257,19 +257,6 @@ _ATTRS = {
         to use npm.
         """,
     ),
-    "unresolved_symlinks_enabled": attr.bool(
-        doc = """Whether unresolved symlinks are enabled in the current build configuration.
-
-        These are enabled with the `--allow_unresolved_symlinks` flag
-        (named `--experimental_allow_unresolved_symlinks in Bazel versions prior to 7.0).
-
-        Typical usage of this rule is via a macro which automatically sets this
-        attribute based on a `config_setting` rule.
-        See /js/private/BUILD.bazel in rules_js for an example.
-        """,
-        # TODO(2.0): make this mandatory so that downstream binary rules that inherit these attributes are required to set it
-        mandatory = False,
-    ),
     "node_toolchain": attr.label(
         doc = """The Node.js toolchain to use for this target.
 
@@ -492,10 +479,7 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
     is_bazel_6 = is_bazel_6_or_greater()
-    unresolved_symlinks_enabled = False
-    if hasattr(ctx.attr, "unresolved_symlinks_enabled"):
-        unresolved_symlinks_enabled = ctx.attr.unresolved_symlinks_enabled
-    use_legacy_node_patches = not is_bazel_6 or not unresolved_symlinks_enabled
+    use_legacy_node_patches = not is_bazel_6
 
     if ctx.attr.node_toolchain:
         node_toolchain = ctx.attr.node_toolchain[platform_common.ToolchainInfo]

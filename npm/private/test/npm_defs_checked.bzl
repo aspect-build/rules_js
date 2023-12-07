@@ -2275,10 +2275,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }),
         )
 
     if is_root:
@@ -2293,10 +2289,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }),
         )
 
     if is_root:
@@ -2311,10 +2303,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }),
         )
 
     for link_package in ["examples/js_binary", "examples/npm_deps"]:
@@ -2325,10 +2313,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
                 visibility = ["//examples:__subpackages__"],
                 tags = ["manual"],
-                use_declare_symlink = select({
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }),
             )
 
             # filegroup target that provides a single file which is
@@ -2353,10 +2337,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }),
         )
 
     for link_package in ["npm/private/test"]:
@@ -2367,10 +2347,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 src = "//:.aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
-                use_declare_symlink = select({
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }),
             )
 
             # filegroup target that provides a single file which is

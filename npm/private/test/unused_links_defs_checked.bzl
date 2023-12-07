@@ -38,10 +38,6 @@ def npm_imported_package_store(name):
         version = "0.2.2",
         dev = True,
         tags = ["manual"],
-        use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }),
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -53,10 +49,6 @@ def npm_imported_package_store(name):
         dev = True,
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }),
     )
 
     # virtual store target with transitive closure of all npm package dependencies
@@ -69,10 +61,6 @@ def npm_imported_package_store(name):
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }),
     )
 
     # filegroup target that provides a single file which is
@@ -116,10 +104,6 @@ def npm_link_imported_package_store(name):
         src = "//:{}".format(store_target_name),
         visibility = ["//visibility:private"],
         tags = ["manual"],
-        use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }),
     )
 
     # filegroup target that provides a single file which is

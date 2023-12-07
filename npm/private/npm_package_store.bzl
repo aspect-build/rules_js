@@ -123,18 +123,6 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     "dev": attr.bool(
         doc = """Whether this npm package is a dev dependency""",
     ),
-    "use_declare_symlink": attr.bool(
-        mandatory = True,
-        doc = """Whether to use ctx.actions.declare_symlink to create symlinks.
-
-        These are enabled with the `--allow_unresolved_symlinks` flag
-        (named `--experimental_allow_unresolved_symlinks in Bazel versions prior to 7.0).
-
-        Typical usage of this rule is via a macro which automatically sets this
-        attribute with `select` based on a `config_setting` rule.
-        See /js/private/BUILD.bazel in rules_js for an example.
-        """,
-    ),
     "hardlink": attr.string(
         values = ["auto", "off", "on"],
         default = "auto",

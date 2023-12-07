@@ -250,25 +250,12 @@ def _virtual_store_name(name, version):
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_file):
-    files = []
-    if ctx.attr.use_declare_symlink:
-        symlink = ctx.actions.declare_symlink(symlink_path)
-        ctx.actions.symlink(
-            output = symlink,
-            target_path = relative_file(target_file.path, symlink.path),
-        )
-        files.append(target_file)
-    else:
-        if target_file.is_directory:
-            symlink = ctx.actions.declare_directory(symlink_path)
-        else:
-            symlink = ctx.actions.declare_file(symlink_path)
-        ctx.actions.symlink(
-            output = symlink,
-            target_file = target_file,
-        )
-    files.append(symlink)
-    return files
+    symlink = ctx.actions.declare_symlink(symlink_path)
+    ctx.actions.symlink(
+        output = symlink,
+        target_path = relative_file(target_file.path, symlink.path),
+    )
+    return [target_file, symlink]
 
 def _parse_package_name(package):
     # Parse a @scope/name string and return a (scope, name) tuple

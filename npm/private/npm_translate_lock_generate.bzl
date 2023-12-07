@@ -38,10 +38,6 @@ _FP_STORE_TMPL = \
             deps = {deps},
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            use_declare_symlink = select({{
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }}),
         )"""
 
 _FP_DIRECT_TMPL = \
@@ -54,10 +50,6 @@ _FP_DIRECT_TMPL = \
                 src = "//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
                 visibility = {link_visibility},
                 tags = ["manual"],
-                use_declare_symlink = select({{
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }}),
             )
 
             # filegroup target that provides a single file which is
