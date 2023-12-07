@@ -19,6 +19,13 @@ exports_files([
     "npm_wrapper.sh",
 ])
 
+# rules_jest and friends refer to these two private targets via the js_binary lib (naughty)
+# TODO(2.0): remove
+alias(
+    name = "enable_runfiles",
+    actual = "//js:enable_runfiles",
+)
+
 bzl_library(
     name = "js_filegroup",
     srcs = ["js_filegroup.bzl"],
