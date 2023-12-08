@@ -184,6 +184,7 @@ npm_import(
     version = "8.4.0",
 )
 
+# Buildifier
 load("@buildifier_prebuilt//:deps.bzl", "buildifier_prebuilt_deps")
 
 buildifier_prebuilt_deps()
@@ -191,3 +192,14 @@ buildifier_prebuilt_deps()
 load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains")
 
 buildifier_prebuilt_register_toolchains()
+
+# rules_lint
+load(
+    "@aspect_rules_lint//format:repositories.bzl",
+    "fetch_shfmt",
+    "fetch_terraform",
+)
+
+fetch_shfmt()
+
+fetch_terraform()

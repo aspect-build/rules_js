@@ -108,3 +108,8 @@ buildifier(
     lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "diff",
 )
+
+alias(
+    name = "format",
+    actual = "//tools:format",
+)
