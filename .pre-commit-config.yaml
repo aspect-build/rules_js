@@ -28,3 +28,10 @@ repos:
       rev: v0.8.0
       hooks:
           - id: shellcheck
+    - repo: local
+      hooks:
+          - id: aspect_rules_lint
+            name: Format
+            language: system
+            entry: bazel run //:format
+            files: .*

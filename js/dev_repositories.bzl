@@ -43,7 +43,12 @@ def rules_js_dev_dependencies():
         name = "buildifier_prebuilt",
         sha256 = "72b5bb0853aac597cce6482ee6c62513318e7f2c0050bc7c319d75d03d8a3875",
         strip_prefix = "buildifier-prebuilt-6.3.3",
-        urls = [
-            "https://github.com/keith/buildifier-prebuilt/archive/6.3.3.tar.gz",
-        ],
+        urls = ["https://github.com/keith/buildifier-prebuilt/archive/6.3.3.tar.gz"],
+    )
+
+    http_archive(
+        name = "aspect_rules_lint",
+        sha256 = "604666ec7ffd4f5f2636001ae892a0fbc29c77401bb33dd10601504e3ba6e9a7",
+        strip_prefix = "rules_lint-0.6.1",
+        url = "https://github.com/aspect-build/rules_lint/releases/download/v0.6.1/rules_lint-v0.6.1.tar.gz",
     )
