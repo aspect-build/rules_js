@@ -43,10 +43,10 @@ function logf_stderr {
     local format_string="$1\n"
     shift
     if [ "${STDERR_CAPTURE:-}" ]; then
-        # shellcheck disable=SC2059
+        # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >>"$STDERR_CAPTURE"
     else
-        # shellcheck disable=SC2059
+        # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >&2
     fi
 }
@@ -142,10 +142,10 @@ trap _exit EXIT
 
 # It helps to determine if we are running on a Windows environment (excludes WSL as it acts like Unix)
 case "$(uname -s)" in
-    CYGWIN*)    _IS_WINDOWS=1 ;;
-    MINGW*)     _IS_WINDOWS=1 ;;
-    MSYS_NT*)   _IS_WINDOWS=1 ;;
-    *)          _IS_WINDOWS=0 ;;
+CYGWIN*) _IS_WINDOWS=1 ;;
+MINGW*) _IS_WINDOWS=1 ;;
+MSYS_NT*) _IS_WINDOWS=1 ;;
+*) _IS_WINDOWS=0 ;;
 esac
 
 # It helps to normalizes paths when running on Windows.
@@ -157,7 +157,7 @@ function _normalize_path {
         # Apply the followings paths transformations to normalize paths on Windows
         # -process driver letter
         # -convert path separator
-        sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<< "$1"
+        sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<<"$1"
     else
         echo "$1"
     fi
@@ -221,7 +221,7 @@ else
         fi
 
         if [ ! -L "$self" ]; then
-            break;
+            break
         fi
 
         readlink="$(readlink "$self")"
@@ -245,7 +245,6 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
     RUNFILES="$PWD/$RUNFILES"
 fi
-
 
 # TODO(2.0): export only JS_BINARY__RUNFILES
 export RUNFILES
@@ -281,7 +280,7 @@ if [[ "${bazel_out_segment:-}" ]]; then
     else
         # We in runfiles and we don't yet know the execroot
         rest="${PWD#*"$bazel_out_segment"}"
-        index=$(( ${#PWD} - ${#rest} - ${#bazel_out_segment} ))
+        index=$((${#PWD} - ${#rest} - ${#bazel_out_segment}))
         if [ ${index} -lt 0 ]; then
             printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
             exit 1
@@ -411,13 +410,13 @@ JS_BINARY__NODE_OPTIONS=()
 JS_BINARY__NODE_OPTIONS+=("--preserve-symlinks-main")
 
 ARGS=()
-ALL_ARGS=( "$@")
+ALL_ARGS=(--my_arg "$@")
 for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     case "$ARG" in
-        # Let users pass through arguments to node itself
-        --node_options=*) JS_BINARY__NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
-        # Remaining argv is collected to pass to the program
-        *) ARGS+=( "$ARG" )
+    # Let users pass through arguments to node itself
+    --node_options=*) JS_BINARY__NODE_OPTIONS+=("${ARG#--node_options=}") ;;
+    # Remaining argv is collected to pass to the program
+    *) ARGS+=("$ARG") ;;
     esac
 done
 
@@ -431,8 +430,8 @@ export JS_BINARY__FS_PATCH_ROOTS
 
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
-  logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
-  export NODE_V8_COVERAGE=${COVERAGE_DIR}
+    logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
+    export NODE_V8_COVERAGE=${COVERAGE_DIR}
 fi
 
 # Put the node wrapper directory on the path so that child processes find it first
@@ -549,7 +548,7 @@ if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
         if [ $RESULT -eq 0 ]; then
             # This exit code is handled specially by Bazel:
             # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
-            readonly BAZEL_EXIT_TESTS_FAILED=3;
+            readonly BAZEL_EXIT_TESTS_FAILED=3
             exit $BAZEL_EXIT_TESTS_FAILED
         fi
         exit $RESULT
@@ -560,7 +559,7 @@ fi
 
 if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
     # Exit zero if the exit code was captured
-    echo -n "$RESULT" > "$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
+    echo -n "$RESULT" >"$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
     exit 0
 else
     exit $RESULT

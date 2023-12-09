@@ -15,6 +15,7 @@ write_file(
 js_binary(
     name = "shellcheck_launcher",
     entry_point = "shellcheck.js",
+    fixed_args = ["--my_arg"],
 )
 
 # Make sed replacements for consistency on different platform

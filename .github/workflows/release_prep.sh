@@ -7,7 +7,7 @@ echo >.git/info/attributes "examples export-ignore"
 # But **do** include e2e/bzlmod since the BCR wants to run presubmit test
 # and it only sees our release artifact.
 # shellcheck disable=2010
-ls e2e | grep -v bzlmod | awk 'NF{print "e2e/" $0 " export-ignore"}' >> .git/info/attributes
+ls e2e | grep -v bzlmod | awk 'NF{print "e2e/" $0 " export-ignore"}' >>.git/info/attributes
 
 # Set by GH actions, see
 # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
@@ -15,10 +15,10 @@ TAG=${GITHUB_REF_NAME}
 # The prefix is chosen to match what GitHub generates for source archives
 PREFIX="rules_js-${TAG:1}"
 ARCHIVE="rules_js-$TAG.tar.gz"
-git archive --format=tar --prefix="${PREFIX}/" "${TAG}" | gzip > "$ARCHIVE"
+git archive --format=tar --prefix="${PREFIX}/" "${TAG}" | gzip >"$ARCHIVE"
 SHA=$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')
 
-cat << EOF
+cat <<EOF
 
 Many companies are successfully building with rules_js.
 If you're getting value from the project, please let us know!
@@ -65,9 +65,9 @@ http_archive(
 EOF
 
 awk 'f;/--SNIP--/{f=1}' e2e/workspace/WORKSPACE
-echo "\`\`\`" 
+echo "\`\`\`"
 
-cat << EOF
+cat <<EOF
 
 To use rules_js with bazel-lib 2.x, you must additionally register the coreutils toolchain.
 

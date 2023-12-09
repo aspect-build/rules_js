@@ -42,7 +42,7 @@ module "aspect_workflows" {
 
   # Warming set definitions
   warming_sets = {
-    default  = {}
+    default = {}
   }
 
   # Resource types for use by runner groups

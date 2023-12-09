@@ -10,10 +10,10 @@
 BASH_INITIALIZE_RUNFILES = r"""
 # It helps to determine if we are running on a Windows environment (excludes WSL as it acts like Unix)
 case "$(uname -s)" in
-    CYGWIN*)    _IS_WINDOWS=1 ;;
-    MINGW*)     _IS_WINDOWS=1 ;;
-    MSYS_NT*)   _IS_WINDOWS=1 ;;
-    *)          _IS_WINDOWS=0 ;;
+CYGWIN*) _IS_WINDOWS=1 ;;
+MINGW*) _IS_WINDOWS=1 ;;
+MSYS_NT*) _IS_WINDOWS=1 ;;
+*) _IS_WINDOWS=0 ;;
 esac
 
 # It helps to normalizes paths when running on Windows.
@@ -25,7 +25,7 @@ function _normalize_path {
         # Apply the followings paths transformations to normalize paths on Windows
         # -process driver letter
         # -convert path separator
-        sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<< "$1"
+        sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<<"$1"
     else
         echo "$1"
     fi
@@ -89,7 +89,7 @@ else
         fi
 
         if [ ! -L "$self" ]; then
-            break;
+            break
         fi
 
         readlink="$(readlink "$self")"

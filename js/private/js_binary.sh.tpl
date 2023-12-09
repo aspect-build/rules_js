@@ -32,10 +32,10 @@ function logf_stderr {
     local format_string="$1\n"
     shift
     if [ "${STDERR_CAPTURE:-}" ]; then
-        # shellcheck disable=SC2059
+        # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >>"$STDERR_CAPTURE"
     else
-        # shellcheck disable=SC2059
+        # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >&2
     fi
 }
@@ -129,7 +129,6 @@ trap _exit EXIT
 # Initialize RUNFILES environment variable
 # ==============================================================================
 {{initialize_runfiles}}
-
 # TODO(2.0): export only JS_BINARY__RUNFILES
 export RUNFILES
 JS_BINARY__RUNFILES="$RUNFILES"
@@ -164,7 +163,7 @@ if [[ "${bazel_out_segment:-}" ]]; then
     else
         # We in runfiles and we don't yet know the execroot
         rest="${PWD#*"$bazel_out_segment"}"
-        index=$(( ${#PWD} - ${#rest} - ${#bazel_out_segment} ))
+        index=$((${#PWD} - ${#rest} - ${#bazel_out_segment}))
         if [ ${index} -lt 0 ]; then
             printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
             exit 1
@@ -297,10 +296,10 @@ ARGS=()
 ALL_ARGS=({{fixed_args}} "$@")
 for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     case "$ARG" in
-        # Let users pass through arguments to node itself
-        --node_options=*) JS_BINARY__NODE_OPTIONS+=( "${ARG#--node_options=}" ) ;;
-        # Remaining argv is collected to pass to the program
-        *) ARGS+=( "$ARG" )
+    # Let users pass through arguments to node itself
+    --node_options=*) JS_BINARY__NODE_OPTIONS+=("${ARG#--node_options=}") ;;
+    # Remaining argv is collected to pass to the program
+    *) ARGS+=("$ARG") ;;
     esac
 done
 
@@ -314,8 +313,8 @@ export JS_BINARY__FS_PATCH_ROOTS
 
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
-  logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
-  export NODE_V8_COVERAGE=${COVERAGE_DIR}
+    logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
+    export NODE_V8_COVERAGE=${COVERAGE_DIR}
 fi
 
 # Put the node wrapper directory on the path so that child processes find it first
@@ -432,7 +431,7 @@ if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
         if [ $RESULT -eq 0 ]; then
             # This exit code is handled specially by Bazel:
             # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
-            readonly BAZEL_EXIT_TESTS_FAILED=3;
+            readonly BAZEL_EXIT_TESTS_FAILED=3
             exit $BAZEL_EXIT_TESTS_FAILED
         fi
         exit $RESULT
@@ -443,7 +442,7 @@ fi
 
 if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
     # Exit zero if the exit code was captured
-    echo -n "$RESULT" > "$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
+    echo -n "$RESULT" >"$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
     exit 0
 else
     exit $RESULT
