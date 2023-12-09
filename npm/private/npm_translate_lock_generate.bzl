@@ -474,7 +474,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
         fp_path = fp_link.get("path")
-        fp_link_packages = fp_link.get("link_packages")
+        fp_link_packages = fp_link.get("link_packages").keys()
         fp_deps = fp_link.get("deps")
         fp_bazel_name = utils.bazel_name(fp_package, fp_path)
         fp_target = "//{}:{}".format(
@@ -495,31 +495,32 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
-        npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
-            bazel_name = fp_bazel_name,
-            link_packages = fp_link_packages.keys(),
-            link_visibility = package_visibility,
-            name = fp_package,
-            package_directory_output_group = utils.package_directory_output_group,
-            root_package = root_package,
-            virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
-            virtual_store_root = utils.virtual_store_root,
-        ))
+        if len(fp_link_packages) > 0:
+            npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
+                bazel_name = fp_bazel_name,
+                link_packages = fp_link_packages,
+                link_visibility = package_visibility,
+                name = fp_package,
+                package_directory_output_group = utils.package_directory_output_group,
+                root_package = root_package,
+                virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
+                virtual_store_root = utils.virtual_store_root,
+            ))
 
-        npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
-            link_packages = fp_link_packages.keys(),
-            name = fp_package,
-        ))
+            npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
+                link_packages = fp_link_packages,
+                name = fp_package,
+            ))
 
-        if "//visibility:public" in package_visibility:
-            add_to_link_targets = """            link_targets.append(":{{}}/{name}".format(name))""".format(name = fp_package)
-            npm_link_all_packages_bzl.append(add_to_link_targets)
-            if len(fp_package.split("/", 1)) > 1:
-                package_scope = fp_package.split("/", 1)[0]
-                add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
-                    package_scope = package_scope,
-                )
-                npm_link_all_packages_bzl.append(add_to_scoped_targets)
+            if "//visibility:public" in package_visibility:
+                add_to_link_targets = """            link_targets.append(":{{}}/{name}".format(name))""".format(name = fp_package)
+                npm_link_all_packages_bzl.append(add_to_link_targets)
+                if len(fp_package.split("/", 1)) > 1:
+                    package_scope = fp_package.split("/", 1)[0]
+                    add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
+                        package_scope = package_scope,
+                    )
+                    npm_link_all_packages_bzl.append(add_to_scoped_targets)
 
     # Generate catch all & scoped npm_linked_packages target
     npm_link_all_packages_bzl.append("""
