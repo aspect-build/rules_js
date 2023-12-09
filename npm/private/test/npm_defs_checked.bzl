@@ -2286,31 +2286,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             }),
         )
 
-    for link_package in []:
-        if link_package == native.package_name():
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/is-odd".format(name),
-                src = "//:.aspect_rules_js/{}/is-odd@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-                use_declare_symlink = select({
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }),
-            )
-
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/is-odd/dir".format(name),
-                srcs = [":{}/is-odd".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/is-odd".format(name))
-
     if is_root:
         _npm_package_store(
             name = ".aspect_rules_js/{}/semver-max@0.0.0".format(name),
@@ -2328,31 +2303,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 "//conditions:default": False,
             }),
         )
-
-    for link_package in []:
-        if link_package == native.package_name():
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/semver-max".format(name),
-                src = "//:.aspect_rules_js/{}/semver-max@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-                use_declare_symlink = select({
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }),
-            )
-
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/semver-max/dir".format(name),
-                srcs = [":{}/semver-max".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/semver-max".format(name))
 
     if is_root:
         _npm_package_store(
@@ -2565,14 +2515,6 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name))
             link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name))
             link_targets.append("//{}:{}/mocha".format(bazel_package, name))
-
-    for link_package in []:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/is-odd".format(bazel_package, name))
-
-    for link_package in []:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/semver-max".format(bazel_package, name))
 
     for link_package in ["examples/js_binary", "examples/npm_deps"]:
         if link_package == bazel_package:
