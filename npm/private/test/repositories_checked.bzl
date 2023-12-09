@@ -26478,7 +26478,7 @@ def npm_repositories():
             "@types/caseless": ["registry.npmjs.org/@types/caseless@0.12.2"],
             "@types/tough-cookie": ["registry.npmjs.org/@types/tough-cookie@4.0.2"],
         },
-        lifecycle_hooks = ["prepare"],
+        lifecycle_hooks = ["build"],
         lifecycle_hooks_execution_requirements = [],
     )
 
