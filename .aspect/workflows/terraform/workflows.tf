@@ -55,6 +55,14 @@ module "aspect_workflows" {
       image_id        = data.google_compute_image.runner_image.id
       use_preemptible = true
     }
+    small = {
+      # Aspect Workflows requires machine types that have local SSD drives. See
+      # https://cloud.google.com/compute/docs/machine-resource#machine_type_comparison for full list
+      # of machine types availble on GCP.
+      machine_type    = "n1-standard-1"
+      image_id        = data.google_compute_image.runner_image.id
+      use_preemptible = true
+    }
   }
 
   # Buildkite runner group definitions
@@ -66,9 +74,22 @@ module "aspect_workflows" {
       min_runners               = 0
       queue                     = "aspect-default"
       resource_type             = "default"
-      scale_out_factor          = 10
       scaling_polling_frequency = 3 # check for queued jobs every 20s
       warming                   = true
+    }
+    small = {
+      agent_idle_timeout_min = 1
+      gh_repo                = "aspect-build/rules_jasmine"
+      # Determine the workflow ID with:
+      # gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/aspect-build/rules_jasmine/actions/workflows
+      # https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#list-repository-workflows
+      gha_workflow_ids          = ["67579950"] # Aspect Workflows
+      max_runners               = 10
+      min_runners               = 0
+      queue                     = "aspect-small"
+      resource_type             = "small"
+      scaling_polling_frequency = 3     # check for queued jobs every 20s
+      warming                   = false # don't warm for faster bootstrap; these runners won't be running large builds
     }
     # The warming runner group is used for the periodic warming job that creates
     # warming archives for use by other runner groups.
