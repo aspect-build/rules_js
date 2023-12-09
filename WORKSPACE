@@ -99,8 +99,10 @@ npm_translate_lock(
     ],
     generate_bzl_library_targets = True,
     lifecycle_hooks = {
-        # we fetch @kubernetes/client-node from source and it has a `prepare` lifecycle hook that needs to be run
-        "@kubernetes/client-node": ["prepare"],
+        # We fetch @kubernetes/client-node from source and it has a `prepare` lifecycle hook that needs to be run
+        # which runs the `build` package.json script: https://github.com/kubernetes-client/javascript/blob/fc681991e61c6808dd26012a2331f83671a11218/package.json#L28.
+        # Here we run run build so we just run `tsc` instead of `npm run build` which ends up just running `tsc`.
+        "@kubernetes/client-node": ["build"],
         # 'install' hook fails as it assumes the following path to `node-pre-gyp`: ./node_modules/.bin/node-pre-gyp
         # https://github.com/stultuss/protoc-gen-grpc-ts/blob/53d52a9d0e1fe3cbe930dec5581eca89b3dde807/package.json#L28
         "protoc-gen-grpc@2.0.3": [],
