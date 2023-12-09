@@ -518,7 +518,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 package_scope = fp_package.split("/", 1)[0]
                 add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                     package_scope = package_scope,
-                    package_visibility = package_visibility,
                 )
                 npm_link_all_packages_bzl.append(add_to_scoped_targets)
 
