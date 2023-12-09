@@ -22,7 +22,7 @@ use_repo(pnpm, "pnpm")
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 go_sdk.download(
     name = "go_sdk",
-    version = "1.19.3",
+    version = "1.20.3",
 )
 use_repo(go_sdk, "go_sdk")
 
