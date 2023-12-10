@@ -211,7 +211,7 @@ sh_binary(
                     transitive_deps = {}
                     raw_deps = {}
                     if dep_importer in importers.keys():
-                        raw_deps = importers.get(dep_importer).get("transitive_deps")
+                        raw_deps = importers.get(dep_importer).get("deps")
                     for raw_package, raw_version in raw_deps.items():
                         if raw_version.startswith("link:") or raw_version.startswith("file:"):
                             dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(

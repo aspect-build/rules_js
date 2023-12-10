@@ -121,16 +121,22 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
     Returns:
         Nested dictionary suitable for further processing in our repository rule
     """
+
+    # All package info mapped by package name
     packages = {}
+
+    # Packages resolved to a different version
+    package_version_map = {}
+
     for package_path, package_snapshot in lock_packages.items():
         package, package_info = _gather_package_info(package_path, package_snapshot)
         packages[package] = package_info
 
-    tar_packages = {
-        p: info
-        for p, info in packages.items()
-        if info["resolution"].get("tarball") and info["resolution"]["tarball"].startswith("file:")
-    }
+        # tarbal versions
+        if package_info["resolution"].get("tarball") and package_info["resolution"]["tarball"].startswith("file:"):
+            package_version_map[package] = package_info
+
+    # Collect deps of each importer (workspace projects)
     importers = {}
     for importPath in lock_importers.keys():
         lock_importer = lock_importers[importPath]
@@ -138,24 +144,26 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
         dev_deps = {} if prod else lock_importer.get("devDependencies", {})
         opt_deps = {} if no_optional else lock_importer.get("optionalDependencies", {})
 
-        transitive_deps = dicts.add(prod_deps, opt_deps)
+        deps = dicts.add(prod_deps, opt_deps)
         all_deps = dicts.add(prod_deps, dev_deps, opt_deps)
 
-        for info in tar_packages.values():
-            if info["name"] in transitive_deps:
-                transitive_deps[info["name"]] = info["version"]
+        # Package versions mapped to alternate versions
+        for info in package_version_map.values():
+            if info["name"] in deps:
+                deps[info["name"]] = info["version"]
             if info["name"] in all_deps:
                 all_deps[info["name"]] = info["version"]
 
         importers[importPath] = {
             # deps this importer should pass on if it is linked as a first-party package; this does
             # not include devDependencies
-            "transitive_deps": transitive_deps,
+            "deps": deps,
             # all deps of this importer to link in the node_modules folder of that Bazel package and
             # make available to all build targets; this includes devDependencies
             "all_deps": all_deps,
         }
 
+    # Collect transitive dependencies for each package
     for package in packages.keys():
         package_info = packages[package]
         transitive_closure = {}
