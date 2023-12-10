@@ -1,138 +1,57 @@
 ---
+queue: aspect-small
 workspaces:
     .:
         icon: js
         label: rules_js
+        tasks:
+            format:
+                soft_fail: false
+            buildifier:
+            test:
+                queue: aspect-default
     e2e/bzlmod:
         icon: bazel
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/js_image_docker:
         icon: docker
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/js_image_oci:
         icon: linux
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     # No test targets. Requires running test.sh.
-    # - e2e/js_run_devserver:
+    # e2e/js_run_devserver:
     e2e/npm_link_package:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_link_package-esm:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_translate_lock:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_translate_lock_empty:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_translate_lock_multi:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_translate_lock_partial_clone:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_translate_lock_subdir_patch:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     # Requires an auth token
-    # - e2e/npm_translate_lock_auth:
+    # e2e/npm_translate_lock_auth:
     # Requires an SSH token
-    # - e2e/npm_translate_lock_git+ssh:
+    # e2e/npm_translate_lock_git+ssh:
     e2e/npm_translate_package_lock:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/npm_translate_yarn_lock:
         icon: yarn
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/package_json_module:
         icon: npm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/pnpm_workspace:
         icon: pnpm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/rules_foo:
         icon: js
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     e2e/vendored_node:
         icon: js
-        tasks:
-            format:
-                without: true
-            buildifier:
-                without: true
     # No test targets. Requires running test.sh.
-    # - e2e/webpack_devserver:
-    # - e2e/webpack_devserver_esm:
+    # e2e/webpack_devserver:
+    # e2e/webpack_devserver_esm:
 tasks:
-    format:
-        soft_fail: false
-    buildifier:
     test:
