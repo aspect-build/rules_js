@@ -3,7 +3,7 @@
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
 
-def gather_transitive_closure(packages, no_optional, direct_deps, transitive_closure):
+def gather_transitive_closure(packages, package, no_optional):
     """Walk the dependency tree, collecting the transitive closure of dependencies and their versions.
 
     This is needed to resolve npm dependency cycles.
@@ -12,11 +12,18 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
 
     Args:
         packages: dictionary from pnpm lock
+        package: the package to collect deps for
         no_optional: whether to exclude optionalDependencies
-        direct_deps: the immediate dependencies of a given package
-        transitive_closure: a dictionary which is mutated as the return value
+
+    Returns:
+        A dictionary of transitive dependencies, mapping package names to dependent versions.
     """
-    stack = [direct_deps]
+    root_package = packages[package]
+
+    transitive_closure = {}
+    transitive_closure[root_package["name"]] = [root_package["version"]]
+
+    stack = [_get_package_info_deps(root_package, no_optional)]
     iteration_max = 999999
     for i in range(0, iteration_max + 1):
         if not len(stack):
@@ -46,7 +53,12 @@ def gather_transitive_closure(packages, no_optional, direct_deps, transitive_clo
                 continue
             else:
                 package_info = packages[package_key]
-            stack.append(package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"]))
+            stack.append(_get_package_info_deps(package_info, no_optional))
+
+    return transitive_closure
+
+def _get_package_info_deps(package_info, no_optional):
+    return package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
 
 def _gather_package_info(package_path, package_snapshot):
     if package_path.startswith("/"):
@@ -158,17 +170,11 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
 
     for package in packages.keys():
         package_info = packages[package]
-        transitive_closure = {}
-        transitive_closure[package_info["name"]] = [package_info["version"]]
-        dependencies = package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
 
-        gather_transitive_closure(
+        package_info["transitive_closure"] = gather_transitive_closure(
             packages,
+            package,
             no_optional,
-            dependencies,
-            transitive_closure,
         )
-
-        package_info["transitive_closure"] = transitive_closure
 
     return (importers, packages)
