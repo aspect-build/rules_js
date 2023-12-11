@@ -40,26 +40,16 @@ TEST_PACKAGES = {
 # buildifier: disable=function-docstring
 def test_walk_deps(ctx):
     env = unittest.begin(ctx)
-    closure = {}
     no_optional = True
     not_no_optional = False
 
-    # Test empty case
-    gather_transitive_closure({}, no_optional, {}, closure)
-    asserts.equals(env, 0, len(closure))
-
     # Walk the example tree above
-    gather_transitive_closure(TEST_PACKAGES, not_no_optional, {
-        "@aspect-test/a": "5.0.0",
-    }, closure)
+    closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", not_no_optional)
     expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["2.0.0", "1.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
     asserts.equals(env, expected, closure)
 
     # Run again with no_optional set, this means we shouldn't walk the dep from @aspect-test/b/5.0.0 -> @aspect-test/c/2.0.0
-    closure = {}
-    gather_transitive_closure(TEST_PACKAGES, no_optional, {
-        "@aspect-test/a": "5.0.0",
-    }, closure)
+    closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", no_optional)
     expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["1.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
     asserts.equals(env, expected, closure)
 
