@@ -1,5 +1,0 @@
---- a/node_modules/@gregmagolan/test-a/main.js
-+++ b/node_modules/@gregmagolan/test-a/main.js
-@@ -1 +1,2 @@
- module.exports = 'test-a-0.0.1';
-+console.log("Hello world!")
