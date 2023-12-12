@@ -52,8 +52,20 @@ def _js_run_devserver_impl(ctx):
     # artifacts those symlinks point to (node_modules/.aspect_rules_js/foo@1.2.3/node_modules/foo)
     data_files = []
     for f in depset(transitive = transitive_runfiles + [dep.files for dep in ctx.attr.data]).to_list():
-        # don't include the virtual store tree artifact; only the node_module link is needed
-        if not "/.aspect_rules_js/" in f.path:
+        if "/.aspect_rules_js/" in f.path:
+            # Special handling for virtual store deps; we only include 1st party deps since copying
+            # all 3rd party node_modules over is expensive for typical graphs
+            path_segments = f.path.split("/")
+            package_name_segment = path_segments.index(".aspect_rules_js") + 1
+
+            # TODO: @0.0.0 is by default the version of all 1p linked packages, however, it can be overridden by users
+            # if they are manually linking a 1p package and not using workspace. A more robust solution would be to
+            # split handling of 1p and 3p package in the JsInfo provider itself. Other optimizations in the rule set
+            # could also be made if that was the case.
+            if len(path_segments) > package_name_segment and "@0.0.0" in path_segments[package_name_segment]:
+                # include this first party linked dependency
+                data_files.append(f)
+        else:
             data_files.append(f)
 
     config = {

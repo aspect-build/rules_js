@@ -28,6 +28,7 @@ js_run_devserver(
         "webpack.config.js",
         ":node_modules",
     ],
+    log_level = "debug",
     tool = "webpack_binary",
 )
 
@@ -45,5 +46,6 @@ js_run_devserver(
         "webpack.config.cjs",
         ":node_modules",
     ],
+    log_level = "debug",
     tool = "webpack_binary",
 )

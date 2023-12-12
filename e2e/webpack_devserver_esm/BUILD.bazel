@@ -28,5 +28,6 @@ js_run_devserver(
         "webpack.config.mjs",
         ":node_modules",
     ],
+    log_level = "debug",
     tool = "webpack_binary",
 )

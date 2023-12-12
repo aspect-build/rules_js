@@ -3,13 +3,15 @@ import * as perf_hooks from 'node:perf_hooks'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as child_process from 'node:child_process'
+import * as crypto from 'node:crypto'
 
 // Globals
 const RUNFILES_ROOT = path.join(
     process.env.JS_BINARY__RUNFILES,
     process.env.JS_BINARY__WORKSPACE
 )
-const synced = new Map()
+const syncedTime = new Map()
+const syncedChecksum = new Map()
 const mkdirs = new Set()
 
 // Ensure that a directory exists. If it has not been previously created or does not exist then it
@@ -34,13 +36,9 @@ function mkdirpSync(p) {
 }
 
 // Determines if a file path refers to a node module.
-//
-// Examples:
-//     isNodeModulePath('/private/var/.../node_modules/@babel/core')  // true
-//     isNodeModulePath('/private/var/.../node_modules/lodash')       // true
-//     isNodeModulePath('/private/var/.../some-file.js')              // false
-function isNodeModulePath(srcPath) {
-    const parentDir = path.dirname(srcPath)
+// See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
+export function isNodeModulePath(p) {
+    const parentDir = path.dirname(p)
     const parentDirName = path.basename(parentDir)
 
     if (parentDirName === 'node_modules') {
@@ -54,41 +52,121 @@ function isNodeModulePath(srcPath) {
     return false
 }
 
+// Determines if a file path is a 1p dep in the virtual store.
+// See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
+export function is1pVirtualStoreDep(p) {
+    // unscoped1p: https://regex101.com/r/hBR08J/1
+    const unscoped1p =
+        /^.+\/\.aspect_rules_js\/([^@\/]+)@0\.0\.0\/node_modules\/\1$/
+    // scoped1p: https://regex101.com/r/bWS7Hl/1
+    const scoped1p =
+        /^.+\/\.aspect_rules_js\/@([^@+\/]+)\+([^@+\/]+)@0\.0\.0\/node_modules\/@\1\/\2$/
+    return p.match(unscoped1p) || p.match(scoped1p)
+}
+
+// Hashes a file using a read stream. Based on https://github.com/kodie/md5-file.
+async function generateChecksum(p) {
+    return new Promise((resolve, reject) => {
+        const output = crypto.createHash('md5')
+        const input = fs.createReadStream(p)
+        input.on('error', (err) => {
+            reject(err)
+        })
+        output.once('readable', () => {
+            resolve(output.read().toString('hex'))
+        })
+        input.pipe(output)
+    })
+}
+
+// Converts a size in bytes to a human readable friendly number such as "24 KiB"
+export function friendlyFileSize(bytes) {
+    if (!bytes) {
+        return '0 B'
+    }
+    const e = Math.floor(Math.log(bytes) / Math.log(1024))
+    if (e == 0) {
+        return `${bytes} B`
+    }
+    return (
+        (bytes / Math.pow(1024, Math.min(e, 5))).toFixed(1) +
+        ' ' +
+        ' KMGTP'.charAt(Math.min(e, 5)) +
+        'iB'
+    )
+}
+
+// https://stackoverflow.com/a/42299191
+function partitionArray(array, callback) {
+    return array.reduce(
+        function (result, element, i) {
+            callback(element, i, array)
+                ? result[0].push(element)
+                : result[1].push(element)
+
+            return result
+        },
+        [[], []]
+    )
+}
+
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
-async function syncRecursive(src, dst, writePerm) {
+async function syncRecursive(src, dst, sandbox, writePerm) {
     try {
         const lstat = await fs.promises.lstat(src)
-        const last = synced.get(src)
+        const last = syncedTime.get(src)
         if (!lstat.isDirectory() && last && lstat.mtimeMs == last) {
             // this file is already up-to-date
+            if (process.env.JS_BINARY__LOG_DEBUG) {
+                console.error(
+                    `Skipping file ${src.slice(
+                        RUNFILES_ROOT.length + 1
+                    )} since its timestamp has not changed`
+                )
+            }
             return 0
         }
-        const exists = synced.has(src) || fs.existsSync(dst)
-        synced.set(src, lstat.mtimeMs)
+        const exists = syncedTime.has(src) || fs.existsSync(dst)
+        syncedTime.set(src, lstat.mtimeMs)
         if (lstat.isSymbolicLink()) {
             const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
-            if (process.env.JS_BINARY__LOG_DEBUG) {
-                console.error(`Syncing symlink ${srcWorkspacePath}`)
-            }
+            let symlinkMeta = ''
             if (isNodeModulePath(src)) {
-                // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
-                // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
-                const maybeBinSrc = path.join(
-                    process.env.JS_BINARY__EXECROOT,
-                    process.env.JS_BINARY__BINDIR,
-                    srcWorkspacePath
-                )
-                if (fs.existsSync(maybeBinSrc)) {
-                    if (process.env.JS_BINARY__LOG_DEBUG) {
-                        console.error(
-                            `Syncing to bazel-out copy of symlink ${srcWorkspacePath}`
-                        )
-                    }
-                    src = maybeBinSrc
+                let linkPath = await fs.promises.readlink(src)
+                if (path.isAbsolute(linkPath)) {
+                    linkPath = path.relative(src, linkPath)
                 }
+                // Special case for 1p node_modules symlinks
+                const maybe1pSync = path.normalize(
+                    path.join(sandbox, srcWorkspacePath, linkPath)
+                )
+                if (fs.existsSync(maybe1pSync)) {
+                    src = maybe1pSync
+                    symlinkMeta = '1p'
+                }
+                if (!symlinkMeta) {
+                    // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
+                    // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
+                    const maybeBinSrc = path.join(
+                        process.env.JS_BINARY__EXECROOT,
+                        process.env.JS_BINARY__BINDIR,
+                        srcWorkspacePath
+                    )
+                    if (fs.existsSync(maybeBinSrc)) {
+                        src = maybeBinSrc
+                        symlinkMeta = 'bazel-out'
+                    }
+                }
+            }
+            if (process.env.JS_BINARY__LOG_DEBUG) {
+                console.error(
+                    `Syncing symlink ${srcWorkspacePath}${
+                        symlinkMeta ? ` (${symlinkMeta})` : ''
+                    }`
+                )
             }
             if (exists) {
                 await fs.promises.unlink(dst)
@@ -111,15 +189,33 @@ async function syncRecursive(src, dst, writePerm) {
                             await syncRecursive(
                                 path.join(src, entry),
                                 path.join(dst, entry),
+                                sandbox,
                                 writePerm
                             )
                     )
                 )
             ).reduce((s, t) => s + t, 0)
         } else {
+            const lastChecksum = syncedChecksum.get(src)
+            const checksum = await generateChecksum(src)
+            if (lastChecksum && checksum == lastChecksum) {
+                // the file contents have not changed since the last sync
+                if (process.env.JS_BINARY__LOG_DEBUG) {
+                    console.error(
+                        `Skipping file ${src.slice(
+                            RUNFILES_ROOT.length + 1
+                        )} since contents have not changed`
+                    )
+                }
+                return 0
+            }
+            syncedChecksum.set(src, checksum)
+
             if (process.env.JS_BINARY__LOG_DEBUG) {
                 console.error(
-                    `Syncing file ${src.slice(RUNFILES_ROOT.length + 1)}`
+                    `Syncing file ${src.slice(
+                        RUNFILES_ROOT.length + 1
+                    )} (${friendlyFileSize(lstat.size)})`
                 )
             }
             if (exists) {
@@ -128,15 +224,18 @@ async function syncRecursive(src, dst, writePerm) {
                 // Intentionally synchronous; see comment on mkdirpSync
                 mkdirpSync(path.dirname(dst))
             }
+
             await fs.promises.copyFile(src, dst)
             if (writePerm) {
                 const s = await fs.promises.stat(dst)
                 const mode = s.mode | fs.constants.S_IWUSR
-                console.error(
-                    `Adding write permissions to file ${src.slice(
-                        RUNFILES_ROOT.length + 1
-                    )}: ${(mode & parseInt('777', 8)).toString(8)}`
-                )
+                if (process.env.JS_BINARY__LOG_DEBUG) {
+                    console.error(
+                        `Adding write permissions to file ${src.slice(
+                            RUNFILES_ROOT.length + 1
+                        )}: ${(mode & parseInt('777', 8)).toString(8)}`
+                    )
+                }
                 await fs.promises.chmod(dst, mode)
             }
             return 1
@@ -149,17 +248,48 @@ async function syncRecursive(src, dst, writePerm) {
 
 // Sync list of files to the sandbox
 async function sync(files, sandbox, writePerm) {
-    console.error('Syncing...')
+    console.error(`Syncing ${files.length} files && folders...`)
     const startTime = perf_hooks.performance.now()
-    const totalSynced = (
+
+    const [virtualStore1pFiles, remainingFiles] = partitionArray(
+        files,
+        is1pVirtualStoreDep
+    )
+
+    if (virtualStore1pFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+        console.error(
+            `Syncing ${virtualStore1pFiles.length} first party virtual store dep(s)`
+        )
+    }
+
+    // Sync first-party virtual store files first since correctly syncing direct 1p node_modules
+    // symlinks depends on checking if the virtual store synced files exist.
+    let totalSynced = (
         await Promise.all(
-            files.map(async (file) => {
+            virtualStore1pFiles.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, writePerm)
+                return await syncRecursive(src, dst, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
+
+    if (remainingFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+        console.error(
+            `Syncing ${remainingFiles.length} other files && folders...`
+        )
+    }
+
+    totalSynced += (
+        await Promise.all(
+            remainingFiles.map(async (file) => {
+                const src = path.join(RUNFILES_ROOT, file)
+                const dst = path.join(sandbox, file)
+                return await syncRecursive(src, dst, sandbox, writePerm)
+            })
+        )
+    ).reduce((s, t) => s + t, 0)
+
     var endTime = perf_hooks.performance.now()
     console.error(
         `${totalSynced} file${
@@ -285,6 +415,9 @@ async function main(args, sandbox) {
 }
 
 ;(async () => {
+    if (process.env.__RULES_JS_UNIT_TEST__)
+        // short-circuit for unit tests
+        return
     let sandbox
     try {
         sandbox = path.join(
