@@ -33,13 +33,14 @@ load(
 load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-_LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
+_LINK_JS_PACKAGE_LOADS_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
 load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
+"""
 
-# Generated npm_package_store targets for npm package {package}@{version}
+_LINK_JS_PACKAGE_TMPL = """# Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_imported_package_store(name):
     root_package = "{root_package}"
@@ -112,7 +113,9 @@ def npm_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
+"""
 
+_LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
     if has_lifecycle_build_target:
         # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
         _npm_package_store(
@@ -189,7 +192,9 @@ def npm_imported_package_store(name):
             version = "{version}",
             tags = ["manual"],
         )
+"""
 
+_LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package_store(name):
@@ -236,7 +241,9 @@ def npm_link_imported_package_store(name):
     )
 
     return [":{{}}".format(name)] if {public_visibility} else []
+"""
 
+_LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
@@ -758,7 +765,7 @@ def _impl_links(rctx):
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
-    npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
+    npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
@@ -783,7 +790,18 @@ def _impl_links(rctx):
         virtual_store_root = utils.virtual_store_root,
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
-    )]
+    )
+
+    npm_link_package_bzl = [
+        tmpl.format(**npm_link_pkg_bzl_vars)
+        for tmpl in [
+            _LINK_JS_PACKAGE_LOADS_TMPL,
+            _LINK_JS_PACKAGE_TMPL,
+            _LINK_JS_PACKAGE_LIFECYCLE_TMPL,
+            _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL,
+            _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL,
+        ]
+    ]
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
 
