@@ -30,22 +30,22 @@ def npm_repositories():
         transitive_closure = {
             "@rollup/plugin-commonjs": ["23.0.4"],
             "@rollup/pluginutils": ["5.0.2"],
+            "@types/estree": ["registry.npmjs.org/@types/estree@1.0.0"],
+            "balanced-match": ["registry.npmjs.org/balanced-match@1.0.2"],
+            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
             "commondir": ["registry.npmjs.org/commondir@1.0.1"],
             "estree-walker": ["registry.npmjs.org/estree-walker@2.0.2"],
-            "glob": ["registry.npmjs.org/glob@8.1.0"],
-            "is-reference": ["registry.npmjs.org/is-reference@1.2.1"],
-            "magic-string": ["registry.npmjs.org/magic-string@0.26.7"],
-            "sourcemap-codec": ["registry.npmjs.org/sourcemap-codec@1.4.8"],
-            "@types/estree": ["registry.npmjs.org/@types/estree@1.0.0"],
             "fs.realpath": ["registry.npmjs.org/fs.realpath@1.0.0"],
+            "glob": ["registry.npmjs.org/glob@8.1.0"],
             "inflight": ["registry.npmjs.org/inflight@1.0.6"],
             "inherits": ["registry.npmjs.org/inherits@2.0.4"],
+            "is-reference": ["registry.npmjs.org/is-reference@1.2.1"],
+            "magic-string": ["registry.npmjs.org/magic-string@0.26.7"],
             "minimatch": ["registry.npmjs.org/minimatch@5.1.6"],
             "once": ["registry.npmjs.org/once@1.4.0"],
-            "wrappy": ["registry.npmjs.org/wrappy@1.0.2"],
-            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
-            "balanced-match": ["registry.npmjs.org/balanced-match@1.0.2"],
             "picomatch": ["registry.npmjs.org/picomatch@2.3.1"],
+            "sourcemap-codec": ["registry.npmjs.org/sourcemap-codec@1.4.8"],
+            "wrappy": ["registry.npmjs.org/wrappy@1.0.2"],
         },
     )
 
@@ -100,20 +100,20 @@ def npm_repositories():
         transitive_closure = {
             "@rollup/plugin-node-resolve": ["15.0.1"],
             "@rollup/pluginutils": ["5.0.2"],
-            "@types/resolve": ["registry.npmjs.org/@types/resolve@1.20.2"],
-            "deepmerge": ["registry.npmjs.org/deepmerge@4.3.0"],
-            "is-builtin-module": ["registry.npmjs.org/is-builtin-module@3.2.1"],
-            "is-module": ["registry.npmjs.org/is-module@1.0.0"],
-            "resolve": ["registry.npmjs.org/resolve@1.22.1"],
-            "is-core-module": ["registry.npmjs.org/is-core-module@2.11.0"],
-            "path-parse": ["registry.npmjs.org/path-parse@1.0.7"],
-            "supports-preserve-symlinks-flag": ["registry.npmjs.org/supports-preserve-symlinks-flag@1.0.0"],
-            "has": ["registry.npmjs.org/has@1.0.3"],
-            "function-bind": ["registry.npmjs.org/function-bind@1.1.1"],
-            "builtin-modules": ["registry.npmjs.org/builtin-modules@3.3.0"],
             "@types/estree": ["registry.npmjs.org/@types/estree@1.0.0"],
+            "@types/resolve": ["registry.npmjs.org/@types/resolve@1.20.2"],
+            "builtin-modules": ["registry.npmjs.org/builtin-modules@3.3.0"],
+            "deepmerge": ["registry.npmjs.org/deepmerge@4.3.0"],
             "estree-walker": ["registry.npmjs.org/estree-walker@2.0.2"],
+            "function-bind": ["registry.npmjs.org/function-bind@1.1.1"],
+            "has": ["registry.npmjs.org/has@1.0.3"],
+            "is-builtin-module": ["registry.npmjs.org/is-builtin-module@3.2.1"],
+            "is-core-module": ["registry.npmjs.org/is-core-module@2.11.0"],
+            "is-module": ["registry.npmjs.org/is-module@1.0.0"],
+            "path-parse": ["registry.npmjs.org/path-parse@1.0.7"],
             "picomatch": ["registry.npmjs.org/picomatch@2.3.1"],
+            "resolve": ["registry.npmjs.org/resolve@1.22.1"],
+            "supports-preserve-symlinks-flag": ["registry.npmjs.org/supports-preserve-symlinks-flag@1.0.0"],
         },
     )
 
@@ -247,8 +247,8 @@ def npm_repositories():
             "balanced-match": "registry.npmjs.org/balanced-match@1.0.2",
         },
         transitive_closure = {
-            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
             "balanced-match": ["registry.npmjs.org/balanced-match@1.0.2"],
+            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
         },
     )
 
@@ -396,15 +396,15 @@ def npm_repositories():
             "once": "registry.npmjs.org/once@1.4.0",
         },
         transitive_closure = {
-            "glob": ["registry.npmjs.org/glob@8.1.0"],
+            "balanced-match": ["registry.npmjs.org/balanced-match@1.0.2"],
+            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
             "fs.realpath": ["registry.npmjs.org/fs.realpath@1.0.0"],
+            "glob": ["registry.npmjs.org/glob@8.1.0"],
             "inflight": ["registry.npmjs.org/inflight@1.0.6"],
             "inherits": ["registry.npmjs.org/inherits@2.0.4"],
             "minimatch": ["registry.npmjs.org/minimatch@5.1.6"],
             "once": ["registry.npmjs.org/once@1.4.0"],
             "wrappy": ["registry.npmjs.org/wrappy@1.0.2"],
-            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
-            "balanced-match": ["registry.npmjs.org/balanced-match@1.0.2"],
         },
     )
 
@@ -424,8 +424,8 @@ def npm_repositories():
             "function-bind": "registry.npmjs.org/function-bind@1.1.1",
         },
         transitive_closure = {
-            "has": ["registry.npmjs.org/has@1.0.3"],
             "function-bind": ["registry.npmjs.org/function-bind@1.1.1"],
+            "has": ["registry.npmjs.org/has@1.0.3"],
         },
     )
 
@@ -485,8 +485,8 @@ def npm_repositories():
             "builtin-modules": "registry.npmjs.org/builtin-modules@3.3.0",
         },
         transitive_closure = {
-            "is-builtin-module": ["registry.npmjs.org/is-builtin-module@3.2.1"],
             "builtin-modules": ["registry.npmjs.org/builtin-modules@3.3.0"],
+            "is-builtin-module": ["registry.npmjs.org/is-builtin-module@3.2.1"],
         },
     )
 
@@ -506,9 +506,9 @@ def npm_repositories():
             "has": "registry.npmjs.org/has@1.0.3",
         },
         transitive_closure = {
-            "is-core-module": ["registry.npmjs.org/is-core-module@2.11.0"],
-            "has": ["registry.npmjs.org/has@1.0.3"],
             "function-bind": ["registry.npmjs.org/function-bind@1.1.1"],
+            "has": ["registry.npmjs.org/has@1.0.3"],
+            "is-core-module": ["registry.npmjs.org/is-core-module@2.11.0"],
         },
     )
 
@@ -562,8 +562,8 @@ def npm_repositories():
             "is-number": "registry.npmjs.org/is-number@6.0.0",
         },
         transitive_closure = {
-            "is-odd": ["registry.npmjs.org/is-odd@3.0.1"],
             "is-number": ["registry.npmjs.org/is-number@6.0.0"],
+            "is-odd": ["registry.npmjs.org/is-odd@3.0.1"],
         },
     )
 
@@ -583,8 +583,8 @@ def npm_repositories():
             "@types/estree": "registry.npmjs.org/@types/estree@1.0.0",
         },
         transitive_closure = {
-            "is-reference": ["registry.npmjs.org/is-reference@1.2.1"],
             "@types/estree": ["registry.npmjs.org/@types/estree@1.0.0"],
+            "is-reference": ["registry.npmjs.org/is-reference@1.2.1"],
         },
     )
 
@@ -645,9 +645,9 @@ def npm_repositories():
             "brace-expansion": "registry.npmjs.org/brace-expansion@2.0.1",
         },
         transitive_closure = {
-            "minimatch": ["registry.npmjs.org/minimatch@5.1.6"],
-            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
             "balanced-match": ["registry.npmjs.org/balanced-match@1.0.2"],
+            "brace-expansion": ["registry.npmjs.org/brace-expansion@2.0.1"],
+            "minimatch": ["registry.npmjs.org/minimatch@5.1.6"],
         },
     )
 
@@ -740,12 +740,12 @@ def npm_repositories():
             "supports-preserve-symlinks-flag": "registry.npmjs.org/supports-preserve-symlinks-flag@1.0.0",
         },
         transitive_closure = {
-            "resolve": ["registry.npmjs.org/resolve@1.22.1"],
+            "function-bind": ["registry.npmjs.org/function-bind@1.1.1"],
+            "has": ["registry.npmjs.org/has@1.0.3"],
             "is-core-module": ["registry.npmjs.org/is-core-module@2.11.0"],
             "path-parse": ["registry.npmjs.org/path-parse@1.0.7"],
+            "resolve": ["registry.npmjs.org/resolve@1.22.1"],
             "supports-preserve-symlinks-flag": ["registry.npmjs.org/supports-preserve-symlinks-flag@1.0.0"],
-            "has": ["registry.npmjs.org/has@1.0.3"],
-            "function-bind": ["registry.npmjs.org/function-bind@1.1.1"],
         },
     )
 
@@ -766,8 +766,8 @@ def npm_repositories():
             "lru-cache": "registry.npmjs.org/lru-cache@6.0.0",
         },
         transitive_closure = {
-            "semver": ["registry.npmjs.org/semver@7.5.1"],
             "lru-cache": ["registry.npmjs.org/lru-cache@6.0.0"],
+            "semver": ["registry.npmjs.org/semver@7.5.1"],
             "yallist": ["registry.npmjs.org/yallist@4.0.0"],
         },
     )

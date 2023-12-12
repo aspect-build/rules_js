@@ -45,7 +45,7 @@ def test_walk_deps(ctx):
 
     # Walk the example tree above
     closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", not_no_optional)
-    expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["2.0.0", "1.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
+    expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["1.0.0", "2.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
     asserts.equals(env, expected, closure)
 
     # Run again with no_optional set, this means we shouldn't walk the dep from @aspect-test/b/5.0.0 -> @aspect-test/c/2.0.0
