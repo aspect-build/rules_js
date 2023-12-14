@@ -171,7 +171,7 @@ workspaces:
     # e2e/webpack_devserver_esm:
 tasks:
     - test:
-    # - format:
+    - format:
     - buildifier:
     - delivery:
           always_deliver: true
