@@ -14,6 +14,8 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/js_image_docker:
         icon: docker
         tasks:
@@ -21,12 +23,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/js_image_oci:
         icon: linux
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     # No test targets. Requires running test.sh.
     # e2e/js_run_devserver:
@@ -37,12 +43,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/npm_link_package-esm:
         icon: npm
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     e2e/npm_translate_lock:
         icon: npm
@@ -51,12 +61,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/npm_translate_lock_empty:
         icon: npm
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     e2e/npm_translate_lock_multi:
         icon: npm
@@ -65,6 +79,8 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/npm_translate_lock_partial_clone:
         icon: npm
         tasks:
@@ -72,12 +88,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/npm_translate_lock_subdir_patch:
         icon: npm
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     # Requires an auth token
     # e2e/npm_translate_lock_auth:
@@ -90,12 +110,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/npm_translate_yarn_lock:
         icon: yarn
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     e2e/package_json_module:
         icon: npm
@@ -104,12 +128,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/pnpm_workspace:
         icon: pnpm
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
@@ -118,12 +146,16 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     e2e/rules_foo:
         icon: js
         tasks:
             - format:
                   without: true
             - buildifier:
+                  without: true
+            - delivery:
                   without: true
     e2e/vendored_node:
         icon: js
@@ -132,6 +164,8 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+            - delivery:
+                  without: true
     # No test targets. Requires running test.sh.
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
@@ -139,3 +173,6 @@ tasks:
     - test:
     # - format:
     - buildifier:
+    - delivery:
+          always_deliver: true
+          queue: aspect-default
