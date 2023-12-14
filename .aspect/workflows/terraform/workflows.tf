@@ -81,12 +81,7 @@ module "aspect_workflows" {
       warming                   = true
     }
     small = {
-      agent_idle_timeout_min = 1
-      gh_repo                = "aspect-build/rules_jasmine"
-      # Determine the workflow ID with:
-      # gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/aspect-build/rules_jasmine/actions/workflows
-      # https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#list-repository-workflows
-      gha_workflow_ids          = ["67579950"] # Aspect Workflows
+      agent_idle_timeout_min    = 1
       max_runners               = 10
       min_runners               = 0
       queue                     = "aspect-small"
