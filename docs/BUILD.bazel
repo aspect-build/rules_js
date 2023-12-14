@@ -66,3 +66,12 @@ stardoc_with_diff_test(
 update_docs(
     name = "update",
 )
+
+# Demonstration delivery target for Aspect Workflows.
+# In the future this could be wired up to push to a demonstration S3 bucket.
+sh_binary(
+    name = "docs_delivery",
+    srcs = ["delivery.sh"],
+    data = glob(["*.md"]),
+    tags = ["deliverable"],
+)

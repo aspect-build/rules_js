@@ -30,7 +30,7 @@ module "aspect_workflows" {
   }
 
   # Delivery properties
-  delivery_enabled = false
+  delivery_enabled = true
 
   # Remote cache configuration
   remote = {
