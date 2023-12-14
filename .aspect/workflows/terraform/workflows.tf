@@ -6,7 +6,7 @@ data "google_compute_image" "runner_image" {
   # https://github.com/aspect-build/workflows-images for example packer scripts and BUILD targets
   # for building GCP images for Workflows.
   project = "aspect-workflows-images"
-  name    = "aspect-workflows-ubuntu-2304-kitchen-sink-1-5-0"
+  name    = "aspect-workflows-ubuntu-2304-kitchen-sink-amd64-1-6-0"
 }
 
 module "aspect_workflows" {
@@ -16,7 +16,7 @@ module "aspect_workflows" {
   region  = local.region
 
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.9.0-beta.10/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.9.0-rc.0/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
