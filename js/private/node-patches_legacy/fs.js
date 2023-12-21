@@ -121,7 +121,7 @@ const patcher = (fs = _fs, roots) => {
     };
     fs.lstatSync = function lstatSync(...args) {
         const stats = origLstatSync(...args);
-        if (!stats.isSymbolicLink()) {
+        if (!(stats === null || stats === void 0 ? void 0 : stats.isSymbolicLink())) {
             // the file is not a symbolic link so there is nothing more to do
             return stats;
         }
