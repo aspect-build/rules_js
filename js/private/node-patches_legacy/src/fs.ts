@@ -135,7 +135,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     ) {
         const stats = origLstatSync(...args)
 
-        if (!stats.isSymbolicLink()) {
+        if (!stats?.isSymbolicLink()) {
             // the file is not a symbolic link so there is nothing more to do
             return stats
         }

@@ -70,6 +70,33 @@ describe('testing lstat', async () => {
         )
     })
 
+    await it('can lstatSync throwIfNoEntry:false', async () => {
+        await withFixtures(
+            {
+                a: { g: {} },
+                b: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                const patchedFs = Object.assign({}, fs)
+                patchedFs.promises = Object.assign({}, fs.promises)
+                patcher(patchedFs, [
+                    path.join(fixturesDir),
+                    path.join(fixturesDir, 'a', 'g'),
+                ])
+
+                assert.equal(
+                    undefined,
+                    patchedFs.lstatSync(
+                        path.join(fixturesDir, 'doesnt-exist'),
+                        { throwIfNoEntry: false }
+                    )
+                )
+            }
+        )
+    })
+
     await it('can lstat symlink in guard is file', async () => {
         await withFixtures(
             {
