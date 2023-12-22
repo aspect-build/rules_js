@@ -73,7 +73,7 @@ module "aspect_workflows" {
       use_preemptible = true
     }
     micro = {
-      machine_type = "e2-micro"
+      machine_type = "e2-small"
       num_ssds     = 0
       image_id     = data.google_compute_image.runner_image.id
       # While preemtible instances are possible to provision and we use them here on this open source
