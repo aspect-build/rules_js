@@ -33,8 +33,7 @@ with the following yaml steps:
 
 ```
 steps:
-  - key: aspect-workflows-setup
-    label: ":aspect: Setup Aspect Workflows"
+  - label: ":aspect: Setup Aspect Workflows"
     commands:
       - "rosetta steps | buildkite-agent pipeline upload"
     agents:
@@ -47,16 +46,18 @@ The scheduled warming pipeline found at https://buildkite.com/aspect/rules-js-wa
 configured with the following yaml steps:
 
 ```
+env:
+  ASPECT_WORKFLOWS_BIN_DIR: /etc/aspect/workflows/bin
 steps:
   - label: ":fire: Create warming archives"
-    commands:
-      - 'echo "--- :aspect: Configure environment"'
-      - 'configure_workflows_env'
-      - 'echo "--- :stethoscope: Agent health checks"'
-      - 'agent_health_check'
-      - 'echo "--- :bazel: Create warming archive for ."'
-      - 'rosetta run warming'
-      - 'warming_archive'
+    commands: |
+      echo "--- :aspect-build: Configure environment"
+      ${ASPECT_WORKFLOWS_BIN_DIR}/configure_workflows_env
+      echo "--- :stethoscope: Agent health checks"
+      ${ASPECT_WORKFLOWS_BIN_DIR}/agent_health_check
+      echo "--- :bazel: Create warming archive"
+      rosetta run warming
+      ${ASPECT_WORKFLOWS_BIN_DIR}/warming_archive
     agents:
       queue: aspect-warming
 ```
