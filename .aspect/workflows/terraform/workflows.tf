@@ -16,7 +16,7 @@ module "aspect_workflows" {
   region  = local.region
 
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.9.0-rc.7/workflows-gcp/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.9.0-rc.9/workflows-gcp/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
@@ -63,7 +63,7 @@ module "aspect_workflows" {
       use_preemptible = true
     }
     small = {
-      machine_type = "e2-small"
+      machine_type = "e2-medium"
       num_ssds     = 0
       image_id     = data.google_compute_image.runner_image.id
       # While preemtible instances are possible to provision and we use them here on this open source
@@ -89,6 +89,7 @@ module "aspect_workflows" {
     # The default runner group is use for the main build & test workflows.
     default = {
       agent_idle_timeout_min    = 1
+      git_clone_depth           = 64
       max_runners               = 10
       min_runners               = 0
       queue                     = "aspect-default"
@@ -97,8 +98,9 @@ module "aspect_workflows" {
       warming                   = true
     }
     small = {
-      agent_idle_timeout_min    = 10
-      max_runners               = 10
+      agent_idle_timeout_min    = 1
+      git_clone_depth           = 64
+      max_runners               = 20
       min_runners               = 0
       queue                     = "aspect-small"
       resource_type             = "small"
@@ -107,6 +109,7 @@ module "aspect_workflows" {
     }
     micro = {
       agent_idle_timeout_min    = 60 * 12
+      git_clone_depth           = 64
       max_runners               = 10
       min_runners               = 0
       queue                     = "aspect-micro"
@@ -118,6 +121,7 @@ module "aspect_workflows" {
     # warming archives for use by other runner groups.
     warming = {
       agent_idle_timeout_min = 1
+      git_clone_depth        = 1
       max_runners            = 1
       min_runners            = 0
       queue                  = "aspect-warming"
