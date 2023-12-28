@@ -26,6 +26,11 @@ build_test(
     targets = ["//:node_modules"],
 )
 
+build_test(
+    name = "testing",
+    targets = ["@mysql_8_0_34_linux-glibc2.28-aarch64//:files"],
+)
+
 # buildifier: disable=duplicated-name
 NODE_MODULES = npm_link_targets(
     name = "node_modules",
