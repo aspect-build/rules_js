@@ -4,7 +4,7 @@ const replace = require("@rollup/plugin-replace");
 const json = require("@rollup/plugin-json");
 
 module.exports = {
-    external: ['readable-stream'],
+    external: ['readable-stream', 'fsevents'],
     plugins: [
         nodeResolve({
             preferBuiltins: true
