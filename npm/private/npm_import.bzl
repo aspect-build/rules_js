@@ -593,11 +593,17 @@ bin = bin_factory("node_modules")
             rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
 
     rules_js_metadata = {}
+
+    custom_postinstalls = rctx.attr.custom_postinstall
+    if custom_postinstalls == "optimize_package":
+        rules_js_metadata["optimize_package"] = True
+        custom_postinstalls = []
+
     if rctx.attr.lifecycle_hooks:
         rules_js_metadata["lifecycle_hooks"] = ",".join(rctx.attr.lifecycle_hooks)
-    if rctx.attr.custom_postinstall:
+    if custom_postinstalls:
         rules_js_metadata["scripts"] = {}
-        rules_js_metadata["scripts"]["custom_postinstall"] = rctx.attr.custom_postinstall
+        rules_js_metadata["scripts"]["custom_postinstall"] = custom_postinstalls
     rules_js_json_path = paths.join(_EXTRACT_TO_DIRNAME, "aspect_rules_js_metadata.json")
     rctx.file(rules_js_json_path, json.encode_indent(rules_js_metadata, indent = "  "))
 

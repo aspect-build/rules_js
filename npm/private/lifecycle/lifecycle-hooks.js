@@ -5,6 +5,11 @@ const path = require('path')
 const { safeReadPackageJsonFromDir } = require('@pnpm/read-package-json')
 const { runLifecycleHook } = require('@pnpm/lifecycle')
 
+const {rollup} = require('rollup');
+const {dts} = require('rollup-plugin-dts');
+const commonjs = require('@rollup/plugin-commonjs');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+
 async function mkdirp(p) {
     if (p && !fs.existsSync(p)) {
         await mkdirp(path.dirname(p))
@@ -126,6 +131,89 @@ async function runLifecycleHooks(opts, hooks) {
 
 function isWindows() {
     return os.platform() === 'win32'
+}
+
+
+async function optimizePackage(destDir) {
+    // We first copy the package to a temporary directory so that we don't have `node_modules`
+    // in our name. Otherwise, `dts` will refuse to do anthing, since `respectExternals` defaults to false.
+    // Setting that to true will inline _all_ externals (including dependencies), which
+    // can break typechecking. Better to bundle the dependencies on their own.
+    const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'aspect_rules_js_'));
+    await fs.promises.cp(destDir, tempDir, {recursive: true, force: true});
+
+    const packageJsonText = await fs.promises.readFile(path.join(tempDir, 'package.json'));
+    const packageJson = JSON.parse(packageJsonText);
+
+    const typesMain = packageJson.type ? path.join(tempDir, packageJson.types) : undefined;
+    const cjsMain = packageJson.main ? path.join(tempDir, packageJson.main) : undefined;
+    const esmMain = packageJson.module ? path.join(tempDir, packageJson.module) : undefined;
+
+    async function bundleDts(input) {
+        const result = await rollup({
+            input,
+            plugins: [dts()],
+        });
+        await result.write({
+            file: input,
+            format: 'esm',
+        });
+    }
+
+    async function bundle(input, format, plugins) {
+        const result = await rollup({
+            input,
+            output: {
+                file: input,
+                format,
+            },
+            plugins,
+            external: [/package\.json$/],
+        });
+        await result.write({
+            file: input,
+            format,
+        });
+    }
+
+    const bundlePromises = [];
+    typesMain && bundlePromises.push(bundleDts(typesMain));
+    cjsMain && bundlePromises.push(bundle(cjsMain, 'cjs', [commonjs()]));
+    esmMain && bundlePromises.push(bundle(esmMain, 'esm', [nodeResolve()]));
+
+    // Would be faster to use esbuild, but we cannot bundle esbuild itself :/
+    /*cjsMain && bundlePromises.push(esbuild.build({
+        entryPoints: [cjsMain],
+        bundle: true,
+        outfile: cjsMain,
+        platform: 'node',
+        format: 'cjs',
+    }));
+    esmMain && bundlePromises.push(esbuild.build({
+        entryPoints: [esmMain],
+        bundle: true,
+        outfile: esmMain,
+        platform: 'node',
+        format: 'esm',
+    }));*/
+
+    await Promise.all(bundlePromises);
+   
+    await fs.promises.rm(destDir, {recursive: true, force: true});
+
+    async function rename(tmpPath, realPath) {
+        const realDir = path.dirname(realPath);
+        await fs.promises.mkdir(realDir, {recursive: true});
+        await fs.promises.cp(tmpPath, realPath);
+    }
+
+    const emitPromises = [];
+    typesMain && emitPromises.push(rename(typesMain, path.join(destDir, packageJson.types)));
+    cjsMain && emitPromises.push(rename(cjsMain, path.join(destDir, packageJson.main)));
+    esmMain && emitPromises.push(rename(esmMain, path.join(destDir, packageJson.module)));
+    await Promise.all(emitPromises);
+
+    await fs.promises.writeFile(path.join(destDir, 'package.json'), packageJsonText);
 }
 
 async function main(args) {
@@ -259,6 +347,10 @@ async function main(args) {
     if (rulesJsJson.scripts?.custom_postinstall) {
         // Run user specified custom postinstall hook
         await runLifecycleHook('custom_postinstall', rulesJsJson, opts)
+    }
+
+    if (rulesJsJson.optimize_package) {
+        await optimizePackage(outputDir);
     }
 }
 
