@@ -95,6 +95,24 @@ function logf_debug {
     fi
 }
 
+function resolve_execroot_bin_path {
+    local short_path="$1"
+    if [[ "$short_path" == ../* ]]; then
+        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/external/${short_path:3}"
+    else
+        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$short_path"
+    fi
+}
+
+function resolve_execroot_src_path {
+    local short_path="$1"
+    if [[ "$short_path" == ../* ]]; then
+        echo "$JS_BINARY__EXECROOT/external/${short_path:3}"
+    else
+        echo "$JS_BINARY__EXECROOT/$short_path"
+    fi
+}
+
 _exit() {
     EXIT_CODE=$?
 
@@ -158,8 +176,8 @@ elif [[ "$PWD" == *"/bazel-~1/"* ]]; then
 fi
 
 if [[ "${bazel_out_segment:-}" ]]; then
-    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
-        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
     else
         # We in runfiles and we don't yet know the execroot
         rest="${PWD#*"$bazel_out_segment"}"
@@ -171,8 +189,8 @@ if [[ "${bazel_out_segment:-}" ]]; then
         JS_BINARY__EXECROOT="${PWD:0:$index}"
     fi
 else
-    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
-        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
     else
         # We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
         JS_BINARY__EXECROOT="$PWD"
@@ -200,9 +218,9 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
 fi
 export JS_BINARY__EXECROOT
 
-if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
+if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
     if [ -z "${BAZEL_BINDIR:-}" ]; then
-        logf_fatal "Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
+        logf_fatal "Expected BAZEL_BINDIR to be set when JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT is set"
         exit 1
     fi
     if [ -z "${JS_BINARY__COPY_DATA_TO_BIN:-}" ] && [ -z "${JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN:-}" ]; then
@@ -210,11 +228,18 @@ if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
 To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
         exit 1
     fi
-    entry_point="{{entry_point_path}}"
-    if [[ "$entry_point" == ../* ]]; then
-        entry_point="external/${entry_point:3}"
+fi
+
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    if [ -z "${JS_BINARY__COPY_DATA_TO_BIN:-}" ] && [ -z "${JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN:-}" ]; then
+        logf_fatal "Expected js_binary copy_data_to_bin to be True when js_binary use_execroot_entry_point is True. \
+To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
+        exit 1
     fi
-    entry_point="$JS_BINARY__EXECROOT/$BAZEL_BINDIR/$entry_point"
+fi
+
+if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    entry_point=$(resolve_execroot_bin_path "{{entry_point_path}}")
 else
     entry_point="$JS_BINARY__RUNFILES/{{workspace_name}}/{{entry_point_path}}"
 fi
@@ -232,9 +257,14 @@ if [ "${node:0:1}" = "/" ]; then
         exit 1
     fi
 else
-    export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/{{node}}"
+    if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+        export JS_BINARY__NODE_BINARY
+        JS_BINARY__NODE_BINARY=$(resolve_execroot_src_path "{{node}}")
+    else
+        export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node}}"
+    fi
     if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
-        logf_fatal "node binary '%s' not found in runfiles" "$JS_BINARY__NODE_BINARY"
+        logf_fatal "node binary '%s' not found" "$JS_BINARY__NODE_BINARY"
         exit 1
     fi
 fi
@@ -254,9 +284,14 @@ if [ "$npm" ]; then
             exit 1
         fi
     else
-        export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/{{npm}}"
+        if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+            export JS_BINARY__NPM_BINARY
+            JS_BINARY__NPM_BINARY=$(resolve_execroot_src_path "{{npm}}")
+        else
+            export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{npm}}"
+        fi
         if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
-            logf_fatal "npm binary '%s' not found in runfiles" "$JS_BINARY__NPM_BINARY"
+            logf_fatal "npm binary '%s' not found" "$JS_BINARY__NPM_BINARY"
             exit 1
         fi
     fi
@@ -266,9 +301,14 @@ if [ "$npm" ]; then
     fi
 fi
 
-export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_wrapper}}"
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    export JS_BINARY__NODE_WRAPPER
+    JS_BINARY__NODE_WRAPPER=$(resolve_execroot_bin_path "{{node_wrapper}}")
+else
+    export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_wrapper}}"
+fi
 if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
-    logf_fatal "node wrapper '%s' not found in runfiles" "$JS_BINARY__NODE_WRAPPER"
+    logf_fatal "node wrapper '%s' not found" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi
 if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
@@ -276,9 +316,14 @@ if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
     exit 1
 fi
 
-export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_patches}}"
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    export JS_BINARY__NODE_PATCHES
+    JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "{{node_patches}}")
+else
+    export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_patches}}"
+fi
 if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
-    logf_fatal "node patches '%s' not found in runfiles" "$JS_BINARY__NODE_PATCHES"
+    logf_fatal "node patches '%s' not found" "$JS_BINARY__NODE_PATCHES"
     exit 1
 fi
 
@@ -351,22 +396,28 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     if [ "${BAZEL_WORKSPACE:-}" ]; then
         logf_debug "BAZEL_WORKSPACE %s" "$BAZEL_WORKSPACE"
     fi
-    logf_debug "js_binary FS_PATCH_ROOTS %s" "${JS_BINARY__FS_PATCH_ROOTS:-}"
-    logf_debug "js_binary NODE_PATCHES %s" "${JS_BINARY__NODE_PATCHES:-}"
-    logf_debug "js_binary NODE_OPTIONS %s" "${JS_BINARY__NODE_OPTIONS:-}"
-    logf_debug "js_binary BINDIR %s" "${JS_BINARY__BINDIR:-}"
-    logf_debug "js_binary BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
-    logf_debug "js_binary COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
-    logf_debug "js_binary NODE_BINARY %s" "${JS_BINARY__NODE_BINARY:-}"
-    logf_debug "js_binary NODE_WRAPPER %s" "${JS_BINARY__NODE_WRAPPER:-}"
+    logf_debug "JS_BINARY__FS_PATCH_ROOTS %s" "${JS_BINARY__FS_PATCH_ROOTS:-}"
+    logf_debug "JS_BINARY__NODE_PATCHES %s" "${JS_BINARY__NODE_PATCHES:-}"
+    logf_debug "JS_BINARY__NODE_OPTIONS %s" "${JS_BINARY__NODE_OPTIONS:-}"
+    logf_debug "JS_BINARY__BINDIR %s" "${JS_BINARY__BINDIR:-}"
+    logf_debug "JS_BINARY__BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
+    logf_debug "JS_BINARY__COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
+    logf_debug "JS_BINARY__NODE_BINARY %s" "${JS_BINARY__NODE_BINARY:-}"
+    logf_debug "JS_BINARY__NODE_WRAPPER %s" "${JS_BINARY__NODE_WRAPPER:-}"
     if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
-        logf_debug "js_binary NPM_BINARY %s" "$JS_BINARY__NPM_BINARY"
+        logf_debug "JS_BINARY__NPM_BINARY %s" "$JS_BINARY__NPM_BINARY"
     fi
-    logf_debug "js_binary PACKAGE %s" "${JS_BINARY__PACKAGE:-}"
-    logf_debug "js_binary TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
-    logf_debug "js_binary TARGET_NAME %s" "${JS_BINARY__TARGET_NAME:-}"
-    logf_debug "js_binary WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
+    if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+        logf_debug "JS_BINARY__NO_RUNFILES %s" "$JS_BINARY__NO_RUNFILES"
+    fi
+    logf_debug "JS_BINARY__PACKAGE %s" "${JS_BINARY__PACKAGE:-}"
+    logf_debug "JS_BINARY__TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
+    logf_debug "JS_BINARY__TARGET_NAME %s" "${JS_BINARY__TARGET_NAME:-}"
+    logf_debug "JS_BINARY__WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
     logf_debug "js_binary entry point %s" "$entry_point"
+    if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
+        logf_debug "JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT %s" "$JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT"
+    fi
 fi
 
 # Info logs
@@ -374,9 +425,9 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     if [ "${BAZEL_TARGET:-}" ]; then
         logf_info "BAZEL_TARGET %s" "${BAZEL_TARGET:-}"
     fi
-    logf_info "js_binary TARGET %s" "${JS_BINARY__TARGET:-}"
-    logf_info "js_binary RUNFILES %s" "${JS_BINARY__RUNFILES:-}"
-    logf_info "js_binary EXECROOT %s" "${JS_BINARY__EXECROOT:-}"
+    logf_info "JS_BINARY__TARGET %s" "${JS_BINARY__TARGET:-}"
+    logf_info "JS_BINARY__RUNFILES %s" "${JS_BINARY__RUNFILES:-}"
+    logf_info "JS_BINARY__EXECROOT %s" "${JS_BINARY__EXECROOT:-}"
     logf_info "PWD %s" "$PWD"
 fi
 

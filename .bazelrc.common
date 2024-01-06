@@ -40,20 +40,6 @@ build:debug --compilation_mode=dbg
 # https://github.com/aspect-build/bazel-lib/blob/main/docs/copy_directory.md
 startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 
-# In general, the rules in this repository assume that runfiles
-# are enabled as we do not support no runfiles case.
-#
-# If you are developing on Windows, you must either run bazel
-# with administrator priviledges or enable developer mode. If
-# you do not you may hit this error on Windows:
-#
-#   Bazel needs to create symlinks to build the runfiles tree.
-#   Creating symlinks on Windows requires one of the following:
-#       1. Bazel is run with administrator privileges.
-#       2. The system version is Windows 10 Creators Update (1703) or later
-#          and developer mode is enabled.
-build --enable_runfiles
-
 build --incompatible_allow_tags_propagation
 
 # Turn off legacy external runfiles on all platforms except Windows.

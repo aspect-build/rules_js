@@ -56,9 +56,6 @@ The following environment variables are made available to the Node.js runtime ba
 * JS_BINARY__NODE_WRAPPER: the Node.js wrapper script used to run Node.js which is available as `node` on the `PATH` at runtime
 * JS_BINARY__RUNFILES: the absolute path to the Bazel runfiles directory
 * JS_BINARY__EXECROOT: the absolute path to the root of the execution root for the action; if in the sandbox, this path absolute path to the root of the execution root within the sandbox
-
-This rules requires that Bazel was run with
-[`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
 """
 
 _ATTRS = {
@@ -330,8 +327,8 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
 # to get back to the short_path.
 # TODO: fix toolchain so we don't have to do this
-def _target_tool_short_path(workspace_name, path):
-    return (workspace_name + "/../" + path[len("external/"):]) if path.startswith("external/") else path
+def _target_tool_path_to_short_path(tool_path):
+    return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
 # Generate a consistent label string between Bazel versions.
 # TODO: hoist this function to bazel-lib and use from there (as well as the dup in npm/private/utils.bzl)
@@ -382,6 +379,8 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
         ),
         "JS_BINARY__WORKSPACE": ctx.workspace_name,
     }
+    if is_windows and not ctx.attr.enable_runfiles:
+        builtins["JS_BINARY__NO_RUNFILES"] = "1"
     for (key, value) in builtins.items():
         envs.append(_ENV_SET.format(var = key, value = value))
 
@@ -441,7 +440,7 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
 
     npm_path = ""
     if ctx.attr.include_npm:
-        npm_path = _target_tool_short_path(ctx.workspace_name, node_toolchain.nodeinfo.npm_path)
+        npm_path = _target_tool_path_to_short_path(node_toolchain.nodeinfo.npm_path)
         if is_windows:
             npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
             ctx.actions.expand_template(
@@ -460,7 +459,7 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
             )
         toolchain_files.append(npm_wrapper)
 
-    node_path = _target_tool_short_path(ctx.workspace_name, node_toolchain.nodeinfo.target_tool_path)
+    node_path = _target_tool_path_to_short_path(node_toolchain.nodeinfo.target_tool_path)
 
     launcher_subst = {
         "{{target_label}}": _consistent_label_str(ctx.workspace_name, ctx.label),
@@ -502,9 +501,6 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         node_toolchain = ctx.attr.node_toolchain[platform_common.ToolchainInfo]
     else:
         node_toolchain = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"]
-
-    if is_windows and not ctx.attr.enable_runfiles:
-        fail("need --enable_runfiles on Windows for to support rules_js")
 
     if ctx.attr.include_npm and not hasattr(node_toolchain.nodeinfo, "npm_files"):
         fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")

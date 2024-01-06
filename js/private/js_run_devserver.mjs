@@ -40,18 +40,18 @@ function mkdirpSync(p) {
 //     isNodeModulePath('/private/var/.../node_modules/lodash')       // true
 //     isNodeModulePath('/private/var/.../some-file.js')              // false
 function isNodeModulePath(srcPath) {
-    const parentDir = path.dirname(srcPath);
-    const parentDirName = path.basename(parentDir);
+    const parentDir = path.dirname(srcPath)
+    const parentDirName = path.basename(parentDir)
 
     if (parentDirName === 'node_modules') {
         // unscoped module like 'lodash'
-        return true;
+        return true
     } else if (parentDirName.startsWith('@')) {
         // scoped module like '@babel/core'
-        const parentParentDir = path.dirname(parentDir);
-        return path.basename(parentParentDir) === 'node_modules';
+        const parentParentDir = path.dirname(parentDir)
+        return path.basename(parentParentDir) === 'node_modules'
     }
-    return false;
+    return false
 }
 
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
@@ -209,7 +209,7 @@ async function main(args, sandbox) {
             // to determine the execroot entry point but since the tool is running
             // in a custom sandbox we don't want to cd into the BAZEL_BINDIR in the launcher
             // (JS_BINARY__NO_CD_BINDIR is set above)
-            env['JS_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
+            env['JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
             env['BAZEL_BINDIR'] = config.bazel_bindir
             if (config.allow_execroot_entry_point_with_no_copy_data_to_bin) {
                 env[

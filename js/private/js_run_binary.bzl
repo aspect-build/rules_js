@@ -327,7 +327,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
 
     # Configure run from execroot
     if use_execroot_entry_point:
-        fixed_env["JS_BINARY__USE_EXECROOT_ENTRY_POINT"] = "1"
+        fixed_env["JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT"] = "1"
 
         # hoist all runfiles to srcs when running from execroot
         js_runfiles_lib_name = "{}_runfiles_lib".format(name)
