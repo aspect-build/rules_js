@@ -598,8 +598,10 @@ bin = bin_factory("node_modules")
     if rctx.attr.custom_postinstall:
         rules_js_metadata["scripts"] = {}
         rules_js_metadata["scripts"]["custom_postinstall"] = rctx.attr.custom_postinstall
-    rules_js_json_path = paths.join(_EXTRACT_TO_DIRNAME, "aspect_rules_js_metadata.json")
-    rctx.file(rules_js_json_path, json.encode_indent(rules_js_metadata, indent = "  "))
+
+    if rules_js_metadata:
+        rules_js_json_path = paths.join(_EXTRACT_TO_DIRNAME, "aspect_rules_js_metadata.json")
+        rctx.file(rules_js_json_path, json.encode_indent(rules_js_metadata, indent = "  "))
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(contents))
