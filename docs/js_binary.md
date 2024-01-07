@@ -62,9 +62,6 @@ The following environment variables are made available to the Node.js runtime ba
 * JS_BINARY__RUNFILES: the absolute path to the Bazel runfiles directory
 * JS_BINARY__EXECROOT: the absolute path to the root of the execution root for the action; if in the sandbox, this path absolute path to the root of the execution root within the sandbox
 
-This rules requires that Bazel was run with
-[`--enable_runfiles`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles). 
-
 
 **ATTRIBUTES**
 

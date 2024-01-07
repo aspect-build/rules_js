@@ -69,39 +69,39 @@ assert_contains(
 )
 
 assert_contains(
-    name = "js_binary_BAZEL_BINDIR_test",
+    name = "JS_BINARY__BAZEL_BINDIR_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary BINDIR bazel-out/",
+    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__BINDIR bazel-out/",
 )
 
 assert_contains(
-    name = "js_binary_BAZEL_BUILD_FILE_PATH_test",
+    name = "JS_BINARY__BAZEL_BUILD_FILE_PATH_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
+    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
 )
 
 assert_contains(
-    name = "js_binary_BAZEL_PACKAGE_test",
+    name = "JS_BINARY__BAZEL_PACKAGE_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary PACKAGE js/private/test/js_binary_sh",
+    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__PACKAGE js/private/test/js_binary_sh",
 )
 
 assert_contains(
-    name = "js_binary_BAZEL_TARGET_test",
+    name = "JS_BINARY__BAZEL_TARGET_test",
     actual = ":stderr",
-    expected = "INFO: aspect_rules_js[js_binary]: js_binary TARGET //js/private/test/js_binary_sh:one",
+    expected = "INFO: aspect_rules_js[js_binary]: JS_BINARY__TARGET //js/private/test/js_binary_sh:one",
 )
 
 assert_contains(
-    name = "js_binary_BAZEL_TARGET_NAME_test",
+    name = "JS_BINARY__BAZEL_TARGET_NAME_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary TARGET_NAME one",
+    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__TARGET_NAME one",
 )
 
 assert_contains(
-    name = "js_binary_BAZEL_WORKSPACE_test",
+    name = "JS_BINARY__BAZEL_WORKSPACE_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: js_binary WORKSPACE aspect_rules_js",
+    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__WORKSPACE aspect_rules_js",
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],
