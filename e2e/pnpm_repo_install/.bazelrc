@@ -1,2 +1,11 @@
-# import common bazelrc shared with e2e workspaces
-import %workspace%/../../.bazelrc.common
+# Import Aspect bazelrc presets
+try-import %workspace%/../../.aspect/bazelrc/bazel7.bazelrc
+import %workspace%/../../.aspect/bazelrc/convenience.bazelrc
+import %workspace%/../../.aspect/bazelrc/correctness.bazelrc
+import %workspace%/../../.aspect/bazelrc/debug.bazelrc
+import %workspace%/../../.aspect/bazelrc/javascript.bazelrc
+import %workspace%/../../.aspect/bazelrc/performance.bazelrc
+
+### YOUR PROJECT SPECIFIC SETTINGS GO HERE ###
+
+build --sandbox_default_allow_network=true

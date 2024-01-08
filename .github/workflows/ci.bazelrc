@@ -1,6 +1,3 @@
-# Bazel settings to apply on CI only
-# Included with a --bazelrc option in the call to bazel
-
 # Directories caches by GitHub actions
 common:local --disk_cache=~/.cache/bazel-disk-cache
 common --repository_cache=~/.cache/bazel-repository-cache
@@ -9,28 +6,16 @@ common --repository_cache=~/.cache/bazel-repository-cache
 common:bazel6 --test_tag_filters=-skip-on-bazel6
 common:bazel7 --test_tag_filters=-skip-on-bazel7
 
-# General CI settings
-build --announce_rc
-test --test_output=errors
+# Bazel-in-bazel support
 test --test_env=XDG_CACHE_HOME
 
-# Generic remote cache
-build --remote_local_fallback
-build --remote_download_toplevel
-build --remote_timeout=3600
-build --remote_upload_local_results
-## Fixes builds hanging on CI that get the TCP connection closed without sending RST packets.
-build --grpc_keepalive_time=30s
-
-# Generic remote build execution
+# Remote execution
+build:rbe --bes_backend=grpcs://remote.buildbuddy.io
+build:rbe --bes_results_url=https://app.buildbuddy.io/invocation/
 build:rbe --extra_execution_platforms=@aspect_rules_js//platforms:x86_64_linux_remote
 # local fallback allows genrule to be executed locally if requested explicitly
 build:rbe --genrule_strategy=remote,local
 build:rbe --host_platform=@aspect_rules_js//platforms:x86_64_linux_remote
 build:rbe --jobs=32
-
-# BuildBuddy remote exec
-build:rbe --bes_results_url=https://app.buildbuddy.io/invocation/
-build:rbe --bes_backend=grpcs://remote.buildbuddy.io
-build:rbe --remote_timeout=3600
 build:rbe --remote_executor=grpcs://remote.buildbuddy.io
+build:rbe --remote_timeout=3600
