@@ -1,11 +1,19 @@
-# import common bazelrc settings used in this repository and in nested workspaces
-import %workspace%/.bazelrc.common
+# Import Aspect bazelrc presets
 
-# import bazelrc settings that are needed for testing in this repository
-import %workspace%/.bazelrc.testing
+try-import %workspace%/.aspect/bazelrc/bazel7.bazelrc
+import %workspace%/.aspect/bazelrc/convenience.bazelrc
+import %workspace%/.aspect/bazelrc/correctness.bazelrc
+import %workspace%/.aspect/bazelrc/debug.bazelrc
+import %workspace%/.aspect/bazelrc/javascript.bazelrc
+import %workspace%/.aspect/bazelrc/performance.bazelrc
 
-# Use a try-import for Bazel 6 settings since this repository is also tested against Bazel 5 on CI
-try-import %workspace%/.bazelrc.bazel6
+### YOUR PROJECT SPECIFIC SETTINGS GO HERE ###
+
+# Mock versioning command to test the --stamp behavior
+build --workspace_status_command="echo BUILD_SCM_VERSION 1.2.3"
+
+# Enable with --config=release
+build:release --stamp --workspace_status_command=$(pwd)/workspace_status.sh
 
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
