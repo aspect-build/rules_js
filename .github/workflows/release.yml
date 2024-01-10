@@ -13,19 +13,22 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Mount bazel caches
               uses: actions/cache@v3
               with:
                   path: |
-                      "~/.cache/bazel"
-                      "~/.cache/bazel-repo"
-                  key: bazel-cache-${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', '**/*.js') }}
-                  restore-keys: bazel-cache-
+                      ~/.cache/bazel-disk-cache
+                      ~/.cache/bazel-repository-cache
+                      ~/.cache/xdg-cache
+                  key: >-
+                      bazel-cache-${{ matrix.bazelversion.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                      ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', 'MODULE.bazel.lock', '**/*.js', '!e2e') }}
+                  restore-keys: |
+                      bazel-cache-${{ matrix.bazelversion.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
             - name: bazel test //...
               env:
-                  # Bazelisk will download bazel to here
-                  XDG_CACHE_HOME: ~/.cache/bazel-repo
+                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
               run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
             - name: Prepare release
               run: .github/workflows/release_prep.sh ${{ env.GITHUB_REF_NAME }} > release_notes.txt

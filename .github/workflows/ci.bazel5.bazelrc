@@ -1,3 +1,0 @@
-# Bazel settings that should only be set when testing with Bazel 5
-
-test --test_tag_filters=-no-bazel-5
