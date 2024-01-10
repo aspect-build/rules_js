@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
-BZLMOD_FLAG="${BZLMOD_FLAG:-}"
+BZLMOD_FLAG="${BZLMOD_FLAG:---enable_bzlmod=1}"
+
 TARGET="$1"
 
 # sedi makes `sed -i` work on both OSX & Linux

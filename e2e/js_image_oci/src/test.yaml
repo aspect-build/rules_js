@@ -8,7 +8,7 @@ commandTests:
           [
               'OS',
               'ARCH/CPU',
-              ' WORKSPACE    js_image_oci',
+              'WORKSPACE',
               ' TARGET    //src:main',
               ' SOURCE CHECK    true',
               ' DIRECTORY CHECK    true',
@@ -21,7 +21,7 @@ commandTests:
           [
               'OS',
               'ARCH/CPU',
-              ' WORKSPACE    js_image_oci',
+              'WORKSPACE',
               ' TARGET    //src:main',
               ' SOURCE CHECK    true',
               ' DIRECTORY CHECK    true',

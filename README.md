@@ -13,11 +13,6 @@ Many companies are successfully building with rules_js. If you're getting value 
 
 Google does not fund development of rules_js. If your company benefits, please consider donating to continue development and maintenance work: <https://opencollective.com/aspect-build/projects/rules_js>
 
-Known issues:
-
--   Remote Execution (RBE) requires the latest version of Bazel, [6.0](https://blog.bazel.build/2022/12/19/bazel-6.0.html).
--   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
-
 rules_js is just a part of what Aspect provides:
 
 -   _Need help?_
@@ -33,6 +28,21 @@ rules_js is just a part of what Aspect provides:
     -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
     -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
     -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
+
+## Bazel compatibility
+
+The ruleset is known to work with:
+
+-   Bazel 7 using WORKSPACE and Bzlmod _(tested on CI)_
+-   Bazel 6 using WORKSPACE and Bzlmod _(tested on CI)_
+-   Bazel 5 using WORKSPACE _(no longer tested on CI)_
+
+> [!NOTE]
+> Remote Execution (RBE) requires at least Bazel [6.0](https://blog.bazel.build/2022/12/19/bazel-6.0.html).
+
+## Known issues
+
+-   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
 
 ## Installation
 
@@ -102,7 +112,7 @@ First, there's dependency management.
 -   `build_bazel_rules_nodejs` uses existing package managers by calling `npm install` or `yarn install` on a whole `package.json`.
 -   `rules_js` uses Bazel's downloader to fetch only the packages needed for the requested targets, then mimics [`pnpm`](https://pnpm.io/) to lay out a `node_modules` tree.
 
-Then, there's how a nodejs tool can be executed:
+Then, there's how a Node.js tool can be executed:
 
 -   `build_bazel_rules_nodejs` follows the Bazel idiom: sources in one folder, outputs in another.
 -   `rules_js` follows the npm idiom: sources and outputs together in a common folder.
@@ -120,7 +130,7 @@ We learned a lot from that project, as well as from discussions with [Rush](http
 There are two core problems:
 
 -   How do you install third-party dependencies?
--   How does a running nodejs program resolve those dependencies?
+-   How does a running Node.js program resolve those dependencies?
 
 And there's a fundamental trade-off: make it fast and deterministic, or support 100% of existing use cases.
 
@@ -135,12 +145,12 @@ dependency graph into Bazel's representation.
 For historical context, we started thinking about this in February 2021 in a (now outdated) [design doc](https://hackmd.io/gu2Nj0TKS068LKAf8KanuA)
 and have been working through the details since then.
 
-### Running nodejs programs
+### Running Node.js programs
 
 Fundamentally, Bazel operates out of a different filesystem layout than Node.
 Bazel keeps outputs in a distinct tree outside of the sources.
 
-Our first attempt was based on what Yarn PnP and Google-internal nodejs rules do:
+Our first attempt was based on what Yarn PnP and Google-internal Node.js rules do:
 monkey-patch the implementation of `require` in NodeJS itself,
 so that every resolution can be aware of the source/output tree difference.
 The main downside to this is compatibility: many packages on npm make their own assumptions about
