@@ -1,12 +1,19 @@
 # Bazel settings to apply on CI only
 # Included with a --bazelrc option in the call to bazel
+
+# Directories caches by GitHub actions
+common:local --disk_cache=~/.cache/bazel-disk-cache
+common --repository_cache=~/.cache/bazel-repository-cache
+
+# Bazel version specific settings
+common:bazel5 --test_tag_filters=-skip-on-bazel5
+common:bazel6 --test_tag_filters=-skip-on-bazel6
+common:bazel7 --test_tag_filters=-skip-on-bazel7
+
+# General CI settings
 build --announce_rc
 test --test_output=errors
-build --repository_cache=~/.cache/bazel-repo
 test --test_env=XDG_CACHE_HOME
-
-# When no remote cache, use a local one
-build:local --disk_cache=~/.cache/bazel
 
 # Generic remote cache
 build --remote_local_fallback

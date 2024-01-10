@@ -36,7 +36,7 @@ write_source_files(
     },
     tags = [
         # node-patches_legacy is used with Bazel 5 which changes the output; no need for that test coverage
-        "no-bazel-5",
+        "skip-on-bazel5",
     ],
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],

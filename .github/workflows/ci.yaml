@@ -1,6 +1,6 @@
 name: CI
 
-# Controls when the action will run.
+# Controls when the action will run
 on:
     # Triggers the workflow on push or pull request events but only for the main branch
     push:
@@ -17,238 +17,192 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    # matrix-prep-* steps dynamically generate a bit of JSON depending on whether our action has
-    # access to repository secrets. When running on a pull_request from a fork, the author is
-    # untrusted so the secret will be absent. Insanely complex for how simple this requirement is...
-    # inspired from
-    # https://stackoverflow.com/questions/65384420/how-to-make-a-github-action-matrix-element-conditional
-
-    matrix-prep-os:
-        # Prepares the 'os' axis of the test matrix, to reduce costs since GitHub hosted runners cost more on some platforms.
-        # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
+    # Prepares dynamic test matrix values
+    matrix-prep:
         runs-on: ubuntu-latest
         steps:
-            - id: linux
-              run: echo "os=ubuntu-latest" >> $GITHUB_OUTPUT
-            - id: windows
-              run: echo "os=windows-latest" >> $GITHUB_OUTPUT
-              # Only run on main branch (or PR branches that contain 'windows') to minimize Windows minutes (billed at 2X)
-              if: github.ref == 'refs/heads/main' || contains(github.head_ref, 'windows')
-            - id: macos
-              run: echo "os=macos-latest" >> $GITHUB_OUTPUT
-              # Only run on main branch (or PR branches that contain 'macos') to minimize macOS minutes (billed at 10X)
-              if: github.ref == 'refs/heads/main' || contains(github.head_ref, 'macos')
+            - uses: actions/checkout@v4
+            - id: bazel-version
+              name: Prepare 'bazel-version' matrix axis
+              run: |
+                  v=$(head -n 1 .bazelversion)
+                  m=${v::1}
+                  a=(
+                    "major:$m, version:\"$v\""
+                    "major:7, version:\"7.0.0-pre.20230524.3\""
+                    "major:5, version:\"5.4.1\""
+                  )
+                  printf -v j '{%s},' "${a[@]}"
+                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
+            - id: config
+              name: Prepare 'config' matrix axis
+              # Only run on main branch (or PR branches that contain 'rbe') to reduce the matrix size for PRs.
+              # Don't run RBE if there is no API key which is the case on forks.
+              run: |
+                  a=( local )
+                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"rbe"* ]]; then
+                    if [[ "${{ env.BUILDBUDDY_API_KEY }}" ]]; then
+                      a+=( rbe )
+                    fi
+                  fi
+                  printf -v j '"%s",' "${a[@]}"
+                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
+              env:
+                  BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+            - id: folder
+              name: Prepare 'folder' matrix axis
+              run: |
+                  a=(
+                    .
+                    e2e/bzlmod
+                    e2e/js_image_docker
+                    e2e/js_image_oci
+                    e2e/js_run_devserver
+                    e2e/npm_link_package
+                    e2e/npm_link_package-esm
+                    e2e/npm_translate_lock
+                    e2e/npm_translate_lock_empty
+                    e2e/npm_translate_lock_multi
+                    e2e/npm_translate_lock_partial_clone
+                    e2e/npm_translate_lock_subdir_patch
+                    e2e/npm_translate_package_lock
+                    e2e/npm_translate_yarn_lock
+                    e2e/package_json_module
+                    e2e/patch_from_repo
+                    e2e/pnpm_repo_install
+                    e2e/pnpm_workspace
+                    e2e/pnpm_workspace_deps
+                    e2e/pnpm_workspace_rerooted
+                    e2e/rules_foo
+                    e2e/stamped_package_json
+                    e2e/update_pnpm_lock
+                    e2e/update_pnpm_lock_with_import
+                    e2e/vendored_node
+                    e2e/vendored_tarfile
+                    e2e/verify_patches
+                    e2e/webpack_devserver
+                    e2e/webpack_devserver_esm
+                    e2e/worker
+                    e2e/workspace
+                  )
+                  if [[ "${{ env.ASPECT_GHTESTER_SSH_KEY }}" ]]; then
+                    a+=(
+                      e2e/git_dep_metadata
+                      e2e/npm_translate_lock_git+ssh
+                    )
+                  fi
+                  if [[ "${{ env.ASPECT_NPM_AUTH_TOKEN }}" ]]; then
+                    a+=( e2e/npm_translate_lock_auth )
+                  fi
+                  printf -v j '"%s",' "${a[@]}"
+                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
+              env:
+                  ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+            - id: os
+              name: Prepare 'os' matrix axis
+              # Only run MacOS and Windows on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
+              # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
+              run: |
+                  a=( ubuntu )
+                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"macos"* ]]; then
+                    a+=( macos )
+                  fi
+                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"windows"* ]]; then
+                    a+=( windows )
+                  fi
+                  printf -v j '"%s",' "${a[@]}"
+                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
         outputs:
-            # Will look like ["ubuntu-latest", "windows-latest", "macos-latest"]
-            os: ${{ toJSON(steps.*.outputs.os) }}
+            bazel-version: ${{ steps.bazel-version.outputs.res }}
+            config: ${{ steps.config.outputs.res }}
+            folder: ${{ steps.folder.outputs.res }}
+            os: ${{ steps.os.outputs.res }}
 
-    matrix-prep-config:
-        # Prepares the 'config' axis of the test matrix
-        runs-on: ubuntu-latest
-        env:
-            BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
-        steps:
-            - id: local
-              run: echo "config=local" >> $GITHUB_OUTPUT
-            - id: rbe
-              run: echo "config=rbe" >> $GITHUB_OUTPUT
-              # Only run on main branch (or PR branches that contain 'rbe') to reduce the matrix size for PRs
-              # Don't run RBE if there is no API key which is the case on forks
-              if: (github.ref == 'refs/heads/main' || contains(github.head_ref, 'rbe')) && env.BUILDBUDDY_API_KEY != ''
-        outputs:
-            # Will look like ["local", "rbe"]
-            config: ${{ toJSON(steps.*.outputs.config) }}
-
-    matrix-prep-bazelversion:
-        # Prepares the 'bazelversion' axis of the test matrix
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
-            - id: bazel_6
-              run: echo "bazelversion=$(head -n 1 .bazelversion)" >> $GITHUB_OUTPUT
-            - id: bazel_7
-              run: echo "bazelversion=7.0.0-pre.20230524.3" >> $GITHUB_OUTPUT
-            - id: bazel_5
-              run: echo "bazelversion=5.4.1" >> $GITHUB_OUTPUT
-        outputs:
-            # Will look like ["<version from .bazelversion>", "7.0.0-pre.*", "5.4.1"]
-            bazelversion: ${{ toJSON(steps.*.outputs.bazelversion) }}
-
-    matrix-prep-folder:
-        # Prepares the 'folder' axis of the test matrix
-        runs-on: ubuntu-latest
-        env:
-            ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-            ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
-        steps:
-            - id: root
-              run: echo "folder=." >> $GITHUB_OUTPUT
-            - id: bzlmod
-              run: echo "folder=e2e/bzlmod" >> $GITHUB_OUTPUT
-            - id: git_dep_metadata
-              run: echo "folder=e2e/git_dep_metadata" >> $GITHUB_OUTPUT
-              # Don't run e2e/git_dep_metadata if there is no ssh key secret which is the case on forks.
-              if: env.ASPECT_GHTESTER_SSH_KEY != ''
-            - id: js_image_docker
-              run: echo "folder=e2e/js_image_docker" >> $GITHUB_OUTPUT
-            - id: js_image_oci
-              run: echo "folder=e2e/js_image_oci" >> $GITHUB_OUTPUT
-            - id: js_run_devserver
-              run: echo "folder=e2e/js_run_devserver" >> $GITHUB_OUTPUT
-            - id: npm_link_package-esm
-              run: echo "folder=e2e/npm_link_package-esm" >> $GITHUB_OUTPUT
-            - id: npm_link_package
-              run: echo "folder=e2e/npm_link_package" >> $GITHUB_OUTPUT
-            - id: npm_translate_lock_auth
-              run: echo "folder=e2e/npm_translate_lock_auth" >> $GITHUB_OUTPUT
-              # Don't run e2e/npm_translate_lock_auth if there is no auth token secret which is the case on forks.
-              if: env.ASPECT_NPM_AUTH_TOKEN != ''
-            - id: npm_translate_lock_git_ssh
-              run: echo "folder=e2e/npm_translate_lock_git+ssh" >> $GITHUB_OUTPUT
-              # Don't run e2e/npm_translate_lock_git+ssh if there is no ssh key secret which is the case on forks.
-              if: env.ASPECT_GHTESTER_SSH_KEY != ''
-            - id: npm_translate_lock
-              run: echo "folder=e2e/npm_translate_lock" >> $GITHUB_OUTPUT
-            - id: npm_translate_lock_empty
-              run: echo "folder=e2e/npm_translate_lock_empty" >> $GITHUB_OUTPUT
-            - id: npm_translate_lock_multi
-              run: echo "folder=e2e/npm_translate_lock_multi" >> $GITHUB_OUTPUT
-            - id: npm_translate_lock_partial_clone
-              run: echo "folder=e2e/npm_translate_lock_partial_clone" >> $GITHUB_OUTPUT
-            - id: npm_translate_lock_subdir_patch
-              run: echo "folder=e2e/npm_translate_lock_subdir_patch" >> $GITHUB_OUTPUT
-            - id: npm_translate_package_lock
-              run: echo "folder=e2e/npm_translate_package_lock" >> $GITHUB_OUTPUT
-            - id: npm_translate_yarn_lock
-              run: echo "folder=e2e/npm_translate_yarn_lock" >> $GITHUB_OUTPUT
-            - id: package_json_module
-              run: echo "folder=e2e/package_json_module" >> $GITHUB_OUTPUT
-            - id: patch_from_repo
-              run: echo "folder=e2e/patch_from_repo" >> $GITHUB_OUTPUT
-            - id: pnpm_repo_install
-              run: echo "folder=e2e/pnpm_repo_install" >> $GITHUB_OUTPUT
-            - id: pnpm_workspace_rerooted
-              run: echo "folder=e2e/pnpm_workspace_rerooted" >> $GITHUB_OUTPUT
-            - id: pnpm_workspace
-              run: echo "folder=e2e/pnpm_workspace" >> $GITHUB_OUTPUT
-            - id: pnpm_workspace_deps
-              run: echo "folder=e2e/pnpm_workspace_deps" >> $GITHUB_OUTPUT
-            - id: rules_foo
-              run: echo "folder=e2e/rules_foo" >> $GITHUB_OUTPUT
-            - id: stamped_package_json
-              run: echo "folder=e2e/stamped_package_json" >> $GITHUB_OUTPUT
-            - id: update_pnpm_lock
-              run: echo "folder=e2e/update_pnpm_lock" >> $GITHUB_OUTPUT
-            - id: update_pnpm_lock_with_import
-              run: echo "folder=e2e/update_pnpm_lock_with_import" >> $GITHUB_OUTPUT
-            - id: vendored_node
-              run: echo "folder=e2e/vendored_node" >> $GITHUB_OUTPUT
-            - id: verify_patches
-              run: echo "folder=e2e/verify_patches" >> $GITHUB_OUTPUT
-            - id: webpack_devserver
-              run: echo "folder=e2e/webpack_devserver" >> $GITHUB_OUTPUT
-            - id: webpack_devserver_esm
-              run: echo "folder=e2e/webpack_devserver_esm" >> $GITHUB_OUTPUT
-            - id: workspace
-              run: echo "folder=e2e/workspace" >> $GITHUB_OUTPUT
-            - id: vendored_tarfile
-              run: echo "folder=e2e/vendored_tarfile" >> $GITHUB_OUTPUT
-            - id: worker
-              run: echo "folder=e2e/worker" >> $GITHUB_OUTPUT
-        outputs:
-            # Will look like [".", "e2e/bzlmod", ...]
-            folder: ${{ toJSON(steps.*.outputs.folder) }}
-
-    matrix-prep-root-hash:
-        # Prepares the 'folder' axis of the test matrix
-        runs-on: ubuntu-latest
-        steps:
-            # need to checkout repository to hash files.
-            - uses: actions/checkout@v3
-            - id: root
-              run: echo "hash=${{ hashFiles('**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'MODULE.bazel', '**/*.js', '!e2e') }}" >> $GITHUB_OUTPUT
-        outputs:
-            hash: ${{ steps.root.outputs.hash }}
     test:
-        runs-on: ${{ matrix.os }}
-
+        runs-on: ${{ matrix.os }}-latest
         needs:
-            - matrix-prep-os
-            - matrix-prep-config
-            - matrix-prep-bazelversion
-            - matrix-prep-folder
-            - matrix-prep-root-hash
-
+            - matrix-prep
         strategy:
             fail-fast: false
             matrix:
-                os: ${{ fromJSON(needs.matrix-prep-os.outputs.os) }}
-                config: ${{ fromJSON(needs.matrix-prep-config.outputs.config) }}
-                bazelversion: ${{ fromJSON(needs.matrix-prep-bazelversion.outputs.bazelversion) }}
-                folder: ${{ fromJSON(needs.matrix-prep-folder.outputs.folder) }}
-                bzlmodEnabled: [true, false]
+                bazel-version: ${{ fromJSON(needs.matrix-prep.outputs.bazel-version) }}
+                bzlmod: [1, 0]
+                os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
+                config: ${{ fromJSON(needs.matrix-prep.outputs.config) }}
+                folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
                     # Exclude Windows default, will opt-in to includes
-                    - os: windows-latest
+                    - os: windows
                     # Exclude MacOS by default, will opt-in to includes
-                    - os: macos-latest
+                    - os: macos
                     # Exclude bazel 7 by default, will opt-in to includes
-                    - bazelversion: 7.0.0-pre.20230524.3
+                    - bazel-version:
+                          major: 7
+                    # Don't test e2e/bzlmod without bzlmod
+                    - bzlmod: 0
+                      folder: e2e/bzlmod
                     # Don't test RBE with Bazel 5 (not supported)
-                    - config: rbe
-                      bazelversion: 5.4.1
-                    # Don't run bzlmod smoke test with Bazel 5 (not supported) or without bzlmod enabled
-                    - bazelversion: 5.4.1
-                      folder: e2e/bzlmod
-                    - bzlmodEnabled: false
-                      folder: e2e/bzlmod
-                    # Don't run workspace smoke test under bzlmod
-                    - folder: e2e/workspace
-                      bzlmodEnabled: true
-                    # Don't run bzlmod e2e tests with Bazel 5
-                    - bazelversion: 5.4.1
-                      bzlmodEnabled: true
+                    - bazel-version:
+                          major: 5
+                      config: rbe
+                    # Don't test bzl with Bazel 5 (not supported)
+                    - bazel-version:
+                          major: 5
+                      bzlmod: 1
                     # Don't run the root workspace with Bazel 5, we don't need the coverage
                     # and it has been red for weeks as of 2023 Oct 18
-                    - bazelversion: 5.4.1
+                    - bazel-version:
+                          major: 5
                       folder: '.'
+                    # Don't run workspace smoke test under bzlmod
+                    - bzlmod: 1
+                      folder: e2e/workspace
                     # TODO: un-exclude the following bzlmod tests once they work
-                    - folder: e2e/js_image_docker
-                      bzlmodEnabled: true
-                    - folder: e2e/js_image_oci
-                      bzlmodEnabled: true
-                    - folder: e2e/npm_link_package-esm
-                      bzlmodEnabled: true
-                    - folder: e2e/npm_link_package
-                      bzlmodEnabled: true
-                    - folder: e2e/rules_foo
-                      bzlmodEnabled: true
+                    - bzlmod: 1
+                      folder: e2e/js_image_docker
+                    - bzlmod: 1
+                      folder: e2e/js_image_oci
+                    - bzlmod: 1
+                      folder: e2e/npm_link_package-esm
+                    - bzlmod: 1
+                      folder: e2e/npm_link_package
+                    - bzlmod: 1
+                      folder: e2e/rules_foo
                 include:
-                    - os: windows-latest
+                    - bazel-version:
+                          major: 6
+                          version: 6.4.0
+                      bzlmod: 1
+                      os: windows
                       config: local
-                      bazelversion: 6.3.2
                       folder: e2e/bzlmod
-                      bzlmodEnabled: true
-                    - os: macos-latest
+                    - bazel-version:
+                          major: 6
+                          version: 6.4.0
+                      bzlmod: 1
+                      os: macos
                       config: local
-                      bazelversion: 6.3.2
                       folder: e2e/bzlmod
-                      bzlmodEnabled: true
-                    - os: ubuntu-latest
+                    - bazel-version:
+                          major: 7
+                          version: 7.0.0-pre.20230524.3
+                      bzlmod: 0
+                      os: ubuntu
                       config: local
-                      bazelversion: 7.0.0-pre.20230524.3
                       folder: .
-                      bzlmodEnabled: false
-                    - os: ubuntu-latest
+                    - bazel-version:
+                          major: 7
+                          version: 7.0.0-pre.20230524.3
+                      bzlmod: 1
+                      os: ubuntu
                       config: local
-                      bazelversion: 7.0.0-pre.20230524.3
                       folder: .
-                      bzlmodEnabled: true
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under github.workspace, so your job can access it
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
             # which exercises fetching a git repository via ssh.
@@ -263,42 +217,30 @@ jobs:
               uses: actions/cache@v3
               with:
                   path: |
-                      ~/.cache/bazel
-                      ~/.cache/bazel-repo
+                      ~/.cache/bazel-disk-cache
+                      ~/.cache/bazel-repository-cache
+                      ~/.cache/xdg-cache
                   key: >-
-                      bazel-cache-${{ matrix.os }}-
-                      ${{ matrix.config }}-${{ matrix.bazelversion }}-
-                      ${{ matrix.folder }}-${{ matrix.bzlmodEnabled }}-
-                      ${{ needs.matrix-prep-root-hash.outputs.hash }}-
-                      ${{ hashFiles( format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder),format('{0}/MODULE.bazel', matrix.folder), format('{0}/**/*.js', matrix.folder) ) }}
+                      bazel-cache-${{ matrix.bazelversion.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                      ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', 'MODULE.bazel.lock', '**/*.js', '!e2e') }}-
+                      ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/.bazeliskrc', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
-                      bazel-cache-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.bazelversion }}-${{ matrix.folder }}-${{ matrix.bzlmodEnabled }}-
+                      bazel-cache-${{ matrix.bazelversion.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
 
             - name: Configure Bazel version
-              if: matrix.os != 'windows-latest'
               working-directory: ${{ matrix.folder }}
-              # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
-              # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
-              # then use .bazelversion to determine which Bazel version to use
+              shell: bash
               run: |
-                  echo "${{ matrix.bazelversion }}" > .bazelversion
-                  BAZEL_VERSION=${{ matrix.bazelversion }}
-                  if [ ${BAZEL_VERSION::1} != "6" ]; then
-                    cat ${{ github.workspace }}/.github/workflows/ci.bazel5.bazelrc >> ${{ github.workspace }}/.github/workflows/ci.bazelrc
-                  fi
-
-            - name: Configure Bazel version (Windows)
-              if: matrix.os == 'windows-latest'
-              working-directory: ${{ matrix.folder }}
-              # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
-              # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
-              # then use .bazelversion to determine which Bazel version to use.
-              run: echo "${{ matrix.bazelversion }}" > .bazelversion
+                  # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
+                  # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
+                  # then use .bazelversion to determine which Bazel version to use.
+                  echo "${{ matrix.bazel-version.version }}" > .bazelversion
 
             - name: Write RBE credentials
               # Writes RBE credential files
               if: matrix.config == 'rbe'
               working-directory: ${{ matrix.folder }}
+              shell: bash
               run: |
                   touch $HOME/.bazelrc
                   chmod 0600 $HOME/.bazelrc
@@ -306,44 +248,39 @@ jobs:
               env:
                   BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
 
-            - name: Set bzlmod flag (for integration tests)
-              # Store the --enable_bzlmod flag that we add to the test command below
-              # only when we're running bzlmod in our test matrix.
-              id: set_bzlmod_flag
-              if: matrix.bzlmodEnabled && matrix.folder != '.'
-              run: echo "bzlmod_flag=--enable_bzlmod" >> $GITHUB_OUTPUT
-
-            - name: Set bzlmod configuration (for test //...)
-              # Store the --config=bzlmod flag that we add to the test command below
-              # only when we're running bzlmod in our test matrix.
-              id: set_bzlmod_config
-              if: matrix.bzlmodEnabled
-              run: echo "bzlmod_config=--config=bzlmod" >> $GITHUB_OUTPUT
+            # TODO: remove this block once we have Aspect CLI Windows releases
+            - name: Don't use Aspect CLI on Windows
+              if: matrix.os == 'windows'
+              working-directory: ${{ matrix.folder }}
+              shell: bash
+              run: rm -f .bazeliskrc
 
             - name: bazel test //...
-              if: matrix.os != 'windows-latest'
               working-directory: ${{ matrix.folder }}
+              shell: bash
               run: |
-                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
-                  ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
+                  BZLMOD_FLAG=
+                  if [[ "${{ matrix.bzlmod }}" == "1" ]]; then
+                    BZLMOD_FLAG=--enable_bzlmod
+                  fi
+                  bazel \
+                    --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
+                    test \
+                    --config=${{ matrix.config }} \
+                    --config=bazel${{ matrix.bazel-version.major }} \
+                    $BZLMOD_FLAG \
+                    //...
               env:
-                  # Bazelisk will download bazel to here
-                  XDG_CACHE_HOME: ~/.cache/bazel-repo
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
-            - name: bazel test //... (Windows)
-              if: matrix.os == 'windows-latest'
+            - name: Check that unused npm packages were not fetched
+              if: matrix.os != 'windows'
               working-directory: ${{ matrix.folder }}
-              run: |
-                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc test --config=${{ matrix.config }} ${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} //...
-              env:
-                  # Bazelisk will download bazel to here
-                  XDG_CACHE_HOME: ~/.cache/bazel-repo
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+              shell: bash
+              run: ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
 
             # Uncomment for debugging, see https://github.com/aspect-build/rules_js/pull/771
             # - name: upload bazel-bin
@@ -362,28 +299,43 @@ jobs:
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               # Don't run coverage on Windows. It is currently broken.
-              if: matrix.config == 'local' && matrix.os != 'windows-latest'
+              if: matrix.config == 'local' && matrix.os != 'windows'
               working-directory: ${{ matrix.folder }}
+              shell: bash
               run: |
-                  bazel --bazelrc=${{ github.workspace }}/.github/workflows/ci.bazelrc --bazelrc=.bazelrc coverage --config=${{ matrix.config }} ${{ steps.set_bzlmod_config.outputs.bzlmod_config }} --instrument_test_targets //...
+                  BZLMOD_FLAG=
+                  if [[ "${{ matrix.bzlmod }}" == "1" ]]; then
+                    BZLMOD_FLAG=--enable_bzlmod
+                  fi
+                  bazel \
+                    --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
+                    coverage \
+                    --config=${{ matrix.config }} \
+                    --config=bazel${{ matrix.bazel-version.major }} \
+                    $BZLMOD_FLAG \
+                    --instrument_test_targets \
+                    //...
               env:
-                  # Bazelisk will download bazel to here
-                  XDG_CACHE_HOME: ~/.cache/bazel-repo
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
             - name: ./test.sh
               # Run if there is a test.sh file in the folder.
-              if: matrix.os != 'windows-latest' && hashFiles(format('{0}/test.sh', matrix.folder)) != ''
+              if: matrix.os != 'windows' && hashFiles(format('{0}//test.sh', matrix.folder)) != ''
               working-directory: ${{ matrix.folder }}
               shell: bash
-              # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod. All test.sh
+              # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod={1,0}. All test.sh
               # scripts that run bazel directly should make use of this variable.
-              run: BZLMOD_FLAG=${{ steps.set_bzlmod_flag.outputs.bzlmod_flag }} ./test.sh
+              run: |
+                  if [[ "${{ matrix.bzlmod }}" == "1" ]]; then
+                    BZLMOD_FLAG=--enable_bzlmod ./test.sh
+                  else
+                    ./test.sh
+                  fi
               env:
-                  # Bazelisk will download bazel to here
-                  XDG_CACHE_HOME: ~/.cache/bazel-repo
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
