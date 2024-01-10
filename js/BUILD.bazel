@@ -1,5 +1,6 @@
 "Public API"
 
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_7_or_greater")
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
@@ -59,7 +60,7 @@ bzl_library(
     deps = [
         "@bazel_tools//tools/build_defs/repo:http.bzl",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",
-    ],
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
 )
 
 bzl_library(
@@ -69,5 +70,5 @@ bzl_library(
     deps = [
         "@bazel_tools//tools/build_defs/repo:http.bzl",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",
-    ],
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
 )

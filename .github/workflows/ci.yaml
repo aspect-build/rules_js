@@ -29,8 +29,7 @@ jobs:
                   m=${v::1}
                   a=(
                     "major:$m, version:\"$v\""
-                    "major:7, version:\"7.0.0-pre.20230524.3\""
-                    "major:5, version:\"5.4.1\""
+                    "major:6, version:\"6.4.0\""
                   )
                   printf -v j '{%s},' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
@@ -136,28 +135,23 @@ jobs:
                     - os: windows
                     # Exclude MacOS by default, will opt-in to includes
                     - os: macos
-                    # Exclude bazel 7 by default, will opt-in to includes
-                    - bazel-version:
-                          major: 7
-                    # Don't test e2e/bzlmod without bzlmod
                     - bzlmod: 0
                       folder: e2e/bzlmod
-                    # Don't test RBE with Bazel 5 (not supported)
+                    # Don't run RBE tests with Bazel 6 to reduce the size of the test matrix
                     - bazel-version:
-                          major: 5
+                          major: 6
                       config: rbe
-                    # Don't test bzl with Bazel 5 (not supported)
+                    # Don't run bzlmod tests with Bazel 6 to reduce the size of the test matrix
                     - bazel-version:
-                          major: 5
+                          major: 6
                       bzlmod: 1
-                    # Don't run the root workspace with Bazel 5, we don't need the coverage
-                    # and it has been red for weeks as of 2023 Oct 18
-                    - bazel-version:
-                          major: 5
-                      folder: '.'
                     # Don't run workspace smoke test under bzlmod
                     - bzlmod: 1
                       folder: e2e/workspace
+                    # rules_docker is not compatible with Bazel 7
+                    - bazel-version:
+                          major: 7
+                      folder: e2e/js_image_docker
                     # TODO: un-exclude the following bzlmod tests once they work
                     - bzlmod: 1
                       folder: e2e/js_image_docker
@@ -169,7 +163,25 @@ jobs:
                       folder: e2e/npm_link_package
                     - bzlmod: 1
                       folder: e2e/rules_foo
+                    - bazel-version:
+                          major: 7
+                      bzlmod: 1
+                      folder: e2e/update_pnpm_lock_with_import
                 include:
+                    - bazel-version:
+                          major: 7
+                          version: 7.0.0
+                      bzlmod: 1
+                      os: windows
+                      config: local
+                      folder: e2e/bzlmod
+                    - bazel-version:
+                          major: 7
+                          version: 7.0.0
+                      bzlmod: 1
+                      os: macos
+                      config: local
+                      folder: e2e/bzlmod
                     - bazel-version:
                           major: 6
                           version: 6.4.0
@@ -184,20 +196,6 @@ jobs:
                       os: macos
                       config: local
                       folder: e2e/bzlmod
-                    - bazel-version:
-                          major: 7
-                          version: 7.0.0-pre.20230524.3
-                      bzlmod: 0
-                      os: ubuntu
-                      config: local
-                      folder: .
-                    - bazel-version:
-                          major: 7
-                          version: 7.0.0-pre.20230524.3
-                      bzlmod: 1
-                      os: ubuntu
-                      config: local
-                      folder: .
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
@@ -259,16 +257,12 @@ jobs:
               working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
-                  BZLMOD_FLAG=
-                  if [[ "${{ matrix.bzlmod }}" == "1" ]]; then
-                    BZLMOD_FLAG=--enable_bzlmod
-                  fi
                   bazel \
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
                     test \
                     --config=${{ matrix.config }} \
                     --config=bazel${{ matrix.bazel-version.major }} \
-                    $BZLMOD_FLAG \
+                    --enable_bzlmod=${{ matrix.bzlmod }} \
                     //...
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
@@ -303,16 +297,12 @@ jobs:
               working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
-                  BZLMOD_FLAG=
-                  if [[ "${{ matrix.bzlmod }}" == "1" ]]; then
-                    BZLMOD_FLAG=--enable_bzlmod
-                  fi
                   bazel \
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
                     coverage \
                     --config=${{ matrix.config }} \
                     --config=bazel${{ matrix.bazel-version.major }} \
-                    $BZLMOD_FLAG \
+                    --enable_bzlmod=${{ matrix.bzlmod }} \
                     --instrument_test_targets \
                     //...
               env:
@@ -328,12 +318,7 @@ jobs:
               shell: bash
               # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod={1,0}. All test.sh
               # scripts that run bazel directly should make use of this variable.
-              run: |
-                  if [[ "${{ matrix.bzlmod }}" == "1" ]]; then
-                    BZLMOD_FLAG=--enable_bzlmod ./test.sh
-                  else
-                    ./test.sh
-                  fi
+              run: BZLMOD_FLAG=--enable_bzlmod=${{ matrix.bzlmod }} ./test.sh
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
