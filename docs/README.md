@@ -364,7 +364,7 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 
 ### Debugging
 
-Add the options in the "Support for debugging Node.js tests" section from https://github.com/aspect-build/rules_js/blob/main/.bazelrc.common to your project’s .bazelrc file to add the `--config=debug` settings for debugging Node.js programs.
+Add [Debug options](https://docs.aspect.build/guides/bazelrc#debug-options) and [Options for JavaScript](https://docs.aspect.build/guides/bazelrc#options-for-javascript) to your project’s .bazelrc file to add the `--config=debug` settings for debugging Node.js programs.
 
 In this repository, for example, we can debug the `//examples/js_binary:test_test` `js_test` target with,
 
