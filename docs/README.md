@@ -28,7 +28,7 @@ For example, Bazel might only need to fetch a single npm package for a simple bu
 where you might experience other tools installing the entire `package.json` file.
 
 Authoring BUILD files by hand is a chore, so we recommend using the
-[`configure`](https://docs.aspect.build/v/cli/commands/aspect_configure) command from
+[`configure`](https://docs.aspect.build/cli/commands/aspect_configure) command from
 [Aspect CLI](https://aspect.build/cli) to automate 80% of this work.
 
 Other recommendations:

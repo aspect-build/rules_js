@@ -2,7 +2,7 @@ data "google_compute_image" "runner_image" {
   # Aspect's GCP aspect-workflows-images project provides public Aspect Workflows GCP images for
   # getting started during the trial period. We recommend that all Workflows users build their own
   # GCP images and keep up-to date with patches. See
-  # https://docs.aspect.build/v/workflows/install/packer for more info and/or
+  # https://docs.aspect.build/workflows/install/packer for more info and/or
   # https://github.com/aspect-build/workflows-images for example packer scripts and BUILD targets
   # for building GCP images for Workflows.
   project = "aspect-workflows-images"
