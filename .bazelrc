@@ -11,6 +11,14 @@ import %workspace%/.aspect/bazelrc/performance.bazelrc
 # We have some empty globs in rules_js
 common --noincompatible_disallow_empty_glob
 
+# Disable lockfile for now. It is unstable.
+# https://github.com/bazelbuild/bazel/issues/19026
+# https://github.com/bazelbuild/bazel/issues/19621
+# https://github.com/bazelbuild/bazel/issues/19971
+# https://github.com/bazelbuild/bazel/issues/20272
+# https://github.com/bazelbuild/bazel/issues/20369
+common --lockfile_mode=off
+
 # Mock versioning command to test the --stamp behavior
 build --workspace_status_command="echo BUILD_SCM_VERSION 1.2.3"
 
