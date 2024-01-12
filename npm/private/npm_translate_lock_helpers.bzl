@@ -198,6 +198,45 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
     return (registries, auth)
 
 ################################################################################
+def _select_npm_auth(url, npm_auth):
+    registry = url.split("//", 1)[-1]
+
+    # Get rid of the port number
+    registry_no_port = registry
+    if ":" in registry:
+        components = registry.split(":", 1)
+        base = components[0]
+
+        path = components[1].split("/", 1)
+        if len(path) == 2:
+            registry_no_port = base + "/" + path[1]
+        else:
+            registry_no_port = base
+
+    npm_auth_bearer = None
+    npm_auth_basic = None
+    npm_auth_username = None
+    npm_auth_password = None
+    match_len = 0
+    for auth_registry, auth_info in npm_auth.items():
+        if auth_registry == "" and match_len == 0:
+            # global auth applied to all registries; will be overridden by a registry scoped auth
+            npm_auth_bearer = auth_info.get("bearer")
+            npm_auth_basic = auth_info.get("basic")
+            npm_auth_username = auth_info.get("username")
+            npm_auth_password = auth_info.get("password")
+        if (registry.startswith(auth_registry) or registry_no_port.startswith(auth_registry)) and len(auth_registry) > match_len:
+            npm_auth_bearer = auth_info.get("bearer")
+            npm_auth_basic = auth_info.get("basic")
+            npm_auth_username = auth_info.get("username")
+            npm_auth_password = auth_info.get("password")
+            match_len = len(auth_registry)
+            break
+
+    return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
+
+
+################################################################################
 def _get_npm_imports(importers, packages, patched_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
@@ -387,25 +426,7 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
         else:
             url = utils.npm_registry_download_url(name, version, registries, default_registry)
 
-        registry = url.split("//", 1)[-1]
-        npm_auth_bearer = None
-        npm_auth_basic = None
-        npm_auth_username = None
-        npm_auth_password = None
-        match_len = 0
-        for auth_registry, auth_info in npm_auth.items():
-            if auth_registry == "" and match_len == 0:
-                # global auth applied to all registries; will be overridden by a registry scoped auth
-                npm_auth_bearer = auth_info.get("bearer")
-                npm_auth_basic = auth_info.get("basic")
-                npm_auth_username = auth_info.get("username")
-                npm_auth_password = auth_info.get("password")
-            if registry.startswith(auth_registry) and len(auth_registry) > match_len:
-                npm_auth_bearer = auth_info.get("bearer")
-                npm_auth_basic = auth_info.get("basic")
-                npm_auth_username = auth_info.get("username")
-                npm_auth_password = auth_info.get("password")
-                match_len = len(auth_registry)
+        npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
         result.append(struct(
             custom_postinstall = custom_postinstall,
