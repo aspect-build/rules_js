@@ -33,12 +33,18 @@ load(
 load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
-_LINK_JS_PACKAGE_TMPL = """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
+_LINK_JS_PACKAGE_LOADS_TMPL = """\
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
+load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")\
+"""
 
+_LINK_JS_PACKAGE_LIFECYCLE_LOADS_TMPL = """\
+load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
+load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")\
+"""
+
+_LINK_JS_PACKAGE_TMPL = """
 # Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_imported_package_store(name):
@@ -53,10 +59,8 @@ def npm_imported_package_store(name):
     link_root_name = name[:-len("/{package}")]
 
     deps = {deps}
-    lc_deps = {lc_deps}
     ref_deps = {ref_deps}
 
-    has_lifecycle_build_target = {has_lifecycle_build_target}
     store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
 
     # reference target used to avoid circular deps
@@ -75,7 +79,7 @@ def npm_imported_package_store(name):
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _npm_package_store(
         name = "{{}}/pkg".format(store_target_name),
-        src = "{{}}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else "{npm_package_target}",
+        src = "{{}}/pkg_lc".format(store_target_name) if {has_lifecycle_build_target} else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
         dev = {dev},
@@ -112,84 +116,89 @@ def npm_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
+"""
 
-    if has_lifecycle_build_target:
-        # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
-        _npm_package_store(
-            name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
-            package = "{package}",
-            version = "{version}",
-            dev = {dev},
-            deps = ref_deps,
-            tags = ["manual"],
-            use_declare_symlink = select({{
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }}),
-        )
+_LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
+    lc_deps = {lc_deps}
 
-        # terminal pre-lifecycle target for use in lifecycle build target below
-        _npm_package_store(
-            name = "{{}}/pkg_pre_lc".format(store_target_name),
-            package = "{package}",
-            version = "{version}",
-            dev = {dev},
-            deps = lc_deps,
-            tags = ["manual"],
-            use_declare_symlink = select({{
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }}),
-        )
+    # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
+    _npm_package_store(
+        name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
+        package = "{package}",
+        version = "{version}",
+        dev = {dev},
+        deps = ref_deps,
+        tags = ["manual"],
+        use_declare_symlink = select({{
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            "//conditions:default": False,
+        }}),
+    )
 
-        # lifecycle build action
-        _js_run_binary(
-            name = "{{}}/lc".format(store_target_name),
-            srcs = [
-                "{npm_package_target_lc}",
-                ":{{}}/pkg_pre_lc".format(store_target_name),
-            ],
-            # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
-            args = [
-                       "{package}",
-                       "../../../$(execpath {npm_package_target_lc})",
-                       "../../../$(@D)",
-                   ] +
-                   select({{
-                       "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
-                       "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
-                       "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
-                       "//conditions:default": [],
-                   }}) +
-                   select({{
-                       "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
-                       "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
-                       "//conditions:default": [],
-                   }}) +
-                   select({{
-                       "@aspect_rules_js//platforms/libc:glibc": ["--libc=glibc"],
-                       "@aspect_rules_js//platforms/libc:musl": ["--libc=musl"],
-                       "//conditions:default": [],
-                   }}),
-            copy_srcs_to_bin = False,
-            tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
-            out_dirs = ["{lifecycle_output_dir}"],
-            tags = ["manual"],
-            execution_requirements = {lifecycle_hooks_execution_requirements},
-            mnemonic = "NpmLifecycleHook",
-            progress_message = "Running lifecycle hooks on npm package {package}@{version}",
-            env = {lifecycle_hooks_env},
-        )
+    # terminal pre-lifecycle target for use in lifecycle build target below
+    _npm_package_store(
+        name = "{{}}/pkg_pre_lc".format(store_target_name),
+        package = "{package}",
+        version = "{version}",
+        dev = {dev},
+        deps = lc_deps,
+        tags = ["manual"],
+        use_declare_symlink = select({{
+            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            "//conditions:default": False,
+        }}),
+    )
 
-        # post-lifecycle npm_package
-        _npm_package_internal(
-            name = "{{}}/pkg_lc".format(store_target_name),
-            src = ":{{}}/lc".format(store_target_name),
-            package = "{package}",
-            version = "{version}",
-            tags = ["manual"],
-        )
+    # lifecycle build action
+    _js_run_binary(
+        name = "{{}}/lc".format(store_target_name),
+        srcs = [
+            "{npm_package_target_lc}",
+            ":{{}}/pkg_pre_lc".format(store_target_name),
+        ],
+        # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
+        args = [
+                   "{package}",
+                   "../../../$(execpath {npm_package_target_lc})",
+                   "../../../$(@D)",
+               ] +
+               select({{
+                   "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
+                   "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
+                   "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
+                   "//conditions:default": [],
+               }}) +
+               select({{
+                   "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
+                   "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
+                   "//conditions:default": [],
+               }}) +
+               select({{
+                   "@aspect_rules_js//platforms/libc:glibc": ["--libc=glibc"],
+                   "@aspect_rules_js//platforms/libc:musl": ["--libc=musl"],
+                   "//conditions:default": [],
+               }}),
+        copy_srcs_to_bin = False,
+        tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
+        out_dirs = ["{lifecycle_output_dir}"],
+        tags = ["manual"],
+        execution_requirements = {lifecycle_hooks_execution_requirements},
+        mnemonic = "NpmLifecycleHook",
+        progress_message = "Running lifecycle hooks on npm package {package}@{version}",
+        env = {lifecycle_hooks_env},
+    )
 
+    # post-lifecycle npm_package
+    _npm_package_internal(
+        name = "{{}}/pkg_lc".format(store_target_name),
+        src = ":{{}}/lc".format(store_target_name),
+        package = "{package}",
+        version = "{version}",
+        tags = ["manual"],
+    )
+"""
+
+_LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package_store(name):
@@ -236,7 +245,9 @@ def npm_link_imported_package_store(name):
     )
 
     return [":{{}}".format(name)] if {public_visibility} else []
+"""
 
+_LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
@@ -760,7 +771,7 @@ def _impl_links(rctx):
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
-    npm_link_package_bzl = [_LINK_JS_PACKAGE_TMPL.format(
+    npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
@@ -768,7 +779,7 @@ def _impl_links(rctx):
         npm_package_target_lc = npm_package_target_lc,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 1, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
-        lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 3),
+        lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
         lifecycle_output_dir = lifecycle_output_dir,
         npm_link_package_bzl = "@%s//:%s" % (rctx.name, _DEFS_BZL_FILENAME),
@@ -785,7 +796,20 @@ def _impl_links(rctx):
         virtual_store_root = utils.virtual_store_root,
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
-    )]
+    )
+
+    npm_link_package_bzl = [
+        tmpl.format(**npm_link_pkg_bzl_vars)
+        for tmpl in [
+            _LINK_JS_PACKAGE_LOADS_TMPL,
+            _LINK_JS_PACKAGE_LIFECYCLE_LOADS_TMPL if rctx.attr.lifecycle_build_target else None,
+            _LINK_JS_PACKAGE_TMPL,
+            _LINK_JS_PACKAGE_LIFECYCLE_TMPL if rctx.attr.lifecycle_build_target else None,
+            _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL,
+            _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL,
+        ]
+        if tmpl
+    ]
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
 
