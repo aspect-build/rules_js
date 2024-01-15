@@ -707,7 +707,7 @@ def _impl_links(rctx):
                 else:
                     store_package = dep_name
                     store_version = dep_version
-                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
+                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
