@@ -235,7 +235,6 @@ def _select_npm_auth(url, npm_auth):
 
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
-
 ################################################################################
 def _get_npm_imports(importers, packages, patched_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
