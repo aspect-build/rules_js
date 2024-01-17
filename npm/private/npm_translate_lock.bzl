@@ -76,6 +76,7 @@ _ATTRS = {
     "verify_patches": attr.label(),
     "npm_package_target_name": attr.string(),
     "yarn_lock": attr.label(),
+    "bzlmod": attr.bool(),
 }
 
 npm_translate_lock_lib = struct(
@@ -98,8 +99,17 @@ def _npm_translate_lock_impl(rctx):
         if state.action_cache_miss():
             _fail_if_frozen_pnpm_lock(rctx, state)
             if _update_pnpm_lock(rctx, state):
-                # If the pnpm lock file was changed then reload it before translation
-                state.reload_lockfile()
+                if rctx.attr.bzlmod:
+                    msg = """
+
+INFO: {} file updated. Please run your build again.
+
+See https://github.com/aspect-build/rules_js/issues/1445
+""".format(state.label_store.relative_path("pnpm_lock"))
+                    fail(msg)
+                else:
+                    # If the pnpm lock file was changed then reload it before translation
+                    state.reload_lockfile()
 
     helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
 
@@ -582,6 +592,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         quiet = quiet,
         update_pnpm_lock_node_toolchain_prefix = update_pnpm_lock_node_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
+        bzlmod = bzlmod,
     )
 
 def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_patterns = []):
