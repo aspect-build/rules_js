@@ -499,6 +499,12 @@ def npm_translate_lock(
     if not bzlmod and pnpm_version != None:
         _pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
 
+    if yarn_lock:
+        data = data + [yarn_lock]
+
+    if npm_package_lock:
+        data = data + [npm_package_lock]
+
     if package_json:
         data = data + [package_json]
 
