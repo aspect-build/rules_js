@@ -25,8 +25,10 @@ module "aspect_workflows" {
   # Number of nodes & machine type in the kubernetes cluster where the remote cache & observability
   # services run.
   k8s_cluster = {
-    node_count   = 3
-    machine_type = "e2-standard-2"
+    # Kubernetes cluster on this deploymemt is tuned for cost. A high-performance deployment should
+    # use a minimum of e2-standard-2 and multiple nodes so that the cache can be sharded.
+    node_count   = 1
+    machine_type = "e2-medium"
   }
 
   # Delivery properties
@@ -34,9 +36,11 @@ module "aspect_workflows" {
 
   # Remote cache configuration
   remote = {
-    cache_shards           = 3
+    # Kubernetes cluster on this deploymemt is tuned for cost. A high-performance deployment should
+    # use a use multiple cache shards.
+    cache_shards           = 1
     cache_size_gb          = 384
-    load_balancer_replicas = 2
+    load_balancer_replicas = 1
     replicate_cache        = false
   }
 
@@ -56,31 +60,16 @@ module "aspect_workflows" {
     default = {
       machine_type = "n1-standard-4"
       image_id     = data.google_compute_image.runner_image.id
-      # While preemtible instances are possible to provision and we use them here on this open source
-      # repository as a demonstration of how to reduce compute costs, they are not recommended for
-      # repositories where the occasional CI failures due to a machine being preemted mid-job are not
-      # acceptable.
-      use_preemptible = true
     }
     small = {
       machine_type = "e2-medium"
       num_ssds     = 0
       image_id     = data.google_compute_image.runner_image.id
-      # While preemtible instances are possible to provision and we use them here on this open source
-      # repository as a demonstration of how to reduce compute costs, they are not recommended for
-      # repositories where the occasional CI failures due to a machine being preemted mid-job are not
-      # acceptable.
-      use_preemptible = true
     }
     micro = {
       machine_type = "e2-small"
       num_ssds     = 0
       image_id     = data.google_compute_image.runner_image.id
-      # While preemtible instances are possible to provision and we use them here on this open source
-      # repository as a demonstration of how to reduce compute costs, they are not recommended for
-      # repositories where the occasional CI failures due to a machine being preemted mid-job are not
-      # acceptable.
-      use_preemptible = true
     }
   }
 
