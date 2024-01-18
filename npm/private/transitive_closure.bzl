@@ -148,7 +148,7 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
         packages[package] = package_info
 
         # tarbal versions
-        if package_info["resolution"].get("tarball") and package_info["resolution"]["tarball"].startswith("file:"):
+        if package_info["resolution"].get("tarball", None) and package_info["resolution"]["tarball"].startswith("file:"):
             package_version_map[package] = package_info
 
     # Collect deps of each importer (workspace projects)
