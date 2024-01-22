@@ -144,17 +144,17 @@ def _parse_pnpm_lock(content):
         content: lockfile content
 
     Returns:
-        A tuple of (importers dict, packages dict)
+        A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
-    parsed = _parse_yaml(content)
+    parsed, err = _parse_yaml(content)
 
-    if parsed == None:
-        return {}, {}, {}
+    if err != None or parsed == None:
+        return {}, {}, {}, err
 
     if not types.is_dict(parsed):
-        fail("lockfile should be a starlark dict")
+        return {}, {}, {}, "lockfile should be a starlark dict"
     if "lockfileVersion" not in parsed.keys():
-        fail("expected lockfileVersion key in lockfile")
+        return {}, {}, {}, "expected lockfileVersion key in lockfile"
 
     # Lockfile version may be a float such as 5.4 or a string such as '6.0'
     lockfile_version = str(parsed["lockfileVersion"])
@@ -183,7 +183,7 @@ def _parse_pnpm_lock(content):
 
     patched_dependencies = parsed.get("patchedDependencies", {})
 
-    return importers, packages, patched_dependencies
+    return importers, packages, patched_dependencies, None
 
 def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):

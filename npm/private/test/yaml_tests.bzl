@@ -7,20 +7,20 @@ def _parse_basic_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Scalars
-    asserts.equals(env, True, parse("true"))
-    asserts.equals(env, False, parse("false"))
-    asserts.equals(env, 1, parse("1"))
-    asserts.equals(env, 3.14, parse("3.14"))
-    asserts.equals(env, "foo", parse("foo"))
-    asserts.equals(env, "foo", parse("'foo'"))
-    asserts.equals(env, "foo", parse("\"foo\""))
-    asserts.equals(env, "foo", parse("  foo"))
-    asserts.equals(env, "foo", parse("  foo  "))
-    asserts.equals(env, "foo", parse("foo  "))
-    asserts.equals(env, "foo", parse("\nfoo"))
-    asserts.equals(env, "foo", parse("foo\n"))
-    asserts.equals(env, "-foo", parse("-foo"))
-    asserts.equals(env, "foo{[]}", parse("foo{[]}"))
+    asserts.equals(env, (True, None), parse("true"))
+    asserts.equals(env, (False, None), parse("false"))
+    asserts.equals(env, (1, None), parse("1"))
+    asserts.equals(env, (3.14, None), parse("3.14"))
+    asserts.equals(env, ("foo", None), parse("foo"))
+    asserts.equals(env, ("foo", None), parse("'foo'"))
+    asserts.equals(env, ("foo", None), parse("\"foo\""))
+    asserts.equals(env, ("foo", None), parse("  foo"))
+    asserts.equals(env, ("foo", None), parse("  foo  "))
+    asserts.equals(env, ("foo", None), parse("foo  "))
+    asserts.equals(env, ("foo", None), parse("\nfoo"))
+    asserts.equals(env, ("foo", None), parse("foo\n"))
+    asserts.equals(env, ("-foo", None), parse("-foo"))
+    asserts.equals(env, ("foo{[]}", None), parse("foo{[]}"))
 
     return unittest.end(env)
 
@@ -28,65 +28,65 @@ def _parse_sequences_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Sequences (- notation)
-    asserts.equals(env, ["foo"], parse("- foo"))
-    asserts.equals(env, ["foo - bar"], parse("- foo - bar"))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, (["foo"], None), parse("- foo"))
+    asserts.equals(env, (["foo - bar"], None), parse("- foo - bar"))
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 - foo
 - bar
 """))
-    asserts.equals(env, ["foo"], parse("""\
+    asserts.equals(env, (["foo"], None), parse("""\
 -
     foo
 """))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 -
     foo
 -
     bar
 """))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 - foo
 -
     bar
 """))
 
     # Sequences ([] notation)
-    asserts.equals(env, [], parse("[]"))
-    asserts.equals(env, ["foo"], parse("[foo]"))
-    asserts.equals(env, ["fo o"], parse("[fo o]"))
-    asserts.equals(env, ["fo\no"], parse("[fo\no]"))
-    asserts.equals(env, ["foo", "bar"], parse("[foo,bar]"))
-    asserts.equals(env, ["foo", "bar"], parse("[foo, bar]"))
-    asserts.equals(env, [1, True, "false"], parse("[1, true, \"false\"]"))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, ([], None), parse("[]"))
+    asserts.equals(env, (["foo"], None), parse("[foo]"))
+    asserts.equals(env, (["fo o"], None), parse("[fo o]"))
+    asserts.equals(env, (["fo\no"], None), parse("[fo\no]"))
+    asserts.equals(env, (["foo", "bar"], None), parse("[foo,bar]"))
+    asserts.equals(env, (["foo", "bar"], None), parse("[foo, bar]"))
+    asserts.equals(env, ([1, True, "false"], None), parse("[1, true, \"false\"]"))
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 [
     foo,
     bar
 ]
 """))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 [
     foo,
     bar,
 ]
 """))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 [
     'foo',
     "bar",
 ]
 """))
-    asserts.equals(env, ["foo", "bar"], parse("""\
+    asserts.equals(env, (["foo", "bar"], None), parse("""\
 [
     foo,
 
     bar
 ]
 """))
-    asserts.equals(env, [["foo", "bar"]], parse("[[foo,bar]]"))
-    asserts.equals(env, [["foo", [1, True]]], parse("[[foo,[1, true]]]"))
-    asserts.equals(env, [["foo", "bar"]], parse("[[foo, bar]]"))
-    asserts.equals(env, [["foo", "bar"]], parse("""\
+    asserts.equals(env, ([["foo", "bar"]], None), parse("[[foo,bar]]"))
+    asserts.equals(env, ([["foo", [1, True]]], None), parse("[[foo,[1, true]]]"))
+    asserts.equals(env, ([["foo", "bar"]], None), parse("[[foo, bar]]"))
+    asserts.equals(env, ([["foo", "bar"]], None), parse("""\
 [
     [
         foo,
@@ -101,33 +101,33 @@ def _parse_maps_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Maps - scalar properties
-    asserts.equals(env, {"foo": "bar"}, parse("foo: bar"))
-    asserts.equals(env, {"foo": "bar"}, parse("foo: 'bar'"))
-    asserts.equals(env, {"foo": "bar"}, parse("foo: \"bar\""))
-    asserts.equals(env, {"foo": "bar"}, parse("foo: bar  "))
-    asserts.equals(env, {"foo": "bar"}, parse("'foo': bar"))
-    asserts.equals(env, {"foo": "bar"}, parse("\"foo\": bar"))
-    asserts.equals(env, {"foo": 1.5}, parse("foo: 1.5"))
-    asserts.equals(env, {"foo": True}, parse("foo: true"))
-    asserts.equals(env, {"foo": False}, parse("foo: false"))
-    asserts.equals(env, {"foo": "bar:baz"}, parse("foo: bar:baz"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("foo: bar"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("foo: 'bar'"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("foo: \"bar\""))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("foo: bar  "))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("'foo': bar"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("\"foo\": bar"))
+    asserts.equals(env, ({"foo": 1.5}, None), parse("foo: 1.5"))
+    asserts.equals(env, ({"foo": True}, None), parse("foo: true"))
+    asserts.equals(env, ({"foo": False}, None), parse("foo: false"))
+    asserts.equals(env, ({"foo": "bar:baz"}, None), parse("foo: bar:baz"))
 
     # Maps - flow notation
-    asserts.equals(env, {}, parse("{}"))
-    asserts.equals(env, {"foo": "bar"}, parse("{foo: bar}"))
-    asserts.equals(env, {"foo": "bar"}, parse("{foo: 'bar'}"))
-    asserts.equals(env, {"foo": "bar"}, parse("{foo: \"bar\"}"))
-    asserts.equals(env, {"foo": "bar"}, parse("{foo: bar  }"))
-    asserts.equals(env, {"foo": "bar"}, parse("{'foo': bar}"))
-    asserts.equals(env, {"foo": "bar"}, parse("{\"foo\": bar}"))
-    asserts.equals(env, {"foo": 1.5}, parse("{foo: 1.5}"))
-    asserts.equals(env, {"foo": True}, parse("{foo: true}"))
-    asserts.equals(env, {"foo": False}, parse("{foo: false}"))
-    asserts.equals(env, {"foo": "bar:baz"}, parse("{foo: bar:baz}"))
-    asserts.equals(env, {"foo": {"bar": 5}}, parse("{foo: {bar: 5}}"))
-    asserts.equals(env, {"foo": 5, "bar": 6}, parse("{foo: 5, bar: 6}"))
-    asserts.equals(env, {"foo": 5, "bar": {"moo": "cow"}, "faz": "baz"}, parse("{foo: 5, bar: {moo: cow}, faz: baz}"))
-    asserts.equals(env, {"foo": {"bar": 5}}, parse("""\
+    asserts.equals(env, ({}, None), parse("{}"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("{foo: bar}"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("{foo: 'bar'}"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("{foo: \"bar\"}"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("{foo: bar  }"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("{'foo': bar}"))
+    asserts.equals(env, ({"foo": "bar"}, None), parse("{\"foo\": bar}"))
+    asserts.equals(env, ({"foo": 1.5}, None), parse("{foo: 1.5}"))
+    asserts.equals(env, ({"foo": True}, None), parse("{foo: true}"))
+    asserts.equals(env, ({"foo": False}, None), parse("{foo: false}"))
+    asserts.equals(env, ({"foo": "bar:baz"}, None), parse("{foo: bar:baz}"))
+    asserts.equals(env, ({"foo": {"bar": 5}}, None), parse("{foo: {bar: 5}}"))
+    asserts.equals(env, ({"foo": 5, "bar": 6}, None), parse("{foo: 5, bar: 6}"))
+    asserts.equals(env, ({"foo": 5, "bar": {"moo": "cow"}, "faz": "baz"}, None), parse("{foo: 5, bar: {moo: cow}, faz: baz}"))
+    asserts.equals(env, ({"foo": {"bar": 5}}, None), parse("""\
 {
     foo:
         {
@@ -142,23 +142,23 @@ def _parse_multiline_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Literal multiline strings (|), strip (-) and keep (+)
-    asserts.equals(env, {"foo": "bar\n"}, parse("""\
+    asserts.equals(env, ({"foo": "bar\n"}, None), parse("""\
 foo: |
     bar
 """))
-    asserts.equals(env, {"foo": "bar\n", "moo": "cow\n"}, parse("""\
+    asserts.equals(env, ({"foo": "bar\n", "moo": "cow\n"}, None), parse("""\
 foo: |
     bar
 moo: |
     cow
 """))
-    asserts.equals(env, {"foo": {"bar": "baz  \n faz\n"}}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": "baz  \n faz\n"}}, None), parse("""\
 foo:
     bar: |
      baz  
       faz
 """))
-    asserts.equals(env, {"a": "b\nc\nd\n"}, parse("""\
+    asserts.equals(env, ({"a": "b\nc\nd\n"}, None), parse("""\
 a: |
     b
     c
@@ -166,7 +166,7 @@ a: |
 
 
 """))
-    asserts.equals(env, {"a": "\n\nb\n\nc\n\nd\n"}, parse("""\
+    asserts.equals(env, ({"a": "\n\nb\n\nc\n\nd\n"}, None), parse("""\
 a: |
 
 
@@ -178,21 +178,21 @@ a: |
 
 
 """))
-    asserts.equals(env, {"foo": "bar"}, parse("""\
+    asserts.equals(env, ({"foo": "bar"}, None), parse("""\
 foo: |-
     bar
 """))
-    asserts.equals(env, {"foo": "bar", "moo": "cow"}, parse("""\
+    asserts.equals(env, ({"foo": "bar", "moo": "cow"}, None), parse("""\
 foo: |-
     bar
 moo: |-
     cow
 """))
-    asserts.equals(env, {"foo": "bar\n"}, parse("""\
+    asserts.equals(env, ({"foo": "bar\n"}, None), parse("""\
 foo: |+
     bar
 """))
-    asserts.equals(env, {"a": "\n\nb\n\nc\n\nd\n\n\n"}, parse("""\
+    asserts.equals(env, ({"a": "\n\nb\n\nc\n\nd\n\n\n"}, None), parse("""\
 a: |+
 
 
@@ -204,7 +204,7 @@ a: |+
 
 
 """))
-    asserts.equals(env, {"foo": "bar\n", "moo": "cow", "faz": "baz\n\n"}, parse("""\
+    asserts.equals(env, ({"foo": "bar\n", "moo": "cow", "faz": "baz\n\n"}, None), parse("""\
 foo: |
     bar
 moo: |-
@@ -221,23 +221,23 @@ def _parse_mixed_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Mixed sequence and map flows
-    asserts.equals(env, {"foo": ["moo"]}, parse("{foo: [moo]}"))
-    asserts.equals(env, ["foo", {"moo": "cow"}], parse("[foo, {moo: cow}]"))
-    asserts.equals(env, {"foo": {"moo": "cow", "faz": ["baz", 123]}}, parse("{foo: {moo: cow, faz: [baz, 123]}}"))
-    asserts.equals(env, [{"foo": ["bar", {"moo": ["cow"]}], "json": "bearded"}], parse("[{foo: [bar, {moo: [cow]}], json: bearded}]"))
+    asserts.equals(env, ({"foo": ["moo"]}, None), parse("{foo: [moo]}"))
+    asserts.equals(env, (["foo", {"moo": "cow"}], None), parse("[foo, {moo: cow}]"))
+    asserts.equals(env, ({"foo": {"moo": "cow", "faz": ["baz", 123]}}, None), parse("{foo: {moo: cow, faz: [baz, 123]}}"))
+    asserts.equals(env, ([{"foo": ["bar", {"moo": ["cow"]}], "json": "bearded"}], None), parse("[{foo: [bar, {moo: [cow]}], json: bearded}]"))
 
     # Multi-level maps
-    asserts.equals(env, {"foo": {"moo": "cow"}}, parse("""\
+    asserts.equals(env, ({"foo": {"moo": "cow"}}, None), parse("""\
 foo:
     moo: cow
 """))
-    asserts.equals(env, {"foo": {"bar": {"moo": 5, "cow": True}}}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": {"moo": 5, "cow": True}}}, None), parse("""\
 foo:
     bar:
         moo: 5
         cow: true
 """))
-    asserts.equals(env, {"a": {"b": {"c": {"d": 1, "e": 2, "f": 3}, "g": {"h": 4}}}}, parse("""\
+    asserts.equals(env, ({"a": {"b": {"c": {"d": 1, "e": 2, "f": 3}, "g": {"h": 4}}}}, None), parse("""\
 a:
     b:
         c:
@@ -249,11 +249,11 @@ a:
 """))
 
     # More than one root property
-    asserts.equals(env, {"a": True, "b": False}, parse("""\
+    asserts.equals(env, ({"a": True, "b": False}, None), parse("""\
 a: true
 b: false
 """))
-    asserts.equals(env, {"a": {"b": True}, "c": {"d": False}}, parse("""\
+    asserts.equals(env, ({"a": {"b": True}, "c": {"d": False}}, None), parse("""\
 a:
     b: true
 c:
@@ -261,23 +261,23 @@ c:
 """))
 
     # Value begins on next line at an indent
-    asserts.equals(env, {"moo": "cow"}, parse("""\
+    asserts.equals(env, ({"moo": "cow"}, None), parse("""\
 moo:
     cow
 """))
 
     # Mixed flow and non-flow maps
-    asserts.equals(env, {"foo": {"bar": {"moo": 5, "cow": True}}}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": {"moo": 5, "cow": True}}}, None), parse("""\
 foo: {bar: {moo: 5, cow: true}}
 """))
-    asserts.equals(env, {"foo": {"bar": {"moo": 5, "cow": True}, "baz": "faz"}}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": {"moo": 5, "cow": True}, "baz": "faz"}}, None), parse("""\
 foo: {bar: {moo: 5, cow: true}, baz: faz}
 """))
-    asserts.equals(env, {"foo": {"bar": {"moo": 5, "cow": True}}}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": {"moo": 5, "cow": True}}}, None), parse("""\
 foo:
     bar: {moo: 5, cow: true}
 """))
-    asserts.equals(env, {"foo": {"bar": {"moo": 5, "cow": True}, "baz": "faz"}, "json": ["bearded"]}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": {"moo": 5, "cow": True}, "baz": "faz"}, "json": ["bearded"]}, None), parse("""\
 foo:
     bar:
         {
@@ -287,7 +287,7 @@ foo:
         faz
 json: [bearded]
 """))
-    asserts.equals(env, {"foo": {"bar": {"moo": [{"cow": True}]}}}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": {"moo": [{"cow": True}]}}}, None), parse("""\
 foo:
     bar: {moo: [
             {cow: true}
@@ -295,7 +295,7 @@ foo:
 """))
 
     # Miscellaneous
-    asserts.equals(env, {"foo": {"bar": "b-ar", "moo": ["cow"]}, "loo": ["roo", "goo"]}, parse("""\
+    asserts.equals(env, ({"foo": {"bar": "b-ar", "moo": ["cow"]}, "loo": ["roo", "goo"]}, None), parse("""\
 foo:
     bar: b-ar
     moo: [cow]
@@ -304,7 +304,7 @@ loo:
     - goo
 """))
 
-    asserts.equals(env, {"foo": "bar\n", "baz": 5}, parse("""\
+    asserts.equals(env, ({"foo": "bar\n", "baz": 5}, None), parse("""\
 foo: |
     bar
 baz: 5
@@ -316,13 +316,13 @@ def _parse_complex_map_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Basic complex-object
-    asserts.equals(env, {"a": True}, parse("""\
+    asserts.equals(env, ({"a": True}, None), parse("""\
 ? a
 : true
 """))
 
     # Multiple bsic complex-object
-    asserts.equals(env, {"a": True, "b": False}, parse("""\
+    asserts.equals(env, ({"a": True, "b": False}, None), parse("""\
 ? a
 : true
 ? b
@@ -330,7 +330,7 @@ def _parse_complex_map_test_impl(ctx):
 """))
 
     # Whitespace in various places
-    asserts.equals(env, {"a": True, "b": False, "c": "foo", "  d  ": "  e  "}, parse("""\
+    asserts.equals(env, ({"a": True, "b": False, "c": "foo", "  d  ": "  e  "}, None), parse("""\
 ?   a
 : true  
   
@@ -346,7 +346,7 @@ def _parse_complex_map_test_impl(ctx):
 """))
 
     # Object in complex mapping key
-    asserts.equals(env, {"a": {"b": {"c": 1, "d": True}}}, parse("""\
+    asserts.equals(env, ({"a": {"b": {"c": 1, "d": True}}}, None), parse("""\
 a:
   ? b
   : c: 1
@@ -354,21 +354,21 @@ a:
 """))
 
     # Array in complex mapping key
-    asserts.equals(env, {"a": {"b": [1, True]}}, parse("""\
+    asserts.equals(env, ({"a": {"b": [1, True]}}, None), parse("""\
 a:
   ? b
   : [1, true]
 """))
 
     # Arrays in complex mapping key
-    asserts.equals(env, {"a": [1, 2]}, parse("""\
+    asserts.equals(env, ({"a": [1, 2]}, None), parse("""\
 ? a
 : - 1
   - 2
 """))
 
     # Multiple nesting, arrays in objects
-    asserts.equals(env, {"a": {"b": {"c": [1, 2]}}, "d": 3}, parse("""\
+    asserts.equals(env, ({"a": {"b": {"c": [1, 2]}}, "d": 3}, None), parse("""\
 ? a
 : ? b
   : ? c
@@ -379,7 +379,7 @@ a:
 """))
 
     # Popping in/out of nested maps
-    asserts.equals(env, {
+    asserts.equals(env, ({
         "a": {
             "b": {
                 "c": 1,
@@ -390,7 +390,7 @@ a:
             },
             "e": 3,
         },
-    }, parse("""\
+    }, None), parse("""\
 a:
   ? b
   : c: 1
@@ -408,7 +408,7 @@ def _parse_lockfile_test_impl(ctx):
     env = unittest.begin(ctx)
 
     # Partial lock file
-    asserts.equals(env, {
+    asserts.equals(env, ({
         "lockfileVersion": 5.4,
         "specifiers": {
             "@aspect-test/a": "5.0.0",
@@ -430,7 +430,7 @@ def _parse_lockfile_test_impl(ctx):
                 "dev": False,
             },
         },
-    }, parse("""\
+    }, None), parse("""\
 lockfileVersion: 5.4
 
 specifiers:
@@ -451,7 +451,7 @@ packages:
         dev: false
 """))
 
-    asserts.equals(env, {
+    asserts.equals(env, ({
         "lockfileVersion": "6.0",
         "packages": {
             "/pkg-a@1.2.3": {
@@ -467,7 +467,7 @@ packages:
                 "dev": True,
             },
         },
-    }, parse("""\
+    }, None), parse("""\
 lockfileVersion: '6.0'
 
 packages:
@@ -486,7 +486,7 @@ def _parse_conflict(ctx):
     env = unittest.begin(ctx)
 
     # Similar test to https://github.com/pnpm/pnpm/blob/37fffbefa5a9136f2e189c01a5edf3c00ac48018/packages/supi/test/lockfile.ts#L1237C1-L1249C13
-    asserts.equals(env, None, parse("""\
+    asserts.equals(env, (None, "Unknown result state: <<<<< HEAD for value 100.0.0"), parse("""\
 importers:
   .:
     dependencies:
@@ -507,7 +507,7 @@ packages:
 def _parse_errors(ctx):
     env = unittest.begin(ctx)
 
-    asserts.equals(env, None, parse("""\
+    asserts.equals(env, (None, "Unknown result state: sdlkfdslkjf for value +"), parse("""\
 asdljfk
             sdlkfdslkjf
     -
@@ -516,11 +516,11 @@ asdljfk
   -- sldkjf
 """))
 
-    asserts.equals(env, None, parse("""\
+    asserts.equals(env, (None, "Unexpected EOF"), parse("""\
 [asdljfk
 """))
 
-    asserts.equals(env, None, parse("""\
+    asserts.equals(env, (None, "Unexpected EOF"), parse("""\
 a: [
 """))
 
