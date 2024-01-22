@@ -144,10 +144,6 @@ The pnpm lock file update will fail if `data` is missing any files required to r
 > To list all local `package.json` files that pnpm needs to read, you can run
 > `pnpm recursive ls --depth -1 --porcelain`.
 
-A `.aspect/rules/external_repository_action_cache/npm_translate_lock_<hash>` file will be created
-and used to determine when the `pnpm-lock.yaml` file should be updated.
-This file should be checked into the source control along with the `pnpm-lock.yaml` file.
-
 When the `pnpm-lock.yaml` file needs updating, `npm_translate_lock` will automatically:
 
 -   run `pnpm import` if there is a `npm_package_lock` or `yarn_lock` attribute specified.
@@ -166,6 +162,30 @@ It is recommended to set this environment variable on CI when `update_pnpm_lock`
 If the `ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK` environment variable is set, `update_pnpm_lock` is disabled
 even if set to True. This can be useful for some CI uses cases where multiple jobs run Bazel by you
 only want one of the jobs checking that the pnpm lock file is up-to-date.
+
+#### `npm_translate_lock_<hash>`
+
+A `.aspect/rules/external_repository_action_cache/npm_translate_lock_<hash>` file will be created and
+used to determine when the `pnpm-lock.yaml` file should be updated. This file persists the state of
+package and lock files that may effect the `pnpm-lock.yaml` generation and should be checked into the
+source control along with the `pnpm-lock.yaml` file.
+
+The `npm_translate_lock_<hash>` file has been a known source of merge conflicts in workspaces with
+frequent lockfile or `package.json` changes. As a generated file manual resolution of merge conflicts
+is unnecessary as it should only be generated and updated by `npm_translate_lock`.
+To reduce the impact on developer workflows `git` can be configured to ignore merge conflicts using
+`.gitattributes` and a [custom merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver).
+
+First, mark the `npm_translate_lock_<hash>` file (with `<hash>` replaced with the hash generated in your workspace)
+to use a custom custom merge driver, in this example named `ours`:
+```
+.aspect/rules/external_repository_action_cache/npm_translate_lock_<hash>= merge=ours
+```
+
+Second, developers must define the `ours` custom merge driver in their git configuration to always accept local change:
+```
+git config --global merge.ours.driver true
+```
 
 ## Working with packages
 
