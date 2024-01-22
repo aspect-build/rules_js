@@ -175,6 +175,7 @@ frequent lockfile or `package.json` changes. As a generated file manual resoluti
 is unnecessary as it should only be generated and updated by `npm_translate_lock`.
 To reduce the impact on developer workflows `git` can be configured to ignore merge conflicts using
 `.gitattributes` and a [custom merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver).
+See our [blog post](https://blog.aspect.dev/easier-merges-on-lockfiles) for a longer explanation.
 
 First, mark the `npm_translate_lock_<hash>` file (with `<hash>` replaced with the hash generated in your workspace)
 to use a custom custom merge driver, in this example named `ours`:
