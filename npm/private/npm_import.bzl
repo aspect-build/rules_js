@@ -420,7 +420,13 @@ def _is_gnu_tar(rctx):
     if repo_utils.is_linux(rctx):
         return True
 
-    result = rctx.execute(["tar", "--version"])
+    # TODO: use a hermetic tar from aspect_bazel_lib and we can drop the "if _is_gnu_tar" branch
+    tar_args = ["tar", "--version"]
+    result = rctx.execute(tar_args)
+    if result.return_code:
+        msg = "Failed to determine tar version. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
+        fail(msg)
+
     return "GNU tar" in result.stdout
 
 def _download_and_extract_archive(rctx):
@@ -475,22 +481,22 @@ def _download_and_extract_archive(rctx):
     mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
-        msg = "mkdir %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
+        msg = "Failed to create package directory. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
         fail(msg)
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    untar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
+    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
     if _is_gnu_tar(rctx):
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
         # extracting files into the directory. Delay permission restoration for directories until all files
         # have been extracted.
-        untar_args.append("--delay-directory-restore")
+        tar_args.append("--delay-directory-restore")
 
-    result = rctx.execute(untar_args)
+    result = rctx.execute(tar_args)
     if result.return_code:
-        msg = "tar %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
+        msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
         fail(msg)
 
     if not repo_utils.is_windows(rctx):
@@ -500,7 +506,7 @@ def _download_and_extract_archive(rctx):
         chmod_args = ["chmod", "-R", "a+X", _EXTRACT_TO_DIRNAME]
         result = rctx.execute(chmod_args)
         if result.return_code:
-            msg = "chmod %s failed: \nSTDOUT:\n%s\nSTDERR:\n%s" % (_EXTRACT_TO_DIRNAME, result.stdout, result.stderr)
+            msg = "Failed to set directory listing permissions. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(chmod_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
 def _npm_import_rule_impl(rctx):
