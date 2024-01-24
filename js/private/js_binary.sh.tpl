@@ -339,7 +339,7 @@ JS_BINARY__NODE_OPTIONS=()
 
 ARGS=()
 ALL_ARGS=({{fixed_args}} "$@")
-for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
+for ARG in "${ALL_ARGS[@]}"}; do
     case "$ARG" in
     # Let users pass through arguments to node itself
     --node_options=*) JS_BINARY__NODE_OPTIONS+=("${ARG#--node_options=}") ;;
