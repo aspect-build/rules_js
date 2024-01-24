@@ -26107,21 +26107,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_blockprotocol_type-system-web__at_gitpkg.vercel.app_blockprotocol_blockprotocol_packages__2540blockprotocol_type-system-web_6526c0e",
+        name = "npm__hello__at_gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello",
         root_package = "",
         link_workspace = "",
         link_packages = {
-            "npm/private/test": ["@blockprotocol/type-system-web"],
+            "npm/private/test": ["hello"],
         },
-        package = "@blockprotocol/type-system-web",
-        version = "@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e",
-        url = "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
+        package = "hello",
+        version = "@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
+        url = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
         dev = True,
         generate_bzl_library_targets = True,
         transitive_closure = {
-            "@blockprotocol/type-system-web": ["@gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%2540blockprotocol/type-system-web?6526c0e"],
+            "hello": ["@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello"],
         },
     )
 

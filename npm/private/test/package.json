@@ -2,7 +2,7 @@
     "private": true,
     "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
     "devDependencies": {
-        "@blockprotocol/type-system-web": "https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e",
+        "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "@figma/nodegit": "^0.28.0-figma.2",
         "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#fc681991e61c6808dd26012a2331f83671a11218",
         "@plotly/regl": "2.1.2",
