@@ -58,6 +58,7 @@ bzl_library(
         "@aspect_bazel_lib//lib:expand_make_vars",
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
+        "@bazel_skylib//lib:dicts",
     ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
 )
 
