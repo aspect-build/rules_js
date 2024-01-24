@@ -150,7 +150,7 @@ def _init_pnpm_labels(label_store, rctx):
     #
     # TODO: Try to understand this better and see if we can go back to using
     #  Label("@nodejs_host//:bin/node")
-    label_store.add("host_node", Label("@%s_%s//:bin/node" % (rctx.attr.update_pnpm_lock_node_toolchain_prefix, repo_utils.platform(rctx))))
+    label_store.add("host_node", Label("@{}_{}//:bin/node".format(rctx.attr.update_pnpm_lock_node_toolchain_prefix, repo_utils.platform(rctx))))
 
     label_store.add("pnpm_entry", Label("@pnpm//:package/bin/pnpm.cjs"))
 
@@ -448,13 +448,13 @@ def _copy_input_file_action(rctx, src, dst):
     dst_segments = dst.split("/")
     if len(dst_segments) > 1:
         dirname = "/".join(dst_segments[:-1])
-        args = ["mkdir", "-p", dirname] if not is_windows else ["cmd", "/c", "if not exist {dir} (mkdir {dir})".format(dir = dirname.replace("/", "\\"))]
+        mkdir_args = ["mkdir", "-p", dirname] if not is_windows else ["cmd", "/c", "if not exist {dir} (mkdir {dir})".format(dir = dirname.replace("/", "\\"))]
         result = rctx.execute(
-            args,
+            mkdir_args,
             quiet = rctx.attr.quiet,
         )
         if result.return_code:
-            msg = "'{}' failed: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(args), result.stdout, result.stderr)
+            msg = "Failed to create directory for copy. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
     cp_args = ["cp", "-f", src, dst] if not is_windows else ["xcopy", "/Y", src.replace("/", "\\"), "\\".join(dst_segments) + "*"]
@@ -463,7 +463,7 @@ def _copy_input_file_action(rctx, src, dst):
         quiet = rctx.attr.quiet,
     )
     if result.return_code:
-        msg = "'{}' failed: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(cp_args), result.stdout, result.stderr)
+        msg = "Failed to copy file. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(cp_args), result.return_code, result.stdout, result.stderr)
         fail(msg)
 
 ################################################################################
