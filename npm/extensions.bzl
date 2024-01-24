@@ -63,7 +63,18 @@ def _extension_impl(module_ctx):
             if not attr.pnpm_lock:
                 continue
 
-            lock_importers, lock_packages, lock_patched_dependencies = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
+            lock_importers, lock_packages, lock_patched_dependencies, lock_parse_errors = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
+            if lock_parse_errors != None:
+                msg = """
+        {type}: pnpm-lock.yaml parse error {error}`.
+        """.format(type = "WARNING" if attr.update_pnpm_lock else "ERROR", error = lock_parse_errors)
+
+                # buildifier: disable=print
+                if attr.update_pnpm_lock:
+                    print(msg)
+                else:
+                    fail(msg)
+
             importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
             registries = {}
             npm_auth = {}

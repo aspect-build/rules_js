@@ -27,7 +27,7 @@ def parse(yaml):
         yaml: string, the yaml content to parse
 
     Returns:
-        An equivalent mapping to native starlark types
+        A tuple containing an equivalent mapping to native starlark types and error.
     """
     yaml = _normalize_yaml(yaml)
 
@@ -56,11 +56,9 @@ def parse(yaml):
             fail(msg)
 
         if starlark["error"] != None:
-            # buildifier: disable=print
-            print("YAML parse error: ", starlark["error"])
-            return None
+            return None, starlark["error"]
 
-    return starlark["result"]
+    return starlark["result"], None
 
 def _handle_CONSUME_SPACE(state, input, stack, starlark):
     if input == EOF:

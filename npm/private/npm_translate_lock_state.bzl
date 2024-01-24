@@ -495,10 +495,23 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
 ################################################################################
 def _load_lockfile(priv, rctx, label_store):
-    importers, packages, patched_dependencies = utils.parse_pnpm_lock(rctx.read(label_store.path("pnpm_lock")))
+    importers, packages, patched_dependencies, lock_parse_errors = utils.parse_pnpm_lock(rctx.read(label_store.path("pnpm_lock")))
     priv["importers"] = importers
     priv["packages"] = packages
     priv["patched_dependencies"] = patched_dependencies
+
+    if lock_parse_errors != None:
+        should_update = _should_update_pnpm_lock(priv)
+
+        msg = """
+{type}: pnpm-lock.yaml parse error {error}`.
+""".format(type = "WARNING" if should_update else "ERROR", error = lock_parse_errors)
+
+        if should_update:
+            # buildifier: disable=print
+            print(msg)
+        else:
+            fail(msg)
 
 ################################################################################
 def _has_workspaces(priv):

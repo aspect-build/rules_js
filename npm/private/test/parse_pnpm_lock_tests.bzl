@@ -7,9 +7,25 @@ def _parse_empty_lock_test_impl(ctx):
     env = unittest.begin(ctx)
 
     parsed = utils.parse_pnpm_lock("")
-    expected = ({}, {}, {})
+    expected = ({}, {}, {}, None)
 
     asserts.equals(env, expected, parsed)
+
+    return unittest.end(env)
+
+def _parse_merge_conflict_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    parsed = utils.parse_pnpm_lock("""
+importers:
+  .:
+    dependencies:
+<<<<< HEAD""")
+    expected = ({}, {}, {}, "expected lockfileVersion key in lockfile")
+
+    asserts.equals(env, expected, parsed)
+
+    return unittest.end(env)
 
 def _parse_lockfile_v5_test_impl(ctx):
     env = unittest.begin(ctx)
@@ -63,6 +79,7 @@ packages:
             },
         },
         {},
+        None,
     )
 
     asserts.equals(env, expected, parsed)
@@ -119,6 +136,7 @@ packages:
             },
         },
         {},
+        None,
     )
 
     asserts.equals(env, expected, parsed)
@@ -130,15 +148,20 @@ parse_lockfile_v5_test = unittest.make(
     attrs = {},
 )
 
-parse_empty_lock_test = unittest.make(
-    _parse_empty_lock_test_impl,
-    attrs = {},
-)
-
 parse_lockfile_v6_test = unittest.make(
     _parse_lockfile_v6_test_impl,
     attrs = {},
 )
 
+parse_empty_lock_test = unittest.make(
+    _parse_empty_lock_test_impl,
+    attrs = {},
+)
+
+parse_merge_conflict_test = unittest.make(
+    _parse_merge_conflict_test_impl,
+    attrs = {},
+)
+
 def parse_pnpm_lock_tests(name):
-    unittest.suite(name, parse_lockfile_v5_test, parse_lockfile_v6_test)
+    unittest.suite(name, parse_empty_lock_test, parse_merge_conflict_test, parse_lockfile_v5_test, parse_lockfile_v6_test)
