@@ -2,6 +2,7 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
@@ -16,8 +17,6 @@ LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 def _extension_impl(module_ctx):
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            # npm_translate_lock MUST run before parse_pnpm_lock below since it may update
-            # the pnpm-lock.yaml file when update_pnpm_lock is True.
             npm_translate_lock(
                 name = attr.name,
                 bins = attr.bins,
@@ -47,6 +46,7 @@ def _extension_impl(module_ctx):
                 quiet = attr.quiet,
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
+                register_yq_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 root_package = attr.root_package,
                 run_lifecycle_hooks = attr.run_lifecycle_hooks,
                 update_pnpm_lock = attr.update_pnpm_lock,
@@ -63,11 +63,30 @@ def _extension_impl(module_ctx):
             if not attr.pnpm_lock:
                 continue
 
-            lock_importers, lock_packages, lock_patched_dependencies, lock_parse_errors = utils.parse_pnpm_lock(module_ctx.read(attr.pnpm_lock))
-            if lock_parse_errors != None:
+            lock_importers = {}
+            lock_packages = {}
+            lock_patched_dependencies = {}
+            lock_parse_err = None
+            if attr.use_starlark_yaml_parser:
+                lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_yaml(module_ctx.read(attr.pnpm_lock))
+            else:
+                is_windows = repo_utils.is_windows(module_ctx)
+                host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(module_ctx), ".exe" if is_windows else ""))
+                yq_args = [
+                    str(module_ctx.path(host_yq)),
+                    str(module_ctx.path(attr.pnpm_lock)),
+                    "-o=json",
+                ]
+                result = module_ctx.execute(yq_args)
+                if result.return_code:
+                    lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
+                else:
+                    lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+
+            if lock_parse_err != None:
                 msg = """
-        {type}: pnpm-lock.yaml parse error {error}`.
-        """.format(type = "WARNING" if attr.update_pnpm_lock else "ERROR", error = lock_parse_errors)
+        {type}: pnpm-lock.yaml parse error: {error}`.
+        """.format(type = "WARNING" if attr.update_pnpm_lock else "ERROR", error = lock_parse_err)
 
                 # buildifier: disable=print
                 if attr.update_pnpm_lock:

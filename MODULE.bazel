@@ -32,6 +32,16 @@ pnpm.pnpm(
 )
 use_repo(pnpm, "pnpm", "pnpm__links")
 
+bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+use_repo(bazel_lib_toolchains, "coreutils_toolchains")
+use_repo(bazel_lib_toolchains, "yq_darwin_amd64")
+use_repo(bazel_lib_toolchains, "yq_darwin_arm64")
+use_repo(bazel_lib_toolchains, "yq_linux_amd64")
+use_repo(bazel_lib_toolchains, "yq_linux_arm64")
+use_repo(bazel_lib_toolchains, "yq_linux_ppc64le")
+use_repo(bazel_lib_toolchains, "yq_linux_s390x")
+use_repo(bazel_lib_toolchains, "yq_windows_amd64")
+
 ####### Dev dependencies ########
 
 bazel_dep(name = "gazelle", version = "0.33.0", dev_dependency = True, repo_name = "bazel_gazelle")
@@ -46,9 +56,6 @@ host = use_extension(
 )
 host.host()
 use_repo(host, "aspect_bazel_lib_host")
-
-bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
-use_repo(bazel_lib_toolchains, "coreutils_toolchains")
 
 node_dev = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",
