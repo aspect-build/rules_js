@@ -29,7 +29,7 @@ jobs:
                   m=${v::1}
                   a=(
                     "major:$m, version:\"$v\""
-                    "major:6, version:\"6.4.0\""
+                    "major:6, version:\"6.5.0\""
                   )
                   printf -v j '{%s},' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
