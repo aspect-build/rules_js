@@ -28,7 +28,6 @@ alias(
 
 multi_formatter_binary(
     name = "format",
-    go = "@go_sdk//:bin/gofmt",
     sh = ":shfmt",
     starlark = "@buildifier_prebuilt//:buildifier",
     terraform = ":terraform",
