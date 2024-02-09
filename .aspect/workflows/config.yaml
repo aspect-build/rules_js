@@ -204,7 +204,7 @@ tasks:
     - configure:
           queue: aspect-small
     - delivery:
-          always_deliver: true
+          auto_deliver: true
           queue: aspect-default
     - finalization:
           queue: aspect-small
