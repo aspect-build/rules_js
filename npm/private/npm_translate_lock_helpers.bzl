@@ -360,6 +360,13 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
 
         patches_used.extend(patches_keys)
 
+        # gather replace packages
+        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
+        if len(replace_packages) > 1:
+            msg = "Multiple package replacements found for package {}".format(name)
+            fail(msg)
+        replace_package = replace_packages[0] if replace_packages else None
+
         # gather custom postinstalls
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
@@ -453,6 +460,7 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             bins = bins,
             package_info = package_info,
             dev = dev,
+            replace_package = replace_package,
         ))
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too

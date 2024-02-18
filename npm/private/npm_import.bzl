@@ -718,7 +718,9 @@ def _impl_links(rctx):
     if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
         npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
-    if rctx.attr.npm_translate_lock_repo:
+    if rctx.attr.replace_package:
+        npm_package_target = rctx.attr.replace_package
+    elif rctx.attr.npm_translate_lock_repo:
         npm_package_target = "@{}//:{}_source_directory".format(
             rctx.attr.npm_translate_lock_repo,
             npm_import_sources_repo_name,
@@ -828,6 +830,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "npm_translate_lock_repo": attr.string(),
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
+    "replace_package": attr.string(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
@@ -899,6 +902,7 @@ def npm_import(
         integrity = "",
         url = "",
         commit = "",
+        replace_package = None,
         package_visibility = ["//visibility:public"],
         patch_args = ["-p0"],
         patches = [],
@@ -1090,6 +1094,19 @@ def npm_import(
 
         commit: Specific commit to be checked out if url is a git repository.
 
+        replace_package: Use the specified npm_package target when linking instead of the fetched sources for this npm package.
+
+            The injected npm_package target may optionally contribute transitive npm package dependencies on top
+            of the transitive dependencies specified in the pnpm lock file for the same package, however, these
+            transitive dependencies must not collide with pnpm lock specified transitive dependencies.
+
+            Any patches specified for this package will be not applied to the injected npm_package target. They
+            will be applied, however, to the fetches sources so they can still be useful for patching the fetched
+            `package.json` file, which is used to determine the generated bin entries for the package.
+
+            NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
+            the injected npm_package. These may be disabled explicitly using the `lifecycle_hooks` attribute.
+
         package_visibility: Visibility of generated node_module link targets.
 
         patch_args: Arguments to pass to the patch tool.
@@ -1218,4 +1235,5 @@ def npm_import(
         bins = bins,
         npm_translate_lock_repo = npm_translate_lock_repo,
         package_visibility = package_visibility,
+        replace_package = replace_package,
     )

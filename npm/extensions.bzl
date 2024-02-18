@@ -47,6 +47,7 @@ def _extension_impl(module_ctx):
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_yq_toolchains = False,  # this registration is handled elsewhere with bzlmod
+                replace_packages = attr.replace_packages,
                 root_package = attr.root_package,
                 run_lifecycle_hooks = attr.run_lifecycle_hooks,
                 update_pnpm_lock = attr.update_pnpm_lock,
@@ -160,6 +161,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                     package = i.package,
                     patch_args = i.patch_args,
                     patches = i.patches,
+                    replace_package = i.replace_package,
                     root_package = i.root_package,
                     transitive_closure = i.transitive_closure,
                     url = i.url,
@@ -191,6 +193,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 package = i.package,
                 patch_args = i.patch_args,
                 patches = i.patches,
+                replace_package = i.replace_package,
                 root_package = i.root_package,
                 run_lifecycle_hooks = i.run_lifecycle_hooks,
                 transitive_closure = i.transitive_closure,

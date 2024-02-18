@@ -52,3 +52,10 @@ def rules_js_dev_dependencies():
         strip_prefix = "rules_lint-0.7.0",
         url = "https://github.com/aspect-build/rules_lint/releases/download/v0.7.0/rules_lint-v0.7.0.tar.gz",
     )
+
+    http_archive(
+        name = "chalk_501",
+        integrity = "sha256-/nD5GSp77HDNFDwIL68S5PbS+8gefWkube2iIr80/x4=",
+        url = "https://registry.npmjs.org/chalk/-/chalk-5.0.1.tgz",
+        build_file = "//npm/private/test:vendored/chalk-5.0.1.BUILD",
+    )
