@@ -357,6 +357,13 @@ def {bin_name}_binary(name, **kwargs):
 """
 
 _JS_PACKAGE_TMPL = """
+_copy_to_directory(
+    name = "package",
+    srcs = glob(["{extract_to_dirname}/**"]),
+    root_paths = ["package"],
+    visibility = ["//visibility:public"],
+)
+
 _npm_package_internal(
     name = "source_directory",
     src = ":{extract_to_dirname}",
@@ -531,7 +538,9 @@ def _npm_import_rule_impl(rctx):
 
     rctx_files = {
         "BUILD.bazel": generated_by_lines + [
-            """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
+            """\
+load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", _copy_to_directory = "copy_to_directory")""",
         ],
     }
 
