@@ -559,11 +559,8 @@ def _js_binary_impl(ctx):
 
     providers = []
 
-    if ctx.attr.testonly and ctx.configuration.coverage_enabled:
-        # We have to instruct rule implementers to have this attribute present.
-        if not hasattr(ctx.attr, "_lcov_merger"):
-            fail("_lcov_merger attribute is missing and coverage was requested")
-
+    # We have to instruct test rule implementers to have this attribute present.
+    if ctx.attr.testonly and ctx.configuration.coverage_enabled and hasattr(ctx.attr, "_lcov_merger"):
         # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
         # See: https://github.com/bazelbuild/bazel/issues/4033
         runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
