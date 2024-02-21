@@ -640,7 +640,9 @@ the contract between Bazel and a test runner.""",
             default = Label("//js/private/coverage:merger"),
             cfg = "exec",
         ),
-        "_is_test": True
+        "_is_test": attr.bool(
+            default = True
+        )
     }),
     test = True,
     toolchains = js_binary_lib.toolchains,
