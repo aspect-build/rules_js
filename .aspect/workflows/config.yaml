@@ -197,6 +197,9 @@ workspaces:
 tasks:
     - test:
           queue: aspect-small
+          bazel:
+              flags:
+                  - --aspect:disable_plugins
     - format:
           queue: aspect-small
     - buildifier:
