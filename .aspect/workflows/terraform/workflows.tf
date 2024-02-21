@@ -82,6 +82,7 @@ module "aspect_workflows" {
       max_runners               = 10
       min_runners               = 0
       queue                     = "aspect-default"
+      reaper_sleep_minutes      = 5
       resource_type             = "default"
       scaling_polling_frequency = 3 # check for queued jobs every 20s
       warming                   = true
@@ -92,6 +93,7 @@ module "aspect_workflows" {
       max_runners               = 20
       min_runners               = 0
       queue                     = "aspect-small"
+      reaper_sleep_minutes      = 10
       resource_type             = "small"
       scaling_polling_frequency = 3     # check for queued jobs every 20s
       warming                   = false # don't warm for faster bootstrap; these runners won't be running large builds
@@ -102,6 +104,7 @@ module "aspect_workflows" {
       max_runners               = 10
       min_runners               = 0
       queue                     = "aspect-micro"
+      reaper_sleep_minutes      = 10
       resource_type             = "micro"
       scaling_polling_frequency = 3     # check for queued jobs every 20s
       warming                   = false # don't warm for faster bootstrap; these runners won't be running large builds
@@ -114,6 +117,7 @@ module "aspect_workflows" {
       max_runners            = 1
       min_runners            = 0
       queue                  = "aspect-warming"
+      reaper_sleep_minutes   = 10
       resource_type          = "default"
     }
   }
