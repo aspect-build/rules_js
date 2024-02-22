@@ -53,6 +53,7 @@ _ATTRS = {
     "dev": attr.bool(),
     "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache()),
     "generate_bzl_library_targets": attr.bool(),
+    "replace_packages": attr.string_dict(),
     "lifecycle_hooks_envs": attr.string_list_dict(),
     "lifecycle_hooks_execution_requirements": attr.string_list_dict(),
     "lifecycle_hooks": attr.string_list_dict(),
@@ -173,6 +174,7 @@ def npm_translate_lock(
         lifecycle_hooks_exclude = [],
         lifecycle_hooks_execution_requirements = {},
         lifecycle_hooks_no_sandbox = True,
+        replace_packages = {},
         bins = {},
         verify_node_modules_ignored = None,
         verify_patches = None,
@@ -381,6 +383,19 @@ def npm_translate_lock(
             TreeArtifacts out of the sandbox.
 
             Read more: [lifecycles](/docs/pnpm.md#lifecycles)
+
+        replace_packages: A dict of package names to npm_package targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
+
+            The injected npm_package targets may optionally contribute transitive npm package dependencies on top
+            of the transitive dependencies specified in the pnpm lock file for their respective packages, however, these
+            transitive dependencies must not collide with pnpm lock specified transitive dependencies.
+
+            Any patches specified for the packages will be not applied to the injected npm_package targets. They
+            will be applied, however, to the fetches sources for their respecitve packages so they can still be useful
+            for patching the fetched `package.json` files, which are used to determine the generated bin entries for packages.
+
+            NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
+            the injected npm_package targets. These may be disabled explicitly using the `lifecycle_hooks` attribute.
 
         bins: Binary files to create in `node_modules/.bin` for packages in this lock file.
 
@@ -616,6 +631,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         lifecycle_hooks = lifecycle_hooks,
         lifecycle_hooks_envs = lifecycle_hooks_envs,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+        replace_packages = replace_packages,
         bins = bins_string_list_dict,
         verify_node_modules_ignored = verify_node_modules_ignored,
         verify_patches = verify_patches,

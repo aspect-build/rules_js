@@ -8,3 +8,13 @@ load(
 fetch_shfmt()
 
 fetch_terraform()
+
+# dev dependency
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "chalk_501",
+    build_file = "//npm/private/test:vendored/chalk-5.0.1.BUILD",
+    integrity = "sha256-/nD5GSp77HDNFDwIL68S5PbS+8gefWkube2iIr80/x4=",
+    url = "https://registry.npmjs.org/chalk/-/chalk-5.0.1.tgz",
+)

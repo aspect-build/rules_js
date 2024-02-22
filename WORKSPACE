@@ -160,6 +160,9 @@ npm_translate_lock(
         # other direct dependencies in the `examples/npm_deps/package.json`.
         "ms@2.1.3": ["examples/npm_deps"],
     },
+    replace_packages = {
+        "chalk@5.0.1": "@chalk_501//:pkg",
+    },
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
     verify_patches = "//examples/npm_deps/patches:patches",
