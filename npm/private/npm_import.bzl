@@ -517,7 +517,10 @@ def _npm_import_rule_impl(rctx):
 
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
-    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
+    if rctx.attr.use_native_patch:
+        patch(rctx, patch_args = rctx.attr.patch_args)
+    else:
+        patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
 
     pkg_json_path = paths.join(_EXTRACT_TO_DIRNAME, "package.json")
 
@@ -845,6 +848,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
+    "use_native_patch": attr.bool(),
 })
 
 def _get_bin_entries(pkg_json, package):
@@ -898,6 +902,7 @@ def npm_import(
         lifecycle_hooks_env = [],
         integrity = "",
         url = "",
+        use_native_patch = False,
         commit = "",
         package_visibility = ["//visibility:public"],
         patch_args = ["-p0"],
@@ -1088,6 +1093,9 @@ def npm_import(
             If url is configured as a git repository, the commit attribute must be set to the
             desired commit.
 
+        use_native_patch: Whether to use the Bazel-native implementation when applying patches.
+            When set, patch diff headers must contain a package/ prefix that is not stripped.
+
         commit: Specific commit to be checked out if url is a git repository.
 
         package_visibility: Visibility of generated node_module link targets.
@@ -1179,6 +1187,7 @@ def npm_import(
         link_packages = link_packages,
         integrity = integrity,
         url = url,
+        use_native_patch = use_native_patch,
         commit = commit,
         patch_args = patch_args,
         patches = patches,
