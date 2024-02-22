@@ -275,6 +275,8 @@ which is equivalent to setting the `lifecycle_hooks` to an empty list for that p
 
 You can set environment variables for hook build actions using the `lifecycle_hooks_envs` attribute of `npm_translate_lock`.
 
+Some hooks may depend on environment variables specified depending on [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env) which may be enabled for hook build actions using the `lifecycle_hooks_use_default_shell_env` attribute of `npm_translate_lock`. Requires bazel-lib >= 2.4.2.
+
 In case there are multiple matches, some attributes are additive.
 (More specific matches are appended to previous matches.)
 Other attributes have specificity: the most specific match wins and the others are ignored.

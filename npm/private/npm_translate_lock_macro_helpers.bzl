@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
-def _macro_lifecycle_args_to_rule_attrs(lifecycle_hooks, lifecycle_hooks_exclude, run_lifecycle_hooks, lifecycle_hooks_no_sandbox, lifecycle_hooks_execution_requirements):
+def _macro_lifecycle_args_to_rule_attrs(lifecycle_hooks, lifecycle_hooks_exclude, run_lifecycle_hooks, lifecycle_hooks_no_sandbox, lifecycle_hooks_execution_requirements, lifecycle_hooks_use_default_shell_env):
     """Convert lifecycle-related macro args into attribute values to pass to the rule"""
 
     # lifecycle_hooks_exclude is a convenience attribute to set `<value>: []` in `lifecycle_hooks`
@@ -24,7 +24,14 @@ def _macro_lifecycle_args_to_rule_attrs(lifecycle_hooks, lifecycle_hooks_exclude
         if "no-sandbox" not in lifecycle_hooks_execution_requirements["*"]:
             lifecycle_hooks_execution_requirements["*"].append("no-sandbox")
 
-    return lifecycle_hooks, lifecycle_hooks_execution_requirements
+    # Convert {"pkg": True|False} to {"pkg": "true"|"false"} and set a default value for "*"
+    use_default_shell_env = {}
+    for p in lifecycle_hooks_use_default_shell_env:
+        use_default_shell_env[p] = "true" if lifecycle_hooks_use_default_shell_env[p] else "false"
+    if "*" not in use_default_shell_env:
+        use_default_shell_env["*"] = "false"
+
+    return lifecycle_hooks, lifecycle_hooks_execution_requirements, use_default_shell_env
 
 helpers = struct(
     macro_lifecycle_args_to_rule_attrs = _macro_lifecycle_args_to_rule_attrs,

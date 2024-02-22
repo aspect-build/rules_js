@@ -56,6 +56,7 @@ _ATTRS = {
     "replace_packages": attr.string_dict(),
     "lifecycle_hooks_envs": attr.string_list_dict(),
     "lifecycle_hooks_execution_requirements": attr.string_list_dict(),
+    "lifecycle_hooks_use_default_shell_env": attr.string_dict(),
     "lifecycle_hooks": attr.string_list_dict(),
     "link_workspace": attr.string(),
     "no_optional": attr.bool(),
@@ -174,6 +175,7 @@ def npm_translate_lock(
         lifecycle_hooks_exclude = [],
         lifecycle_hooks_execution_requirements = {},
         lifecycle_hooks_no_sandbox = True,
+        lifecycle_hooks_use_default_shell_env = {},
         replace_packages = {},
         bins = {},
         verify_node_modules_ignored = None,
@@ -381,6 +383,15 @@ def npm_translate_lock(
 
             This defaults to True to limit the overhead of sandbox creation and copying the output
             TreeArtifacts out of the sandbox.
+
+            Read more: [lifecycles](/docs/pnpm.md#lifecycles)
+
+        lifecycle_hooks_use_default_shell_env: The `use_default_shell_env` attribute of the lifecycle hooks
+            actions on npm packages.
+
+            See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
+
+            This defaults to False reduce the negative effects of `use_default_shell_env`. Requires bazel-lib >= 2.4.2.
 
             Read more: [lifecycles](/docs/pnpm.md#lifecycles)
 
@@ -604,12 +615,13 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
     if not update_pnpm_lock and preupdate:
         fail("expected update_pnpm_lock to be True when preupdate are specified")
 
-    lifecycle_hooks, lifecycle_hooks_execution_requirements = macro_helpers.macro_lifecycle_args_to_rule_attrs(
+    lifecycle_hooks, lifecycle_hooks_execution_requirements, lifecycle_hooks_use_default_shell_env = macro_helpers.macro_lifecycle_args_to_rule_attrs(
         lifecycle_hooks,
         lifecycle_hooks_exclude,
         run_lifecycle_hooks,
         lifecycle_hooks_no_sandbox,
         lifecycle_hooks_execution_requirements,
+        lifecycle_hooks_use_default_shell_env,
     )
 
     npm_translate_lock_rule(
@@ -631,6 +643,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         lifecycle_hooks = lifecycle_hooks,
         lifecycle_hooks_envs = lifecycle_hooks_envs,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+        lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         replace_packages = replace_packages,
         bins = bins_string_list_dict,
         verify_node_modules_ignored = verify_node_modules_ignored,
