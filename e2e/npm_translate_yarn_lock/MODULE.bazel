@@ -12,6 +12,13 @@ local_path_override(
     path = "../..",
 )
 
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(
+    name = "pnpm-old-version",
+    pnpm_version = "7.33.3",
+)
+use_repo(pnpm, "pnpm-old-version")
+
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",
@@ -21,6 +28,7 @@ npm.npm_translate_lock(
     preupdate = ["//:transform_package_json.js"],
     quiet = False,
     update_pnpm_lock = True,
+    use_pnpm = "@pnpm-old-version//:package/bin/pnpm.cjs",
     verify_node_modules_ignored = "//:.bazelignore",
     yarn_lock = "//:yarn.lock",
 )
