@@ -17,7 +17,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         package_visibility = {package_visibility},
-        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}
+        npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
     )
 """
 
@@ -95,7 +95,7 @@ def generate_repository_files(rctx, pnpm_lock_label, importers, packages, patche
         "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
     ]
 
-    npm_imports = helpers.get_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, npm_registries, default_registry, npm_auth)
+    npm_imports = helpers.get_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, rctx.attr.lifecycle_hooks_use_default_shell_env, npm_registries, default_registry, npm_auth)
 
     repositories_bzl = []
 
@@ -305,6 +305,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
         maybe_lifecycle_hooks_execution_requirements = ("""
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks else ""
+        maybe_lifecycle_hooks_use_default_shell_env = ("""
+        lifecycle_hooks_use_default_shell_env = True,""") if _import.lifecycle_hooks_use_default_shell_env else ""
         maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
         maybe_generate_bzl_library_targets = ("""
@@ -337,6 +339,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             maybe_lifecycle_hooks = maybe_lifecycle_hooks,
             maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
             maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
+            maybe_lifecycle_hooks_use_default_shell_env = maybe_lifecycle_hooks_use_default_shell_env,
             maybe_npm_auth = maybe_npm_auth,
             maybe_npm_auth_basic = maybe_npm_auth_basic,
             maybe_npm_auth_password = maybe_npm_auth_password,

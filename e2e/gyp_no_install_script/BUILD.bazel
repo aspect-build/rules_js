@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 
@@ -9,4 +10,16 @@ js_test(
         ":node_modules/segfault-handler",
     ],
     entry_point = "test.js",
+)
+
+write_source_files(
+    name = "write_npm_translate_lock",
+    files = {
+        "test/repositories.bzl.checked": "@npm//:repositories.bzl",
+        "test/segfault-handler_defs.bzl.checked": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
+    },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )

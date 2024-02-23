@@ -30,6 +30,7 @@ def _extension_impl(module_ctx):
                 lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
                 lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
                 lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
+                lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
                 link_workspace = attr.link_workspace,
                 no_optional = attr.no_optional,
                 npmrc = attr.npmrc,
@@ -117,12 +118,13 @@ def _extension_impl(module_ctx):
 WARNING: Cannot determine home directory in order to load home `.npmrc` file in module extension `npm_translate_lock(name = "{attr_name}")`.
 """.format(attr_name = attr.name))
 
-            lifecycle_hooks, lifecycle_hooks_execution_requirements = macro_helpers.macro_lifecycle_args_to_rule_attrs(
+            lifecycle_hooks, lifecycle_hooks_execution_requirements, lifecycle_hooks_use_default_shell_env = macro_helpers.macro_lifecycle_args_to_rule_attrs(
                 lifecycle_hooks = attr.lifecycle_hooks,
                 lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
                 run_lifecycle_hooks = attr.run_lifecycle_hooks,
                 lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
                 lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
+                lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
             )
             imports = npm_translate_lock_helpers.get_npm_imports(
                 importers = importers,
@@ -133,6 +135,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 attr = attr,
                 all_lifecycle_hooks = lifecycle_hooks,
                 all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
+                all_lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
                 registries = registries,
                 default_registry = utils.default_registry(),
                 npm_auth = npm_auth,
@@ -151,6 +154,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                     lifecycle_hooks = i.run_lifecycle_hooks if i.run_lifecycle_hooks and i.lifecycle_hooks else [],
                     lifecycle_hooks_env = i.lifecycle_hooks_env if i.run_lifecycle_hooks and i.lifecycle_hooks_env else {},
                     lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements if i.run_lifecycle_hooks else [],
+                    lifecycle_hooks_use_default_shell_env = i.lifecycle_hooks_use_default_shell_env,
                     link_packages = i.link_packages,
                     link_workspace = attr.link_workspace if attr.link_workspace else attr.pnpm_lock.workspace_name,
                     npm_auth = i.npm_auth,
@@ -184,6 +188,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 lifecycle_hooks_env = i.lifecycle_hooks_env,
                 lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements,
                 lifecycle_hooks_no_sandbox = i.lifecycle_hooks_no_sandbox,
+                lifecycle_hooks_use_default_shell_env = i.lifecycle_hooks_use_default_shell_env,
                 link_packages = i.link_packages,
                 link_workspace = i.link_workspace,
                 npm_auth = i.npm_auth,

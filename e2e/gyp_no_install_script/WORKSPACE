@@ -1,6 +1,15 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 local_repository(
     name = "aspect_rules_js",
     path = "../..",
+)
+
+http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "f75d03783588e054899eb0729a97fb5b8973c1a26f30373fafd485c90bf207d1",
+    strip_prefix = "bazel-lib-2.4.2",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.4.2/bazel-lib-v2.4.2.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -19,6 +28,9 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 npm_translate_lock(
     name = "npm",
     data = ["//:package.json"],
+    lifecycle_hooks_use_default_shell_env = {
+        "segfault-handler": True,
+    },
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
