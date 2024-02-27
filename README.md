@@ -1,4 +1,4 @@
-# Bazel rules for JavaScript
+# Bazel rules for JavaScript. I love it.
 
 This ruleset is a high-performance and npm-compatible Bazel integration for JavaScript.
 
