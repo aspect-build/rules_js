@@ -67,6 +67,7 @@ _ATTRS = {
     "package_visibility": attr.string_list_dict(),
     "patch_args": attr.string_list_dict(),
     "patches": attr.string_list_dict(),
+    "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs"),  # bzlmod pnpm extension
     "pnpm_lock": attr.label(),
     "preupdate": attr.label_list(),
     "prod": attr.bool(),
@@ -184,6 +185,7 @@ def npm_translate_lock(
         external_repository_action_cache = utils.default_external_repository_action_cache(),
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
+        use_pnpm = None,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
         register_yq_toolchains = True,
@@ -499,6 +501,16 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
+            Can be left unspecified and the rules_js default `LATEST_PNPM_VERSION` will be used.
+
+            Use `use_pnpm` for bzlmod.
+
+        use_pnpm: label of the pnpm extension to use.
+
+            Can be left unspecified and the rules_js default pnpm extension (with the `LATEST_PNPM_VERSION`) will be used.
+
+            Use `pnpm_version` for non-bzlmod.
+
         register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
 
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
@@ -659,6 +671,7 @@ WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is de
         preupdate = preupdate,
         quiet = quiet,
         node_toolchain_prefix = update_pnpm_lock_node_toolchain_prefix if update_pnpm_lock_node_toolchain_prefix else node_toolchain_prefix,
+        use_pnpm = use_pnpm,
         yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
         use_starlark_yaml_parser = use_starlark_yaml_parser,

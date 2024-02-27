@@ -155,7 +155,7 @@ def _init_pnpm_labels(label_store, rctx):
     #  Label("@nodejs_host//:bin/node")
     label_store.add("host_node", Label("@{}_{}//:bin/node".format(rctx.attr.node_toolchain_prefix, repo_utils.platform(rctx))))
 
-    label_store.add("pnpm_entry", Label("@pnpm//:package/bin/pnpm.cjs"))
+    label_store.add("pnpm_entry", rctx.attr.use_pnpm if rctx.attr.use_pnpm else Label("@pnpm//:package/bin/pnpm.cjs"))
 
 ################################################################################
 def _init_update_labels(priv, rctx, label_store):
