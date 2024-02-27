@@ -12,7 +12,17 @@ bazel_dep(name = "aspect_bazel_lib", version = "1.40.0")
 bazel_dep(name = "aspect_rules_lint", version = "0.9.1")
 bazel_dep(name = "bazel_features", version = "0.1.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
+
+# Keep v5 in to avoid breaking changes.
+# TODO(2.0): change minimum to v6
 bazel_dep(name = "rules_nodejs", version = "5.8.2")
+
+# Override rules_nodejs to v6 to test the latest and recommended version internally.
+single_version_override(
+    module_name = "rules_nodejs",
+    version = "6.0.5",
+)
+
 bazel_dep(name = "platforms", version = "0.0.5")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")

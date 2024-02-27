@@ -14,6 +14,7 @@ def rules_js_dependencies():
         urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.1/bazel-skylib-1.4.1.tar.gz"],
     )
 
+    # TODO(2.0): update to rules_nodejs v6
     http_archive(
         name = "rules_nodejs",
         sha256 = "8fc8e300cb67b89ceebd5b8ba6896ff273c84f6099fc88d23f24e7102319d8fd",
