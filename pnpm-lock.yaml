@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
+packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -262,8 +262,8 @@ importers:
         specifier: ^0.28.0-figma.2
         version: 0.28.0-figma.2
       '@kubernetes/client-node':
-        specifier: https://github.com/kubernetes-client/javascript#fc681991e61c6808dd26012a2331f83671a11218
-        version: github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218(bufferutil@4.0.7)
+        specifier: https://github.com/kubernetes-client/javascript#bce2fedd977e6c8afa060a36b439a24f2bd3e5ac
+        version: github.com/kubernetes-client/javascript/bce2fedd977e6c8afa060a36b439a24f2bd3e5ac(bufferutil@4.0.7)
       '@plotly/regl':
         specifier: 2.1.2
         version: 2.1.2
@@ -1306,6 +1306,55 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
     dev: true
+
+  /@types/caseless@0.12.2:
+    resolution: {integrity: sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==, tarball: https://registry.npmjs.org/@types/caseless/-/caseless-0.12.2.tgz}
+    dev: true
+
+  /@types/js-yaml@4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==, tarball: https://registry.npmjs.org/@types/js-yaml/-/js-yaml-4.0.5.tgz}
+    dev: true
+
+  /@types/node@18.11.18:
+    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
+    dev: true
+
+  /@types/node@20.11.20:
+    resolution: {integrity: sha512-7/rR21OS+fq8IyHTgtLkDK949uzsa6n8BkziAKtPVpugIkO6D+/ooXMvzXxDnZrmtXVfjb1bKQafYpb8s89LOg==, tarball: https://registry.npmjs.org/@types/node/-/node-20.11.20.tgz}
+    dependencies:
+      undici-types: 5.26.5
+    dev: true
+
+  /@types/request@2.48.8:
+    resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==, tarball: https://registry.npmjs.org/@types/request/-/request-2.48.8.tgz}
+    dependencies:
+      '@types/caseless': 0.12.2
+      '@types/node': 18.11.18
+      '@types/tough-cookie': 4.0.2
+      form-data: 2.5.1
+    dev: true
+
+  /@types/tough-cookie@4.0.2:
+    resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==, tarball: https://registry.npmjs.org/@types/tough-cookie/-/tough-cookie-4.0.2.tgz}
+    dev: true
+
+  /@types/underscore@1.11.4:
+    resolution: {integrity: sha512-uO4CD2ELOjw8tasUrAhvnn2W4A0ZECOvMjCivJr4gA9pGgjv+qxKWY9GLTMVEK8ej85BxQOocUyE7hImmSQYcg==, tarball: https://registry.npmjs.org/@types/underscore/-/underscore-1.11.4.tgz}
+    dev: true
+
+  /@types/ws@8.5.5:
+    resolution: {integrity: sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==, tarball: https://registry.npmjs.org/@types/ws/-/ws-8.5.5.tgz}
+    dependencies:
+      '@types/node': 18.11.18
+    dev: true
+
+  /@types/yauzl@2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
+    requiresBuild: true
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.11.18
+    dev: true
+    optional: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -3126,7 +3175,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': registry.npmjs.org/@types/yauzl@2.10.0
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4196,6 +4245,11 @@ packages:
   /jsonpath-plus@7.2.0:
     resolution: {integrity: sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==}
     engines: {node: '>=12.0.0'}
+    dev: true
+
+  /jsonpath-plus@8.0.0:
+    resolution: {integrity: sha512-+AOBHcQvRr8DcWVIkfOCCCLSlYgQuNZ+gFNqwkBrNpdUfdfkcrbO4ml3F587fWUMFOmoy6D9c+5wrghgjN3mbg==}
+    engines: {node: '>=14.0.0'}
     dev: true
 
   /jsprim@1.4.2:
@@ -6425,24 +6479,11 @@ packages:
     resolution: {integrity: sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==}
     dev: true
 
-  /tmp-promise@3.0.3:
-    resolution: {integrity: sha512-RwM7MoPojPxsOBYnyd2hy0bxtIlVrihNs9pj5SUvY8Zz1sQcQG2tG1hSr8PDxfgEB8RNKDhqbIlroIarSNDNsQ==}
-    dependencies:
-      tmp: 0.2.1
-    dev: true
-
   /tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
     engines: {node: '>=0.6.0'}
     dependencies:
       os-tmpdir: 1.0.2
-    dev: true
-
-  /tmp@0.2.1:
-    resolution: {integrity: sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ==}
-    engines: {node: '>=8.17.0'}
-    dependencies:
-      rimraf: 3.0.2
     dev: true
 
   /to-array-buffer@3.2.0:
@@ -6596,8 +6637,8 @@ packages:
       through: 2.3.8
     dev: true
 
-  /underscore@1.13.6:
-    resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
+  /undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
     dev: true
 
   /unique-filename@2.0.1:
@@ -7206,37 +7247,33 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       google-protobuf: 3.21.2
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
     dev: true
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
 
-  github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218(bufferutil@4.0.7):
-    resolution: {tarball: https://codeload.github.com/kubernetes-client/javascript/tar.gz/fc681991e61c6808dd26012a2331f83671a11218}
-    id: github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218
+  github.com/kubernetes-client/javascript/bce2fedd977e6c8afa060a36b439a24f2bd3e5ac(bufferutil@4.0.7):
+    resolution: {tarball: https://codeload.github.com/kubernetes-client/javascript/tar.gz/bce2fedd977e6c8afa060a36b439a24f2bd3e5ac}
+    id: github.com/kubernetes-client/javascript/bce2fedd977e6c8afa060a36b439a24f2bd3e5ac
     name: '@kubernetes/client-node'
-    version: 0.18.1
+    version: 0.20.0
+    prepare: true
     requiresBuild: true
     dependencies:
-      '@types/js-yaml': registry.npmjs.org/@types/js-yaml@4.0.5
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
-      '@types/request': registry.npmjs.org/@types/request@2.48.8
-      '@types/underscore': registry.npmjs.org/@types/underscore@1.11.4
-      '@types/ws': registry.npmjs.org/@types/ws@8.5.5
+      '@types/js-yaml': 4.0.5
+      '@types/node': 20.11.20
+      '@types/request': 2.48.8
+      '@types/underscore': 1.11.4
+      '@types/ws': 8.5.5
       byline: 5.0.0
       isomorphic-ws: 5.0.0(ws@8.13.0)
       js-yaml: 4.1.0
-      jsonpath-plus: 7.2.0
+      jsonpath-plus: 8.0.0
       request: 2.88.2
       rfc4648: 1.5.2
       stream-buffers: 3.0.2
       tar: 6.1.13
-      tmp-promise: 3.0.3
       tslib: 2.6.0
       typescript: 4.9.5
-      underscore: 1.13.6
       ws: 8.13.0(bufferutil@4.0.7)
     optionalDependencies:
       openid-client: 5.4.0
@@ -7275,12 +7312,6 @@ packages:
       '@types/keyv': registry.npmjs.org/@types/keyv@3.1.4
       '@types/node': registry.npmjs.org/@types/node@18.11.18
       '@types/responselike': registry.npmjs.org/@types/responselike@1.0.0
-    dev: true
-
-  registry.npmjs.org/@types/caseless@0.12.2:
-    resolution: {integrity: sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/caseless/-/caseless-0.12.2.tgz}
-    name: '@types/caseless'
-    version: 0.12.2
     dev: true
 
   registry.npmjs.org/@types/eslint-scope@3.7.4:
@@ -7342,12 +7373,6 @@ packages:
     version: 2.0.4
     dev: false
 
-  registry.npmjs.org/@types/js-yaml@4.0.5:
-    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/js-yaml/-/js-yaml-4.0.5.tgz}
-    name: '@types/js-yaml'
-    version: 4.0.5
-    dev: true
-
   registry.npmjs.org/@types/json-schema@7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.11.tgz}
     name: '@types/json-schema'
@@ -7383,17 +7408,6 @@ packages:
     name: '@types/node'
     version: 18.11.18
 
-  registry.npmjs.org/@types/request@2.48.8:
-    resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/request/-/request-2.48.8.tgz}
-    name: '@types/request'
-    version: 2.48.8
-    dependencies:
-      '@types/caseless': registry.npmjs.org/@types/caseless@0.12.2
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
-      '@types/tough-cookie': registry.npmjs.org/@types/tough-cookie@4.0.2
-      form-data: 2.5.1
-    dev: true
-
   registry.npmjs.org/@types/resolve@1.20.2:
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz}
     name: '@types/resolve'
@@ -7415,33 +7429,3 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.11.11
     dev: true
-
-  registry.npmjs.org/@types/tough-cookie@4.0.2:
-    resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/tough-cookie/-/tough-cookie-4.0.2.tgz}
-    name: '@types/tough-cookie'
-    version: 4.0.2
-    dev: true
-
-  registry.npmjs.org/@types/underscore@1.11.4:
-    resolution: {integrity: sha512-uO4CD2ELOjw8tasUrAhvnn2W4A0ZECOvMjCivJr4gA9pGgjv+qxKWY9GLTMVEK8ej85BxQOocUyE7hImmSQYcg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/underscore/-/underscore-1.11.4.tgz}
-    name: '@types/underscore'
-    version: 1.11.4
-    dev: true
-
-  registry.npmjs.org/@types/ws@8.5.5:
-    resolution: {integrity: sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/ws/-/ws-8.5.5.tgz}
-    name: '@types/ws'
-    version: 8.5.5
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
-    dev: true
-
-  registry.npmjs.org/@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
-    name: '@types/yauzl'
-    version: 2.10.0
-    requiresBuild: true
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
-    dev: true
-    optional: true
