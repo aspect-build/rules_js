@@ -2,6 +2,7 @@
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@rules_license//rules:providers.bzl", "PackageInfo")
 load(":utils.bzl", "utils")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
@@ -160,6 +161,7 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
 def _npm_package_store_impl(ctx):
     package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
     version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
+    license = getattr(ctx.attr.src[NpmPackageInfo], "license", "") if ctx.attr.src else None
 
     if not package:
         fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
@@ -305,6 +307,19 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             files = files_depset,
             transitive_files = transitive_files_depset,
             dev = ctx.attr.dev,
+        ),
+        PackageInfo(
+            # Metadata providers must include a type discriminator. We don't need it
+            # to collect the providers, but we do need it to write the JSON. We
+            # key on the type field to look up the correct block of code to pull
+            # data out and format it. We can't to the lookup on the provider class.
+            type = "package_info",
+            label = ctx.label,
+            package_name = package,
+            #package_url = ctx.attr.package_url,
+            package_version = version,
+            # TODO: need to provide a LicenseInfo also?
+            # license = license,
         ),
     ]
     if virtual_store_directory:

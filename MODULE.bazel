@@ -24,6 +24,7 @@ single_version_override(
 )
 
 bazel_dep(name = "platforms", version = "0.0.5")
+bazel_dep(name = "rules_license", version = "0.0.7")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(node, "nodejs_darwin_amd64")

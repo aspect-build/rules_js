@@ -362,6 +362,7 @@ _npm_package_internal(
     src = ":{extract_to_dirname}",
     package = "{package}",
     version = "{version}",
+    license = "{license}",
     visibility = ["//visibility:public"],
 )
 
@@ -370,6 +371,7 @@ _npm_package_internal(
     src = ":{extract_to_dirname}",
     package = "{package}",
     version = "{version}",
+    license = "{license}",
     visibility = ["//visibility:public"],
 )
 """
@@ -539,6 +541,7 @@ def _npm_import_rule_impl(rctx):
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         package = rctx.attr.package,
         version = rctx.attr.version,
+        license = pkg_json["license"],
     ))
 
     if rctx.attr.extra_build_content:

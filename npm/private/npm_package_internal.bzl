@@ -16,6 +16,7 @@ _ATTRS = {
         doc = """The package version.""",
         mandatory = True,
     ),
+    "license": attr.string(doc = "todo"),
 }
 
 def _npm_package_internal_impl(ctx):
@@ -35,6 +36,7 @@ def _npm_package_internal_impl(ctx):
             directory = dst,
             npm_package_store_deps = depset(),
             hardlink = True,  # always hardlink downstream
+            license = ctx.attr.license,
         ),
     ]
 
