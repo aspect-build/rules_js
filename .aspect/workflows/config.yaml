@@ -206,5 +206,16 @@ tasks:
     - delivery:
           auto_deliver: true
           queue: aspect-default
+          rules:
+              - deliverable: 'attr("tags", "\bdeliverable\b", //...)'
+                condition:
+                    branches:
+                        - main
+              - deliverable:
+                    - //docs:docs_delivery
+                condition:
+                    only_on_change: false
+                    branches:
+                        - main
     - finalization:
           queue: aspect-small

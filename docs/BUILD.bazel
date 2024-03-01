@@ -70,8 +70,16 @@ update_docs(
 # Demonstration delivery target for Aspect Workflows.
 # In the future this could be wired up to push to a demonstration S3 bucket.
 sh_binary(
-    name = "docs_delivery",
+    name = "docs_delivery_only_on_change",
     srcs = ["delivery.sh"],
     data = glob(["*.md"]),
     tags = ["deliverable"],
+)
+
+# Demonstration delivery target for Aspect Workflows.
+# In the future this could be wired up to push to a demonstration S3 bucket.
+sh_binary(
+    name = "docs_delivery",
+    srcs = ["delivery.sh"],
+    data = glob(["*.md"]),
 )
