@@ -195,6 +195,8 @@ workspaces:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
 tasks:
+    - branch_freshness:
+          update_strategy: none
     - test:
           queue: aspect-small
     - format:
