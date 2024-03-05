@@ -43,6 +43,7 @@ def js_run_binary(
         stamp = 0,
         patch_node_fs = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
+        use_default_shell_env = None,
         **kwargs):
     """Wrapper around @aspect_bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
 
@@ -223,6 +224,15 @@ def js_run_binary(
 
             See `use_execroot_entry_point` doc for more info.
 
+        use_default_shell_env: If set, passed to the underlying run_binary.
+
+            May introduce non-determinism when True; use with care!
+            See e.g. https://github.com/bazelbuild/bazel/issues/4912
+
+            Requires a minimum of aspect_bazel_lib v1.40.3 or v2.4.2.
+
+            Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
+
         **kwargs: Additional arguments
     """
 
@@ -353,6 +363,13 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
 
     if allow_execroot_entry_point_with_no_copy_data_to_bin:
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
+
+    # Pass use_default_shell_env via kwargs and only if it is not None since older versions of
+    # aspect_bazel_lib run_binary don't support this attribute. We set the correct 1.x minimum for
+    # bzlmod but users could have a 2.x version < 2.4.2. For users using WORKSPACE, an older
+    # aspect_bazel_lib may sneak in since order matters for WORKSPACE deps.
+    if use_default_shell_env != None:
+        kwargs["use_default_shell_env"] = use_default_shell_env
 
     _run_binary(
         name = name,
