@@ -16,7 +16,7 @@ module "aspect_workflows" {
   region  = local.region
 
   # Aspect Workflows terraform module
-  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.9.16/terraform-gcp-aspect-workflows.zip"
+  source = "https://s3.us-east-2.amazonaws.com/static.aspect.build/aspect/5.9.18/terraform-gcp-aspect-workflows.zip"
 
   # Network properties
   network    = google_compute_network.workflows_network.id
@@ -26,7 +26,7 @@ module "aspect_workflows" {
   # services run.
   k8s_cluster = {
     # Kubernetes cluster on this deploymemt is tuned for cost. A high-performance deployment should
-    # use a minimum of e2-standard-2 and multiple nodes so that the cache can be sharded.
+    # use a minimum of e2-highmem-4 and multiple nodes so that the cache can be sharded.
     node_count   = 1
     machine_type = "e2-medium"
   }
