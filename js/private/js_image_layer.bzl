@@ -225,6 +225,7 @@ def _build_layer(ctx, type, entries, inputs):
         arguments = [args],
         executable = ctx.executable._builder,
         progress_message = "JsImageLayer %{label}",
+        mnemonic = "JsImageLayer",
         env = {
             "BAZEL_BINDIR": ".",
         },
