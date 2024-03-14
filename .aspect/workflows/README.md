@@ -1,19 +1,14 @@
 # Aspect Workflows demonstration deployment
 
-This deployment of [Aspect Workflows](https://www.aspect.build/workflows) is configured to run on GCP + Buildkite.
+This deployment of [Aspect Workflows](https://www.aspect.build/workflows) is configured to run on Buildkite.
 
 You can see this Aspect Workflows demonstration deployment live at
 https://buildkite.com/aspect/rules-js.
 
-The three components of the configuration are,
+The two components of the configuration for this repository are,
 
-1. Aspect Workflows terraform module
 1. Aspect Workflows configuration yaml
 1. Buildkite pipeline configuration (in the Buildkite UI)
-
-## Aspect Workflows terraform module
-
-This is found under the [.aspect/workflows/terraform](./terraform) directory.
 
 ## Aspect Workflows configuration yaml
 
@@ -37,8 +32,11 @@ steps:
     commands:
       - "rosetta steps | buildkite-agent pipeline upload"
     agents:
-      queue: aspect-default
+      queue: aspect-small
 ```
+
+> [!IMPORTANT]
+> The Setup Aspect Workflows step above is configured to run on the `aspect-small` queue that is serviced by a runner group made up of lightweight and inexpensive `e2.small` GCP VM instances.
 
 ### Scheduled warming pipeline configuration
 
