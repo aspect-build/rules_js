@@ -5,10 +5,11 @@ workspaces:
         label: rules_js
         tasks:
             - test:
-                  queue: aspect-default
     e2e/bzlmod:
         icon: bazel
         tasks:
+            - test:
+                  queue: aspect-default
             - format:
                   without: true
             - buildifier:
@@ -23,6 +24,8 @@ workspaces:
     e2e/js_image_oci:
         icon: linux
         tasks:
+            - test:
+                  queue: aspect-default
             - format:
                   without: true
             - buildifier:
@@ -36,6 +39,8 @@ workspaces:
     e2e/npm_link_package:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -47,6 +52,8 @@ workspaces:
     e2e/npm_link_package-esm:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -58,6 +65,8 @@ workspaces:
     e2e/npm_translate_lock:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -69,6 +78,8 @@ workspaces:
     e2e/npm_translate_lock_empty:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -80,6 +91,8 @@ workspaces:
     e2e/npm_translate_lock_multi:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -91,6 +104,8 @@ workspaces:
     e2e/npm_translate_lock_partial_clone:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -102,6 +117,8 @@ workspaces:
     e2e/npm_translate_lock_subdir_patch:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -117,6 +134,8 @@ workspaces:
     e2e/npm_translate_package_lock:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -128,6 +147,8 @@ workspaces:
     e2e/npm_translate_yarn_lock:
         icon: yarn
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -139,6 +160,8 @@ workspaces:
     e2e/package_json_module:
         icon: npm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -150,6 +173,8 @@ workspaces:
     e2e/pnpm_workspace:
         icon: pnpm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -161,6 +186,8 @@ workspaces:
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -172,6 +199,8 @@ workspaces:
     e2e/rules_foo:
         icon: js
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -183,6 +212,8 @@ workspaces:
     e2e/vendored_node:
         icon: js
         tasks:
+            - test:
+                  queue: aspect-medium
             - format:
                   without: true
             - buildifier:
@@ -198,16 +229,14 @@ tasks:
     - branch_freshness:
           update_strategy: none
     - test:
-          queue: aspect-small
     - format:
-          queue: aspect-small
+          queue: aspect-medium
     - buildifier:
-          queue: aspect-small
+          queue: aspect-medium
     - configure:
-          queue: aspect-small
+          queue: aspect-medium
     - delivery:
           auto_deliver: true
-          queue: aspect-default
           rules:
               - deliverable: 'attr("tags", "\bdeliverable\b", //...)'
                 condition:
