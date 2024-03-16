@@ -21,10 +21,11 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
     """
     root_package = packages[package]
 
+    direct_closure = _get_package_info_deps(root_package, no_optional)
     transitive_closure = {}
-    transitive_closure[root_package["name"]] = [root_package["version"]]
+    transitive_closure[root_package["name"]] = []
 
-    stack = [_get_package_info_deps(root_package, no_optional)]
+    stack = [direct_closure]
     iteration_max = 999999
     for i in range(0, iteration_max + 1):
         if not len(stack):
@@ -63,11 +64,15 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                 # Recurse into the next level of dependencies
                 stack.append(_get_package_info_deps(packages[package_key], no_optional))
 
+    is_circular = root_package["version"] in transitive_closure[root_package["name"]]
+    if not is_circular:
+        transitive_closure[root_package["name"]].append(root_package["version"])
+
     result = dict()
     for key in sorted(transitive_closure.keys()):
         result[key] = sorted(transitive_closure[key])
 
-    return result
+    return (is_circular, result)
 
 def _get_package_info_deps(package_info, no_optional):
     return package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
@@ -192,13 +197,15 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
     for package in packages.keys():
         package_info = packages[package]
 
-        package_info["transitive_closure"] = gather_transitive_closure(
+        _, transitive_closure = gather_transitive_closure(
             packages,
             package,
             no_optional,
             cache,
         )
 
-        cache[package] = package_info["transitive_closure"]
+        package_info["transitive_closure"] = transitive_closure
+
+        cache[package] = transitive_closure
 
     return (importers, packages)
