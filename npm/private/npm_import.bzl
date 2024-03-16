@@ -645,16 +645,14 @@ def _impl_links(rctx):
     for (dep_name, dep_version) in rctx.attr.deps.items():
         store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
-            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                root_package = rctx.attr.root_package,
-                virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                virtual_store_root = utils.virtual_store_root,
-            )
+            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
         else:
-            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
-                virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                virtual_store_root = utils.virtual_store_root,
-            )
+            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)"""
+        dep_store_target = dep_store_target.format(
+            root_package = rctx.attr.root_package,
+            virtual_store_name = utils.virtual_store_name(store_package, store_version),
+            virtual_store_root = utils.virtual_store_root,
+        )
         ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
@@ -666,45 +664,42 @@ def _impl_links(rctx):
             for dep_version in dep_versions:
                 store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                        root_package = rctx.attr.root_package,
-                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                    lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
-                    deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+                    lc_dep_store_target = dep_store_target
                 else:
-                    dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
-                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
+                    dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)"""
+                    lc_dep_store_target = dep_store_target
                     if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
-                        dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
-                            virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                            virtual_store_root = utils.virtual_store_root,
-                        )
-
                         # special case for lifecycle transitive closure deps; do not depend on
                         # the __pkg of this package as that will be the output directory
                         # of the lifecycle action
-                        lc_deps[dep_store_target_pkg_pre_lc_lite] = lc_deps[dep_store_target_pkg_pre_lc_lite] + [dep_name] if dep_store_target_pkg_pre_lc_lite in lc_deps else [dep_name]
-                    else:
-                        lc_deps[dep_store_target_pkg] = lc_deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in lc_deps else [dep_name]
-                    deps[dep_store_target_pkg] = deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in deps else [dep_name]
-    else:
-        for (dep_name, dep_version) in rctx.attr.deps.items():
-            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
-            if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
+                        lc_dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)"""
+
+                dep_store_target = dep_store_target.format(
                     root_package = rctx.attr.root_package,
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
-            else:
-                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
+                lc_dep_store_target = lc_dep_store_target.format(
+                    root_package = rctx.attr.root_package,
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
+
+                lc_deps[lc_dep_store_target] = lc_deps[lc_dep_store_target] + [dep_name] if lc_dep_store_target in lc_deps else [dep_name]
+                deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+    else:
+        for (dep_name, dep_version) in rctx.attr.deps.items():
+            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
+            if dep_version.startswith("link:") or dep_version.startswith("file:"):
+                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+            else:
+                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+            dep_store_target = dep_store_target.format(
+                root_package = rctx.attr.root_package,
+                virtual_store_name = utils.virtual_store_name(store_package, store_version),
+                virtual_store_root = utils.virtual_store_root,
+            )
             lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
             deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
 
