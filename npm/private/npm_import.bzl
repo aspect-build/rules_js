@@ -643,14 +643,14 @@ def _impl_links(rctx):
     bzlmod_supported = is_bazel_6_or_greater()
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
+        store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
             dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                 root_package = rctx.attr.root_package,
-                virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
+                virtual_store_name = utils.virtual_store_name(store_package, store_version),
                 virtual_store_root = utils.virtual_store_root,
             )
         else:
-            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
             dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
                 virtual_store_name = utils.virtual_store_name(store_package, store_version),
                 virtual_store_root = utils.virtual_store_root,
@@ -664,16 +664,16 @@ def _impl_links(rctx):
         # party npm deps; it is not recommended for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
+                store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 if dep_version.startswith("link:") or dep_version.startswith("file:"):
                     dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                         root_package = rctx.attr.root_package,
-                        virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
+                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
                         virtual_store_root = utils.virtual_store_root,
                     )
                     lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
                     deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
                 else:
-                    store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                     dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
                         virtual_store_name = utils.virtual_store_name(store_package, store_version),
                         virtual_store_root = utils.virtual_store_root,
@@ -693,14 +693,14 @@ def _impl_links(rctx):
                     deps[dep_store_target_pkg] = deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in deps else [dep_name]
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
+            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
             if dep_version.startswith("link:") or dep_version.startswith("file:"):
                 dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                     root_package = rctx.attr.root_package,
-                    virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
+                    virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
             else:
-                store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
