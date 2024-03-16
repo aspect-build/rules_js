@@ -1,0 +1,9 @@
+{
+    "name": "@test/a",
+    "version": "1.0.0",
+    "dependencies": {
+        "@test/b": "workspace:*",
+        "@test/c": "file:../c",
+        "@test/d": "link:../d"
+    }
+}
