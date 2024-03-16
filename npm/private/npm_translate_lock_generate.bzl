@@ -156,9 +156,8 @@ sh_binary(
                     virtual_store_root = utils.virtual_store_root,
                 )
                 if dep_store_target not in transitive_deps:
-                    transitive_deps[dep_store_target] = [raw_package]
-                else:
-                    transitive_deps[dep_store_target].append(raw_package)
+                    transitive_deps[dep_store_target] = []
+                transitive_deps[dep_store_target].append(raw_package)
 
             # collapse link aliases lists into to acomma separated strings
             for dep_store_target in transitive_deps.keys():
@@ -207,9 +206,8 @@ sh_binary(
                             virtual_store_root = utils.virtual_store_root,
                         )
                         if dep_store_target not in transitive_deps:
-                            transitive_deps[dep_store_target] = [raw_package]
-                        else:
-                            transitive_deps[dep_store_target].append(raw_package)
+                            transitive_deps[dep_store_target] = []
+                        transitive_deps[dep_store_target].append(raw_package)
 
                     # collapse link aliases lists into to a comma separated strings
                     for dep_store_target in transitive_deps.keys():
