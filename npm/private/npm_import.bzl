@@ -669,7 +669,9 @@ def _npm_import_links_rule_impl(rctx):
             virtual_store_name = utils.virtual_store_name(store_package, store_version),
             virtual_store_root = utils.virtual_store_root,
         )
-        ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
+        if dep_store_target not in ref_deps:
+            ref_deps[dep_store_target] = []
+        ref_deps[dep_store_target].append(dep_name)
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
     if transitive_closure_pattern:
@@ -702,8 +704,13 @@ def _npm_import_links_rule_impl(rctx):
                     virtual_store_root = utils.virtual_store_root,
                 )
 
-                lc_deps[lc_dep_store_target] = lc_deps[lc_dep_store_target] + [dep_name] if lc_dep_store_target in lc_deps else [dep_name]
-                deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+                if lc_dep_store_target not in lc_deps:
+                    lc_deps[lc_dep_store_target] = []
+                lc_deps[lc_dep_store_target].append(dep_name)
+
+                if dep_store_target not in deps:
+                    deps[dep_store_target] = []
+                deps[dep_store_target].append(dep_name)
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
             store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
@@ -716,8 +723,13 @@ def _npm_import_links_rule_impl(rctx):
                 virtual_store_name = utils.virtual_store_name(store_package, store_version),
                 virtual_store_root = utils.virtual_store_root,
             )
-            lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
-            deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+            if dep_store_target not in lc_deps:
+                lc_deps[dep_store_target] = []
+            lc_deps[dep_store_target].append(dep_name)
+
+            if dep_store_target not in deps:
+                deps[dep_store_target] = []
+            deps[dep_store_target].append(dep_name)
 
     virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
 
