@@ -635,7 +635,7 @@ def _mnemonic_for_bin(bin_name):
     bin_words = bin_name.split("_")
     return "".join([word.capitalize() for word in bin_words])
 
-def _impl_links(rctx):
+def _npm_import_links_rule_impl(rctx):
     ref_deps = {}
     lc_deps = {}
     deps = {}
@@ -872,7 +872,7 @@ def _make_generated_by_lines(package, version):
     ]
 
 npm_import_links_lib = struct(
-    implementation = _impl_links,
+    implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS,
 )
 
@@ -882,7 +882,7 @@ npm_import_lib = struct(
 )
 
 npm_import_links = repository_rule(
-    implementation = _impl_links,
+    implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS,
 )
 

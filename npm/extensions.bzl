@@ -14,7 +14,7 @@ load("//npm/private:utils.bzl", "utils")
 
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 
-def _extension_impl(module_ctx):
+def _npm_extension_impl(module_ctx):
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
             # TODO(2.0): remove pnpm_version from bzlmod API
@@ -248,14 +248,14 @@ def _npm_import_attrs():
     return attrs
 
 npm = module_extension(
-    implementation = _extension_impl,
+    implementation = _npm_extension_impl,
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
     },
 )
 
-def _pnpm_impl(module_ctx):
+def _pnpm_extension_impl(module_ctx):
     for mod in module_ctx.modules:
         for attr in mod.tags.pnpm:
             pnpm_repository(
@@ -266,7 +266,7 @@ def _pnpm_impl(module_ctx):
             )
 
 pnpm = module_extension(
-    implementation = _pnpm_impl,
+    implementation = _pnpm_extension_impl,
     tag_classes = {
         "pnpm": tag_class(
             attrs = {
