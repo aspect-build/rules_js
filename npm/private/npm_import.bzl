@@ -35,8 +35,7 @@ load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")\
+load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")\
 """
 
 _LINK_JS_PACKAGE_LIFECYCLE_LOADS_TMPL = """\
@@ -112,7 +111,7 @@ def npm_imported_package_store(name):
     native.filegroup(
         name = "{{}}/dir".format(store_target_name),
         srcs = [":{{}}".format(store_target_name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "{package_directory_output_group}",
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
@@ -239,7 +238,7 @@ def npm_link_imported_package_store(name):
     native.filegroup(
         name = "{{}}/dir".format(name),
         srcs = [":{{}}".format(name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "{package_directory_output_group}",
         visibility = {link_visibility},
         tags = ["manual"],
     )
@@ -778,6 +777,7 @@ def _npm_import_links_rule_impl(rctx):
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,
+        package_directory_output_group = utils.package_directory_output_group,
         rctx_name = rctx.name,
         ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 1, quote_key = False),
         root_package = rctx.attr.root_package,
