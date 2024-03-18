@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream } from 'node:fs'
-import { readdir, readFile, readlink, realpath, stat } from 'node:fs/promises'
+import { readdir, readFile, readlink, stat } from 'node:fs/promises'
 import * as path from 'node:path'
 import { Readable, Stream } from 'node:stream'
 import { pathToFileURL } from 'node:url'
@@ -15,6 +15,11 @@ type HermeticStat = {
     mtime: Date
     mode: number
     size?: number
+}
+
+type Owner = {
+    gid: number
+    uid: number
 }
 
 type Entry = {
@@ -150,7 +155,12 @@ async function* walk(dir: string, accumulate = '') {
     }
 }
 
-function add_parents(name: string, pkg: Pack, existing_paths: Set<string>) {
+function add_parents(
+    name: string,
+    pkg: Pack,
+    existing_paths: Set<string>,
+    owner: Owner
+) {
     const segments = path.dirname(name).split('/')
     let prev = ''
     const stats: HermeticStat = {
@@ -170,16 +180,23 @@ function add_parents(name: string, pkg: Pack, existing_paths: Set<string>) {
         }
 
         existing_paths.add(prev)
-        add_directory(prev, pkg, stats)
+        add_directory(prev, pkg, owner, stats)
     }
 }
 
-function add_directory(name: string, pkg: Pack, stats: HermeticStat) {
+function add_directory(
+    name: string,
+    pkg: Pack,
+    owner: Owner,
+    stats: HermeticStat
+) {
     pkg.entry({
         type: 'directory',
         name: name.replace(/^\//, ''),
         mode: stats.mode,
         mtime: MTIME,
+        gid: owner.gid,
+        uid: owner.uid,
     }).end()
 }
 
@@ -187,6 +204,7 @@ function add_symlink(
     name: string,
     linkname: string,
     pkg: Pack,
+    owner: Owner,
     stats: HermeticStat
 ) {
     const link_parent = path.dirname(name)
@@ -196,6 +214,8 @@ function add_symlink(
         linkname: path.relative(link_parent, linkname),
         mode: stats.mode,
         mtime: MTIME,
+        uid: owner.uid,
+        gid: owner.gid,
     }).end()
 }
 
@@ -203,6 +223,7 @@ function add_file(
     name: string,
     content: Readable,
     pkg: Pack,
+    owner: Owner,
     stats: HermeticStat
 ) {
     return new Promise((resolve, reject) => {
@@ -213,6 +234,8 @@ function add_file(
                 mode: stats.mode,
                 size: stats.size,
                 mtime: MTIME,
+                uid: owner.uid,
+                gid: owner.gid,
             },
             (err) => {
                 if (err) {
@@ -230,6 +253,7 @@ export async function build(
     entries: Entries,
     outputPath: string,
     compression: Compression,
+    owner: Owner,
     useLegacySymlinkDetection: boolean
 ) {
     const resolveSymlinkFn = useLegacySymlinkDetection
@@ -260,13 +284,14 @@ export async function build(
                 const new_key = path.join(key, sub_key)
                 const new_dest = path.join(dest, sub_key)
 
-                add_parents(new_key, output, existing_paths)
+                add_parents(new_key, output, existing_paths, owner)
 
                 const stats = await stat(new_dest)
                 await add_file(
                     new_key,
                     createReadStream(new_dest),
                     output,
+                    owner,
                     stats
                 )
             }
@@ -274,7 +299,7 @@ export async function build(
         }
 
         // create parents of current path.
-        add_parents(key, output, existing_paths)
+        add_parents(key, output, existing_paths, owner)
 
         // A source file from workspace, not an output of a target.
         if (is_source) {
@@ -285,7 +310,7 @@ export async function build(
                 mtime: MTIME,
                 size: originalStat.size,
             }
-            await add_file(key, createReadStream(dest), output, stats)
+            await add_file(key, createReadStream(dest), output, owner, stats)
             continue
         }
 
@@ -322,7 +347,7 @@ export async function build(
                         `runfiles: ${key}\n\n`
                 )
             }
-            add_symlink(key, linkname, output, stats)
+            add_symlink(key, linkname, output, owner, stats)
         } else {
             // Due to filesystems setting different bits depending on the os we have to opt-in
             // to use a stable mode for files.
@@ -354,7 +379,7 @@ export async function build(
                 stats.size = replaced.byteLength
             }
 
-            await add_file(key, stream, output, stats)
+            await add_file(key, stream, output, owner, stats)
         }
     }
 
@@ -362,14 +387,21 @@ export async function build(
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [entriesPath, outputPath, compression, useLegacySymlinkDetection] =
-        process.argv.slice(2)
+    const [
+        entriesPath,
+        outputPath,
+        compression,
+        owner,
+        useLegacySymlinkDetection,
+    ] = process.argv.slice(2)
     const raw_entries = await readFile(entriesPath)
     const entries: Entries = JSON.parse(raw_entries.toString())
+    const [uid, gid] = owner.split(':').map(parseInt)
     build(
         entries,
         outputPath,
         compression as Compression,
+        { uid, gid } as Owner,
         !!useLegacySymlinkDetection
     )
 }

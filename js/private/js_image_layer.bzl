@@ -14,8 +14,8 @@ js_image_layer(
 """
 
 load("@aspect_bazel_lib//lib:paths.bzl", "to_rlocation_path")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """Create container image layers from js_binary targets.
 
@@ -216,6 +216,7 @@ def _build_layer(ctx, type, entries, inputs):
     args.add(entries_output)
     args.add(output)
     args.add(ctx.attr.compression)
+    args.add(ctx.attr.owner)
     if not is_bazel_6_or_greater():
         args.add("true")
 
@@ -242,6 +243,10 @@ def _should_be_in_node_modules_layer(destination, file):
 def _js_image_layer_impl(ctx):
     if len(ctx.attr.binary) != 1:
         fail("binary attribute has more than one transition")
+
+    ownersplit = ctx.attr.owner.split(":")
+    if len(ownersplit) != 2 or not ownersplit[0].isdigit() or not ownersplit[1].isdigit():
+        fail("owner attribute should be in `0:0` `int:int` format.")
 
     default_info = ctx.attr.binary[0][DefaultInfo]
     runfiles_dir = _runfiles_dir(ctx.attr.root, default_info)
@@ -319,6 +324,10 @@ js_image_layer_lib = struct(
         ),
         "root": attr.string(
             doc = "Path where the files from js_binary will reside in. eg: /apps/app1 or /app",
+        ),
+        "owner": attr.string(
+            doc = "Owner of the entries, in `GID:UID` format. By default `0:0` (root, root) is used.",
+            default = "0:0",
         ),
         "compression": attr.string(
             doc = "Compression algorithm. Can be one of `gzip`, `none`.",

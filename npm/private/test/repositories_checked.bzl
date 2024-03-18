@@ -6717,6 +6717,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/chownr/-/chownr-2.0.0.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==",
         transitive_closure = {
@@ -11076,6 +11077,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/fs-minipass/-/fs-minipass-2.1.0.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==",
         deps = {
@@ -15950,6 +15952,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/minipass/-/minipass-3.3.6.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-DxiNidxSEK+tHG6zOIklvNOwm3hvCrbUrdtzY74U6HKTJxvIDfOUL5W5P2Ghd3DTkhhKPYGqeNUIh5qcM4YBfw==",
         deps = {
@@ -15971,6 +15974,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/minipass/-/minipass-4.2.4.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-lwycX3cBMTvcejsHITUgYj6Gy6A7Nh4Q6h9NP4sTHY1ccJlC7yKzDmiShEHsJ16Jf1nKGDEaiHxiltsJEvk0nQ==",
         transitive_closure = {
@@ -16029,6 +16033,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/minizlib/-/minizlib-2.1.2.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-bAxsR8BVfj60DWXHE3u30oHzfl4G7khkSuPW+qvpd7jFRHm7dLxOjUk1EHACJ/hxLY8phGJ0YhYHZo7jil7Qdg==",
         deps = {
@@ -16110,6 +16115,7 @@ def npm_repositories():
         url = "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==",
         transitive_closure = {
@@ -22999,7 +23005,6 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "js/private/image": ["tar-stream"],
-            "js/private/test/image": ["tar-stream"],
         },
         package = "tar-stream",
         version = "3.0.0",
@@ -23071,14 +23076,13 @@ def npm_repositories():
         name = "npm__tar__6.1.13",
         root_package = "",
         link_workspace = "",
-        link_packages = {
-            "js/private/test/image": ["tar"],
-        },
+        link_packages = {},
         package = "tar",
         version = "6.1.13",
         url = "https://registry.npmjs.org/tar/-/tar-6.1.13.tgz",
         package_visibility = ["//visibility:public"],
         npm_translate_lock_repo = "npm",
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-jdIBIN6LTIe2jqzay/2vtYLlBHa3JF42ot3h1dW8Q0PaAG4v8rm0cvpVePtau5C6OKXGGcgO9q2AMNSWxiLqKw==",
         deps = {
