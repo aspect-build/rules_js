@@ -396,7 +396,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     ] = process.argv.slice(2)
     const raw_entries = await readFile(entriesPath)
     const entries: Entries = JSON.parse(raw_entries.toString())
-    const [uid, gid] = owner.split(':').map(parseInt)
+    const [uid, gid] = owner.split(':').map(Number)
     build(
         entries,
         outputPath,
