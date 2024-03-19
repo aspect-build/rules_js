@@ -25,6 +25,10 @@ platform(
 make_js_image_layer(
     name = "cksum",
     binary = ":bin",
+    # gzip compression embeds os information into the archive which is not okay from reproducibility standpoint.
+    # set it to none since uncompressed archive is always stable.
+    # more: https://stackoverflow.com/questions/26516369/zlib-gzip-produces-different-results-for-same-input-on-different-oses
+    compression = "none",
     platform = ":linux_amd64",
     root = "/app",
 )
@@ -47,6 +51,12 @@ write_source_file(
     testonly = True,
     in_file = ":checksum_gen",
     out_file = "checksum.expected",
+    # Under bzlmod workspace name is a fixed string `_main` which differs from WORKSPACE.
+    # disable this under bzlmod.
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 # Case 1: Defaults

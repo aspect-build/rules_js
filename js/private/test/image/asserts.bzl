@@ -47,5 +47,9 @@ def assert_tar_listing(name, actual, expected):
         in_file = actual_listing,
         out_file = expected,
         testonly = True,
-        target_compatible_with = [],
+        # TODO: js_image_layer is broken with bzlmod https://github.com/aspect-build/rules_js/issues/1530
+        target_compatible_with = select({
+            "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+            "//conditions:default": [],
+        }),
     )
