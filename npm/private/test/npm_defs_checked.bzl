@@ -868,7 +868,7 @@ load("@@npm__tar-stream__1.6.2__links//:defs.bzl", store_860 = "npm_imported_pac
 load("@@npm__tar-stream__2.2.0__links//:defs.bzl", store_861 = "npm_imported_package_store")
 load("@@npm__tar-stream__3.0.0__links//:defs.bzl", link_862 = "npm_link_imported_package_store", store_862 = "npm_imported_package_store")
 load("@@npm__tar__4.4.19__links//:defs.bzl", store_863 = "npm_imported_package_store")
-load("@@npm__tar__6.1.13__links//:defs.bzl", link_864 = "npm_link_imported_package_store", store_864 = "npm_imported_package_store")
+load("@@npm__tar__6.1.13__links//:defs.bzl", store_864 = "npm_imported_package_store")
 load("@@npm__terser-webpack-plugin__5.3.6__webpack_5.76.3__links//:defs.bzl", store_865 = "npm_imported_package_store")
 load("@@npm__terser__5.16.5__links//:defs.bzl", store_866 = "npm_imported_package_store")
 load("@@npm__test-exclude__6.0.0__links//:defs.bzl", store_867 = "npm_imported_package_store")
@@ -2230,10 +2230,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         if native.package_name() == "js/private/test/image":
             link_143(name = "{}/acorn".format(name))
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-            link_862(name = "{}/tar-stream".format(name))
-            link_targets.append("//{}:{}/tar-stream".format(bazel_package, name))
-            link_864(name = "{}/tar".format(name))
-            link_targets.append("//{}:{}/tar".format(bazel_package, name))
         if native.package_name() == "examples/npm_package/libs/lib_a":
             link_220(name = "{}/chalk".format(name))
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
@@ -2494,8 +2490,6 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
         if bazel_package == "js/private/test/image":
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-            link_targets.append("//{}:{}/tar-stream".format(bazel_package, name))
-            link_targets.append("//{}:{}/tar".format(bazel_package, name))
         if bazel_package == "examples/npm_package/libs/lib_a":
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
         if bazel_package == "npm/private/test/npm_package":
