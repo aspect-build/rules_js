@@ -9580,15 +9580,6 @@ function findKeyByValue(entries, value) {
     }
     return undefined;
 }
-function leftStrip(p, p1, p2) {
-    if (p.startsWith(p1)) {
-        return p.slice(p1.length);
-    }
-    else if (p.startsWith(p2)) {
-        return p.slice(p2.length);
-    }
-    return p;
-}
 async function readlinkSafe(p) {
     try {
         const link = await readlink(p);
@@ -9599,35 +9590,6 @@ async function readlinkSafe(p) {
             return p;
         }
         throw e;
-    }
-}
-// TODO: drop once we no longer support bazel 5
-async function resolveSymlinkLegacy(relativeP) {
-    let prevHop = path.resolve(relativeP);
-    let hopped = false;
-    let execrootOutOfSandbox = '';
-    let execroot = process.env.JS_BINARY__EXECROOT;
-    while (true) {
-        let nextHop = await readlinkSafe(prevHop);
-        if (!execrootOutOfSandbox && !nextHop.startsWith(execroot)) {
-            execrootOutOfSandbox = nextHop
-                .replace(relativeP, '')
-                .replace(/\/$/, '');
-            prevHop = nextHop;
-            continue;
-        }
-        let relativeNextHop = leftStrip(nextHop, execroot, execrootOutOfSandbox);
-        let relativePrevHop = leftStrip(prevHop, execroot, execrootOutOfSandbox);
-        if (relativeNextHop != relativePrevHop) {
-            prevHop = nextHop;
-            hopped = true;
-        }
-        else if (!hopped) {
-            return undefined;
-        }
-        else {
-            return nextHop;
-        }
     }
 }
 async function resolveSymlink(p) {
@@ -9749,10 +9711,7 @@ function add_file(name, content, pkg, owner, stats) {
         content.pipe(entry);
     });
 }
-async function build(entries, outputPath, compression, owner, useLegacySymlinkDetection) {
-    const resolveSymlinkFn = useLegacySymlinkDetection
-        ? resolveSymlinkLegacy
-        : resolveSymlink;
+async function build(entries, outputPath, compression, owner) {
     const output = pack();
     const existing_paths = new Set();
     let write = output;
@@ -9793,7 +9752,7 @@ async function build(entries, outputPath, compression, owner, useLegacySymlinkDe
             // everything except sources should have
             throw new Error(`unexpected entry format. ${JSON.stringify(entries[key])}. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose`);
         }
-        const realp = await resolveSymlinkFn(dest);
+        const realp = await resolveSymlink(dest);
         // it's important that we don't treat any symlink pointing out of execroot since
         // bazel symlinks external files into sandbox to make them available to us.
         if (realp && !is_external) {

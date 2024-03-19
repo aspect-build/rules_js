@@ -19,7 +19,6 @@ for a given lockfile.
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(
@@ -70,10 +69,6 @@ def npm_imported_package_store(name):
         version = "{version}",
         dev = {dev},
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -85,10 +80,6 @@ def npm_imported_package_store(name):
         dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # virtual store target with transitive closure of all npm package dependencies
@@ -101,10 +92,6 @@ def npm_imported_package_store(name):
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # filegroup target that provides a single file which is
@@ -129,10 +116,6 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # terminal pre-lifecycle target for use in lifecycle build target below
@@ -143,10 +126,6 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         dev = {dev},
         deps = lc_deps,
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # lifecycle build action
@@ -227,11 +206,7 @@ def npm_link_imported_package_store(name):
         package = link_alias,
         src = "//{root_package}:{{}}".format(store_target_name),
         visibility = {link_visibility},
-        tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),{maybe_bins}
+        tags = ["manual"],{maybe_bins}
     )
 
     # filegroup target that provides a single file which is
@@ -637,10 +612,8 @@ def _mnemonic_for_bin(bin_name):
 
 def _impl_links(rctx):
     ref_deps = {}
-    lc_deps = {}
+    lc_deps = {} if rctx.attr.lifecycle_build_target else None
     deps = {}
-
-    bzlmod_supported = is_bazel_6_or_greater()
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
@@ -670,7 +643,8 @@ def _impl_links(rctx):
                         virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
                         virtual_store_root = utils.virtual_store_root,
                     )
-                    lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
+                    if lc_deps != None:
+                        lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
                     deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
                 else:
                     store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
@@ -678,18 +652,19 @@ def _impl_links(rctx):
                         virtual_store_name = utils.virtual_store_name(store_package, store_version),
                         virtual_store_root = utils.virtual_store_root,
                     )
-                    if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
-                        dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
-                            virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                            virtual_store_root = utils.virtual_store_root,
-                        )
+                    if lc_deps != None:
+                        if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
+                            dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
+                                virtual_store_name = utils.virtual_store_name(store_package, store_version),
+                                virtual_store_root = utils.virtual_store_root,
+                            )
 
-                        # special case for lifecycle transitive closure deps; do not depend on
-                        # the __pkg of this package as that will be the output directory
-                        # of the lifecycle action
-                        lc_deps[dep_store_target_pkg_pre_lc_lite] = lc_deps[dep_store_target_pkg_pre_lc_lite] + [dep_name] if dep_store_target_pkg_pre_lc_lite in lc_deps else [dep_name]
-                    else:
-                        lc_deps[dep_store_target_pkg] = lc_deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in lc_deps else [dep_name]
+                            # special case for lifecycle transitive closure deps; do not depend on
+                            # the __pkg of this package as that will be the output directory
+                            # of the lifecycle action
+                            lc_deps[dep_store_target_pkg_pre_lc_lite] = lc_deps[dep_store_target_pkg_pre_lc_lite] + [dep_name] if dep_store_target_pkg_pre_lc_lite in lc_deps else [dep_name]
+                        else:
+                            lc_deps[dep_store_target_pkg] = lc_deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in lc_deps else [dep_name]
                     deps[dep_store_target_pkg] = deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in deps else [dep_name]
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
@@ -705,7 +680,8 @@ def _impl_links(rctx):
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
-            lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
+            if lc_deps != None:
+                lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
             deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
 
     virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
@@ -726,14 +702,8 @@ def _impl_links(rctx):
             npm_import_sources_repo_name,
         )
     else:
-        npm_package_target = "{}{}//:source_directory".format(
-            "@@" if bzlmod_supported else "@",
-            npm_import_sources_repo_name,
-        )
-    npm_package_target_lc = "{}{}//:pkg".format(
-        "@@" if bzlmod_supported else "@",
-        npm_import_sources_repo_name,
-    )
+        npm_package_target = "@@{}//:source_directory".format(npm_import_sources_repo_name)
+    npm_package_target_lc = "@@{}//:pkg".format(npm_import_sources_repo_name)
 
     link_packages = {}
     for package, link_aliases in rctx.attr.link_packages.items():
@@ -742,8 +712,9 @@ def _impl_links(rctx):
     # collapse link aliases lists into comma separated strings
     for dep in deps.keys():
         deps[dep] = ",".join(deps[dep])
-    for dep in lc_deps.keys():
-        lc_deps[dep] = ",".join(lc_deps[dep])
+    if lc_deps != None:
+        for dep in lc_deps.keys():
+            lc_deps[dep] = ",".join(lc_deps[dep])
     for dep in ref_deps.keys():
         ref_deps[dep] = ",".join(ref_deps[dep])
 
@@ -773,7 +744,7 @@ def _impl_links(rctx):
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
         npm_package_target_lc = npm_package_target_lc,
-        lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 1, quote_key = False),
+        lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 3, quote_key = False) if lc_deps else None,
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),

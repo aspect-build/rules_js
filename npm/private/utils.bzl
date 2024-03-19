@@ -1,6 +1,5 @@
 "Utility functions for npm rules"
 
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -250,32 +249,12 @@ def _virtual_store_name(name, version):
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_file):
-    files = []
-    if ctx.attr.use_declare_symlink:
-        symlink = ctx.actions.declare_symlink(symlink_path)
-        ctx.actions.symlink(
-            output = symlink,
-            target_path = relative_file(target_file.path, symlink.path),
-        )
-        files.append(target_file)
-    else:
-        if _is_at_least_bazel_6() and target_file.is_directory:
-            # BREAKING CHANGE in Bazel 6 requires you to use declare_directory if your target_file
-            # in ctx.actions.symlink is a directory artifact
-            symlink = ctx.actions.declare_directory(symlink_path)
-        else:
-            symlink = ctx.actions.declare_file(symlink_path)
-        ctx.actions.symlink(
-            output = symlink,
-            target_file = target_file,
-        )
-    files.append(symlink)
-    return files
-
-def _is_at_least_bazel_6():
-    # Hacky way to check if the we're using at least Bazel 6. Would be nice if there was a ctx.bazel_version instead.
-    # native.bazel_version only works in repository rules.
-    return "apple_binary" not in dir(native)
+    symlink = ctx.actions.declare_symlink(symlink_path)
+    ctx.actions.symlink(
+        output = symlink,
+        target_path = relative_file(target_file.path, symlink.path),
+    )
+    return [target_file, symlink]
 
 def _parse_package_name(package):
     # Parse a @scope/name string and return a (scope, name) tuple
@@ -462,7 +441,6 @@ utils = struct(
     hash = _hash,
     dicts_match = _dicts_match,
     consistent_label_str = _consistent_label_str,
-    bzlmod_supported = is_bazel_6_or_greater(),
     reverse_force_copy = _reverse_force_copy,
     exists = _exists,
     home_directory = _home_directory,

@@ -38,10 +38,6 @@ _FP_STORE_TMPL = \
             deps = {deps},
             visibility = ["//visibility:public"],
             tags = ["manual"],
-            use_declare_symlink = select({{
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }}),
         )"""
 
 _FP_DIRECT_TMPL = \
@@ -54,10 +50,6 @@ _FP_DIRECT_TMPL = \
                 src = "//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
                 visibility = {link_visibility},
                 tags = ["manual"],
-                use_declare_symlink = select({{
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                    "//conditions:default": False,
-                }}),
             )
 
             # filegroup target that provides a single file which is
@@ -364,16 +356,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 )
 """.format(
             name = "{}_source_directory".format(_import.name),
-            actual = "{}{}//:source_directory".format(
-                "@@" if utils.bzlmod_supported else "@",
-                _import.name,
-            ),
+            actual = "@@{}//:source_directory".format(_import.name),
         ))
 
         if _import.link_packages:
             defs_bzl_header.append(
-                """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
-                    at = "@@" if utils.bzlmod_supported else "@",
+                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
                     i = i,
                     links_repo_suffix = utils.links_repo_suffix,
                     repo_name = _import.name,
@@ -381,8 +369,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             )
         else:
             defs_bzl_header.append(
-                """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
-                    at = "@@" if utils.bzlmod_supported else "@",
+                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
                     i = i,
                     links_repo_suffix = utils.links_repo_suffix,
                     repo_name = _import.name,
@@ -437,8 +424,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         ),
                     ))
                 package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
-                repo_package_json_bzl = "{at}{repo_name}//{link_package}:{package_json_bzl}".format(
-                    at = "@@" if utils.bzlmod_supported else "@",
+                repo_package_json_bzl = "@@{repo_name}//{link_package}:{package_json_bzl}".format(
                     repo_name = _import.name,
                     link_package = link_package,
                     package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,

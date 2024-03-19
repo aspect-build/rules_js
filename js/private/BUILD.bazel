@@ -26,11 +26,6 @@ alias(
     actual = "//js:enable_runfiles",
 )
 
-alias(
-    name = "experimental_allow_unresolved_symlinks",
-    actual = "//js:allow_unresolved_symlinks",
-)
-
 bzl_library(
     name = "js_filegroup",
     srcs = ["js_filegroup.bzl"],
