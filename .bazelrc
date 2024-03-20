@@ -8,6 +8,9 @@ import %workspace%/.aspect/bazelrc/performance.bazelrc
 
 ### YOUR PROJECT SPECIFIC SETTINGS GO HERE ###
 
+# TESTING TESTING
+common --experimental_repository_cache_hardlinks
+
 # We have some empty globs in rules_js
 common --noincompatible_disallow_empty_glob
 
