@@ -598,7 +598,7 @@ bin = bin_factory("node_modules")
                     name = link_package.split("/")[-1] or package_name_no_scope,
                     src = _PACKAGE_JSON_BZL_FILENAME,
                 ))
-            rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
+            rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, _EXTRACT_TO_DIRNAME))
 
     rules_js_metadata = {}
     if rctx.attr.lifecycle_hooks:
