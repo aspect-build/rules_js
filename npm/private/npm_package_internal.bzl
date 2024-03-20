@@ -34,7 +34,6 @@ def _npm_package_internal_impl(ctx):
             version = ctx.attr.version,
             directory = dst,
             npm_package_store_deps = depset(),
-            hardlink = True,  # always hardlink downstream
         ),
     ]
 

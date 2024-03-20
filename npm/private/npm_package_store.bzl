@@ -150,6 +150,10 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
         - "auto": hardlinks are used for generated files already in the output tree
         - "off": all files are copied
         - "on": hardlinks are used for all files (not recommended)
+
+        NB: Hardlinking source files in external repositories as was done under the hood
+        prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
+        failures as reported in https://github.com/aspect-build/rules_js/issues/1412.
         """,
     ),
     "verbose": attr.bool(
@@ -191,13 +195,15 @@ def _npm_package_store_impl(ctx):
             virtual_store_directory = src_directory
         else:
             virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
-            hardlink = ctx.attr.src[NpmPackageInfo].hardlink if hasattr(ctx.attr.src[NpmPackageInfo], "hardlink") else False
             copy_directory_bin_action(
                 ctx,
                 src = src_directory,
                 dst = virtual_store_directory,
                 copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
-                hardlink = "on" if hardlink else ctx.attr.hardlink,
+                # Hardlinking source files in external repositories as was done under the hood
+                # prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
+                # failures as reported in https://github.com/aspect-build/rules_js/issues/1412.
+                hardlink = ctx.attr.hardlink,
                 verbose = ctx.attr.verbose,
             )
 
