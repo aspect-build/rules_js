@@ -42,7 +42,7 @@ def npm_imported_package_store(name):
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _npm_package_store(
         name = "{}/pkg".format(store_target_name),
-        src = "{}/pkg_lc".format(store_target_name) if True else "@npm//:npm__fsevents__2.3.2_source_directory",
+        src = "{}/pkg_lc".format(store_target_name) if True else "@@npm__fsevents__2.3.2//:source_directory",
         package = "fsevents",
         version = "2.3.2",
         dev = True,
@@ -57,7 +57,7 @@ def npm_imported_package_store(name):
     # virtual store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
-        src = None if True else "@npm//:npm__fsevents__2.3.2_source_directory",
+        src = None if True else "@@npm__fsevents__2.3.2//:source_directory",
         package = "fsevents",
         version = "2.3.2",
         dev = True,

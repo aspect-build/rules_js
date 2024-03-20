@@ -720,7 +720,9 @@ def _impl_links(rctx):
 
     if rctx.attr.replace_package:
         npm_package_target = rctx.attr.replace_package
-    elif rctx.attr.npm_translate_lock_repo:
+    elif rctx.attr.bzlmod and rctx.attr.npm_translate_lock_repo:
+        # When bzlmod is enabled we need to use aliases for the user
+        # facing target since bzlmod will enforce external repository visibility.
         npm_package_target = "@{}//:{}_source_directory".format(
             rctx.attr.npm_translate_lock_repo,
             npm_import_sources_repo_name,
@@ -832,6 +834,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
+    "bzlmod": attr.bool(),
     "npm_translate_lock_repo": attr.string(),
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
@@ -1190,6 +1193,7 @@ def npm_import(
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
 
+    bzlmod = kwargs.pop("bzlmod", False)
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
@@ -1250,6 +1254,7 @@ def npm_import(
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         bins = bins,
+        bzlmod = bzlmod,
         npm_translate_lock_repo = npm_translate_lock_repo,
         package_visibility = package_visibility,
         replace_package = replace_package,

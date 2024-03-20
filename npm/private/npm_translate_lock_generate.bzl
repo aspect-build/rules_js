@@ -17,6 +17,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         package_visibility = {package_visibility},
+        bzlmod = {bzlmod},
         npm_translate_lock_repo = "{npm_translate_lock_repo}",{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
     )
 """
@@ -349,6 +350,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             maybe_replace_package = maybe_replace_package,
             maybe_transitive_closure = maybe_transitive_closure,
             name = helpers.to_apparent_repo_name(_import.name),
+            bzlmod = rctx.attr.bzlmod,
             npm_translate_lock_repo = helpers.to_apparent_repo_name(rctx.name),
             package = _import.package,
             package_visibility = _import.package_visibility,
