@@ -533,6 +533,7 @@ def _npm_import_rule_impl(rctx):
         "BUILD.bazel": generated_by_lines + [
             """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
         ],
+        "_generation": ["1"],  # bump the generation to force this repository rule to invalidate on next rules_js upgrade
     }
 
     rctx_files["BUILD.bazel"].append(_JS_PACKAGE_TMPL.format(
@@ -812,6 +813,8 @@ def _impl_links(rctx):
     ]
 
     generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
+
+    rctx.file("_generation", "1")  # bump the generation to force this repository rule to invalidate on next rules_js upgrade
 
     rctx.file(_DEFS_BZL_FILENAME, "\n".join(generated_by_lines + npm_link_package_bzl))
 
