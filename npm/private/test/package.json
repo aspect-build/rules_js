@@ -8,7 +8,7 @@
         "@plotly/regl": "2.1.2",
         "bufferutil": "4.0.7",
         "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
-        "esbuild": "0.14.38",
+        "esbuild": "0.20.2",
         "handlebars-helpers/helper-date": "github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55",
         "hot-shots": "10.0.0",
         "inline-fixtures": "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
