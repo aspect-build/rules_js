@@ -15,7 +15,7 @@
         "json-stable-stringify": "1.0.1",
         "lodash": "file:vendored/lodash-4.17.21.tgz",
         "node-gyp": "9.3.0",
-        "plotly.js": "2.12.1",
+        "plotly.js": "2.25.2",
         "protoc-gen-grpc": "git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f",
         "puppeteer": "19.11.0",
         "regl": "npm:@plotly/regl@2.1.2",
