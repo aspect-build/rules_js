@@ -152,13 +152,13 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
     _js_run_binary(
         name = "{{}}/lc".format(store_target_name),
         srcs = [
-            "{npm_package_target_lc}",
+            "{npm_package_target}",
             ":{{}}/pkg_pre_lc".format(store_target_name),
         ],
         # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
         args = [
                    "{package}",
-                   "../../../$(execpath {npm_package_target_lc})",
+                   "../../../$(execpath {npm_package_target})",
                    "../../../$(@D)",
                ] +
                select({{
@@ -356,14 +356,6 @@ def {bin_name}_binary(name, **kwargs):
 """
 
 _JS_PACKAGE_TMPL = """
-_npm_package_internal(
-    name = "source_directory",
-    src = ":{extract_to_dirname}",
-    package = "{package}",
-    version = "{version}",
-    visibility = ["//visibility:public"],
-)
-
 _npm_package_internal(
     name = "pkg",
     src = ":{extract_to_dirname}",
@@ -715,19 +707,15 @@ def _npm_import_links_rule_impl(rctx):
     if rctx.attr.replace_package:
         npm_package_target = rctx.attr.replace_package
     elif rctx.attr.npm_translate_lock_repo:
-        npm_package_target = "@{}//:{}_source_directory".format(
+        npm_package_target = "@{}//:{}_pkg".format(
             rctx.attr.npm_translate_lock_repo,
             npm_import_sources_repo_name,
         )
     else:
-        npm_package_target = "{}{}//:source_directory".format(
+        npm_package_target = "{}{}//:pkg".format(
             "@@" if bzlmod_supported else "@",
             npm_import_sources_repo_name,
         )
-    npm_package_target_lc = "{}{}//:pkg".format(
-        "@@" if bzlmod_supported else "@",
-        npm_import_sources_repo_name,
-    )
 
     link_packages = {}
     for package, link_aliases in rctx.attr.link_packages.items():
@@ -766,7 +754,6 @@ def _npm_import_links_rule_impl(rctx):
         link_default = "None" if rctx.attr.link_packages else "True",
         extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
-        npm_package_target_lc = npm_package_target_lc,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 1, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
