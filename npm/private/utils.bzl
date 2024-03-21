@@ -50,6 +50,9 @@ def _pnpm_name(name, version):
     return "%s/%s" % (name, version)
 
 def _parse_pnpm_package_key(pnpm_name, pnpm_version):
+    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
+        return pnpm_name, "0.0.0"
+
     if not pnpm_version.startswith("/"):
         if not pnpm_name:
             fail("parse_pnpm_package_key: pnpm_name is empty for non-versioned package %s" % pnpm_version)
