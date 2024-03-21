@@ -349,8 +349,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     visibility = ["//visibility:public"],
 )
 """.format(
-            name = "{}_source_directory".format(_import.name),
-            actual = "{}{}//:source_directory".format(
+            name = "{}_pkg".format(_import.name),
+            actual = "{}{}//:pkg".format(
                 "@@" if utils.bzlmod_supported else "@",
                 _import.name,
             ),
