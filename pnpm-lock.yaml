@@ -42,6 +42,8 @@ importers:
         specifier: workspace:*
         version: link:../npm_package/packages/pkg_a
 
+  examples/linked_empty_node_modules: {}
+
   examples/macro:
     devDependencies:
       mocha:

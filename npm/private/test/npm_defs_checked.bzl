@@ -1019,12 +1019,12 @@ load("@@npm__at_types_yauzl__registry.npmjs.org_at_types_yauzl_2.10.0__links//:d
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
     root_package = ""
-    link_packages = ["", "examples/js_binary", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
+    link_packages = ["", "examples/js_binary", "examples/linked_empty_node_modules", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
     bazel_package = native.package_name()
     is_root = bazel_package == root_package
     link = bazel_package in link_packages
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: '', 'examples/js_binary', 'examples/macro', 'examples/npm_deps', 'examples/npm_package/libs/lib_a', 'examples/npm_package/packages/pkg_a', 'examples/npm_package/packages/pkg_b', 'examples/webpack_cli', 'js/private/coverage/bundle', 'js/private/image', 'js/private/test/image', 'js/private/test/js_run_devserver', 'js/private/worker/src', 'npm/private/test', 'npm/private/test/npm_package'" % native.package_name()
+        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: '', 'examples/js_binary', 'examples/linked_empty_node_modules', 'examples/macro', 'examples/npm_deps', 'examples/npm_package/libs/lib_a', 'examples/npm_package/packages/pkg_a', 'examples/npm_package/packages/pkg_b', 'examples/webpack_cli', 'js/private/coverage/bundle', 'js/private/image', 'js/private/test/image', 'js/private/test/js_run_devserver', 'js/private/worker/src', 'npm/private/test', 'npm/private/test/npm_package'" % native.package_name()
         fail(msg)
     link_targets = []
     scope_targets = {}
@@ -2401,7 +2401,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None):
-    link_packages = ["", "examples/js_binary", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
+    link_packages = ["", "examples/js_binary", "examples/linked_empty_node_modules", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in link_packages
 
