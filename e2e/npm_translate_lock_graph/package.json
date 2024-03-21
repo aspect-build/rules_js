@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "dependencies": {
+        "@aspect-test/a": "^5.0.2",
+        "@aspect-test/b": "^5.0.2",
+        "@aspect-test/c": "^2.0.0",
+        "is-odd": "^3.0.1",
+        "is-number": "^6.0.0",
+        "@test/a": "workspace:*",
+        "@test/b": "workspace:*"
+    }
+}

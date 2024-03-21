@@ -2,7 +2,6 @@
 
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")
 
 # Generated npm_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
@@ -80,7 +79,7 @@ def npm_imported_package_store(name):
     native.filegroup(
         name = "{}/dir".format(store_target_name),
         srcs = [":{}".format(store_target_name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "package_directory",
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
@@ -127,7 +126,7 @@ def npm_link_imported_package_store(name):
     native.filegroup(
         name = "{}/dir".format(name),
         srcs = [":{}".format(name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "package_directory",
         visibility = ["//visibility:private"],
         tags = ["manual"],
     )

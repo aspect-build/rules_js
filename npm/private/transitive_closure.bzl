@@ -3,7 +3,7 @@
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
 
-def gather_transitive_closure(packages, package, no_optional):
+def gather_transitive_closure(packages, package, no_optional, cache = {}):
     """Walk the dependency tree, collecting the transitive closure of dependencies and their versions.
 
     This is needed to resolve npm dependency cycles.
@@ -14,16 +14,18 @@ def gather_transitive_closure(packages, package, no_optional):
         packages: dictionary from pnpm lock
         package: the package to collect deps for
         no_optional: whether to exclude optionalDependencies
+        cache: a dictionary of results from previous invocations
 
     Returns:
         A dictionary of transitive dependencies, mapping package names to dependent versions.
     """
     root_package = packages[package]
 
+    direct_closure = _get_package_info_deps(root_package, no_optional)
     transitive_closure = {}
-    transitive_closure[root_package["name"]] = [root_package["version"]]
+    transitive_closure[root_package["name"]] = []
 
-    stack = [_get_package_info_deps(root_package, no_optional)]
+    stack = [direct_closure]
     iteration_max = 999999
     for i in range(0, iteration_max + 1):
         if not len(stack):
@@ -45,20 +47,32 @@ def gather_transitive_closure(packages, package, no_optional):
             transitive_closure[name] = transitive_closure.get(name, [])
             if version in transitive_closure[name]:
                 continue
-            transitive_closure[name].insert(0, version)
+            transitive_closure[name].append(version)
             if package_key.startswith("link:"):
                 # we don't need to drill down through first-party links for the transitive closure since there are no cycles
                 # allowed in first-party links
                 continue
+
+            if package_key in cache:
+                # Already computed for this dep, merge the cached results
+                for transitive_name in cache[package_key].keys():
+                    transitive_closure[transitive_name] = transitive_closure.get(transitive_name, [])
+                    for transitive_version in cache[package_key][transitive_name]:
+                        if transitive_version not in transitive_closure[transitive_name]:
+                            transitive_closure[transitive_name].append(transitive_version)
             else:
-                package_info = packages[package_key]
-            stack.append(_get_package_info_deps(package_info, no_optional))
+                # Recurse into the next level of dependencies
+                stack.append(_get_package_info_deps(packages[package_key], no_optional))
+
+    is_circular = root_package["version"] in transitive_closure[root_package["name"]]
+    if not is_circular:
+        transitive_closure[root_package["name"]].append(root_package["version"])
 
     result = dict()
     for key in sorted(transitive_closure.keys()):
         result[key] = sorted(transitive_closure[key])
 
-    return result
+    return (is_circular, result)
 
 def _get_package_info_deps(package_info, no_optional):
     return package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
@@ -179,13 +193,19 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
         }
 
     # Collect transitive dependencies for each package
+    cache = {}
     for package in packages.keys():
         package_info = packages[package]
 
-        package_info["transitive_closure"] = gather_transitive_closure(
+        _, transitive_closure = gather_transitive_closure(
             packages,
             package,
             no_optional,
+            cache,
         )
+
+        package_info["transitive_closure"] = transitive_closure
+
+        cache[package] = transitive_closure
 
     return (importers, packages)

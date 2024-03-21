@@ -44,13 +44,15 @@ def test_walk_deps(ctx):
     not_no_optional = False
 
     # Walk the example tree above
-    closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", not_no_optional)
+    is_circular, closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", not_no_optional)
     expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["1.0.0", "2.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
+    asserts.equals(env, False, is_circular)
     asserts.equals(env, expected, closure)
 
     # Run again with no_optional set, this means we shouldn't walk the dep from @aspect-test/b/5.0.0 -> @aspect-test/c/2.0.0
-    closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", no_optional)
+    is_circular, closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a/5.0.0", no_optional)
     expected = {"@aspect-test/a": ["5.0.0"], "@aspect-test/b": ["5.0.0"], "@aspect-test/c": ["1.0.0"], "@aspect-test/d": ["2.0.0_@aspect-test+c@1.0.0"]}
+    asserts.equals(env, False, is_circular)
     asserts.equals(env, expected, closure)
 
     return unittest.end(env)

@@ -1,0 +1,102 @@
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@aspect-test/a':
+        specifier: ^5.0.2
+        version: 5.0.2
+      '@aspect-test/b':
+        specifier: ^5.0.2
+        version: 5.0.2
+      '@aspect-test/c':
+        specifier: ^2.0.0
+        version: 2.0.2
+      '@test/a':
+        specifier: workspace:*
+        version: link:projects/a
+      '@test/b':
+        specifier: workspace:*
+        version: link:projects/b
+      is-number:
+        specifier: ^6.0.0
+        version: 6.0.0
+      is-odd:
+        specifier: ^3.0.1
+        version: 3.0.1
+
+  projects/a:
+    dependencies:
+      '@test/b':
+        specifier: workspace:*
+        version: link:../b
+      '@test/c':
+        specifier: file:../c
+        version: file:projects/c
+      '@test/d':
+        specifier: link:../d
+        version: link:../d
+
+  projects/b: {}
+
+  projects/c: {}
+
+  projects/d: {}
+
+packages:
+
+  /@aspect-test/a@5.0.2:
+    resolution: {integrity: sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==}
+    hasBin: true
+    dependencies:
+      '@aspect-test/b': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+    dev: false
+
+  /@aspect-test/b@5.0.2:
+    resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
+    hasBin: true
+    dependencies:
+      '@aspect-test/a': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+    dev: false
+
+  /@aspect-test/c@2.0.2:
+    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
+
+  /@aspect-test/d@2.0.0(@aspect-test/c@2.0.2):
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+    dependencies:
+      '@aspect-test/c': 2.0.2
+    dev: false
+
+  /is-number@6.0.0:
+    resolution: {integrity: sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==}
+    engines: {node: '>=0.10.0'}
+    dev: false
+
+  /is-odd@3.0.1:
+    resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==}
+    engines: {node: '>=4'}
+    dependencies:
+      is-number: 6.0.0
+    dev: false
+
+  file:projects/c:
+    resolution: {directory: projects/c, type: directory}
+    name: '@test/c'
+    version: 1.0.0
+    dev: false

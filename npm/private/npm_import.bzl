@@ -35,8 +35,7 @@ load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")\
+load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")\
 """
 
 _LINK_JS_PACKAGE_LIFECYCLE_LOADS_TMPL = """\
@@ -112,7 +111,7 @@ def npm_imported_package_store(name):
     native.filegroup(
         name = "{{}}/dir".format(store_target_name),
         srcs = [":{{}}".format(store_target_name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "{package_directory_output_group}",
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
@@ -239,7 +238,7 @@ def npm_link_imported_package_store(name):
     native.filegroup(
         name = "{{}}/dir".format(name),
         srcs = [":{{}}".format(name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "{package_directory_output_group}",
         visibility = {link_visibility},
         tags = ["manual"],
     )
@@ -653,7 +652,9 @@ def _npm_import_links_rule_impl(rctx):
             virtual_store_name = utils.virtual_store_name(store_package, store_version),
             virtual_store_root = utils.virtual_store_root,
         )
-        ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
+        if dep_store_target not in ref_deps:
+            ref_deps[dep_store_target] = []
+        ref_deps[dep_store_target].append(dep_name)
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
     if transitive_closure_pattern:
@@ -686,8 +687,13 @@ def _npm_import_links_rule_impl(rctx):
                     virtual_store_root = utils.virtual_store_root,
                 )
 
-                lc_deps[lc_dep_store_target] = lc_deps[lc_dep_store_target] + [dep_name] if lc_dep_store_target in lc_deps else [dep_name]
-                deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+                if lc_dep_store_target not in lc_deps:
+                    lc_deps[lc_dep_store_target] = []
+                lc_deps[lc_dep_store_target].append(dep_name)
+
+                if dep_store_target not in deps:
+                    deps[dep_store_target] = []
+                deps[dep_store_target].append(dep_name)
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
             store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
@@ -700,8 +706,13 @@ def _npm_import_links_rule_impl(rctx):
                 virtual_store_name = utils.virtual_store_name(store_package, store_version),
                 virtual_store_root = utils.virtual_store_root,
             )
-            lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
-            deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+            if dep_store_target not in lc_deps:
+                lc_deps[dep_store_target] = []
+            lc_deps[dep_store_target].append(dep_name)
+
+            if dep_store_target not in deps:
+                deps[dep_store_target] = []
+            deps[dep_store_target].append(dep_name)
 
     virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
 
@@ -778,6 +789,7 @@ def _npm_import_links_rule_impl(rctx):
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,
+        package_directory_output_group = utils.package_directory_output_group,
         rctx_name = rctx.name,
         ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 1, quote_key = False),
         root_package = rctx.attr.root_package,

@@ -1,0 +1,28 @@
+module(
+    name = "e2e_npm_translate_lock",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "aspect_bazel_lib", version = "1.40.3")
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    data = [
+        "//:package.json",
+        "//projects/a:package.json",
+        "//projects/b:package.json",
+        "//projects/c:package.json",
+        "//projects/d:package.json",
+    ],
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")
