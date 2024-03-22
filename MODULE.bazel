@@ -8,7 +8,7 @@ module(
 
 # Lower-bounds for runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
-bazel_dep(name = "aspect_bazel_lib", version = "1.40.3")
+bazel_dep(name = "aspect_bazel_lib", version = "1.42.0")
 bazel_dep(name = "aspect_rules_lint", version = "0.12.0")
 bazel_dep(name = "bazel_features", version = "0.1.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
@@ -43,6 +43,7 @@ pnpm.pnpm(
 use_repo(pnpm, "pnpm", "pnpm__links")
 
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+bazel_lib_toolchains.tar()
 use_repo(bazel_lib_toolchains, "coreutils_toolchains")
 use_repo(bazel_lib_toolchains, "yq_darwin_amd64")
 use_repo(bazel_lib_toolchains, "yq_darwin_arm64")
@@ -51,6 +52,7 @@ use_repo(bazel_lib_toolchains, "yq_linux_arm64")
 use_repo(bazel_lib_toolchains, "yq_linux_ppc64le")
 use_repo(bazel_lib_toolchains, "yq_linux_s390x")
 use_repo(bazel_lib_toolchains, "yq_windows_amd64")
+use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 ####### Dev dependencies ########
 

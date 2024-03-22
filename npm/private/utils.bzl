@@ -438,6 +438,34 @@ def _is_vendored_tarfile(package_snapshot):
 def _default_external_repository_action_cache():
     return DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE
 
+def _is_tarball_extension(ext):
+    # Takes an extension (without leading dot) and return True if the extension
+    # is a common tarball extension as per
+    # https://en.wikipedia.org/wiki/Tar_(computing)#Suffixes_for_compressed_files
+    tarball_extensions = [
+        "tar",
+        "tar.bz2",
+        "tb2",
+        "tbz",
+        "tbz2",
+        "tz2",
+        "tar.gz",
+        "taz",
+        "tgz",
+        "tar.lz",
+        "tar.lzma",
+        "tlz",
+        "tar.lzo",
+        "tar.xz",
+        "txz",
+        "tar.Z",
+        "tZ",
+        "taZ",
+        "tar.zst",
+        "tzst",
+    ]
+    return ext in tarball_extensions
+
 utils = struct(
     bazel_name = _bazel_name,
     pnpm_name = _pnpm_name,
@@ -471,4 +499,5 @@ utils = struct(
     home_directory = _home_directory,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_vendored_tarfile = _is_vendored_tarfile,
+    is_tarball_extension = _is_tarball_extension,
 )

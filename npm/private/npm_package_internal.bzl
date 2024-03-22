@@ -20,7 +20,7 @@ _ATTRS = {
 
 def _npm_package_internal_impl(ctx):
     if ctx.file.src.is_source or ctx.file.src.is_directory:
-        # pass the source directory or TreeArtifact through
+        # pass the source archive, source directory or TreeArtifact through
         dst = ctx.file.src
     else:
         fail("Expected src to be a source directory or an output directory")
@@ -32,6 +32,7 @@ def _npm_package_internal_impl(ctx):
         NpmPackageInfo(
             package = ctx.attr.package,
             version = ctx.attr.version,
+            # TODO(2.0): rename `directory` to `src` since it may now be an archive file
             directory = dst,
             npm_package_store_deps = depset(),
         ),
