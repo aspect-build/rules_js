@@ -14,14 +14,27 @@ nodejs_register_toolchains(
     node_version = DEFAULT_NODE_VERSION,
 )
 
-load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock", "pnpm_repository")
 
 npm_translate_lock(
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_version = "8.6.7",
     verify_node_modules_ignored = "//:.bazelignore",
+)
+
+pnpm_repository(
+    name = "pnpm",
+    pnpm_version = (
+        "8.6.7",
+        "sha512-vRIWpD/L4phf9Bk2o/O2TDR8fFoJnpYrp2TKqTIZF/qZ2/rgL3qKXzHofHgbXsinwMoSEigz28sqk3pQ+yMEQQ==",
+    ),
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
+
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+
+bazel_features_deps()
