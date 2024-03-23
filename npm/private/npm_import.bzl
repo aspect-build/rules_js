@@ -706,11 +706,6 @@ def _npm_import_links_rule_impl(rctx):
 
     if rctx.attr.replace_package:
         npm_package_target = rctx.attr.replace_package
-    elif rctx.attr.npm_translate_lock_repo:
-        npm_package_target = "@{}//:{}_pkg".format(
-            rctx.attr.npm_translate_lock_repo,
-            npm_import_sources_repo_name,
-        )
     else:
         npm_package_target = "{}{}//:pkg".format(
             "@@" if bzlmod_supported else "@",
@@ -814,7 +809,6 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
-    "npm_translate_lock_repo": attr.string(),
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
@@ -1172,7 +1166,6 @@ def npm_import(
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
 
-    npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
@@ -1232,7 +1225,6 @@ def npm_import(
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         bins = bins,
-        npm_translate_lock_repo = npm_translate_lock_repo,
         package_visibility = package_visibility,
         replace_package = replace_package,
     )

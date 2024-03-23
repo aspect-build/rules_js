@@ -166,7 +166,6 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                     npm_auth_basic = i.npm_auth_basic,
                     npm_auth_password = i.npm_auth_password,
                     npm_auth_username = i.npm_auth_username,
-                    npm_translate_lock_repo = attr.name,
                     package = i.package,
                     patch_args = i.patch_args,
                     patches = i.patches,
