@@ -247,24 +247,27 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     # check all links and fail if there are duplicates which can happen with public hoisting
     helpers.check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
-    repositories_bzl = []
+    repositories_bzl = None
+    if not rctx.attr.bzlmod:
+        repositories_bzl = []
+        if len(npm_imports) > 0:
+            repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
+            repositories_bzl.append("")
 
-    if len(npm_imports) > 0:
-        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
-        repositories_bzl.append("")
+        repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(str(pnpm_lock_label)))
+        repositories_bzl.append("# buildifier: disable=function-docstring")
+        repositories_bzl.append("def npm_repositories():")
 
-    repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(str(pnpm_lock_label)))
-    repositories_bzl.append("# buildifier: disable=function-docstring")
-    repositories_bzl.append("def npm_repositories():")
-    if len(npm_imports) == 0:
-        repositories_bzl.append("    pass")
-        repositories_bzl.append("")
+        if len(npm_imports) == 0:
+            repositories_bzl.append("    pass")
+            repositories_bzl.append("")
 
     stores_bzl = []
     links_bzl = {}
     links_targets_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        repositories_bzl.append(_gen_npm_import(rctx, _import, link_workspace))
+        if not rctx.attr.bzlmod:
+            repositories_bzl.append(_gen_npm_import(rctx, _import, link_workspace))
 
         if _import.link_packages:
             defs_bzl_header.append(
@@ -439,7 +442,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     npm_link_targets_bzl.append("""    return link_targets""")
 
     rctx_files[rctx.attr.defs_bzl_filename] = ["\n".join(defs_bzl_header + [""] + npm_link_all_packages_bzl + [""] + npm_link_targets_bzl + [""])]
-    rctx_files[rctx.attr.repositories_bzl_filename] = ["\n".join(repositories_bzl)]
+
+    if not rctx.attr.bzlmod:
+        rctx_files[rctx.attr.repositories_bzl_filename] = ["\n".join(repositories_bzl)]
 
     for filename, contents in rctx.attr.additional_file_contents.items():
         if not filename in rctx_files.keys():

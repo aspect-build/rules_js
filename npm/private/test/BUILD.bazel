@@ -55,8 +55,8 @@ write_source_files(
 write_source_files(
     name = "write_npm_translate_lock_bzlmod",
     files = {
+        # NOTE: @npm//:repositories.bzl not generated for bzlmod
         "snapshots/bzlmod/npm_defs.bzl": "@npm//:defs.bzl",
-        "snapshots/bzlmod/repositories.bzl": "@npm//:repositories.bzl",
         "snapshots/bzlmod/chalk_links_defs.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
         "snapshots/bzlmod/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/bzlmod/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",

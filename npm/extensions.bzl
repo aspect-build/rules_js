@@ -60,6 +60,7 @@ def _npm_extension_impl(module_ctx):
                 verify_patches = attr.verify_patches,
                 yarn_lock = attr.yarn_lock,
                 bzlmod = True,
+                repositories_bzl_filename = None,
             )
 
         for attr in mod.tags.npm_translate_lock:
