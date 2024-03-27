@@ -52,6 +52,7 @@ def _npm_extension_impl(module_ctx):
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_yq_toolchains = False,  # this registration is handled elsewhere with bzlmod
+                register_tar_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 replace_packages = attr.replace_packages,
                 root_package = attr.root_package,
                 run_lifecycle_hooks = attr.run_lifecycle_hooks,

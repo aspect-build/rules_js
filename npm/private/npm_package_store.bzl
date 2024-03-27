@@ -195,17 +195,41 @@ def _npm_package_store_impl(ctx):
             virtual_store_directory = src_directory
         else:
             virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
-            copy_directory_bin_action(
-                ctx,
-                src = src_directory,
-                dst = virtual_store_directory,
-                copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
-                # Hardlinking source files in external repositories as was done under the hood
-                # prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
-                # failures as reported in https://github.com/aspect-build/rules_js/issues/1412.
-                hardlink = ctx.attr.hardlink,
-                verbose = ctx.attr.verbose,
-            )
+            if utils.is_tarball_extension(src_directory.extension):
+                # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
+                # we can use the --strip-components 1 argument with tar to strip one directory level
+                args = ctx.actions.args()
+                args.add("--extract")
+                args.add("--no-same-owner")
+                args.add("--no-same-permissions")
+                args.add("--strip-components")
+                args.add(str(1))
+                args.add("--file")
+                args.add(src_directory.path)
+                args.add("--directory")
+                args.add(virtual_store_directory.path)
+
+                bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+                ctx.actions.run(
+                    executable = bsdtar.tarinfo.binary,
+                    inputs = depset(direct = [src_directory], transitive = [bsdtar.default.files]),
+                    outputs = [virtual_store_directory],
+                    arguments = [args],
+                    mnemonic = "NpmPackageExtract",
+                    progress_message = "Extracting npm package {}@{}".format(package, version),
+                )
+            else:
+                copy_directory_bin_action(
+                    ctx,
+                    src = src_directory,
+                    dst = virtual_store_directory,
+                    copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
+                    # Hardlinking source files in external repositories as was done under the hood
+                    # prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
+                    # failures as reported in https://github.com/aspect-build/rules_js/issues/1412.
+                    hardlink = ctx.attr.hardlink,
+                    verbose = ctx.attr.verbose,
+                )
 
         linked_virtual_store_directories = []
         for dep, _dep_aliases in ctx.attr.deps.items():
@@ -325,7 +349,10 @@ npm_package_store_lib = struct(
     attrs = _ATTRS,
     implementation = _npm_package_store_impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
-    toolchains = ["@aspect_bazel_lib//lib:copy_directory_toolchain_type"],
+    toolchains = [
+        "@aspect_bazel_lib//lib:copy_directory_toolchain_type",
+        "@aspect_bazel_lib//lib:tar_toolchain_type",
+    ],
 )
 
 npm_package_store = rule(

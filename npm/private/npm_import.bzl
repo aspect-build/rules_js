@@ -20,8 +20,8 @@ for a given lockfile.
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
     "@bazel_tools//tools/build_defs/repo:git_worker.bzl",
     _git_add_origin = "add_origin",
@@ -30,8 +30,8 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
-load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
+load(":utils.bzl", "utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
@@ -358,7 +358,7 @@ def {bin_name}_binary(name, **kwargs):
 _JS_PACKAGE_TMPL = """
 _npm_package_internal(
     name = "pkg",
-    src = ":{extract_to_dirname}",
+    src = ":{package_src}",
     package = "{package}",
     version = "{version}",
     visibility = ["//visibility:public"],
@@ -420,7 +420,7 @@ def _is_gnu_tar(rctx):
 
     return "GNU tar" in result.stdout
 
-def _download_and_extract_archive(rctx):
+def _download_and_extract_archive(rctx, package_json_only):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
     auth = {}
@@ -485,10 +485,21 @@ def _download_and_extract_archive(rctx):
         # have been extracted.
         tar_args.append("--delay-directory-restore")
 
-    result = rctx.execute(tar_args)
-    if result.return_code:
-        msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
-        fail(msg)
+    if package_json_only:
+        # Try to extract package/package.json; 'package' as the root folder is the common
+        # case but some npm package tarballs will use a different root folder. In this case
+        # this extract call will fail and we'll fallback to extracting the full package.
+        tar_args_package_json_only = tar_args[:]
+        tar_args_package_json_only.append("package/package.json")
+        result = rctx.execute(tar_args_package_json_only)
+        if result.return_code:
+            package_json_only = False
+
+    if not package_json_only:
+        result = rctx.execute(tar_args)
+        if result.return_code:
+            msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
+            fail(msg)
 
     if not repo_utils.is_windows(rctx):
         # Some packages have directory permissions missing executable which
@@ -501,10 +512,18 @@ def _download_and_extract_archive(rctx):
             fail(msg)
 
 def _npm_import_rule_impl(rctx):
+    has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
+    has_patches = not (not rctx.attr.patches)
+
+    package_src = _EXTRACT_TO_DIRNAME
     if utils.is_git_repository_url(rctx.attr.url):
         _fetch_git_repository(rctx)
+    elif rctx.attr.extract_full_archive or has_patches or has_lifecycle_hooks:
+        _download_and_extract_archive(rctx, package_json_only = False)
     else:
-        _download_and_extract_archive(rctx)
+        # TODO: support tarball package_src with lifecycle hooks
+        _download_and_extract_archive(rctx, package_json_only = True)
+        package_src = _TARBALL_FILENAME
 
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
@@ -527,7 +546,7 @@ def _npm_import_rule_impl(rctx):
     }
 
     rctx_files["BUILD.bazel"].append(_JS_PACKAGE_TMPL.format(
-        extract_to_dirname = _EXTRACT_TO_DIRNAME,
+        package_src = package_src,
         package = rctx.attr.package,
         version = rctx.attr.version,
     ))
@@ -598,7 +617,7 @@ bin = bin_factory("node_modules")
                     name = link_package.split("/")[-1] or package_name_no_scope,
                     src = _PACKAGE_JSON_BZL_FILENAME,
                 ))
-            rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
+            rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
 
     rules_js_metadata = {}
     if rctx.attr.lifecycle_hooks:
@@ -752,7 +771,6 @@ def _npm_import_links_rule_impl(rctx):
     npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
-        extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 1, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
@@ -824,6 +842,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "commit": attr.string(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
+    "extract_full_archive": attr.bool(),
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
@@ -1174,6 +1193,7 @@ def npm_import(
 
     npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
+    extract_full_archive = kwargs.pop("extract_full_archive", None)
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
@@ -1207,6 +1227,7 @@ def npm_import(
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
         ),
         generate_bzl_library_targets = generate_bzl_library_targets,
+        extract_full_archive = extract_full_archive,
     )
 
     if lifecycle_hooks_no_sandbox:
