@@ -43,7 +43,7 @@ The following environment variables are made available to the Node.js runtime ba
 
 The following environment variables are made available to the Node.js runtime based on the rule context:
 
-* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the Bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target's rule context
+* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the Bazel target being run
 * JS_BINARY__PACKAGE: the package of the Bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target's rule context
 * JS_BINARY__TARGET: the full label of the Bazel target being run; a stringified version of `ctx.label` of the `js_binary` target's rule context
 * JS_BINARY__TARGET_NAME: the name of the Bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target's rule context
@@ -369,7 +369,7 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
 
     # Add rule context variables to the environment
     builtins = {
-        "JS_BINARY__BUILD_FILE_PATH": ctx.build_file_path,
+        "JS_BINARY__BUILD_FILE_PATH": ctx.label.package + "/BUILD",
         "JS_BINARY__PACKAGE": ctx.label.package,
         "JS_BINARY__TARGET_NAME": ctx.label.name,
         "JS_BINARY__TARGET": "{}//{}:{}".format(
