@@ -14,8 +14,8 @@ js_image_layer(
 """
 
 load("@aspect_bazel_lib//lib:paths.bzl", "to_rlocation_path")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """Create container image layers from js_binary targets.
 
@@ -282,7 +282,7 @@ def _js_image_layer_impl(ctx):
     node_modules = _build_layer(ctx, type = "node_modules", entries = node_modules_entries, inputs = node_modules_inputs)
 
     return [
-        DefaultInfo(files = depset([app, node_modules])),
+        DefaultInfo(files = depset([node_modules, app])),
         OutputGroupInfo(app = depset([app]), node_modules = depset([node_modules])),
     ]
 
