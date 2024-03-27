@@ -214,10 +214,11 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
             )
 
+    metadata_kwargs = {}
     if bazel_features.external_deps.extension_metadata_has_reproducible:
-        return module_ctx.extension_metadata(
-            reproducible = True,
-        )
+        metadata_kwargs["reproducible"] = True
+
+    return module_ctx.extension_metadata(**metadata_kwargs)
 
 def _npm_translate_lock_attrs():
     attrs = dict(**npm_translate_lock_lib.attrs)

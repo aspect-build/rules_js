@@ -11,4 +11,4 @@ import %workspace%/../../.aspect/bazelrc/performance.bazelrc
 common --enable_bzlmod
 
 # Enable lockfile as an example. This requires Bazel 7.1.0+ to make it usable.
-common --lockfile_mode=error
+common --lockfile_mode=update
