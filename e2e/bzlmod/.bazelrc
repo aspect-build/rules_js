@@ -10,10 +10,5 @@ import %workspace%/../../.aspect/bazelrc/performance.bazelrc
 
 common --enable_bzlmod
 
-# Disable lockfile for now. It is unstable.
-# https://github.com/bazelbuild/bazel/issues/19026
-# https://github.com/bazelbuild/bazel/issues/19621
-# https://github.com/bazelbuild/bazel/issues/19971
-# https://github.com/bazelbuild/bazel/issues/20272
-# https://github.com/bazelbuild/bazel/issues/20369
-common --lockfile_mode=off
+# Enable lockfile as an example. This requires Bazel 7.1.0+ to make it usable.
+common --lockfile_mode=error
