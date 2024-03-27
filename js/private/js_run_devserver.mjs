@@ -110,6 +110,28 @@ function partitionArray(array, callback) {
     )
 }
 
+// Returns the correct symlink type if we are building on windows. This doesn't appear to be an issue
+// on *nix based machines as native fs.symlink without type just works 
+// (see https://nodejs.org/api/fs.html#fssymlinktarget-path-type-callback). However on windows machines
+// we need to be more specific on whether or not we are attempting to symlink a file or directory.
+function getSymlinkArgs(src) {
+    const symlinkArgs = [];
+    const isWindows = os.platform() == 'win32';
+    if (!isWindows) {
+        return symlinkArgs;
+    }
+    const isDirectory = p => fs.lstatSync(p).isDirectory();
+    const isNodeModules =  p => p.includes("node_modules");
+    const isNodeModulesBin = p => p.includes("node_modules/.bin");
+
+    if (isDirectory(src) || (isNodeModules(src) && !isNodeModulesBin(src))) {
+        symlinkArgs.push('junction');
+    } else {
+        symlinkArgs.push('file');
+    }
+    return symlinkArgs;
+}
+
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
@@ -174,7 +196,8 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
                 // Intentionally synchronous; see comment on mkdirpSync
                 mkdirpSync(path.dirname(dst))
             }
-            await fs.promises.symlink(src, dst)
+            const symlinkArgs = getSymlinkArgs(src);
+            await fs.promises.symlink(src, dst, ...symlinkArgs)
             return 1
         } else if (lstat.isDirectory()) {
             const contents = await fs.promises.readdir(src)
