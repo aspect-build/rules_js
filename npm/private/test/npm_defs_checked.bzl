@@ -1980,7 +1980,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_975(name = "{}/@types/ws".format(name))
         store_976(name = "{}/@types/yauzl".format(name))
     if link:
-        if native.package_name() == "examples/npm_deps":
+        if bazel_package == "examples/npm_deps":
             link_1(name = "{}/@aspect-test/a".format(name))
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
@@ -2009,7 +2009,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
             link_901(name = "{}/uvu".format(name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
-        if native.package_name() == "npm/private/test":
+        elif bazel_package == "npm/private/test":
             link_55(name = "{}/@figma/nodegit".format(name))
             link_targets.append("//{}:{}/@figma/nodegit".format(bazel_package, name))
             scope_targets["@figma"] = scope_targets["@figma"] + [link_targets[-1]] if "@figma" in scope_targets else [link_targets[-1]]
@@ -2059,7 +2059,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@kubernetes"] = scope_targets["@kubernetes"] + [link_targets[-1]] if "@kubernetes" in scope_targets else [link_targets[-1]]
             link_949(name = "{}/debug".format(name))
             link_targets.append("//{}:{}/debug".format(bazel_package, name))
-        if native.package_name() == "js/private/image":
+        elif bazel_package == "js/private/image":
             link_89(name = "{}/@rollup/plugin-commonjs".format(name))
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
@@ -2086,7 +2086,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_972(name = "{}/@types/tar-stream".format(name))
             link_targets.append("//{}:{}/@types/tar-stream".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
-        if native.package_name() == "js/private/worker/src":
+        elif bazel_package == "js/private/worker/src":
             link_89(name = "{}/@rollup/plugin-commonjs".format(name))
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
@@ -2118,7 +2118,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_968(name = "{}/@types/node".format(name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
-        if native.package_name() == "js/private/coverage/bundle":
+        elif bazel_package == "js/private/coverage/bundle":
             link_90(name = "{}/@rollup/plugin-commonjs".format(name))
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
@@ -2132,7 +2132,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/c8".format(bazel_package, name))
             link_776(name = "{}/rollup".format(name))
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-        if native.package_name() == "examples/webpack_cli":
+        elif bazel_package == "examples/webpack_cli":
             link_110(name = "{}/@vanilla-extract/css".format(name))
             link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name))
             scope_targets["@vanilla-extract"] = scope_targets["@vanilla-extract"] + [link_targets[-1]] if "@vanilla-extract" in scope_targets else [link_targets[-1]]
@@ -2149,28 +2149,28 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/webpack-cli".format(bazel_package, name))
             link_913(name = "{}/webpack".format(name))
             link_targets.append("//{}:{}/webpack".format(bazel_package, name))
-        if native.package_name() == "examples/npm_package/packages/pkg_a":
+        elif bazel_package == "examples/npm_package/packages/pkg_a":
             link_142(name = "{}/acorn".format(name))
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_900(name = "{}/uuid".format(name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
-        if native.package_name() == "examples/npm_package/packages/pkg_b":
+        elif bazel_package == "examples/npm_package/packages/pkg_b":
             link_142(name = "{}/acorn".format(name))
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_900(name = "{}/uuid".format(name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
-        if native.package_name() == "js/private/test/image":
+        elif bazel_package == "js/private/test/image":
             link_143(name = "{}/acorn".format(name))
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-        if native.package_name() == "examples/npm_package/libs/lib_a":
+        elif bazel_package == "examples/npm_package/libs/lib_a":
             link_218(name = "{}/chalk".format(name))
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
-        if native.package_name() == "npm/private/test/npm_package":
+        elif bazel_package == "npm/private/test/npm_package":
             link_218(name = "{}/chalk".format(name))
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
             link_219(name = "{}/chalk-alt".format(name))
             link_targets.append("//{}:{}/chalk-alt".format(bazel_package, name))
-        if native.package_name() == "":
+        elif bazel_package == "":
             link_219(name = "{}/chalk".format(name))
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
             link_490(name = "{}/inline-fixtures".format(name))
@@ -2182,13 +2182,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_966(name = "{}/@types/node".format(name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
-        if native.package_name() == "js/private/test/js_run_devserver":
+        elif bazel_package == "js/private/test/js_run_devserver":
             link_532(name = "{}/jasmine".format(name))
             link_targets.append("//{}:{}/jasmine".format(bazel_package, name))
             link_966(name = "{}/@types/node".format(name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
-        if native.package_name() == "examples/macro":
+        elif bazel_package == "examples/macro":
             link_618(name = "{}/mocha-junit-reporter".format(name))
             link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name))
             link_619(name = "{}/mocha-multi-reporters".format(name))
@@ -2353,7 +2353,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/react".format(bazel_package, name))
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
-        if bazel_package == "npm/private/test":
+        elif bazel_package == "npm/private/test":
             link_targets.append("//{}:{}/@figma/nodegit".format(bazel_package, name))
             link_targets.append("//{}:{}/@plotly/regl".format(bazel_package, name))
             link_targets.append("//{}:{}/regl".format(bazel_package, name))
@@ -2376,7 +2376,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/protoc-gen-grpc".format(bazel_package, name))
             link_targets.append("//{}:{}/@kubernetes/client-node".format(bazel_package, name))
             link_targets.append("//{}:{}/debug".format(bazel_package, name))
-        if bazel_package == "js/private/image":
+        elif bazel_package == "js/private/image":
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name))
@@ -2387,7 +2387,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/tar-stream".format(bazel_package, name))
-        if bazel_package == "js/private/worker/src":
+        elif bazel_package == "js/private/worker/src":
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
@@ -2400,13 +2400,13 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/typescript".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/google-protobuf".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-        if bazel_package == "js/private/coverage/bundle":
+        elif bazel_package == "js/private/coverage/bundle":
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
             link_targets.append("//{}:{}/c8".format(bazel_package, name))
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-        if bazel_package == "examples/webpack_cli":
+        elif bazel_package == "examples/webpack_cli":
             link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name))
             link_targets.append("//{}:{}/@vanilla-extract/webpack-plugin".format(bazel_package, name))
             link_targets.append("//{}:{}/css-loader".format(bazel_package, name))
@@ -2414,29 +2414,29 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/mini-css-extract-plugin".format(bazel_package, name))
             link_targets.append("//{}:{}/webpack-cli".format(bazel_package, name))
             link_targets.append("//{}:{}/webpack".format(bazel_package, name))
-        if bazel_package == "examples/npm_package/packages/pkg_a":
+        elif bazel_package == "examples/npm_package/packages/pkg_a":
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
-        if bazel_package == "examples/npm_package/packages/pkg_b":
+        elif bazel_package == "examples/npm_package/packages/pkg_b":
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
-        if bazel_package == "js/private/test/image":
+        elif bazel_package == "js/private/test/image":
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-        if bazel_package == "examples/npm_package/libs/lib_a":
+        elif bazel_package == "examples/npm_package/libs/lib_a":
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
-        if bazel_package == "npm/private/test/npm_package":
+        elif bazel_package == "npm/private/test/npm_package":
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
             link_targets.append("//{}:{}/chalk-alt".format(bazel_package, name))
-        if bazel_package == "":
+        elif bazel_package == "":
             link_targets.append("//{}:{}/chalk".format(bazel_package, name))
             link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name))
             link_targets.append("//{}:{}/jsonpath-plus".format(bazel_package, name))
             link_targets.append("//{}:{}/typescript".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-        if bazel_package == "js/private/test/js_run_devserver":
+        elif bazel_package == "js/private/test/js_run_devserver":
             link_targets.append("//{}:{}/jasmine".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-        if bazel_package == "examples/macro":
+        elif bazel_package == "examples/macro":
             link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name))
             link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name))
             link_targets.append("//{}:{}/mocha".format(bazel_package, name))
