@@ -2,6 +2,7 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
@@ -213,6 +214,12 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
                 register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
             )
+
+    if bazel_features.external_deps.extension_metadata_has_reproducible:
+        return module_ctx.extension_metadata(
+            reproducible = True,
+        )
+    return module_ctx.extension_metadata()
 
 def _npm_translate_lock_attrs():
     attrs = dict(**npm_translate_lock_lib.attrs)
