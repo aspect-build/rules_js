@@ -914,8 +914,6 @@ def npm_import(
         dev = False,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
-        # TODO(2.0): remove run_lifecycle_hooks from npm_import
-        run_lifecycle_hooks = None,
         # TODO(2.0): remove lifecycle_hooks_no_sandbox from npm_import
         lifecycle_hooks_no_sandbox = None,
         **kwargs):
@@ -1124,8 +1122,9 @@ def npm_import(
 
         patches: Patch files to apply onto the downloaded npm package.
 
-        custom_postinstall: Custom string postinstall script to run on the installed npm package. Runs after any
-            existing lifecycle hooks if `run_lifecycle_hooks` is True.
+        custom_postinstall: Custom string postinstall script to run on the installed npm package.
+
+            Runs after any existing lifecycle hooks if any are enabled.
 
         npm_auth: Auth token to authenticate with npm. When using Bearer authentication.
 
@@ -1165,11 +1164,6 @@ def npm_import(
 
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
 
-        run_lifecycle_hooks: If True, runs `preinstall`, `install`, `postinstall` and 'prepare' lifecycle hooks declared
-            in this package.
-
-            Deprecated. Use `lifecycle_hooks` instead.
-
         lifecycle_hooks_no_sandbox: If True, adds "no-sandbox" to `lifecycle_hooks_execution_requirements`.
 
             Deprecated. Add "no-sandbox" to `lifecycle_hooks_execution_requirements` instead.
@@ -1188,11 +1182,6 @@ def npm_import(
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
-
-    if lifecycle_hooks and run_lifecycle_hooks:
-        fail("Expected only one of lifecycle_hooks or run_lifecycle_hooks")
-    if run_lifecycle_hooks:
-        lifecycle_hooks = ["preinstall", "install", "postinstall"]
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
