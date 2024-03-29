@@ -441,15 +441,25 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     if len(links_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if link:""")
+        first_link = True
         for link_package, bzl in links_bzl.items():
-            npm_link_all_packages_bzl.append("""        if native.package_name() == "{}":""".format(link_package))
+            npm_link_all_packages_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
+                els = "" if first_link else "el",
+                pkg = link_package,
+            ))
             npm_link_all_packages_bzl.extend(bzl)
+            first_link = False
 
     if len(links_targets_bzl) > 0:
         npm_link_targets_bzl.append("""    if link:""")
+        first_link = True
         for link_package, bzl in links_targets_bzl.items():
-            npm_link_targets_bzl.append("""        if bazel_package == "{}":""".format(link_package))
+            npm_link_targets_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
+                els = "" if first_link else "el",
+                pkg = link_package,
+            ))
             npm_link_targets_bzl.extend(bzl)
+            first_link = False
 
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
