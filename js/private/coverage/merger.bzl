@@ -2,7 +2,7 @@
 
 # Simple binary that call coverage.js with node toolchain
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load("//js/private:bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load("//js/private:bash.bzl", "BASH_INITIALIZE_JS_BINARY_RUNFILES")
 
 _ATTRS = {
     "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
@@ -32,7 +32,7 @@ def _coverage_merger_impl(ctx):
         output = bash_launcher,
         substitutions = {
             "{{entry_point_path}}": ctx.file.entry_point.short_path,
-            "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
+            "{{initialize_js_binary_runfiles}}": BASH_INITIALIZE_JS_BINARY_RUNFILES,
             "{{node}}": node_path,
             "{{workspace_name}}": ctx.workspace_name,
         },

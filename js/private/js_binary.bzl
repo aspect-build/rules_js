@@ -21,7 +21,7 @@ load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
-load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load(":bash.bzl", "BASH_INITIALIZE_JS_BINARY_RUNFILES")
 
 _DOC = """Execute a program in the Node.js runtime.
 
@@ -434,7 +434,7 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args_expanded),
-        "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
+        "{{initialize_js_binary_runfiles}}": BASH_INITIALIZE_JS_BINARY_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),

@@ -144,13 +144,9 @@ _exit() {
 trap _exit EXIT
 
 # ==============================================================================
-# Initialize RUNFILES environment variable
+# Initialize JS_BINARY__RUNFILES environment variable
 # ==============================================================================
-{{initialize_runfiles}}
-# TODO(2.0): export only JS_BINARY__RUNFILES
-export RUNFILES
-JS_BINARY__RUNFILES="$RUNFILES"
-export JS_BINARY__RUNFILES
+{{initialize_js_binary_runfiles}}
 
 # ==============================================================================
 # Prepare to run main program
