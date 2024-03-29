@@ -5,9 +5,6 @@ workspace(
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Override rules_nodejs to v6 to test the latest and recommended versional internally,
-# while keeping v5 in rules_js_dependencies() to avoid breaking changes.
-# TODO(2.0): change minimum to v6 in repositories.bzl
 http_archive(
     name = "rules_nodejs",
     sha256 = "a50986c7d2f2dc43a5b9b81a6245fd89bdc4866f1d5e316d9cef2782dd859292",
