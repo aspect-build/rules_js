@@ -26,14 +26,6 @@ Advanced users may want to directly fetch a package from npm rather than start f
 """
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load(
-    "@aspect_bazel_lib//lib:repositories.bzl",
-    _register_copy_directory_toolchains = "register_copy_directory_toolchains",
-    _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains",
-    _register_coreutils_toolchains = "register_coreutils_toolchains",
-    _register_tar_toolchains = "register_tar_toolchains",
-    _register_yq_toolchains = "register_yq_toolchains",
-)
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
@@ -193,11 +185,6 @@ def npm_translate_lock(
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
         use_pnpm = None,
-        register_copy_directory_toolchains = True,
-        register_copy_to_directory_toolchains = True,
-        register_coreutils_toolchains = True,
-        register_yq_toolchains = True,
-        register_tar_toolchains = True,
         npm_package_target_name = "{dirname}",
         use_starlark_yaml_parser = False,
         **kwargs):
@@ -518,16 +505,6 @@ def npm_translate_lock(
 
             Use `pnpm_version` for non-bzlmod.
 
-        register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
-
-        register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
-
-        register_coreutils_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_coreutils_toolchains()` is called if the toolchain is not already registered
-
-        register_yq_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_yq_toolchains()` is called if the toolchain is not already registered
-
-        register_tar_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_tar_toolchains()` is called if the toolchain is not already registered
-
         npm_package_target_name: The name of linked `npm_package` targets. When `npm_package` targets are linked as pnpm workspace
             packages, the name of the target must align with this value.
 
@@ -564,18 +541,6 @@ def npm_translate_lock(
 
         **kwargs: Internal use only
     """
-
-    # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
-    if register_copy_directory_toolchains and not native.existing_rule("copy_directory_toolchains"):
-        _register_copy_directory_toolchains()
-    if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
-        _register_copy_to_directory_toolchains()
-    if register_coreutils_toolchains and not native.existing_rule("register_coreutils_toolchains"):
-        _register_coreutils_toolchains()
-    if register_yq_toolchains and not native.existing_rule("yq_toolchains"):
-        _register_yq_toolchains()
-    if register_tar_toolchains and not native.existing_rule("tar_toolchains"):
-        _register_tar_toolchains()
 
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)

@@ -3,15 +3,6 @@ workspace(
     name = "aspect_rules_js",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "rules_nodejs",
-    sha256 = "a50986c7d2f2dc43a5b9b81a6245fd89bdc4866f1d5e316d9cef2782dd859292",
-    strip_prefix = "rules_nodejs-6.0.5",
-    url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.0.5/rules_nodejs-v6.0.5.tar.gz",
-)
-
 load("//js:dev_repositories.bzl", "rules_js_dev_dependencies")
 
 rules_js_dev_dependencies()
@@ -20,18 +11,15 @@ load("//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_jq_toolchains")
+load("//js:configure.bzl", "rules_js_configure")
+
+rules_js_configure(node_version = "16.14.2")
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
 
 aspect_bazel_lib_dependencies()
 
-register_jq_toolchains()
-
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
-
-nodejs_register_toolchains(
-    name = "nodejs",
-    node_version = "16.14.2",
-)
 
 # Alternate toolchains for testing across versions
 nodejs_register_toolchains(

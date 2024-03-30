@@ -15,6 +15,13 @@ bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "rules_nodejs", version = "6.0.5")
 bazel_dep(name = "platforms", version = "0.0.5")
 
+archive_override(
+    module_name = "rules_nodejs",
+    integrity = "sha256-w7yMsYGMkgKhVZJizhmB9T668fGzdEvRXThptjTtnpo=",
+    strip_prefix = "rules_nodejs-d28957af10035c3030ffcb26ced95bb411a50692",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/d28957af10035c3030ffcb26ced95bb411a50692.tar.gz"],
+)
+
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(node, "nodejs_darwin_amd64")
 use_repo(node, "nodejs_darwin_arm64")

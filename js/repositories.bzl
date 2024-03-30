@@ -16,9 +16,12 @@ def rules_js_dependencies():
 
     http_archive(
         name = "rules_nodejs",
-        sha256 = "a50986c7d2f2dc43a5b9b81a6245fd89bdc4866f1d5e316d9cef2782dd859292",
-        strip_prefix = "rules_nodejs-6.0.5",
-        url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.0.5/rules_nodejs-v6.0.5.tar.gz",
+        integrity = "sha256-w7yMsYGMkgKhVZJizhmB9T668fGzdEvRXThptjTtnpo=",
+        strip_prefix = "rules_nodejs-d28957af10035c3030ffcb26ced95bb411a50692",
+        url = "https://github.com/bazelbuild/rules_nodejs/archive/d28957af10035c3030ffcb26ced95bb411a50692.tar.gz",
+        # sha256 = "a50986c7d2f2dc43a5b9b81a6245fd89bdc4866f1d5e316d9cef2782dd859292",
+        # strip_prefix = "rules_nodejs-6.0.5",
+        # url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.0.5/rules_nodejs-v6.0.5.tar.gz",
     )
 
     http_archive(

@@ -5,6 +5,13 @@ local_path_override(
     path = "../..",
 )
 
+archive_override(
+    module_name = "rules_nodejs",
+    integrity = "sha256-w7yMsYGMkgKhVZJizhmB9T668fGzdEvRXThptjTtnpo=",
+    strip_prefix = "rules_nodejs-d28957af10035c3030ffcb26ced95bb411a50692",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/d28957af10035c3030ffcb26ced95bb411a50692.tar.gz"],
+)
+
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",
