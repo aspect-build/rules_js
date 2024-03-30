@@ -41,7 +41,7 @@ def npm_imported_package_store(name):
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _npm_package_store(
         name = "{}/pkg".format(store_target_name),
-        src = "{}/pkg_lc".format(store_target_name) if True else "@npm//:npm__fsevents__2.3.2_pkg",
+        src = "{}/pkg_lc".format(store_target_name) if True else "@@npm__fsevents__2.3.2//:pkg",
         package = "fsevents",
         version = "2.3.2",
         dev = True,
@@ -56,7 +56,7 @@ def npm_imported_package_store(name):
     # virtual store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
-        src = None if True else "@npm//:npm__fsevents__2.3.2_pkg",
+        src = None if True else "@@npm__fsevents__2.3.2//:pkg",
         package = "fsevents",
         version = "2.3.2",
         dev = True,
@@ -115,13 +115,13 @@ def npm_imported_package_store(name):
     _js_run_binary(
         name = "{}/lc".format(store_target_name),
         srcs = [
-            "@npm//:npm__fsevents__2.3.2_pkg",
+            "@@npm__fsevents__2.3.2//:pkg",
             ":{}/pkg_pre_lc".format(store_target_name),
         ],
         # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
         args = [
                    "fsevents",
-                   "../../../$(execpath @npm//:npm__fsevents__2.3.2_pkg)",
+                   "../../../$(execpath @@npm__fsevents__2.3.2//:pkg)",
                    "../../../$(@D)",
                ] +
                select({
