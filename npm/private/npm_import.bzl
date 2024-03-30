@@ -720,8 +720,6 @@ def _npm_import_links_rule_impl(rctx):
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(utils.links_repo_suffix)]
-    if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
-        npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
     if rctx.attr.replace_package:
         npm_package_target = rctx.attr.replace_package

@@ -372,8 +372,6 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
         repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
-        if repo_name.startswith("aspect_rules_js.npm."):
-            repo_name = repo_name[len("aspect_rules_js.npm."):]
 
         # gather package visibility
         package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
