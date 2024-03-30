@@ -326,12 +326,12 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 # Do the opposite of _to_manifest_path in
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
 # to get back to the short_path.
-# TODO: fix toolchain so we don't have to do this
+# TODO(2.0): fix toolchain so we don't have to do this
 def _target_tool_path_to_short_path(tool_path):
     return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
 # Generate a consistent label string between Bazel versions.
-# TODO: hoist this function to bazel-lib and use from there (as well as the dup in npm/private/utils.bzl)
+# TODO(2.0): hoist this function to bazel-lib and use from there (as well as the dup in npm/private/utils.bzl)
 def _consistent_label_str(workspace_name, label):
     # Starting in Bazel 6, the workspace name is empty for the local workspace and there's no other way to determine it.
     # This behavior differs from Bazel 5 where the local workspace name was fully qualified in str(label).

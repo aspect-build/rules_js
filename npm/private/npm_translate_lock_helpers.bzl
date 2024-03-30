@@ -506,7 +506,6 @@ def _has_strip_prefix_arg(patch_args, strip_num = None):
     return False
 
 ################################################################################
-# TODO: move to bazel-lib?
 def _to_apparent_repo_name(canonical_name):
     return canonical_name[canonical_name.rfind("~") + 1:]
 
