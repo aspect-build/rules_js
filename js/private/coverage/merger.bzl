@@ -25,7 +25,7 @@ def _coverage_merger_impl(ctx):
     node_bin = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
     # Create launcher
-    bash_launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
+    bash_launcher = ctx.actions.declare_file(ctx.label.name)
     node_path = _target_tool_path_to_short_path(ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.target_tool_path)
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
