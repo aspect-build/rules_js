@@ -192,8 +192,6 @@ def npm_translate_lock(
         register_tar_toolchains = True,
         npm_package_target_name = "{dirname}",
         use_starlark_yaml_parser = False,
-        # TODO(2.0): remove package_json
-        package_json = None,
         **kwargs):
     """Repository macro to generate starlark code from a lock file.
 
@@ -520,10 +518,6 @@ def npm_translate_lock(
 
         register_tar_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_tar_toolchains()` is called if the toolchain is not already registered
 
-        package_json: Deprecated.
-
-            Add all `package.json` files that are part of the workspace to `data` instead.
-
         npm_package_target_name: The name of linked `npm_package` targets. When `npm_package` targets are linked as pnpm workspace
             packages, the name of the target must align with this value.
 
@@ -594,14 +588,6 @@ def npm_translate_lock(
 
     if npm_package_lock:
         data = data + [npm_package_lock]
-
-    if package_json:
-        data = data + [package_json]
-
-        # buildifier: disable=print
-        print("""
-WARNING: `package_json` attribute in `npm_translate_lock(name = "{name}")` is deprecated. Add all package.json files to the `data` attribute instead.
-""".format(name = name))
 
     # convert bins to a string_list_dict to satisfy attr type in repository rule
     bins_string_list_dict = {}
