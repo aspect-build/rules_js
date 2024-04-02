@@ -198,7 +198,6 @@ def _npm_import_bzlmod(i):
         patches = i.patches,
         replace_package = i.replace_package,
         root_package = i.root_package,
-        run_lifecycle_hooks = i.run_lifecycle_hooks,
         transitive_closure = i.transitive_closure,
         url = i.url,
         version = i.version,
