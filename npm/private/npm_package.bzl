@@ -171,8 +171,7 @@ def npm_package(
         include_transitive_sources = True,
         include_declarations = True,
         include_transitive_declarations = True,
-        # TODO(2.0): flip include_runfiles default to False
-        include_runfiles = True,
+        include_runfiles = False,
         hardlink = "auto",
         verbose = False,
         **kwargs):
