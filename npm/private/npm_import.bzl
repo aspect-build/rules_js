@@ -915,8 +915,6 @@ def npm_import(
         dev = False,
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
-        # TODO(2.0): remove lifecycle_hooks_no_sandbox from npm_import
-        lifecycle_hooks_no_sandbox = None,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1165,10 +1163,6 @@ def npm_import(
 
         register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
 
-        lifecycle_hooks_no_sandbox: If True, adds "no-sandbox" to `lifecycle_hooks_execution_requirements`.
-
-            Deprecated. Add "no-sandbox" to `lifecycle_hooks_execution_requirements` instead.
-
         **kwargs: Internal use only
     """
 
@@ -1210,10 +1204,6 @@ def npm_import(
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
     )
-
-    if lifecycle_hooks_no_sandbox:
-        if "no-sandbox" not in lifecycle_hooks_execution_requirements:
-            lifecycle_hooks_execution_requirements.append("no-sandbox")
 
     has_custom_postinstall = not (not custom_postinstall)
     has_lifecycle_hooks = not (not lifecycle_hooks)
