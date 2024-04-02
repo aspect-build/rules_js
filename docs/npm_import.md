@@ -27,8 +27,7 @@ npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-package">pa
            <a href="#npm_import-lifecycle_hooks_env">lifecycle_hooks_env</a>, <a href="#npm_import-lifecycle_hooks_use_default_shell_env">lifecycle_hooks_use_default_shell_env</a>, <a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-url">url</a>, <a href="#npm_import-commit">commit</a>,
            <a href="#npm_import-replace_package">replace_package</a>, <a href="#npm_import-package_visibility">package_visibility</a>, <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>, <a href="#npm_import-custom_postinstall">custom_postinstall</a>, <a href="#npm_import-npm_auth">npm_auth</a>,
            <a href="#npm_import-npm_auth_basic">npm_auth_basic</a>, <a href="#npm_import-npm_auth_username">npm_auth_username</a>, <a href="#npm_import-npm_auth_password">npm_auth_password</a>, <a href="#npm_import-bins">bins</a>, <a href="#npm_import-dev">dev</a>,
-           <a href="#npm_import-register_copy_directory_toolchains">register_copy_directory_toolchains</a>, <a href="#npm_import-register_copy_to_directory_toolchains">register_copy_to_directory_toolchains</a>,
-           <a href="#npm_import-lifecycle_hooks_no_sandbox">lifecycle_hooks_no_sandbox</a>, <a href="#npm_import-kwargs">kwargs</a>)
+           <a href="#npm_import-register_copy_directory_toolchains">register_copy_directory_toolchains</a>, <a href="#npm_import-register_copy_to_directory_toolchains">register_copy_to_directory_toolchains</a>, <a href="#npm_import-kwargs">kwargs</a>)
 </pre>
 
 Import a single npm package into Bazel.
@@ -162,7 +161,6 @@ Read more about the downloader config: <https://blog.aspect.dev/configuring-baze
 | <a id="npm_import-dev"></a>dev |  Whether this npm package is a dev dependency   |  `False` |
 | <a id="npm_import-register_copy_directory_toolchains"></a>register_copy_directory_toolchains |  if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered   |  `True` |
 | <a id="npm_import-register_copy_to_directory_toolchains"></a>register_copy_to_directory_toolchains |  if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered   |  `True` |
-| <a id="npm_import-lifecycle_hooks_no_sandbox"></a>lifecycle_hooks_no_sandbox |  If True, adds "no-sandbox" to `lifecycle_hooks_execution_requirements`.<br><br>Deprecated. Add "no-sandbox" to `lifecycle_hooks_execution_requirements` instead.   |  `None` |
 | <a id="npm_import-kwargs"></a>kwargs |  Internal use only   |  none |
 
 
