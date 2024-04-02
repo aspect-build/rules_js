@@ -194,9 +194,6 @@ def npm_translate_lock(
         use_starlark_yaml_parser = False,
         # TODO(2.0): remove package_json
         package_json = None,
-        # TODO(2.0): remove warn_on_unqualified_tarball_url
-        # buildifier: disable=unused-variable
-        warn_on_unqualified_tarball_url = None,
         **kwargs):
     """Repository macro to generate starlark code from a lock file.
 
@@ -520,8 +517,6 @@ def npm_translate_lock(
         package_json: Deprecated.
 
             Add all `package.json` files that are part of the workspace to `data` instead.
-
-        warn_on_unqualified_tarball_url: Deprecated. Will be removed in next major release.
 
         npm_package_target_name: The name of linked `npm_package` targets. When `npm_package` targets are linked as pnpm workspace
             packages, the name of the target must align with this value.
