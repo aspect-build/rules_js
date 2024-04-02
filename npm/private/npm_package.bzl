@@ -128,7 +128,7 @@ def _npm_package_impl(ctx):
         NpmPackageInfo(
             package = ctx.attr.package,
             version = ctx.attr.version,
-            directory = dst,
+            src = dst,
             npm_package_store_deps = depset([], transitive = npm_package_store_deps),
         ),
     ]
