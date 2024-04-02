@@ -19,10 +19,6 @@ _DEFAULT_PNPM_REPO_NAME = "pnpm"
 def _npm_extension_impl(module_ctx):
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            # TODO(2.0): remove pnpm_version from bzlmod API
-            if attr.pnpm_version:
-                fail("npm_translate_lock paramater 'pnpm_version' is not supported with bzlmod, use `use_pnpm` instead, received value: '{}'")
-
             _npm_translate_lock_bzlmod(attr)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
@@ -81,7 +77,6 @@ def _npm_translate_lock_bzlmod(attr):
         verify_patches = attr.verify_patches,
         yarn_lock = attr.yarn_lock,
         bzlmod = True,
-        pnpm_version = None,
     )
 
 def _npm_lock_imports_bzlmod(module_ctx, attr):
@@ -212,11 +207,6 @@ def _npm_translate_lock_attrs():
     attrs["name"] = attr.string()
     attrs["lifecycle_hooks_exclude"] = attr.string_list(default = [])
     attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = True)
-
-    # Note, pnpm_version can't be a tuple here, so we can't accept the integrity hash.
-    # This is okay since you can just call the pnpm module extension below first.
-    # TODO(2.0): drop pnpm_version from this module extension
-    attrs["pnpm_version"] = attr.string(mandatory = False)
     attrs["run_lifecycle_hooks"] = attr.bool(default = True)
 
     # Args defaulted differently by the macro
