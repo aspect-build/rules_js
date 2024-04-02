@@ -467,6 +467,7 @@ def _download_and_extract_archive(rctx, package_json_only):
         url = download_url,
         integrity = rctx.attr.integrity,
         auth = auth,
+        canonical_id = download_url,
     )
 
     mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
