@@ -172,7 +172,7 @@ def _npm_package_store_impl(ctx):
 
     virtual_store_name = utils.virtual_store_name(package, version)
 
-    src_directory = None
+    src = None
     virtual_store_directory = None
     transitive_files = []
     direct_ref_deps = {}
@@ -188,14 +188,14 @@ def _npm_package_store_impl(ctx):
             expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, virtual_store_directory_path)
         else:
             expected_short_path = paths.join(ctx.label.package, virtual_store_directory_path)
-        src_directory = ctx.attr.src[NpmPackageInfo].directory
-        if src_directory.short_path == expected_short_path:
+        src = ctx.attr.src[NpmPackageInfo].src
+        if src.short_path == expected_short_path:
             # the input is already the desired output; this is the pattern for
             # packages with lifecycle hooks
-            virtual_store_directory = src_directory
+            virtual_store_directory = src
         else:
             virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
-            if utils.is_tarball_extension(src_directory.extension):
+            if utils.is_tarball_extension(src.extension):
                 # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
                 # we can use the --strip-components 1 argument with tar to strip one directory level
                 args = ctx.actions.args()
@@ -205,14 +205,14 @@ def _npm_package_store_impl(ctx):
                 args.add("--strip-components")
                 args.add(str(1))
                 args.add("--file")
-                args.add(src_directory.path)
+                args.add(src.path)
                 args.add("--directory")
                 args.add(virtual_store_directory.path)
 
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
-                    inputs = depset(direct = [src_directory], transitive = [bsdtar.default.files]),
+                    inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [virtual_store_directory],
                     arguments = [args],
                     mnemonic = "NpmPackageExtract",
@@ -221,7 +221,7 @@ def _npm_package_store_impl(ctx):
             else:
                 copy_directory_bin_action(
                     ctx,
-                    src = src_directory,
+                    src = src,
                     dst = virtual_store_directory,
                     copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
                     # Hardlinking source files in external repositories as was done under the hood
