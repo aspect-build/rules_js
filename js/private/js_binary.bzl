@@ -267,8 +267,7 @@ _ATTRS = {
         attribute based on a `config_setting` rule.
         See /js/private/BUILD.bazel in rules_js for an example.
         """,
-        # TODO(2.0): make this mandatory so that downstream binary rules that inherit these attributes are required to set it
-        mandatory = False,
+        mandatory = True,
     ),
     "node_toolchain": attr.label(
         doc = """The Node.js toolchain to use for this target.
