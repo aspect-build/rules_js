@@ -549,9 +549,6 @@ def npm_translate_lock(
         **kwargs: Internal use only
     """
 
-    # TODO(2.0): remove backward compat support for update_pnpm_lock_node_toolchain_prefix
-    update_pnpm_lock_node_toolchain_prefix = kwargs.pop("update_pnpm_lock_node_toolchain_prefix", None)
-
     # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
     if register_copy_directory_toolchains and not native.existing_rule("copy_directory_toolchains"):
         _register_copy_directory_toolchains()
@@ -653,7 +650,7 @@ def npm_translate_lock(
         data = data,
         preupdate = preupdate,
         quiet = quiet,
-        node_toolchain_prefix = update_pnpm_lock_node_toolchain_prefix if update_pnpm_lock_node_toolchain_prefix else node_toolchain_prefix,
+        node_toolchain_prefix = node_toolchain_prefix,
         use_pnpm = use_pnpm,
         yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
