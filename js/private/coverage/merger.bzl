@@ -16,7 +16,7 @@ _ATTRS = {
 # Do the opposite of _to_manifest_path in
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
 # to get back to the short_path.
-# TODO: fix toolchain so we don't have to do this
+# TODO(2.0): fix toolchain so we don't have to do this
 def _target_tool_path_to_short_path(tool_path):
     return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 

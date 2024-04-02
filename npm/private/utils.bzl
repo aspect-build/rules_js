@@ -404,7 +404,7 @@ if [ ! -f $1 ]; then exit 42; fi
     else:
         fail(INTERNAL_ERROR_MSG)
 
-# TODO: move this to aspect_bazel_lib
+# TODO(2.0): move this to aspect_bazel_lib
 def _home_directory(rctx):
     if "HOME" in rctx.os.environ and not repo_utils.is_windows(rctx):
         return rctx.os.environ["HOME"]
