@@ -32,8 +32,7 @@ def _npm_package_internal_impl(ctx):
         NpmPackageInfo(
             package = ctx.attr.package,
             version = ctx.attr.version,
-            # TODO(2.0): rename `directory` to `src` since it may now be an archive file
-            directory = dst,
+            src = dst,
             npm_package_store_deps = depset(),
         ),
     ]
