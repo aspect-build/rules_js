@@ -193,7 +193,6 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 lifecycle_hooks = i.lifecycle_hooks,
                 lifecycle_hooks_env = i.lifecycle_hooks_env,
                 lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements,
-                lifecycle_hooks_no_sandbox = i.lifecycle_hooks_no_sandbox,
                 lifecycle_hooks_use_default_shell_env = i.lifecycle_hooks_use_default_shell_env,
                 link_packages = i.link_packages,
                 link_workspace = i.link_workspace,
