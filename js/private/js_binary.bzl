@@ -454,7 +454,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{workspace_name}}": ctx.workspace_name,
     }
 
-    launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
+    launcher = ctx.actions.declare_file(ctx.label.name)
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = launcher,
