@@ -56,7 +56,7 @@ coverage_pass_test(
     name = "pass",
     data = ["lib.js"],
     enable_runfiles = select({
-        "@aspect_rules_js//js/private:enable_runfiles": True,
+        "@aspect_rules_js//js:enable_runfiles": True,
         "//conditions:default": False,
     }),
     entry_point = "lib.js",
