@@ -19,7 +19,6 @@ for a given lockfile.
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
@@ -74,10 +73,6 @@ def npm_imported_package_store(name):
         version = "{version}",
         dev = {dev},
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -89,10 +84,6 @@ def npm_imported_package_store(name):
         dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # virtual store target with transitive closure of all npm package dependencies
@@ -105,10 +96,6 @@ def npm_imported_package_store(name):
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # filegroup target that provides a single file which is
@@ -133,10 +120,6 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # terminal pre-lifecycle target for use in lifecycle build target below
@@ -147,10 +130,6 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         dev = {dev},
         deps = lc_deps,
         tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),
     )
 
     # lifecycle build action
@@ -232,11 +211,7 @@ def npm_link_imported_package_store(name):
         package = link_alias,
         src = "//{root_package}:{{}}".format(store_target_name),
         visibility = {link_visibility},
-        tags = ["manual"],
-        use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-            "//conditions:default": False,
-        }}),{maybe_bins}
+        tags = ["manual"],{maybe_bins}
     )
 
     # filegroup target that provides a single file which is
@@ -659,8 +634,6 @@ def _npm_import_links_rule_impl(rctx):
     lc_deps = {}
     deps = {}
 
-    bzlmod_supported = is_bazel_6_or_greater()
-
     for (dep_name, dep_version) in rctx.attr.deps.items():
         store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
@@ -733,8 +706,7 @@ def _npm_import_links_rule_impl(rctx):
     if rctx.attr.replace_package:
         npm_package_target = rctx.attr.replace_package
     else:
-        npm_package_target = "{}{}//:pkg".format(
-            "@@" if bzlmod_supported else "@",
+        npm_package_target = "@@{}//:pkg".format(
             npm_import_sources_repo_name,
         )
 
