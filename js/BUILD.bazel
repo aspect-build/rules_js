@@ -1,8 +1,8 @@
 "Public API"
 
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_7_or_greater")
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("//js/private:is_bazel_7_or_greater.bzl", "is_bazel_7_or_greater")
 
 exports_files(
     glob(["*.bzl"]),
