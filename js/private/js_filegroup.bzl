@@ -48,7 +48,7 @@ js_filegroup = rule(
             default = False,
         ),
         "include_npm_linked_packages": attr.bool(
-            doc = """When True, files in `npm_linked_packages` and `transitive_npm_linked_packages` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+            doc = """When True, files in `npm_linked_packages` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
 
             `transitive_files` from `NpmPackageStoreInfo` providers in data targets are also included in the default outputs of the target.
             """,

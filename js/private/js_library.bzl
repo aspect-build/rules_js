@@ -215,13 +215,10 @@ def _js_library_impl(ctx):
     return [
         js_info(
             declarations = declarations,
-            npm_linked_package_files = npm_linked_packages.direct_files,
-            npm_linked_packages = npm_linked_packages.direct,
+            npm_linked_packages = npm_linked_packages,
             npm_package_store_deps = npm_package_store_deps,
             sources = sources,
             transitive_declarations = transitive_declarations,
-            transitive_npm_linked_package_files = npm_linked_packages.transitive_files,
-            transitive_npm_linked_packages = npm_linked_packages.transitive,
             transitive_sources = transitive_sources,
         ),
         DefaultInfo(
