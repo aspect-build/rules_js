@@ -18,7 +18,6 @@ js_binary(
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:utils.bzl", "consistent_label_str", "is_bazel_6_or_greater")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
@@ -257,18 +256,6 @@ _ATTRS = {
         to use npm.
         """,
     ),
-    "unresolved_symlinks_enabled": attr.bool(
-        doc = """Whether unresolved symlinks are enabled in the current build configuration.
-
-        These are enabled with the `--allow_unresolved_symlinks` flag
-        (named `--experimental_allow_unresolved_symlinks in Bazel versions prior to 7.0).
-
-        Typical usage of this rule is via a macro which automatically sets this
-        attribute based on a `config_setting` rule.
-        See /js/private/BUILD.bazel in rules_js for an example.
-        """,
-        mandatory = True,
-    ),
     "node_toolchain": attr.label(
         doc = """The Node.js toolchain to use for this target.
 
@@ -300,14 +287,6 @@ _ATTRS = {
         allow_single_file = True,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
-    "_node_patches_legacy_files": attr.label_list(
-        allow_files = True,
-        default = [Label("@aspect_rules_js//js/private/node-patches_legacy:fs.js")],
-    ),
-    "_node_patches_legacy": attr.label(
-        allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-patches_legacy:register.js"),
-    ),
     "_node_patches_files": attr.label_list(
         allow_files = True,
         default = [Label("@aspect_rules_js//js/private/node-patches:fs.js")],
@@ -330,7 +309,7 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 def _deprecated_target_tool_path_to_short_path(tool_path):
     return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
-def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches):
+def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
     if is_windows:
@@ -458,9 +437,9 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
 
     launcher_subst = {
-        "{{target_label}}": consistent_label_str(ctx, ctx.label),
-        "{{template_label}}": consistent_label_str(ctx, ctx.attr._launcher_template.label),
-        "{{entry_point_label}}": consistent_label_str(ctx, ctx.attr.entry_point.label),
+        "{{target_label}}": str(ctx.label),
+        "{{template_label}}": str(ctx.attr._launcher_template.label),
+        "{{entry_point_label}}": str(ctx.attr.entry_point.label),
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args_expanded),
@@ -468,7 +447,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
-        "{{node_patches}}": ctx.file._node_patches_legacy.short_path if use_legacy_node_patches else ctx.file._node_patches.short_path,
+        "{{node_patches}}": ctx.file._node_patches.short_path,
         "{{node_wrapper}}": node_wrapper.short_path,
         "{{node}}": node_path,
         "{{npm}}": npm_path,
@@ -487,11 +466,6 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
-    is_bazel_6 = is_bazel_6_or_greater()
-    unresolved_symlinks_enabled = False
-    if hasattr(ctx.attr, "unresolved_symlinks_enabled"):
-        unresolved_symlinks_enabled = ctx.attr.unresolved_symlinks_enabled
-    use_legacy_node_patches = not is_bazel_6 or not unresolved_symlinks_enabled
 
     if ctx.attr.node_toolchain:
         nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
@@ -510,7 +484,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches)
+    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
     launcher_files = [bash_launcher]
@@ -522,10 +496,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         # TODO(3.0): drop support for deprecated toolchain attributes
         launcher_files.extend(nodeinfo.tool_files)
 
-    if use_legacy_node_patches:
-        launcher_files.extend(ctx.files._node_patches_legacy_files + [ctx.file._node_patches_legacy])
-    else:
-        launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
+    launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     transitive_launcher_files = None
     if ctx.attr.include_npm:
         if hasattr(nodeinfo, "npm_sources"):
