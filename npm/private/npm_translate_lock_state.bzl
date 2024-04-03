@@ -161,9 +161,11 @@ def _init_pnpm_labels(label_store, rctx):
 def _init_update_labels(priv, rctx, label_store):
     attr = rctx.attr
 
+    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_lock_label_str = "//{}:{}".format(pnpm_lock_label.package, pnpm_lock_label.name)
     action_cache_path = paths.join(
         priv["external_repository_action_cache"],
-        PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(rctx.name) + utils.consistent_label_str(label_store.label("pnpm_lock")))),
+        PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(rctx.name) + pnpm_lock_label_str)),
     )
     label_store.add_root("action_cache", action_cache_path)
     for i, d in enumerate(attr.preupdate):
@@ -408,7 +410,7 @@ def _action_cache_miss(priv, rctx, label_store):
 def _write_action_cache(priv, rctx, label_store):
     contents = [
         "# @generated",
-        "# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").".format(helpers.to_apparent_repo_name(rctx.name), utils.consistent_label_str(label_store.label("pnpm_lock"))),
+        "# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").".format(helpers.to_apparent_repo_name(rctx.name), str(label_store.label("pnpm_lock"))),
         "# This file should be checked into version control along with the pnpm-lock.yaml file.",
     ]
     for key, value in priv["input_hashes"].items():
