@@ -253,7 +253,6 @@ def _virtual_store_name(name, version):
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_file):
-    files = []
     if not is_bazel_6_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
         fail("A minimum version of Bazel 6 required to use rules_js")
@@ -262,9 +261,7 @@ def _make_symlink(ctx, symlink_path, target_file):
         output = symlink,
         target_path = relative_file(target_file.path, symlink.path),
     )
-    files.append(target_file)
-    files.append(symlink)
-    return files
+    return symlink
 
 def _parse_package_name(package):
     # Parse a @scope/name string and return a (scope, name) tuple
