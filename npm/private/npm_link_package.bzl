@@ -78,10 +78,6 @@ def npm_link_package(
             deps = deps,
             visibility = ["//visibility:public"],
             tags = tags,
-            use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }),
             **kwargs
         )
 
@@ -96,10 +92,6 @@ def npm_link_package(
             ),
             tags = tags,
             visibility = visibility,
-            use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
-                "//conditions:default": False,
-            }),
         )
         link_target = ":{}".format(name)
 
