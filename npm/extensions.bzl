@@ -169,6 +169,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                     npm_auth_password = i.npm_auth_password,
                     npm_auth_username = i.npm_auth_username,
                     package = i.package,
+                    package_visibility = i.package_visibility,
                     patch_args = i.patch_args,
                     patches = i.patches,
                     replace_package = i.replace_package,
@@ -202,6 +203,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
                 npm_auth_username = i.npm_auth_username,
                 npm_auth_password = i.npm_auth_password,
                 package = i.package,
+                package_visibility = i.package_visibility,
                 patch_args = i.patch_args,
                 patches = i.patches,
                 replace_package = i.replace_package,
@@ -251,6 +253,7 @@ def _npm_import_attrs():
     # Args defaulted differently by the macro
     attrs["lifecycle_hooks_execution_requirements"] = attr.string_list(default = ["no-sandbox"])
     attrs["patch_args"] = attr.string_list(default = ["-p0"])
+    attrs["package_visibility"] = attr.string_list(default = ["//visibility:public"])
 
     return attrs
 
