@@ -2,7 +2,6 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
-load(":npm_linked_package_info.bzl", "NpmLinkedPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load("//js:providers.bzl", "JsInfo", "js_info")
 
@@ -107,16 +106,6 @@ def _npm_link_package_store_impl(ctx):
 
     transitive_files_depset = depset(files, transitive = [store_info.transitive_files])
 
-    npm_linked_package_info = NpmLinkedPackageInfo(
-        label = ctx.label,
-        link_package = ctx.label.package,
-        package = store_info.package,
-        version = store_info.version,
-        store_info = store_info,
-        files = files_depset,
-        transitive_files = transitive_files_depset,
-    )
-
     providers = [
         DefaultInfo(
             # Only provide direct files in DefaultInfo files
@@ -126,12 +115,9 @@ def _npm_link_package_store_impl(ctx):
             runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
         ),
         js_info(
-            npm_linked_package_files = files_depset,
-            npm_linked_packages = depset([npm_linked_package_info]),
+            npm_linked_packages = transitive_files_depset,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
             npm_package_store_deps = depset([store_info]) if not store_info.dev else depset(),
-            transitive_npm_linked_package_files = transitive_files_depset,
-            transitive_npm_linked_packages = depset([npm_linked_package_info]),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
