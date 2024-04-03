@@ -1,10 +1,10 @@
 "Internal implementation details"
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_7_or_greater")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("//js:defs.bzl", "js_binary")
-load("//js/private:is_bazel_7_or_greater.bzl", "is_bazel_7_or_greater")
 
 exports_files(
     glob(["*.bzl"]),
