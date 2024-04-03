@@ -67,7 +67,9 @@ genrule(
     name = "require_acorn",
     srcs = [
         ":require_acorn_js",
+        # reference the location where the "acorn" npm package was linked in our root Bazel package.
         "//:node_modules/acorn",
+        "//:node_modules/acorn/dir",
     ],
     outs = ["out2"],
     cmd = """
