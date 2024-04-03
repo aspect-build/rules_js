@@ -13,10 +13,10 @@ js_test(
 )
 
 write_source_files(
-    name = "write_npm_translate_wksp_lock",
+    name = "write_npm_translate_lock_wksp",
     files = {
-        "test/snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
-        "test/snapshots/wksp/segfault-handler_defs.bzl": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
+        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/wksp/segfault-handler_defs.bzl": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
@@ -25,10 +25,10 @@ write_source_files(
 )
 
 write_source_files(
-    name = "write_npm_translate_bzlmod_lock",
+    name = "write_npm_translate_lock_bzlmod",
     files = {
-        "test/snapshots/bzlmod/repositories.bzl": "@npm//:repositories.bzl",
-        "test/snapshots/bzlmod/segfault-handler_defs.bzl": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
+        "snapshots/bzlmod/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/bzlmod/segfault-handler_defs.bzl": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": [],

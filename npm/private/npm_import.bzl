@@ -34,12 +34,17 @@ load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")\
 """
 
 _LINK_JS_PACKAGE_LIFECYCLE_LOADS_TMPL = """\
 load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
+
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")\
 """
 
