@@ -162,7 +162,7 @@ def _npm_package_store_impl(ctx):
 
     src = None
     virtual_store_directory = None
-    transitive_files = []
+    files = []
     direct_ref_deps = {}
 
     npm_package_store_deps = []
@@ -234,7 +234,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 for dep_alias in dep_aliases:
                     # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                     dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_alias)
-                    transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
@@ -251,13 +251,12 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             if dep_virtual_store_directory not in linked_virtual_store_directories:
                 # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                 dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
-                transitive_files.extend(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
                 npm_package_store_deps.append(store)
     else:
-        # if ctx.attr.src is _not_ set and ctx.attr.deps is, this is a terminal
-        # package with deps being the transitive closure of deps;
-        # this pattern is used to break circular dependencies between 3rd
-        # party npm deps; it is not recommended for 1st party deps
+        # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
+        # being the transitive closure of deps; this pattern is used to break circular dependencies
+        # between 3rd party npm deps; it is not recommended for 1st party deps
         deps_map = {}
         for dep, _dep_aliases in ctx.attr.deps.items():
             dep_package = dep[NpmPackageStoreInfo].package
@@ -277,8 +276,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             if virtual_store_name == dep_virtual_store_name:
                 # provide the node_modules directory for this package if found in the transitive_closure
                 virtual_store_directory = dep[NpmPackageStoreInfo].virtual_store_directory
-                if virtual_store_directory:
-                    transitive_files.append(virtual_store_directory)
             for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
                 dep_ref_dep_virtual_store_name = utils.virtual_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
                 if not dep_ref_dep_virtual_store_name in deps_map:
@@ -293,9 +290,10 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
                         # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
                         dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
-                        transitive_files.extend(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
+                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
 
-    files = [virtual_store_directory] if virtual_store_directory else []
+    if virtual_store_directory:
+        files.append(virtual_store_directory)
 
     npm_package_store_deps.extend([
         target[NpmPackageStoreInfo]
@@ -304,10 +302,23 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     files_depset = depset(files)
 
-    transitive_files_depset = depset(files, transitive = [depset(transitive_files)] + [
-        npm_package_store.transitive_files
-        for npm_package_store in npm_package_store_deps
-    ])
+    if ctx.attr.src:
+        transitive_files_depset = depset(files, transitive = [
+            npm_package_store.transitive_files
+            for npm_package_store in npm_package_store_deps
+        ])
+    else:
+        # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
+        # being the transitive closure of deps; this pattern is used to break circular dependencies
+        # between 3rd party npm deps; it is not recommended for 1st party deps because
+        # npm_package_store_deps is the transitive closure of all the entire package store deps, we
+        # can safely add just `files` from each of these to `transitive_files_depset`. Doing so
+        # reduces the size of `transitive_files_depset` significantly and reduces analysis time and
+        # Bazel memory usage during analysis
+        transitive_files_depset = depset(files, transitive = [
+            npm_package_store.files
+            for npm_package_store in npm_package_store_deps
+        ])
 
     providers = [
         DefaultInfo(
