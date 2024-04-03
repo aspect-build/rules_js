@@ -174,7 +174,19 @@ this option is not needed.
 
     return copy_file_to_bin_action(ctx, file)
 
-def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_to_bin = False, no_copy_to_bin = [], include_transitive_sources = True, include_declarations = False, include_npm_linked_packages = True):
+def gather_runfiles(
+        ctx,
+        sources,
+        data,
+        deps,
+        data_files = [],
+        copy_data_files_to_bin = False,
+        no_copy_to_bin = [],
+        include_sources = True,
+        include_transitive_sources = True,
+        include_declarations = False,
+        include_transitive_declarations = False,
+        include_npm_linked_packages = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
@@ -210,9 +222,13 @@ def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_t
             file such as a file in an external repository. In most cases, this option is not needed.
             See `copy_data_files_to_bin` docstring for more info.
 
+        include_sources: see js_filegroup documentation
+
         include_transitive_sources: see js_filegroup documentation
 
         include_declarations: see js_filegroup documentation
+
+        include_transitive_declarations: see js_filegroup documentation
 
         include_npm_linked_packages: see js_filegroup documentation
 
@@ -231,12 +247,13 @@ def gather_runfiles(ctx, sources, data, deps, data_files = [], copy_data_files_t
         for target in data
     ])
 
-    # Gather the transitive sources & transitive npm linked packages from the JsInfo &
-    # NpmPackageStoreInfo providers of data & deps targets.
+    # Gather files from JsInfo providers of data & deps
     transitive_files_depsets.append(gather_files_from_js_providers(
         targets = data + deps,
+        include_sources = include_sources,
         include_transitive_sources = include_transitive_sources,
         include_declarations = include_declarations,
+        include_transitive_declarations = include_transitive_declarations,
         include_npm_linked_packages = include_npm_linked_packages,
     ))
 
@@ -296,25 +313,31 @@ def envs_for_log_level(log_level):
 
 def gather_files_from_js_providers(
         targets,
+        include_sources,
         include_transitive_sources,
         include_declarations,
+        include_transitive_declarations,
         include_npm_linked_packages):
     """Gathers files from JsInfo and NpmPackageStoreInfo providers.
 
     Args:
         targets: list of target to gather from
+        include_sources: see js_filegroup documentation
         include_transitive_sources: see js_filegroup documentation
         include_declarations: see js_filegroup documentation
+        include_transitive_declarations: see js_filegroup documentation
         include_npm_linked_packages: see js_filegroup documentation
 
     Returns:
         A depset of files
     """
-    files_depsets = [
-        target[JsInfo].sources
-        for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "sources")
-    ]
+    files_depsets = []
+    if include_sources:
+        files_depsets = [
+            target[JsInfo].sources
+            for target in targets
+            if JsInfo in target and hasattr(target[JsInfo], "sources")
+        ]
     if include_transitive_sources:
         files_depsets.extend([
             target[JsInfo].transitive_sources
@@ -322,6 +345,12 @@ def gather_files_from_js_providers(
             if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
         ])
     if include_declarations:
+        files_depsets.extend([
+            target[JsInfo].declarations
+            for target in targets
+            if JsInfo in target and hasattr(target[JsInfo], "declarations")
+        ])
+    if include_transitive_declarations:
         files_depsets.extend([
             target[JsInfo].transitive_declarations
             for target in targets
