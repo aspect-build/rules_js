@@ -140,10 +140,6 @@ def npm_imported_package_store(name):
         version = "1.3.0",
         dev = False,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -155,10 +151,6 @@ def npm_imported_package_store(name):
         dev = False,
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # virtual store target with transitive closure of all npm package dependencies
@@ -171,17 +163,6 @@ def npm_imported_package_store(name):
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
-    )
-
-    # filegroup target that provides a single file which is
-    # package directory for use in $(execpath) and $(rootpath)
-    native.filegroup(
-        name = "{}/dir".format(store_target_name),
-        srcs = [":{}".format(store_target_name)],
         output_group = "package_directory",
         visibility = ["//visibility:public"],
         tags = ["manual"],
@@ -298,10 +279,6 @@ def npm_imported_package_store(name):
         dev = False,
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # terminal pre-lifecycle target for use in lifecycle build target below
@@ -312,17 +289,6 @@ def npm_imported_package_store(name):
         dev = False,
         deps = lc_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
-    )
-
-    # lifecycle build action
-    _js_run_binary(
-        name = "{}/lc".format(store_target_name),
-        srcs = [
-            "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
             ":{}/pkg_pre_lc".format(store_target_name),
         ],
         # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
@@ -400,10 +366,6 @@ def npm_link_imported_package_store(name):
         src = "//:{}".format(store_target_name),
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # filegroup target that provides a single file which is
