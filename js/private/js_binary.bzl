@@ -200,7 +200,7 @@ _ATTRS = {
         default = False,
     ),
     "include_npm_linked_packages": attr.bool(
-        doc = """When True, files in `npm_linked_packages` and `transitive_npm_linked_packages` from `JsInfo` providers in data targets are included in the runfiles of the target.
+        doc = """When True, files in `npm_linked_packages` from `JsInfo` providers in data targets are included in the runfiles of the target.
 
         `transitive_files` from `NpmPackageStoreInfo` providers in data targets are also included in the runfiles of the target.
         """,
