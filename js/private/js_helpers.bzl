@@ -81,43 +81,14 @@ def gather_npm_linked_packages(srcs, deps):
         deps: dep targets; these typically come from the `deps` attribute of a rule
 
     Returns:
-        A `struct(direct, direct_files, transitive, transitive_files)` of direct and transitive npm linked packages & underlying files gathered
+        Depset of npm linked package files
     """
 
-    # npm_linked_packages
-    npm_linked_packages = [
+    return depset([], transitive = [
         target[JsInfo].npm_linked_packages
-        for target in srcs
+        for target in srcs + deps
         if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
-    ]
-
-    # npm_linked_package_files
-    npm_linked_package_files = [
-        target[JsInfo].npm_linked_package_files
-        for target in srcs
-        if JsInfo in target and hasattr(target[JsInfo], "npm_linked_package_files")
-    ]
-
-    # transitive_npm_linked_packages
-    transitive_npm_linked_packages = depset([], transitive = npm_linked_packages + [
-        target[JsInfo].transitive_npm_linked_packages
-        for target in srcs + deps
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_npm_linked_packages")
     ])
-
-    # transitive_npm_linked_package_files
-    transitive_npm_linked_package_files = depset([], transitive = npm_linked_package_files + [
-        target[JsInfo].transitive_npm_linked_package_files
-        for target in srcs + deps
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_npm_linked_package_files")
-    ])
-
-    return struct(
-        direct = depset([], transitive = npm_linked_packages),
-        direct_files = depset([], transitive = npm_linked_package_files),
-        transitive = transitive_npm_linked_packages,
-        transitive_files = transitive_npm_linked_package_files,
-    )
 
 def gather_npm_package_store_deps(targets):
     """Gathers NpmPackageStoreInfo providers from the list of targets
@@ -358,9 +329,9 @@ def gather_files_from_js_providers(
         ])
     if include_npm_linked_packages:
         files_depsets.extend([
-            target[JsInfo].transitive_npm_linked_package_files
+            target[JsInfo].npm_linked_packages
             for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_npm_linked_package_files")
+            if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
         ])
         files_depsets.extend([
             target[NpmPackageStoreInfo].transitive_files
