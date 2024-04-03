@@ -116,7 +116,7 @@ def npm_link_imported_package_store(name):
         name = name,
         package = link_alias,
         src = "//:{}".format(store_target_name),
-        visibility = ["//visibility:public"],
+        visibility = ["//visibility:private"],
         tags = ["manual"],
         use_declare_symlink = select({
             "@aspect_rules_js//js:allow_unresolved_symlinks": True,
@@ -130,11 +130,11 @@ def npm_link_imported_package_store(name):
         name = "{}/dir".format(name),
         srcs = [":{}".format(name)],
         output_group = "package_directory",
-        visibility = ["//visibility:public"],
+        visibility = ["//visibility:private"],
         tags = ["manual"],
     )
 
-    return [":{}".format(name)] if True else []
+    return [":{}".format(name)] if False else []
 
 # Generated npm_package_store and npm_link_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
@@ -169,7 +169,7 @@ def npm_link_imported_package(
         for link_alias in link_aliases:
             link_target_name = "{}/{}".format(name, link_alias)
             npm_link_imported_package_store(name = link_target_name)
-            if True:
+            if False:
                 link_targets.append(":{}".format(link_target_name))
                 if len(link_alias.split("/", 1)) > 1:
                     link_scope = link_alias.split("/", 1)[0]
