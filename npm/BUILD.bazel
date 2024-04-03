@@ -57,8 +57,6 @@ bzl_library(
     name = "repositories",
     srcs = [
         "repositories.bzl",
-        # bazel_features does not provide bzl_library targets.
-        "@bazel_features//:bzl_files",
     ],
     visibility = ["//visibility:public"],
     deps = [
