@@ -184,7 +184,8 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         execution_requirements = {lifecycle_hooks_execution_requirements},
         mnemonic = "NpmLifecycleHook",
         progress_message = "Running lifecycle hooks on npm package {package}@{version}",
-        env = {lifecycle_hooks_env},{maybe_use_default_shell_env}
+        env = {lifecycle_hooks_env},
+        use_default_shell_env = {use_default_shell_env},
     )
 
     # post-lifecycle npm_package
@@ -786,10 +787,7 @@ def _npm_import_links_rule_impl(rctx):
         virtual_store_root = utils.virtual_store_root,
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
-        # Insert nothing when `lifecycle_hooks_use_default_shell_env` is None to remain backwards-compatible
-        # with bazel-lib `run_binary` before `use_default_shell_env` was added.
-        # TODO(2.0): remove support for old bazel-lib without `run_binary(use_default_shell_env)`
-        maybe_use_default_shell_env = "\n        use_default_shell_env = True," if rctx.attr.lifecycle_hooks_use_default_shell_env else "",
+        use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
     )
 
     npm_link_package_bzl = [

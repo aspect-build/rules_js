@@ -150,6 +150,7 @@ def npm_imported_package_store(name):
         mnemonic = "NpmLifecycleHook",
         progress_message = "Running lifecycle hooks on npm package fsevents@2.3.2",
         env = {},
+        use_default_shell_env = False,
     )
 
     # post-lifecycle npm_package
