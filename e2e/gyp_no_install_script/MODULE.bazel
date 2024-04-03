@@ -17,4 +17,8 @@ npm.npm_translate_lock(
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
-use_repo(npm, "npm")
+use_repo(
+    npm,
+    "npm",
+    "npm__segfault-handler__1.3.0__links",
+)

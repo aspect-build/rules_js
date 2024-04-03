@@ -12,8 +12,23 @@ build_test(
 )
 
 write_source_files(
-    name = "write_npm_translate_lock",
+    name = "write_npm_translate_wksp_lock",
     files = {
-        "repositories_checked.bzl": "@npm//:repositories.bzl",
+        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
     },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+write_source_files(
+    name = "write_npm_translate_bzlmod_lock",
+    files = {
+        "snapshots/bzlmod/repositories_wksp.bzl": "@npm//:repositories.bzl",
+    },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

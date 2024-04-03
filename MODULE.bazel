@@ -217,7 +217,16 @@ npm.npm_translate_lock(
     verify_node_modules_ignored = "//:.bazelignore",
     verify_patches = "//examples/npm_deps/patches:patches",
 )
-use_repo(npm, "npm", "npm__rollup__2.70.2", "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7")
+use_repo(
+    npm,
+    "npm",
+    "npm__chalk__5.0.1__links",
+    "npm__fsevents__2.3.2__links",
+    "npm__rollup__2.70.2",
+    "npm__rollup__2.70.2__links",
+    "npm__unused__0.2.2__links",
+    "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7",
+)
 
 # As an example, manually import a package using explicit coordinates.
 # Just a demonstration of the syntax de-sugaring.
@@ -230,8 +239,11 @@ npm.npm_import(
     root_package = "",
     version = "8.4.0",
 )
-use_repo(npm, "acorn__8.4.0")
-use_repo(npm, "acorn__8.4.0__links")
+use_repo(
+    npm,
+    "acorn__8.4.0",
+    "acorn__8.4.0__links",
+)
 
 # Used by formatter
 go_sdk = use_extension(

@@ -2,7 +2,7 @@
 See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-starlark-utilities
 """
 
-load(":package_json_checked.bzl", rollup_bin = "bin")
+load(":snapshots/wksp/package_json.bzl", rollup_bin = "bin")
 load("@bazel_skylib//lib:unittest.bzl", "loadingtest")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 
