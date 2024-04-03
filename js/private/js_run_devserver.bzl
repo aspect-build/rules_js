@@ -266,10 +266,6 @@ def js_run_devserver(
             Label("@aspect_rules_js//js:enable_runfiles"): True,
             "//conditions:default": False,
         }),
-        unresolved_symlinks_enabled = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
         entry_point = Label("@aspect_rules_js//js/private:js_devserver_entrypoint"),
         # This rule speaks the ibazel protocol
         tags = kwargs.pop("tags", []) + ["ibazel_notify_changes"],

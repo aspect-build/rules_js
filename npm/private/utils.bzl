@@ -275,31 +275,17 @@ def _virtual_store_name(name, version):
 
 def _make_symlink(ctx, symlink_path, target_file):
     files = []
-    if ctx.attr.use_declare_symlink:
-        symlink = ctx.actions.declare_symlink(symlink_path)
-        ctx.actions.symlink(
-            output = symlink,
-            target_path = relative_file(target_file.path, symlink.path),
-        )
-        files.append(target_file)
-    else:
-        if _is_at_least_bazel_6() and target_file.is_directory:
-            # BREAKING CHANGE in Bazel 6 requires you to use declare_directory if your target_file
-            # in ctx.actions.symlink is a directory artifact
-            symlink = ctx.actions.declare_directory(symlink_path)
-        else:
-            symlink = ctx.actions.declare_file(symlink_path)
-        ctx.actions.symlink(
-            output = symlink,
-            target_file = target_file,
-        )
+    if not is_bazel_6_or_greater():
+        # ctx.actions.declare_symlink was added in Bazel 6
+        fail("A minimum version of Bazel 6 required to use rules_js")
+    symlink = ctx.actions.declare_symlink(symlink_path)
+    ctx.actions.symlink(
+        output = symlink,
+        target_path = relative_file(target_file.path, symlink.path),
+    )
+    files.append(target_file)
     files.append(symlink)
     return files
-
-def _is_at_least_bazel_6():
-    # Hacky way to check if the we're using at least Bazel 6. Would be nice if there was a ctx.bazel_version instead.
-    # native.bazel_version only works in repository rules.
-    return "apple_binary" not in dir(native)
 
 def _parse_package_name(package):
     # Parse a @scope/name string and return a (scope, name) tuple
@@ -351,15 +337,6 @@ def _dicts_match(a, b):
         if a[key] != b[key]:
             return False
     return True
-
-# Generate a consistent label string between Bazel versions.
-def _consistent_label_str(label):
-    return "//{}:{}".format(
-        # Starting in Bazel 6, the workspace name is empty for the local workspace and there's no other way to determine it.
-        # This behavior differs from Bazel 5 where the local workspace name was fully qualified in str(label).
-        label.package,
-        label.name,
-    )
 
 # Copies a file from the external repository to the same relative location in the source tree
 def _reverse_force_copy(rctx, label, dst = None):
@@ -508,8 +485,6 @@ utils = struct(
     default_registry = _default_registry,
     hash = _hash,
     dicts_match = _dicts_match,
-    consistent_label_str = _consistent_label_str,
-    bzlmod_supported = is_bazel_6_or_greater(),
     reverse_force_copy = _reverse_force_copy,
     exists = _exists,
     home_directory = _home_directory,
