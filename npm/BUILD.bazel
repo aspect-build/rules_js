@@ -48,7 +48,6 @@ bzl_library(
     srcs = ["providers.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//npm/private:npm_linked_package_info",
         "//npm/private:npm_package_info",
         "//npm/private:npm_package_store_info",
     ],
