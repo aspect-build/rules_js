@@ -66,14 +66,3 @@ EOF
 
 awk 'f;/--SNIP--/{f=1}' e2e/workspace/WORKSPACE
 echo "\`\`\`"
-
-cat <<EOF
-
-To use rules_js with bazel-lib 2.x, you must additionally register the coreutils toolchain.
-
-\`\`\`starlark
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_coreutils_toolchains")
-
-register_coreutils_toolchains()
-\`\`\`
-EOF
