@@ -66,6 +66,7 @@ def _npm_translate_lock_bzlmod(attr):
         quiet = attr.quiet,
         register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
         register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
+        register_coreutils_toolchains = False,  # this registration is handled elsewhere with bzlmod
         register_yq_toolchains = False,  # this registration is handled elsewhere with bzlmod
         register_tar_toolchains = False,  # this registration is handled elsewhere with bzlmod
         replace_packages = attr.replace_packages,
