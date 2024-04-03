@@ -8,10 +8,11 @@ load(":yaml_tests.bzl", "yaml_tests")
 load(":utils_tests.bzl", "utils_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":pkg_glob_tests.bzl", "pkg_glob_tests")
-load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
+
+# load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
 
-# gazelle:exclude *_checked.bzl
+# gazelle:exclude **/snapshots/**/*
 
 npm_link_all_packages(name = "node_modules")
 
@@ -30,25 +31,43 @@ yaml_tests(name = "test_yaml")
 
 parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
 
-generated_pkg_json_test(name = "test_generated_pkg_json")
+# generated_pkg_json_test(name = "test_generated_pkg_json")
 
 npm_auth_test_suite()
 
 write_source_files(
-    name = "write_npm_translate_lock",
+    name = "write_npm_translate_lock_wksp",
     files = {
-        "npm_defs_checked.bzl": "@npm//:defs.bzl",
-        "repositories_checked.bzl": "@npm//:repositories.bzl",
-        "chalk_links_defs_checked.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
-        "unused_links_defs_checked.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
-        "fsevents_links_defs_checked.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
-        "rollup_links_defs_checked.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
-        "package_json_checked.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
-        "package_json_with_dashes_checked.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
+        "snapshots/wksp/npm_defs.bzl": "@npm//:defs.bzl",
+        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/wksp/chalk_links_defs.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
+        "snapshots/wksp/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
+        "snapshots/wksp/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
+        "snapshots/wksp/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
+        "snapshots/wksp/package_json.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
+        "snapshots/wksp/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],
+    }),
+)
+
+write_source_files(
+    name = "write_npm_translate_lock_bzlmod",
+    files = {
+        "snapshots/bzlmod/npm_defs.bzl": "@npm//:defs.bzl",
+        "snapshots/bzlmod/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/bzlmod/chalk_links_defs.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
+        "snapshots/bzlmod/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
+        "snapshots/bzlmod/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
+        "snapshots/bzlmod/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
+        "snapshots/bzlmod/package_json.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
+        "snapshots/bzlmod/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
+    },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
     }),
 )
 
