@@ -37,10 +37,6 @@ def npm_imported_package_store(name):
         version = "2.3.2",
         dev = True,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -52,10 +48,6 @@ def npm_imported_package_store(name):
         dev = True,
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # virtual store target with transitive closure of all npm package dependencies
@@ -68,10 +60,6 @@ def npm_imported_package_store(name):
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # filegroup target that provides a single file which is
@@ -96,10 +84,6 @@ def npm_imported_package_store(name):
         dev = True,
         deps = ref_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # terminal pre-lifecycle target for use in lifecycle build target below
@@ -110,10 +94,6 @@ def npm_imported_package_store(name):
         dev = True,
         deps = lc_deps,
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # lifecycle build action
@@ -196,10 +176,6 @@ def npm_link_imported_package_store(name):
         src = "//:{}".format(store_target_name),
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        use_declare_symlink = select({
-            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
-            "//conditions:default": False,
-        }),
     )
 
     # filegroup target that provides a single file which is
