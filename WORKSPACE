@@ -23,9 +23,7 @@ load("//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_coreutils_toolchains", "register_expand_template_toolchains", "register_jq_toolchains")
-
-register_coreutils_toolchains()
+load("@aspect_bazel_lib//lib:repositories.bzl", "register_expand_template_toolchains", "register_jq_toolchains")
 
 register_expand_template_toolchains()
 
