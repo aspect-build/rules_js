@@ -30,13 +30,24 @@ genrule(
 )
 
 write_source_files(
-    name = "write_shellcheck_launcher",
+    name = "write_launcher_wksp",
     files = {
-        "shellcheck_launcher.sh": ":shell_launcher_sed",
+        "snapshots/wksp/launcher.sh": ":shell_launcher_sed",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],
+    }),
+)
+
+write_source_files(
+    name = "write_launcher_bzlmod",
+    files = {
+        "snapshots/bzlmod/launcher.sh": ":shell_launcher_sed",
+    },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
     }),
 )
 
