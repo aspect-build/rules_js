@@ -18,7 +18,7 @@ js_binary(
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
+load("@aspect_bazel_lib//lib:utils.bzl", "consistent_label_str", "is_bazel_6_or_greater")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
@@ -330,18 +330,6 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 def _deprecated_target_tool_path_to_short_path(tool_path):
     return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
-# Generate a consistent label string between Bazel versions.
-# TODO(2.0): hoist this function to bazel-lib and use from there (as well as the dup in npm/private/utils.bzl)
-def _consistent_label_str(workspace_name, label):
-    # Starting in Bazel 6, the workspace name is empty for the local workspace and there's no other way to determine it.
-    # This behavior differs from Bazel 5 where the local workspace name was fully qualified in str(label).
-    workspace_name = "" if label.workspace_name == workspace_name else label.workspace_name
-    return "@{}//{}:{}".format(
-        workspace_name,
-        label.package,
-        label.name,
-    )
-
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows, use_legacy_node_patches):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
@@ -470,9 +458,9 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
 
     launcher_subst = {
-        "{{target_label}}": _consistent_label_str(ctx.workspace_name, ctx.label),
-        "{{template_label}}": _consistent_label_str(ctx.workspace_name, ctx.attr._launcher_template.label),
-        "{{entry_point_label}}": _consistent_label_str(ctx.workspace_name, ctx.attr.entry_point.label),
+        "{{target_label}}": consistent_label_str(ctx, ctx.label),
+        "{{template_label}}": consistent_label_str(ctx, ctx.attr._launcher_template.label),
+        "{{entry_point_label}}": consistent_label_str(ctx, ctx.attr.entry_point.label),
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args_expanded),
