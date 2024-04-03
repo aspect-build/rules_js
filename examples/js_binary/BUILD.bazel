@@ -471,7 +471,7 @@ write_file(
         { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
         # --- end runfiles.bash initialization v2 ---
 
-        $(rlocation aspect_rules_js/examples/js_binary/bin10-js_binary.sh) "$@"
+        $(rlocation aspect_rules_js/examples/js_binary/bin10-js_binary) "$@"
 """],
 )
 
