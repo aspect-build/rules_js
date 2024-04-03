@@ -428,7 +428,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     )
                     npm_link_all_packages_bzl.append(add_to_scoped_targets)
 
-    # Generate catch all & scoped npm_linked_packages target
+    # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
     for scope, scoped_targets in scope_targets.items():
         _js_library(
