@@ -32,7 +32,7 @@ def _coverage_merger_impl(ctx):
         node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
 
     # Create launcher
-    bash_launcher = ctx.actions.declare_file("%s.sh" % ctx.label.name)
+    bash_launcher = ctx.actions.declare_file(ctx.label.name)
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = bash_launcher,
