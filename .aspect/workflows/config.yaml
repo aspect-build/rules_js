@@ -257,3 +257,5 @@ tasks:
                         - main
     - finalization:
           queue: aspect-small
+notifications:
+    github: {}
