@@ -8,8 +8,7 @@ load(":yaml_tests.bzl", "yaml_tests")
 load(":utils_tests.bzl", "utils_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":pkg_glob_tests.bzl", "pkg_glob_tests")
-
-# load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
+load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
 
 # gazelle:exclude **/snapshots/**/*
@@ -31,7 +30,7 @@ yaml_tests(name = "test_yaml")
 
 parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
 
-# generated_pkg_json_test(name = "test_generated_pkg_json")
+generated_pkg_json_test(name = "test_generated_pkg_json")
 
 npm_auth_test_suite()
 
