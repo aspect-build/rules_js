@@ -14,11 +14,12 @@ def rules_js_dependencies():
         urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.1/bazel-skylib-1.4.1.tar.gz"],
     )
 
-    # TODO(2.0): update to rules_nodejs v6
+    # DNL: testing rules_nodejs from HEAD
     http_archive(
         name = "rules_nodejs",
-        sha256 = "8fc8e300cb67b89ceebd5b8ba6896ff273c84f6099fc88d23f24e7102319d8fd",
-        urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.8.4/rules_nodejs-core-5.8.4.tar.gz"],
+        integrity = "sha256-7oUb51pi91gSXCT8tPEE7+qyW6VD8Wr7ti3lMBPg2O0=",
+        strip_prefix = "rules_nodejs-113efd11503a0c622887e945c237089c54938b77",
+        url = "https://github.com/bazelbuild/rules_nodejs/archive/113efd11503a0c622887e945c237089c54938b77.tar.gz",
     )
 
     http_archive(

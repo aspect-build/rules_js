@@ -11,6 +11,14 @@ local_path_override(
     path = "../..",
 )
 
+# DNL: testing rules_nodejs from HEAD
+archive_override(
+    module_name = "rules_nodejs",
+    integrity = "sha256-7oUb51pi91gSXCT8tPEE7+qyW6VD8Wr7ti3lMBPg2O0=",
+    strip_prefix = "rules_nodejs-113efd11503a0c622887e945c237089c54938b77",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/113efd11503a0c622887e945c237089c54938b77.tar.gz"],
+)
+
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(node, "nodejs_toolchains")
 use_repo(node, "nodejs_darwin_amd64")
