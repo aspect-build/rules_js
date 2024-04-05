@@ -4,7 +4,6 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "aspect_bazel_lib", version = "2.6.1")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 bazel_dep(name = "rules_nodejs", version = "6.0.5")
 bazel_dep(name = "platforms", version = "0.0.4")
