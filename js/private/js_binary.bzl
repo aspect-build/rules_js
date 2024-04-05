@@ -304,11 +304,12 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 # Do the opposite of _to_manifest_path in
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
 # to get back to the short_path.
-# TODO(2.0): fix toolchain so we don't have to do this
-def _target_tool_path_to_short_path(tool_path):
+# TODO(3.0): remove this after a grace period for the DEPRECATED toolchain attributes
+# buildifier: disable=unused-variable
+def _deprecated_target_tool_path_to_short_path(tool_path):
     return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
-def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
+def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
     if is_windows:
@@ -406,7 +407,11 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
 
     npm_path = ""
     if ctx.attr.include_npm:
-        npm_path = _target_tool_path_to_short_path(node_toolchain.nodeinfo.npm_path)
+        if hasattr(nodeinfo, "npm"):
+            npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
+        else:
+            # TODO(3.0): drop support for deprecated toolchain attributes
+            npm_path = _deprecated_target_tool_path_to_short_path(nodeinfo.npm_path)
         if is_windows:
             npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
             ctx.actions.expand_template(
@@ -425,7 +430,11 @@ def _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, l
             )
         toolchain_files.append(npm_wrapper)
 
-    node_path = _target_tool_path_to_short_path(node_toolchain.nodeinfo.target_tool_path)
+    if hasattr(nodeinfo, "node"):
+        node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
+    else:
+        # TODO(3.0): drop support for deprecated toolchain attributes
+        node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
 
     launcher_subst = {
         "{{target_label}}": str(ctx.label),
@@ -459,12 +468,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
     if ctx.attr.node_toolchain:
-        node_toolchain = ctx.attr.node_toolchain[platform_common.ToolchainInfo]
+        nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
     else:
-        node_toolchain = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"]
-
-    if ctx.attr.include_npm and not hasattr(node_toolchain.nodeinfo, "npm_files"):
-        fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
+        nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
     if DirectoryPathInfo in ctx.attr.entry_point:
         entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
@@ -478,14 +484,28 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, node_toolchain, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
+    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    launcher_files = [bash_launcher] + toolchain_files
+    launcher_files = [bash_launcher]
+    launcher_files.extend(toolchain_files)
+    if hasattr(nodeinfo, "node"):
+        if nodeinfo.node:
+            launcher_files.append(nodeinfo.node)
+    else:
+        # TODO(3.0): drop support for deprecated toolchain attributes
+        launcher_files.extend(nodeinfo.tool_files)
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
-    launcher_files.extend(node_toolchain.nodeinfo.tool_files)
+
+    transitive_launcher_files = None
     if ctx.attr.include_npm:
-        launcher_files.extend(node_toolchain.nodeinfo.npm_files)
+        if hasattr(nodeinfo, "npm_sources"):
+            transitive_launcher_files = nodeinfo.npm_sources
+        else:
+            # TODO(3.0): drop support for deprecated toolchain attributes
+            if not hasattr(nodeinfo, "npm_files"):
+                fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
+            launcher_files.extend(nodeinfo.npm_files)
 
     runfiles = gather_runfiles(
         ctx = ctx,
@@ -498,7 +518,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         include_transitive_sources = ctx.attr.include_transitive_sources,
         include_declarations = ctx.attr.include_declarations,
         include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
-    ).merge(ctx.runfiles(files = launcher_files))
+    ).merge(ctx.runfiles(
+        files = launcher_files,
+        transitive_files = transitive_launcher_files,
+    ))
 
     return struct(
         executable = launcher,
