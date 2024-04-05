@@ -10,9 +10,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # TODO(2.0): change minimum to v6 in repositories.bzl
 http_archive(
     name = "rules_nodejs",
-    sha256 = "a50986c7d2f2dc43a5b9b81a6245fd89bdc4866f1d5e316d9cef2782dd859292",
-    strip_prefix = "rules_nodejs-6.0.5",
-    url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.0.5/rules_nodejs-v6.0.5.tar.gz",
+    sha256 = "dddd60acc3f2f30359bef502c9d788f67e33814b0ddd99aa27c5a15eb7a41b8c",
+    strip_prefix = "rules_nodejs-6.1.0",
+    url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.1.0/rules_nodejs-v6.1.0.tar.gz",
 )
 
 load("//js:dev_repositories.bzl", "rules_js_dev_dependencies")

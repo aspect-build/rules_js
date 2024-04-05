@@ -20,7 +20,7 @@ bazel_dep(name = "rules_nodejs", version = "5.8.2")
 # Override rules_nodejs to v6 to test the latest and recommended version internally.
 single_version_override(
     module_name = "rules_nodejs",
-    version = "6.0.5",
+    version = "6.1.0",
 )
 
 bazel_dep(name = "platforms", version = "0.0.5")
