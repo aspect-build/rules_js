@@ -5,6 +5,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load(":repository_label_store.bzl", "repository_label_store")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
@@ -483,7 +484,7 @@ def _load_npmrc(priv, rctx, npmrc_path):
 
 ################################################################################
 def _load_home_npmrc(priv, rctx):
-    home_directory = utils.home_directory(rctx)
+    home_directory = bazel_lib_utils.home_directory(rctx)
     if not home_directory:
         # buildifier: disable=print
         print("""

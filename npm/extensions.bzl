@@ -4,6 +4,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
@@ -107,7 +108,7 @@ def _npm_extension_impl(module_ctx):
                 (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
 
             if attr.use_home_npmrc:
-                home_directory = utils.home_directory(module_ctx)
+                home_directory = bazel_lib_utils.home_directory(module_ctx)
                 if home_directory:
                     home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
                     home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
