@@ -8,12 +8,6 @@ exports_files(
     visibility = ["//docs:__pkg__"],
 )
 
-config_setting(
-    name = "enable_runfiles",
-    values = {"enable_runfiles": "true"},
-    visibility = ["//visibility:public"],
-)
-
 bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
