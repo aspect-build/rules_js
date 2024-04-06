@@ -264,74 +264,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     links_bzl = {}
     links_targets_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        maybe_integrity = ("""
-        integrity = "%s",""" % _import.integrity) if _import.integrity else ""
-        maybe_deps = ("""
-        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
-        maybe_transitive_closure = ("""
-        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
-        maybe_patches = ("""
-        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
-        maybe_patch_args = ("""
-        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
-        maybe_custom_postinstall = ("""
-        custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
-        maybe_lifecycle_hooks = ("""
-        lifecycle_hooks = %s,""" % _import.lifecycle_hooks) if _import.run_lifecycle_hooks and _import.lifecycle_hooks else ""
-        maybe_lifecycle_hooks_env = ("""
-        lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
-        maybe_lifecycle_hooks_execution_requirements = ("""
-        lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks else ""
-        maybe_lifecycle_hooks_use_default_shell_env = ("""
-        lifecycle_hooks_use_default_shell_env = True,""") if _import.lifecycle_hooks_use_default_shell_env else ""
-        maybe_bins = ("""
-        bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
-        maybe_generate_bzl_library_targets = ("""
-        generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
-        maybe_commit = ("""
-        commit = "%s",""" % _import.commit) if _import.commit else ""
-        maybe_npm_auth = ("""
-        npm_auth = "%s",""" % _import.npm_auth) if _import.npm_auth else ""
-        maybe_npm_auth_basic = ("""
-        npm_auth_basic = "%s",""" % _import.npm_auth_basic) if _import.npm_auth_basic else ""
-        maybe_npm_auth_username = ("""
-        npm_auth_username = "%s",""" % _import.npm_auth_username) if _import.npm_auth_username else ""
-        maybe_npm_auth_password = ("""
-        npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
-        maybe_dev = ("""
-        dev = True,""") if _import.dev else ""
-        maybe_replace_package = ("""
-        replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
-
-        repositories_bzl.append(_NPM_IMPORT_TMPL.format(
-            link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
-            link_workspace = link_workspace,
-            maybe_bins = maybe_bins,
-            maybe_commit = maybe_commit,
-            maybe_custom_postinstall = maybe_custom_postinstall,
-            maybe_deps = maybe_deps,
-            maybe_dev = maybe_dev,
-            maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
-            maybe_integrity = maybe_integrity,
-            maybe_lifecycle_hooks = maybe_lifecycle_hooks,
-            maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
-            maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
-            maybe_lifecycle_hooks_use_default_shell_env = maybe_lifecycle_hooks_use_default_shell_env,
-            maybe_npm_auth = maybe_npm_auth,
-            maybe_npm_auth_basic = maybe_npm_auth_basic,
-            maybe_npm_auth_password = maybe_npm_auth_password,
-            maybe_npm_auth_username = maybe_npm_auth_username,
-            maybe_patch_args = maybe_patch_args,
-            maybe_patches = maybe_patches,
-            maybe_replace_package = maybe_replace_package,
-            maybe_transitive_closure = maybe_transitive_closure,
-            name = helpers.to_apparent_repo_name(_import.name),
-            package = _import.package,
-            package_visibility = _import.package_visibility,
-            root_package = _import.root_package,
-            url = _import.url,
-            version = _import.version,
-        ))
+        repositories_bzl.append(_gen_npm_import(rctx, _import, link_workspace))
 
         if _import.link_packages:
             defs_bzl_header.append(
@@ -526,3 +459,73 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(generated_by_lines + contents))
+
+def _gen_npm_import(rctx, _import, link_workspace):
+    maybe_integrity = ("""
+        integrity = "%s",""" % _import.integrity) if _import.integrity else ""
+    maybe_deps = ("""
+        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
+    maybe_transitive_closure = ("""
+        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
+    maybe_patches = ("""
+        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
+    maybe_patch_args = ("""
+        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
+    maybe_custom_postinstall = ("""
+        custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
+    maybe_lifecycle_hooks = ("""
+        lifecycle_hooks = %s,""" % _import.lifecycle_hooks) if _import.run_lifecycle_hooks and _import.lifecycle_hooks else ""
+    maybe_lifecycle_hooks_env = ("""
+        lifecycle_hooks_env = %s,""" % _import.lifecycle_hooks_env) if _import.run_lifecycle_hooks and _import.lifecycle_hooks_env else ""
+    maybe_lifecycle_hooks_execution_requirements = ("""
+        lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.run_lifecycle_hooks else ""
+    maybe_lifecycle_hooks_use_default_shell_env = ("""
+        lifecycle_hooks_use_default_shell_env = True,""") if _import.lifecycle_hooks_use_default_shell_env else ""
+    maybe_bins = ("""
+        bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
+    maybe_generate_bzl_library_targets = ("""
+        generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
+    maybe_commit = ("""
+        commit = "%s",""" % _import.commit) if _import.commit else ""
+    maybe_npm_auth = ("""
+        npm_auth = "%s",""" % _import.npm_auth) if _import.npm_auth else ""
+    maybe_npm_auth_basic = ("""
+        npm_auth_basic = "%s",""" % _import.npm_auth_basic) if _import.npm_auth_basic else ""
+    maybe_npm_auth_username = ("""
+        npm_auth_username = "%s",""" % _import.npm_auth_username) if _import.npm_auth_username else ""
+    maybe_npm_auth_password = ("""
+        npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
+    maybe_dev = ("""
+        dev = True,""") if _import.dev else ""
+    maybe_replace_package = ("""
+        replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
+
+    return _NPM_IMPORT_TMPL.format(
+        link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
+        link_workspace = link_workspace,
+        maybe_bins = maybe_bins,
+        maybe_commit = maybe_commit,
+        maybe_custom_postinstall = maybe_custom_postinstall,
+        maybe_deps = maybe_deps,
+        maybe_dev = maybe_dev,
+        maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
+        maybe_integrity = maybe_integrity,
+        maybe_lifecycle_hooks = maybe_lifecycle_hooks,
+        maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
+        maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
+        maybe_lifecycle_hooks_use_default_shell_env = maybe_lifecycle_hooks_use_default_shell_env,
+        maybe_npm_auth = maybe_npm_auth,
+        maybe_npm_auth_basic = maybe_npm_auth_basic,
+        maybe_npm_auth_password = maybe_npm_auth_password,
+        maybe_npm_auth_username = maybe_npm_auth_username,
+        maybe_patch_args = maybe_patch_args,
+        maybe_patches = maybe_patches,
+        maybe_replace_package = maybe_replace_package,
+        maybe_transitive_closure = maybe_transitive_closure,
+        name = helpers.to_apparent_repo_name(_import.name),
+        package = _import.package,
+        package_visibility = _import.package_visibility,
+        root_package = _import.root_package,
+        url = _import.url,
+        version = _import.version,
+    )
