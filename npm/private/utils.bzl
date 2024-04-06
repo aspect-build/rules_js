@@ -399,9 +399,6 @@ if [ ! -f $1 ]; then exit 42; fi
     else:
         fail(INTERNAL_ERROR_MSG)
 
-def _home_directory(rctx):
-    return repo_utils.get_env_var(rctx, "HOME", None)
-
 def _replace_npmrc_token_envvar(token, npmrc_path, environ):
     # A token can be a reference to an environment variable
     if token.startswith("$"):
@@ -484,7 +481,6 @@ utils = struct(
     dicts_match = _dicts_match,
     reverse_force_copy = _reverse_force_copy,
     exists = _exists,
-    home_directory = _home_directory,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_vendored_tarfile = _is_vendored_tarfile,
     is_tarball_extension = _is_tarball_extension,
