@@ -2,6 +2,7 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_features//:features.bzl", "bazel_features")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
@@ -98,7 +99,7 @@ def _npm_lock_imports_bzlmod(module_ctx, attr):
         (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
 
     if attr.use_home_npmrc:
-        home_directory = utils.home_directory(module_ctx)
+        home_directory = repo_utils.get_home_directory(module_ctx)
         if home_directory:
             home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
             home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))

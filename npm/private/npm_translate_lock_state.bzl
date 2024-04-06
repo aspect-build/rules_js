@@ -493,7 +493,7 @@ def _load_npmrc(priv, rctx, npmrc_path):
 
 ################################################################################
 def _load_home_npmrc(priv, rctx):
-    home_directory = utils.home_directory(rctx)
+    home_directory = repo_utils.get_home_directory(rctx)
     if not home_directory:
         # buildifier: disable=print
         print("""
