@@ -11,7 +11,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 """
 
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
-load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
@@ -332,7 +332,7 @@ WARNING: {name} is not configured to produce outputs.
 If this is a generated bin from package_json.bzl, consider using the *_binary or *_test variant instead.
 See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-published-to-npm
 """.format(
-            name = to_label(name),
+            name = bazel_lib_utils.to_label(name),
         ))
 
     # Configure run from execroot
