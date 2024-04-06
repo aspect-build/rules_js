@@ -4,7 +4,7 @@ module(
 )
 
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-bazel_dep(name = "aspect_bazel_lib", version = "2.6.1")
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.0")
 
 local_path_override(
     module_name = "aspect_rules_js",
