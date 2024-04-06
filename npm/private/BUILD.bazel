@@ -1,7 +1,7 @@
 "Internal implementation details"
 
 load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_7_or_greater")
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
@@ -216,7 +216,7 @@ bzl_library(
         "@aspect_bazel_lib//lib:repo_utils",
         "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:types",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
 
 bzl_library(
