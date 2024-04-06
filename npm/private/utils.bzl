@@ -1,6 +1,6 @@
 "Utility functions for npm rules"
 
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -274,7 +274,7 @@ def _virtual_store_name(name, version):
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_file):
-    if not is_bazel_6_or_greater():
+    if not bazel_lib_utils.is_bazel_6_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
         fail("A minimum version of Bazel 6 required to use rules_js")
     symlink = ctx.actions.declare_symlink(symlink_path)
