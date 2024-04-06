@@ -7,28 +7,9 @@ load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load(
-    "@aspect_bazel_lib//lib:repositories.bzl",
-    "register_copy_directory_toolchains",
-    "register_copy_to_directory_toolchains",
-    "register_coreutils_toolchains",
-    "register_tar_toolchains",
-    "register_yq_toolchains",
-)
+load("@aspect_rules_js//js:configure.bzl", "rules_js_register_toolchains")
 
-register_copy_directory_toolchains()
-
-register_copy_to_directory_toolchains()
-
-register_coreutils_toolchains()
-
-register_tar_toolchains()
-
-register_yq_toolchains()
-
-load("@bazel_features//:deps.bzl", "bazel_features_deps")
-
-bazel_features_deps()
+rules_js_register_toolchains(register_nodejs_toolchain = False)
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
