@@ -3,18 +3,6 @@ workspace(
     name = "aspect_rules_js",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-# Override rules_nodejs to v6 to test the latest and recommended versional internally,
-# while keeping v5 in rules_js_dependencies() to avoid breaking changes.
-# TODO(2.0): change minimum to v6 in repositories.bzl
-http_archive(
-    name = "rules_nodejs",
-    sha256 = "dddd60acc3f2f30359bef502c9d788f67e33814b0ddd99aa27c5a15eb7a41b8c",
-    strip_prefix = "rules_nodejs-6.1.0",
-    url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.1.0/rules_nodejs-v6.1.0.tar.gz",
-)
-
 load("//js:dev_repositories.bzl", "rules_js_dev_dependencies")
 
 rules_js_dev_dependencies()
