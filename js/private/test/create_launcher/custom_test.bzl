@@ -49,7 +49,7 @@ _custom_test = rule(
 def custom_test(**kwargs):
     _custom_test(
         enable_runfiles = select({
-            Label("@aspect_rules_js//js:enable_runfiles"): True,
+            Label("@aspect_bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
         }),
         **kwargs

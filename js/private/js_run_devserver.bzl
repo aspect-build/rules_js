@@ -263,7 +263,7 @@ def js_run_devserver(
     rule_to_execute(
         name = name,
         enable_runfiles = select({
-            Label("@aspect_rules_js//js:enable_runfiles"): True,
+            Label("@aspect_bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
         }),
         entry_point = Label("@aspect_rules_js//js/private:js_devserver_entrypoint"),
