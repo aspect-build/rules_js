@@ -88,19 +88,6 @@ def generate_repository_files(rctx, pnpm_lock_label, importers, packages, patche
 
     npm_imports = helpers.get_npm_imports(importers, packages, patched_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, rctx.attr.lifecycle_hooks_use_default_shell_env, npm_registries, default_registry, npm_auth)
 
-    repositories_bzl = []
-
-    if len(npm_imports) > 0:
-        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
-        repositories_bzl.append("")
-
-    repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(str(pnpm_lock_label)))
-    repositories_bzl.append("# buildifier: disable=function-docstring")
-    repositories_bzl.append("def npm_repositories():")
-    if len(npm_imports) == 0:
-        repositories_bzl.append("    pass")
-        repositories_bzl.append("")
-
     link_packages = [helpers.link_package(root_package, import_path) for import_path in importers.keys()]
 
     defs_bzl_header = ["""# buildifier: disable=bzl-visibility
@@ -259,6 +246,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     # check all links and fail if there are duplicates which can happen with public hoisting
     helpers.check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
+
+    repositories_bzl = []
+
+    if len(npm_imports) > 0:
+        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
+        repositories_bzl.append("")
+
+    repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(str(pnpm_lock_label)))
+    repositories_bzl.append("# buildifier: disable=function-docstring")
+    repositories_bzl.append("def npm_repositories():")
+    if len(npm_imports) == 0:
+        repositories_bzl.append("    pass")
+        repositories_bzl.append("")
 
     stores_bzl = []
     links_bzl = {}
