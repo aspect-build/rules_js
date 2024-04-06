@@ -119,7 +119,7 @@ def _npm_lock_imports_bzlmod(module_ctx, attr):
         (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
 
     if attr.use_home_npmrc:
-        home_directory = utils.home_directory(module_ctx)
+        home_directory = repo_utils.home_directory(module_ctx)
         if home_directory:
             home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
             home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
