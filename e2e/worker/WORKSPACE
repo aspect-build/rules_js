@@ -15,6 +15,25 @@ nodejs_register_toolchains(
     node_version = "14.20.0",
 )
 
+load(
+    "@aspect_bazel_lib//lib:repositories.bzl",
+    "register_copy_directory_toolchains",
+    "register_copy_to_directory_toolchains",
+    "register_coreutils_toolchains",
+    "register_tar_toolchains",
+    "register_yq_toolchains",
+)
+
+register_copy_directory_toolchains()
+
+register_copy_to_directory_toolchains()
+
+register_coreutils_toolchains()
+
+register_tar_toolchains()
+
+register_yq_toolchains()
+
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 
 bazel_features_deps()
