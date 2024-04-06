@@ -1,8 +1,8 @@
 "Bash snippets for js rules"
 
-# TODO(2.0): Instead of setting a new RUNFILES env; just set RUNFILES_DIR if it is not set;
-#            needs testing to know if RUNFILES_DIR is set always set to the same value as RUNFILES
-#            when it is set.
+# TODO: Instead of setting a new RUNFILES env; just set RUNFILES_DIR if it is not set;
+#       needs testing to know if RUNFILES_DIR is set always set to the same value as RUNFILES
+#       when it is set.
 # Bash snipped to initialize the RUNFILES environment variable.
 # Depends on there being a logf_fatal function defined.
 # NB: If this can be generalized fully in the future and not depend on logf_fatal

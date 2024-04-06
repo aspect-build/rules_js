@@ -264,7 +264,6 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     RUNFILES="$PWD/$RUNFILES"
 fi
 
-# TODO(2.0): export only JS_BINARY__RUNFILES
 export RUNFILES
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
