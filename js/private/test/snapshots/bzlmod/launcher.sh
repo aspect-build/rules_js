@@ -365,7 +365,7 @@ if [ ! -f "$entry_point" ]; then
     exit 1
 fi
 
-node="$(_normalize_path "../rules_nodejs~6.0.5~node~nodejs_linux_amd64/bin/nodejs/bin/node")"
+node="$(_normalize_path "../rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/node")"
 if [ "${node:0:1}" = "/" ]; then
     # A user may specify an absolute path to node using target_tool_path in node_toolchain
     export JS_BINARY__NODE_BINARY="$node"
@@ -376,9 +376,9 @@ if [ "${node:0:1}" = "/" ]; then
 else
     if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
         export JS_BINARY__NODE_BINARY
-        JS_BINARY__NODE_BINARY=$(resolve_execroot_src_path "../rules_nodejs~6.0.5~node~nodejs_linux_amd64/bin/nodejs/bin/node")
+        JS_BINARY__NODE_BINARY=$(resolve_execroot_src_path "../rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/node")
     else
-        export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/_main/../rules_nodejs~6.0.5~node~nodejs_linux_amd64/bin/nodejs/bin/node"
+        export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/_main/../rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/node"
     fi
     if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
         logf_fatal "node binary '%s' not found" "$JS_BINARY__NODE_BINARY"
