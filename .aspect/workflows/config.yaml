@@ -227,7 +227,7 @@ workspaces:
     # e2e/webpack_devserver_esm:
 tasks:
     - branch_freshness:
-          update_strategy: none
+          update_strategy: rebase
     - test:
           hooks:
               - type: before_task
