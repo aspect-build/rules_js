@@ -1,7 +1,7 @@
 "Internal implementation details"
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_7_or_greater")
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("//js:defs.bzl", "js_binary")
@@ -28,7 +28,7 @@ bzl_library(
     ],
     deps = [
         ":js_helpers",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
 
 bzl_library(
@@ -47,7 +47,7 @@ bzl_library(
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:windows_utils",
         "@bazel_skylib//lib:dicts",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
 
 bzl_library(
@@ -76,7 +76,7 @@ bzl_library(
         ":js_info",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@bazel_skylib//lib:dicts",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
 
 bzl_library(
@@ -107,7 +107,7 @@ bzl_library(
         ":js_binary",
         ":js_helpers",
         "@bazel_skylib//lib:dicts",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
 
 bzl_library(
@@ -133,7 +133,7 @@ bzl_library(
         "@aspect_bazel_lib//lib:paths",
         "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:paths",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if is_bazel_7_or_greater() else []),
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
 
 copy_to_bin(
