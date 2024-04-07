@@ -8,7 +8,7 @@ load("//js:providers.bzl", "JsInfo", "js_info")
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
 This is used in conjunction with the npm_package_store rule that outputs an npm package into the
-node_modules/.aspect_rules_js virtual store in a pnpm style symlinked node_modules structure.
+node_modules/.aspect_rules_js package store in a pnpm style symlinked node_modules structure.
 
 The term "package" is defined at
 <https://nodejs.org/docs/latest-v16.x/api/packages.html>
@@ -63,24 +63,24 @@ exec node "$basedir/{bin_path}" "$@"
 def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
 
-    virtual_store_directory = store_info.virtual_store_directory
-    if not virtual_store_directory:
-        fail("src must be a npm_link_package that provides a virtual_store_directory")
+    package_store_directory = store_info.package_store_directory
+    if not package_store_directory:
+        fail("src must be a npm_link_package that provides a package_store_directory")
 
-    if virtual_store_directory.owner.workspace_name != ctx.label.workspace_name:
-        msg = "expected virtual_store_directory to be in the same workspace as the link target '{}' but found '{}'".format(
+    if package_store_directory.owner.workspace_name != ctx.label.workspace_name:
+        msg = "expected package_store_directory to be in the same workspace as the link target '{}' but found '{}'".format(
             ctx.label.workspace_name,
-            virtual_store_directory.owner.workspace_name,
+            package_store_directory.owner.workspace_name,
         )
         fail(msg)
 
     package = ctx.attr.package if ctx.attr.package else store_info.package
 
-    # symlink the package's path in the virtual store to the root of the node_modules
+    # symlink the package's path in the package store to the root of the node_modules
     # "node_modules/{package}" so it is available as a direct dependency
     root_symlink_path = paths.join("node_modules", package)
 
-    files = [utils.make_symlink(ctx, root_symlink_path, virtual_store_directory)]
+    files = [utils.make_symlink(ctx, root_symlink_path, package_store_directory)]
 
     for bin_name, bin_path in ctx.attr.bins.items():
         bin_file = ctx.actions.declare_file(paths.join("node_modules", ".bin", bin_name))
