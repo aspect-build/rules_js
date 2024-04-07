@@ -64,7 +64,7 @@ def npm_imported_package_store(name):
     deps = {deps}
     ref_deps = {ref_deps}
 
-    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
+    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
 
     # reference target used to avoid circular deps
     _npm_package_store(
@@ -86,7 +86,7 @@ def npm_imported_package_store(name):
         tags = ["manual"],
     )
 
-    # virtual store target with transitive closure of all npm package dependencies
+    # package store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
         src = None if {transitive_closure_pattern} else "{npm_package_target}",
@@ -203,7 +203,7 @@ def npm_link_imported_package_store(name):
         fail(msg)
 
     link_root_name = name[:-len("/{{}}".format(link_alias))]
-    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
+    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
 
     # terminal package store target to link
     _npm_link_package_store(
@@ -275,7 +275,7 @@ def npm_link_imported_package(
 
 _BIN_MACRO_TMPL = """
 def _{bin_name}_internal(name, link_root_name, **kwargs):
-    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
+    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
@@ -297,7 +297,7 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
     )
 
 def _{bin_name}_test_internal(name, link_root_name, **kwargs):
-    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
+    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
@@ -312,7 +312,7 @@ def _{bin_name}_test_internal(name, link_root_name, **kwargs):
     )
 
 def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
-    store_target_name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)
+    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
@@ -538,7 +538,7 @@ def _npm_import_rule_impl(rctx):
         rctx_files["BUILD.bazel"].append("\n" + rctx.attr.extra_build_content)
 
     if bins:
-        virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+        package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
         package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
 
         for link_package in rctx.attr.link_packages.keys():
@@ -559,8 +559,8 @@ def _npm_import_rule_impl(rctx):
                         package = rctx.attr.package,
                         root_package = rctx.attr.root_package,
                         version = rctx.attr.version,
-                        virtual_store_name = virtual_store_name,
-                        virtual_store_root = utils.virtual_store_root,
+                        package_store_name = package_store_name,
+                        package_store_root = utils.package_store_root,
                     ),
                 )
 
@@ -637,13 +637,13 @@ def _npm_import_links_rule_impl(rctx):
     for (dep_name, dep_version) in rctx.attr.deps.items():
         store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
-            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+            dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
         else:
-            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)"""
+            dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/ref".format(link_root_name)"""
         dep_store_target = dep_store_target.format(
             root_package = rctx.attr.root_package,
-            virtual_store_name = utils.virtual_store_name(store_package, store_version),
-            virtual_store_root = utils.virtual_store_root,
+            package_store_name = utils.package_store_name(store_package, store_version),
+            package_store_root = utils.package_store_root,
         )
         ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
 
@@ -656,26 +656,26 @@ def _npm_import_links_rule_impl(rctx):
             for dep_version in dep_versions:
                 store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+                    dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
                     lc_dep_store_target = dep_store_target
                 else:
-                    dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)"""
+                    dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/pkg".format(link_root_name)"""
                     lc_dep_store_target = dep_store_target
                     if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
                         # special case for lifecycle transitive closure deps; do not depend on
                         # the __pkg of this package as that will be the output directory
                         # of the lifecycle action
-                        lc_dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)"""
+                        lc_dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/pkg_pre_lc_lite".format(link_root_name)"""
 
                 dep_store_target = dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                    virtual_store_root = utils.virtual_store_root,
+                    package_store_name = utils.package_store_name(store_package, store_version),
+                    package_store_root = utils.package_store_root,
                 )
                 lc_dep_store_target = lc_dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                    virtual_store_root = utils.virtual_store_root,
+                    package_store_name = utils.package_store_name(store_package, store_version),
+                    package_store_root = utils.package_store_root,
                 )
 
                 lc_deps[lc_dep_store_target] = lc_deps[lc_dep_store_target] + [dep_name] if lc_dep_store_target in lc_deps else [dep_name]
@@ -684,21 +684,21 @@ def _npm_import_links_rule_impl(rctx):
         for (dep_name, dep_version) in rctx.attr.deps.items():
             store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
             if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+                dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
             else:
-                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+                dep_store_target = """":{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
             dep_store_target = dep_store_target.format(
                 root_package = rctx.attr.root_package,
-                virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                virtual_store_root = utils.virtual_store_root,
+                package_store_name = utils.package_store_name(store_package, store_version),
+                package_store_root = utils.package_store_root,
             )
             lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
             deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
 
-    virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+    package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
 
-    # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-    lifecycle_output_dir = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", rctx.attr.package)
+    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+    lifecycle_output_dir = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", rctx.attr.package)
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(utils.links_repo_suffix)]
@@ -738,7 +738,7 @@ def _npm_import_links_rule_impl(rctx):
     maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(rctx.attr.bins, 3)) if len(rctx.attr.bins) > 0 else ""
 
-    virtual_store_name = utils.virtual_store_name(rctx.attr.package, rctx.attr.version)
+    package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
@@ -762,8 +762,8 @@ def _npm_import_links_rule_impl(rctx):
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
-        virtual_store_name = virtual_store_name,
-        virtual_store_root = utils.virtual_store_root,
+        package_store_name = package_store_name,
+        package_store_root = utils.package_store_root,
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
@@ -999,7 +999,7 @@ def npm_import(
         transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
             package name and value is a list of version(s) depended on in the closure.
 
-        root_package: The root package where the node_modules virtual store is linked to.
+        root_package: The root package where the node_modules package store is linked to.
             Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
 
         link_workspace: The workspace name where links will be created for this package.

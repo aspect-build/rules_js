@@ -262,10 +262,10 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _virtual_store_name(name, version):
-    "Make a virtual store name for a given package and version"
+def _package_store_name(name, version):
+    "Make a package store name for a given package and version"
     if version.startswith("@"):
-        # Special case where the package name should _not_ be included in the virtual store name.
+        # Special case where the package name should _not_ be included in the package store name.
         # See https://github.com/aspect-build/rules_js/issues/423 for more context.
         return version.replace("/", "+")
     else:
@@ -461,11 +461,11 @@ utils = struct(
     parse_pnpm_lock_yaml = _parse_pnpm_lock_yaml,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     friendly_name = _friendly_name,
-    virtual_store_name = _virtual_store_name,
+    package_store_name = _package_store_name,
     strip_peer_dep_or_patched_version = _strip_peer_dep_or_patched_version,
     make_symlink = _make_symlink,
-    # Symlinked node_modules structure virtual store path under node_modules
-    virtual_store_root = ".aspect_rules_js",
+    # Symlinked node_modules structure package store path under node_modules
+    package_store_root = ".aspect_rules_js",
     # Suffix for npm_import links repository
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked package

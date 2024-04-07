@@ -53,9 +53,9 @@ def test_friendly_name(ctx):
     asserts.equals(env, "@scope/y@2.1.1", utils.friendly_name("@scope/y", "2.1.1"))
     return unittest.end(env)
 
-def test_virtual_store_name(ctx):
+def test_package_store_name(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "@scope+y@2.1.1", utils.virtual_store_name("@scope/y", "2.1.1"))
+    asserts.equals(env, "@scope+y@2.1.1", utils.package_store_name("@scope/y", "2.1.1"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -158,7 +158,7 @@ t0_test = unittest.make(test_strip_peer_dep_or_patched_version)
 t1_test = unittest.make(test_bazel_name)
 t2_test = unittest.make(test_pnpm_name)
 t3_test = unittest.make(test_friendly_name)
-t4_test = unittest.make(test_virtual_store_name)
+t4_test = unittest.make(test_package_store_name)
 t5_test = unittest.make(test_version_supported)
 t6_test = unittest.make(test_parse_package_name)
 t7_test = unittest.make(test_npm_registry_download_url)
