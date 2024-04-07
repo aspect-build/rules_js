@@ -50,12 +50,12 @@ def _js_run_devserver_impl(ctx):
     )]
 
     # The .to_list() calls here are intentional and cannot be avoided; they should be small sets of
-    # files as they only include direct npm links (node_modules/foo) and the virtual store tree
+    # files as they only include direct npm links (node_modules/foo) and the package store tree
     # artifacts those symlinks point to (node_modules/.aspect_rules_js/foo@1.2.3/node_modules/foo)
     data_files = []
     for f in depset(transitive = transitive_runfiles + [dep.files for dep in ctx.attr.data]).to_list():
         if "/.aspect_rules_js/" in f.path:
-            # Special handling for virtual store deps; we only include 1st party deps since copying
+            # Special handling for package store deps; we only include 1st party deps since copying
             # all 3rd party node_modules over is expensive for typical graphs
             path_segments = f.path.split("/")
             package_name_segment = path_segments.index(".aspect_rules_js") + 1
@@ -196,8 +196,8 @@ def js_run_devserver(
     The custom sandbox is populated with the default outputs of all targets in `data`
     as well as transitive sources & npm links.
 
-    As an optimization, virtual store files are explicitly excluded from the sandbox since the npm
-    links will point to the virtual store in the execroot and Node.js will follow those links as it
+    As an optimization, package store files are explicitly excluded from the sandbox since the npm
+    links will point to the package store in the execroot and Node.js will follow those links as it
     does within the execroot. As a result, rules_js npm package link targets such as
     `//:node_modules/next` are handled efficiently. Since these targets are symlinks in the output
     tree, they are recreated as symlinks in the custom sandbox and do not incur a full copy of the

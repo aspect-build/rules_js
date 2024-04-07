@@ -513,11 +513,11 @@ describe('testing realpath', async () => {
             {
                 sandbox: {
                     node_modules: {},
-                    virtual_store: { pkg: {} },
+                    package_store: { pkg: {} },
                 },
                 execroot: {
                     node_modules: {},
-                    virtual_store: {
+                    package_store: {
                         pkg: {
                             file: 'contents',
                         },
@@ -527,9 +527,9 @@ describe('testing realpath', async () => {
             async (fixturesDir) => {
                 fixturesDir = fs.realpathSync(fixturesDir)
 
-                // create symlink from execroot/node_modules/pkg to execroot/virtual_store/pkg
+                // create symlink from execroot/node_modules/pkg to execroot/package_store/pkg
                 fs.symlinkSync(
-                    path.join(fixturesDir, 'execroot', 'virtual_store', 'pkg'),
+                    path.join(fixturesDir, 'execroot', 'package_store', 'pkg'),
                     path.join(fixturesDir, 'execroot', 'node_modules', 'pkg')
                 )
 
@@ -538,20 +538,20 @@ describe('testing realpath', async () => {
                     path.join(
                         fixturesDir,
                         'execroot',
-                        'virtual_store',
+                        'package_store',
                         'pkg',
                         'file'
                     ),
                     path.join(
                         fixturesDir,
                         'sandbox',
-                        'virtual_store',
+                        'package_store',
                         'pkg',
                         'file'
                     )
                 )
                 fs.symlinkSync(
-                    path.join(fixturesDir, 'sandbox', 'virtual_store', 'pkg'),
+                    path.join(fixturesDir, 'sandbox', 'package_store', 'pkg'),
                     path.join(fixturesDir, 'sandbox', 'node_modules', 'pkg')
                 )
 
@@ -569,7 +569,7 @@ describe('testing realpath', async () => {
                 const filePath = path.join(
                     fixturesDir,
                     'sandbox',
-                    'virtual_store',
+                    'package_store',
                     'pkg',
                     'file'
                 )
@@ -613,7 +613,7 @@ describe('testing realpath', async () => {
                 const filePath2 = path.join(
                     fixturesDir,
                     'sandbox',
-                    'virtual_store',
+                    'package_store',
                     'pkg'
                 )
 
