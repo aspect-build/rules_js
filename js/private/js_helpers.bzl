@@ -193,15 +193,15 @@ def gather_runfiles(
             file such as a file in an external repository. In most cases, this option is not needed.
             See `copy_data_files_to_bin` docstring for more info.
 
-        include_sources: see js_filegroup documentation
+        include_sources: see js_info_files documentation
 
-        include_transitive_sources: see js_filegroup documentation
+        include_transitive_sources: see js_info_files documentation
 
-        include_declarations: see js_filegroup documentation
+        include_declarations: see js_info_files documentation
 
-        include_transitive_declarations: see js_filegroup documentation
+        include_transitive_declarations: see js_info_files documentation
 
-        include_npm_linked_packages: see js_filegroup documentation
+        include_npm_linked_packages: see js_info_files documentation
 
     Returns:
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
@@ -293,11 +293,11 @@ def gather_files_from_js_providers(
 
     Args:
         targets: list of target to gather from
-        include_sources: see js_filegroup documentation
-        include_transitive_sources: see js_filegroup documentation
-        include_declarations: see js_filegroup documentation
-        include_transitive_declarations: see js_filegroup documentation
-        include_npm_linked_packages: see js_filegroup documentation
+        include_sources: see js_info_files documentation
+        include_transitive_sources: see js_info_files documentation
+        include_declarations: see js_info_files documentation
+        include_transitive_declarations: see js_info_files documentation
+        include_npm_linked_packages: see js_info_files documentation
 
     Returns:
         A depset of files
