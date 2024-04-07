@@ -26,8 +26,21 @@ load(
     _js_image_layer = "js_image_layer",
 )
 
+# buildifier: disable=function-docstring
 def js_binary(**kwargs):
+    include_npm_deps = kwargs.pop("include_npm_deps", False)
+
+    # For backward compat
+    # TODO(3.0): remove backward compat handling
+    include_npm_linked_packages = kwargs.pop("include_npm_linked_packages", None)
+    if include_npm_linked_packages != None:
+        # buildifier: disable=print
+        print("""
+WARNING: js_library 'include_npm_linked_packages' is deprecated. Use 'include_npm_deps' instead.""")
+        include_npm_deps = include_npm_linked_packages
+
     _js_binary(
+        include_npm_deps = include_npm_deps,
         enable_runfiles = select({
             Label("@aspect_bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
@@ -35,6 +48,7 @@ def js_binary(**kwargs):
         **kwargs
     )
 
+# buildifier: disable=function-docstring
 def js_test(**kwargs):
     _js_test(
         enable_runfiles = select({

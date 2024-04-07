@@ -7,12 +7,12 @@ load(":js_info.bzl", "JsInfo")
 
 DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING = """If this list contains linked npm packages, npm package store targets or other targets that provide
 `JsInfo`, `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from
-the `npm_package_store_deps` field of these. For linked npm package targets, the underlying
+the `npm_package_store_infos` field of these. For linked npm package targets, the underlying
 `npm_package_store` target(s) that back the links is used. Gathered `NpmPackageStoreInfo`
 providers are propagated to the direct dependencies of downstream linked `npm_package` targets.
 
 NB: Linked npm package targets that are "dev" dependencies do not forward their underlying
-`npm_package_store` target(s) through `npm_package_store_deps` and will therefore not be
+`npm_package_store` target(s) through `npm_package_store_infos` and will therefore not be
 propagated to the direct dependencies of downstream linked `npm_package` targets. npm packages
 that come in from `npm_translate_lock` are considered "dev" dependencies if they are have
 `dev: true` set in the pnpm lock file. This should be all packages that are only listed as
@@ -73,7 +73,7 @@ def gather_transitive_declarations(declarations, targets):
     ]
     return depset([], transitive = [declarations] + transitive)
 
-def gather_npm_linked_packages(srcs, deps):
+def gather_npm_deps(srcs, deps):
     """Gathers npm linked packages from a list of srcs and deps targets
 
     Args:
@@ -85,12 +85,12 @@ def gather_npm_linked_packages(srcs, deps):
     """
 
     return depset([], transitive = [
-        target[JsInfo].npm_linked_packages
+        target[JsInfo].npm_deps
         for target in srcs + deps
-        if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
+        if JsInfo in target and hasattr(target[JsInfo], "npm_deps")
     ])
 
-def gather_npm_package_store_deps(targets):
+def gather_npm_package_store_infos(targets):
     """Gathers NpmPackageStoreInfo providers from the list of targets
 
     Args:
@@ -100,14 +100,14 @@ def gather_npm_package_store_deps(targets):
         A depset of npm package stores gathered
     """
 
-    # npm_package_store_deps
-    npm_package_store_deps = [
-        target[JsInfo].npm_package_store_deps
+    # npm_package_store_infos
+    npm_package_store_infos = [
+        target[JsInfo].npm_package_store_infos
         for target in targets
         if JsInfo in target
     ]
 
-    return depset([], transitive = npm_package_store_deps)
+    return depset([], transitive = npm_package_store_infos)
 
 def copy_js_file_to_bin_action(ctx, file):
     if ctx.label.workspace_name != file.owner.workspace_name or ctx.label.package != file.owner.package:
@@ -157,7 +157,7 @@ def gather_runfiles(
         include_transitive_sources = True,
         include_declarations = False,
         include_transitive_declarations = False,
-        include_npm_linked_packages = True):
+        include_npm_deps = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
@@ -201,7 +201,7 @@ def gather_runfiles(
 
         include_transitive_declarations: see js_info_files documentation
 
-        include_npm_linked_packages: see js_info_files documentation
+        include_npm_deps: see js_info_files documentation
 
     Returns:
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
@@ -225,7 +225,7 @@ def gather_runfiles(
         include_transitive_sources = include_transitive_sources,
         include_declarations = include_declarations,
         include_transitive_declarations = include_transitive_declarations,
-        include_npm_linked_packages = include_npm_linked_packages,
+        include_npm_deps = include_npm_deps,
     ))
 
     files_runfiles = []
@@ -288,7 +288,7 @@ def gather_files_from_js_info(
         include_transitive_sources,
         include_declarations,
         include_transitive_declarations,
-        include_npm_linked_packages):
+        include_npm_deps):
     """Gathers files from JsInfo and NpmPackageStoreInfo providers.
 
     Args:
@@ -297,7 +297,7 @@ def gather_files_from_js_info(
         include_transitive_sources: see js_info_files documentation
         include_declarations: see js_info_files documentation
         include_transitive_declarations: see js_info_files documentation
-        include_npm_linked_packages: see js_info_files documentation
+        include_npm_deps: see js_info_files documentation
 
     Returns:
         A depset of files
@@ -327,11 +327,11 @@ def gather_files_from_js_info(
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
         ])
-    if include_npm_linked_packages:
+    if include_npm_deps:
         files_depsets.extend([
-            target[JsInfo].npm_linked_packages
+            target[JsInfo].npm_deps
             for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
+            if JsInfo in target and hasattr(target[JsInfo], "npm_deps")
         ])
         files_depsets.extend([
             target[NpmPackageStoreInfo].transitive_files
