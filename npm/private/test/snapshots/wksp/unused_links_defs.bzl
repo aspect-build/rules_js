@@ -53,7 +53,7 @@ def npm_imported_package_store(name):
         tags = ["manual"],
     )
 
-    # virtual store target with transitive closure of all npm package dependencies
+    # package store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
         src = None if True else "@@npm__unused__0.2.2//:pkg",
