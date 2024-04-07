@@ -7,7 +7,7 @@ _DOC = """Gathers files from the JsInfo providers from targets in srcs and provi
 This helper rule is used by the `js_run_binary` macro.
 """
 
-def _js_filegroup_impl(ctx):
+def _js_info_files_impl(ctx):
     return DefaultInfo(files = _gather_files_from_js_providers(
         targets = ctx.attr.srcs,
         include_sources = ctx.attr.include_sources,
@@ -17,9 +17,9 @@ def _js_filegroup_impl(ctx):
         include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
     ))
 
-js_filegroup = rule(
+js_info_files = rule(
     doc = _DOC,
-    implementation = _js_filegroup_impl,
+    implementation = _js_info_files_impl,
     attrs = {
         "srcs": attr.label_list(
             doc = """List of targets to gather files from.""",
