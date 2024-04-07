@@ -55,6 +55,7 @@ jobs:
                   a=(
                     .
                     e2e/bzlmod
+                    e2e/gyp_no_install_script
                     e2e/js_image_docker
                     e2e/js_image_oci
                     e2e/js_run_devserver
@@ -174,31 +175,37 @@ jobs:
                           major: 7
                       bzlmod: 1
                       folder: e2e/update_pnpm_lock_with_import
+                    # gyp_no_install_script is broken in an usual way on 6.5.0
+                    # that is not worth investigating as we're dropping Bazel 6 support soon
+                    - bazel-version:
+                          major: 6
+                      bzlmod: 0
+                      folder: e2e/gyp_no_install_script
                 include:
                     - bazel-version:
                           major: 7
-                          version: 7.0.0
+                          version: 7.1.1
                       bzlmod: 1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 7
-                          version: 7.0.0
+                          version: 7.1.1
                       bzlmod: 1
                       os: macos
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 6
-                          version: 6.4.0
+                          version: 6.5.0
                       bzlmod: 1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 6
-                          version: 6.4.0
+                          version: 6.5.0
                       bzlmod: 1
                       os: macos
                       config: local
