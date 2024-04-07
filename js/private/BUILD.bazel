@@ -20,8 +20,8 @@ exports_files([
 ])
 
 bzl_library(
-    name = "js_filegroup",
-    srcs = ["js_filegroup.bzl"],
+    name = "js_info_files",
+    srcs = ["js_info_files.bzl"],
     visibility = [
         "//docs:__subpackages__",
         "//js:__subpackages__",
@@ -87,8 +87,8 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
-        ":js_filegroup",
         ":js_helpers",
+        ":js_info_files",
         ":js_library",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:run_binary",
