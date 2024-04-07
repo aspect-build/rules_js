@@ -22,8 +22,8 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
-    name = "js_filegroup",
-    bzl_library_target = "//js/private:js_filegroup",
+    name = "js_info_files",
+    bzl_library_target = "//js/private:js_info_files",
 )
 
 stardoc_with_diff_test(

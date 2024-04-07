@@ -15,7 +15,7 @@ load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
-load(":js_filegroup.bzl", _js_filegroup = "js_filegroup")
+load(":js_info_files.bzl", _js_info_files = "js_info_files")
 load(":js_library.bzl", _js_library = "js_library")
 
 def js_run_binary(
@@ -150,11 +150,11 @@ def js_run_binary(
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
-        include_transitive_sources: see `js_filegroup` documentation
+        include_transitive_sources: see `js_info_files` documentation
 
-        include_declarations: see `js_filegroup` documentation
+        include_declarations: see `js_info_files` documentation
 
-        include_npm_linked_packages: see `js_filegroup` documentation
+        include_npm_linked_packages: see `js_info_files` documentation
 
         log_level: Set the logging level of the `js_binary` tool.
 
@@ -245,13 +245,13 @@ def js_run_binary(
     extra_srcs = []
 
     # Hoist js provider files to DefaultInfo
-    make_js_filegroup_target = (include_transitive_sources or
-                                include_declarations or
-                                include_npm_linked_packages)
-    if make_js_filegroup_target:
-        js_filegroup_name = "{}_js_filegroup".format(name)
-        _js_filegroup(
-            name = js_filegroup_name,
+    make_js_info_files_target = (include_transitive_sources or
+                                 include_declarations or
+                                 include_npm_linked_packages)
+    if make_js_info_files_target:
+        js_info_files_name = "{}_js_info_files".format(name)
+        _js_info_files(
+            name = js_info_files_name,
             srcs = srcs,
             include_transitive_sources = include_transitive_sources,
             include_declarations = include_declarations,
@@ -261,7 +261,7 @@ def js_run_binary(
             # Always propagate the testonly attribute
             testonly = kwargs.get("testonly", False),
         )
-        extra_srcs.append(":{}".format(js_filegroup_name))
+        extra_srcs.append(":{}".format(js_info_files_name))
 
     # Copy srcs to bin
     if copy_srcs_to_bin:

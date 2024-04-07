@@ -14,8 +14,8 @@ load(
     _js_run_binary = "js_run_binary",
 )
 load(
-    "//js/private:js_filegroup.bzl",
-    _js_filegroup = "js_filegroup",
+    "//js/private:js_info_files.bzl",
+    _js_info_files = "js_info_files",
 )
 load(
     "//js/private:js_run_devserver.bzl",
@@ -45,7 +45,7 @@ def js_test(**kwargs):
     )
 
 js_run_devserver = _js_run_devserver
-js_filegroup = _js_filegroup
+js_info_files = _js_info_files
 js_library = _js_library
 js_run_binary = _js_run_binary
 js_image_layer = _js_image_layer
