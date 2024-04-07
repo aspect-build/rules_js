@@ -30,7 +30,7 @@ const is1pVirtualStoreDep_true = [
 ]
 for (const p of is1pVirtualStoreDep_true) {
     if (!is1pVirtualStoreDep(p)) {
-        console.error(`ERROR: expected ${p} to be a 1p virtual store dep`)
+        console.error(`ERROR: expected ${p} to be a 1p package store dep`)
         process.exit(1)
     }
 }
@@ -48,7 +48,7 @@ const is1pVirtualStoreDep_false = [
 ]
 for (const p of is1pVirtualStoreDep_false) {
     if (is1pVirtualStoreDep(p)) {
-        console.error(`ERROR: expected ${p} to not be a 1p virtual store dep`)
+        console.error(`ERROR: expected ${p} to not be a 1p package store dep`)
         process.exit(1)
     }
 }
