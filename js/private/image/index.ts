@@ -43,15 +43,6 @@ function findKeyByValue(entries: Entries, value: string): string | undefined {
     return undefined
 }
 
-function leftStrip(p: string, p1: string, p2: string) {
-    if (p.startsWith(p1)) {
-        return p.slice(p1.length)
-    } else if (p.startsWith(p2)) {
-        return p.slice(p2.length)
-    }
-    return p
-}
-
 async function readlinkSafe(p: string) {
     try {
         const link = await readlink(p)
@@ -61,37 +52,6 @@ async function readlinkSafe(p: string) {
             return p
         }
         throw e
-    }
-}
-
-// TODO: drop once we no longer support bazel 5
-async function resolveSymlinkLegacy(relativeP: string) {
-    let prevHop = path.resolve(relativeP)
-    let hopped = false
-    let execrootOutOfSandbox = ''
-    let execroot = process.env.JS_BINARY__EXECROOT!
-    while (true) {
-        let nextHop = await readlinkSafe(prevHop)
-
-        if (!execrootOutOfSandbox && !nextHop.startsWith(execroot)) {
-            execrootOutOfSandbox = nextHop
-                .replace(relativeP, '')
-                .replace(/\/$/, '')
-            prevHop = nextHop
-            continue
-        }
-
-        let relativeNextHop = leftStrip(nextHop, execroot, execrootOutOfSandbox)
-        let relativePrevHop = leftStrip(prevHop, execroot, execrootOutOfSandbox)
-
-        if (relativeNextHop != relativePrevHop) {
-            prevHop = nextHop
-            hopped = true
-        } else if (!hopped) {
-            return undefined
-        } else {
-            return nextHop
-        }
     }
 }
 
@@ -254,11 +214,7 @@ export async function build(
     outputPath: string,
     compression: Compression,
     owner: Owner,
-    useLegacySymlinkDetection: boolean
 ) {
-    const resolveSymlinkFn = useLegacySymlinkDetection
-        ? resolveSymlinkLegacy
-        : resolveSymlink
     const output = pack()
     const existing_paths = new Set<string>()
 
@@ -325,7 +281,7 @@ export async function build(
             )
         }
 
-        const realp = await resolveSymlinkFn(dest)
+        const realp = await resolveSymlink(dest)
 
         // it's important that we don't treat any symlink pointing out of execroot since
         // bazel symlinks external files into sandbox to make them available to us.
@@ -392,7 +348,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
         outputPath,
         compression,
         owner,
-        useLegacySymlinkDetection,
     ] = process.argv.slice(2)
     const raw_entries = await readFile(entriesPath)
     const entries: Entries = JSON.parse(raw_entries.toString())
@@ -401,7 +356,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
         entries,
         outputPath,
         compression as Compression,
-        { uid, gid } as Owner,
-        !!useLegacySymlinkDetection
+        { uid, gid } as Owner
     )
 }
