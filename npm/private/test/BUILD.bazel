@@ -88,7 +88,7 @@ sh_test(
     data = [
         # Test that node_modules/.bin binaries work in both the root package
         # and in subpackages. The relative paths in the two are different since the
-        # actual node entry is in the virtual store which is in the root package.
+        # actual node entry is in the package store which is in the root package.
         "//:node_modules/typescript",
         ":node_modules/typescript",
         # This eager toolchain fetching could be cleaed up in the future
