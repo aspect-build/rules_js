@@ -52,7 +52,7 @@ Installation is included in the `WORKSPACE` snippet you pasted from the Installa
 ### Fetch third-party packages from npm
 
 rules_js accesses npm packages using [pnpm].
-pnpm's "virtual store" of packages aligns with Bazel's "external repositories",
+pnpm's ["symlinked node_modules structure"](https://pnpm.io/symlinked-node-modules-structure) of packages aligns with Bazel's "external repositories",
 and the pnpm "linker" which creates the `node_modules` tree has semantics we can reproduce with Bazel actions.
 
 If your code works with pnpm, then you should expect it works under Bazel as well.
@@ -132,9 +132,9 @@ You can see this working by running `bazel build ...`, then look in the `bazel-b
 You'll see something like this:
 
 ```bash
-# the virtual store
+# the package store
 bazel-bin/node_modules/.aspect_rules_js
-# symlink into the virtual store
+# symlink into the package store
 bazel-bin/node_modules/some_pkg
 # If you used pnpm workspaces:
 bazel-bin/packages/some_pkg/node_modules/some_dep

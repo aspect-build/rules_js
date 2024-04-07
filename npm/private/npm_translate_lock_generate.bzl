@@ -30,7 +30,7 @@ _FP_STORE_TMPL = \
     """
     if is_root:
         _npm_package_store(
-            name = "{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
+            name = "{package_store_root}/{{}}/{package_store_name}".format(name),
             src = "{npm_package_target}",
             package = "{package}",
             version = "0.0.0",
@@ -46,7 +46,7 @@ _FP_DIRECT_TMPL = \
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{{}}/{name}".format(name),
-                src = "//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name),
+                src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
                 visibility = {link_visibility},
                 tags = ["manual"],
             )
@@ -126,10 +126,10 @@ sh_binary(
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
                 store_package, store_version = utils.parse_pnpm_package_key(raw_package, raw_version)
-                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
+                dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
                     root_package = root_package,
-                    virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                    virtual_store_root = utils.virtual_store_root,
+                    package_store_name = utils.package_store_name(store_package, store_version),
+                    package_store_root = utils.package_store_root,
                 )
                 if dep_store_target not in transitive_deps:
                     transitive_deps[dep_store_target] = [raw_package]
@@ -177,10 +177,10 @@ sh_binary(
                         raw_deps = importers.get(dep_importer).get("deps")
                     for raw_package, raw_version in raw_deps.items():
                         store_package, store_version = utils.parse_pnpm_package_key(raw_package, raw_version)
-                        dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(name)""".format(
+                        dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
                             root_package = root_package,
-                            virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                            virtual_store_root = utils.virtual_store_root,
+                            package_store_name = utils.package_store_name(store_package, store_version),
+                            package_store_root = utils.package_store_root,
                         )
                         if dep_store_target not in transitive_deps:
                             transitive_deps[dep_store_target] = [raw_package]
@@ -364,8 +364,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
-            virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
-            virtual_store_root = utils.virtual_store_root,
+            package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+            package_store_root = utils.package_store_root,
         ))
 
         package_visibility, _ = helpers.gather_values_from_matching_names(True, rctx.attr.package_visibility, "*", fp_package)
@@ -380,8 +380,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 name = fp_package,
                 package_directory_output_group = utils.package_directory_output_group,
                 root_package = root_package,
-                virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
-                virtual_store_root = utils.virtual_store_root,
+                package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                package_store_root = utils.package_store_root,
             ))
 
             npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
