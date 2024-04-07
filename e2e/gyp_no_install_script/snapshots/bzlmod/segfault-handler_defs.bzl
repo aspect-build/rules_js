@@ -149,7 +149,7 @@ def npm_imported_package_store(name):
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _npm_package_store(
         name = "{}/pkg".format(store_target_name),
-        src = "{}/pkg_lc".format(store_target_name) if True else "@@aspect_rules_js~override~npm~npm__segfault-handler__1.3.0//:pkg",
+        src = "{}/pkg_lc".format(store_target_name) if True else "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
         package = "segfault-handler",
         version = "1.3.0",
         dev = False,
@@ -164,7 +164,7 @@ def npm_imported_package_store(name):
     # virtual store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
-        src = None if True else "@@aspect_rules_js~override~npm~npm__segfault-handler__1.3.0//:pkg",
+        src = None if True else "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
         package = "segfault-handler",
         version = "1.3.0",
         dev = False,
@@ -322,13 +322,13 @@ def npm_imported_package_store(name):
     _js_run_binary(
         name = "{}/lc".format(store_target_name),
         srcs = [
-            "@@aspect_rules_js~override~npm~npm__segfault-handler__1.3.0//:pkg",
+            "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
             ":{}/pkg_pre_lc".format(store_target_name),
         ],
         # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
         args = [
                    "segfault-handler",
-                   "../../../$(execpath @@aspect_rules_js~override~npm~npm__segfault-handler__1.3.0//:pkg)",
+                   "../../../$(execpath @@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg)",
                    "../../../$(@D)",
                ] +
                select({
