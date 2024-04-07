@@ -219,7 +219,7 @@ def gather_runfiles(
     ])
 
     # Gather files from JsInfo providers of data & deps
-    transitive_files_depsets.append(gather_files_from_js_providers(
+    transitive_files_depsets.append(gather_files_from_js_info(
         targets = data + deps,
         include_sources = include_sources,
         include_transitive_sources = include_transitive_sources,
@@ -282,7 +282,7 @@ def envs_for_log_level(log_level):
         envs.append("JS_BINARY__LOG_DEBUG")
     return envs
 
-def gather_files_from_js_providers(
+def gather_files_from_js_info(
         targets,
         include_sources,
         include_transitive_sources,
