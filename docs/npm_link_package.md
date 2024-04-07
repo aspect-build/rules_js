@@ -13,10 +13,10 @@ npm_link_package(<a href="#npm_link_package-name">name</a>, <a href="#npm_link_p
 
 "Links an npm package to node_modules if link is True.
 
-When called at the root_package, a virtual store target is generated named `link__{bazelified_name}__store`.
+When called at the root_package, a package store target is generated named `link__{bazelified_name}__store`.
 
 When linking, a `{name}` target is generated which consists of the `node_modules/<package>` symlink and transitively
-its virtual store link and the virtual store links of the transitive closure of deps.
+its package store link and the package store links of the transitive closure of deps.
 
 When linking, `{name}/dir` filegroup is also generated that refers to a directory artifact can be used to access
 the package directory for creating entry points or accessing files in the package.
@@ -27,8 +27,8 @@ the package directory for creating entry points or accessing files in the packag
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_package-name"></a>name |  The name of the link target to create if `link` is True. For first-party deps linked across a workspace, the name must match in all packages being linked as it is used to derive the virtual store link target name.   |  none |
-| <a id="npm_link_package-root_package"></a>root_package |  the root package where the node_modules virtual store is linked to   |  `""` |
+| <a id="npm_link_package-name"></a>name |  The name of the link target to create if `link` is True. For first-party deps linked across a workspace, the name must match in all packages being linked as it is used to derive the package store link target name.   |  none |
+| <a id="npm_link_package-root_package"></a>root_package |  the root package where the node_modules package store is linked to   |  `""` |
 | <a id="npm_link_package-link"></a>link |  whether or not to link in this package If false, only the npm_package_store target will be created _if_ this is called in the `root_package`.   |  `True` |
 | <a id="npm_link_package-src"></a>src |  the npm_package target to link; may only to be specified when linking in the root package   |  `None` |
 | <a id="npm_link_package-deps"></a>deps |  list of npm_package_store; may only to be specified when linking in the root package   |  `{}` |

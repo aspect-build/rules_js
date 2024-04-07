@@ -226,7 +226,7 @@ npm.npm_import(
     bins = {"acorn": "./bin/acorn"},
     integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
     package = "acorn",
-    # Root package where to link the virtual store
+    # Root package where to link the package store
     root_package = "",
     version = "8.4.0",
 )
