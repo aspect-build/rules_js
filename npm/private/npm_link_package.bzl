@@ -16,10 +16,10 @@ def npm_link_package(
         **kwargs):
     """"Links an npm package to node_modules if link is True.
 
-    When called at the root_package, a virtual store target is generated named `link__{bazelified_name}__store`.
+    When called at the root_package, a package store target is generated named `link__{bazelified_name}__store`.
 
     When linking, a `{name}` target is generated which consists of the `node_modules/<package>` symlink and transitively
-    its virtual store link and the virtual store links of the transitive closure of deps.
+    its package store link and the package store links of the transitive closure of deps.
 
     When linking, `{name}/dir` filegroup is also generated that refers to a directory artifact can be used to access
     the package directory for creating entry points or accessing files in the package.
@@ -27,8 +27,8 @@ def npm_link_package(
     Args:
         name: The name of the link target to create if `link` is True.
             For first-party deps linked across a workspace, the name must match in all packages
-            being linked as it is used to derive the virtual store link target name.
-        root_package: the root package where the node_modules virtual store is linked to
+            being linked as it is used to derive the package store link target name.
+        root_package: the root package where the node_modules package store is linked to
         link: whether or not to link in this package
             If false, only the npm_package_store target will be created _if_ this is called in the `root_package`.
         src: the npm_package target to link; may only to be specified when linking in the root package
@@ -61,9 +61,9 @@ def npm_link_package(
         msg = "src may only be specified when linking in the root package '{}'".format(root_package)
         fail(msg)
 
-    store_target_name = "{virtual_store_root}/{name}".format(
+    store_target_name = "{package_store_root}/{name}".format(
         name = name,
-        virtual_store_root = utils.virtual_store_root,
+        package_store_root = utils.package_store_root,
     )
 
     tags = kwargs.pop("tags", [])
@@ -71,7 +71,7 @@ def npm_link_package(
         tags.append("manual")
 
     if is_root:
-        # link the virtual store when linking at the root
+        # link the package store when linking at the root
         npm_package_store(
             name = store_target_name,
             src = src,

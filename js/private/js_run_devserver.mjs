@@ -52,7 +52,7 @@ export function isNodeModulePath(p) {
     return false
 }
 
-// Determines if a file path is a 1p dep in the virtual store.
+// Determines if a file path is a 1p dep in the package store.
 // See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
 export function is1pVirtualStoreDep(p) {
     // unscoped1p: https://regex101.com/r/hBR08J/1
@@ -258,12 +258,12 @@ async function sync(files, sandbox, writePerm) {
 
     if (virtualStore1pFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
-            `Syncing ${virtualStore1pFiles.length} first party virtual store dep(s)`
+            `Syncing ${virtualStore1pFiles.length} first party package store dep(s)`
         )
     }
 
-    // Sync first-party virtual store files first since correctly syncing direct 1p node_modules
-    // symlinks depends on checking if the virtual store synced files exist.
+    // Sync first-party package store files first since correctly syncing direct 1p node_modules
+    // symlinks depends on checking if the package store synced files exist.
     let totalSynced = (
         await Promise.all(
             virtualStore1pFiles.map(async (file) => {

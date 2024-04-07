@@ -103,7 +103,7 @@ The documentation says the value provided to each element in the map is:
 > a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
 
 To make plugins work, you should have the Bazel package containing the pnpm workspace root (the folder containing `pnpm-lock.yaml`) in this list.
-This ensures that the tool in the pnpm virtual store `node_modules/.aspect_rules_js` will be able to locate the plugins.
+This ensures that the tool in the package store (`node_modules/.aspect_rules_js`) will be able to locate the plugins.
 If your lockfile is in the root of the Bazel workspace, this value should be an empty string: `""`.
 If the lockfile is in `some/subpkg/pnpm-lock.yaml` then `"some/subpkg"` should appear in the list.
 

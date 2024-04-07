@@ -158,31 +158,31 @@ def _npm_package_store_impl(ctx):
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
 
-    virtual_store_name = utils.virtual_store_name(package, version)
+    package_store_name = utils.package_store_name(package, version)
 
     src = None
-    virtual_store_directory = None
+    package_store_directory = None
     files = []
     direct_ref_deps = {}
 
     npm_package_store_deps = []
 
     if ctx.attr.src:
-        # output the package as a TreeArtifact to its virtual store location
-        # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-        virtual_store_directory_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", package)
+        # output the package as a TreeArtifact to its package store location
+        # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+        package_store_directory_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", package)
 
         if ctx.label.workspace_name:
-            expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, virtual_store_directory_path)
+            expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
         else:
-            expected_short_path = paths.join(ctx.label.package, virtual_store_directory_path)
+            expected_short_path = paths.join(ctx.label.package, package_store_directory_path)
         src = ctx.attr.src[NpmPackageInfo].src
         if src.short_path == expected_short_path:
             # the input is already the desired output; this is the pattern for
             # packages with lifecycle hooks
-            virtual_store_directory = src
+            package_store_directory = src
         else:
-            virtual_store_directory = ctx.actions.declare_directory(virtual_store_directory_path)
+            package_store_directory = ctx.actions.declare_directory(package_store_directory_path)
             if utils.is_tarball_extension(src.extension):
                 # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
                 # we can use the --strip-components 1 argument with tar to strip one directory level
@@ -195,13 +195,13 @@ def _npm_package_store_impl(ctx):
                 args.add("--file")
                 args.add(src.path)
                 args.add("--directory")
-                args.add(virtual_store_directory.path)
+                args.add(package_store_directory.path)
 
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
-                    outputs = [virtual_store_directory],
+                    outputs = [package_store_directory],
                     arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
@@ -210,7 +210,7 @@ def _npm_package_store_impl(ctx):
                 copy_directory_bin_action(
                     ctx,
                     src = src,
-                    dst = virtual_store_directory,
+                    dst = package_store_directory,
                     copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
                     # Hardlinking source files in external repositories as was done under the hood
                     # prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
@@ -219,22 +219,22 @@ def _npm_package_store_impl(ctx):
                     verbose = ctx.attr.verbose,
                 )
 
-        linked_virtual_store_directories = []
+        linked_package_store_directories = []
         for dep, _dep_aliases in ctx.attr.deps.items():
-            # symlink the package's direct deps to its virtual store location
+            # symlink the package's direct deps to its package store location
             if dep[NpmPackageStoreInfo].root_package != ctx.label.package:
                 msg = """npm_package_store in %s package cannot depend on npm_package_store in %s package.
 deps of npm_package_store must be in the same package.""" % (ctx.label.package, dep[NpmPackageStoreInfo].root_package)
                 fail(msg)
             dep_package = dep[NpmPackageStoreInfo].package
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
-            dep_virtual_store_directory = dep[NpmPackageStoreInfo].virtual_store_directory
-            if dep_virtual_store_directory:
-                linked_virtual_store_directories.append(dep_virtual_store_directory)
+            dep_package_store_directory = dep[NpmPackageStoreInfo].package_store_directory
+            if dep_package_store_directory:
+                linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
-                    # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                    dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_alias)
-                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+                    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+                    dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_alias)
+                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
@@ -244,14 +244,14 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
         for store in ctx.attr.src[NpmPackageInfo].npm_package_store_deps.to_list():
             dep_package = store.package
-            dep_virtual_store_directory = store.virtual_store_directory
+            dep_package_store_directory = store.package_store_directory
 
             # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
             # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
-            if dep_virtual_store_directory not in linked_virtual_store_directories:
-                # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, virtual_store_name, "node_modules", dep_package)
-                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_virtual_store_directory))
+            if dep_package_store_directory not in linked_package_store_directories:
+                # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+                dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_package)
+                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory))
                 npm_package_store_deps.append(store)
     else:
         # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
@@ -262,38 +262,38 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             dep_package = dep[NpmPackageStoreInfo].package
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
 
-            # create a map of deps that have virtual store directories
-            if dep[NpmPackageStoreInfo].virtual_store_directory:
-                deps_map[utils.virtual_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)] = dep
+            # create a map of deps that have package store directories
+            if dep[NpmPackageStoreInfo].package_store_directory:
+                deps_map[utils.package_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)] = dep
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
         for dep in ctx.attr.deps:
-            dep_virtual_store_name = utils.virtual_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)
+            dep_package_store_name = utils.package_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)
             dep_ref_deps = dep[NpmPackageStoreInfo].ref_deps
-            if virtual_store_name == dep_virtual_store_name:
+            if package_store_name == dep_package_store_name:
                 # provide the node_modules directory for this package if found in the transitive_closure
-                virtual_store_directory = dep[NpmPackageStoreInfo].virtual_store_directory
+                package_store_directory = dep[NpmPackageStoreInfo].package_store_directory
             for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
-                dep_ref_dep_virtual_store_name = utils.virtual_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
-                if not dep_ref_dep_virtual_store_name in deps_map:
+                dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
+                if not dep_ref_dep_package_store_name in deps_map:
                     # This can happen in lifecycle npm package targets. We have no choice but to
                     # ignore reference back to self in dyadic circular deps in this case since a
                     # transitive dep on this npm package is impossible in an action that is
-                    # outputting the virtual store tree artifact that circular dep would point to.
+                    # outputting the package store tree artifact that circular dep would point to.
                     continue
-                actual_dep = deps_map[dep_ref_dep_virtual_store_name]
-                dep_ref_def_virtual_store_directory = actual_dep[NpmPackageStoreInfo].virtual_store_directory
-                if dep_ref_def_virtual_store_directory:
+                actual_dep = deps_map[dep_ref_dep_package_store_name]
+                dep_ref_def_package_store_directory = actual_dep[NpmPackageStoreInfo].package_store_directory
+                if dep_ref_def_package_store_directory:
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
-                        # "node_modules/{virtual_store_root}/{virtual_store_name}/node_modules/{package}"
-                        dep_ref_dep_symlink_path = paths.join("node_modules", utils.virtual_store_root, dep_virtual_store_name, "node_modules", dep_ref_dep_alias)
-                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_virtual_store_directory))
+                        # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+                        dep_ref_dep_symlink_path = paths.join("node_modules", utils.package_store_root, dep_package_store_name, "node_modules", dep_ref_dep_alias)
+                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory))
 
-    if virtual_store_directory:
-        files.append(virtual_store_directory)
+    if package_store_directory:
+        files.append(package_store_directory)
 
     npm_package_store_deps.extend([
         target[NpmPackageStoreInfo]
@@ -329,17 +329,17 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             package = package,
             version = version,
             ref_deps = direct_ref_deps,
-            virtual_store_directory = virtual_store_directory,
+            package_store_directory = package_store_directory,
             files = files_depset,
             transitive_files = transitive_files_depset,
             dev = ctx.attr.dev,
         ),
     ]
-    if virtual_store_directory:
+    if package_store_directory:
         # Provide an output group that provides a single file which is the
         # package directory for use in $(execpath) and $(rootpath).
         # Output group name must match utils.package_directory_output_group
-        providers.append(OutputGroupInfo(package_directory = depset([virtual_store_directory])))
+        providers.append(OutputGroupInfo(package_directory = depset([package_store_directory])))
 
     return providers
 
