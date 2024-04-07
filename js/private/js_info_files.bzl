@@ -1,6 +1,6 @@
 """Helper rule to gather files from JsInfo providers of targets and provide them as default outputs"""
 
-load("//js/private:js_helpers.bzl", _gather_files_from_js_providers = "gather_files_from_js_providers")
+load("//js/private:js_helpers.bzl", _gather_files_from_js_info = "gather_files_from_js_info")
 
 _DOC = """Gathers files from the JsInfo providers from targets in srcs and provides them as default outputs.
 
@@ -8,7 +8,7 @@ This helper rule is used by the `js_run_binary` macro.
 """
 
 def _js_info_files_impl(ctx):
-    return DefaultInfo(files = _gather_files_from_js_providers(
+    return DefaultInfo(files = _gather_files_from_js_info(
         targets = ctx.attr.srcs,
         include_sources = ctx.attr.include_sources,
         include_transitive_sources = ctx.attr.include_transitive_sources,

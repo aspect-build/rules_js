@@ -1,7 +1,7 @@
 "Implementation details for js_run_devserver rule"
 
 load(":js_binary.bzl", "js_binary_lib")
-load(":js_helpers.bzl", _gather_files_from_js_providers = "gather_files_from_js_providers")
+load(":js_helpers.bzl", _gather_files_from_js_info = "gather_files_from_js_info")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
 _attrs = dicts.add(js_binary_lib.attrs, {
@@ -40,7 +40,7 @@ def _js_run_devserver_impl(ctx):
     if use_tool and ctx.attr.command:
         fail("Only one of tool or command may be specified")
 
-    transitive_runfiles = [_gather_files_from_js_providers(
+    transitive_runfiles = [_gather_files_from_js_info(
         targets = ctx.attr.data,
         include_sources = True,
         include_transitive_sources = ctx.attr.include_transitive_sources,
