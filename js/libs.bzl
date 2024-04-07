@@ -14,7 +14,7 @@ load(
     _JS_LIBRARY_DATA_ATTR = "JS_LIBRARY_DATA_ATTR",
     _LOG_LEVELS = "LOG_LEVELS",
     _envs_for_log_level = "envs_for_log_level",
-    _gather_files_from_js_providers = "gather_files_from_js_providers",
+    _gather_files_from_js_info = "gather_files_from_js_info",
     _gather_npm_linked_packages = "gather_npm_linked_packages",
     _gather_npm_package_store_deps = "gather_npm_package_store_deps",
     _gather_runfiles = "gather_runfiles",
@@ -27,7 +27,7 @@ js_library_lib = _js_library_lib
 
 js_lib_helpers = struct(
     envs_for_log_level = _envs_for_log_level,
-    gather_files_from_js_providers = _gather_files_from_js_providers,
+    gather_files_from_js_info = _gather_files_from_js_info,
     gather_npm_linked_packages = _gather_npm_linked_packages,
     gather_npm_package_store_deps = _gather_npm_package_store_deps,
     gather_runfiles = _gather_runfiles,
