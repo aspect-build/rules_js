@@ -14,7 +14,6 @@ js_image_layer(
 """
 
 load("@aspect_bazel_lib//lib:paths.bzl", "to_rlocation_path")
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """Create container image layers from js_binary targets.
@@ -221,8 +220,6 @@ def _build_layer(ctx, type, entries, inputs):
     args.add(output)
     args.add(ctx.attr.compression)
     args.add(ctx.attr.owner)
-    if not bazel_lib_utils.is_bazel_6_or_greater():
-        args.add("true")
 
     ctx.actions.run(
         inputs = inputs + [entries_output],
