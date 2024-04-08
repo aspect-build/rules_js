@@ -21,14 +21,3 @@ write_source_files(
         "//conditions:default": [],
     }),
 )
-
-write_source_files(
-    name = "write_npm_translate_lock_bzlmod",
-    files = {
-        "snapshots/bzlmod/repositories.bzl": "@npm//:repositories.bzl",
-    },
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
-)
