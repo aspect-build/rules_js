@@ -27,7 +27,6 @@ write_source_files(
 write_source_files(
     name = "write_npm_translate_lock_bzlmod",
     files = {
-        "snapshots/bzlmod/repositories.bzl": "@npm//:repositories.bzl",
         "snapshots/bzlmod/segfault-handler_defs.bzl": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
     },
     target_compatible_with = select({
