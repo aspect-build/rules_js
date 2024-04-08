@@ -294,8 +294,8 @@ importers:
         specifier: 9.3.0
         version: 9.3.0
       plotly.js:
-        specifier: 2.25.2
-        version: 2.25.2
+        specifier: 2.30.1
+        version: 2.30.1(mapbox-gl@1.10.1)
       protoc-gen-grpc:
         specifier: git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f
         version: github.com/gregmagolan-codaio/protoc-gen-grpc-ts/be5580b06348d3eb9b4610a4a94065154a0df41f
@@ -1010,6 +1010,36 @@ packages:
     resolution: {integrity: sha512-x49ThEu1FRA00kTso4Jdfyf2byaCPLBGmLjAYQz5OzaPyLUhHesX3/Nfv2OHEhynhdy2UB39DLXq6thYe2L2kg==}
     dev: true
 
+  /@plotly/mapbox-gl@1.13.4(mapbox-gl@1.10.1):
+    resolution: {integrity: sha512-sR3/Pe5LqT/fhYgp4rT4aSFf1rTsxMbGiH6Hojc7PH36ny5Bn17iVFUjpzycafETURuFbLZUfjODO8LvSI+5zQ==}
+    engines: {node: '>=6.4.0'}
+    dependencies:
+      '@mapbox/geojson-rewind': 0.5.2
+      '@mapbox/geojson-types': 1.0.2
+      '@mapbox/jsonlint-lines-primitives': 2.0.2
+      '@mapbox/mapbox-gl-supported': 1.5.0(mapbox-gl@1.10.1)
+      '@mapbox/point-geometry': 0.1.0
+      '@mapbox/tiny-sdf': 1.2.5
+      '@mapbox/unitbezier': 0.0.0
+      '@mapbox/vector-tile': 1.3.1
+      '@mapbox/whoots-js': 3.1.0
+      csscolorparser: 1.0.3
+      earcut: 2.2.4
+      geojson-vt: 3.2.1
+      gl-matrix: 3.4.3
+      grid-index: 1.1.0
+      murmurhash-js: 1.0.0
+      pbf: 3.2.1
+      potpack: 1.0.2
+      quickselect: 2.0.0
+      rw: 1.3.3
+      supercluster: 7.1.5
+      tinyqueue: 2.0.3
+      vt-pbf: 3.1.3
+    transitivePeerDependencies:
+      - mapbox-gl
+    dev: true
+
   /@plotly/point-cluster@3.1.9:
     resolution: {integrity: sha512-MwaI6g9scKf68Orpr1pHZ597pYx9uP8UEFXLPbsCmuw3a84obwz6pnMXGc90VhgDNeNiLEdlmuK7CPo+5PIxXw==}
     dependencies:
@@ -1302,6 +1332,14 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
     dev: true
+
+  /@types/yauzl@2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
+    requiresBuild: true
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.11.18
+    dev: true
+    optional: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -1769,6 +1807,11 @@ packages:
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
+  /base64-arraybuffer@1.0.2:
+    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
+    engines: {node: '>= 0.6.0'}
+    dev: true
+
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
@@ -2165,6 +2208,12 @@ packages:
       color-name: 1.1.4
       defined: 1.0.1
       is-plain-obj: 1.1.0
+    dev: true
+
+  /color-parse@2.0.0:
+    resolution: {integrity: sha512-g2Z+QnWsdHLppAbrpcFWo629kLOnOPtpxYV69GCqm92gqSgyXbzlfyN3MXs0412fPBkFmiuS+rXposgBgBa6Kg==}
+    dependencies:
+      color-name: 1.1.4
     dev: true
 
   /color-rgba@2.1.1:
@@ -3097,7 +3146,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': registry.npmjs.org/@types/yauzl@2.10.0
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5235,19 +5284,21 @@ packages:
       pathe: 1.1.0
     dev: true
 
-  /plotly.js@2.25.2:
-    resolution: {integrity: sha512-Pf6dPYGl21W7A3FTgLQ52fpgvrqGhCPDT3+612bxwg4QXlvxhnoFwvuhT1BRW/l2nbYGpRoUH79K54yf2vCMVQ==}
+  /plotly.js@2.30.1(mapbox-gl@1.10.1):
+    resolution: {integrity: sha512-KE3KeM4B6qtjPU7FGOxklmwYua4nWGgr48BRMWZVysZjphlSaQLzvUAieFlUCfPBPfJIRBLxFQy1KHMIQgfwrA==}
     dependencies:
       '@plotly/d3': 3.8.1
       '@plotly/d3-sankey': 0.7.2
       '@plotly/d3-sankey-circular': 0.33.1
+      '@plotly/mapbox-gl': 1.13.4(mapbox-gl@1.10.1)
       '@turf/area': 6.5.0
       '@turf/bbox': 6.5.0
       '@turf/centroid': 6.5.0
+      base64-arraybuffer: 1.0.2
       canvas-fit: 1.5.0
       color-alpha: 1.0.4
       color-normalize: 1.5.0
-      color-parse: 1.3.8
+      color-parse: 2.0.0
       color-rgba: 2.1.1
       country-regex: 1.1.0
       d3-force: 1.2.1
@@ -5261,11 +5312,9 @@ packages:
       fast-isnumeric: 1.1.4
       gl-mat4: 1.2.0
       gl-text: 1.3.1
-      glslify: 7.1.1
       has-hover: 1.0.1
       has-passive-events: 1.0.0
       is-mobile: 4.0.0
-      mapbox-gl: 1.10.1
       mouse-change: 1.4.0
       mouse-event-offset: 3.0.2
       mouse-wheel: 1.2.0
@@ -5276,7 +5325,7 @@ packages:
       probe-image-size: 7.2.3
       regl: /@plotly/regl@2.1.2
       regl-error2d: 2.0.12
-      regl-line2d: 3.1.2
+      regl-line2d: 3.1.3
       regl-scatter2d: 3.3.1
       regl-splom: 1.0.14
       strongly-connected-components: 1.0.1
@@ -5288,6 +5337,7 @@ packages:
       webgl-context: 2.2.0
       world-calendars: 1.0.3
     transitivePeerDependencies:
+      - mapbox-gl
       - supports-color
     dev: true
 
@@ -5609,8 +5659,8 @@ packages:
       update-diff: 1.1.0
     dev: true
 
-  /regl-line2d@3.1.2:
-    resolution: {integrity: sha512-nmT7WWS/WxmXAQMkgaMKWXaVmwJ65KCrjbqHGOUjjqQi6shfT96YbBOvelXwO9hG7/hjvbzjtQ2UO0L3e7YaXQ==}
+  /regl-line2d@3.1.3:
+    resolution: {integrity: sha512-fkgzW+tTn4QUQLpFKsUIE0sgWdCmXAM3ctXcCgoGBZTSX5FE2A0M7aynz7nrZT5baaftLrk9te54B+MEq4QcSA==}
     dependencies:
       array-bounds: 1.0.1
       array-find-index: 1.0.2
@@ -5619,7 +5669,6 @@ packages:
       earcut: 2.2.4
       es6-weak-map: 2.0.3
       flatten-vertex-data: 1.0.2
-      glslify: 7.1.1
       object-assign: 4.1.1
       parse-rect: 1.2.0
       pick-by-alias: 1.2.0
@@ -7009,9 +7058,6 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       google-protobuf: 3.21.2
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
     dev: true
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
@@ -7238,13 +7284,3 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.11.18
     dev: true
-
-  registry.npmjs.org/@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
-    name: '@types/yauzl'
-    version: 2.10.0
-    requiresBuild: true
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
-    dev: true
-    optional: true
