@@ -14,7 +14,7 @@ def _js_info_files_impl(ctx):
         include_transitive_sources = ctx.attr.include_transitive_sources,
         include_declarations = ctx.attr.include_declarations,
         include_transitive_declarations = ctx.attr.include_transitive_declarations,
-        include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
+        include_npm_sources = ctx.attr.include_npm_sources,
     ))
 
 js_info_files = rule(
@@ -47,8 +47,8 @@ js_info_files = rule(
             time due to having to generate typings on source file changes.""",
             default = False,
         ),
-        "include_npm_linked_packages": attr.bool(
-            doc = """When True, files in `npm_linked_packages` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+        "include_npm_sources": attr.bool(
+            doc = """When True, files in `npm_sources` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
 
             `transitive_files` from `NpmPackageStoreInfo` providers in data targets are also included in the default outputs of the target.
             """,

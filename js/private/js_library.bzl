@@ -24,7 +24,7 @@ js_library(
 """
 
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_linked_packages", "gather_npm_package_store_infos", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
@@ -190,7 +190,7 @@ def _js_library_impl(ctx):
         targets = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
     )
 
-    npm_linked_packages = gather_npm_linked_packages(
+    npm_sources = gather_npm_sources(
         srcs = ctx.attr.srcs + ctx.attr.declarations,
         deps = ctx.attr.deps,
     )
@@ -209,13 +209,13 @@ def _js_library_impl(ctx):
         no_copy_to_bin = ctx.files.no_copy_to_bin,
         include_transitive_sources = True,
         include_declarations = False,
-        include_npm_linked_packages = True,
+        include_npm_sources = True,
     )
 
     return [
         js_info(
             declarations = declarations,
-            npm_linked_packages = npm_linked_packages,
+            npm_sources = npm_sources,
             npm_package_store_infos = npm_package_store_infos,
             sources = sources,
             transitive_declarations = transitive_declarations,
