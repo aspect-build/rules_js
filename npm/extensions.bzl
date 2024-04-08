@@ -234,6 +234,8 @@ def _npm_translate_lock_attrs():
     # Args defaulted differently by the macro
     attrs["npm_package_target_name"] = attr.string(default = "{dirname}")
 
+    attrs.pop("repositories_bzl_filename")
+
     return attrs
 
 def _npm_import_attrs():
