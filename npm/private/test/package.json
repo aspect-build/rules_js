@@ -12,7 +12,7 @@
         "handlebars-helpers/helper-date": "github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55",
         "hot-shots": "10.0.0",
         "inline-fixtures": "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
-        "json-stable-stringify": "1.0.1",
+        "json-stable-stringify": "1.1.1",
         "lodash": "file:vendored/lodash-4.17.21.tgz",
         "node-gyp": "9.3.0",
         "plotly.js": "2.25.2",
