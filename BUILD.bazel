@@ -65,7 +65,7 @@ diff_test(
 )
 
 # Example of manually linking a first-party dependency. Its transitive npm dependencies
-# are picked up automatically via 'npm_package_store_deps' in the js_library targets that
+# are picked up automatically via 'npm_package_store_infos' in the js_library targets that
 # the `npm_package` target depends on.
 npm_link_package(
     name = "node_modules/@mycorp/pkg-b",
