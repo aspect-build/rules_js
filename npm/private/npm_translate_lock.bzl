@@ -162,7 +162,7 @@ def npm_translate_lock(
         pnpm_lock = None,
         npm_package_lock = None,
         yarn_lock = None,
-        update_pnpm_lock = None,
+        update_pnpm_lock = False,
         node_toolchain_prefix = "nodejs",
         yq_toolchain_prefix = "yq",
         preupdate = [],
@@ -616,11 +616,6 @@ def npm_translate_lock(
             bins_string_list_dict[key] = []
         for value_key, value_value in value.items():
             bins_string_list_dict[key].append("{}={}".format(value_key, value_value))
-
-    # Default update_pnpm_lock to True if npm_package_lock or yarn_lock is set to
-    # preserve pre-update_pnpm_lock `pnpm import` behavior.
-    if update_pnpm_lock == None and (npm_package_lock or yarn_lock):
-        update_pnpm_lock = True
 
     if not update_pnpm_lock and preupdate:
         fail("expected update_pnpm_lock to be True when preupdate are specified")
