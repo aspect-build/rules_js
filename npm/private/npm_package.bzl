@@ -89,13 +89,13 @@ def _npm_package_files_impl(ctx):
 def _npm_package_impl(ctx):
     dst = ctx.actions.declare_directory(ctx.attr.out if ctx.attr.out else ctx.attr.name)
 
-    # forward all npm_package_store_deps
-    npm_package_store_deps = [
-        target[JsInfo].npm_package_store_deps
+    # forward all npm_package_store_infos
+    npm_package_store_infos = [
+        target[JsInfo].npm_package_store_infos
         for target in ctx.attr.srcs
-        if JsInfo in target and hasattr(target[JsInfo], "npm_package_store_deps")
+        if JsInfo in target and hasattr(target[JsInfo], "npm_package_store_infos")
     ]
-    npm_package_store_deps.append(js_lib_helpers.gather_npm_package_store_deps(
+    npm_package_store_infos.append(js_lib_helpers.gather_npm_package_store_infos(
         targets = ctx.attr.data,
     ))
 
@@ -129,7 +129,7 @@ def _npm_package_impl(ctx):
             package = ctx.attr.package,
             version = ctx.attr.version,
             src = dst,
-            npm_package_store_deps = depset([], transitive = npm_package_store_deps),
+            npm_package_store_infos = depset([], transitive = npm_package_store_infos),
         ),
     ]
 
@@ -247,7 +247,7 @@ def npm_package(
 
             `NpmPackageStoreInfo` providers are gathered from `JsInfo` of the targets specified. Targets can be linked npm
             packages, npm package store targets or other targets that provide `JsInfo`. This is done directly from the
-            `npm_package_store_deps` field of these. For linked npm package targets, the underlying npm_package_store
+            `npm_package_store_infos` field of these. For linked npm package targets, the underlying npm_package_store
             target(s) that back the links is used.
 
             Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies of this npm package when

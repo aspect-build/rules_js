@@ -7,12 +7,12 @@ load(":js_info.bzl", "JsInfo")
 
 DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING = """If this list contains linked npm packages, npm package store targets or other targets that provide
 `JsInfo`, `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from
-the `npm_package_store_deps` field of these. For linked npm package targets, the underlying
+the `npm_package_store_infos` field of these. For linked npm package targets, the underlying
 `npm_package_store` target(s) that back the links is used. Gathered `NpmPackageStoreInfo`
 providers are propagated to the direct dependencies of downstream linked `npm_package` targets.
 
 NB: Linked npm package targets that are "dev" dependencies do not forward their underlying
-`npm_package_store` target(s) through `npm_package_store_deps` and will therefore not be
+`npm_package_store` target(s) through `npm_package_store_infos` and will therefore not be
 propagated to the direct dependencies of downstream linked `npm_package` targets. npm packages
 that come in from `npm_translate_lock` are considered "dev" dependencies if they are have
 `dev: true` set in the pnpm lock file. This should be all packages that are only listed as
@@ -90,7 +90,7 @@ def gather_npm_linked_packages(srcs, deps):
         if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
     ])
 
-def gather_npm_package_store_deps(targets):
+def gather_npm_package_store_infos(targets):
     """Gathers NpmPackageStoreInfo providers from the list of targets
 
     Args:
@@ -100,14 +100,14 @@ def gather_npm_package_store_deps(targets):
         A depset of npm package stores gathered
     """
 
-    # npm_package_store_deps
-    npm_package_store_deps = [
-        target[JsInfo].npm_package_store_deps
+    # npm_package_store_infos
+    npm_package_store_infos = [
+        target[JsInfo].npm_package_store_infos
         for target in targets
         if JsInfo in target
     ]
 
-    return depset([], transitive = npm_package_store_deps)
+    return depset([], transitive = npm_package_store_infos)
 
 def copy_js_file_to_bin_action(ctx, file):
     if ctx.label.workspace_name != file.owner.workspace_name or ctx.label.package != file.owner.package:

@@ -33,7 +33,7 @@ def _npm_package_internal_impl(ctx):
             package = ctx.attr.package,
             version = ctx.attr.version,
             src = dst,
-            npm_package_store_deps = depset(),
+            npm_package_store_infos = depset(),
         ),
     ]
 
