@@ -107,7 +107,7 @@ def _npm_link_package_store_impl(ctx):
         js_info(
             npm_linked_packages = transitive_files_depset,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
-            npm_package_store_deps = depset([store_info]) if not store_info.dev else depset(),
+            npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
