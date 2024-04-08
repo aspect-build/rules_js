@@ -92,6 +92,8 @@ npm_translate_lock_lib = struct(
 def _npm_translate_lock_impl(rctx):
     rctx.report_progress("Initializing")
 
+    rctx.file("_generation", "1")  # bump the generation to force this repository rule to invalidate on next rules_js upgrade
+
     state = npm_translate_lock_state.new(rctx)
 
     # If a pnpm lock file has not been specified then we need to bootstrap by running `pnpm
