@@ -80,6 +80,7 @@ _ATTRS = {
     "prod": attr.bool(),
     "public_hoist_packages": attr.string_list_dict(),
     "quiet": attr.bool(default = True),
+    # TODO(bzlmod): remove repositories_bzl_filename
     "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
     "update_pnpm_lock": attr.bool(),
