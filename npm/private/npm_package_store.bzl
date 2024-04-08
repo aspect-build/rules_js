@@ -165,7 +165,7 @@ def _npm_package_store_impl(ctx):
     files = []
     direct_ref_deps = {}
 
-    npm_package_store_deps = []
+    npm_package_store_infos = []
 
     if ctx.attr.src:
         # output the package as a TreeArtifact to its package store location
@@ -242,7 +242,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 # party npm deps; it is not recommended for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
 
-        for store in ctx.attr.src[NpmPackageInfo].npm_package_store_deps.to_list():
+        for store in ctx.attr.src[NpmPackageInfo].npm_package_store_infos.to_list():
             dep_package = store.package
             dep_package_store_directory = store.package_store_directory
 
@@ -252,7 +252,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
                 dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_package)
                 files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory))
-                npm_package_store_deps.append(store)
+                npm_package_store_infos.append(store)
     else:
         # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
         # being the transitive closure of deps; this pattern is used to break circular dependencies
@@ -295,7 +295,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
     if package_store_directory:
         files.append(package_store_directory)
 
-    npm_package_store_deps.extend([
+    npm_package_store_infos.extend([
         target[NpmPackageStoreInfo]
         for target in ctx.attr.deps
     ])
@@ -305,19 +305,19 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
     if ctx.attr.src:
         transitive_files_depset = depset(files, transitive = [
             npm_package_store.transitive_files
-            for npm_package_store in npm_package_store_deps
+            for npm_package_store in npm_package_store_infos
         ])
     else:
         # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
         # being the transitive closure of deps; this pattern is used to break circular dependencies
         # between 3rd party npm deps; it is not recommended for 1st party deps because
-        # npm_package_store_deps is the transitive closure of all the entire package store deps, we
+        # npm_package_store_infos is the transitive closure of all the entire package store deps, we
         # can safely add just `files` from each of these to `transitive_files_depset`. Doing so
         # reduces the size of `transitive_files_depset` significantly and reduces analysis time and
         # Bazel memory usage during analysis
         transitive_files_depset = depset(files, transitive = [
             npm_package_store.files
-            for npm_package_store in npm_package_store_deps
+            for npm_package_store in npm_package_store_infos
         ])
 
     providers = [
