@@ -214,6 +214,9 @@ def _npm_translate_lock_attrs():
     attrs["npm_package_target_name"] = attr.string(default = "{dirname}")
     attrs["patch_args"] = attr.string_list_dict(default = {"*": ["-p0"]})
 
+    # Args not supported or unnecessary in bzlmod
+    attrs.pop("repositories_bzl_filename")
+
     return attrs
 
 def _npm_import_attrs():

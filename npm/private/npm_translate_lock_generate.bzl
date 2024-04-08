@@ -445,13 +445,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         else:
             rctx_files[filename].extend(contents)
 
-    # TODO(2.0): do not generate with bzlmod
-    rctx_files[rctx.attr.repositories_bzl_filename] = _generate_repositories(
-        rctx,
-        npm_imports,
-        pnpm_lock_label,
-        link_workspace,
-    )
+    if not rctx.attr.bzlmod:
+        rctx_files[rctx.attr.repositories_bzl_filename] = _generate_repositories(
+            rctx,
+            npm_imports,
+            pnpm_lock_label,
+            link_workspace,
+        )
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, generated_by_prefix + "\n" + "\n".join(contents))
