@@ -44,8 +44,8 @@ def _js_run_devserver_impl(ctx):
         targets = ctx.attr.data,
         include_sources = True,
         include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_declarations = ctx.attr.include_declarations,
-        include_transitive_declarations = ctx.attr.include_declarations,
+        include_types = ctx.attr.include_types,
+        include_transitive_types = ctx.attr.include_types,
         include_npm_sources = ctx.attr.include_npm_sources,
     )]
 

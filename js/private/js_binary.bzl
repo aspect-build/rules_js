@@ -191,10 +191,10 @@ _ATTRS = {
         doc = """When True, `transitive_sources` from `JsInfo` providers in data targets are included in the runfiles of the target.""",
         default = True,
     ),
-    "include_declarations": attr.bool(
-        doc = """When True, `declarations` and `transitive_declarations` from `JsInfo` providers in data targets are included in the runfiles of the target.
+    "include_types": attr.bool(
+        doc = """When True, `types` and `transitive_types` from `JsInfo` providers in data targets are included in the runfiles of the target.
 
-        Defaults to false since declarations are generally not needed at runtime and introducing them could slow down developer round trip
+        Defaults to false since types are generally not needed at runtime and introducing them could slow down developer round trip
         time due to having to generate typings on source file changes.""",
         default = False,
     ),
@@ -516,7 +516,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
         include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_declarations = ctx.attr.include_declarations,
+        include_types = ctx.attr.include_types,
         include_npm_sources = ctx.attr.include_npm_sources,
     ).merge(ctx.runfiles(
         files = launcher_files,

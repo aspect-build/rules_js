@@ -18,8 +18,8 @@ load(
     _gather_npm_package_store_infos = "gather_npm_package_store_infos",
     _gather_npm_sources = "gather_npm_sources",
     _gather_runfiles = "gather_runfiles",
-    _gather_transitive_declarations = "gather_transitive_declarations",
     _gather_transitive_sources = "gather_transitive_sources",
+    _gather_transitive_types = "gather_transitive_types",
 )
 
 js_binary_lib = _js_binary_lib
@@ -31,7 +31,7 @@ js_lib_helpers = struct(
     gather_npm_sources = _gather_npm_sources,
     gather_npm_package_store_infos = _gather_npm_package_store_infos,
     gather_runfiles = _gather_runfiles,
-    gather_transitive_declarations = _gather_transitive_declarations,
+    gather_transitive_types = _gather_transitive_types,
     gather_transitive_sources = _gather_transitive_sources,
     JS_LIBRARY_DATA_ATTR = _JS_LIBRARY_DATA_ATTR,
     DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING = _DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING,
