@@ -18,8 +18,8 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 <pre>
 js_run_binary(<a href="#js_run_binary-name">name</a>, <a href="#js_run_binary-tool">tool</a>, <a href="#js_run_binary-env">env</a>, <a href="#js_run_binary-srcs">srcs</a>, <a href="#js_run_binary-outs">outs</a>, <a href="#js_run_binary-out_dirs">out_dirs</a>, <a href="#js_run_binary-args">args</a>, <a href="#js_run_binary-chdir">chdir</a>, <a href="#js_run_binary-stdout">stdout</a>, <a href="#js_run_binary-stderr">stderr</a>, <a href="#js_run_binary-exit_code_out">exit_code_out</a>,
               <a href="#js_run_binary-silent_on_success">silent_on_success</a>, <a href="#js_run_binary-use_execroot_entry_point">use_execroot_entry_point</a>, <a href="#js_run_binary-copy_srcs_to_bin">copy_srcs_to_bin</a>,
-              <a href="#js_run_binary-include_transitive_sources">include_transitive_sources</a>, <a href="#js_run_binary-include_declarations">include_declarations</a>, <a href="#js_run_binary-include_npm_linked_packages">include_npm_linked_packages</a>,
-              <a href="#js_run_binary-log_level">log_level</a>, <a href="#js_run_binary-mnemonic">mnemonic</a>, <a href="#js_run_binary-progress_message">progress_message</a>, <a href="#js_run_binary-execution_requirements">execution_requirements</a>, <a href="#js_run_binary-stamp">stamp</a>, <a href="#js_run_binary-patch_node_fs">patch_node_fs</a>,
+              <a href="#js_run_binary-include_transitive_sources">include_transitive_sources</a>, <a href="#js_run_binary-include_declarations">include_declarations</a>, <a href="#js_run_binary-include_npm_sources">include_npm_sources</a>, <a href="#js_run_binary-log_level">log_level</a>,
+              <a href="#js_run_binary-mnemonic">mnemonic</a>, <a href="#js_run_binary-progress_message">progress_message</a>, <a href="#js_run_binary-execution_requirements">execution_requirements</a>, <a href="#js_run_binary-stamp">stamp</a>, <a href="#js_run_binary-patch_node_fs">patch_node_fs</a>,
               <a href="#js_run_binary-allow_execroot_entry_point_with_no_copy_data_to_bin">allow_execroot_entry_point_with_no_copy_data_to_bin</a>, <a href="#js_run_binary-use_default_shell_env">use_default_shell_env</a>, <a href="#js_run_binary-kwargs">kwargs</a>)
 </pre>
 
@@ -63,7 +63,7 @@ The following environment variables are made available to the Node.js runtime ba
 | <a id="js_run_binary-copy_srcs_to_bin"></a>copy_srcs_to_bin |  When True, all srcs files are copied to the output tree that are not already there.   |  `True` |
 | <a id="js_run_binary-include_transitive_sources"></a>include_transitive_sources |  see `js_info_files` documentation   |  `True` |
 | <a id="js_run_binary-include_declarations"></a>include_declarations |  see `js_info_files` documentation   |  `False` |
-| <a id="js_run_binary-include_npm_linked_packages"></a>include_npm_linked_packages |  see `js_info_files` documentation   |  `True` |
+| <a id="js_run_binary-include_npm_sources"></a>include_npm_sources |  see `js_info_files` documentation   |  `True` |
 | <a id="js_run_binary-log_level"></a>log_level |  Set the logging level of the `js_binary` tool.<br><br>This overrides the log level set on the `js_binary` tool target.   |  `None` |
 | <a id="js_run_binary-mnemonic"></a>mnemonic |  A one-word description of the action, for example, CppCompile or GoLink.   |  `"JsRunBinary"` |
 | <a id="js_run_binary-progress_message"></a>progress_message |  Progress message to show to the user during the build, for example, "Compiling foo.cc to create foo.o". The message may contain %{label}, %{input}, or %{output} patterns, which are substituted with label string, first input, or output's path, respectively. Prefer to use patterns instead of static strings, because the former are more efficient.   |  `None` |

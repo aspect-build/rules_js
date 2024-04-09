@@ -35,7 +35,7 @@ def js_run_binary(
         copy_srcs_to_bin = True,
         include_transitive_sources = True,
         include_declarations = False,
-        include_npm_linked_packages = True,
+        include_npm_sources = True,
         log_level = None,
         mnemonic = "JsRunBinary",
         progress_message = None,
@@ -154,7 +154,7 @@ def js_run_binary(
 
         include_declarations: see `js_info_files` documentation
 
-        include_npm_linked_packages: see `js_info_files` documentation
+        include_npm_sources: see `js_info_files` documentation
 
         log_level: Set the logging level of the `js_binary` tool.
 
@@ -242,12 +242,21 @@ def js_run_binary(
     if "deps" in kwargs.keys():
         fail("Use srcs instead of deps in js_run_binary: https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_binary#srcs")
 
+    # For backward compat
+    # TODO(3.0): remove backward compat handling
+    include_npm_linked_packages = kwargs.pop("include_npm_linked_packages", None)
+    if include_npm_linked_packages != None:
+        # buildifier: disable=print
+        print("""
+WARNING: js_run_binary 'include_npm_linked_packages' is deprecated. Use 'include_npm_sources' instead.""")
+        include_npm_sources = include_npm_linked_packages
+
     extra_srcs = []
 
     # Hoist js provider files to DefaultInfo
     make_js_info_files_target = (include_transitive_sources or
                                  include_declarations or
-                                 include_npm_linked_packages)
+                                 include_npm_sources)
     if make_js_info_files_target:
         js_info_files_name = "{}_js_info_files".format(name)
         _js_info_files(
@@ -255,7 +264,7 @@ def js_run_binary(
             srcs = srcs,
             include_transitive_sources = include_transitive_sources,
             include_declarations = include_declarations,
-            include_npm_linked_packages = include_npm_linked_packages,
+            include_npm_sources = include_npm_sources,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
             # Always propagate the testonly attribute

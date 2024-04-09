@@ -468,7 +468,7 @@ utils = struct(
     package_store_root = ".aspect_rules_js",
     # Suffix for npm_import links repository
     links_repo_suffix = "__links",
-    # Output group name for the package directory of a linked package
+    # Output group name for the package directory of a linked npm package
     package_directory_output_group = "package_directory",
     npm_registry_url = _npm_registry_url,
     npm_registry_download_url = _npm_registry_download_url,
