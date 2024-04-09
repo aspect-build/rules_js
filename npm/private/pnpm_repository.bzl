@@ -40,6 +40,4 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
                 """js_binary(name = "pnpm", data = glob(["package/**"]), entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ]),
             extract_full_archive = True,
-            register_copy_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
-            register_copy_to_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
         )
