@@ -27,10 +27,3 @@ def rules_js_dependencies():
         strip_prefix = "bazel-lib-2.7.1",
         url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.7.1/bazel-lib-v2.7.1.tar.gz",
     )
-
-    http_archive(
-        name = "bazel_features",
-        sha256 = "f3082bfcdca73dc77dcd68faace806135a2e08c230b02b1d9fbdbd7db9d9c450",
-        strip_prefix = "bazel_features-0.1.0",
-        url = "https://github.com/bazel-contrib/bazel_features/releases/download/v0.1.0/bazel_features-v0.1.0.tar.gz",
-    )
