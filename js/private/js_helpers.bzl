@@ -73,21 +73,21 @@ def gather_transitive_declarations(declarations, targets):
     ]
     return depset([], transitive = [declarations] + transitive)
 
-def gather_npm_linked_packages(srcs, deps):
-    """Gathers npm linked packages from a list of srcs and deps targets
+def gather_npm_sources(srcs, deps):
+    """Gathers npm sources from a list of srcs and deps targets
 
     Args:
         srcs: source targets; these typically come from the `srcs` and/or `data` attributes of a rule
         deps: dep targets; these typically come from the `deps` attribute of a rule
 
     Returns:
-        Depset of npm linked package files
+        Depset of npm sources
     """
 
     return depset([], transitive = [
-        target[JsInfo].npm_linked_packages
+        target[JsInfo].npm_sources
         for target in srcs + deps
-        if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
+        if JsInfo in target and hasattr(target[JsInfo], "npm_sources")
     ])
 
 def gather_npm_package_store_infos(targets):
@@ -157,11 +157,11 @@ def gather_runfiles(
         include_transitive_sources = True,
         include_declarations = False,
         include_transitive_declarations = False,
-        include_npm_linked_packages = True):
+        include_npm_sources = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
-    gathers the transitive sources & transitive npm linked packages from the `JsInfo` &
+    gathers the transitive sources & transitive npm sources from the `JsInfo` &
     `NpmPackageStoreInfo` providers of `data` & `deps` targets.
 
     See https://bazel.build/extending/rules#runfiles for more info on providing runfiles in build rules.
@@ -201,7 +201,7 @@ def gather_runfiles(
 
         include_transitive_declarations: see js_info_files documentation
 
-        include_npm_linked_packages: see js_info_files documentation
+        include_npm_sources: see js_info_files documentation
 
     Returns:
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
@@ -225,7 +225,7 @@ def gather_runfiles(
         include_transitive_sources = include_transitive_sources,
         include_declarations = include_declarations,
         include_transitive_declarations = include_transitive_declarations,
-        include_npm_linked_packages = include_npm_linked_packages,
+        include_npm_sources = include_npm_sources,
     ))
 
     files_runfiles = []
@@ -288,7 +288,7 @@ def gather_files_from_js_info(
         include_transitive_sources,
         include_declarations,
         include_transitive_declarations,
-        include_npm_linked_packages):
+        include_npm_sources):
     """Gathers files from JsInfo and NpmPackageStoreInfo providers.
 
     Args:
@@ -297,7 +297,7 @@ def gather_files_from_js_info(
         include_transitive_sources: see js_info_files documentation
         include_declarations: see js_info_files documentation
         include_transitive_declarations: see js_info_files documentation
-        include_npm_linked_packages: see js_info_files documentation
+        include_npm_sources: see js_info_files documentation
 
     Returns:
         A depset of files
@@ -327,11 +327,11 @@ def gather_files_from_js_info(
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
         ])
-    if include_npm_linked_packages:
+    if include_npm_sources:
         files_depsets.extend([
-            target[JsInfo].npm_linked_packages
+            target[JsInfo].npm_sources
             for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "npm_linked_packages")
+            if JsInfo in target and hasattr(target[JsInfo], "npm_sources")
         ])
         files_depsets.extend([
             target[NpmPackageStoreInfo].transitive_files
