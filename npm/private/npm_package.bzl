@@ -34,10 +34,10 @@ _NPM_PACKAGE_ATTRS = dicts.add(copy_to_directory_lib_attrs, {
 })
 
 _NPM_PACKAGE_FILES_ATTRS = {
-    "include_declarations": attr.bool(),
+    "include_types": attr.bool(),
     "include_runfiles": attr.bool(),
     "include_sources": attr.bool(),
-    "include_transitive_declarations": attr.bool(),
+    "include_transitive_types": attr.bool(),
     "include_transitive_sources": attr.bool(),
     "srcs": attr.label_list(allow_files = True),
 }
@@ -60,19 +60,19 @@ def _npm_package_files_impl(ctx):
             if JsInfo in target and hasattr(target[JsInfo], "sources")
         ])
 
-    if ctx.attr.include_transitive_declarations:
-        # include all transitive declarations (this includes direct declarations)
+    if ctx.attr.include_transitive_types:
+        # include all transitive types (this includes direct types)
         files_depsets.extend([
-            target[JsInfo].transitive_declarations
+            target[JsInfo].transitive_types
             for target in ctx.attr.srcs
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
+            if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
         ])
-    elif ctx.attr.include_declarations:
-        # include only direct declarations
+    elif ctx.attr.include_types:
+        # include only direct types
         files_depsets.extend([
-            target[JsInfo].declarations
+            target[JsInfo].types
             for target in ctx.attr.srcs
-            if JsInfo in target and hasattr(target[JsInfo], "declarations")
+            if JsInfo in target and hasattr(target[JsInfo], "types")
         ])
 
     if ctx.attr.include_runfiles:
@@ -169,8 +169,8 @@ def npm_package(
         allow_overwrites = False,
         include_sources = True,
         include_transitive_sources = True,
-        include_declarations = True,
-        include_transitive_declarations = True,
+        include_types = True,
+        include_transitive_types = True,
         include_runfiles = False,
         hardlink = "auto",
         publishable = True,
@@ -214,14 +214,14 @@ def npm_package(
     `npm_package` makes use of `copy_to_directory`
     (https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory) under the hood,
     adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
-    `npm_package` includes `transitive_sources` and `transitive_declarations` files from `JsInfo` providers in srcs
-    by default. The behavior of including sources and declarations from `JsInfo` can be configured
-    using the `include_sources`, `include_transitive_sources`, `include_declarations`, `include_transitive_declarations`
+    `npm_package` includes `transitive_sources` and `transitive_types` files from `JsInfo` providers in srcs
+    by default. The behavior of including sources and types from `JsInfo` can be configured
+    using the `include_sources`, `include_transitive_sources`, `include_types`, `include_transitive_types`
     attributes.
 
-    The two `include*_declarations` options may cause type-check actions to run, which slows down your
+    The two `include*_types` options may cause type-check actions to run, which slows down your
     development round-trip.
-    You can pass the Bazel option `--@aspect_rules_js//npm:exclude_declarations_from_npm_packages`
+    You can pass the Bazel option `--@aspect_rules_js//npm:exclude_types_from_npm_packages`
     to override these two attributes for an individual `bazel` invocation, avoiding the type-check.
 
     `npm_package` also includes default runfiles from `srcs` by default which `copy_to_directory` does not. This behavior
@@ -408,15 +408,15 @@ def npm_package(
 
         include_transitive_sources: When True, `transitive_sources` from `JsInfo` providers in data targets are included in the list of available files to copy.
 
-        include_declarations: When True, `declarations` from `JsInfo` providers in data targets are included in the list of available files to copy.
+        include_types: When True, `types` from `JsInfo` providers in data targets are included in the list of available files to copy.
 
-        include_transitive_declarations: When True, `transitive_declarations` from `JsInfo` providers in data targets are included in the list of available files to copy.
+        include_transitive_types: When True, `transitive_types` from `JsInfo` providers in data targets are included in the list of available files to copy.
 
         include_runfiles: When True, default runfiles from `srcs` targets are included in the list of available files to copy.
 
             This may be needed in a few cases:
 
-            - to work-around issues with rules that don't provide everything needed in sources, transitive_sources, declarations & transitive_declarations
+            - to work-around issues with rules that don't provide everything needed in sources, transitive_sources, types & transitive_types
             - to depend on the runfiles targets that don't use JsInfo
 
             NB: The default value will be flipped to False in the next major release as runfiles are not needed in the general case
@@ -443,20 +443,20 @@ def npm_package(
         **kwargs: Additional attributes such as `tags` and `visibility`
     """
 
-    if include_sources or include_transitive_sources or include_declarations or include_transitive_declarations or include_runfiles:
+    if include_sources or include_transitive_sources or include_types or include_transitive_types or include_runfiles:
         files_target = "{}_files".format(name)
         _npm_package_files(
             name = files_target,
             srcs = srcs,
             include_sources = include_sources,
             include_transitive_sources = include_transitive_sources,
-            include_declarations = select({
-                Label("@aspect_rules_js//npm:exclude_declarations_from_npm_packages_flag"): False,
-                "//conditions:default": include_declarations,
+            include_types = select({
+                Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
+                "//conditions:default": include_types,
             }),
-            include_transitive_declarations = select({
-                Label("@aspect_rules_js//npm:exclude_declarations_from_npm_packages_flag"): False,
-                "//conditions:default": include_transitive_declarations,
+            include_transitive_types = select({
+                Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
+                "//conditions:default": include_transitive_types,
             }),
             include_runfiles = include_runfiles,
             # Always tag the target manual since we should only build it when the final target is built.
