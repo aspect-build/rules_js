@@ -511,14 +511,6 @@ def stamped_package_json(name, stamp_var, **kwargs):
 
     For more information on stamping, read https://docs.aspect.build/rules/aspect_bazel_lib/docs/stamping.
 
-    Using this rule requires that you register the jq toolchain in your WORKSPACE:
-
-    ```starlark
-    load("@aspect_bazel_lib//lib:repositories.bzl", "register_jq_toolchains")
-
-    register_jq_toolchains()
-    ```
-
     Args:
         name: name of the resulting `jq` target, must be "package"
         stamp_var: a key from the bazel-out/stable-status.txt or bazel-out/volatile-status.txt files
