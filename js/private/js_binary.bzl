@@ -198,8 +198,8 @@ _ATTRS = {
         time due to having to generate typings on source file changes.""",
         default = False,
     ),
-    "include_npm_linked_packages": attr.bool(
-        doc = """When True, files in `npm_linked_packages` from `JsInfo` providers in data targets are included in the runfiles of the target.
+    "include_npm_sources": attr.bool(
+        doc = """When True, files in `npm_sources` from `JsInfo` providers in data targets are included in the runfiles of the target.
 
         `transitive_files` from `NpmPackageStoreInfo` providers in data targets are also included in the runfiles of the target.
         """,
@@ -517,7 +517,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         no_copy_to_bin = ctx.files.no_copy_to_bin,
         include_transitive_sources = ctx.attr.include_transitive_sources,
         include_declarations = ctx.attr.include_declarations,
-        include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
+        include_npm_sources = ctx.attr.include_npm_sources,
     ).merge(ctx.runfiles(
         files = launcher_files,
         transitive_files = transitive_launcher_files,
