@@ -63,11 +63,6 @@ def _npm_translate_lock_bzlmod(attr):
         prod = attr.prod,
         public_hoist_packages = attr.public_hoist_packages,
         quiet = attr.quiet,
-        register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
-        register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
-        register_coreutils_toolchains = False,  # this registration is handled elsewhere with bzlmod
-        register_yq_toolchains = False,  # this registration is handled elsewhere with bzlmod
-        register_tar_toolchains = False,  # this registration is handled elsewhere with bzlmod
         replace_packages = attr.replace_packages,
         root_package = attr.root_package,
         run_lifecycle_hooks = attr.run_lifecycle_hooks,
@@ -185,8 +180,6 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             transitive_closure = i.transitive_closure,
             url = i.url,
             version = i.version,
-            register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
-            register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
         )
 
 def _npm_import_bzlmod(i):
@@ -218,8 +211,6 @@ def _npm_import_bzlmod(i):
         transitive_closure = i.transitive_closure,
         url = i.url,
         version = i.version,
-        register_copy_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
-        register_copy_to_directory_toolchains = False,  # this registration is handled elsewhere with bzlmod
     )
 
 def _npm_translate_lock_attrs():
