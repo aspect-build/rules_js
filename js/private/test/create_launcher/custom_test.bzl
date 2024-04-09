@@ -25,7 +25,7 @@ def _custom_test_impl(ctx):
             include_transitive_sources = ctx.attr.include_transitive_sources,
             include_declarations = ctx.attr.include_declarations,
             include_transitive_declarations = ctx.attr.include_declarations,
-            include_npm_linked_packages = ctx.attr.include_npm_linked_packages,
+            include_npm_sources = ctx.attr.include_npm_sources,
         ),
     ).merge(launcher.runfiles).merge_all([
         target[DefaultInfo].default_runfiles
