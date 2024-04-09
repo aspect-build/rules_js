@@ -28,8 +28,7 @@ npm_import(<a href="#npm_import-name">name</a>, <a href="#npm_import-package">pa
            <a href="#npm_import-link_workspace">link_workspace</a>, <a href="#npm_import-link_packages">link_packages</a>, <a href="#npm_import-lifecycle_hooks">lifecycle_hooks</a>, <a href="#npm_import-lifecycle_hooks_execution_requirements">lifecycle_hooks_execution_requirements</a>,
            <a href="#npm_import-lifecycle_hooks_env">lifecycle_hooks_env</a>, <a href="#npm_import-lifecycle_hooks_use_default_shell_env">lifecycle_hooks_use_default_shell_env</a>, <a href="#npm_import-integrity">integrity</a>, <a href="#npm_import-url">url</a>, <a href="#npm_import-commit">commit</a>,
            <a href="#npm_import-replace_package">replace_package</a>, <a href="#npm_import-package_visibility">package_visibility</a>, <a href="#npm_import-patch_args">patch_args</a>, <a href="#npm_import-patches">patches</a>, <a href="#npm_import-custom_postinstall">custom_postinstall</a>, <a href="#npm_import-npm_auth">npm_auth</a>,
-           <a href="#npm_import-npm_auth_basic">npm_auth_basic</a>, <a href="#npm_import-npm_auth_username">npm_auth_username</a>, <a href="#npm_import-npm_auth_password">npm_auth_password</a>, <a href="#npm_import-bins">bins</a>, <a href="#npm_import-dev">dev</a>,
-           <a href="#npm_import-register_copy_directory_toolchains">register_copy_directory_toolchains</a>, <a href="#npm_import-register_copy_to_directory_toolchains">register_copy_to_directory_toolchains</a>, <a href="#npm_import-kwargs">kwargs</a>)
+           <a href="#npm_import-npm_auth_basic">npm_auth_basic</a>, <a href="#npm_import-npm_auth_username">npm_auth_username</a>, <a href="#npm_import-npm_auth_password">npm_auth_password</a>, <a href="#npm_import-bins">bins</a>, <a href="#npm_import-dev">dev</a>, <a href="#npm_import-kwargs">kwargs</a>)
 </pre>
 
 Import a single npm package into Bazel.
@@ -161,8 +160,6 @@ Read more about the downloader config: &lt;https://blog.aspect.dev/configuring-b
 | <a id="npm_import-npm_auth_password"></a>npm_auth_password |  Auth password to authenticate with npm. When using Basic authentication.   |  <code>""</code> |
 | <a id="npm_import-bins"></a>bins |  Dictionary of <code>node_modules/.bin</code> binary files to create mapped to their node entry points.<br><br>This is typically derived from the "bin" attribute in the package.json file of the npm package being linked.<br><br>For example:<br><br><pre><code> bins = {     "foo": "./foo.js",     "bar": "./bar.js", } </code></pre><br><br>In the future, this field may be automatically populated by npm_translate_lock from information in the pnpm lock file. That feature is currently blocked on https://github.com/pnpm/pnpm/issues/5131.   |  <code>{}</code> |
 | <a id="npm_import-dev"></a>dev |  Whether this npm package is a dev dependency   |  <code>False</code> |
-| <a id="npm_import-register_copy_directory_toolchains"></a>register_copy_directory_toolchains |  if True, <code>@aspect_bazel_lib//lib:repositories.bzl</code> <code>register_copy_directory_toolchains()</code> is called if the toolchain is not already registered   |  <code>True</code> |
-| <a id="npm_import-register_copy_to_directory_toolchains"></a>register_copy_to_directory_toolchains |  if True, <code>@aspect_bazel_lib//lib:repositories.bzl</code> <code>register_copy_to_directory_toolchains()</code> is called if the toolchain is not already registered   |  <code>True</code> |
 | <a id="npm_import-kwargs"></a>kwargs |  Internal use only   |  none |
 
 
