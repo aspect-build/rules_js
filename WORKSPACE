@@ -7,22 +7,19 @@ load("//js:dev_repositories.bzl", "rules_js_dev_dependencies")
 
 rules_js_dev_dependencies()
 
-load("//js:repositories.bzl", "rules_js_dependencies")
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_expand_template_toolchains", "register_jq_toolchains")
+load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
+
+rules_js_register_toolchains(node_version = "16.14.2")
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "register_expand_template_toolchains")
 
 register_expand_template_toolchains()
 
-register_jq_toolchains()
-
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
-
-nodejs_register_toolchains(
-    name = "nodejs",
-    node_version = "16.14.2",
-)
 
 # Alternate toolchains for testing across versions
 nodejs_register_toolchains(
