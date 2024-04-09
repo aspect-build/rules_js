@@ -209,16 +209,17 @@ sh_binary(
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
+    npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(link_packages = str(link_packages))
+
     npm_link_targets_bzl = [
         """\
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None):
-    link_packages = {link_packages}
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in link_packages
+    link = bazel_package in _LINK_PACKAGES
 
     link_targets = []
-""".format(link_packages = str(link_packages)),
+""",
     ]
 
     npm_link_all_packages_bzl = [
@@ -226,12 +227,11 @@ def npm_link_targets(name = "node_modules", package = None):
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
     root_package = "{root_package}"
-    link_packages = {link_packages}
     bazel_package = native.package_name()
     is_root = bazel_package == root_package
-    link = bazel_package in link_packages
+    link = bazel_package in _LINK_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: {link_packages_comma_separated}" % native.package_name()
+        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (native.package_name(), {link_packages_comma_separated})
         fail(msg)
     link_targets = []
     scope_targets = {{}}
@@ -243,8 +243,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
 """.format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
-            link_packages = str(link_packages),
-            link_packages_comma_separated = "'" + "', '".join(link_packages) + "'" if len(link_packages) else "",
+            link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "",
             root_package = root_package,
             pnpm_lock_label = pnpm_lock_label,
         ),
@@ -450,6 +449,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     rctx_files[rctx.attr.defs_bzl_filename] = [
         "\n".join(defs_bzl_header),
+        "",
+        npm_link_packages_const,
         "",
         "\n".join(npm_link_all_packages_bzl),
         "",
