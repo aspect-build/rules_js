@@ -16,8 +16,8 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-srcs">srcs</a>, <a href="#npm_package-data">data</a>, <a href="#npm_package-args">args</a>, <a href="#npm_package-out">out</a>, <a href="#npm_package-package">package</a>, <a href="#npm_package-version">version</a>, <a href="#npm_package-root_paths">root_paths</a>,
             <a href="#npm_package-include_external_repositories">include_external_repositories</a>, <a href="#npm_package-include_srcs_packages">include_srcs_packages</a>, <a href="#npm_package-exclude_srcs_packages">exclude_srcs_packages</a>,
             <a href="#npm_package-include_srcs_patterns">include_srcs_patterns</a>, <a href="#npm_package-exclude_srcs_patterns">exclude_srcs_patterns</a>, <a href="#npm_package-replace_prefixes">replace_prefixes</a>, <a href="#npm_package-allow_overwrites">allow_overwrites</a>,
-            <a href="#npm_package-include_sources">include_sources</a>, <a href="#npm_package-include_transitive_sources">include_transitive_sources</a>, <a href="#npm_package-include_declarations">include_declarations</a>,
-            <a href="#npm_package-include_transitive_declarations">include_transitive_declarations</a>, <a href="#npm_package-include_runfiles">include_runfiles</a>, <a href="#npm_package-hardlink">hardlink</a>, <a href="#npm_package-publishable">publishable</a>, <a href="#npm_package-verbose">verbose</a>, <a href="#npm_package-kwargs">kwargs</a>)
+            <a href="#npm_package-include_sources">include_sources</a>, <a href="#npm_package-include_transitive_sources">include_transitive_sources</a>, <a href="#npm_package-include_types">include_types</a>, <a href="#npm_package-include_transitive_types">include_transitive_types</a>,
+            <a href="#npm_package-include_runfiles">include_runfiles</a>, <a href="#npm_package-hardlink">hardlink</a>, <a href="#npm_package-publishable">publishable</a>, <a href="#npm_package-verbose">verbose</a>, <a href="#npm_package-kwargs">kwargs</a>)
 </pre>
 
 A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
@@ -58,14 +58,14 @@ for more information on supported globbing patterns.
 `npm_package` makes use of `copy_to_directory`
 (https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory) under the hood,
 adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
-`npm_package` includes `transitive_sources` and `transitive_declarations` files from `JsInfo` providers in srcs
-by default. The behavior of including sources and declarations from `JsInfo` can be configured
-using the `include_sources`, `include_transitive_sources`, `include_declarations`, `include_transitive_declarations`
+`npm_package` includes `transitive_sources` and `transitive_types` files from `JsInfo` providers in srcs
+by default. The behavior of including sources and types from `JsInfo` can be configured
+using the `include_sources`, `include_transitive_sources`, `include_types`, `include_transitive_types`
 attributes.
 
-The two `include*_declarations` options may cause type-check actions to run, which slows down your
+The two `include*_types` options may cause type-check actions to run, which slows down your
 development round-trip.
-You can pass the Bazel option `--@aspect_rules_js//npm:exclude_declarations_from_npm_packages`
+You can pass the Bazel option `--@aspect_rules_js//npm:exclude_types_from_npm_packages`
 to override these two attributes for an individual `bazel` invocation, avoiding the type-check.
 
 `npm_package` also includes default runfiles from `srcs` by default which `copy_to_directory` does not. This behavior
@@ -103,9 +103,9 @@ To stamp the current git tag as the "version" in the package.json file, see
 | <a id="npm_package-allow_overwrites"></a>allow_overwrites |  If True, allow files to be overwritten if the same output file is copied to twice.<br><br>The order of srcs matters as the last copy of a particular file will win when overwriting. Performance of `npm_package` will be slightly degraded when allow_overwrites is True since copies cannot be parallelized out as they are calculated. Instead all copy paths must be calculated before any copies can be started.   |  `False` |
 | <a id="npm_package-include_sources"></a>include_sources |  When True, `sources` from `JsInfo` providers in data targets are included in the list of available files to copy.   |  `True` |
 | <a id="npm_package-include_transitive_sources"></a>include_transitive_sources |  When True, `transitive_sources` from `JsInfo` providers in data targets are included in the list of available files to copy.   |  `True` |
-| <a id="npm_package-include_declarations"></a>include_declarations |  When True, `declarations` from `JsInfo` providers in data targets are included in the list of available files to copy.   |  `True` |
-| <a id="npm_package-include_transitive_declarations"></a>include_transitive_declarations |  When True, `transitive_declarations` from `JsInfo` providers in data targets are included in the list of available files to copy.   |  `True` |
-| <a id="npm_package-include_runfiles"></a>include_runfiles |  When True, default runfiles from `srcs` targets are included in the list of available files to copy.<br><br>This may be needed in a few cases:<br><br>- to work-around issues with rules that don't provide everything needed in sources, transitive_sources, declarations & transitive_declarations - to depend on the runfiles targets that don't use JsInfo<br><br>NB: The default value will be flipped to False in the next major release as runfiles are not needed in the general case and adding them to the list of files available to copy can add noticeable overhead to the analysis phase in a large repository with many npm_package targets.   |  `False` |
+| <a id="npm_package-include_types"></a>include_types |  When True, `types` from `JsInfo` providers in data targets are included in the list of available files to copy.   |  `True` |
+| <a id="npm_package-include_transitive_types"></a>include_transitive_types |  When True, `transitive_types` from `JsInfo` providers in data targets are included in the list of available files to copy.   |  `True` |
+| <a id="npm_package-include_runfiles"></a>include_runfiles |  When True, default runfiles from `srcs` targets are included in the list of available files to copy.<br><br>This may be needed in a few cases:<br><br>- to work-around issues with rules that don't provide everything needed in sources, transitive_sources, types & transitive_types - to depend on the runfiles targets that don't use JsInfo<br><br>NB: The default value will be flipped to False in the next major release as runfiles are not needed in the general case and adding them to the list of files available to copy can add noticeable overhead to the analysis phase in a large repository with many npm_package targets.   |  `False` |
 | <a id="npm_package-hardlink"></a>hardlink |  Controls when to use hardlinks to files instead of making copies.<br><br>Creating hardlinks is much faster than making copies of files with the caveat that hardlinks share file permissions with their source.<br><br>Since Bazel removes write permissions on files in the output tree after an action completes, hardlinks to source files are not recommended since write permissions will be inadvertently removed from sources files.<br><br>- `auto`: hardlinks are used for generated files already in the output tree - `off`: all files are copied - `on`: hardlinks are used for all files (not recommended)   |  `"auto"` |
 | <a id="npm_package-publishable"></a>publishable |  When True, enable generation of `{name}.publish` target   |  `True` |
 | <a id="npm_package-verbose"></a>verbose |  If true, prints out verbose logs to stdout   |  `False` |

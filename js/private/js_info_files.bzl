@@ -12,8 +12,8 @@ def _js_info_files_impl(ctx):
         targets = ctx.attr.srcs,
         include_sources = ctx.attr.include_sources,
         include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_declarations = ctx.attr.include_declarations,
-        include_transitive_declarations = ctx.attr.include_transitive_declarations,
+        include_types = ctx.attr.include_types,
+        include_transitive_types = ctx.attr.include_transitive_types,
         include_npm_sources = ctx.attr.include_npm_sources,
     ))
 
@@ -33,17 +33,17 @@ js_info_files = rule(
             doc = """When True, `transitive_sources` from `JsInfo` providers in `srcs` targets are included in the default outputs of the target.""",
             default = True,
         ),
-        "include_declarations": attr.bool(
-            doc = """When True, `declarations` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+        "include_types": attr.bool(
+            doc = """When True, `types` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
 
-            Defaults to False since declarations are generally not needed at runtime and introducing them could slow down developer round trip
+            Defaults to False since types are generally not needed at runtime and introducing them could slow down developer round trip
             time due to having to generate typings on source file changes.""",
             default = False,
         ),
-        "include_transitive_declarations": attr.bool(
-            doc = """When True, `transitive_declarations` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+        "include_transitive_types": attr.bool(
+            doc = """When True, `transitive_types` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
 
-            Defaults to False since declarations are generally not needed at runtime and introducing them could slow down developer round trip
+            Defaults to False since types are generally not needed at runtime and introducing them could slow down developer round trip
             time due to having to generate typings on source file changes.""",
             default = False,
         ),
