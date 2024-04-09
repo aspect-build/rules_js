@@ -18,7 +18,6 @@ for a given lockfile.
 """
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
-load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
@@ -888,8 +887,6 @@ def npm_import(
         npm_auth_password = "",
         bins = {},
         dev = False,
-        register_copy_directory_toolchains = True,
-        register_copy_to_directory_toolchains = True,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1134,18 +1131,8 @@ def npm_import(
 
         dev: Whether this npm package is a dev dependency
 
-        register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
-
-        register_copy_to_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_to_directory_toolchains()` is called if the toolchain is not already registered
-
         **kwargs: Internal use only
     """
-
-    # TODO(2.0): move this to a new required rules_js_repositories() WORKSPACE function
-    if register_copy_directory_toolchains and not native.existing_rule("copy_directory_toolchains"):
-        _register_copy_directory_toolchains()
-    if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
-        _register_copy_to_directory_toolchains()
 
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
