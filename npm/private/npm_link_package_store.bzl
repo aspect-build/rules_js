@@ -105,7 +105,7 @@ def _npm_link_package_store_impl(ctx):
             runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
         ),
         js_info(
-            npm_linked_packages = transitive_files_depset,
+            npm_sources = transitive_files_depset,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
             npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
         ),
