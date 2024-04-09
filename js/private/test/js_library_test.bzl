@@ -27,69 +27,69 @@ def _js_library_test_suite_data():
     )
 
 # Tests
-def _declarations_test_impl(ctx):
+def _types_test_impl(ctx):
     env = analysistest.begin(ctx)
     target_under_test = analysistest.target_under_test(env)
 
-    # declarations should only have the source declarations
-    declarations = target_under_test[JsInfo].declarations.to_list()
-    asserts.equals(env, 2, len(declarations))
-    asserts.true(env, declarations[0].path.find("/importing.d.ts") != -1)
-    asserts.true(env, declarations[1].path.find("/data.json") != -1)
+    # types should only have the source types
+    types = target_under_test[JsInfo].types.to_list()
+    asserts.equals(env, 2, len(types))
+    asserts.true(env, types[0].path.find("/importing.d.ts") != -1)
+    asserts.true(env, types[1].path.find("/data.json") != -1)
 
-    # transitive_declarations should have the source declarations and transitive declarations
-    transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
-    asserts.true(env, len(transitive_declarations) == 2)
-    asserts.true(env, transitive_declarations[0].path.find("/importing.d.ts") != -1)
-    asserts.true(env, transitive_declarations[1].path.find("/data.json") != -1)
+    # transitive_types should have the source types and transitive types
+    transitive_types = target_under_test[JsInfo].transitive_types.to_list()
+    asserts.true(env, len(transitive_types) == 2)
+    asserts.true(env, transitive_types[0].path.find("/importing.d.ts") != -1)
+    asserts.true(env, transitive_types[1].path.find("/data.json") != -1)
 
-    # types OutputGroupInfo should be the same as direct declarations
-    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
+    # types OutputGroupInfo should be the same as direct types
+    asserts.equals(env, types, target_under_test[OutputGroupInfo].types.to_list())
 
     return analysistest.end(env)
 
-def _explicit_declarations_test_impl(ctx):
+def _explicit_types_test_impl(ctx):
     env = analysistest.begin(ctx)
     target_under_test = analysistest.target_under_test(env)
 
-    # declarations should only have the source declarations
-    declarations = target_under_test[JsInfo].declarations.to_list()
-    asserts.equals(env, 2, len(declarations))
-    asserts.true(env, declarations[0].path.find("/data.json") != -1)
-    asserts.true(env, declarations[1].path.find("/index.js") != -1)
+    # types should only have the source types
+    types = target_under_test[JsInfo].types.to_list()
+    asserts.equals(env, 2, len(types))
+    asserts.true(env, types[0].path.find("/data.json") != -1)
+    asserts.true(env, types[1].path.find("/index.js") != -1)
 
-    # transitive_declarations should have the source declarations and transitive declarations
-    transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
-    asserts.true(env, len(transitive_declarations) == 2)
-    asserts.true(env, transitive_declarations[0].path.find("/data.json") != -1)
-    asserts.true(env, transitive_declarations[1].path.find("/index.js") != -1)
+    # transitive_types should have the source types and transitive types
+    transitive_types = target_under_test[JsInfo].transitive_types.to_list()
+    asserts.true(env, len(transitive_types) == 2)
+    asserts.true(env, transitive_types[0].path.find("/data.json") != -1)
+    asserts.true(env, transitive_types[1].path.find("/index.js") != -1)
 
-    # types OutputGroupInfo should be the same as direct declarations
-    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
+    # types OutputGroupInfo should be the same as direct types
+    asserts.equals(env, types, target_under_test[OutputGroupInfo].types.to_list())
 
     return analysistest.end(env)
 
-def _declarations_empty_srcs_test_impl(ctx):
+def _types_empty_srcs_test_impl(ctx):
     env = analysistest.begin(ctx)
     target_under_test = analysistest.target_under_test(env)
 
-    # declarations should only have the source declarations, in this case 0
-    declarations = target_under_test[JsInfo].declarations.to_list()
-    asserts.equals(env, 0, len(declarations))
+    # types should only have the source types, in this case 0
+    types = target_under_test[JsInfo].types.to_list()
+    asserts.equals(env, 0, len(types))
 
-    # transitive_declarations should contain additional indirect deps
-    transitive_declarations = target_under_test[JsInfo].transitive_declarations.to_list()
-    asserts.true(env, len(transitive_declarations) > len(declarations))
+    # transitive_types should contain additional indirect deps
+    transitive_types = target_under_test[JsInfo].transitive_types.to_list()
+    asserts.true(env, len(transitive_types) > len(types))
 
-    # types OutputGroupInfo should be the same as direct declarations
-    asserts.equals(env, declarations, target_under_test[OutputGroupInfo].types.to_list())
+    # types OutputGroupInfo should be the same as direct types
+    asserts.equals(env, types, target_under_test[OutputGroupInfo].types.to_list())
 
     return analysistest.end(env)
 
-# Test declarations
-_declarations_test = analysistest.make(_declarations_test_impl)
-_explicit_declarations_test = analysistest.make(_explicit_declarations_test_impl)
-_declarations_empty_srcs_test = analysistest.make(_declarations_empty_srcs_test_impl)
+# Test types
+_types_test = analysistest.make(_types_test_impl)
+_explicit_types_test = analysistest.make(_explicit_types_test_impl)
+_types_empty_srcs_test = analysistest.make(_types_empty_srcs_test_impl)
 
 def js_library_test_suite(name):
     """Test suite including all tests and data
@@ -108,33 +108,33 @@ def js_library_test_suite(name):
         ],
         tags = ["manual"],
     )
-    _declarations_test(
+    _types_test(
         name = "transitive_type_deps_test",
         target_under_test = "transitive_type_deps",
     )
 
-    # Explicit declarations
+    # Explicit types
     js_library(
-        name = "explicit_declarations",
+        name = "explicit_types",
         srcs = ["data.json"],
-        declarations = ["index.js"],
+        types = ["index.js"],
         deps = [
             "//:node_modules/@types/node",
         ],
         tags = ["manual"],
     )
-    _explicit_declarations_test(
-        name = "explicit_declarations_test",
-        target_under_test = "explicit_declarations",
+    _explicit_types_test(
+        name = "explicit_types_test",
+        target_under_test = "explicit_types",
     )
 
-    # Empty srcs, declarations in deps
+    # Empty srcs, types in deps
     js_library(
         name = "transitive_type_deps_empty_srcs",
         deps = [":transitive_type_deps"],
         tags = ["manual"],
     )
-    _declarations_empty_srcs_test(
+    _types_empty_srcs_test(
         name = "transitive_type_deps_empty_srcs_test",
         target_under_test = "transitive_type_deps_empty_srcs",
     )
@@ -143,7 +143,7 @@ def js_library_test_suite(name):
         name = name,
         tests = [
             ":transitive_type_deps_test",
-            ":explicit_declarations_test",
+            ":explicit_types_test",
             ":transitive_type_deps_empty_srcs_test",
         ],
     )
