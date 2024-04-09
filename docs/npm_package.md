@@ -145,14 +145,6 @@ This ensures that actions which use the package.json file can get cache hits.
 
 For more information on stamping, read https://docs.aspect.build/rules/aspect_bazel_lib/docs/stamping.
 
-Using this rule requires that you register the jq toolchain in your WORKSPACE:
-
-```starlark
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_jq_toolchains")
-
-register_jq_toolchains()
-```
-
 
 **PARAMETERS**
 
