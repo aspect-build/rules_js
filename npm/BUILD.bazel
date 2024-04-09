@@ -11,14 +11,21 @@ exports_files(
 # Allows for faster dev roundtrip by excluding type-checking from libraries that are
 # internally used via npm_package
 bool_flag(
-    name = "exclude_declarations_from_npm_packages",
+    name = "exclude_types_from_npm_packages",
     build_setting_default = False,
     visibility = ["//visibility:public"],
 )
 
+# For backward compat
+# TODO(3.0): remove this backward compat flag
+alias(
+    name = "exclude_declarations_from_npm_packages",
+    actual = ":exclude_types_from_npm_packages",
+)
+
 config_setting(
-    name = "exclude_declarations_from_npm_packages_flag",
-    flag_values = {":exclude_declarations_from_npm_packages": "true"},
+    name = "exclude_types_from_npm_packages_flag",
+    flag_values = {":exclude_types_from_npm_packages": "true"},
     visibility = ["//visibility:public"],
 )
 
