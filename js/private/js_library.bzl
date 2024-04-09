@@ -24,7 +24,7 @@ js_library(
 """
 
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_declarations", "gather_transitive_sources")
+load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
@@ -32,7 +32,7 @@ and derivative rule sets.
 
 Declaration files are handled separately from sources since they are generally not needed at
 runtime and build rules, such as ts_project, are optimal in their build graph if they only depend
-on declarations from `deps` since these they don't need the JavaScript source files from deps to
+on types from `deps` since these they don't need the JavaScript source files from deps to
 typecheck.
 
 Linked npm dependences are also handled separately from sources since not all rules require them and it
@@ -53,22 +53,22 @@ runfiles of this target. They should appear in the '*.runfiles' area of any exec
 runtime dependency on this target.
 
 Source files that are JSON files, declaration files or directory artifacts will be automatically provided as
-"declarations" available to downstream rules for type checking. To explicitly provide source files as "declarations"
-available to downstream rules for type checking that do not match these criteria, move those files to the `declarations`
+"types" available to downstream rules for type checking. To explicitly provide source files as "types"
+available to downstream rules for type checking that do not match these criteria, move those files to the `types`
 attribute instead.
 """,
         allow_files = True,
     ),
-    "declarations": attr.label_list(
-        doc = """Same as `srcs` except all files are also provided as "declarations" available to downstream rules for type checking.
+    "types": attr.label_list(
+        doc = """Same as `srcs` except all files are also provided as "types" available to downstream rules for type checking.
 
 For example, a js_library with only `.js` files that are intended to be imported as `.js` files by downstream type checking
-rules such as `ts_project` would list those files in `declarations`:
+rules such as `ts_project` would list those files in `types`:
 
 ```
 js_library(
     name = "js_lib",
-    declarations = ["index.js"],
+    types = ["index.js"],
 )
 ```
 """,
@@ -103,33 +103,33 @@ runtime dependency on this target.
     ),
 }
 
-def _gather_sources_and_declarations(ctx, targets, files):
-    """Gathers sources and declarations from a list of targets
+def _gather_sources_and_types(ctx, targets, files):
+    """Gathers sources and types from a list of targets
 
     Args:
         ctx: the rule context
 
-        targets: List of targets to gather sources and declarations from their JsInfo providers.
+        targets: List of targets to gather sources and types from their JsInfo providers.
 
             These typically come from the `srcs` and/or `data` attributes of a rule
 
-        files: List of files to gather as sources and declarations.
+        files: List of files to gather as sources and types.
 
             These typically come from the `srcs` and/or `data` attributes of a rule
 
     Returns:
-        Sources & declaration files depsets in the sequence (sources, declarations)
+        Sources & declaration files depsets in the sequence (sources, types)
     """
     sources = []
-    declarations = []
+    types = []
 
     for file in files:
         if file.is_source:
             file = copy_js_file_to_bin_action(ctx, file)
 
         if file.is_directory:
-            # assume a directory contains declarations since we can't know that it doesn't
-            declarations.append(file)
+            # assume a directory contains types since we can't know that it doesn't
+            types.append(file)
             sources.append(file)
         elif (
             file.path.endswith(".d.ts") or
@@ -139,11 +139,11 @@ def _gather_sources_and_declarations(ctx, targets, files):
             file.path.endswith(".d.cts") or
             file.path.endswith(".d.cts.map")
         ):
-            declarations.append(file)
+            types.append(file)
         elif file.path.endswith(".json"):
             # Any .json can produce types: https://www.typescriptlang.org/tsconfig/#resolveJsonModule
-            # package.json may be required to resolve declarations with the "typings" key
-            declarations.append(file)
+            # package.json may be required to resolve types with the "typings" key
+            types.append(file)
             sources.append(file)
         else:
             sources.append(file)
@@ -155,43 +155,43 @@ def _gather_sources_and_declarations(ctx, targets, files):
         if JsInfo in target and hasattr(target[JsInfo], "sources")
     ])
 
-    # declarations as depset
-    declarations = depset(declarations, transitive = [
-        target[JsInfo].declarations
+    # types as depset
+    types = depset(types, transitive = [
+        target[JsInfo].types
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "declarations")
+        if JsInfo in target and hasattr(target[JsInfo], "types")
     ])
 
-    return (sources, declarations)
+    return (sources, types)
 
 def _js_library_impl(ctx):
-    sources, declarations = _gather_sources_and_declarations(
+    sources, types = _gather_sources_and_types(
         ctx = ctx,
         targets = ctx.attr.srcs,
         files = ctx.files.srcs,
     )
 
-    additional_sources, additional_declarations = _gather_sources_and_declarations(
+    additional_sources, additional_types = _gather_sources_and_types(
         ctx = ctx,
-        targets = ctx.attr.declarations,
-        files = ctx.files.declarations,
+        targets = ctx.attr.types,
+        files = ctx.files.types,
     )
 
     sources = depset(transitive = [sources, additional_sources])
-    declarations = depset(transitive = [declarations, additional_sources, additional_declarations])
+    types = depset(transitive = [types, additional_sources, additional_types])
 
     transitive_sources = gather_transitive_sources(
         sources = sources,
-        targets = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
+        targets = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
     )
 
-    transitive_declarations = gather_transitive_declarations(
-        declarations = declarations,
-        targets = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
+    transitive_types = gather_transitive_types(
+        types = types,
+        targets = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
     )
 
     npm_sources = gather_npm_sources(
-        srcs = ctx.attr.srcs + ctx.attr.declarations,
+        srcs = ctx.attr.srcs + ctx.attr.types,
         deps = ctx.attr.deps,
     )
 
@@ -203,22 +203,22 @@ def _js_library_impl(ctx):
         ctx = ctx,
         sources = transitive_sources,
         data = ctx.attr.data,
-        deps = ctx.attr.srcs + ctx.attr.declarations + ctx.attr.deps,
+        deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
         data_files = ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
         include_transitive_sources = True,
-        include_declarations = False,
+        include_types = False,
         include_npm_sources = True,
     )
 
     return [
         js_info(
-            declarations = declarations,
+            types = types,
             npm_sources = npm_sources,
             npm_package_store_infos = npm_package_store_infos,
             sources = sources,
-            transitive_declarations = transitive_declarations,
+            transitive_types = transitive_types,
             transitive_sources = transitive_sources,
         ),
         DefaultInfo(
@@ -226,7 +226,7 @@ def _js_library_impl(ctx):
             runfiles = runfiles,
         ),
         OutputGroupInfo(
-            types = declarations,
+            types = types,
             runfiles = runfiles.files,
         ),
     ]

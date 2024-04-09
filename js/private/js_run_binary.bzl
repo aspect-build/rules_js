@@ -34,7 +34,7 @@ def js_run_binary(
         use_execroot_entry_point = True,
         copy_srcs_to_bin = True,
         include_transitive_sources = True,
-        include_declarations = False,
+        include_types = False,
         include_npm_sources = True,
         log_level = None,
         mnemonic = "JsRunBinary",
@@ -152,7 +152,7 @@ def js_run_binary(
 
         include_transitive_sources: see `js_info_files` documentation
 
-        include_declarations: see `js_info_files` documentation
+        include_types: see `js_info_files` documentation
 
         include_npm_sources: see `js_info_files` documentation
 
@@ -251,11 +251,20 @@ def js_run_binary(
 WARNING: js_run_binary 'include_npm_linked_packages' is deprecated. Use 'include_npm_sources' instead.""")
         include_npm_sources = include_npm_linked_packages
 
+    # For backward compat
+    # TODO(3.0): remove backward compat handling
+    include_declarations = kwargs.pop("include_declarations", False)
+    if include_declarations:
+        # buildifier: disable=print
+        print("""
+WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' instead.""")
+        include_types = include_declarations
+
     extra_srcs = []
 
     # Hoist js provider files to DefaultInfo
     make_js_info_files_target = (include_transitive_sources or
-                                 include_declarations or
+                                 include_types or
                                  include_npm_sources)
     if make_js_info_files_target:
         js_info_files_name = "{}_js_info_files".format(name)
@@ -263,7 +272,7 @@ WARNING: js_run_binary 'include_npm_linked_packages' is deprecated. Use 'include
             name = js_info_files_name,
             srcs = srcs,
             include_transitive_sources = include_transitive_sources,
-            include_declarations = include_declarations,
+            include_types = include_types,
             include_npm_sources = include_npm_sources,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
