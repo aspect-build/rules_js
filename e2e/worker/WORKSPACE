@@ -7,33 +7,7 @@ load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
 
-load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
+load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
 
-nodejs_register_toolchains(
-    name = "nodejs",
-    # nodejs 14 is used intentionally here, to assert AbortController polyfill is installed properly.
-    node_version = "14.20.0",
-)
-
-load(
-    "@aspect_bazel_lib//lib:repositories.bzl",
-    "register_copy_directory_toolchains",
-    "register_copy_to_directory_toolchains",
-    "register_coreutils_toolchains",
-    "register_tar_toolchains",
-    "register_yq_toolchains",
-)
-
-register_copy_directory_toolchains()
-
-register_copy_to_directory_toolchains()
-
-register_coreutils_toolchains()
-
-register_tar_toolchains()
-
-register_yq_toolchains()
-
-load("@bazel_features//:deps.bzl", "bazel_features_deps")
-
-bazel_features_deps()
+# nodejs 14 is used intentionally here, to assert AbortController polyfill is installed properly.
+rules_js_register_toolchains(node_version = "14.20.0")
