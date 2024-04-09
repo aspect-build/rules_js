@@ -54,24 +54,24 @@ def gather_transitive_sources(sources, targets):
     ]
     return depset([], transitive = [sources] + transitive)
 
-def gather_transitive_declarations(declarations, targets):
-    """Gathers transitive declarations from a list of direct declarations and targets
+def gather_transitive_types(types, targets):
+    """Gathers transitive types from a list of direct types and targets
 
     Args:
-        declarations: list or depset of direct sources which should be included in `transitive_declarations`
-        targets: list of targets to gather `transitive_declarations` from `JsInfo`
+        types: list or depset of direct sources which should be included in `transitive_types`
+        targets: list of targets to gather `transitive_types` from `JsInfo`
 
     Returns:
         A depset of transitive sources
     """
-    if type(declarations) == "list":
-        declarations = depset(declarations)
+    if type(types) == "list":
+        types = depset(types)
     transitive = [
-        target[JsInfo].transitive_declarations
+        target[JsInfo].transitive_types
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
+        if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
     ]
-    return depset([], transitive = [declarations] + transitive)
+    return depset([], transitive = [types] + transitive)
 
 def gather_npm_sources(srcs, deps):
     """Gathers npm sources from a list of srcs and deps targets
@@ -155,8 +155,8 @@ def gather_runfiles(
         no_copy_to_bin = [],
         include_sources = True,
         include_transitive_sources = True,
-        include_declarations = False,
-        include_transitive_declarations = False,
+        include_types = False,
+        include_transitive_types = False,
         include_npm_sources = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
@@ -197,9 +197,9 @@ def gather_runfiles(
 
         include_transitive_sources: see js_info_files documentation
 
-        include_declarations: see js_info_files documentation
+        include_types: see js_info_files documentation
 
-        include_transitive_declarations: see js_info_files documentation
+        include_transitive_types: see js_info_files documentation
 
         include_npm_sources: see js_info_files documentation
 
@@ -223,8 +223,8 @@ def gather_runfiles(
         targets = data + deps,
         include_sources = include_sources,
         include_transitive_sources = include_transitive_sources,
-        include_declarations = include_declarations,
-        include_transitive_declarations = include_transitive_declarations,
+        include_types = include_types,
+        include_transitive_types = include_transitive_types,
         include_npm_sources = include_npm_sources,
     ))
 
@@ -286,8 +286,8 @@ def gather_files_from_js_info(
         targets,
         include_sources,
         include_transitive_sources,
-        include_declarations,
-        include_transitive_declarations,
+        include_types,
+        include_transitive_types,
         include_npm_sources):
     """Gathers files from JsInfo and NpmPackageStoreInfo providers.
 
@@ -295,8 +295,8 @@ def gather_files_from_js_info(
         targets: list of target to gather from
         include_sources: see js_info_files documentation
         include_transitive_sources: see js_info_files documentation
-        include_declarations: see js_info_files documentation
-        include_transitive_declarations: see js_info_files documentation
+        include_types: see js_info_files documentation
+        include_transitive_types: see js_info_files documentation
         include_npm_sources: see js_info_files documentation
 
     Returns:
@@ -315,17 +315,17 @@ def gather_files_from_js_info(
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
         ])
-    if include_declarations:
+    if include_types:
         files_depsets.extend([
-            target[JsInfo].declarations
+            target[JsInfo].types
             for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "declarations")
+            if JsInfo in target and hasattr(target[JsInfo], "types")
         ])
-    if include_transitive_declarations:
+    if include_transitive_types:
         files_depsets.extend([
-            target[JsInfo].transitive_declarations
+            target[JsInfo].transitive_types
             for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_declarations")
+            if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
         ])
     if include_npm_sources:
         files_depsets.extend([
