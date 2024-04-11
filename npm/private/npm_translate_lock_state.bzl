@@ -549,23 +549,16 @@ def _load_root_package_json(priv, rctx, label_store):
         priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
         return priv["root_package_json"]
 
-    lockfile_is_loaded = "importers" in priv
-    if lockfile_is_loaded:
-        # Load an undeclared package.json derived from the root importer in the lockfile
-        has_root_importer = "." in priv["importers"].keys()
-        if has_root_importer:
-            label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
-            root_package_json_path = label_store.path("package_json_root")
-            priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
-        else:
-            # if there is no root importer that means there is no root package.json to read; pnpm allows
-            # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
-            priv["root_package_json"] = {}
+    # Load an undeclared package.json derived from the root importer in the lockfile
+    has_root_importer = "." in priv["importers"].keys()
+    if has_root_importer:
+        label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
+        root_package_json_path = label_store.path("package_json_root")
+        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
     else:
-        # The lockfile hasn't been loaded yet so we can't check for a root importer.
-        # Don't cache anything so that this method doesn't short-circuit when run again
-        # after the lockfile has been loaded.
-        return {}
+        # if there is no root importer that means there is no root package.json to read; pnpm allows
+        # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
+        priv["root_package_json"] = {}
 
     return priv["root_package_json"]
 
@@ -619,6 +612,7 @@ def _new(rctx):
         "npm_registries": {},
         "packages": {},
         "root_package": None,
+        "patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
     }
 
