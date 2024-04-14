@@ -650,7 +650,7 @@ def _npm_import_links_rule_impl(rctx):
     if transitive_closure_pattern:
         # transitive closure deps pattern is used for breaking circular deps;
         # this pattern is used to break circular dependencies between 3rd
-        # party npm deps; it is not recommended for 1st party deps
+        # party npm deps; it is not used for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
                 store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
