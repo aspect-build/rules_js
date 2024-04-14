@@ -237,7 +237,7 @@ js_test(
 )
 
 #######################################
-# Case 7: use a first-party npm package from within our Bazel monorepo workspace
+# Case 7: use a first-party npm package within our Bazel monorepo workspace from an npm_package target
 
 write_file(
     name = "write7",
