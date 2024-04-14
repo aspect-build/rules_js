@@ -70,9 +70,15 @@ importers:
       '@mycorp/pkg-a':
         specifier: workspace:*
         version: link:../npm_package/packages/pkg_a
+      '@mycorp/pkg-d':
+        specifier: workspace:*
+        version: link:../npm_package/packages/pkg_d
       '@rollup/plugin-commonjs':
         specifier: 21.1.0
         version: 21.1.0(rollup@2.70.2)
+      acorn:
+        specifier: 8.7.1
+        version: 8.7.1
       debug:
         specifier: 3.2.7
         version: 3.2.7
@@ -115,6 +121,15 @@ importers:
       acorn:
         specifier: 8.x.x
         version: 8.8.2
+      uuid:
+        specifier: 8.3.2
+        version: 8.3.2
+
+  examples/npm_package/packages/pkg_d:
+    dependencies:
+      acorn:
+        specifier: 8.x.x
+        version: 8.7.1
       uuid:
         specifier: 8.3.2
         version: 8.3.2
@@ -1550,7 +1565,6 @@ packages:
     resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-    dev: false
 
   /acorn@8.8.2:
     resolution: {integrity: sha512-xjIYgE8HBrkpd/sJqOGNspf8uHG+NOHGOw6a/Urj8taM2EXfdNAH2oFcPeIFfsv3+kz/mJrS5VuMqbNLjCa2vw==}

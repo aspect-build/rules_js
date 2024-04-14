@@ -214,6 +214,7 @@ def _js_library_impl(ctx):
 
     return [
         js_info(
+            target = ctx.label,
             sources = sources,
             types = types,
             transitive_sources = transitive_sources,
