@@ -273,14 +273,14 @@ def _package_store_name(name, version):
         escaped_version = version.replace("/", "+")
         return "%s@%s" % (escaped_name, escaped_version)
 
-def _make_symlink(ctx, symlink_path, target_file):
+def _make_symlink(ctx, symlink_path, target_path):
     if not bazel_lib_utils.is_bazel_6_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
         fail("A minimum version of Bazel 6 required to use rules_js")
     symlink = ctx.actions.declare_symlink(symlink_path)
     ctx.actions.symlink(
         output = symlink,
-        target_path = relative_file(target_file.path, symlink.path),
+        target_path = relative_file(target_path, symlink.path),
     )
     return symlink
 
