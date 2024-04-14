@@ -239,7 +239,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
                 # this pattern is used to break circular dependencies between 3rd
-                # party npm deps; it is not recommended for 1st party deps
+                # party npm deps; it is not used for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
 
         for store in ctx.attr.src[NpmPackageInfo].npm_package_store_infos.to_list():
@@ -254,9 +254,10 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
                 npm_package_store_infos.append(store)
     else:
-        # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
-        # being the transitive closure of deps; this pattern is used to break circular dependencies
-        # between 3rd party npm deps; it is not recommended for 1st party deps
+        # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
+        # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
+        # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
+        # is not used for 1st party deps
         deps_map = {}
         for dep, _dep_aliases in ctx.attr.deps.items():
             dep_package = dep[NpmPackageStoreInfo].package
@@ -268,7 +269,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
-                # for lifecycle hooks on 3rd party deps; it is not recommended for 1st party deps
+                # for lifecycle hooks on 3rd party deps; it is not used for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
         for dep in ctx.attr.deps:
             dep_package_store_name = utils.package_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)
@@ -308,13 +309,13 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             for npm_package_store in npm_package_store_infos
         ])
     else:
-        # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
-        # being the transitive closure of deps; this pattern is used to break circular dependencies
-        # between 3rd party npm deps; it is not recommended for 1st party deps because
-        # npm_package_store_infos is the transitive closure of all the entire package store deps, we
-        # can safely add just `files` from each of these to `transitive_files_depset`. Doing so
-        # reduces the size of `transitive_files_depset` significantly and reduces analysis time and
-        # Bazel memory usage during analysis
+        # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when ctx.attr.src is
+        # _not_ set, this is a terminal 3p package with ctx.attr.deps being the transitive closure
+        # of deps; this pattern is used to break circular dependencies between 3rd party npm deps;
+        # it is not used for 1st party deps; because npm_package_store_infos is the transitive
+        # closure of all the entire package store deps, we can safely add just `files` from each of
+        # these to `transitive_files_depset`; doing so reduces the size of `transitive_files_depset`
+        # significantly and reduces analysis time and Bazel memory usage during analysis
         transitive_files_depset = depset(files, transitive = [
             npm_package_store.files
             for npm_package_store in npm_package_store_infos
