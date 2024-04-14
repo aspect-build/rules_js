@@ -234,7 +234,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 for dep_alias in dep_aliases:
                     # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
                     dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_alias)
-                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory))
+                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
@@ -251,7 +251,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             if dep_package_store_directory not in linked_package_store_directories:
                 # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
                 dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_package)
-                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory))
+                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
                 npm_package_store_infos.append(store)
     else:
         # if ctx.attr.src is _not_ set then this is a terminal 3p package with ctx.attr.deps is
@@ -290,7 +290,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
                         # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
                         dep_ref_dep_symlink_path = paths.join("node_modules", utils.package_store_root, dep_package_store_name, "node_modules", dep_ref_dep_alias)
-                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory))
+                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path))
 
     if package_store_directory:
         files.append(package_store_directory)
