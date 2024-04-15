@@ -39,6 +39,5 @@ npm_package(
     # that this package is linked as is set by the pnpm lockfile. If it is
     # specified here then it won't be load bearing since the value in the pnpm
     # lockfile will take precedence.
-    include_runfiles = False,
     visibility = ["//visibility:public"],
 )
