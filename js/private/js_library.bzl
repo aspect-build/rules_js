@@ -214,12 +214,12 @@ def _js_library_impl(ctx):
 
     return [
         js_info(
+            sources = sources,
             types = types,
+            transitive_sources = transitive_sources,
+            transitive_types = transitive_types,
             npm_sources = npm_sources,
             npm_package_store_infos = npm_package_store_infos,
-            sources = sources,
-            transitive_types = transitive_types,
-            transitive_sources = transitive_sources,
         ),
         DefaultInfo(
             files = sources,
