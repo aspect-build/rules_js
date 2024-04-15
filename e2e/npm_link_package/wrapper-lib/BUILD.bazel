@@ -18,7 +18,6 @@ js_library(
 npm_package(
     name = "wrapper-lib_pkg",
     srcs = [":js"],
-    include_runfiles = False,
     package = "@e2e/wrapper-lib",
     visibility = ["//visibility:public"],
 )

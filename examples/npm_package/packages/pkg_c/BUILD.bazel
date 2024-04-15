@@ -11,7 +11,6 @@ npm_package(
         "data1/pkg-c.json",
         "src/index.js",
     ],
-    include_runfiles = False,
     package = "@mycorp/pkg-c1",
     root_paths = [
         package_name(),
@@ -28,7 +27,6 @@ npm_package(
         "data2/pkg-c.json",
         "src/index.js",
     ],
-    include_runfiles = False,
     package = "@mycorp/pkg-c2",
     root_paths = [
         package_name(),
