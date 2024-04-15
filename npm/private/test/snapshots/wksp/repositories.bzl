@@ -4633,7 +4633,9 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
+            "examples/npm_deps": ["acorn"],
             "examples/npm_package/packages/pkg_a": ["acorn"],
+            "examples/npm_package/packages/pkg_d": ["acorn"],
         },
         package = "acorn",
         version = "8.7.1",
@@ -23012,6 +23014,7 @@ def npm_repositories():
         link_packages = {
             "examples/npm_package/packages/pkg_a": ["uuid"],
             "examples/npm_package/packages/pkg_b": ["uuid"],
+            "examples/npm_package/packages/pkg_d": ["uuid"],
         },
         package = "uuid",
         version = "8.3.2",

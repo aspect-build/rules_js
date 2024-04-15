@@ -6,6 +6,9 @@ load(":utils.bzl", "utils")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 
+# buildifier: disable=bzl-visibility
+load("//js/private:js_info.bzl", "JsInfo")
+
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
 The npm package is linked with a pnpm style symlinked node_modules output tree.
@@ -24,7 +27,6 @@ _ATTRS = {
     "src": attr.label(
         doc = """A npm_package target or or any other target that provides a NpmPackageInfo.
         """,
-        providers = [NpmPackageInfo],
         mandatory = True,
     ),
     "deps": attr.label_keyed_string_dict(
@@ -150,8 +152,26 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
 }
 
 def _npm_package_store_impl(ctx):
-    package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
-    version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
+    if ctx.attr.src:
+        if NpmPackageInfo in ctx.attr.src:
+            package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
+            version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
+        elif JsInfo in ctx.attr.src:
+            if not ctx.attr.package:
+                msg = "Expected package to be specified in '{}' when src '{}' provides a JsInfo".format(ctx.label, ctx.attr.src[JsInfo].target)
+                fail(msg)
+            package = ctx.attr.package
+            version = ctx.attr.version if ctx.attr.version else "0.0.0"
+        else:
+            msg = "Expected src of '{}' to provide either NpmPackageInfo or JsInfo".format(ctx.label)
+            fail(msg)
+    else:
+        # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
+        # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
+        # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
+        # is not used for 1st party deps
+        package = ctx.attr.package
+        version = ctx.attr.version
 
     if not package:
         fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
@@ -159,19 +179,20 @@ def _npm_package_store_impl(ctx):
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
 
     package_store_name = utils.package_store_name(package, version)
-
-    src = None
     package_store_directory = None
+
     files = []
+    transitive_files_depsets = []
+    transitive_package_store_infos_depsets = []
+    npm_package_store_infos = []
     direct_ref_deps = {}
 
-    npm_package_store_infos = []
+    # the path to the package store location for this package
+    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+    package_store_directory_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", package)
 
-    if ctx.attr.src:
+    if ctx.attr.src and NpmPackageInfo in ctx.attr.src:
         # output the package as a TreeArtifact to its package store location
-        # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-        package_store_directory_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", package)
-
         if ctx.label.workspace_name:
             expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
         else:
@@ -253,7 +274,22 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_package)
                 files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
                 npm_package_store_infos.append(store)
-    else:
+    elif ctx.attr.src and JsInfo in ctx.attr.src:
+        # Symlink to the directory of the target that created this JsInfo
+        if ctx.label.workspace_name:
+            symlink_path = paths.join("external", ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
+        else:
+            symlink_path = paths.join(ctx.label.package, package_store_directory_path)
+        transitive_files_depsets.append(ctx.attr.src[JsInfo].transitive_sources)
+        transitive_files_depsets.append(ctx.attr.src[JsInfo].transitive_types)
+        transitive_package_store_infos_depsets.append(ctx.attr.src[JsInfo].npm_package_store_infos)
+        if ctx.attr.src[JsInfo].target.workspace_name:
+            target_path = paths.join(ctx.bin_dir.path, "external", ctx.attr.src[JsInfo].target.workspace_name, ctx.attr.src[JsInfo].target.package)
+            package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+        else:
+            target_path = paths.join(ctx.bin_dir.path, ctx.attr.src[JsInfo].target.package)
+            package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+    elif not ctx.attr.src:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
         # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
@@ -292,6 +328,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                         # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
                         dep_ref_dep_symlink_path = paths.join("node_modules", utils.package_store_root, dep_package_store_name, "node_modules", dep_ref_dep_alias)
                         files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path))
+    else:
+        # We should _never_ get here
+        fail("Internal error")
 
     if package_store_directory:
         files.append(package_store_directory)
@@ -303,10 +342,14 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     files_depset = depset(files)
 
+    for transitive_package_store_infos_depset in transitive_package_store_infos_depsets:
+        for npm_package_store_info in transitive_package_store_infos_depset.to_list():
+            npm_package_store_infos.append(npm_package_store_info)
+
     if ctx.attr.src:
-        transitive_files_depset = depset(files, transitive = [
-            npm_package_store.transitive_files
-            for npm_package_store in npm_package_store_infos
+        transitive_files_depset = depset(files, transitive = transitive_files_depsets + [
+            npm_package_store_info.transitive_files
+            for npm_package_store_info in npm_package_store_infos
         ])
     else:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when ctx.attr.src is
@@ -316,9 +359,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # closure of all the entire package store deps, we can safely add just `files` from each of
         # these to `transitive_files_depset`; doing so reduces the size of `transitive_files_depset`
         # significantly and reduces analysis time and Bazel memory usage during analysis
-        transitive_files_depset = depset(files, transitive = [
-            npm_package_store.files
-            for npm_package_store in npm_package_store_infos
+        transitive_files_depset = depset(files, transitive = transitive_files_depsets + [
+            npm_package_store_info.files
+            for npm_package_store_info in npm_package_store_infos
         ])
 
     providers = [
@@ -336,7 +379,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             dev = ctx.attr.dev,
         ),
     ]
-    if package_store_directory:
+    if package_store_directory and package_store_directory.is_directory:
         # Provide an output group that provides a single file which is the
         # package directory for use in $(execpath) and $(rootpath).
         # Output group name must match utils.package_directory_output_group
