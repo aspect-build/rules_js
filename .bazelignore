@@ -6,6 +6,8 @@ examples/npm_deps/node_modules/
 examples/npm_package/libs/lib_a/node_modules/
 examples/npm_package/packages/pkg_a/node_modules/
 examples/npm_package/packages/pkg_b/node_modules/
+examples/npm_package/packages/pkg_c/node_modules/
+examples/npm_package/packages/pkg_d/node_modules/
 examples/webpack_cli/node_modules/
 js/private/coverage/bundle/node_modules
 js/private/image/node_modules
