@@ -2156,7 +2156,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_900(name = "{}/uuid".format(name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
         elif bazel_package == "examples/npm_package/packages/pkg_b":
-            link_142(name = "{}/acorn".format(name))
+            link_143(name = "{}/acorn".format(name))
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_900(name = "{}/uuid".format(name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
