@@ -5,7 +5,6 @@ npm_package(
     srcs = glob(
         include = ["package/**/*"],
     ),
-    include_runfiles = False,
     root_paths = ["package"],
     visibility = ["//visibility:public"],
 )

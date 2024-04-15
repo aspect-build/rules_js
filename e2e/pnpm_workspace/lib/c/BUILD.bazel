@@ -10,6 +10,5 @@ npm_package(
         "package.json",
     ],
     out = "pkg",
-    include_runfiles = False,
     visibility = ["//visibility:public"],
 )

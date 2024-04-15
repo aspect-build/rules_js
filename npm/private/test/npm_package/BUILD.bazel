@@ -23,7 +23,6 @@ js_library(
 npm_package(
     name = "npm_package",
     srcs = [":lib_a"],
-    include_runfiles = False,
     visibility = ["//visibility:public"],
 )
 
