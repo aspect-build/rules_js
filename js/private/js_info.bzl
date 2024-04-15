@@ -3,6 +3,7 @@
 JsInfo = provider(
     doc = "Encapsulates information provided by rules in rules_js and derivative rule sets",
     fields = {
+        "target": "The label of target that created this JsInfo",
         "sources": "A depset of source files produced by the target",
         "types": "A depset of typings files produced by the target",
         "transitive_sources": "A depset of source files produced by the target and the target's transitive deps",
@@ -13,6 +14,7 @@ JsInfo = provider(
 )
 
 def js_info(
+        target,
         sources = depset(),
         types = depset(),
         transitive_sources = depset(),
@@ -22,6 +24,7 @@ def js_info(
     """Construct a JsInfo.
 
     Args:
+        target: See JsInfo documentation
         sources: See JsInfo documentation
         types: See JsInfo documentation
         transitive_sources: See JsInfo documentation
@@ -32,6 +35,9 @@ def js_info(
     Returns:
         A JsInfo provider
     """
+    if type(target) != "Label":
+        msg = "Expected target to be a Label but got {}".format(type(target))
+        fail(msg)
     if type(sources) != "depset":
         msg = "Expected sources to be a depset but got {}".format(type(sources))
         fail(msg)
@@ -52,6 +58,7 @@ def js_info(
         fail(msg)
 
     return JsInfo(
+        target = target,
         sources = sources,
         types = types,
         transitive_sources = transitive_sources,
