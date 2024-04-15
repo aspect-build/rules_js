@@ -4634,7 +4634,6 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "examples/npm_package/packages/pkg_a": ["acorn"],
-            "examples/npm_package/packages/pkg_b": ["acorn"],
         },
         package = "acorn",
         version = "8.7.1",
@@ -4652,6 +4651,7 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
+            "examples/npm_package/packages/pkg_b": ["acorn"],
             "js/private/test/image": ["acorn"],
         },
         package = "acorn",

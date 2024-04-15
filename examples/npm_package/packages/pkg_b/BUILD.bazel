@@ -1,30 +1,21 @@
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
-load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
-
-# Use js_library so that npm_package picks up our transitive sources from deps
-# via the JsInfo provider.
-js_library(
-    name = "lib",
-    srcs = [
-        "index.js",
-        "package.json",
-    ],
-    data = [
-        # Runtime non-dev dependencies propagate to downstream binary and npm_link_package (via npm_package) targets
-        ":node_modules/acorn",
-        ":node_modules/uuid",
-    ],
-)
 
 # The terminal npm_package target for this package. This target is linked
 # manually in the root of the pnpm workspace with `npm_link_package`.
 npm_package(
     name = "pkg_b",
-    srcs = [":lib"],
-    include_runfiles = False,
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    data = [
+        # npm deps must be added explicitly as this package is linked manually
+        # so deps are _not_ picked up from the pnpm lock file
+        ":node_modules",
+    ],
     package = "@mycorp/pkg-b",
     visibility = ["//visibility:public"],
 )

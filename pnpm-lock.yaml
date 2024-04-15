@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
+packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -104,7 +104,7 @@ importers:
   examples/npm_package/packages/pkg_a:
     dependencies:
       acorn:
-        specifier: 8.7.1
+        specifier: 8.x.x
         version: 8.7.1
       uuid:
         specifier: 8.3.2
@@ -113,8 +113,8 @@ importers:
   examples/npm_package/packages/pkg_b:
     dependencies:
       acorn:
-        specifier: 8.7.1
-        version: 8.7.1
+        specifier: 8.x.x
+        version: 8.8.2
       uuid:
         specifier: 8.3.2
         version: 8.3.2

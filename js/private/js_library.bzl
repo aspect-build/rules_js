@@ -196,7 +196,7 @@ def _js_library_impl(ctx):
     )
 
     npm_package_store_deps = gather_npm_package_store_deps(
-        targets = ctx.attr.data + ctx.attr.deps,
+        targets = ctx.attr.srcs + ctx.attr.data + ctx.attr.deps,
     )
 
     runfiles = gather_runfiles(
