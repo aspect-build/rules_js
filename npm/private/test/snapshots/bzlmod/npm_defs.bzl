@@ -982,7 +982,7 @@ load("@@_main~npm~npm__at_types_underscore__registry.npmjs.org_at_types_undersco
 load("@@_main~npm~npm__at_types_ws__registry.npmjs.org_at_types_ws_8.5.5__links//:defs.bzl", store_975 = "npm_imported_package_store")
 load("@@_main~npm~npm__at_types_yauzl__registry.npmjs.org_at_types_yauzl_2.10.0__links//:defs.bzl", store_976 = "npm_imported_package_store")
 
-_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_empty_node_modules", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
+_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_empty_node_modules", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -1994,6 +1994,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_88(name = "{}/@rollup/plugin-commonjs".format(name))
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
             scope_targets["@rollup"] = scope_targets["@rollup"] + [link_targets[-1]] if "@rollup" in scope_targets else [link_targets[-1]]
+            link_142(name = "{}/acorn".format(name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_296(name = "{}/debug".format(name))
             link_targets.append("//{}:{}/debug".format(bazel_package, name))
             link_584(name = "{}/meaning-of-life".format(name))
@@ -2155,6 +2157,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_900(name = "{}/uuid".format(name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+        elif bazel_package == "examples/npm_package/packages/pkg_d":
+            link_142(name = "{}/acorn".format(name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_900(name = "{}/uuid".format(name))
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
         elif bazel_package == "examples/npm_package/packages/pkg_b":
             link_143(name = "{}/acorn".format(name))
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
@@ -2260,6 +2267,42 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     if is_root:
         _npm_package_store(
+            name = ".aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
+            src = "//examples/npm_package/packages/pkg_d:pkg_d",
+            package = "@mycorp/pkg-d",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
+                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["examples/npm_deps"]:
+        if link_package == native.package_name():
+            # terminal target for direct dependencies
+            _npm_link_package_store(
+                name = "{}/@mycorp/pkg-d".format(name),
+                src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/@mycorp/pkg-d/dir".format(name),
+                srcs = [":{}/@mycorp/pkg-d".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            link_targets.append(":{}/@mycorp/pkg-d".format(name))
+            scope_targets["@mycorp"] = scope_targets["@mycorp"] + [link_targets[-1]] if "@mycorp" in scope_targets else [link_targets[-1]]
+
+    if is_root:
+        _npm_package_store(
             name = ".aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
             src = "//npm/private/test/npm_package:npm_package",
             package = "test-npm_package",
@@ -2321,6 +2364,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
             link_targets.append("//{}:{}/@gregmagolan/test-b".format(bazel_package, name))
             link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_targets.append("//{}:{}/debug".format(bazel_package, name))
             link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
             link_targets.append("//{}:{}/mobx-react".format(bazel_package, name))
@@ -2393,6 +2437,9 @@ def npm_link_targets(name = "node_modules", package = None):
         elif bazel_package == "examples/npm_package/packages/pkg_a":
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+        elif bazel_package == "examples/npm_package/packages/pkg_d":
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
         elif bazel_package == "examples/npm_package/packages/pkg_b":
             link_targets.append("//{}:{}/acorn".format(bazel_package, name))
             link_targets.append("//{}:{}/uuid".format(bazel_package, name))
@@ -2420,6 +2467,10 @@ def npm_link_targets(name = "node_modules", package = None):
     for link_package in ["examples/js_binary", "examples/npm_deps"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@mycorp/pkg-a".format(bazel_package, name))
+
+    for link_package in ["examples/npm_deps"]:
+        if link_package == bazel_package:
+            link_targets.append("//{}:{}/@mycorp/pkg-d".format(bazel_package, name))
 
     for link_package in ["npm/private/test"]:
         if link_package == bazel_package:
