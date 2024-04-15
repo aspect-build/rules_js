@@ -262,3 +262,20 @@ js_test(
     ],
     entry_point = "patched-dependencies-test.js",
 )
+
+#######################################
+# Case 9: use a first-party npm package within our Bazel monorepo workspace from a js_library target
+
+write_file(
+    name = "write9",
+    out = "case9.js",
+    content = ["require('@mycorp/pkg-d')"],
+)
+
+js_test(
+    name = "test9",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+    ],
+    entry_point = "case9.js",
+)
