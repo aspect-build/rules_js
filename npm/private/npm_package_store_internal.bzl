@@ -2,7 +2,6 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":npm_package_store.bzl", _npm_package_store_lib = "npm_package_store_lib")
-load(":npm_package_info.bzl", "NpmPackageInfo")
 
 _INTERNAL_ATTRS_STORE = dicts.add(_npm_package_store_lib.attrs, {
     "src": attr.label(
@@ -15,7 +14,6 @@ _INTERNAL_ATTRS_STORE = dicts.add(_npm_package_store_lib.attrs, {
         complication. Outside our `npm_import` you should structure you `npm_link_package` targets in
         a DAG (without cycles).
         """,
-        providers = [NpmPackageInfo],
     ),
     "package": attr.string(
         doc = """The package name to link to.
