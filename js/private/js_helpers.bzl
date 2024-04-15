@@ -222,8 +222,8 @@ def gather_runfiles(
     transitive_files_depsets.append(gather_files_from_js_info(
         targets = data + deps,
         include_sources = include_sources,
-        include_transitive_sources = include_transitive_sources,
         include_types = include_types,
+        include_transitive_sources = include_transitive_sources,
         include_transitive_types = include_transitive_types,
         include_npm_sources = include_npm_sources,
     ))
@@ -285,8 +285,8 @@ def envs_for_log_level(log_level):
 def gather_files_from_js_info(
         targets,
         include_sources,
-        include_transitive_sources,
         include_types,
+        include_transitive_sources,
         include_transitive_types,
         include_npm_sources):
     """Gathers files from JsInfo and NpmPackageStoreInfo providers.
@@ -294,8 +294,8 @@ def gather_files_from_js_info(
     Args:
         targets: list of target to gather from
         include_sources: see js_info_files documentation
-        include_transitive_sources: see js_info_files documentation
         include_types: see js_info_files documentation
+        include_transitive_sources: see js_info_files documentation
         include_transitive_types: see js_info_files documentation
         include_npm_sources: see js_info_files documentation
 
@@ -309,17 +309,17 @@ def gather_files_from_js_info(
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "sources")
         ]
-    if include_transitive_sources:
-        files_depsets.extend([
-            target[JsInfo].transitive_sources
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-        ])
     if include_types:
         files_depsets.extend([
             target[JsInfo].types
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "types")
+        ])
+    if include_transitive_sources:
+        files_depsets.extend([
+            target[JsInfo].transitive_sources
+            for target in targets
+            if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
         ])
     if include_transitive_types:
         files_depsets.extend([
