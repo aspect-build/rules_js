@@ -2,8 +2,8 @@ load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//:less/package_json.bzl", less_bin = "bin")
 load("@npm//:jasmine/package_json.bzl", jasmine_bin = "bin")
+load("@npm//:less/package_json.bzl", less_bin = "bin")
 load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
 
 not_windows = select({

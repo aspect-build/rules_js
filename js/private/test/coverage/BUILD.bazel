@@ -1,5 +1,5 @@
-load(":test.bzl", "coverage_fail_test", "coverage_pass_test")
 load("//js/private/coverage:merger.bzl", "coverage_merger")
+load(":test.bzl", "coverage_fail_test", "coverage_pass_test")
 
 FAIL_CMD = """\
 echo "require('fs').writeFileSync(process.env.COVERAGE_OUTPUT_FILE, '# no coverage');" >> $@

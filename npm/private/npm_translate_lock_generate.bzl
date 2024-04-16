@@ -2,9 +2,9 @@
 """
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load(":utils.bzl", "utils")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
+load(":utils.bzl", "utils")
 
 ################################################################################
 _NPM_IMPORT_TMPL = \
