@@ -1,6 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
-load("@rules_oci//oci:defs.bzl", "oci_image")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
+load("@rules_oci//oci:defs.bzl", "oci_image")
 
 platform(
     name = "linux_amd64",

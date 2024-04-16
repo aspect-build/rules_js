@@ -1,8 +1,8 @@
 "npm_link_package rule"
 
-load(":utils.bzl", "utils")
-load(":npm_package_store.bzl", "npm_package_store")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
+load(":npm_package_store.bzl", "npm_package_store")
+load(":utils.bzl", "utils")
 
 def npm_link_package(
         name,

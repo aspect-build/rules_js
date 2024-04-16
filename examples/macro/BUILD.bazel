@@ -1,6 +1,6 @@
-load("//examples/macro:mocha.bzl", "mocha_test")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//examples/macro:mocha.bzl", "mocha_test")
 
 # Link all direct dependencies in /examples/macro/package.json to
 # bazel-bin/examples/macro/node_modules
