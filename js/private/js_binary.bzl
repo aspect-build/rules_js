@@ -15,13 +15,13 @@ js_binary(
 ```
 """
 
-load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
-load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
+load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
+load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 
 _DOC = """Execute a program in the Node.js runtime.
 

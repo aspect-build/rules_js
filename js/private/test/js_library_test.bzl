@@ -2,8 +2,8 @@
 
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//js/private:js_library.bzl", "js_library")
 load("//js/private:js_info.bzl", "JsInfo")
+load("//js/private:js_library.bzl", "js_library")
 
 # Files + targets generated for use in tests
 def _js_library_test_suite_data():
