@@ -25,16 +25,16 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](./npm_import) does this.
 """
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
 load(":pnpm_repository.bzl", "LATEST_PNPM_VERSION", _pnpm_repository = "pnpm_repository")
-load(":utils.bzl", "utils")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
+load(":utils.bzl", "utils")
 
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
 
