@@ -1,17 +1,17 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 ###########################
 
+# Load from the "bin" property from the package.json of the uvu package
+load("@npm//examples/npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
+
 # Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
 # Just to show what the syntax de-sugaring looks like, and to test that
 # bare `npm_import` produces working binaries.
 load("@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
-
-# Load from the "bin" property from the package.json of the uvu package
-load("@npm//examples/npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
 
 ###########################
 
