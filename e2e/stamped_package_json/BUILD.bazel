@@ -1,6 +1,6 @@
-load("@aspect_rules_js//npm:defs.bzl", "stamped_package_json")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:testing.bzl", "assert_json_matches")
+load("@aspect_rules_js//npm:defs.bzl", "stamped_package_json")
 
 stamped_package_json(
     name = "package",

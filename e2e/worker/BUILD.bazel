@@ -1,6 +1,6 @@
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
 load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(":defs.bzl", "pi_rule")
 
 copy_file(

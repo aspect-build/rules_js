@@ -23,9 +23,9 @@ js_library(
 | Python sources and provides a `PyInfo`.
 """
 
-load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
+load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
+load(":js_info.bzl", "JsInfo", "js_info")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
