@@ -1,9 +1,9 @@
 "npm_link_package_store rule"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load(":utils.bzl", "utils")
-load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load("//js:providers.bzl", "JsInfo", "js_info")
+load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
+load(":utils.bzl", "utils")
 
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
