@@ -24,7 +24,7 @@ js_library(
 """
 
 load(":js_info.bzl", "JsInfo", "js_info")
-load(":js_helpers.bzl", "DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING", "JS_LIBRARY_DATA_ATTR", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
+load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
@@ -41,6 +41,21 @@ is optimal for these rules to not depend on them in the build graph.
 NB: `js_library` copies all source files to the output tree before providing them in JsInfo. See
 https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155/docs#javascript
 for more context on why we do this."""
+
+_LINKED_NPM_DEPS_DOCSTRING = """If this list contains linked npm packages, npm package store targets or other targets that provide
+`JsInfo`, `NpmPackageStoreInfo` providers are gathered from `JsInfo`. This is done directly from
+the `npm_package_store_infos` field of these. For linked npm package targets, the underlying
+`npm_package_store` target(s) that back the links are used. Gathered `NpmPackageStoreInfo`
+providers are propagated to the direct dependencies of downstream linked targets.
+
+NB: Linked npm package targets that are "dev" dependencies do not forward their underlying
+`npm_package_store` target(s) through `npm_package_store_infos` and will therefore not be
+propagated to the direct dependencies of downstream linked targets. npm packages
+that come in from `npm_translate_lock` are considered "dev" dependencies if they are have
+`dev: true` set in the pnpm lock file. This should be all packages that are only listed as
+"devDependencies" in all `package.json` files within the pnpm workspace. This behavior is
+intentional to mimic how `devDependencies` work in published npm packages.
+"""
 
 _ATTRS = {
     "srcs": attr.label_list(
@@ -83,11 +98,23 @@ The transitive npm dependencies, transitive sources & runfiles of targets in the
 runfiles of this target. They should appear in the '*.runfiles' area of any executable which is output by or has a
 runtime dependency on this target.
 
-{downstream_linked_npm_deps}
-""".format(downstream_linked_npm_deps = DOWNSTREAM_LINKED_NPM_DEPS_DOCSTRING),
+{linked_npm_deps}
+""".format(linked_npm_deps = _LINKED_NPM_DEPS_DOCSTRING),
         providers = [JsInfo],
     ),
-    "data": JS_LIBRARY_DATA_ATTR,
+    "data": attr.label_list(
+        doc = """Runtime dependencies to include in binaries/tests that depend on this target.
+
+The transitive npm dependencies, transitive sources, default outputs and runfiles of targets in the `data` attribute
+are added to the runfiles of this target. They should appear in the '*.runfiles' area of any executable which has
+a runtime dependency on this target.
+
+{linked_npm_deps}
+""".format(
+            linked_npm_deps = _LINKED_NPM_DEPS_DOCSTRING,
+        ),
+        allow_files = True,
+    ),
     "no_copy_to_bin": attr.label_list(
         allow_files = True,
         doc = """List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
