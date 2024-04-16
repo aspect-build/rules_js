@@ -20,6 +20,16 @@ exports_files([
 ])
 
 bzl_library(
+    name = "dev_deps",
+    srcs = ["dev_deps.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bazel_tools//tools/build_defs/repo:http.bzl",
+        "@bazel_tools//tools/build_defs/repo:utils.bzl",
+    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+)
+
+bzl_library(
     name = "js_info_files",
     srcs = ["js_info_files.bzl"],
     visibility = [
