@@ -289,7 +289,7 @@ def _js_image_layer_impl(ctx):
     node_modules = _build_layer(ctx, type = "node_modules", entries = node_modules_entries, inputs = node_modules_inputs)
 
     return [
-        DefaultInfo(files = depset([app, node_modules])),
+        DefaultInfo(files = depset([node_modules, app])),
         OutputGroupInfo(app = depset([app]), node_modules = depset([node_modules])),
     ]
 
