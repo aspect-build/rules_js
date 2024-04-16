@@ -5,14 +5,14 @@ Simple examples of running JS programs in node with js_binary, js_run_binary, an
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
-load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//examples/npm_deps:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//examples/npm_deps:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 load(":custom_rule.bzl", "custom_rule")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to

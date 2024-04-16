@@ -1,5 +1,5 @@
-load("//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//js:defs.bzl", "js_library")
 
 npm_link_all_packages(name = "node_modules")
 
