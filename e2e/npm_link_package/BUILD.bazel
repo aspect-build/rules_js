@@ -1,6 +1,6 @@
-load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
 load("@foo//:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
 
