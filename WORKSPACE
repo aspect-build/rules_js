@@ -3,7 +3,8 @@ workspace(
     name = "aspect_rules_js",
 )
 
-load("//js:dev_repositories.bzl", "rules_js_dev_dependencies")
+# buildifier: disable=bzl-visibility
+load("//js/private:dev_deps.bzl", "rules_js_dev_dependencies")
 
 rules_js_dev_dependencies()
 
