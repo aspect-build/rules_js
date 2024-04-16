@@ -1,5 +1,5 @@
-load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 

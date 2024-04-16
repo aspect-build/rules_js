@@ -5,10 +5,6 @@ load(
     _js_binary_lib = "js_binary_lib",
 )
 load(
-    "//js/private:js_library.bzl",
-    _js_library_lib = "js_library_lib",
-)
-load(
     "//js/private:js_helpers.bzl",
     _LOG_LEVELS = "LOG_LEVELS",
     _envs_for_log_level = "envs_for_log_level",
@@ -18,6 +14,10 @@ load(
     _gather_runfiles = "gather_runfiles",
     _gather_transitive_sources = "gather_transitive_sources",
     _gather_transitive_types = "gather_transitive_types",
+)
+load(
+    "//js/private:js_library.bzl",
+    _js_library_lib = "js_library_lib",
 )
 
 js_binary_lib = _js_binary_lib

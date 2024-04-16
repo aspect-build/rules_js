@@ -10,9 +10,9 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 ```
 """
 
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
