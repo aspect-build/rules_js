@@ -6,6 +6,14 @@ load(
     _js_test = "js_test",
 )
 load(
+    "//js/private:js_image_layer.bzl",
+    _js_image_layer = "js_image_layer",
+)
+load(
+    "//js/private:js_info_files.bzl",
+    _js_info_files = "js_info_files",
+)
+load(
     "//js/private:js_library.bzl",
     _js_library = "js_library",
 )
@@ -14,16 +22,8 @@ load(
     _js_run_binary = "js_run_binary",
 )
 load(
-    "//js/private:js_info_files.bzl",
-    _js_info_files = "js_info_files",
-)
-load(
     "//js/private:js_run_devserver.bzl",
     _js_run_devserver = "js_run_devserver",
-)
-load(
-    "//js/private:js_image_layer.bzl",
-    _js_image_layer = "js_image_layer",
 )
 
 # buildifier: disable=function-docstring

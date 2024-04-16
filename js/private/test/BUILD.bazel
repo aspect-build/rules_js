@@ -1,6 +1,6 @@
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@aspect_bazel_lib_host//:defs.bzl", "host")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
 

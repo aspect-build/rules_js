@@ -2,9 +2,9 @@
 See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-starlark-utilities
 """
 
-load(":snapshots/wksp/package_json.bzl", rollup_bin = "bin")
-load("@bazel_skylib//lib:unittest.bzl", "loadingtest")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
+load("@bazel_skylib//lib:unittest.bzl", "loadingtest")
+load(":snapshots/wksp/package_json.bzl", rollup_bin = "bin")
 
 _TEST_TARGET_PREFIX = "__rollup"
 
