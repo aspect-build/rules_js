@@ -1,3 +1,5 @@
+Foobar
+
 # Bazel rules for JavaScript
 
 This ruleset is a high-performance and npm-compatible Bazel integration for JavaScript.
