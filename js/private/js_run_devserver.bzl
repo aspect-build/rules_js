@@ -1,8 +1,8 @@
 "Implementation details for js_run_devserver rule"
 
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_binary.bzl", "js_binary_lib")
 load(":js_helpers.bzl", _gather_files_from_js_info = "gather_files_from_js_info")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
 _attrs = dicts.add(js_binary_lib.attrs, {
     "tool_exec_cfg": attr.label(
