@@ -315,8 +315,8 @@ def _load_bins_from_local_package_json(priv, rctx, label_store):
                 if "name" not in package_json:
                     fail("when bin is specificed in package.json, it requires a name")
                 package_json_name = package_json["name"]
-                if (package_json_name.startswith('@')):
-                    package_json_dict[package_json_name.rsplit('/', 1)[-1]] = package_json_bin
+                if (package_json_name.startswith("@")):
+                    package_json_dict[package_json_name.rsplit("/", 1)[-1]] = package_json_bin
                 else:
                     package_json_dict[package_json_name] = package_json_bin
             else:
