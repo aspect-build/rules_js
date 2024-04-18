@@ -56,7 +56,7 @@ _FP_DIRECT_TMPL = \
                 use_declare_symlink = select({{
                     "@aspect_rules_js//js:allow_unresolved_symlinks": True,
                     "//conditions:default": False,
-                }}),
+                }}),{maybe_bins}
             )
 
             # filegroup target that provides a single file which is
@@ -203,6 +203,7 @@ sh_binary(
                         "path": dep_path,
                         "link_packages": {link_package: []},
                         "deps": transitive_deps,
+                        "bins": importers.get(dep_path, {}).get("bins", {}),
                     }
 
     if fp_links:
@@ -379,6 +380,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
+        fp_bins = fp_link.get("bins")
         fp_path = fp_link.get("path")
         fp_link_packages = fp_link.get("link_packages").keys()
         fp_deps = fp_link.get("deps")
@@ -411,6 +413,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 root_package = root_package,
                 virtual_store_name = utils.virtual_store_name(fp_package, "0.0.0"),
                 virtual_store_root = utils.virtual_store_root,
+                maybe_bins = ("""
+                bins = %s,""" % starlark_codegen_utils.to_dict_attr(fp_bins, 4)) if len(fp_bins) > 0 else "",
             ))
 
             npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(

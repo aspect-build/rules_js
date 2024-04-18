@@ -167,6 +167,7 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
         prod_deps = {} if dev else lock_importer.get("dependencies", {})
         dev_deps = {} if prod else lock_importer.get("devDependencies", {})
         opt_deps = {} if no_optional else lock_importer.get("optionalDependencies", {})
+        bins = lock_importer.get("bins", {})
 
         deps = dicts.add(prod_deps, opt_deps)
         all_deps = dicts.add(prod_deps, dev_deps, opt_deps)
@@ -185,6 +186,8 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
             # all deps of this importer to link in the node_modules folder of that Bazel package and
             # make available to all build targets; this includes devDependencies
             "all_deps": all_deps,
+            # Bins from the importer package.json
+            "bins": bins,
         }
 
     # Collect transitive dependencies for each package

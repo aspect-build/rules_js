@@ -77,6 +77,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _copy_common_input_files(priv, rctx, label_store, pnpm_lock_exists)
 
+    _load_bins_from_local_package_json(priv, rctx, label_store)
+
     if _should_update_pnpm_lock(priv):
         _copy_update_input_files(priv, rctx, label_store)
         _copy_unspecified_input_files(priv, rctx, label_store)
@@ -297,6 +299,29 @@ def _copy_update_input_files(priv, rctx, label_store):
     for k in keys:
         if label_store.has(k):
             _copy_input_file(priv, rctx, label_store, k)
+
+def _load_bins_from_local_package_json(priv, rctx, label_store):
+    _init_importer_labels(priv, label_store)
+    for i, name in enumerate(priv["importers"].keys()):
+        package_json_key = "package_json_{}".format(i)
+        package_json_label = label_store.label(package_json_key)
+        package_json = json.decode(rctx.read(package_json_label))
+        if "bin" in package_json:
+            package_json_bin = package_json["bin"]
+            package_json_dict = {}
+            if type(package_json_bin) == "dict":
+                package_json_dict = package_json_bin
+            elif type(package_json_bin) == "string":
+                if "name" not in package_json:
+                    fail("when bin is specificed in package.json, it requires a name")
+                package_json_name = package_json["name"]
+                if (package_json_name.startswith('@')):
+                    package_json_dict[package_json_name.rsplit('/', 1)[-1]] = package_json_bin
+                else:
+                    package_json_dict[package_json_name] = package_json_bin
+            else:
+                fail("Unexpected type of bin: ", type(package_json_bin))
+            priv["importers"][name]["bins"] = package_json_dict
 
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
