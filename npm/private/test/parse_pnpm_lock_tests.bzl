@@ -84,9 +84,6 @@ packages:
     expected = (
         {
             ".": {
-                "specifiers": {
-                    "@aspect-test/a": "5.0.0",
-                },
                 "dependencies": {
                     "@aspect-test/a": "5.0.0",
                 },
@@ -169,7 +166,6 @@ packages:
     expected = (
         {
             ".": {
-                "specifiers": {},
                 "dependencies": {
                     "@aspect-test/a": "5.0.0",
                 },

@@ -110,16 +110,13 @@ def _convert_v6_importers(importers):
     # Convert pnpm lockfile v6 importers to a rules_js compatible format.
     result = {}
     for import_path, importer in importers.items():
-        result[import_path] = {
-            "specifiers": {},
-            "dependencies": {},
-            "optionalDependencies": {},
-            "devDependencies": {},
-        }
+        result[import_path] = {}
         for key in ["dependencies", "optionalDependencies", "devDependencies"]:
-            deps = importer.get(key, {})
-            for name, attributes in deps.items():
-                result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
+            deps = importer.get(key, None)
+            if deps != None:
+                result[import_path][key] = {}
+                for name, attributes in deps.items():
+                    result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
     return result
 
 def _convert_v6_packages(packages):
@@ -192,7 +189,6 @@ def _parse_pnpm_lock_common(parsed, err):
 
     importers = parsed.get("importers", {
         ".": {
-            "specifiers": parsed.get("specifiers", {}),
             "dependencies": parsed.get("dependencies", {}),
             "optionalDependencies": parsed.get("optionalDependencies", {}),
             "devDependencies": parsed.get("devDependencies", {}),
