@@ -183,6 +183,19 @@ workspaces:
                   without: true
             - delivery:
                   without: true
+    e2e/pnpm_lockfiles:
+        icon: pnpm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            - configure:
+                  without: true
+            - delivery:
+                  without: true
     e2e/pnpm_workspace:
         icon: pnpm
         tasks:
