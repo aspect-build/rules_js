@@ -509,24 +509,22 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
-def _load_lockfile(priv, rctx, attr, label_store):
+def _load_lockfile(priv, rctx, _, label_store):
     importers = {}
     packages = {}
     patched_dependencies = {}
     lock_parse_err = None
-    if attr.use_starlark_yaml_parser:
-        importers, packages, patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_yaml(rctx.read(label_store.path("pnpm_lock")))
+
+    yq_args = [
+        str(label_store.path("host_yq")),
+        str(label_store.path("pnpm_lock")),
+        "-o=json",
+    ]
+    result = rctx.execute(yq_args)
+    if result.return_code:
+        lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        yq_args = [
-            str(label_store.path("host_yq")),
-            str(label_store.path("pnpm_lock")),
-            "-o=json",
-        ]
-        result = rctx.execute(yq_args)
-        if result.return_code:
-            lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
-        else:
-            importers, packages, patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        importers, packages, patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
 
     priv["importers"] = importers
     priv["packages"] = packages

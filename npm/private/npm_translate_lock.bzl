@@ -76,7 +76,6 @@ _ATTRS = {
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
     "update_pnpm_lock": attr.bool(),
     "use_home_npmrc": attr.bool(),
-    "use_starlark_yaml_parser": attr.bool(),
     "verify_node_modules_ignored": attr.label(),
     "verify_patches": attr.label(),
     "yarn_lock": attr.label(),
@@ -186,7 +185,6 @@ def npm_translate_lock(
         pnpm_version = LATEST_PNPM_VERSION,
         use_pnpm = None,
         npm_package_target_name = "{dirname}",
-        use_starlark_yaml_parser = False,
         **kwargs):
     """Repository macro to generate starlark code from a lock file.
 
@@ -514,31 +512,6 @@ def npm_translate_lock(
 
             Default: `{dirname}`
 
-        use_starlark_yaml_parser: Opt-out of using `yq` to parse the pnpm-lock file which was added
-            in https://github.com/aspect-build/rules_js/pull/1458 and use the legacy starlark yaml
-            parser instead.
-
-            This opt-out is a return safety in cases where yq is not able to parse the pnpm generated
-            yaml file. For example, this has been observed to happen due to a line such as the following
-            in the pnpm generated lock file:
-
-            ```
-            resolution: {tarball: https://gitpkg.vercel.app/blockprotocol/blockprotocol/packages/%40blockprotocol/type-system-web?6526c0e}
-            ```
-
-            where the `?` character in the `tarball` value causes `yq` to fail with:
-
-            ```
-            $ yq pnpm-lock.yaml -o=json
-            Error: bad file 'pnpm-lock.yaml': yaml: line 7129: did not find expected ',' or '}'
-            ```
-
-            If the tarball value is quoted or escaped then yq would accept it but as of this writing, the latest
-            version of pnpm (8.14.3) does not quote or escape such a value and the latest version of yq (4.40.5)
-            does not handle it as is.
-
-            Possibly related to https://github.com/pnpm/pnpm/issues/5414.
-
         **kwargs: Internal use only
     """
 
@@ -632,7 +605,6 @@ def npm_translate_lock(
         use_pnpm = use_pnpm,
         yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
-        use_starlark_yaml_parser = use_starlark_yaml_parser,
         bzlmod = bzlmod,
     )
 

@@ -5,7 +5,6 @@ load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
-load(":yaml.bzl", _parse_yaml = "parse")
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
 DEFAULT_REGISTRY_PROTOCOL = "https"
@@ -162,18 +161,6 @@ def _convert_v6_packages(packages):
         result[_convert_pnpm_v6_package_name(package)] = package_info
     return result
 
-def _parse_pnpm_lock_yaml(content):
-    """Parse the content of a pnpm-lock.yaml file.
-
-    Args:
-        content: lockfile content
-
-    Returns:
-        A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
-    """
-    parsed, err = _parse_yaml(content)
-    return _parse_pnpm_lock_common(parsed, err)
-
 def _parse_pnpm_lock_json(content):
     """Parse the content of a pnpm-lock.yaml file.
 
@@ -186,7 +173,7 @@ def _parse_pnpm_lock_json(content):
     return _parse_pnpm_lock_common(json.decode(content) if content else None, None)
 
 def _parse_pnpm_lock_common(parsed, err):
-    """Helper function used by _parse_pnpm_lock_yaml and _parse_pnpm_lock_json.
+    """Helper function used by _parse_pnpm_lock_json.
 
     Args:
         parsed: lockfile content object
@@ -458,7 +445,6 @@ utils = struct(
     pnpm_name = _pnpm_name,
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_package_key = _parse_pnpm_package_key,
-    parse_pnpm_lock_yaml = _parse_pnpm_lock_yaml,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     friendly_name = _friendly_name,
     package_store_name = _package_store_name,
