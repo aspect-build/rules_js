@@ -16511,6 +16511,29 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__nopt__1.0.10",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["nopt"],
+        },
+        package = "nopt",
+        version = "1.0.10",
+        url = "https://registry.npmjs.org/nopt/-/nopt-1.0.10.tgz",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-NWmpvLSqUrgrAC9HCuxEvb+PSloHpqVu+FqcO4eeF2h5qYRhA7ev6KvelyQAKtegUbC6RypJnlEOhd8vloNKYg==",
+        deps = {
+            "abbrev": "1.1.1",
+        },
+        transitive_closure = {
+            "abbrev": ["1.1.1"],
+            "nopt": ["1.0.10"],
+        },
+    )
+
+    npm_import(
         name = "npm__nopt__4.0.3",
         root_package = "",
         link_workspace = "",
