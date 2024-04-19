@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_binary.bzl", "js_binary_lib")
-load(":js_helpers.bzl", _gather_files_from_js_info = "gather_files_from_js_info")
+load(":js_helpers.bzl", _gather_files_from_js_infos = "gather_files_from_js_infos")
 
 _attrs = dicts.add(js_binary_lib.attrs, {
     "tool_exec_cfg": attr.label(
@@ -40,7 +40,7 @@ def _js_run_devserver_impl(ctx):
     if use_tool and ctx.attr.command:
         fail("Only one of tool or command may be specified")
 
-    transitive_runfiles = [_gather_files_from_js_info(
+    transitive_runfiles = [_gather_files_from_js_infos(
         targets = ctx.attr.data,
         include_sources = True,
         include_types = ctx.attr.include_types,
