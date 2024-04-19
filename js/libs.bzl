@@ -8,7 +8,7 @@ load(
     "//js/private:js_helpers.bzl",
     _LOG_LEVELS = "LOG_LEVELS",
     _envs_for_log_level = "envs_for_log_level",
-    _gather_files_from_js_info = "gather_files_from_js_info",
+    _gather_files_from_js_infos = "gather_files_from_js_infos",
     _gather_npm_package_store_infos = "gather_npm_package_store_infos",
     _gather_npm_sources = "gather_npm_sources",
     _gather_runfiles = "gather_runfiles",
@@ -25,7 +25,7 @@ js_library_lib = _js_library_lib
 
 js_lib_helpers = struct(
     envs_for_log_level = _envs_for_log_level,
-    gather_files_from_js_info = _gather_files_from_js_info,
+    gather_files_from_js_infos = _gather_files_from_js_infos,
     gather_npm_sources = _gather_npm_sources,
     gather_npm_package_store_infos = _gather_npm_package_store_infos,
     gather_runfiles = _gather_runfiles,
