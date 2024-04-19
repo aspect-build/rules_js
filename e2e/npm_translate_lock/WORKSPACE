@@ -19,7 +19,6 @@ npm_translate_lock(
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
-    use_starlark_yaml_parser = True,  # test coverage for this flag
     verify_node_modules_ignored = "//:.bazelignore",
 )
 
