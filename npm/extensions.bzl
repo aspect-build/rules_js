@@ -79,21 +79,19 @@ def _npm_lock_imports_bzlmod(module_ctx, attr):
     lock_packages = {}
     lock_patched_dependencies = {}
     lock_parse_err = None
-    if attr.use_starlark_yaml_parser:
-        lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_yaml(module_ctx.read(attr.pnpm_lock))
+
+    is_windows = repo_utils.is_windows(module_ctx)
+    host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(module_ctx), ".exe" if is_windows else ""))
+    yq_args = [
+        str(module_ctx.path(host_yq)),
+        str(module_ctx.path(attr.pnpm_lock)),
+        "-o=json",
+    ]
+    result = module_ctx.execute(yq_args)
+    if result.return_code:
+        lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        is_windows = repo_utils.is_windows(module_ctx)
-        host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(module_ctx), ".exe" if is_windows else ""))
-        yq_args = [
-            str(module_ctx.path(host_yq)),
-            str(module_ctx.path(attr.pnpm_lock)),
-            "-o=json",
-        ]
-        result = module_ctx.execute(yq_args)
-        if result.return_code:
-            lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
-        else:
-            lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
 
     if lock_parse_err != None:
         msg = """
