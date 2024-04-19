@@ -19,7 +19,7 @@ def _custom_test_impl(ctx):
 
     runfiles = ctx.runfiles(
         files = ctx.files.data,
-        transitive_files = js_lib_helpers.gather_files_from_js_info(
+        transitive_files = js_lib_helpers.gather_files_from_js_infos(
             targets = ctx.attr.data,
             include_sources = True,
             include_types = ctx.attr.include_types,
