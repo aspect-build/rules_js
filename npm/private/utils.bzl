@@ -94,9 +94,7 @@ def _convert_pnpm_v6_package_name(package_name):
     # Covert a pnpm lock file v6 name/version string of the format
     # @scope/name@version(@scope/name@version)(@scope/name@version)
     # to a @scope/name/version_peer_version that is compatible with rules_js.
-    if package_name[0].isdigit():
-        return _convert_pnpm_v6_version_peer_dep(package_name)
-    elif package_name.startswith("/"):
+    if package_name.startswith("/"):
         package_name = _convert_pnpm_v6_version_peer_dep(package_name)
         segments = package_name.rsplit("@", 1)
         if len(segments) != 2:
