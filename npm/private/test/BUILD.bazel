@@ -9,7 +9,6 @@ load(":pkg_glob_tests.bzl", "pkg_glob_tests")
 load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_helpers_tests.bzl", "translate_lock_helpers_tests")
 load(":utils_tests.bzl", "utils_tests")
-load(":yaml_tests.bzl", "yaml_tests")
 
 # gazelle:exclude **/snapshots/**/*
 
@@ -25,8 +24,6 @@ pkg_glob_tests(name = "test_pkg_glob")
 transitive_closure_tests(name = "test_transitive_closure")
 
 translate_lock_helpers_tests(name = "test_translate_lock")
-
-yaml_tests(name = "test_yaml")
 
 parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
 
