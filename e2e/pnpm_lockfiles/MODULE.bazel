@@ -28,6 +28,7 @@ npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
             "//:package.json",
             "//:pnpm-workspace.yaml",
         ],
+        npmrc = "//:.npmrc",
         pnpm_lock = "//%s:pnpm-lock.yaml" % version,
         verify_node_modules_ignored = "//:.bazelignore",
     )
