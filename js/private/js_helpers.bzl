@@ -2,7 +2,6 @@
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
-load("//npm:providers.bzl", "NpmPackageStoreInfo")
 load(":js_info.bzl", "JsInfo")
 
 def gather_transitive_sources(sources, targets):
@@ -131,8 +130,8 @@ def gather_runfiles(
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
-    gathers the transitive sources & transitive npm sources from the `JsInfo` &
-    `NpmPackageStoreInfo` providers of `data` & `deps` targets.
+    gathers the transitive sources & transitive npm sources from the `JsInfo` providers of
+    `data` & `deps` targets.
 
     See https://bazel.build/extending/rules#runfiles for more info on providing runfiles in build rules.
 
@@ -259,7 +258,7 @@ def gather_files_from_js_info(
         include_transitive_sources,
         include_transitive_types,
         include_npm_sources):
-    """Gathers files from JsInfo and NpmPackageStoreInfo providers.
+    """Gathers files from JsInfo providers.
 
     Args:
         targets: list of target to gather from
@@ -302,10 +301,5 @@ def gather_files_from_js_info(
             target[JsInfo].npm_sources
             for target in targets
             if JsInfo in target and hasattr(target[JsInfo], "npm_sources")
-        ])
-        files_depsets.extend([
-            target[NpmPackageStoreInfo].transitive_files
-            for target in targets
-            if NpmPackageStoreInfo in target and hasattr(target[NpmPackageStoreInfo], "transitive_files")
         ])
     return depset([], transitive = files_depsets)
