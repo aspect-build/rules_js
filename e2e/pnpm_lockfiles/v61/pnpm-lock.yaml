@@ -25,6 +25,23 @@ importers:
       '@aspect-test/b':
         specifier: 5.0.2
         version: 5.0.2
+      '@types/node':
+        specifier: 16.18.11
+        version: registry.npmjs.org/@types/node@16.18.11
+
+  projects/a: {}
+
+  projects/b:
+    dependencies:
+      '@scoped/a':
+        specifier: workspace:*
+        version: link:../a
+
+  projects/c:
+    dependencies:
+      '@scoped/a':
+        specifier: link:../a
+        version: link:../a
 
 packages:
 
@@ -375,3 +392,9 @@ packages:
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: false
+
+  registry.npmjs.org/@types/node@16.18.11:
+    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+    name: '@types/node'
+    version: 16.18.11
+    dev: true

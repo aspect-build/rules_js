@@ -23,6 +23,7 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
             "//:package.json",
             "//:pnpm-workspace.yaml",
         ],
+        npmrc = "//:.npmrc",
         pnpm_lock = "//%s:pnpm-lock.yaml" % version,
         verify_node_modules_ignored = "//:.bazelignore",
     )
