@@ -187,21 +187,34 @@ _ATTRS = {
         which can lead to non-hermetic behavior.""",
         default = True,
     ),
+    "include_sources": attr.bool(
+        doc = """When True, `sources` from `JsInfo` providers in `data` targets are included in the runfiles of the target.""",
+        default = True,
+    ),
     "include_transitive_sources": attr.bool(
-        doc = """When True, `transitive_sources` from `JsInfo` providers in data targets are included in the runfiles of the target.""",
+        doc = """When True, `transitive_sources` from `JsInfo` providers in `data` targets are included in the runfiles of the target.""",
         default = True,
     ),
     "include_types": attr.bool(
-        doc = """When True, `types` and `transitive_types` from `JsInfo` providers in data targets are included in the runfiles of the target.
+        doc = """When True, `types` from `JsInfo` providers in `data` targets are included in the runfiles of the target.
 
-        Defaults to false since types are generally not needed at runtime and introducing them could slow down developer round trip
+        Defaults to False since types are generally not needed at runtime and introducing them could slow down developer round trip
+        time due to having to generate typings on source file changes.
+
+        NB: These are types from direct `data` dependencies only. You may also need to set `include_transitive_types` to True.""",
+        default = False,
+    ),
+    "include_transitive_types": attr.bool(
+        doc = """When True, `transitive_types` from `JsInfo` providers in `data` targets are included in the runfiles of the target.
+
+        Defaults to False since types are generally not needed at runtime and introducing them could slow down developer round trip
         time due to having to generate typings on source file changes.""",
         default = False,
     ),
     "include_npm_sources": attr.bool(
-        doc = """When True, files in `npm_sources` from `JsInfo` providers in data targets are included in the runfiles of the target.
+        doc = """When True, files in `npm_sources` from `JsInfo` providers in `data` targets are included in the runfiles of the target.
 
-        `transitive_files` from `NpmPackageStoreInfo` providers in data targets are also included in the runfiles of the target.
+        `transitive_files` from `NpmPackageStoreInfo` providers in `data` targets are also included in the runfiles of the target.
         """,
         default = True,
     ),
@@ -515,8 +528,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         deps = [],
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_transitive_sources = ctx.attr.include_transitive_sources,
+        include_sources = ctx.attr.include_sources,
         include_types = ctx.attr.include_types,
+        include_transitive_sources = ctx.attr.include_transitive_sources,
+        include_transitive_types = ctx.attr.include_transitive_types,
         include_npm_sources = ctx.attr.include_npm_sources,
     ).merge(ctx.runfiles(
         files = launcher_files,
