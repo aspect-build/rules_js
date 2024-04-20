@@ -33,8 +33,10 @@ def js_run_binary(
         silent_on_success = True,
         use_execroot_entry_point = True,
         copy_srcs_to_bin = True,
-        include_transitive_sources = True,
+        include_sources = True,
         include_types = False,
+        include_transitive_sources = True,
+        include_transitive_types = False,
         include_npm_sources = True,
         log_level = None,
         mnemonic = "JsRunBinary",
@@ -150,9 +152,13 @@ def js_run_binary(
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
-        include_transitive_sources: see `js_info_files` documentation
+        include_sources: see `js_info_files` documentation
 
         include_types: see `js_info_files` documentation
+
+        include_transitive_sources: see `js_info_files` documentation
+
+        include_transitive_types: see `js_info_files` documentation
 
         include_npm_sources: see `js_info_files` documentation
 
@@ -259,6 +265,7 @@ WARNING: js_run_binary 'include_npm_linked_packages' is deprecated. Use 'include
         print("""
 WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' instead.""")
         include_types = include_declarations
+        include_transitive_types = include_declarations
 
     extra_srcs = []
 
@@ -271,8 +278,10 @@ WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' in
         _js_info_files(
             name = js_info_files_name,
             srcs = srcs,
-            include_transitive_sources = include_transitive_sources,
+            include_sources = include_sources,
             include_types = include_types,
+            include_transitive_sources = include_transitive_sources,
+            include_transitive_types = include_transitive_types,
             include_npm_sources = include_npm_sources,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
