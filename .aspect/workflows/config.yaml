@@ -105,7 +105,7 @@ workspaces:
     # e2e/webpack_devserver_esm:
 tasks:
     - checkout:
-          update_strategy: rebase
+          update_strategy: none
     - test:
           hooks:
               - type: before_task
