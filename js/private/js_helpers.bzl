@@ -123,8 +123,8 @@ def gather_runfiles(
         copy_data_files_to_bin = False,
         no_copy_to_bin = [],
         include_sources = True,
-        include_transitive_sources = True,
         include_types = False,
+        include_transitive_sources = True,
         include_transitive_types = False,
         include_npm_sources = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
@@ -164,9 +164,9 @@ def gather_runfiles(
 
         include_sources: see js_info_files documentation
 
-        include_transitive_sources: see js_info_files documentation
-
         include_types: see js_info_files documentation
+
+        include_transitive_sources: see js_info_files documentation
 
         include_transitive_types: see js_info_files documentation
 

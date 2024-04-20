@@ -34,23 +34,25 @@ js_info_files = rule(
             default = True,
         ),
         "include_types": attr.bool(
-            doc = """When True, `types` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+            doc = """When True, `types` from `JsInfo` providers in `srcs` targets are included in the default outputs of the target.
 
             Defaults to False since types are generally not needed at runtime and introducing them could slow down developer round trip
-            time due to having to generate typings on source file changes.""",
+            time due to having to generate typings on source file changes.
+
+            NB: These are types from direct `srcs` dependencies only. You may also need to set `include_transitive_types` to True.""",
             default = False,
         ),
         "include_transitive_types": attr.bool(
-            doc = """When True, `transitive_types` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+            doc = """When True, `transitive_types` from `JsInfo` providers in `srcs` targets are included in the default outputs of the target.
 
             Defaults to False since types are generally not needed at runtime and introducing them could slow down developer round trip
             time due to having to generate typings on source file changes.""",
             default = False,
         ),
         "include_npm_sources": attr.bool(
-            doc = """When True, files in `npm_sources` from `JsInfo` providers in srcs targets are included in the default outputs of the target.
+            doc = """When True, files in `npm_sources` from `JsInfo` providers in `srcs` targets are included in the default outputs of the target.
 
-            `transitive_files` from `NpmPackageStoreInfo` providers in data targets are also included in the default outputs of the target.
+            `transitive_files` from `NpmPackageStoreInfo` providers in `srcs` targets are also included in the default outputs of the target.
             """,
             default = True,
         ),

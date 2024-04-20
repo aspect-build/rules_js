@@ -21,10 +21,10 @@ def _custom_test_impl(ctx):
         files = ctx.files.data,
         transitive_files = js_lib_helpers.gather_files_from_js_infos(
             targets = ctx.attr.data,
-            include_sources = True,
+            include_sources = ctx.attr.include_sources,
             include_types = ctx.attr.include_types,
             include_transitive_sources = ctx.attr.include_transitive_sources,
-            include_transitive_types = ctx.attr.include_types,
+            include_transitive_types = ctx.attr.include_transitive_types,
             include_npm_sources = ctx.attr.include_npm_sources,
         ),
     ).merge(launcher.runfiles).merge_all([

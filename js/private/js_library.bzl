@@ -234,8 +234,10 @@ def _js_library_impl(ctx):
         data_files = ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_transitive_sources = True,
+        include_sources = True,
         include_types = False,
+        include_transitive_sources = True,
+        include_transitive_types = False,
         include_npm_sources = True,
     )
 
