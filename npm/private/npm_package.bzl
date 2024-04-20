@@ -168,8 +168,8 @@ def npm_package(
         replace_prefixes = {},
         allow_overwrites = False,
         include_sources = True,
-        include_transitive_sources = True,
         include_types = True,
+        include_transitive_sources = True,
         include_transitive_types = True,
         include_runfiles = False,
         hardlink = "auto",
@@ -404,13 +404,13 @@ def npm_package(
             since copies cannot be parallelized out as they are calculated. Instead all copy paths
             must be calculated before any copies can be started.
 
-        include_sources: When True, `sources` from `JsInfo` providers in data targets are included in the list of available files to copy.
+        include_sources: When True, `sources` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
 
-        include_transitive_sources: When True, `transitive_sources` from `JsInfo` providers in data targets are included in the list of available files to copy.
+        include_types: When True, `types` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
 
-        include_types: When True, `types` from `JsInfo` providers in data targets are included in the list of available files to copy.
+        include_transitive_sources: When True, `transitive_sources` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
 
-        include_transitive_types: When True, `transitive_types` from `JsInfo` providers in data targets are included in the list of available files to copy.
+        include_transitive_types: When True, `transitive_types` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
 
         include_runfiles: When True, default runfiles from `srcs` targets are included in the list of available files to copy.
 
@@ -449,11 +449,11 @@ def npm_package(
             name = files_target,
             srcs = srcs,
             include_sources = include_sources,
-            include_transitive_sources = include_transitive_sources,
             include_types = select({
                 Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
                 "//conditions:default": include_types,
             }),
+            include_transitive_sources = include_transitive_sources,
             include_transitive_types = select({
                 Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
                 "//conditions:default": include_transitive_types,
