@@ -9,11 +9,10 @@ module(
 # Lower-bounds (minimum) versions for direct runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.1")
-bazel_dep(name = "aspect_rules_lint", version = "0.12.0")
 bazel_dep(name = "bazel_features", version = "1.9.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
-bazel_dep(name = "rules_nodejs", version = "6.1.0")
 bazel_dep(name = "platforms", version = "0.0.5")
+bazel_dep(name = "rules_nodejs", version = "6.1.0")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(node, "nodejs_darwin_amd64")
@@ -46,10 +45,12 @@ use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 ####### Dev dependencies ########
 
-bazel_dep(name = "gazelle", version = "0.35.0", dev_dependency = True, repo_name = "bazel_gazelle")
-bazel_dep(name = "buildifier_prebuilt", version = "6.4.0", dev_dependency = True)
+bazel_dep(name = "aspect_rules_lint", version = "0.12.0", dev_dependency = True)
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.5.0", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "6.4.0", dev_dependency = True)
+bazel_dep(name = "gazelle", version = "0.36.0", dev_dependency = True, repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_go", version = "0.46.0", dev_dependency = True)
+bazel_dep(name = "stardoc", version = "0.6.2", dev_dependency = True, repo_name = "io_bazel_stardoc")
 
 host = use_extension(
     "@aspect_bazel_lib//lib:extensions.bzl",
