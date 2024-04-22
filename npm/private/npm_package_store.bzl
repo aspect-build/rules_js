@@ -350,8 +350,8 @@ npm_package_store_lib = struct(
     implementation = _npm_package_store_impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
     toolchains = [
-        "@aspect_bazel_lib//lib:copy_directory_toolchain_type",
-        "@aspect_bazel_lib//lib:tar_toolchain_type",
+        Label("@aspect_bazel_lib//lib:copy_directory_toolchain_type"),
+        Label("@aspect_bazel_lib//lib:tar_toolchain_type"),
     ],
 )
 

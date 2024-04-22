@@ -38,7 +38,7 @@ def npm_imported_package_store(name):
         dev = True,
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -53,7 +53,7 @@ def npm_imported_package_store(name):
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -69,7 +69,7 @@ def npm_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -97,7 +97,7 @@ def npm_imported_package_store(name):
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -111,7 +111,7 @@ def npm_imported_package_store(name):
         deps = lc_deps,
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -130,23 +130,23 @@ def npm_imported_package_store(name):
                    "../../../$(@D)",
                ] +
                select({
-                   "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
-                   "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
-                   "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
+                   Label("@aspect_rules_js//platforms/os:osx"): ["--platform=darwin"],
+                   Label("@aspect_rules_js//platforms/os:linux"): ["--platform=linux"],
+                   Label("@aspect_rules_js//platforms/os:windows"): ["--platform=win32"],
                    "//conditions:default": [],
                }) +
                select({
-                   "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
-                   "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
+                   Label("@aspect_rules_js//platforms/cpu:arm64"): ["--arch=arm64"],
+                   Label("@aspect_rules_js//platforms/cpu:x86_64"): ["--arch=x64"],
                    "//conditions:default": [],
                }) +
                select({
-                   "@aspect_rules_js//platforms/libc:glibc": ["--libc=glibc"],
-                   "@aspect_rules_js//platforms/libc:musl": ["--libc=musl"],
+                   Label("@aspect_rules_js//platforms/libc:glibc"): ["--libc=glibc"],
+                   Label("@aspect_rules_js//platforms/libc:musl"): ["--libc=musl"],
                    "//conditions:default": [],
                }),
         copy_srcs_to_bin = False,
-        tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
+        tool = Label("@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks"),
         out_dirs = ["node_modules/.aspect_rules_js/fsevents@2.3.2/node_modules/fsevents"],
         tags = ["manual"],
         execution_requirements = {
@@ -196,7 +196,7 @@ def npm_link_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )

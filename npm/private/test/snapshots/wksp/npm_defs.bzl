@@ -2209,7 +2209,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
             use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                 "//conditions:default": False,
             }),
         )
@@ -2227,7 +2227,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
             use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                 "//conditions:default": False,
             }),
         )
@@ -2245,7 +2245,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
             use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                 "//conditions:default": False,
             }),
         )
@@ -2259,7 +2259,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 visibility = ["//examples:__subpackages__"],
                 tags = ["manual"],
                 use_declare_symlink = select({
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                    Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                     "//conditions:default": False,
                 }),
             )
@@ -2287,7 +2287,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
             use_declare_symlink = select({
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                 "//conditions:default": False,
             }),
         )
@@ -2301,7 +2301,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 visibility = ["//visibility:public"],
                 tags = ["manual"],
                 use_declare_symlink = select({
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                    Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                     "//conditions:default": False,
                 }),
             )
