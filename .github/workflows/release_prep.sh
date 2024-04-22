@@ -34,7 +34,7 @@ bazel_dep(name = "aspect_rules_js", version = "${TAG:1}")
 # By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
 # Optionally you can pin a different node version:
 bazel_dep(name = "rules_nodejs", version = "6.1.0")
-node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
 node.toolchain(node_version = "16.14.2")
 #################################
 
