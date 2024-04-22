@@ -11,8 +11,8 @@ module(
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.1")
 bazel_dep(name = "bazel_features", version = "1.9.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
-bazel_dep(name = "rules_nodejs", version = "6.1.0")
 bazel_dep(name = "platforms", version = "0.0.5")
+bazel_dep(name = "rules_nodejs", version = "6.1.0")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(node, "nodejs_darwin_amd64")
