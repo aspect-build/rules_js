@@ -1,5 +1,4 @@
-# This workspace is loaded as a local_repository
-workspace(name = "rules_foo")
+workspace(name = "rules_foo")  # explicit name required for npm_translate_lock @rules_foo//foo:pnpm-lock.yaml" label in foo_repositories
 
 local_repository(
     name = "aspect_rules_js",
@@ -16,7 +15,7 @@ rules_js_register_toolchains(node_version = "16.14.2")
 
 load("@rules_foo//foo:repositories.bzl", "foo_repositories")
 
-foo_repositories(name = "foo")
+foo_repositories()
 
 load("@foo//:npm_repositories.bzl", foo_npm_repositories = "npm_repositories")
 
