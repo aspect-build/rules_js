@@ -1,24 +1,27 @@
-module(
-    name = "e2e_translate_yarn_lock",
-    version = "0.0.0",
-    compatibility_level = 1,
-)
-
-bazel_dep(name = "bazel_skylib", version = "1.5.0")
-bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
 
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
+
+pnpm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "pnpm",
+    dev_dependency = True,
+)
 pnpm.pnpm(
     name = "pnpm-old-version",
     pnpm_version = "7.33.3",
 )
 use_repo(pnpm, "pnpm-old-version")
 
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
 npm.npm_translate_lock(
     name = "npm",
     data = ["//:package.json"],

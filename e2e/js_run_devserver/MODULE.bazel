@@ -1,23 +1,25 @@
-module(
-    name = "e2e_js_run_devserver",
-    version = "0.0.0",
-    compatibility_level = 1,
-)
-
-bazel_dep(name = "aspect_bazel_lib", version = "2.7.1")
-bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-bazel_dep(name = "bazel_skylib", version = "1.5.0")
-bazel_dep(name = "rules_go", version = "0.46.0")
-
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
 
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.1", dev_dependency = True)
+bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
+bazel_dep(name = "rules_go", version = "0.46.0", dev_dependency = True)
+
+pnpm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "pnpm",
+    dev_dependency = True,
+)
 use_repo(pnpm, "pnpm")
 
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
 npm.npm_translate_lock(
     name = "npm",
     bins = {
@@ -32,7 +34,11 @@ npm.npm_translate_lock(
 )
 use_repo(npm, "npm")
 
-go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+go_sdk = use_extension(
+    "@rules_go//go:extensions.bzl",
+    "go_sdk",
+    dev_dependency = True,
+)
 go_sdk.download(
     name = "go_sdk",
     version = "1.20.3",
