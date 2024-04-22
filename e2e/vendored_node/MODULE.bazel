@@ -1,16 +1,10 @@
-module(
-    name = "e2e_vendored_node",
-    version = "0.0.0",
-    compatibility_level = 1,
-)
-
-bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-bazel_dep(name = "rules_nodejs", version = "6.1.0")
-bazel_dep(name = "platforms", version = "0.0.4")
-
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
 )
+
+bazel_dep(name = "platforms", version = "0.0.9", dev_dependency = True)
+bazel_dep(name = "rules_nodejs", version = "6.1.0", dev_dependency = True)
 
 register_toolchains("//toolchains:all")
