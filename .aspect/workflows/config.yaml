@@ -114,6 +114,7 @@ tasks:
                 command: cat vmstat.out
           artifact_paths:
               - vmstat.out
+              - build_event_log.bin
     - format:
           queue: aspect-medium
     - buildifier:
