@@ -1,7 +1,4 @@
-workspace(
-    # see https://docs.bazel.build/versions/main/skylark/deploying.html#workspace
-    name = "aspect_rules_js",
-)
+workspace(name = "aspect_rules_js")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:dev_deps.bzl", "rules_js_dev_dependencies")

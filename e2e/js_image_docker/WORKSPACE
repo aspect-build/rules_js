@@ -29,13 +29,6 @@ load("@npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
 
-# TODO: remove when rules_?  upgrades to modern version supporting
-http_archive(
-    name = "bazel_gazelle",
-    integrity = "sha256-dd8ojEsxyB61D1Hi4U9HY8t1SNquEmgXJHBkY3/Z6mI=",
-    urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.36.0/bazel-gazelle-v0.36.0.tar.gz"],
-)
-
 ###
 # Setup rules_docker
 # rules_docker does not work with M1 macs due to ancient rules_go version.
@@ -52,6 +45,20 @@ http_archive(
     name = "io_bazel_rules_go",
     sha256 = "80a98277ad1311dacd837f9b16db62887702e9f1d1c4c9f796d0121a46c8e184",
     urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.46.0/rules_go-v0.46.0.zip"],
+)
+
+# Bring in a newer version of bazel_gazelle to work-around an incompatability with an older
+# version that is brought in transitively below that is incompatible with newer versions of rules_go.
+# Error when this is not done is:
+# ERROR: Traceback (most recent call last):
+# 	File "/private/var/tmp/_bazel_greg/970c650b0c043c16acaced625553237d/external/bazel_gazelle/internal/go_repository_tools.bzl", line 15, column 52, in <toplevel>
+# 		load("@io_bazel_rules_go//go/private:common.bzl", "env_execute", "executable_extension")
+# Error: file '@io_bazel_rules_go//go/private:common.bzl' does not contain symbol 'env_execute'
+# ERROR: Error computing the main repository mapping: at /private/var/tmp/_bazel_greg/970c650b0c043c16acaced625553237d/external/io_bazel_rules_docker/repositories/deps.bzl:22:6: at /private/var/tmp/_bazel_greg/970c650b0c043c16acaced625553237d/external/io_bazel_rules_docker/repositories/go_repositories.bzl:22:6: at /private/var/tmp/_bazel_greg/970c650b0c043c16acaced625553237d/external/bazel_gazelle/deps.bzl:24:5: initialization of module 'internal/go_repository_tools.bzl' failed
+http_archive(
+    name = "bazel_gazelle",
+    integrity = "sha256-dd8ojEsxyB61D1Hi4U9HY8t1SNquEmgXJHBkY3/Z6mI=",
+    urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.36.0/bazel-gazelle-v0.36.0.tar.gz"],
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
