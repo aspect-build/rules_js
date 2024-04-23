@@ -76,7 +76,7 @@ def _parse_pnpm_package_key(pnpm_name, pnpm_version):
 def _convert_pnpm_v6_version_peer_dep(version):
     # Covert a pnpm lock file v6 version string of the format
     # version(@scope/peer@version)(@scope/peer@version)
-    # to a version_peer_version that is compatible with rules_js.
+    # to a pnpm lock file v5 version_peer_version that is compatible with rules_js.
     if version[-1] == ")":
         # There is a peer dep if the string ends with ")"
         peer_dep_index = version.find("(")
@@ -91,9 +91,9 @@ def _convert_pnpm_v6_version_peer_dep(version):
     return version
 
 def _convert_pnpm_v6_package_name(package_name):
-    # Covert a pnpm lock file v6 name/version string of the format
+    # Covert a pnpm lock file v6 /name/version string of the format
     # @scope/name@version(@scope/name@version)(@scope/name@version)
-    # to a @scope/name/version_peer_version that is compatible with rules_js.
+    # to a pnpm lock file v5 @scope/name/version_peer_version format that is compatible with rules_js.
     if package_name.startswith("/"):
         package_name = _convert_pnpm_v6_version_peer_dep(package_name)
         segments = package_name.rsplit("@", 1)
@@ -105,7 +105,29 @@ def _convert_pnpm_v6_package_name(package_name):
         return _convert_pnpm_v6_version_peer_dep(package_name)
 
 def _convert_v6_importers(importers):
-    # Convert pnpm lockfile v6 importers to a rules_js compatible format.
+    # Convert pnpm lockfile v6 importers to a rules_js compatible ~v5 format.
+    #
+    # v5 importers:
+    #   specifiers:
+    #      pkg-a: 1.2.3
+    #      pkg-b: ^4.5.6
+    #   deps:
+    #      pkg-a: 1.2.3
+    #   devDeps:
+    #      pkg-b: 4.10.1
+    #   ...
+    #
+    # v6 pushed the 'specifiers' and 'version' into subproperties:
+    #
+    #   deps:
+    #      pkg-a:
+    #         specifier: 1.2.3
+    #         version: 1.2.3
+    #   devDeps:
+    #      pkg-b:
+    #          specifier: ^4.5.6
+    #          version: 4.10.1
+
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = {}
@@ -118,20 +140,25 @@ def _convert_v6_importers(importers):
     return result
 
 def _convert_v6_packages(packages):
-    # Convert pnpm lockfile v6 importers to a rules_js compatible format.
+    # Convert pnpm lockfile v6 importers to a rules_js compatible ~v5 format.
+    #
+    # v6 package metadata mainly changed formatting of metadata such as:
+    #
+    # dependency versions with peers:
+    #   v5: 2.0.0_@aspect-test+c@2.0.2
+    #   v6: 2.0.0(@aspect-test/c@2.0.2)
+
     result = {}
     for package, package_info in packages.items():
-        # dependencies
-        dependencies = {}
-        for dep_name, dep_version in package_info.get("dependencies", {}).items():
-            dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
-        package_info["dependencies"] = dependencies
+        # convert v6 package dependencies + optionalDependencies
+        for key in ["dependencies", "optionalDependencies"]:
+            deps = package_info.get(key, None)
+            if deps != None:
+                dependencies = {}
+                for dep_name, dep_version in deps.items():
+                    dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
+                package_info[key] = dependencies
 
-        # optionalDependencies
-        optional_dependencies = {}
-        for dep_name, dep_version in package_info.get("optionalDependencies", {}).items():
-            optional_dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
-        package_info["optionalDependencies"] = optional_dependencies
         result[_convert_pnpm_v6_package_name(package)] = package_info
     return result
 
