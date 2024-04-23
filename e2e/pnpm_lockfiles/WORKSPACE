@@ -27,15 +27,19 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
         "v54",
         "v60",
         "v61",
+        "v90",
     ]
 ]
 
 load("@lock-v54//:repositories.bzl", npm_repositories_v54 = "npm_repositories")
 load("@lock-v60//:repositories.bzl", npm_repositories_v60 = "npm_repositories")
 load("@lock-v61//:repositories.bzl", npm_repositories_v61 = "npm_repositories")
+load("@lock-v90//:repositories.bzl", npm_repositories_v90 = "npm_repositories")
 
 npm_repositories_v54()
 
 npm_repositories_v60()
 
 npm_repositories_v61()
+
+npm_repositories_v90()
