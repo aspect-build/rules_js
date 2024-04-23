@@ -4,10 +4,10 @@ importers:
 
   .:
     specifiers:
-      '@aspect-test/a': 5.0.2
+      '@aspect-test/a': ^5.0.2
       '@aspect-test/b': 5.0.2
-      '@aspect-test/c': 2.0.2
-      '@types/node': 16.18.11
+      '@aspect-test/c': '2.0'
+      '@types/node': ~16.18.11
       rollup: 3.2.5
       uvu: 0.5.6
     dependencies:
