@@ -34,7 +34,7 @@ def npm_imported_package_store(name):
         dev = False,
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -49,7 +49,7 @@ def npm_imported_package_store(name):
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -65,7 +65,7 @@ def npm_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )
@@ -113,7 +113,7 @@ def npm_link_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
         use_declare_symlink = select({
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }),
     )

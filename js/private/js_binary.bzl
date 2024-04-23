@@ -303,19 +303,19 @@ _ATTRS = {
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_legacy_files": attr.label_list(
         allow_files = True,
-        default = ["@aspect_rules_js//js/private/node-patches_legacy:fs.js"],
+        default = [Label("@aspect_rules_js//js/private/node-patches_legacy:fs.js")],
     ),
     "_node_patches_legacy": attr.label(
         allow_single_file = True,
-        default = "@aspect_rules_js//js/private/node-patches_legacy:register.js",
+        default = Label("@aspect_rules_js//js/private/node-patches_legacy:register.js"),
     ),
     "_node_patches_files": attr.label_list(
         allow_files = True,
-        default = ["@aspect_rules_js//js/private/node-patches:fs.js"],
+        default = [Label("@aspect_rules_js//js/private/node-patches:fs.js")],
     ),
     "_node_patches": attr.label(
         allow_single_file = True,
-        default = "@aspect_rules_js//js/private/node-patches:register.js",
+        default = Label("@aspect_rules_js//js/private/node-patches:register.js"),
     ),
 }
 

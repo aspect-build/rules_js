@@ -90,6 +90,11 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+    e2e/repo_mapping:
+        icon: js
+        tasks:
+            - test:
+                  queue: aspect-medium
     e2e/rules_foo:
         icon: js
         tasks:

@@ -1,0 +1,25 @@
+load("@rules_js-repo_name//js:defs.bzl", "js_test")
+load("@rules_js-repo_name//npm:defs.bzl", "npm_package")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+js_test(
+    name = "test",
+    data = [":node_modules"],
+    entry_point = "main.mjs",
+)
+
+npm_package(
+    name = "npm-pkg",
+    srcs = ["main.mjs"],
+)
+
+build_test(
+    name = "node_modules_test",
+    targets = [
+        ":node_modules",
+        ":npm-pkg",
+    ],
+)

@@ -38,7 +38,7 @@ _FP_STORE_TMPL = \
             visibility = ["//visibility:public"],
             tags = ["manual"],
             use_declare_symlink = select({{
-                "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                 "//conditions:default": False,
             }}),
         )"""
@@ -54,7 +54,7 @@ _FP_DIRECT_TMPL = \
                 visibility = {link_visibility},
                 tags = ["manual"],
                 use_declare_symlink = select({{
-                    "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+                    Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
                     "//conditions:default": False,
                 }}),
             )
