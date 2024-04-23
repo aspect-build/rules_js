@@ -26,7 +26,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 """
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains", _register_yq_toolchains = "register_yq_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains", _register_tar_toolchains = "register_tar_toolchains", _register_yq_toolchains = "register_yq_toolchains")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
@@ -189,6 +189,7 @@ def npm_translate_lock(
         register_copy_directory_toolchains = True,
         register_copy_to_directory_toolchains = True,
         register_yq_toolchains = True,
+        register_tar_toolchains = True,
         npm_package_target_name = "{dirname}",
         use_starlark_yaml_parser = False,
         # TODO(2.0): remove package_json
@@ -520,6 +521,8 @@ def npm_translate_lock(
 
         register_yq_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_yq_toolchains()` is called if the toolchain is not already registered
 
+        register_tar_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_tar_toolchains()` is called if the toolchain is not already registered
+
         package_json: Deprecated.
 
             Add all `package.json` files that are part of the workspace to `data` instead.
@@ -573,6 +576,8 @@ def npm_translate_lock(
         _register_copy_to_directory_toolchains()
     if register_yq_toolchains and not native.existing_rule("yq_toolchains"):
         _register_yq_toolchains()
+    if register_tar_toolchains and not native.existing_rule("tar_toolchains"):
+        _register_tar_toolchains()
 
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)

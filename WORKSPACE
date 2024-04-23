@@ -10,9 +10,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # TODO(2.0): change minimum to v6 in repositories.bzl
 http_archive(
     name = "rules_nodejs",
-    sha256 = "a50986c7d2f2dc43a5b9b81a6245fd89bdc4866f1d5e316d9cef2782dd859292",
-    strip_prefix = "rules_nodejs-6.0.5",
-    url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.0.5/rules_nodejs-v6.0.5.tar.gz",
+    sha256 = "dddd60acc3f2f30359bef502c9d788f67e33814b0ddd99aa27c5a15eb7a41b8c",
+    strip_prefix = "rules_nodejs-6.1.0",
+    url = "https://github.com/bazelbuild/rules_nodejs/releases/download/v6.1.0/rules_nodejs-v6.1.0.tar.gz",
 )
 
 load("//js:dev_repositories.bzl", "rules_js_dev_dependencies")
@@ -221,3 +221,36 @@ load(
 fetch_shfmt()
 
 fetch_terraform()
+
+load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
+
+bazel_toolchain_dependencies()
+
+load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
+
+llvm_toolchain(
+    name = "llvm_toolchain",
+    llvm_version = "14.0.0",
+    sha256 = {
+        "darwin-aarch64": "1b8975db6b638b308c1ee437291f44cf8f67a2fb926eb2e6464efd180e843368",
+        "linux-x86_64": "564fcbd79c991e93fdf75f262fa7ac6553ec1dd04622f5d7db2a764c5dc7fac6",
+    },
+    strip_prefix = {
+        "darwin-aarch64": "clang+llvm-14.0.0-arm64-apple-darwin",
+        "linux-x86_64": "clang+llvm-14.0.0-x86_64-linux-gnu",
+    },
+    sysroot = {
+        "linux-aarch64": "@org_chromium_sysroot_linux_arm64//:sysroot",
+        "linux-x86_64": "@org_chromium_sysroot_linux_x86_64//:sysroot",
+        "darwin-aarch64": "@sysroot_darwin_universal//:sysroot",
+        "darwin-x86_64": "@sysroot_darwin_universal//:sysroot",
+    },
+    urls = {
+        "darwin-aarch64": ["https://github.com/aspect-forks/llvm-project/releases/download/aspect-release-14.0.0/clang+llvm-14.0.0-arm64-apple-darwin.tar.xz"],
+        "linux-x86_64": ["https://github.com/aspect-forks/llvm-project/releases/download/aspect-release-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu.tar.xz"],
+    },
+)
+
+load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
+
+llvm_register_toolchains()

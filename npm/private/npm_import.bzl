@@ -20,8 +20,8 @@ for a given lockfile.
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_bazel_lib//lib:repositories.bzl", _register_copy_directory_toolchains = "register_copy_directory_toolchains", _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains")
 load("@aspect_bazel_lib//lib:utils.bzl", "is_bazel_6_or_greater")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
     "@bazel_tools//tools/build_defs/repo:git_worker.bzl",
     _git_add_origin = "add_origin",
@@ -30,17 +30,21 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
-load(":utils.bzl", "utils")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
+load(":utils.bzl", "utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:utils.bzl", _utils = "utils")\
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")\
 """
 
 _LINK_JS_PACKAGE_LIFECYCLE_LOADS_TMPL = """\
 load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")
+
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")\
 """
 
@@ -71,7 +75,7 @@ def npm_imported_package_store(name):
         dev = {dev},
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }}),
     )
@@ -86,7 +90,7 @@ def npm_imported_package_store(name):
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }}),
     )
@@ -102,7 +106,7 @@ def npm_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }}),
     )
@@ -112,7 +116,7 @@ def npm_imported_package_store(name):
     native.filegroup(
         name = "{{}}/dir".format(store_target_name),
         srcs = [":{{}}".format(store_target_name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "{package_directory_output_group}",
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
@@ -130,7 +134,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         deps = ref_deps,
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }}),
     )
@@ -144,7 +148,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         deps = lc_deps,
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }}),
     )
@@ -153,33 +157,33 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
     _js_run_binary(
         name = "{{}}/lc".format(store_target_name),
         srcs = [
-            "{npm_package_target_lc}",
+            "{npm_package_target}",
             ":{{}}/pkg_pre_lc".format(store_target_name),
         ],
         # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
         args = [
                    "{package}",
-                   "../../../$(execpath {npm_package_target_lc})",
+                   "../../../$(execpath {npm_package_target})",
                    "../../../$(@D)",
                ] +
                select({{
-                   "@aspect_rules_js//platforms/os:osx": ["--platform=darwin"],
-                   "@aspect_rules_js//platforms/os:linux": ["--platform=linux"],
-                   "@aspect_rules_js//platforms/os:windows": ["--platform=win32"],
+                   Label("@aspect_rules_js//platforms/os:osx"): ["--platform=darwin"],
+                   Label("@aspect_rules_js//platforms/os:linux"): ["--platform=linux"],
+                   Label("@aspect_rules_js//platforms/os:windows"): ["--platform=win32"],
                    "//conditions:default": [],
                }}) +
                select({{
-                   "@aspect_rules_js//platforms/cpu:arm64": ["--arch=arm64"],
-                   "@aspect_rules_js//platforms/cpu:x86_64": ["--arch=x64"],
+                   Label("@aspect_rules_js//platforms/cpu:arm64"): ["--arch=arm64"],
+                   Label("@aspect_rules_js//platforms/cpu:x86_64"): ["--arch=x64"],
                    "//conditions:default": [],
                }}) +
                select({{
-                   "@aspect_rules_js//platforms/libc:glibc": ["--libc=glibc"],
-                   "@aspect_rules_js//platforms/libc:musl": ["--libc=musl"],
+                   Label("@aspect_rules_js//platforms/libc:glibc"): ["--libc=glibc"],
+                   Label("@aspect_rules_js//platforms/libc:musl"): ["--libc=musl"],
                    "//conditions:default": [],
                }}),
         copy_srcs_to_bin = False,
-        tool = "@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks",
+        tool = Label("@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks"),
         out_dirs = ["{lifecycle_output_dir}"],
         tags = ["manual"],
         execution_requirements = {lifecycle_hooks_execution_requirements},
@@ -229,7 +233,7 @@ def npm_link_imported_package_store(name):
         visibility = {link_visibility},
         tags = ["manual"],
         use_declare_symlink = select({{
-            "@aspect_rules_js//js:allow_unresolved_symlinks": True,
+            Label("@aspect_rules_js//js:allow_unresolved_symlinks"): True,
             "//conditions:default": False,
         }}),{maybe_bins}
     )
@@ -239,7 +243,7 @@ def npm_link_imported_package_store(name):
     native.filegroup(
         name = "{{}}/dir".format(name),
         srcs = [":{{}}".format(name)],
-        output_group = _utils.package_directory_output_group,
+        output_group = "{package_directory_output_group}",
         visibility = {link_visibility},
         tags = ["manual"],
     )
@@ -358,16 +362,8 @@ def {bin_name}_binary(name, **kwargs):
 
 _JS_PACKAGE_TMPL = """
 _npm_package_internal(
-    name = "source_directory",
-    src = ":{extract_to_dirname}",
-    package = "{package}",
-    version = "{version}",
-    visibility = ["//visibility:public"],
-)
-
-_npm_package_internal(
     name = "pkg",
-    src = ":{extract_to_dirname}",
+    src = ":{package_src}",
     package = "{package}",
     version = "{version}",
     visibility = ["//visibility:public"],
@@ -429,7 +425,7 @@ def _is_gnu_tar(rctx):
 
     return "GNU tar" in result.stdout
 
-def _download_and_extract_archive(rctx):
+def _download_and_extract_archive(rctx, package_json_only):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
     auth = {}
@@ -476,6 +472,7 @@ def _download_and_extract_archive(rctx):
         url = download_url,
         integrity = rctx.attr.integrity,
         auth = auth,
+        canonical_id = download_url,
     )
 
     mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
@@ -494,10 +491,21 @@ def _download_and_extract_archive(rctx):
         # have been extracted.
         tar_args.append("--delay-directory-restore")
 
-    result = rctx.execute(tar_args)
-    if result.return_code:
-        msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
-        fail(msg)
+    if package_json_only:
+        # Try to extract package/package.json; 'package' as the root folder is the common
+        # case but some npm package tarballs will use a different root folder. In this case
+        # this extract call will fail and we'll fallback to extracting the full package.
+        tar_args_package_json_only = tar_args[:]
+        tar_args_package_json_only.append("package/package.json")
+        result = rctx.execute(tar_args_package_json_only)
+        if result.return_code:
+            package_json_only = False
+
+    if not package_json_only:
+        result = rctx.execute(tar_args)
+        if result.return_code:
+            msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
+            fail(msg)
 
     if not repo_utils.is_windows(rctx):
         # Some packages have directory permissions missing executable which
@@ -510,10 +518,18 @@ def _download_and_extract_archive(rctx):
             fail(msg)
 
 def _npm_import_rule_impl(rctx):
+    has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
+    has_patches = not (not rctx.attr.patches)
+
+    package_src = _EXTRACT_TO_DIRNAME
     if utils.is_git_repository_url(rctx.attr.url):
         _fetch_git_repository(rctx)
+    elif rctx.attr.extract_full_archive or has_patches or has_lifecycle_hooks:
+        _download_and_extract_archive(rctx, package_json_only = False)
     else:
-        _download_and_extract_archive(rctx)
+        # TODO: support tarball package_src with lifecycle hooks
+        _download_and_extract_archive(rctx, package_json_only = True)
+        package_src = _TARBALL_FILENAME
 
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
@@ -525,18 +541,19 @@ def _npm_import_rule_impl(rctx):
 
     bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
-    generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
+    generated_by_prefix = _make_generated_by_prefix(rctx.attr.package, rctx.attr.version)
 
     bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version)
 
     rctx_files = {
-        "BUILD.bazel": generated_by_lines + [
+        "BUILD.bazel": [
+            generated_by_prefix,
             """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
         ],
     }
 
     rctx_files["BUILD.bazel"].append(_JS_PACKAGE_TMPL.format(
-        extract_to_dirname = _EXTRACT_TO_DIRNAME,
+        package_src = package_src,
         package = rctx.attr.package,
         version = rctx.attr.version,
     ))
@@ -549,7 +566,8 @@ def _npm_import_rule_impl(rctx):
         package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
 
         for link_package in rctx.attr.link_packages.keys():
-            bin_bzl = generated_by_lines + [
+            bin_bzl = [
+                generated_by_prefix,
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
                 """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
             ]
@@ -600,14 +618,14 @@ bin = bin_factory("node_modules")
 
             build_file = paths.join(link_package, "BUILD.bazel")
             if build_file not in rctx_files:
-                rctx_files[build_file] = generated_by_lines[:]
+                rctx_files[build_file] = [generated_by_prefix]
             if rctx.attr.generate_bzl_library_targets:
                 rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
                 rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
                     name = link_package.split("/")[-1] or package_name_no_scope,
                     src = _PACKAGE_JSON_BZL_FILENAME,
                 ))
-            rctx_files[build_file].append("""exports_files(["{}"])""".format(_PACKAGE_JSON_BZL_FILENAME))
+            rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
 
     rules_js_metadata = {}
     if rctx.attr.lifecycle_hooks:
@@ -635,7 +653,7 @@ def _mnemonic_for_bin(bin_name):
     bin_words = bin_name.split("_")
     return "".join([word.capitalize() for word in bin_words])
 
-def _impl_links(rctx):
+def _npm_import_links_rule_impl(rctx):
     ref_deps = {}
     lc_deps = {}
     deps = {}
@@ -643,18 +661,16 @@ def _impl_links(rctx):
     bzlmod_supported = is_bazel_6_or_greater()
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
+        store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
-            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                root_package = rctx.attr.root_package,
-                virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
-                virtual_store_root = utils.virtual_store_root,
-            )
+            dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
         else:
-            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
-            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)""".format(
-                virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                virtual_store_root = utils.virtual_store_root,
-            )
+            dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/ref".format(link_root_name)"""
+        dep_store_target = dep_store_target.format(
+            root_package = rctx.attr.root_package,
+            virtual_store_name = utils.virtual_store_name(store_package, store_version),
+            virtual_store_root = utils.virtual_store_root,
+        )
         ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
@@ -664,47 +680,44 @@ def _impl_links(rctx):
         # party npm deps; it is not recommended for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
+                store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
-                        root_package = rctx.attr.root_package,
-                        virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
-                    lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
-                    deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+                    dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+                    lc_dep_store_target = dep_store_target
                 else:
-                    store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
-                    dep_store_target_pkg = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)""".format(
-                        virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                        virtual_store_root = utils.virtual_store_root,
-                    )
+                    dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg".format(link_root_name)"""
+                    lc_dep_store_target = dep_store_target
                     if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
-                        dep_store_target_pkg_pre_lc_lite = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)""".format(
-                            virtual_store_name = utils.virtual_store_name(store_package, store_version),
-                            virtual_store_root = utils.virtual_store_root,
-                        )
-
                         # special case for lifecycle transitive closure deps; do not depend on
                         # the __pkg of this package as that will be the output directory
                         # of the lifecycle action
-                        lc_deps[dep_store_target_pkg_pre_lc_lite] = lc_deps[dep_store_target_pkg_pre_lc_lite] + [dep_name] if dep_store_target_pkg_pre_lc_lite in lc_deps else [dep_name]
-                    else:
-                        lc_deps[dep_store_target_pkg] = lc_deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in lc_deps else [dep_name]
-                    deps[dep_store_target_pkg] = deps[dep_store_target_pkg] + [dep_name] if dep_store_target_pkg in deps else [dep_name]
-    else:
-        for (dep_name, dep_version) in rctx.attr.deps.items():
-            if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
+                        lc_dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}/pkg_pre_lc_lite".format(link_root_name)"""
+
+                dep_store_target = dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    virtual_store_name = utils.virtual_store_name(dep_name, "0.0.0"),
-                    virtual_store_root = utils.virtual_store_root,
-                )
-            else:
-                store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
-                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)""".format(
                     virtual_store_name = utils.virtual_store_name(store_package, store_version),
                     virtual_store_root = utils.virtual_store_root,
                 )
+                lc_dep_store_target = lc_dep_store_target.format(
+                    root_package = rctx.attr.root_package,
+                    virtual_store_name = utils.virtual_store_name(store_package, store_version),
+                    virtual_store_root = utils.virtual_store_root,
+                )
+
+                lc_deps[lc_dep_store_target] = lc_deps[lc_dep_store_target] + [dep_name] if lc_dep_store_target in lc_deps else [dep_name]
+                deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
+    else:
+        for (dep_name, dep_version) in rctx.attr.deps.items():
+            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
+            if dep_version.startswith("link:") or dep_version.startswith("file:"):
+                dep_store_target = """"//{root_package}:{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+            else:
+                dep_store_target = """":{virtual_store_root}/{{}}/{virtual_store_name}".format(link_root_name)"""
+            dep_store_target = dep_store_target.format(
+                root_package = rctx.attr.root_package,
+                virtual_store_name = utils.virtual_store_name(store_package, store_version),
+                virtual_store_root = utils.virtual_store_root,
+            )
             lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
             deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
 
@@ -715,25 +728,14 @@ def _impl_links(rctx):
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(utils.links_repo_suffix)]
-    if npm_import_sources_repo_name.startswith("aspect_rules_js.npm."):
-        npm_import_sources_repo_name = npm_import_sources_repo_name[len("aspect_rules_js.npm."):]
 
     if rctx.attr.replace_package:
         npm_package_target = rctx.attr.replace_package
-    elif rctx.attr.npm_translate_lock_repo:
-        npm_package_target = "@{}//:{}_source_directory".format(
-            rctx.attr.npm_translate_lock_repo,
-            npm_import_sources_repo_name,
-        )
     else:
-        npm_package_target = "{}{}//:source_directory".format(
+        npm_package_target = "{}{}//:pkg".format(
             "@@" if bzlmod_supported else "@",
             npm_import_sources_repo_name,
         )
-    npm_package_target_lc = "{}{}//:pkg".format(
-        "@@" if bzlmod_supported else "@",
-        npm_import_sources_repo_name,
-    )
 
     link_packages = {}
     for package, link_aliases in rctx.attr.link_packages.items():
@@ -770,9 +772,7 @@ def _impl_links(rctx):
     npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
-        extract_to_dirname = _EXTRACT_TO_DIRNAME,
         npm_package_target = npm_package_target,
-        npm_package_target_lc = npm_package_target_lc,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 1, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
@@ -783,6 +783,7 @@ def _impl_links(rctx):
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,
+        package_directory_output_group = utils.package_directory_output_group,
         rctx_name = rctx.name,
         ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 1, quote_key = False),
         root_package = rctx.attr.root_package,
@@ -811,9 +812,9 @@ def _impl_links(rctx):
         if tmpl
     ]
 
-    generated_by_lines = _make_generated_by_lines(rctx.attr.package, rctx.attr.version)
+    generated_by_prefix = _make_generated_by_prefix(rctx.attr.package, rctx.attr.version)
 
-    rctx.file(_DEFS_BZL_FILENAME, "\n".join(generated_by_lines + npm_link_package_bzl))
+    rctx.file(_DEFS_BZL_FILENAME, generated_by_prefix + "\n" + "\n".join(npm_link_package_bzl))
 
     rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_DEFS_BZL_FILENAME]))
 
@@ -832,7 +833,6 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
-    "npm_translate_lock_repo": attr.string(),
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
@@ -842,6 +842,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "commit": attr.string(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
+    "extract_full_archive": attr.bool(),
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
@@ -862,17 +863,15 @@ def _get_bin_entries(pkg_json, package):
         bin = {paths.basename(package): bin}
     return bin
 
-def _make_generated_by_lines(package, version):
-    return [
-        "\"@generated by @aspect_rules_js//npm/private:npm_import.bzl for npm package {package}@{version}\"".format(
-            package = package,
-            version = version,
-        ),
-        "",  # empty line after bzl docstring since buildifier expects this if this file is vendored in
-    ]
+def _make_generated_by_prefix(package, version):
+    # empty line after bzl docstring since buildifier expects this if this file is vendored in
+    return "\"@generated by @aspect_rules_js//npm/private:npm_import.bzl for npm package {package}@{version}\"\n".format(
+        package = package,
+        version = version,
+    )
 
 npm_import_links_lib = struct(
-    implementation = _impl_links,
+    implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS,
 )
 
@@ -882,7 +881,7 @@ npm_import_lib = struct(
 )
 
 npm_import_links = repository_rule(
-    implementation = _impl_links,
+    implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS,
 )
 
@@ -1190,8 +1189,8 @@ def npm_import(
     if register_copy_to_directory_toolchains and not native.existing_rule("copy_to_directory_toolchains"):
         _register_copy_to_directory_toolchains()
 
-    npm_translate_lock_repo = kwargs.pop("npm_translate_lock_repo", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
+    extract_full_archive = kwargs.pop("extract_full_archive", None)
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
@@ -1225,6 +1224,7 @@ def npm_import(
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
         ),
         generate_bzl_library_targets = generate_bzl_library_targets,
+        extract_full_archive = extract_full_archive,
     )
 
     if lifecycle_hooks_no_sandbox:
@@ -1250,7 +1250,6 @@ def npm_import(
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         bins = bins,
-        npm_translate_lock_repo = npm_translate_lock_repo,
         package_visibility = package_visibility,
         replace_package = replace_package,
     )

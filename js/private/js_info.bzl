@@ -4,13 +4,13 @@ JsInfo = provider(
     doc = "Encapsulates information provided by rules in rules_js and derivative rule sets",
     fields = {
         "declarations": "A depset of declaration files produced by the target",
-        "npm_linked_package_files": "A depset of files in npm linked package dependencies of this target",
-        "npm_linked_packages": "A depset of NpmLinkedPackageInfo providers that are dependencies of this target",
-        "npm_package_store_deps": "A depset of NpmPackageStoreInfo providers from non-dev npm dependencies of this target and the target's transitive dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package",
+        "npm_linked_package_files": "A depset of node_modules links and bin files produced by the target",
+        "npm_linked_packages": "A depset of NpmLinkedPackageInfo providers that are dependencies of the target",
+        "npm_package_store_deps": "A depset of NpmPackageStoreInfo providers from non-dev npm dependencies of the target and the target's transitive dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package",
         "sources": "A depset of source files produced by the target",
         "transitive_declarations": "A depset of declaration files produced by the target and the target's transitive deps",
-        "transitive_npm_linked_package_files": "A depset of files in npm linked package dependencies of this target and the target's transitive deps",
-        "transitive_npm_linked_packages": "A depset of NpmLinkedPackageInfo providers that are dependencies of this target and the target's transitive deps",
+        "transitive_npm_linked_package_files": "A depset of files in npm linked package dependencies of the target and the target's transitive deps",
+        "transitive_npm_linked_packages": "A depset of NpmLinkedPackageInfo providers that are dependencies of the target and the target's transitive deps",
         "transitive_sources": "A depset of source files produced by the target and the target's transitive deps",
     },
 )

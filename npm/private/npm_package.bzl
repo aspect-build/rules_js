@@ -143,7 +143,7 @@ _npm_package = rule(
     implementation = npm_package_lib.implementation,
     attrs = npm_package_lib.attrs,
     provides = npm_package_lib.provides,
-    toolchains = ["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"],
+    toolchains = [Label("@aspect_bazel_lib//lib:copy_to_directory_toolchain_type")],
 )
 
 _npm_package_files = rule(
@@ -452,11 +452,11 @@ def npm_package(
             include_sources = include_sources,
             include_transitive_sources = include_transitive_sources,
             include_declarations = select({
-                "@aspect_rules_js//npm:exclude_declarations_from_npm_packages_flag": False,
+                Label("@aspect_rules_js//npm:exclude_declarations_from_npm_packages_flag"): False,
                 "//conditions:default": include_declarations,
             }),
             include_transitive_declarations = select({
-                "@aspect_rules_js//npm:exclude_declarations_from_npm_packages_flag": False,
+                Label("@aspect_rules_js//npm:exclude_declarations_from_npm_packages_flag"): False,
                 "//conditions:default": include_transitive_declarations,
             }),
             include_runfiles = include_runfiles,
@@ -471,7 +471,7 @@ def npm_package(
     if publishable:
         js_binary(
             name = "{}.publish".format(name),
-            entry_point = "@aspect_rules_js//npm/private:npm_publish_mjs",
+            entry_point = Label("@aspect_rules_js//npm/private:npm_publish_mjs"),
             fixed_args = [
                 "$(rootpath :{})".format(name),
             ],

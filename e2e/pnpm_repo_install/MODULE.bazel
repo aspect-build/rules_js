@@ -4,7 +4,7 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "rules_nodejs", version = "6.0.5")
+bazel_dep(name = "rules_nodejs", version = "6.1.0")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 local_path_override(
     module_name = "aspect_rules_js",
@@ -25,3 +25,6 @@ npm.npm_translate_lock(
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+use_repo(pnpm, "pnpm")

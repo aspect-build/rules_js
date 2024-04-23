@@ -40,6 +40,14 @@ def test_pnpm_name(ctx):
     asserts.equals(env, ("@scope/y", "1.1.1"), utils.parse_pnpm_package_key("@scope/y", "1.1.1"))
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
+def test_link_version(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, ("@scope/y", "0.0.0"), utils.parse_pnpm_package_key("@scope/y", "link:foo"))
+    asserts.equals(env, ("@scope/y", "0.0.0"), utils.parse_pnpm_package_key("@scope/y", "file:bar"))
+    asserts.equals(env, ("@scope/y", "0.0.0"), utils.parse_pnpm_package_key("@scope/y", "file:@foo/bar"))
+    return unittest.end(env)
+
 def test_friendly_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope/y@2.1.1", utils.friendly_name("@scope/y", "2.1.1"))
@@ -149,6 +157,7 @@ t5_test = unittest.make(test_version_supported)
 t6_test = unittest.make(test_parse_package_name)
 t7_test = unittest.make(test_npm_registry_download_url)
 t8_test = unittest.make(test_npm_registry_url)
+t9_test = unittest.make(test_link_version)
 
 def utils_tests(name):
     unittest.suite(
@@ -162,4 +171,5 @@ def utils_tests(name):
         t6_test,
         t7_test,
         t8_test,
+        t9_test,
     )

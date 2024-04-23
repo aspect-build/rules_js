@@ -39,6 +39,7 @@ def pnpm_repository(name, pnpm_version = LATEST_PNPM_VERSION):
                 """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
                 """js_binary(name = "pnpm", data = glob(["package/**"]), entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ]),
+            extract_full_archive = True,
             register_copy_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
             register_copy_to_directory_toolchains = False,  # this code path should work for both WORKSPACE and bzlmod
         )

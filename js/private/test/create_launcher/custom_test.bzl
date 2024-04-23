@@ -2,7 +2,7 @@
 
 load("@aspect_rules_js//js:libs.bzl", "js_binary_lib", "js_lib_helpers")
 
-def _impl(ctx):
+def _custom_test_impl(ctx):
     fixed_args = ["--arg1", "--arg2"]
     fixed_env = {
         "ENV1": "foo",
@@ -39,7 +39,7 @@ def _impl(ctx):
 
 _custom_test = rule(
     attrs = js_binary_lib.attrs,
-    implementation = _impl,
+    implementation = _custom_test_impl,
     test = True,
     toolchains = js_binary_lib.toolchains,
 )

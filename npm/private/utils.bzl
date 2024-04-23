@@ -50,6 +50,9 @@ def _pnpm_name(name, version):
     return "%s/%s" % (name, version)
 
 def _parse_pnpm_package_key(pnpm_name, pnpm_version):
+    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
+        return pnpm_name, "0.0.0"
+
     if not pnpm_version.startswith("/"):
         if not pnpm_name:
             fail("parse_pnpm_package_key: pnpm_name is empty for non-versioned package %s" % pnpm_version)
@@ -91,9 +94,7 @@ def _convert_pnpm_v6_package_name(package_name):
     # Covert a pnpm lock file v6 name/version string of the format
     # @scope/name@version(@scope/name@version)(@scope/name@version)
     # to a @scope/name/version_peer_version that is compatible with rules_js.
-    if package_name[0].isdigit():
-        return _convert_pnpm_v6_version_peer_dep(package_name)
-    elif package_name.startswith("/"):
+    if package_name.startswith("/"):
         package_name = _convert_pnpm_v6_version_peer_dep(package_name)
         segments = package_name.rsplit("@", 1)
         if len(segments) != 2:
@@ -107,16 +108,13 @@ def _convert_v6_importers(importers):
     # Convert pnpm lockfile v6 importers to a rules_js compatible format.
     result = {}
     for import_path, importer in importers.items():
-        result[import_path] = {
-            "specifiers": {},
-            "dependencies": {},
-            "optionalDependencies": {},
-            "devDependencies": {},
-        }
+        result[import_path] = {}
         for key in ["dependencies", "optionalDependencies", "devDependencies"]:
-            deps = importer.get(key, {})
-            for name, attributes in deps.items():
-                result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
+            deps = importer.get(key, None)
+            if deps != None:
+                result[import_path][key] = {}
+                for name, attributes in deps.items():
+                    result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
     return result
 
 def _convert_v6_packages(packages):
@@ -189,7 +187,6 @@ def _parse_pnpm_lock_common(parsed, err):
 
     importers = parsed.get("importers", {
         ".": {
-            "specifiers": parsed.get("specifiers", {}),
             "dependencies": parsed.get("dependencies", {}),
             "optionalDependencies": parsed.get("optionalDependencies", {}),
             "devDependencies": parsed.get("devDependencies", {}),
@@ -401,7 +398,7 @@ if [ ! -f $1 ]; then exit 42; fi
     else:
         fail(INTERNAL_ERROR_MSG)
 
-# TODO: move this to aspect_bazel_lib
+# TODO(2.0): move this to aspect_bazel_lib
 def _home_directory(rctx):
     if "HOME" in rctx.os.environ and not repo_utils.is_windows(rctx):
         return rctx.os.environ["HOME"]
@@ -434,6 +431,34 @@ def _is_vendored_tarfile(package_snapshot):
 
 def _default_external_repository_action_cache():
     return DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE
+
+def _is_tarball_extension(ext):
+    # Takes an extension (without leading dot) and return True if the extension
+    # is a common tarball extension as per
+    # https://en.wikipedia.org/wiki/Tar_(computing)#Suffixes_for_compressed_files
+    tarball_extensions = [
+        "tar",
+        "tar.bz2",
+        "tb2",
+        "tbz",
+        "tbz2",
+        "tz2",
+        "tar.gz",
+        "taz",
+        "tgz",
+        "tar.lz",
+        "tar.lzma",
+        "tlz",
+        "tar.lzo",
+        "tar.xz",
+        "txz",
+        "tar.Z",
+        "tZ",
+        "taZ",
+        "tar.zst",
+        "tzst",
+    ]
+    return ext in tarball_extensions
 
 utils = struct(
     bazel_name = _bazel_name,
@@ -468,4 +493,5 @@ utils = struct(
     home_directory = _home_directory,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_vendored_tarfile = _is_vendored_tarfile,
+    is_tarball_extension = _is_tarball_extension,
 )

@@ -18,6 +18,19 @@ workspaces:
                   without: true
             - delivery:
                   without: true
+    e2e/gyp_no_install_script:
+        icon: npm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            - configure:
+                  without: true
+            - delivery:
+                  without: true
     # rules_docker not compatible with Bazel 7.
     # See https://github.com/bazelbuild/bazel/issues/20494#issuecomment-1852401451.
     # e2e/js_image_docker:
@@ -170,6 +183,19 @@ workspaces:
                   without: true
             - delivery:
                   without: true
+    e2e/pnpm_lockfiles:
+        icon: pnpm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            - configure:
+                  without: true
+            - delivery:
+                  without: true
     e2e/pnpm_workspace:
         icon: pnpm
         tasks:
@@ -185,6 +211,19 @@ workspaces:
                   without: true
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            - configure:
+                  without: true
+            - delivery:
+                  without: true
+    e2e/repo_mapping:
+        icon: js
         tasks:
             - test:
                   queue: aspect-medium
@@ -226,8 +265,8 @@ workspaces:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
 tasks:
-    - branch_freshness:
-          update_strategy: none
+    - checkout:
+          update_strategy: rebase
     - test:
           hooks:
               - type: before_task
@@ -236,6 +275,7 @@ tasks:
                 command: cat vmstat.out
           artifact_paths:
               - vmstat.out
+              - build_event_log.bin
     - format:
           queue: aspect-medium
     - buildifier:
@@ -257,3 +297,5 @@ tasks:
                         - main
     - finalization:
           queue: aspect-small
+notifications:
+    github: {}

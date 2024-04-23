@@ -1,5 +1,7 @@
-bazel_dep(name = "aspect_bazel_lib", version = "2.4.2")
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.1")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+bazel_dep(name = "platforms", version = "0.0.8")
+
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",
@@ -17,4 +19,8 @@ npm.npm_translate_lock(
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
-use_repo(npm, "npm")
+use_repo(
+    npm,
+    "npm",
+    "npm__segfault-handler__1.3.0__links",
+)

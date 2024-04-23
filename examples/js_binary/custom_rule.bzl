@@ -1,6 +1,6 @@
 "A simple custom rule for testing js_binary used in a custom rule"
 
-def _impl(ctx):
+def _custom_rule_impl(ctx):
     out = ctx.actions.declare_file("{}.out".format(ctx.label.name))
     args = ctx.actions.args()
     args.add(out.short_path)
@@ -19,7 +19,7 @@ def _impl(ctx):
     )
 
 custom_rule = rule(
-    implementation = _impl,
+    implementation = _custom_rule_impl,
     attrs = {
         "tool": attr.label(
             executable = True,

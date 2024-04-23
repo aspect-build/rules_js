@@ -1,7 +1,6 @@
-bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 bazel_dep(name = "local_repo", version = "0.0.0")
-bazel_dep(name = "aspect_bazel_lib", version = "1.40.3")
 
 local_path_override(
     module_name = "aspect_rules_js",
@@ -25,10 +24,10 @@ npm.npm_translate_lock(
     },
     patches = {
         # TODO: Because `patches` is a string_list_dict that doesn't take labels, we can't
-        # pass in a label like `@local_repo//:....` because only the root repository knows
+        # pass in a label like `@local_repo~//:....` because only the root repository knows
         # how to map this repo to its local override. This causes rules_js to fail when trying
         # to convert the label into a path.
-        "meaning-of-life@1.0.0": ["@@local_repo~override//:meaning-of-life@1.0.0.patch"],
+        "meaning-of-life@1.0.0": ["@@local_repo~//:meaning-of-life@1.0.0.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
 )

@@ -372,8 +372,6 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
         repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
-        if repo_name.startswith("aspect_rules_js.npm."):
-            repo_name = repo_name[len("aspect_rules_js.npm."):]
 
         # gather package visibility
         package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
@@ -508,7 +506,6 @@ def _has_strip_prefix_arg(patch_args, strip_num = None):
     return False
 
 ################################################################################
-# TODO: move to bazel-lib?
 def _to_apparent_repo_name(canonical_name):
     return canonical_name[canonical_name.rfind("~") + 1:]
 
