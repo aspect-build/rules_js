@@ -2,10 +2,6 @@
 common:local --disk_cache=~/.cache/bazel-disk-cache
 common --repository_cache=~/.cache/bazel-repository-cache
 
-# Bazel version specific settings
-common:bazel6 --test_tag_filters=-skip-on-bazel6
-common:bazel7 --test_tag_filters=-skip-on-bazel7
-
 # Bazel-in-bazel support
 test --test_env=XDG_CACHE_HOME
 
