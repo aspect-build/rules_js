@@ -14,8 +14,8 @@ load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//tools:version.bzl", BAZEL_LIB_VERSION = "VERSION")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:versions.bzl", "versions")
-load("//js:libs.bzl", "js_lib_helpers")
 load("//js:defs.bzl", "js_binary")
+load("//js:libs.bzl", "js_lib_helpers")
 load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
@@ -174,6 +174,7 @@ def npm_package(
         # TODO(2.0): flip include_runfiles default to False
         include_runfiles = True,
         hardlink = "auto",
+        publishable = True,
         verbose = False,
         **kwargs):
     """A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
@@ -436,6 +437,8 @@ def npm_package(
             - `off`: all files are copied
             - `on`: hardlinks are used for all files (not recommended)
 
+        publishable: When True, enable generation of `{name}.publish` target
+
         verbose: If true, prints out verbose logs to stdout
 
         **kwargs: Additional attributes such as `tags` and `visibility`
@@ -464,20 +467,22 @@ def npm_package(
         )
         srcs = srcs + [files_target]
 
-    js_binary(
-        name = "{}.publish".format(name),
-        entry_point = Label("@aspect_rules_js//npm/private:npm_publish_mjs"),
-        fixed_args = [
-            "$(rootpath :{})".format(name),
-        ],
-        data = [name],
-        # required to make npm to be available in PATH
-        include_npm = True,
-        args = args,
-        tags = kwargs.get("tags", []) + ["manual"],
-        testonly = kwargs.get("testonly", False),
-        visibility = kwargs.get("visibility", None),
-    )
+    # TODO(2.0): switch to false
+    if publishable:
+        js_binary(
+            name = "{}.publish".format(name),
+            entry_point = Label("@aspect_rules_js//npm/private:npm_publish_mjs"),
+            fixed_args = [
+                "$(rootpath :{})".format(name),
+            ],
+            data = [name],
+            # required to make npm to be available in PATH
+            include_npm = True,
+            args = args,
+            tags = kwargs.get("tags", []) + ["manual"],
+            testonly = kwargs.get("testonly", False),
+            visibility = kwargs.get("visibility", None),
+        )
 
     _npm_package(
         name = name,
