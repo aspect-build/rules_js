@@ -1,6 +1,6 @@
 # build without the bytes
-test --remote_download_minimal
-test --nobuild_runfile_links
+common --remote_download_outputs=minimal
+common --nobuild_runfile_links
 
 # generate build_event_log binary build event profile file
 common --build_event_binary_file=build_event_log.bin
