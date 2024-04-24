@@ -2,16 +2,16 @@
     "name": "pnpm-versions",
     "private": true,
     "dependencies": {
-        "@aspect-test/a": "5.0.2",
+        "@aspect-test/a": "^5.0.2",
         "rollup": "3.2.5",
         "uvu": "0.5.6"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",
-        "@types/node": "16.18.11"
+        "@types/node": "~16.18.11"
     },
     "optionalDependencies": {
-        "@aspect-test/c": "2.0.2"
+        "@aspect-test/c": "2.0"
     },
     "peerDependencies": {
         "@aspect-test/e": "1.0.0"

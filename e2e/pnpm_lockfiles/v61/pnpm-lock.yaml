@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@aspect-test/a':
-        specifier: 5.0.2
+        specifier: ^5.0.2
         version: 5.0.2
       '@aspect-test/e':
         specifier: 1.0.0
@@ -22,14 +22,14 @@ importers:
         version: 0.5.6
     optionalDependencies:
       '@aspect-test/c':
-        specifier: 2.0.2
+        specifier: '2.0'
         version: 2.0.2
     devDependencies:
       '@aspect-test/b':
         specifier: 5.0.2
         version: 5.0.2
       '@types/node':
-        specifier: 16.18.11
+        specifier: ~16.18.11
         version: registry.npmjs.org/@types/node@16.18.11
 
   projects/a: {}
