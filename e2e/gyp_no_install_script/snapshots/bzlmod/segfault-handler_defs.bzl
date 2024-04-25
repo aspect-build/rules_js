@@ -163,6 +163,13 @@ def npm_imported_package_store(name):
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
+    )
+
+    # filegroup target that provides a single file which is
+    # package directory for use in $(execpath) and $(rootpath)
+    native.filegroup(
+        name = "{}/dir".format(store_target_name),
+        srcs = [":{}".format(store_target_name)],
         output_group = "package_directory",
         visibility = ["//visibility:public"],
         tags = ["manual"],
@@ -289,6 +296,13 @@ def npm_imported_package_store(name):
         dev = False,
         deps = lc_deps,
         tags = ["manual"],
+    )
+
+    # lifecycle build action
+    _js_run_binary(
+        name = "{}/lc".format(store_target_name),
+        srcs = [
+            "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
             ":{}/pkg_pre_lc".format(store_target_name),
         ],
         # js_run_binary runs in the output dir; must add "../../../" because paths are relative to the exec root
