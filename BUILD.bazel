@@ -69,7 +69,7 @@ diff_test(
 # the `npm_package` target depends on.
 npm_link_package(
     name = "node_modules/@mycorp/pkg-b",
-    src = "//examples/npm_package/packages/pkg_b",
+    src = "//examples/npm_package/packages/pkg_b:pkg",
 )
 
 # Manually linked pkg-c with additional use cases.

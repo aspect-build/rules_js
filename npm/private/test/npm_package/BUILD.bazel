@@ -21,13 +21,13 @@ js_library(
 )
 
 npm_package(
-    name = "npm_package",
+    name = "pkg",
     srcs = [":lib_a"],
     visibility = ["//visibility:public"],
 )
 
 copy_to_directory(
-    name = "expected_npm_package",
+    name = "expected_pkg",
     srcs = [
         "index.js",
         ":package.json",
@@ -36,6 +36,6 @@ copy_to_directory(
 
 diff_test(
     name = "test",
-    file1 = ":npm_package",
-    file2 = ":expected_npm_package",
+    file1 = ":pkg",
+    file2 = ":expected_pkg",
 )

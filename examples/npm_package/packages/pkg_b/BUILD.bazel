@@ -6,7 +6,7 @@ npm_link_all_packages(name = "node_modules")
 # The terminal npm_package target for this package. This target is linked
 # manually in the root of the pnpm workspace with `npm_link_package`.
 npm_package(
-    name = "pkg_b",
+    name = "pkg",
     srcs = [
         "index.js",
         "package.json",

@@ -6,7 +6,7 @@ npm_link_all_packages(name = "node_modules")
 
 # A basic library with 2 simple dependencies (packages with no dependencies))
 js_library(
-    name = "js_lib",
+    name = "lib",
     srcs = ["index.js"],
     data = [
         ":node_modules/@aspect-test/e",
@@ -17,10 +17,10 @@ js_library(
 
 # Exposed via npm_package()
 npm_package(
-    name = "lib",
+    name = "pkg",
     srcs = [
         "package.json",
-        ":js_lib",
+        ":lib",
     ],
     visibility = ["//visibility:public"],
 )
