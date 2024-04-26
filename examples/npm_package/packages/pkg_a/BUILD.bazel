@@ -33,7 +33,7 @@ js_library(
 # rule encodes the linking logic for this dependency into the generated 'npm_link_all_packages'
 # marco.
 npm_package(
-    name = "pkg_a",
+    name = "pkg",
     srcs = [":lib"],
     # The package name does not need to be specified in this target since the name
     # that this package is linked as is set by the pnpm lockfile. If it is
