@@ -7,7 +7,7 @@ npm_link_all_packages(name = "node_modules")
 js_test(
     name = "direct",
     data = [
-        "//lib:js_lib",
+        "//lib",
     ],
     entry_point = "test_file_all_linked.js",
 )
