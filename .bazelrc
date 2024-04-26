@@ -27,9 +27,6 @@ common --lockfile_mode=off
 # Mock versioning command to test the --stamp behavior
 build --workspace_status_command="echo BUILD_SCM_VERSION 1.2.3"
 
-# Enable with --config=release
-build:release --stamp --workspace_status_command=$(pwd)/workspace_status.sh
-
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
 # This needs to be last statement in this
