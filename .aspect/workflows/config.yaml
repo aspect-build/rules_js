@@ -284,6 +284,9 @@ tasks:
           queue: aspect-medium
     - delivery:
           auto_deliver: true
+          stamp_flags:
+              - --stamp
+              - --workspace_status_command="${PWD}/workspace_status.sh"
           rules:
               - deliverable: 'attr("tags", "\bdeliverable\b", //...)'
                 condition:
