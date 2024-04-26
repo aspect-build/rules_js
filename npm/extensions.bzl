@@ -202,7 +202,7 @@ def _npm_translate_lock_attrs():
     attrs["run_lifecycle_hooks"] = attr.bool(default = True)
 
     # Args defaulted differently by the macro
-    attrs["npm_package_target_name"] = attr.string(default = "{dirname}")
+    attrs["npm_package_target_name"] = attr.string(default = "pkg")
     attrs["patch_args"] = attr.string_list_dict(default = {"*": ["-p0"]})
 
     # Args not supported or unnecessary in bzlmod
