@@ -184,7 +184,7 @@ def npm_translate_lock(
         link_workspace = None,
         pnpm_version = LATEST_PNPM_VERSION,
         use_pnpm = None,
-        npm_package_target_name = "{dirname}",
+        npm_package_target_name = "pkg",
         **kwargs):
     """Repository macro to generate starlark code from a lock file.
 
@@ -503,14 +503,11 @@ def npm_translate_lock(
 
             Use `pnpm_version` for non-bzlmod.
 
-        npm_package_target_name: The name of linked `npm_package` targets. When `npm_package` targets are linked as pnpm workspace
-            packages, the name of the target must align with this value.
+        npm_package_target_name: The name of linked `npm_package`, `js_library` or `JsInfo` producing targets.
+
+            When targets are linked as pnpm workspace packages, the name of the target must align with this value.
 
             The `{dirname}` placeholder is replaced with the directory name of the target.
-
-            By default the directory name of the target is used.
-
-            Default: `{dirname}`
 
         **kwargs: Internal use only
     """

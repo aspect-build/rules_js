@@ -6,7 +6,7 @@ npm_link_all_packages(name = "node_modules")
 
 # A library with 2 aliases to one simple dependency (package with no dependencies)
 js_library(
-    name = "js_lib_dupes",
+    name = "lib-dupes",
     srcs = ["index.js"],
     data = [
         # Two versions of the same package (via aliases), see https://github.com/aspect-build/rules_js/issues/1110
@@ -18,10 +18,10 @@ js_library(
 
 # Exposed via npm_package()
 npm_package(
-    name = "lib-dupes",
+    name = "pkg",
     srcs = [
         "package.json",
-        ":js_lib_dupes",
+        ":lib-dupes",
     ],
     visibility = ["//visibility:public"],
 )
