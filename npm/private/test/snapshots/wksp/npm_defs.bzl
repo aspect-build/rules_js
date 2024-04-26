@@ -2207,7 +2207,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_package_store(
             name = ".aspect_rules_js/{}/is-odd@0.0.0".format(name),
-            src = "//npm/private/test/vendored/is-odd:is-odd",
+            src = "//npm/private/test/vendored/is-odd:pkg",
             package = "is-odd",
             version = "0.0.0",
             deps = {
@@ -2220,7 +2220,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_package_store(
             name = ".aspect_rules_js/{}/semver-max@0.0.0".format(name),
-            src = "//npm/private/test/vendored/semver-max:semver-max",
+            src = "//npm/private/test/vendored/semver-max:pkg",
             package = "semver-max",
             version = "0.0.0",
             deps = {
@@ -2234,7 +2234,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_package_store(
             name = ".aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
-            src = "//examples/npm_package/packages/pkg_a:pkg_a",
+            src = "//examples/npm_package/packages/pkg_a:pkg",
             package = "@mycorp/pkg-a",
             version = "0.0.0",
             deps = {
@@ -2268,7 +2268,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_package_store(
             name = ".aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
-            src = "//examples/npm_package/packages/pkg_d:pkg_d",
+            src = "//examples/npm_package/packages/pkg_d:pkg",
             package = "@mycorp/pkg-d",
             version = "0.0.0",
             deps = {
@@ -2304,7 +2304,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_package_store(
             name = ".aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
-            src = "//npm/private/test/npm_package:npm_package",
+            src = "//npm/private/test/npm_package:pkg",
             package = "test-npm_package",
             version = "0.0.0",
             deps = {
