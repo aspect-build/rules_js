@@ -339,7 +339,7 @@ async function main(args, sandbox) {
             // to determine the execroot entry point but since the tool is running
             // in a custom sandbox we don't want to cd into the BAZEL_BINDIR in the launcher
             // (JS_BINARY__NO_CD_BINDIR is set above)
-            env['JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
+            env['JS_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
             env['BAZEL_BINDIR'] = config.bazel_bindir
             if (config.allow_execroot_entry_point_with_no_copy_data_to_bin) {
                 env[
