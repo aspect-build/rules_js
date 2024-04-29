@@ -292,8 +292,8 @@ elif [[ "$PWD" == *"/bazel-~1/"* ]]; then
 fi
 
 if [[ "${bazel_out_segment:-}" ]]; then
-    if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
-        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
     else
         # We in runfiles and we don't yet know the execroot
         rest="${PWD#*"$bazel_out_segment"}"
@@ -305,8 +305,8 @@ if [[ "${bazel_out_segment:-}" ]]; then
         JS_BINARY__EXECROOT="${PWD:0:$index}"
     fi
 else
-    if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
-        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
     else
         # We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
         JS_BINARY__EXECROOT="$PWD"
@@ -334,9 +334,9 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
 fi
 export JS_BINARY__EXECROOT
 
-if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
     if [ -z "${BAZEL_BINDIR:-}" ]; then
-        logf_fatal "Expected BAZEL_BINDIR to be set when JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT is set"
+        logf_fatal "Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
         exit 1
     fi
     if [ -z "${JS_BINARY__COPY_DATA_TO_BIN:-}" ] && [ -z "${JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN:-}" ]; then
@@ -354,7 +354,7 @@ To disable this validation you can set allow_execroot_entry_point_with_no_copy_d
     fi
 fi
 
-if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "js/private/test/shellcheck.js")
 else
     entry_point="$JS_BINARY__RUNFILES/_main/js/private/test/shellcheck.js"
@@ -531,8 +531,8 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     logf_debug "JS_BINARY__TARGET_NAME %s" "${JS_BINARY__TARGET_NAME:-}"
     logf_debug "JS_BINARY__WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
     logf_debug "js_binary entry point %s" "$entry_point"
-    if [ "${JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
-        logf_debug "JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT %s" "$JS_RUN_BINARY__USE_EXECROOT_ENTRY_POINT"
+    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
+        logf_debug "JS_BINARY__USE_EXECROOT_ENTRY_POINT %s" "$JS_BINARY__USE_EXECROOT_ENTRY_POINT"
     fi
 fi
 
