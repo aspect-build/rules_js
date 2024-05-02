@@ -173,7 +173,7 @@ def npm_package(
         include_transitive_types = True,
         include_runfiles = False,
         hardlink = "auto",
-        publishable = True,
+        publishable = False,
         verbose = False,
         **kwargs):
     """A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
