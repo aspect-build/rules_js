@@ -3,11 +3,33 @@ Test utils for lockfiles
 """
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 
 def lockfile_test(name = "lockfile", node_modules = "node_modules"):
     """
     A test that verifies the `node_modules` target generated is correct.
+
+    Args:
+        name: name of the test
+        node_modules: name of the tested 'node_modules' directory
     """
+
+    # TODO: lockfile v53 does not support patching?
+    if native.package_name() != "v53":
+        copy_file(
+            name = "copy-tests",
+            src = "//:patched-dependencies-test.js",
+            out = "patched-dependencies-test.js",
+        )
+
+        js_test(
+            name = "patch-test",
+            data = [
+                ":%s/meaning-of-life" % node_modules,
+            ],
+            entry_point = "patched-dependencies-test.js",
+        )
 
     build_test(
         name = name,
