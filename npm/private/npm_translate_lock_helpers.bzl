@@ -236,7 +236,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
+def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -393,7 +393,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        if requires_build:
+        run_lifecycle_hooks = name in only_built_dependencies if only_built_dependencies != None else requires_build
+        if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
             lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
             lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
