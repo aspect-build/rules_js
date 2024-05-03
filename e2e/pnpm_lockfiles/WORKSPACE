@@ -25,7 +25,6 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
             "//:pnpm-workspace.yaml",
         ],
         npmrc = "//:.npmrc",
-        patch_args = {"*": ["-p1"]},
         pnpm_lock = "//%s:pnpm-lock.yaml" % version,
         verify_node_modules_ignored = "//:.bazelignore",
     )

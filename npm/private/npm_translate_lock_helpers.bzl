@@ -325,13 +325,23 @@ def _get_npm_imports(importers, packages, patched_dependencies, root_package, rc
             # there is no unfriendly name for this package
             unfriendly_name = None
 
-        # gather patches & patch args
-        patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
+        # Patch and patch arguments for this package.
+        patches = []
+        patch_args = []
 
         # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
             patch_path = "//%s:%s" % (attr.pnpm_lock.package, patched_dependencies.get(friendly_name).get("path"))
-            patches.insert(0, patch_path)
+            patches.append(patch_path)
+
+        # Gather npm_translate_lock patches & patch_args
+        translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
+        if len(translate_patches) > 0:
+            translate_patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
+
+            patches.extend(translate_patches)
+            patch_args.extend(translate_patch_args)
+            patches_used.extend(patches_keys)
 
         # Resolve string patch labels relative to the root respository rather than relative to rules_js.
         # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
@@ -341,13 +351,13 @@ def _get_npm_imports(importers, packages, patched_dependencies, root_package, rc
         # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
-        patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
-
         # Patches in `pnpm.patchedDependencies` must have the -p1 format. Therefore any
         # patches applied via `patches` must also use -p1 since we don't support different
         # patch args for different patches.
-        if pnpm_patched and not _has_strip_prefix_arg(patch_args, 1):
-            if _has_strip_prefix_arg(patch_args):
+        if pnpm_patched:
+            if not _has_strip_prefix_arg(patch_args):
+                patch_args.append("-p1")
+            elif not _has_strip_prefix_arg(patch_args, 1):
                 msg = """\
 ERROR: patch_args for package {package} contains a strip prefix that is incompatible with a patch applied via `pnpm.patchedDependencies`.
 
@@ -355,10 +365,6 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
 
 """.format(package = friendly_name)
                 fail(msg)
-            patch_args = patch_args[:]
-            patch_args.append("-p1")
-
-        patches_used.extend(patches_keys)
 
         # gather replace packages
         replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
