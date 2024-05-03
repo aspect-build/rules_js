@@ -4,6 +4,7 @@
     "dependencies": {
         "@aspect-test/a": "^5.0.2",
         "rollup": "3.2.5",
+        "meaning-of-life": "1.0.0",
         "uvu": "0.5.6"
     },
     "devDependencies": {
@@ -15,5 +16,10 @@
     },
     "peerDependencies": {
         "@aspect-test/e": "1.0.0"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "meaning-of-life@1.0.0": "patches/meaning-of-life@1.0.0-pnpm.patch"
+        }
     }
 }

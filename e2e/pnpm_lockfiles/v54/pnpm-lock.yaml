@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  meaning-of-life@1.0.0:
+    hash: o3deharooos255qt5xdujc3cuq
+    path: patches/meaning-of-life@1.0.0-pnpm.patch
+
 importers:
 
   .:
@@ -8,10 +13,12 @@ importers:
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': '2.0'
       '@types/node': ~16.18.11
+      meaning-of-life: 1.0.0
       rollup: 3.2.5
       uvu: 0.5.6
     dependencies:
       '@aspect-test/a': 5.0.2
+      meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 3.2.5
       uvu: 0.5.6
     optionalDependencies:
@@ -88,6 +95,11 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
     dev: false
+
+  /meaning-of-life/1.0.0_o3deharooos255qt5xdujc3cuq:
+    resolution: {integrity: sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==}
+    dev: false
+    patched: true
 
   /mri/1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
