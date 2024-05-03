@@ -244,6 +244,7 @@ def _npm_translate_lock_attrs():
 
     # Args defaulted differently by the macro
     attrs["npm_package_target_name"] = attr.string(default = "{dirname}")
+    attrs["patch_args"] = attr.string_list_dict(default = {"*": ["-p0"]})
 
     return attrs
 
