@@ -394,11 +394,16 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
-        lifecycle_hooks_use_default_shell_env, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_use_default_shell_env, "*", name, friendly_name, unfriendly_name)
-        run_lifecycle_hooks = requires_build and lifecycle_hooks
+        if requires_build:
+            lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
+            lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
+            lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
+            lifecycle_hooks_use_default_shell_env, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_use_default_shell_env, "*", name, friendly_name, unfriendly_name)
+        else:
+            lifecycle_hooks = False
+            lifecycle_hooks_env = []
+            lifecycle_hooks_execution_requirements = []
+            lifecycle_hooks_use_default_shell_env = False
 
         bins = {}
         matching_bins, _ = _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name, unfriendly_name)
@@ -444,11 +449,10 @@ ERROR: patch_args for package {package} contains a strip prefix that is incompat
             patch_args = patch_args,
             patches = patches,
             root_package = root_package,
-            run_lifecycle_hooks = run_lifecycle_hooks,
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
-            lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env[0] == "true",
+            lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env[0] == "true" if lifecycle_hooks else False,
             npm_auth = npm_auth_bearer,
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
