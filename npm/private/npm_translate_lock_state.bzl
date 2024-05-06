@@ -37,6 +37,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_patches_labels(priv, rctx, label_store)
 
+    _init_root_package(priv, rctx, label_store)
+
     root_package_json_declared = label_store.has("package_json_root")
     if root_package_json_declared and _should_update_pnpm_lock(priv):
         # If we need to read the patches list from the package.json since
@@ -70,8 +72,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
-
-    _init_root_package(priv, rctx, label_store)
 
     _init_npmrc(priv, rctx, label_store)
 
@@ -195,7 +195,7 @@ def _init_patches_labels(priv, rctx, label_store):
 def _init_patched_dependencies_labels(priv, rctx, label_store):
     if rctx.attr.update_pnpm_lock:
         # Read patches from package.json `pnpm.patchedDependencies`
-        root_package_json = _load_root_package_json(priv, rctx, label_store)
+        root_package_json = _root_package_json(priv)
         patches = ["//%s:%s" % (label_store.label("pnpm_lock").package, patch) for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
     else:
         # Read patches from pnpm-lock.yaml `patchedDependencies`
@@ -243,6 +243,20 @@ def _init_root_package(priv, rctx, label_store):
         if _has_workspaces(priv):
             fail("root_package cannot be overridden if there are pnpm workspace packages specified")
         priv["root_package"] = rctx.attr.root_package
+
+    # Load a declared root package.json
+    if label_store.has("package_json_root"):
+        root_package_json_path = label_store.path("package_json_root")
+        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
+    elif "." in priv["importers"].keys():
+        # Load an undeclared package.json derived from the root importer in the lockfile
+        label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
+        root_package_json_path = label_store.path("package_json_root")
+        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
+    else:
+        # if there is no root importer that means there is no root package.json to read; pnpm allows
+        # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
+        priv["root_package_json"] = {}
 
 ################################################################################
 def _init_npmrc(priv, rctx, label_store):
@@ -348,7 +362,7 @@ WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lo
 
     if rctx.attr.update_pnpm_lock:
         # Read patches from package.json `pnpm.patchedDependencies`
-        root_package_json = _load_root_package_json(priv, rctx, label_store)
+        root_package_json = _root_package_json(priv)
         pnpm_patches = root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()
     else:
         # Read patches from pnpm-lock.yaml `patchedDependencies`
@@ -539,30 +553,6 @@ def _has_workspaces(priv):
     return importer_paths and (len(importer_paths) > 1 or importer_paths[0] != ".")
 
 ################################################################################
-def _load_root_package_json(priv, rctx, label_store):
-    if "root_package_json" in priv:
-        return priv["root_package_json"]
-
-    # Load a declared root package.json
-    if label_store.has("package_json_root"):
-        root_package_json_path = label_store.path("package_json_root")
-        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
-        return priv["root_package_json"]
-
-    # Load an undeclared package.json derived from the root importer in the lockfile
-    has_root_importer = "." in priv["importers"].keys()
-    if has_root_importer:
-        label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
-        root_package_json_path = label_store.path("package_json_root")
-        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
-    else:
-        # if there is no root importer that means there is no root package.json to read; pnpm allows
-        # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
-        priv["root_package_json"] = {}
-
-    return priv["root_package_json"]
-
-################################################################################
 def _should_update_pnpm_lock(priv):
     return priv["should_update_pnpm_lock"]
 
@@ -592,6 +582,9 @@ def _npm_auth(priv):
 
 def _root_package(priv):
     return priv["root_package"]
+
+def _root_package_json(priv):
+    return priv["root_package_json"]
 
 ################################################################################
 def _new(rctx):
