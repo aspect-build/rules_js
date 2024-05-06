@@ -1,6 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
-load("@rules_oci//oci:defs.bzl", "oci_image")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
 
 platform(
     name = "linux_amd64",
@@ -39,7 +39,10 @@ js_binary(
     entry_point = "main.js",
 )
 
-# Image
+# FIXME: due to bzlmod Node.js toolchain issuehttps://github.com/aspect-build/rules_js/issues/1530,
+# on MacOS, this target must be built with `--extra_toolchains` to select right the linux Node.js
+# toolchain for the image layer:
+# bazel build //src:layers --extra_toolchains=@nodejs_toolchains//:linux_arm64_toolchain_target
 js_image_layer(
     name = "layers",
     binary = ":main",
@@ -70,4 +73,15 @@ container_structure_test(
     image = ":image",
     # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
     tags = ["no-remote-exec"],
+)
+
+# FIXME: due to bzlmod Node.js toolchain issuehttps://github.com/aspect-build/rules_js/issues/1530,
+# on MacOS, this target must be built with `--extra_toolchains` to select right the linux Node.js
+# toolchain for the image layer:
+# bazel run //src:image_tarball --extra_toolchains=@nodejs_toolchains//:linux_arm64_toolchain_target
+# docker run -t e2e_js_image_oci:latest
+oci_tarball(
+    name = "image_tarball",
+    image = ":image",
+    repo_tags = ["e2e_js_image_oci:latest"],
 )

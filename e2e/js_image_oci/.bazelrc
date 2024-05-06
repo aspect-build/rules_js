@@ -8,6 +8,13 @@ import %workspace%/../../.aspect/bazelrc/performance.bazelrc
 
 ### YOUR PROJECT SPECIFIC SETTINGS GO HERE ###
 
+# There are some empty globs in the LLVM toolchain
+common --noincompatible_disallow_empty_glob
+
+# Don't try and auto detect the cc toolchain, as we use our llvm.
+build --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build --incompatible_enable_cc_toolchain_resolution
+
 # Disable lockfile for now. It is unstable.
 # https://github.com/bazelbuild/bazel/issues/19026
 # https://github.com/bazelbuild/bazel/issues/19621

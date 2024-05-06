@@ -27,6 +27,16 @@ console.log(
     space,
     chalk.redBright(process.platform, os.version(), os.arch())
 )
+console.log(
+    chalk.bold.bgMagenta(' CWD '),
+    space,
+    chalk.magentaBright(process.cwd())
+)
+console.log(
+    chalk.bold.bgCyan(' JS_BINARY__RUNFILES '),
+    space,
+    chalk.cyanBright(process.env.JS_BINARY__RUNFILES)
+)
 console.log('')
 
 console.log(
