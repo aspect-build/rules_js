@@ -10,11 +10,7 @@ bazel_dep(name = "platforms", version = "0.0.10", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "5.8.2", dev_dependency = True)
 bazel_dep(name = "rules_oci", version = "1.7.5", dev_dependency = True)
 
-npm = use_extension(
-    "@aspect_rules_js//npm:extensions.bzl",
-    "npm",
-    dev_dependency = True,
-)
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 npm.npm_translate_lock(
     name = "npm",
     npmrc = "//:.npmrc",
@@ -23,7 +19,7 @@ npm.npm_translate_lock(
 )
 use_repo(npm, "npm")
 
-oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci", dev_dependency = True)
 oci.pull(
     name = "debian",
     digest = "sha256:3d868b5eb908155f3784317b3dda2941df87bbbbaa4608f84881de66d9bb297b",
@@ -41,9 +37,5 @@ oci.pull(
 )
 use_repo(oci, "debian")
 
-node = use_extension(
-    "@rules_nodejs//nodejs:extensions.bzl",
-    "node",
-    dev_dependency = True,
-)
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
 use_repo(node, "nodejs_toolchains")
