@@ -6,6 +6,8 @@ Simple examples of running JS programs in node with js_binary, js_run_binary, an
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
@@ -457,22 +459,18 @@ js_binary(
     entry_point = "case10.js",
 )
 
-write_file(
+expand_template(
     name = "write10_launch_sh",
     out = "launch_case10.sh",
-    content = ["""\
-        # --- begin runfiles.bash initialization v2 ---
-        set -uo pipefail; f=bazel_tools/tools/bash/runfiles/runfiles.bash
-        source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
-        source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null || \
-        source "$0.runfiles/$f" 2>/dev/null || \
-        source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
-        source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null || \
-        { echo>&2 "ERROR: cannot find $f"; exit 1; }; f=; set -e
-        # --- end runfiles.bash initialization v2 ---
-
-        $(rlocation aspect_rules_js/examples/js_binary/bin10-js_binary.sh) "$@"
-"""],
+    data = [":bin10-js_binary"],
+    is_executable = True,
+    substitutions = {
+        "{rlocationpath}": "$(rlocationpath :bin10-js_binary)",
+    },
+    template = [
+        BASH_RLOCATION_FUNCTION,
+        "$(rlocation {rlocationpath}) \"$@\"",
+    ],
 )
 
 # NB: https://github.com/aspect-build/rules_js/issues/285 is only reproducable
