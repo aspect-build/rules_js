@@ -467,7 +467,10 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{workspace_name}}": ctx.workspace_name,
     }
 
-    launcher = ctx.actions.declare_file(ctx.label.name)
+    # The '_' avoids collisions with another file matching the label name.
+    # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
+    # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
+    launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = launcher,
