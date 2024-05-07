@@ -151,9 +151,6 @@ jobs:
                     # Don't run workspace smoke test under bzlmod
                     - bzlmod: 1
                       folder: e2e/workspace
-                    # Don't run update_pnpm_lock under bzlmod
-                    - bzlmod: 1
-                      folder: e2e/update_pnpm_lock
                     # rules_docker is not compatible with Bazel 7
                     - bazel-version:
                           major: 7
@@ -167,10 +164,6 @@ jobs:
                       folder: e2e/npm_link_package
                     - bzlmod: 1
                       folder: e2e/rules_foo
-                    - bazel-version:
-                          major: 7
-                      bzlmod: 1
-                      folder: e2e/update_pnpm_lock_with_import
                     # gyp_no_install_script is broken in an usual way on 6.5.0
                     # that is not worth investigating as we're dropping Bazel 6 support soon
                     - bazel-version:
