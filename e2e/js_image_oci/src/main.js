@@ -44,6 +44,11 @@ console.log(`@mycorp/pkg-a acorn@${pkgA.getAcornVersion()}`)
 console.log(`@mycorp/pkg-a uuid@${pkgA.getUuidVersion()}`)
 console.log('')
 
+const pkgB = require('@mycorp/pkg-b')
+console.log(`@mycorp/pkg-b acorn@${pkgB.getAcornVersion()}`)
+console.log(`@mycorp/pkg-b uuid@${pkgB.getUuidVersion()}`)
+console.log('')
+
 console.log(
     chalk.bold.bgYellow(' SOURCE CHECK '),
     space,
