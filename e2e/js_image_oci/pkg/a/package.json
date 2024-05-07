@@ -1,0 +1,10 @@
+{
+    "name": "@mycorp/pkg-a",
+    "private": true,
+    "dependencies": {
+        "uuid": "9.0.1"
+    },
+    "peerDependencies": {
+        "acorn": "8.x.x"
+    }
+}
