@@ -16,7 +16,7 @@ copy_file(
 )
 
 js_binary(
-    name = "worker_binary",
+    name = "worker",
     data = [":copy_worker_js"],
     entry_point = ":copy_dummy_worker",
     visibility = ["//visibility:public"],
