@@ -1,6 +1,9 @@
 {
     "name": "image",
     "dependencies": {
-        "chalk": "^4.0.0"
+        "acorn": "8.7.1",
+        "chalk": "^4.0.0",
+        "@mycorp/pkg-a": "workspace:*",
+        "@mycorp/pkg-b": "workspace:*"
     }
 }

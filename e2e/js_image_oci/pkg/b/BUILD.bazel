@@ -1,0 +1,19 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+js_library(
+    name = "pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+    # because we're linking this js_library, we must explictly add our npm dependendies to `deps` so
+    # they are picked up my the linker. npm dependendies in `data` are not propogated through the
+    # linker when linking a js_libary.
+    deps = [
+        ":node_modules",
+    ],
+)

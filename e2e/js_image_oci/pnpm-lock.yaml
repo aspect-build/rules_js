@@ -1,15 +1,57 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  chalk:
-    specifier: ^4.0.0
-    version: 4.0.0
+importers:
+
+  .:
+    dependencies:
+      '@mycorp/pkg-a':
+        specifier: workspace:*
+        version: link:pkg/a
+      '@mycorp/pkg-b':
+        specifier: workspace:*
+        version: link:pkg/b
+      acorn:
+        specifier: 8.7.1
+        version: 8.7.1
+      chalk:
+        specifier: ^4.0.0
+        version: 4.0.0
+
+  pkg/a:
+    dependencies:
+      acorn:
+        specifier: 8.x.x
+        version: 8.0.0
+      uuid:
+        specifier: 9.0.1
+        version: 9.0.1
+
+  pkg/b:
+    dependencies:
+      acorn:
+        specifier: 8.x.x
+        version: 8.0.0
+      uuid:
+        specifier: 8.3.2
+        version: 8.3.2
 
 packages:
+
+  /acorn@8.0.0:
+    resolution: {integrity: sha512-wuJmBvKP9pkjPd2m+6skNcgK6S43df5cRbUTWQlns8rukcu5bcSvx9eZjvNXTtFe4+oCslAvIhNCvYBe/69xMw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+    dev: false
+
+  /acorn@8.7.1:
+    resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+    dev: false
 
   /ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
@@ -47,4 +89,14 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
+    dev: false
+
+  /uuid@8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+    dev: false
+
+  /uuid@9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
     dev: false
