@@ -47,21 +47,31 @@ fi
 ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 
 print_step "It should update the lockfile after a running the invalide target with ASPECT_RULES_JS_FROZEN_PNPM_LOCK unset"
-if ! bazel run "$BZLMOD_FLAG" @npm//:sync; then
-    echo "ERROR: expected 'bazel run $BZLMOD_FLAG @npm//:sync' to pass"
+
+# Trigger the update of the pnpm lockfile which should exit non-zero
+if bazel run "$BZLMOD_FLAG" @npm//:sync; then
+    echo "ERROR: expected 'update_pnpm_lock' to exit with non-zero exit code on update"
     exit 1
 fi
 
+# The lockfile should be updated
 diff="$(git diff pnpm-lock.yaml)"
 if [ -z "$diff" ]; then
     echo "ERROR: expected 'git diff pnpm-lock.yaml' to not be empty"
     exit 1
 fi
 
+# The action cache file should be updated
 action_cache_file=".aspect/rules/external_repository_action_cache/npm_translate_lock_LTE4Nzc1MDcwNjU="
 diff="$(git diff "$action_cache_file")"
 if [ -z "$diff" ]; then
     echo "ERROR: expected 'git diff $action_cache_file' to not be empty"
+    exit 1
+fi
+
+# The lockfile has been updated and sync should now exit 0
+if ! bazel run "$BZLMOD_FLAG" @npm//:sync; then
+    echo "ERROR: expected 'update_pnpm_lock' to exit zero once the lockfile is up to date"
     exit 1
 fi
 
