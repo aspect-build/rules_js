@@ -48,7 +48,7 @@ ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 
 print_step "It should update the lockfile after a running the invalide target with ASPECT_RULES_JS_FROZEN_PNPM_LOCK unset"
 
-# Trigger the update of the pnpm lockfile which should fail
+# Trigger the update of the pnpm lockfile which should exit non-zero
 if bazel run "$BZLMOD_FLAG" @npm//:sync; then
     echo "ERROR: expected 'update_pnpm_lock' to exit with non-zero exit code on update"
     exit 1
@@ -69,9 +69,9 @@ if [ -z "$diff" ]; then
     exit 1
 fi
 
-# The lockfile has been updated and sync should now succeed
+# The lockfile has been updated and sync should now exit 0
 if ! bazel run "$BZLMOD_FLAG" @npm//:sync; then
-    echo "ERROR: expected 'update_pnpm_lock' to succeed once the lockfile is up to date"
+    echo "ERROR: expected 'update_pnpm_lock' to exit zero once the lockfile is up to date"
     exit 1
 fi
 
