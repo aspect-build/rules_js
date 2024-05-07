@@ -59,6 +59,8 @@ If your code works with pnpm, then you should expect it works under Bazel as wel
 This means that if your issue can be reproduced outside of Bazel, using a reproduction with only pnpm,
 then we ask that you fix the issue there, and will close such issues filed on rules_js.
 
+Supported pnpm versions are 7-8 (lockfile versions 5.4-6.1) with pnpm 9 (lockfile 9) support in progress (see [1652](https://github.com/aspect-build/rules_js/issues/1652)).
+
 The typical usage is to import an entire `pnpm-lock.yaml` file.
 Create such a file if you don't have one. You could install pnpm on your machine, or use `npx` to run it.
 We recommend this command, which creates a lockfile with minimal installation needed,
