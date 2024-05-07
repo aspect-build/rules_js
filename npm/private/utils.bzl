@@ -223,16 +223,15 @@ def _assert_lockfile_version(version, testonly = False):
         fail("version should be passed as a float")
 
     # Restrict the supported lock file versions to what this code has been tested with:
-    #   5.3 - pnpm v6.x.x
     #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
     #   6.0 - pnpm v8.0.0 bumped the lockfile version to 6.0; this included breaking changes
     #   6.1 - pnpm v8.6.0 bumped the lockfile version to 6.1
-    min_lock_version = 5.3
+    min_lock_version = 5.4
     max_lock_version = 6.1
     msg = None
 
     if version < min_lock_version:
-        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v6 or greater.".format(
+        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v7 or greater.".format(
             min = min_lock_version,
             actual = version,
         )
