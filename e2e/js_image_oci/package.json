@@ -1,6 +1,6 @@
 {
     "name": "image",
     "dependencies": {
-        "chalk": "^5.2.0"
+        "chalk": "^4.0.0"
     }
 }
