@@ -81,17 +81,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         _copy_update_input_files(priv, rctx, attr, label_store)
         _copy_unspecified_input_files(priv, rctx, attr, label_store)
 
-def _reload_lockfile(priv, rctx, attr, label_store):
-    _load_lockfile(priv, rctx, attr, label_store)
-
-    if _should_update_pnpm_lock(priv):
-        _init_importer_labels(priv, label_store)
-
-    _init_root_package(priv, rctx, attr, label_store)
-
-    if _should_update_pnpm_lock(priv):
-        _copy_unspecified_input_files(priv, rctx, attr, label_store)
-
 ################################################################################
 def _validate_attrs(attr, is_windows):
     if is_windows and not attr.pnpm_lock:
@@ -624,7 +613,6 @@ def _new(rctx_name, rctx, attr, bzlmod):
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
         action_cache_miss = lambda: _action_cache_miss(priv, rctx, label_store),
         write_action_cache = lambda: _write_action_cache(priv, rctx, label_store),
-        reload_lockfile = lambda: _reload_lockfile(priv, rctx, attr, label_store),
     )
 
 npm_translate_lock_state = struct(
