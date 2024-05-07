@@ -1,2 +1,4 @@
 node_modules
+pkg/a/node_modules
+pkg/b/node_modules
 repo
