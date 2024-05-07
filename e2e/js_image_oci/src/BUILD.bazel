@@ -24,8 +24,9 @@ filegroup(
 )
 
 js_binary(
-    name = "main",
+    name = "bin",
     args = ["foo"],
+    chdir = package_name(),
     # skip copying so we can test external source directories
     copy_data_to_bin = False,
     data = [
@@ -45,7 +46,7 @@ js_binary(
 # bazel build //src:layers --extra_toolchains=@nodejs_toolchains//:linux_arm64_toolchain_target
 js_image_layer(
     name = "layers",
-    binary = ":main",
+    binary = ":bin",
     platform = select({
         "@platforms//cpu:arm64": ":linux_arm64",
         "@platforms//cpu:x86_64": ":linux_amd64",
@@ -58,13 +59,18 @@ oci_image(
     name = "image",
     # Since js_binary depends on bash we have to bring in a base image that has bash
     base = "@debian",
-    # This is going to be /{root of js_image_layer}/{package_name()}/{name of js_binary}
-    cmd = ["/app/src/main"],
+    # This is `/[js_image_layer 'root']/[package name of js_image_layer 'binary' target]/[name of js_image_layer 'binary' target]`
+    cmd = ["/app/src/bin"],
     entrypoint = ["bash"],
     tars = [
         ":layers",
     ],
     visibility = ["//visibility:public"],
+    # This is `cmd` + `.runfiles/[workspace name]`
+    workdir = select({
+        "@aspect_bazel_lib//lib:bzlmod": "/app/src/bin.runfiles/_main",
+        "//conditions:default": "/app/src/bin.runfiles/__main__",
+    }),
 )
 
 container_structure_test(

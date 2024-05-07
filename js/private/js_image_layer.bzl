@@ -21,10 +21,13 @@ _DOC = """Create container image layers from js_binary targets.
 
 By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
 This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
-A proper `cmd` usually looks like /`[ root of js_image_layer ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of js_binary ]`, 
-unless you have a launcher script that invokes the entry_point of the `js_binary` in a different path.
-On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace or __main__ if empty ]` suffix**. If `workdir` is not set correctly, some
-attributes such as `chdir` might not work properly.
+
+A proper `cmd` usually looks like /`[ js_image_layer 'root' ]`/`[ package name of js_image_layer 'binary' target ]/[ name of js_image_layer 'binary' target ]`,
+unless you have a custom launcher script that invokes the entry_point of the `js_binary` in a different path.
+
+On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace ]` suffix**.
+If using bzlmod then name of the local workspace is always `_main`. If bzlmod is not enabled then the name of the local workspace, if not otherwise specified
+in the `WORKSPACE` file, is `__main__`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
 
@@ -37,7 +40,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
 js_binary(
-    name = "binary",
+    name = "bin",
     entry_point = "main.js",
 )
 
@@ -51,18 +54,22 @@ platform(
 
 js_image_layer(
     name = "layers",
-    binary = ":binary",
+    binary = ":bin",
     platform = ":amd64_linux",
-    root = "/app"
+    root = "/app",
 )
 
 oci_image(
     name = "image",
-    cmd = ["/app/main"],
+    cmd = ["/app/bin"],
     entrypoint = ["bash"],
     tars = [
         ":layers"
-    ]
+    ],
+    workdir = select({
+        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+        "//conditions:default": "/app/bin.runfiles/__main__",
+    }),
 )
 ```
 
@@ -74,7 +81,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index")
 
 js_binary(
-    name = "binary",
+    name = "bin",
     entry_point = "main.js",
 )
 
@@ -86,20 +93,27 @@ js_binary(
             "@platforms//cpu:{}".format(arch if arch != "amd64" else "x86_64"),
         ],
     )
+
     js_image_layer(
         name = "{}_layers".format(arch),
-        binary = ":binary",
+        binary = ":bin",
         platform = ":linux_{arch}",
-        root = "/app"
+        root = "/app",
     )
+
     oci_image(
         name = "{}_image".format(arch),
-        cmd = ["/app/main"],
+        cmd = ["/app/bin"],
         entrypoint = ["bash"],
         tars = [
             ":{}_layers".format(arch)
-        ]
+        ],
+        workdir = select({
+            "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+            "//conditions:default": "/app/bin.runfiles/__main__",
+        }),
     )
+
     for arch in ["amd64", "arm64"]
 ]
 
@@ -110,7 +124,6 @@ oci_image_index(
         ":amd64_image"
     ]
 )
-
 ```
 
 **An example using legacy rules_docker**
@@ -122,17 +135,16 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 
 js_binary(
-    name = "main",
+    name = "bin",
     data = [
         "//:node_modules/args-parser",
     ],
     entry_point = "main.js",
 )
 
-
 js_image_layer(
     name = "layers",
-    binary = ":main",
+    binary = ":bin",
     root = "/app",
     visibility = ["//visibility:__pkg__"],
 )
@@ -140,8 +152,9 @@ js_image_layer(
 filegroup(
     name = "app_tar", 
     srcs = [":layers"], 
-    output_group = "app"
+    output_group = "app",
 )
+
 container_layer(
     name = "app_layer",
     tars = [":app_tar"],
@@ -150,8 +163,9 @@ container_layer(
 filegroup(
     name = "node_modules_tar", 
     srcs = [":layers"], 
-    output_group = "node_modules"
+    output_group = "node_modules",
 )
+
 container_layer(
     name = "node_modules_layer",
     tars = [":node_modules_tar"],
@@ -159,12 +173,16 @@ container_layer(
 
 container_image(
     name = "image",
-    cmd = ["/app/main"],
+    cmd = ["/app/bin"],
     entrypoint = ["bash"],
     layers = [
         ":app_layer",
         ":node_modules_layer",
     ],
+    workdir = select({
+        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+        "//conditions:default": "/app/bin.runfiles/__main__",
+    }),
 )
 ```
 """
@@ -175,35 +193,21 @@ container_image(
 _LAUNCHER_TMPL = """\
 #!/usr/bin/env bash
 export BAZEL_BINDIR=.
-source {executable_path}
+source {real_binary_path}
 """
 
-def _write_laucher(ctx, executable_path):
+def _write_laucher(ctx, real_binary_path):
     "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
-    launcher = ctx.actions.declare_file("%s_launcher.sh" % ctx.label.name)
+    launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
     ctx.actions.write(
         output = launcher,
-        content = _LAUNCHER_TMPL.format(executable_path = executable_path),
+        content = _LAUNCHER_TMPL.format(real_binary_path = real_binary_path),
         is_executable = True,
     )
     return launcher
 
 def _runfile_path(ctx, file, runfiles_dir):
     return paths.join(runfiles_dir, to_rlocation_path(ctx, file))
-
-def _runfiles_dir(root, default_info):
-    manifest = default_info.files_to_run.runfiles_manifest
-
-    nobuild_runfile_links_is_set = manifest.short_path.endswith("_manifest")
-
-    if nobuild_runfile_links_is_set:
-        # When `--nobuild_runfile_links` is set, runfiles_manifest points to the manifest
-        # file sitting adjacent to the runfiles tree rather than within it.
-        runfiles = default_info.files_to_run.runfiles_manifest.short_path.replace("_manifest", "")
-    else:
-        runfiles = manifest.short_path.replace(manifest.basename, "")[:-1]
-
-    return paths.join(root, runfiles.replace(".sh", ""))
 
 def _build_layer(ctx, type, entries, inputs):
     entries_output = ctx.actions.declare_file("{}_{}_entries.json".format(ctx.label.name, type))
@@ -248,17 +252,18 @@ def _js_image_layer_impl(ctx):
     if len(ownersplit) != 2 or not ownersplit[0].isdigit() or not ownersplit[1].isdigit():
         fail("owner attribute should be in `0:0` `int:int` format.")
 
-    default_info = ctx.attr.binary[0][DefaultInfo]
-    runfiles_dir = _runfiles_dir(ctx.attr.root, default_info)
+    binary_default_info = ctx.attr.binary[0][DefaultInfo]
+    binary_label = ctx.attr.binary[0].label
 
-    executable = default_info.files_to_run.executable
-    executable_path = paths.replace_extension(paths.join(ctx.attr.root, executable.short_path), "")
-    real_executable_path = _runfile_path(ctx, executable, runfiles_dir)
-    launcher = _write_laucher(ctx, real_executable_path)
+    binary_path = paths.join(ctx.attr.root, binary_label.package, binary_label.name)
+    runfiles_dir = binary_path + ".runfiles"
 
-    all_files = depset(transitive = [default_info.files, default_info.default_runfiles.files])
+    real_binary_path = _runfile_path(ctx, binary_default_info.files_to_run.executable, runfiles_dir)
+    launcher = _write_laucher(ctx, real_binary_path)
 
-    app_entries = {executable_path: {"dest": launcher.path, "root": launcher.root.path}}
+    all_files = depset(transitive = [binary_default_info.files, binary_default_info.default_runfiles.files])
+
+    app_entries = {binary_path: {"dest": launcher.path, "root": launcher.root.path}}
     app_inputs = [launcher]
 
     node_modules_entries = {}
@@ -273,7 +278,7 @@ def _js_image_layer_impl(ctx):
             "is_source": file.is_source,
             "is_directory": file.is_directory,
         }
-        if destination == real_executable_path:
+        if destination == real_binary_path:
             entry["remove_non_hermetic_lines"] = True
 
         if _should_be_in_node_modules_layer(destination, file):
@@ -320,6 +325,7 @@ js_image_layer_lib = struct(
         "binary": attr.label(
             mandatory = True,
             cfg = _js_image_layer_transition,
+            executable = True,
             doc = "Label to an js_binary target",
         ),
         "root": attr.string(

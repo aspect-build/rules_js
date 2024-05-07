@@ -27,10 +27,13 @@ Create container image layers from js_binary targets.
 
 By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
 This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
-A proper `cmd` usually looks like /`[ root of js_image_layer ]`/`[ relative path to BUILD file from WORKSPACE or package_name() ]/[ name of js_binary ]`, 
-unless you have a launcher script that invokes the entry_point of the `js_binary` in a different path.
-On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace or __main__ if empty ]` suffix**. If `workdir` is not set correctly, some
-attributes such as `chdir` might not work properly.
+
+A proper `cmd` usually looks like /`[ js_image_layer 'root' ]`/`[ package name of js_image_layer 'binary' target ]/[ name of js_image_layer 'binary' target ]`,
+unless you have a custom launcher script that invokes the entry_point of the `js_binary` in a different path.
+
+On the other hand, `workdir` has to be set to `runfiles tree root` which would be exactly `cmd` **but with `.runfiles/[ name of the workspace ]` suffix**.
+If using bzlmod then name of the local workspace is always `_main`. If bzlmod is not enabled then the name of the local workspace, if not otherwise specified
+in the `WORKSPACE` file, is `__main__`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
 
@@ -43,7 +46,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
 js_binary(
-    name = "binary",
+    name = "bin",
     entry_point = "main.js",
 )
 
@@ -57,18 +60,22 @@ platform(
 
 js_image_layer(
     name = "layers",
-    binary = ":binary",
+    binary = ":bin",
     platform = ":amd64_linux",
-    root = "/app"
+    root = "/app",
 )
 
 oci_image(
     name = "image",
-    cmd = ["/app/main"],
+    cmd = ["/app/bin"],
     entrypoint = ["bash"],
     tars = [
         ":layers"
-    ]
+    ],
+    workdir = select({
+        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+        "//conditions:default": "/app/bin.runfiles/__main__",
+    }),
 )
 ```
 
@@ -80,7 +87,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index")
 
 js_binary(
-    name = "binary",
+    name = "bin",
     entry_point = "main.js",
 )
 
@@ -92,20 +99,27 @@ js_binary(
             "@platforms//cpu:{}".format(arch if arch != "amd64" else "x86_64"),
         ],
     )
+
     js_image_layer(
         name = "{}_layers".format(arch),
-        binary = ":binary",
+        binary = ":bin",
         platform = ":linux_{arch}",
-        root = "/app"
+        root = "/app",
     )
+
     oci_image(
         name = "{}_image".format(arch),
-        cmd = ["/app/main"],
+        cmd = ["/app/bin"],
         entrypoint = ["bash"],
         tars = [
             ":{}_layers".format(arch)
-        ]
+        ],
+        workdir = select({
+            "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+            "//conditions:default": "/app/bin.runfiles/__main__",
+        }),
     )
+
     for arch in ["amd64", "arm64"]
 ]
 
@@ -116,7 +130,6 @@ oci_image_index(
         ":amd64_image"
     ]
 )
-
 ```
 
 **An example using legacy rules_docker**
@@ -128,17 +141,16 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 
 js_binary(
-    name = "main",
+    name = "bin",
     data = [
         "//:node_modules/args-parser",
     ],
     entry_point = "main.js",
 )
 
-
 js_image_layer(
     name = "layers",
-    binary = ":main",
+    binary = ":bin",
     root = "/app",
     visibility = ["//visibility:__pkg__"],
 )
@@ -146,8 +158,9 @@ js_image_layer(
 filegroup(
     name = "app_tar", 
     srcs = [":layers"], 
-    output_group = "app"
+    output_group = "app",
 )
+
 container_layer(
     name = "app_layer",
     tars = [":app_tar"],
@@ -156,8 +169,9 @@ container_layer(
 filegroup(
     name = "node_modules_tar", 
     srcs = [":layers"], 
-    output_group = "node_modules"
+    output_group = "node_modules",
 )
+
 container_layer(
     name = "node_modules_layer",
     tars = [":node_modules_tar"],
@@ -165,12 +179,16 @@ container_layer(
 
 container_image(
     name = "image",
-    cmd = ["/app/main"],
+    cmd = ["/app/bin"],
     entrypoint = ["bash"],
     layers = [
         ":app_layer",
         ":node_modules_layer",
     ],
+    workdir = select({
+        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+        "//conditions:default": "/app/bin.runfiles/__main__",
+    }),
 )
 ```
 

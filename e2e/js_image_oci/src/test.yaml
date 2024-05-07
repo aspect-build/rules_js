@@ -3,26 +3,30 @@ schemaVersion: 2.0.0
 commandTests:
     - name: 'smoke'
       command: 'bash'
-      args: ['/app/src/main']
+      args: ['/app/src/bin']
       expectedOutput:
           [
               'OS',
               'ARCH/CPU',
               'WORKSPACE',
-              ' TARGET    //src:main',
+              ' TARGET    //src:bin',
+              ' CWD    /app/src/bin.runfiles/',
+              ' JS_BINARY__RUNFILES    /app/src/bin.runfiles',
               ' SOURCE CHECK    true',
               ' DIRECTORY CHECK    true',
               ' PROTO CHECK    true',
               ' SOURCE DIRECTORY CHECK    true',
           ]
     - name: 'smoke2'
-      command: '/app/src/main'
+      command: '/app/src/bin'
       expectedOutput:
           [
               'OS',
               'ARCH/CPU',
               'WORKSPACE',
-              ' TARGET    //src:main',
+              ' TARGET    //src:bin',
+              ' CWD    /app/src/bin.runfiles/',
+              ' JS_BINARY__RUNFILES    /app/src/bin.runfiles',
               ' SOURCE CHECK    true',
               ' DIRECTORY CHECK    true',
               ' PROTO CHECK    true',
