@@ -31,8 +31,10 @@ def _coverage_merger_impl(ctx):
         # TODO(3.0): drop support for deprecated toolchain attributes
         node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
 
-    # Create launcher
-    bash_launcher = ctx.actions.declare_file(ctx.label.name)
+    # The '_' avoids collisions with another file matching the label name.
+    # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
+    # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
+    bash_launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = bash_launcher,

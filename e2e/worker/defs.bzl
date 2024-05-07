@@ -31,7 +31,7 @@ pi_rule = rule(
         "worker": attr.label(
             executable = True,
             cfg = "exec",
-            default = ":worker_binary",
+            default = ":worker",
         ),
     },
 )
