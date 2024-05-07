@@ -102,17 +102,13 @@ def _npm_translate_lock_impl(rctx):
         if state.action_cache_miss():
             _fail_if_frozen_pnpm_lock(rctx, state)
             if _update_pnpm_lock(rctx, state):
-                if rctx.attr.bzlmod:
-                    msg = """
+                msg = """
 
 INFO: {} file updated. Please run your build again.
 
 See https://github.com/aspect-build/rules_js/issues/1445
 """.format(state.label_store.relative_path("pnpm_lock"))
-                    fail(msg)
-                else:
-                    # If the pnpm lock file was changed then reload it before translation
-                    state.reload_lockfile()
+                fail(msg)
 
     helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
 

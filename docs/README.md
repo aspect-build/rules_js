@@ -70,10 +70,10 @@ using the identical version of pnpm that Bazel is configured with:
 $ bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only
 ```
 
-Instead of checking in a `pnpm-lock.yaml` file, you could use a `package-lock.json` or `yarn.lock`
-file with the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`.
-If you do, rules_js will run `pnpm import` to generate a `pnpm-lock.yaml` file on-the-fly.
-This is only recommended during migrations; see the notes about these attributes in the [migration guide](https://docs.aspect.build/guides/rules_js_migration).
+During migration from npm or yarn you can still use a `package-lock.json` or `yarn.lock` as the source of truth by
+setting the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`. When the `pnpm-lock.yaml` is out of date
+rules_js will run `pnpm import` to generate the `pnpm-lock.yaml` file.
+See the notes about these attributes in the [migration guide](https://docs.aspect.build/guides/rules_js_migration).
 
 Next, you'll typically use `npm_translate_lock` to translate the lock file to Starlark, which Bazel extensions understand.
 The `WORKSPACE` snippet you pasted above already contains this code.
