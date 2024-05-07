@@ -40,7 +40,6 @@ npm = use_extension(
         verify_node_modules_ignored = "//:.bazelignore",
     )
     for version in [
-        "v53",
         "v54",
         "v60",
         "v61",
@@ -53,7 +52,6 @@ npm = use_extension(
         "lock-%s" % version,
     )
     for version in [
-        "v53",
         "v54",
         "v60",
         "v61",
