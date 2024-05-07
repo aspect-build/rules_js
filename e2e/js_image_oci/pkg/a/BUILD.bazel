@@ -1,0 +1,16 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+npm_package(
+    name = "pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    data = [
+        ":node_modules",
+    ],
+    visibility = ["//visibility:public"],
+)
