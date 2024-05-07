@@ -27,19 +27,15 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
         verify_node_modules_ignored = "//:.bazelignore",
     )
     for version in [
-        "v53",
         "v54",
         "v60",
         "v61",
     ]
 ]
 
-load("@lock-v53//:repositories.bzl", npm_repositories_v53 = "npm_repositories")
 load("@lock-v54//:repositories.bzl", npm_repositories_v54 = "npm_repositories")
 load("@lock-v60//:repositories.bzl", npm_repositories_v60 = "npm_repositories")
 load("@lock-v61//:repositories.bzl", npm_repositories_v61 = "npm_repositories")
-
-npm_repositories_v53()
 
 npm_repositories_v54()
 

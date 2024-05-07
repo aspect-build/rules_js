@@ -1,11 +1,7 @@
 node_modules/
-v53/node_modules/
 v54/node_modules/
 v60/node_modules/
 v61/node_modules/
-v53/projects/a/node_modules
-v53/projects/b/node_modules
-v53/projects/c/node_modules
 v54/projects/a/node_modules
 v54/projects/b/node_modules
 v54/projects/c/node_modules
