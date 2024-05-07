@@ -1,2 +1,3 @@
 packages:
-    - '.'
+    - 'pkg/a'
+    - 'pkg/b'
