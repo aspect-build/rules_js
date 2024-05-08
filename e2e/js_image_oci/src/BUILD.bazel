@@ -33,6 +33,7 @@ js_binary(
         "ascii.art",
         ":proto",
         "//:node_modules/@mycorp/pkg-a",
+        "//:node_modules/@mycorp/pkg-b",
         "//:node_modules/chalk",
         "@repo//:dir",
         "@repo//:source_txt",
