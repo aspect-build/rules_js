@@ -8,7 +8,7 @@ npm_link_all_packages(name = "node_modules")
 js_binary(
     name = "bin",
     data = [
-        ":node_modules/acorn",
+        ":node_modules",
     ],
     entry_point = "main.js",
 )
@@ -67,15 +67,33 @@ make_js_image_layer(
 )
 
 assert_tar_listing(
-    name = "assert_default_app_layer",
-    actual = "default_app_layer",
-    expected = "default_app.listing",
+    name = "assert_default_node_layer",
+    actual = "default_node_layer",
+    expected = "default_node.listing",
+)
+
+assert_tar_listing(
+    name = "assert_default_package_store_3p_layer",
+    actual = "default_package_store_3p_layer",
+    expected = "default_package_store_3p.listing",
+)
+
+assert_tar_listing(
+    name = "assert_default_package_store_1p_layer",
+    actual = "default_package_store_1p_layer",
+    expected = "default_package_store_1p.listing",
 )
 
 assert_tar_listing(
     name = "assert_default_node_modules_layer",
     actual = "default_node_modules_layer",
     expected = "default_node_modules.listing",
+)
+
+assert_tar_listing(
+    name = "assert_default_app_layer",
+    actual = "default_app_layer",
+    expected = "default_app.listing",
 )
 
 # Case 2: Change owner
@@ -88,13 +106,31 @@ make_js_image_layer(
 )
 
 assert_tar_listing(
-    name = "assert_custom_owner_app_layer",
-    actual = "custom_owner_app_layer",
-    expected = "custom_owner_app.listing",
+    name = "assert_custom_owner_node_layer",
+    actual = "custom_owner_node_layer",
+    expected = "custom_owner_node.listing",
+)
+
+assert_tar_listing(
+    name = "assert_custom_owner_package_store_3p_layer",
+    actual = "custom_owner_package_store_3p_layer",
+    expected = "custom_owner_package_store_3p.listing",
+)
+
+assert_tar_listing(
+    name = "assert_custom_owner_package_store_1p_layer",
+    actual = "custom_owner_package_store_1p_layer",
+    expected = "custom_owner_package_store_1p.listing",
 )
 
 assert_tar_listing(
     name = "assert_custom_owner_node_modules_layer",
     actual = "custom_owner_node_modules_layer",
     expected = "custom_owner_node_modules.listing",
+)
+
+assert_tar_listing(
+    name = "assert_custom_owner_app_layer",
+    actual = "custom_owner_app_layer",
+    expected = "custom_owner_app.listing",
 )
