@@ -36,8 +36,29 @@ type Compression = 'gzip' | 'none'
 
 function findKeyByValue(entries: Entries, value: string): string | undefined {
     for (const [key, { dest: val }] of Object.entries(entries)) {
+        // Check for exact match
         if (val == value) {
             return key
+        }
+        // Check matching parent directory (https://stackoverflow.com/a/45242825).
+        // For example, if `value` is a parent directory of `val`:
+        //
+        //   value = bazel-out/darwin_arm64-fastbuild-ST-1072e68bc32d/bin/pkg/b
+        //   val = bazel-out/darwin_arm64-fastbuild-ST-1072e68bc32d/bin/pkg/b/index.js
+        //
+        // then relative is `index.js` and `/index.js` is stripped from `key`:
+        //
+        //   key = /app/src/bin.runfiles/_main/pkg/b/index.js
+        //
+        // which returns `/app/src/bin.runfiles/_main/pkg/b`
+        const relative = path.relative(value, val)
+        if (
+            relative &&
+            !relative.startsWith('..') &&
+            !path.isAbsolute(relative) &&
+            key.length > relative.length + 1
+        ) {
+            return key.substring(0, key.length - relative.length - 1)
         }
     }
     return undefined
@@ -49,6 +70,11 @@ async function readlinkSafe(p: string) {
         return path.resolve(path.dirname(p), link)
     } catch (e) {
         if (e.code == 'EINVAL') {
+            return p
+        }
+        if (e.code == 'ENOENT') {
+            // That is as far as we can follow this symlink in this layer so we can only
+            // assume the file exists in another layer
             return p
         }
         throw e
@@ -210,10 +236,11 @@ function add_file(
 }
 
 export async function build(
+    allEntries: Entries,
     entries: Entries,
     outputPath: string,
     compression: Compression,
-    owner: Owner,
+    owner: Owner
 ) {
     const output = pack()
     const existing_paths = new Set<string>()
@@ -292,7 +319,8 @@ export async function build(
             // see: https://chmodcommand.com/chmod-775/
             // const stats = await stat(dest)
             const stats: HermeticStat = { mode: MODE_FOR_SYMLINK, mtime: MTIME }
-            const linkname = findKeyByValue(entries, output_path)
+            // Look in all entries for symlinks since they may be in other layers
+            const linkname = findKeyByValue(allEntries, output_path)
             if (linkname == undefined) {
                 throw new Error(
                     `Couldn't map symbolic link ${output_path} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
@@ -343,16 +371,15 @@ export async function build(
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [
-        entriesPath,
-        outputPath,
-        compression,
-        owner,
-    ] = process.argv.slice(2)
-    const raw_entries = await readFile(entriesPath)
-    const entries: Entries = JSON.parse(raw_entries.toString())
+    const [allEntriesPath, entriesPath, outputPath, compression, owner] =
+        process.argv.slice(2)
+    const rawAllEntries = await readFile(allEntriesPath)
+    const allEntries: Entries = JSON.parse(rawAllEntries.toString())
+    const rawEntries = await readFile(entriesPath)
+    const entries: Entries = JSON.parse(rawEntries.toString())
     const [uid, gid] = owner.split(':').map(Number)
     build(
+        allEntries,
         entries,
         outputPath,
         compression as Compression,

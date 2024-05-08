@@ -208,21 +208,22 @@ def _write_laucher(ctx, real_binary_path):
 def _runfile_path(ctx, file, runfiles_dir):
     return paths.join(runfiles_dir, to_rlocation_path(ctx, file))
 
-def _build_layer(ctx, type, entries, inputs):
-    entries_output = ctx.actions.declare_file("{}_{}_entries.json".format(ctx.label.name, type))
-    ctx.actions.write(entries_output, content = json.encode(entries))
+def _build_layer(ctx, type, all_entries_json, entries, inputs):
+    entries_json = ctx.actions.declare_file("{}_{}_entries.json".format(ctx.label.name, type))
+    ctx.actions.write(entries_json, content = json.encode(entries))
 
     extension = "tar.gz" if ctx.attr.compression == "gzip" else "tar"
     output = ctx.actions.declare_file("{name}_{type}.{extension}".format(name = ctx.label.name, type = type, extension = extension))
 
     args = ctx.actions.args()
-    args.add(entries_output)
+    args.add(all_entries_json)
+    args.add(entries_json)
     args.add(output)
     args.add(ctx.attr.compression)
     args.add(ctx.attr.owner)
 
     ctx.actions.run(
-        inputs = inputs + [entries_output],
+        inputs = inputs + [all_entries_json, entries_json],
         outputs = [output],
         arguments = [args],
         executable = ctx.executable._builder,
@@ -266,6 +267,8 @@ def _js_image_layer_impl(ctx):
     node_modules_entries = {}
     node_modules_inputs = []
 
+    all_entries = {}
+
     for file in all_files.to_list():
         destination = _runfile_path(ctx, file, runfiles_dir)
         entry = {
@@ -278,6 +281,7 @@ def _js_image_layer_impl(ctx):
         if destination == real_binary_path:
             entry["remove_non_hermetic_lines"] = True
 
+        all_entries[destination] = entry
         if _should_be_in_node_modules_layer(destination, file):
             node_modules_entries[destination] = entry
             node_modules_inputs.append(file)
@@ -285,8 +289,11 @@ def _js_image_layer_impl(ctx):
             app_entries[destination] = entry
             app_inputs.append(file)
 
-    app = _build_layer(ctx, type = "app", entries = app_entries, inputs = app_inputs)
-    node_modules = _build_layer(ctx, type = "node_modules", entries = node_modules_entries, inputs = node_modules_inputs)
+    all_entries_json = ctx.actions.declare_file("{}_all_entries.json".format(ctx.label.name))
+    ctx.actions.write(all_entries_json, content = json.encode(all_entries))
+
+    app = _build_layer(ctx, type = "app", all_entries_json = all_entries_json, entries = app_entries, inputs = app_inputs)
+    node_modules = _build_layer(ctx, type = "node_modules", all_entries_json = all_entries_json, entries = node_modules_entries, inputs = node_modules_inputs)
 
     return [
         DefaultInfo(files = depset([node_modules, app])),
