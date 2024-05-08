@@ -252,25 +252,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     # check all links and fail if there are duplicates which can happen with public hoisting
     helpers.check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
 
-    repositories_bzl = []
-
-    if len(npm_imports) > 0:
-        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
-        repositories_bzl.append("")
-
-    repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(utils.consistent_label_str(pnpm_lock_label)))
-    repositories_bzl.append("# buildifier: disable=function-docstring")
-    repositories_bzl.append("def npm_repositories():")
-    if len(npm_imports) == 0:
-        repositories_bzl.append("    pass")
-        repositories_bzl.append("")
-
     stores_bzl = []
     links_bzl = {}
     links_targets_bzl = {}
     for (i, _import) in enumerate(npm_imports):
-        repositories_bzl.append(_gen_npm_import(rctx, _import, link_workspace))
-
         if _import.link_packages:
             defs_bzl_header.append(
                 """load("{at}{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
@@ -457,7 +442,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         "\n".join(npm_link_targets_bzl),
         "",
     ]
-    rctx_files[rctx.attr.repositories_bzl_filename] = repositories_bzl
 
     for filename, contents in rctx.attr.additional_file_contents.items():
         if not filename in rctx_files.keys():
@@ -475,8 +459,35 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         else:
             rctx_files[filename].extend(contents)
 
+    # TODO(2.0): do not generate with bzlmod
+    rctx_files[rctx.attr.repositories_bzl_filename] = _generate_repositories(
+        rctx,
+        npm_imports,
+        pnpm_lock_label,
+        link_workspace,
+    )
+
     for filename, contents in rctx_files.items():
         rctx.file(filename, generated_by_prefix + "\n" + "\n".join(contents))
+
+def _generate_repositories(rctx, npm_imports, pnpm_lock_label, link_workspace):
+    repositories_bzl = []
+
+    if len(npm_imports) > 0:
+        repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
+        repositories_bzl.append("")
+
+    repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(utils.consistent_label_str(pnpm_lock_label)))
+    repositories_bzl.append("# buildifier: disable=function-docstring")
+    repositories_bzl.append("def npm_repositories():")
+    if len(npm_imports) == 0:
+        repositories_bzl.append("    pass")
+        repositories_bzl.append("")
+
+    for _, _import in enumerate(npm_imports):
+        repositories_bzl.append(_gen_npm_import(rctx, _import, link_workspace))
+
+    return repositories_bzl
 
 def _gen_npm_import(rctx, _import, link_workspace):
     maybe_integrity = ("""
