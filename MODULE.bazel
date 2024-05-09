@@ -187,12 +187,6 @@ npm.npm_translate_lock(
         "unused": ["//visibility:private"],
         "@mycorp/pkg-a": ["//examples:__subpackages__"],
     },
-    patch_args = {
-        "*": ["-p1"],
-    },
-    patches = {
-        "meaning-of-life@1.0.0": ["//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
-    },
     pnpm_lock = "//:pnpm-lock.yaml",
     public_hoist_packages = {
         # Instructs the linker to hoist the ms@2.1.3 npm package to `node_modules/ms` in the `examples/npm_deps` package.

@@ -141,12 +141,6 @@ npm_translate_lock(
         "unused": ["//visibility:private"],
         "@mycorp/pkg-a": ["//examples:__subpackages__"],
     },
-    patch_args = {
-        "*": ["-p1"],
-    },
-    patches = {
-        "meaning-of-life@1.0.0": ["//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
-    },
     pnpm_lock = "//:pnpm-lock.yaml",
     # Use a version that's not vendored into rules_js by providing a (version, integrity) tuple.
     # curl --silent https://registry.npmjs.org/pnpm | jq '.versions["8.6.11"].dist.integrity'
