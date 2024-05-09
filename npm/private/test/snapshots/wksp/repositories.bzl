@@ -14534,7 +14534,7 @@ def npm_repositories():
         transitive_closure = {
             "meaning-of-life": ["1.0.0_-1287509853"],
         },
-        patches = ["@//:examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch", "@//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
+        patches = ["@//:examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch"],
         patch_args = ["-p1"],
     )
 
