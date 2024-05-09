@@ -1,7 +1,0 @@
-diff --git a/index.js b/index.js
-index a8653a9c9264ca1ac9fd2acb6c523a321912ab33..ae967de93c7c12074a686e1e8437b7b2344108be 100644
---- a/index.js
-+++ b/index.js
-@@ -1 +1 @@
--module.exports = "forty two"
-+module.exports = 32
