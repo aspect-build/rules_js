@@ -1,17 +1,23 @@
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image
--r-xr-xr-x 0/0             136 1970-01-01 00:00 app/js/private/test/image/bin
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_
--r-xr-xr-x 0/0           23908 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_/bin
-drwxr-xr-x 0/0               0 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_node_bin
--r-xr-xr-x 0/0             133 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_node_bin/node
--r-xr-xr-x 0/0              20 1970-01-01 00:00 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/main.js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image
+-r-xr-xr-x  0 0      0         136 Jan  1  1970 app/js/private/test/image/bin
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/examples
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/examples/npm_package
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/examples/npm_package/packages
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/examples/npm_package/packages/pkg_d
+-r-xr-xr-x  0 0      0         387 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/examples/npm_package/packages/pkg_d/index.js
+-r-xr-xr-x  0 0      0         164 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/examples/npm_package/packages/pkg_d/package.json
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_
+-r-xr-xr-x  0 0      0       23908 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_/bin
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_node_bin
+-r-xr-xr-x  0 0      0         133 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/bin_node_bin/node
+-r-xr-xr-x  0 0      0          20 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/test/image/main.js

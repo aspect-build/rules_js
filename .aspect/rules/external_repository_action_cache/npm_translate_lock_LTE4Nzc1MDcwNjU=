@@ -2,7 +2,7 @@
 # Input hashes for repository rule npm_translate_lock(name = "npm", pnpm_lock = "@@//:pnpm-lock.yaml").
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=-2065072158
-pnpm-lock.yaml=1142601305
+pnpm-lock.yaml=-481966245
 examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch=-442666336
 package.json=-275319675
 pnpm-workspace.yaml=-1178830835
@@ -23,5 +23,5 @@ npm/private/test/vendored/semver-max/package.json=578664053
 examples/linked_empty_node_modules/package.json=-1039372825
 examples/npm_package/packages/pkg_d/package.json=1110895851
 js/private/image/package.json=-1260474848
-js/private/test/image/package.json=1286417612
+js/private/test/image/package.json=-687546763
 js/private/test/js_run_devserver/package.json=-260856079

@@ -2245,7 +2245,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             tags = ["manual"],
         )
 
-    for link_package in ["examples/js_binary", "examples/npm_deps"]:
+    for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
         if link_package == native.package_name():
             # terminal target for direct dependencies
             _npm_link_package_store(
@@ -2279,7 +2279,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             tags = ["manual"],
         )
 
-    for link_package in ["examples/npm_deps"]:
+    for link_package in ["examples/npm_deps", "js/private/test/image"]:
         if link_package == native.package_name():
             # terminal target for direct dependencies
             _npm_link_package_store(
@@ -2464,11 +2464,11 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name))
             link_targets.append("//{}:{}/mocha".format(bazel_package, name))
 
-    for link_package in ["examples/js_binary", "examples/npm_deps"]:
+    for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@mycorp/pkg-a".format(bazel_package, name))
 
-    for link_package in ["examples/npm_deps"]:
+    for link_package in ["examples/npm_deps", "js/private/test/image"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@mycorp/pkg-d".format(bazel_package, name))
 

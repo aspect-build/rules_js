@@ -3,6 +3,7 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("//js:defs.bzl", "js_image_layer")
 
+# buildifier: disable=function-docstring
 def make_js_image_layer(name, **kwargs):
     js_image_layer(
         name = name,
@@ -16,9 +17,23 @@ def make_js_image_layer(name, **kwargs):
     )
 
     native.filegroup(
-        name = name + "_app_layer",
+        name = name + "_node_layer",
         srcs = [name],
-        output_group = "app",
+        output_group = "node",
+        testonly = 1,
+    )
+
+    native.filegroup(
+        name = name + "_package_store_3p_layer",
+        srcs = [name],
+        output_group = "package_store_3p",
+        testonly = 1,
+    )
+
+    native.filegroup(
+        name = name + "_package_store_1p_layer",
+        srcs = [name],
+        output_group = "package_store_1p",
         testonly = 1,
     )
 
@@ -26,6 +41,13 @@ def make_js_image_layer(name, **kwargs):
         name = name + "_node_modules_layer",
         srcs = [name],
         output_group = "node_modules",
+        testonly = 1,
+    )
+
+    native.filegroup(
+        name = name + "_app_layer",
+        srcs = [name],
+        output_group = "app",
         testonly = 1,
     )
 
@@ -37,9 +59,8 @@ def assert_tar_listing(name, actual, expected):
         srcs = [actual],
         testonly = True,
         outs = ["_{}.listing".format(name)],
-        # Install gnu-tar on macos to match CI
-        # And replace tar below with  /opt/homebrew/opt/gnu-tar/libexec/gnubin/tar
-        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" tar -tvf $(locations {}) >$@'.format(actual),
+        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) >$@'.format(actual),
+        toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
     )
 
     write_source_file(
