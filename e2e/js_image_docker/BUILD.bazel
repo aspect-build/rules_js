@@ -47,14 +47,25 @@ js_image_layer(
 )
 
 filegroup(
-    name = "app_tar",
+    name = "node_tar",
     srcs = [":layers"],
-    output_group = "app",
+    output_group = "node",
 )
 
 container_layer(
-    name = "app_layer",
-    tars = [":app_tar"],
+    name = "node_layer",
+    tars = [":node_tar"],
+)
+
+filegroup(
+    name = "package_store_3p_tar",
+    srcs = [":layers"],
+    output_group = "package_store_3p",
+)
+
+container_layer(
+    name = "package_store_3p_layer",
+    tars = [":package_store_3p_tar"],
 )
 
 filegroup(
@@ -68,6 +79,17 @@ container_layer(
     tars = [":node_modules_tar"],
 )
 
+filegroup(
+    name = "app_tar",
+    srcs = [":layers"],
+    output_group = "app",
+)
+
+container_layer(
+    name = "app_layer",
+    tars = [":app_tar"],
+)
+
 container_image(
     name = "image",
     architecture = "amd64",  # or arm64
@@ -77,8 +99,10 @@ container_image(
     cmd = ["/app/bin"],
     entrypoint = ["bash"],
     layers = [
-        ":app_layer",
+        ":node_layer",
+        ":package_store_3p_layer",
         ":node_modules_layer",
+        ":app_layer",
     ],
     # This is `cmd` + `.runfiles/[workspace name]`
     workdir = select({

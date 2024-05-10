@@ -1,5 +1,7 @@
 {
     "dependencies": {
+        "@mycorp/pkg-a": "workspace:*",
+        "@mycorp/pkg-d": "workspace:*",
         "acorn": "8.8.2"
     }
 }

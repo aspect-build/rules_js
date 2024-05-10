@@ -1,0 +1,13 @@
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/node_modules
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/node_modules/.aspect_rules_js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules
+drwxr-xr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp/pkg-d -> ../../../../../examples/npm_package/packages/pkg_d
