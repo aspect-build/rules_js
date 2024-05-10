@@ -154,9 +154,6 @@ jobs:
                     # Don't run update_pnpm_lock under bzlmod
                     - bzlmod: 1
                       folder: e2e/update_pnpm_lock
-                    # Don't run update_pnpm_lock under bzlmod
-                    - bzlmod: 1
-                      folder: e2e/npm_translate_lock_auth
                     # rules_docker is not compatible with Bazel 7
                     - bazel-version:
                           major: 7
