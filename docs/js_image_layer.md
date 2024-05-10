@@ -19,7 +19,7 @@ js_image_layer(
 ## js_image_layer
 
 <pre>
-js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-platform">platform</a>, <a href="#js_image_layer-root">root</a>)
+js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-generate_empty_layers">generate_empty_layers</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-platform">platform</a>, <a href="#js_image_layer-root">root</a>)
 </pre>
 
 Create container image layers from js_binary targets.
@@ -269,6 +269,7 @@ container_image(
 | <a id="js_image_layer-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="js_image_layer-binary"></a>binary |  Label to an js_binary target   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="js_image_layer-compression"></a>compression |  Compression algorithm. Can be one of `gzip`, `none`.   | String | optional |  `"gzip"`  |
+| <a id="js_image_layer-generate_empty_layers"></a>generate_empty_layers |  Generate layers even if they are empty.<br><br>Helpful when using js_image_layer with rules_docker. See https://github.com/aspect-build/rules_js/pull/1714 for more info   | Boolean | optional |  `False`  |
 | <a id="js_image_layer-owner"></a>owner |  Owner of the entries, in `GID:UID` format. By default `0:0` (root, root) is used.   | String | optional |  `"0:0"`  |
 | <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 | <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional |  `""`  |

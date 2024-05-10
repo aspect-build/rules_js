@@ -279,7 +279,7 @@ def _runfile_path(ctx, file, runfiles_dir):
     return paths.join(runfiles_dir, to_rlocation_path(ctx, file))
 
 def _build_layer(ctx, type, all_entries_json, entries, inputs):
-    if not entries:
+    if not entries and not ctx.attr.generate_empty_layers:
         return None
 
     entries_json = ctx.actions.declare_file("{}_{}_entries.json".format(ctx.label.name, type))
@@ -489,6 +489,12 @@ js_image_layer_lib = struct(
         ),
         "platform": attr.label(
             doc = "Platform to transition.",
+        ),
+        "generate_empty_layers": attr.bool(
+            doc = """Generate layers even if they are empty.
+
+Helpful when using js_image_layer with rules_docker.
+See https://github.com/aspect-build/rules_js/pull/1714 for more info""",
         ),
     },
 )

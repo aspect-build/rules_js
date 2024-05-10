@@ -42,6 +42,7 @@ js_binary(
 js_image_layer(
     name = "layers",
     binary = ":bin",
+    generate_empty_layers = True,
     root = "/app",
     visibility = ["//visibility:__pkg__"],
 )
@@ -66,6 +67,17 @@ filegroup(
 container_layer(
     name = "package_store_3p_layer",
     tars = [":package_store_3p_tar"],
+)
+
+filegroup(
+    name = "package_store_1p_tar",
+    srcs = [":layers"],
+    output_group = "package_store_1p",
+)
+
+container_layer(
+    name = "package_store_1p_layer",
+    tars = [":package_store_1p_tar"],
 )
 
 filegroup(
@@ -101,6 +113,7 @@ container_image(
     layers = [
         ":node_layer",
         ":package_store_3p_layer",
+        ":package_store_1p_layer",
         ":node_modules_layer",
         ":app_layer",
     ],
