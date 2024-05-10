@@ -28,7 +28,22 @@ else
     _sedi 's#npmrc = "//:.npmrc",#use_home_npmrc = True,#' WORKSPACE
 fi
 
-bazel run "$BZLMOD_FLAG" @npm//:sync
+if [[ "$BZLMOD_FLAG" == "--enable_bzlmod=1" ]]; then
+    # Trigger the update of the pnpm lockfile which should exit non-zero
+    if bazel run "$BZLMOD_FLAG" @npm//:sync; then
+        echo "ERROR: expected 'update_pnpm_lock' to exit with non-zero exit code on update"
+        exit 1
+    fi
+
+    # The lockfile has been updated and sync should now exit 0
+    if ! bazel run "$BZLMOD_FLAG" @npm//:sync; then
+        echo "ERROR: expected 'update_pnpm_lock' to exit zero once the lockfile is up to date"
+        exit 1
+    fi
+else
+    bazel run "$BZLMOD_FLAG" @npm//:sync
+fi
+
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 
 bazel test "$BZLMOD_FLAG" //...
