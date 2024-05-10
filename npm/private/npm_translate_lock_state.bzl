@@ -342,16 +342,20 @@ WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the 
     for i, _ in enumerate(priv["importers"].keys()):
         package_json_key = "package_json_{}".format(i)
         if not _has_input_hash(priv, label_store.relative_path(package_json_key)):
-            # there is a workspace package here so there must be a package.json file
-            # buildifier: disable=print
-            print("""
-WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lock}` file contains this workspace package.
-    Add '{package_json}' to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
-""".format(
-                pnpm_lock = pnpm_lock_label,
-                package_json = label_store.label(package_json_key),
-                rctx_name = rctx.name,
-            ))
+            # If the env is set, don't warn to the end user
+            # TODO: aggregate all warnings into one warning that formats the output
+            # the way it should be added to `data`
+            if not rctx.attr.SUPPRESS_DATA_PACKAGE_DECLARATION_WARNINGS:
+                # there is a workspace package here so there must be a package.json file
+                # buildifier: disable=print
+                print("""
+    WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lock}` file contains this workspace package.
+        Add '{package_json}' to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
+    """.format(
+                    pnpm_lock = pnpm_lock_label,
+                    package_json = label_store.label(package_json_key),
+                    rctx_name = rctx.name,
+                ))
             if not utils.exists(rctx, label_store.path(package_json_key)):
                 msg = "ERROR: expected {path} to exist since the `{pnpm_lock}` file contains this workspace package".format(
                     path = label_store.path(package_json_key),
