@@ -1,0 +1,17 @@
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/node-patches
+-r-xr-xr-x  0 100    0       32555 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/node-patches/fs.js
+-r-xr-xr-x  0 100    0        1698 Jan  1  1970 app/js/private/test/image/bin.runfiles/aspect_rules_js/js/private/node-patches/register.js
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/nodejs_linux_amd64
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/nodejs_linux_amd64/bin
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/nodejs_linux_amd64/bin/nodejs
+drwxr-xr-x  0 100    0           0 Jan  1  1970 app/js/private/test/image/bin.runfiles/nodejs_linux_amd64/bin/nodejs/bin
+-r-xr-xr-x  0 100    0    80316256 Jan  1  1970 app/js/private/test/image/bin.runfiles/nodejs_linux_amd64/bin/nodejs/bin/node
