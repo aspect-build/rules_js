@@ -4,10 +4,10 @@ See https://bazel.build/docs/bzlmod#extension-definition
 
 load("@bazel_features//:features.bzl", "bazel_features")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
-load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
@@ -94,21 +94,27 @@ def _npm_lock_imports_bzlmod(module_ctx, attr):
         attr.no_optional,
     )
 
+    default_registry = utils.default_registry()
     registries = {}
     npm_auth = {}
+
+    def load_npmrc(path):
+        npmrc = parse_npmrc(module_ctx.read(path))
+        (_registries, _npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
+        registries.update(_registries)
+        npm_auth.update(_npm_auth)
+        if "registry" in npmrc:
+            return utils.to_registry_url(npmrc["registry"])
+        return default_registry
+
     if attr.npmrc:
-        npmrc = parse_npmrc(module_ctx.read(attr.npmrc))
-        (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
+        default_registry = load_npmrc(attr.npmrc)
 
     if attr.use_home_npmrc:
         home_directory = utils.home_directory(module_ctx)
         if home_directory:
             home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
-            home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
-
-            (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx.os.environ)
-            registries.update(registries2)
-            npm_auth.update(npm_auth2)
+            default_registry = load_npmrc(home_npmrc_path)
         else:
             # buildifier: disable=print
             print("""
@@ -134,7 +140,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         all_lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         registries = registries,
-        default_registry = utils.default_registry(),
+        default_registry = default_registry,
         npm_auth = npm_auth,
     )
 
