@@ -39,14 +39,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_root_package(priv, rctx, attr, label_store)
 
-    root_package_json_declared = label_store.has("package_json_root")
-    if root_package_json_declared and _should_update_pnpm_lock(priv):
-        # If we need to read the patches list from the package.json since
-        # update_pnpm_lock is enabled and the user has declared the root package.json
-        # as an input file then we can read it right away.
-        _init_patched_dependencies_labels(priv, rctx, attr, label_store)
-        priv["patched_dependencies_labels_initialized"] = True
-
     if _should_update_pnpm_lock(priv) or not attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
         _init_pnpm_labels(priv, rctx, attr, label_store)
@@ -62,12 +54,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     pnpm_lock_exists = is_windows or utils.exists(rctx, label_store.path("pnpm_lock"))
     if pnpm_lock_exists:
         _load_lockfile(priv, rctx, attr, label_store)
-
-    if not priv["patched_dependencies_labels_initialized"]:
-        # If we didn't initialize the patched dependency labels above then try again now. We'll either
-        # read the list of patches from the lock file now that it has been read or, if update_pnpm_lock
-        # is enabled, we can derive the existance of a root package.json by looking for a `.` importer
-        # in the `importers` list.
         _init_patched_dependencies_labels(priv, rctx, attr, label_store)
 
     if _should_update_pnpm_lock(priv):
@@ -176,19 +162,13 @@ def _init_patches_labels(priv, _, attr, label_store):
         label_store.add("patches_{}".format(i), d)
 
     priv["num_patches"] = len(patches)
-    priv["patched_dependencies_labels_initialized"] = False
 
 ################################################################################
 def _init_patched_dependencies_labels(priv, _, attr, label_store):
-    if attr.update_pnpm_lock:
-        # Read patches from package.json `pnpm.patchedDependencies`
-        root_package_json = _root_package_json(priv)
-        patches = ["//%s:%s" % (label_store.label("pnpm_lock").package, patch) for patch in root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()]
-    else:
-        # Read patches from pnpm-lock.yaml `patchedDependencies`
-        patches = []
-        for patch_info in priv["patched_dependencies"].values():
-            patches.append("//%s:%s" % (label_store.label("pnpm_lock").package, patch_info.get("path")))
+    # Read patches from pnpm-lock.yaml `patchedDependencies`
+    patches = []
+    for patch_info in priv["patched_dependencies"].values():
+        patches.append("//%s:%s" % (label_store.label("pnpm_lock").package, patch_info.get("path")))
 
     # Convert patch label strings to labels
     patches = [attr.pnpm_lock.relative(p) for p in patches]
@@ -347,15 +327,10 @@ WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lo
                 fail(msg)
             _copy_input_file(priv, rctx, attr, label_store, package_json_key)
 
-    if attr.update_pnpm_lock:
-        # Read patches from package.json `pnpm.patchedDependencies`
-        root_package_json = _root_package_json(priv)
-        pnpm_patches = root_package_json.get("pnpm", {}).get("patchedDependencies", {}).values()
-    else:
-        # Read patches from pnpm-lock.yaml `patchedDependencies`
-        pnpm_patches = []
-        for patch_info in priv["patched_dependencies"].values():
-            pnpm_patches.append(patch_info.get("path"))
+    # Read patches from pnpm-lock.yaml `patchedDependencies`
+    pnpm_patches = []
+    for patch_info in priv["patched_dependencies"].values():
+        pnpm_patches.append(patch_info.get("path"))
 
     num_patches = priv["num_patches"]
 
@@ -567,9 +542,6 @@ def _npm_auth(priv):
 
 def _root_package(priv):
     return priv["root_package"]
-
-def _root_package_json(priv):
-    return priv["root_package_json"]
 
 ################################################################################
 def _new(rctx_name, rctx, attr, bzlmod):
