@@ -118,7 +118,7 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 
 1. Make a file containing a rewrite rule like
 
-    `rewrite (registry.nodejs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2`
+    `rewrite (registry.npmjs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2`
 
 1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
 
