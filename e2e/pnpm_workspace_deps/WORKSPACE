@@ -40,6 +40,7 @@ npm_translate_lock(
         "//lib-dupes:package.json",
         "//tests:package.json",
     ],
+    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",

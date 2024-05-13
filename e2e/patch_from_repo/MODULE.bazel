@@ -19,6 +19,7 @@ npm.npm_translate_lock(
         "//:package.json",
         "//:pnpm-workspace.yaml",
     ],
+    npmrc = "//:.npmrc",
     patch_args = {
         "meaning-of-life": ["-p1"],
     },
@@ -30,5 +31,6 @@ npm.npm_translate_lock(
         "meaning-of-life@1.0.0": ["@@local_repo~//:meaning-of-life@1.0.0.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")

@@ -215,12 +215,9 @@ buildifier_prebuilt_register_toolchains()
 load(
     "@aspect_rules_lint//format:repositories.bzl",
     "fetch_shfmt",
-    "fetch_terraform",
 )
 
 fetch_shfmt()
-
-fetch_terraform()
 
 load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
 

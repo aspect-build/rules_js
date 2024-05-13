@@ -2,8 +2,11 @@
 common:local --disk_cache=~/.cache/bazel-disk-cache
 common --repository_cache=~/.cache/bazel-repository-cache
 
-# Bazel-in-bazel support
-test --test_env=XDG_CACHE_HOME
+# Debug where options came from
+common --announce_rc
+
+# Allows tests to run bazelisk-in-bazel, since this is the cache folder used
+common --test_env=XDG_CACHE_HOME
 
 # Remote execution
 build:rbe --bes_backend=grpcs://remote.buildbuddy.io

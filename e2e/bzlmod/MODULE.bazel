@@ -29,6 +29,7 @@ npm.npm_translate_lock(
         "less": "npm --version",
         "jasmine": "tsc --version",
     },
+    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
