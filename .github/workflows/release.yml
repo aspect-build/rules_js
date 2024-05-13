@@ -21,11 +21,8 @@ jobs:
                       ~/.cache/bazel-disk-cache
                       ~/.cache/bazel-repository-cache
                       ~/.cache/xdg-cache
-                  key: >-
-                      bazel-cache-${{ matrix.bazelversion.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
-                      ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', 'MODULE.bazel.lock', '**/*.js', '!e2e') }}
-                  restore-keys: |
-                      bazel-cache-${{ matrix.bazelversion.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                  key: bazel-cache-release-${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}
+                  restore-keys: bazel-cache-release-
             - name: bazel test //...
               env:
                   XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here

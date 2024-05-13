@@ -30,6 +30,7 @@ npm_translate_lock(
     lifecycle_hooks_execution_requirements = {
         "sharp": ["requires-network"],
     },
+    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )

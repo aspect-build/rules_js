@@ -14,15 +14,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_x86_64": "@shfmt_darwin_x86_64//file:shfmt",
         "@bazel_tools//src/conditions:linux_aarch64": "@shfmt_linux_aarch64//file:shfmt",
         "@bazel_tools//src/conditions:linux_x86_64": "@shfmt_linux_x86_64//file:shfmt",
-    }),
-)
-
-alias(
-    name = "terraform",
-    actual = select({
-        "@bazel_tools//src/conditions:darwin_arm64": "@terraform_macos_aarch64//:terraform",
-        "@bazel_tools//src/conditions:darwin_x86_64": "@terraform_macos_x86_64//:terraform",
-        "@bazel_tools//src/conditions:linux": "@terraform_linux_x86_64//:terraform",
+        "//conditions:default": ":noop",
     }),
 )
 
@@ -30,5 +22,4 @@ multi_formatter_binary(
     name = "format",
     sh = ":shfmt",
     starlark = "@buildifier_prebuilt//:buildifier",
-    terraform = ":terraform",
 )

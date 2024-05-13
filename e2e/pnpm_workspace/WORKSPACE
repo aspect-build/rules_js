@@ -52,6 +52,7 @@ npm_translate_lock(
         "//vendored/a:package.json",
         "//vendored/b:package.json",
     ],
+    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",

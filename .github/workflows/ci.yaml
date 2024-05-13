@@ -230,7 +230,7 @@ jobs:
                       ~/.cache/xdg-cache
                   key: >-
                       bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
-                      ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', 'MODULE.bazel.lock', '**/*.js', '!e2e') }}-
+                      ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
                       ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/.bazeliskrc', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
                       bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
