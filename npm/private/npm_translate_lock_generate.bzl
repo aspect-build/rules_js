@@ -249,9 +249,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         ),
     ]
 
-    # check all links and fail if there are duplicates which can happen with public hoisting
-    helpers.check_for_conflicting_public_links(npm_imports, rctx.attr.public_hoist_packages)
-
     stores_bzl = []
     links_bzl = {}
     links_targets_bzl = {}
