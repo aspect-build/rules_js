@@ -59,9 +59,12 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                     for transitive_version in cache[package_key][transitive_name]:
                         if transitive_version not in transitive_closure[transitive_name]:
                             transitive_closure[transitive_name].append(transitive_version)
-            else:
+            elif package_key in packages:
                 # Recurse into the next level of dependencies
                 stack.append(_get_package_info_deps(packages[package_key], no_optional))
+            else:
+                msg = "Unknown package key: {} in {}".format(package_key, packages.keys())
+                fail(msg)
 
     result = dict()
     for key in sorted(transitive_closure.keys()):
