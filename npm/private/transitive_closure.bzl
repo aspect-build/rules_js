@@ -130,7 +130,6 @@ def _gather_package_info(package_path, package_snapshot):
         "optional_dependencies": package_snapshot.get("optionalDependencies", {}),
         "dev": package_snapshot.get("dev", False),
         "optional": package_snapshot.get("optional", False),
-        "patched": package_snapshot.get("patched", False),
         "has_bin": package_snapshot.get("hasBin", False),
         "requires_build": package_snapshot.get("requiresBuild", False),
     }
