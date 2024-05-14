@@ -14,7 +14,6 @@ js_image_layer(
 )
 ```
 
-
 <a id="js_image_layer"></a>
 
 ## js_image_layer
@@ -25,7 +24,7 @@ js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer
 
 Create container image layers from js_binary targets.
 
-By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
+By design, js_image_layer doesn't have any preference over which rule assembles the container image.
 This means the downstream rule (`oci_image`, or `container_image` in this case) must set a proper `workdir` and `cmd` to for the container work.
 
 A proper `cmd` usually looks like /`[ js_image_layer 'root' ]`/`[ package name of js_image_layer 'binary' target ]/[ name of js_image_layer 'binary' target ]`,
@@ -37,7 +36,7 @@ in the `WORKSPACE` file, is `__main__`. If `workdir` is not set correctly, some 
 
 js_image_layer supports transitioning to specific `platform` to allow building multi-platform container images.
 
-&gt; WARNING: Structure of the resulting layers are not subject to semver guarantees and may change without a notice. However, it is guaranteed to work when provided together in the `app` and `node_modules` order
+> WARNING: Structure of the resulting layers are not subject to semver guarantees and may change without a notice. However, it is guaranteed to work when provided together in the `app` and `node_modules` order
 
 **A partial example using rules_oci with transition to linux/amd64 platform.**
 
@@ -156,8 +155,8 @@ js_image_layer(
 )
 
 filegroup(
-    name = "app_tar", 
-    srcs = [":layers"], 
+    name = "app_tar",
+    srcs = [":layers"],
     output_group = "app",
 )
 
@@ -167,8 +166,8 @@ container_layer(
 )
 
 filegroup(
-    name = "node_modules_tar", 
-    srcs = [":layers"], 
+    name = "node_modules_tar",
+    srcs = [":layers"],
     output_group = "node_modules",
 )
 
@@ -192,7 +191,6 @@ container_image(
 )
 ```
 
-
 **ATTRIBUTES**
 
 
@@ -200,10 +198,10 @@ container_image(
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="js_image_layer-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="js_image_layer-binary"></a>binary |  Label to an js_binary target   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
-| <a id="js_image_layer-compression"></a>compression |  Compression algorithm. Can be one of <code>gzip</code>, <code>none</code>.   | String | optional | <code>"gzip"</code> |
-| <a id="js_image_layer-owner"></a>owner |  Owner of the entries, in <code>GID:UID</code> format. By default <code>0:0</code> (root, root) is used.   | String | optional | <code>"0:0"</code> |
-| <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional | <code>None</code> |
-| <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional | <code>""</code> |
+| <a id="js_image_layer-compression"></a>compression |  Compression algorithm. Can be one of `gzip`, `none`.   | String | optional |  `"gzip"`  |
+| <a id="js_image_layer-owner"></a>owner |  Owner of the entries, in `GID:UID` format. By default `0:0` (root, root) is used.   | String | optional |  `"0:0"`  |
+| <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
+| <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional |  `""`  |
 
 
 <a id="js_image_layer_lib.implementation"></a>
