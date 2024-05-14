@@ -484,6 +484,9 @@ Either remove this patch file if it is no longer needed or change its key to mat
             )
             fail(msg)
 
+    # check all links and fail if there are duplicates which can happen with public hoisting
+    _check_for_conflicting_public_links(result, attr.public_hoist_packages)
+
     return result
 
 ################################################################################
@@ -596,7 +599,6 @@ To disable this check, remove the `verify_patches` attribute from `npm_translate
 """.format(patches_list = state.label_store.relative_path("verify_patches"), missing_patches = missing_patches_formatted))
 
 helpers = struct(
-    check_for_conflicting_public_links = _check_for_conflicting_public_links,
     gather_values_from_matching_names = _gather_values_from_matching_names,
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
