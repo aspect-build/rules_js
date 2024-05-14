@@ -258,7 +258,7 @@ def _init_root_package(priv, rctx, attr, label_store):
 def _init_npmrc(priv, rctx, attr, label_store):
     if not label_store.has("npmrc"):
         # check for a .npmrc next to the pnpm-lock.yaml file
-        _maybe_npmrc(priv, rctx, label_store, "sibling_npmrc")
+        _maybe_npmrc(priv, rctx, attr, label_store, "sibling_npmrc")
 
     if label_store.has("npmrc"):
         _load_npmrc(priv, rctx, label_store.path("npmrc"))
@@ -267,7 +267,7 @@ def _init_npmrc(priv, rctx, attr, label_store):
         _load_home_npmrc(priv, rctx)
 
 ################################################################################
-def _maybe_npmrc(priv, rctx, label_store, key):
+def _maybe_npmrc(priv, rctx, attr, label_store, key):
     is_windows = repo_utils.is_windows(rctx)
     if is_windows:
         # TODO(windows): utils.exists is not yet support on Windows
