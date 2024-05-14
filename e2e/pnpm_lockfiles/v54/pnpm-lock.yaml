@@ -27,16 +27,16 @@ importers:
       '@aspect-test/b': 5.0.2
       '@types/node': registry.npmjs.org/@types/node/16.18.11
 
-  projects/a:
+  ../projects/a:
     specifiers: {}
 
-  projects/b:
+  ../projects/b:
     specifiers:
       '@scoped/a': workspace:*
     dependencies:
       '@scoped/a': link:../a
 
-  projects/c:
+  ../projects/c:
     specifiers:
       '@scoped/a': link:../a
     dependencies:
