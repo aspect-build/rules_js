@@ -222,7 +222,7 @@ jobs:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
 
             - name: Mount bazel caches
-              uses: actions/cache@v3
+              uses: actions/cache@v4
               with:
                   path: |
                       ~/.cache/bazel-disk-cache
