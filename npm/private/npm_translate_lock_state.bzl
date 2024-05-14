@@ -37,8 +37,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_patches_labels(priv, rctx, attr, label_store)
 
-    _init_root_package(priv, rctx, attr, label_store)
-
     if _should_update_pnpm_lock(priv) or not attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
         _init_pnpm_labels(priv, rctx, attr, label_store)
@@ -55,6 +53,9 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if pnpm_lock_exists:
         _load_lockfile(priv, rctx, attr, label_store)
         _init_patched_dependencies_labels(priv, rctx, attr, label_store)
+
+    # May depend on lockfile state
+    _init_root_package(priv, rctx, attr, label_store)
 
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
@@ -531,6 +532,9 @@ def _packages(priv):
 def _patched_dependencies(priv):
     return priv["patched_dependencies"]
 
+def _only_built_dependencies(priv):
+    return _root_package_json(priv).get("pnpm", {}).get("onlyBuildDependencies", None)
+
 def _num_patches(priv):
     return priv["num_patches"]
 
@@ -542,6 +546,9 @@ def _npm_auth(priv):
 
 def _root_package(priv):
     return priv["root_package"]
+
+def _root_package_json(priv):
+    return priv["root_package_json"]
 
 ################################################################################
 def _new(rctx_name, rctx, attr, bzlmod):
@@ -564,6 +571,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         "npm_registries": {},
         "packages": {},
         "root_package": None,
+        "root_package_json": {},
         "patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
     }
@@ -578,6 +586,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
         patched_dependencies = lambda: _patched_dependencies(priv),
+        only_built_dependencies = lambda: _only_built_dependencies(priv),
         npm_registries = lambda: _npm_registries(priv),
         npm_auth = lambda: _npm_auth(priv),
         num_patches = lambda: _num_patches(priv),

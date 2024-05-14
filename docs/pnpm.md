@@ -260,8 +260,16 @@ npm packages have "lifecycle scripts" such as `postinstall` which are documented
 
 We refer to these as "lifecycle hooks".
 
-> You can disable this feature completely by setting all packages to have no hooks, using
-> `lifecycle_hooks = { "*": [] }` in `npm_translate_lock`.
+The lifecycle hooks of a package are determined by the `package.json` [`pnpm.onlyBuiltDependencies` attribute](https://pnpm.io/package_json#pnpmonlybuiltdependencies).
+
+If `pnpm.onlyBuiltDependencies` is unspecified `npm_translate_lock` will fallback to the legacy pnpm lockfile `requiresBuild` attribute.
+This attribute is only available in pnpm _before_ v9, see [pnpm #7707](https://github.com/pnpm/pnpm/issues/7707) for reasons why this attribute was removed.
+
+When a package has lifecycle hooks the `lifecycle_*` attributes are applied to filter which hooks are run and how they are run.
+
+For example, you can restrict lifecycle hooks across all packages to only run `postinstall`:
+
+> `lifecycle_hooks = { "*": ["postinstall"] }` in `npm_translate_lock`.
 
 Because rules_js models the execution of these hooks as build actions, rather than repository rules,
 the result can be stored in the remote cache and shared between developers.

@@ -132,6 +132,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
         importers,
         packages,
         state.patched_dependencies(),
+        state.only_built_dependencies(),
         state.root_package(),
         state.default_registry(),
         state.npm_registries(),
