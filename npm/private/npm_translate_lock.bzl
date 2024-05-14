@@ -92,7 +92,7 @@ npm_translate_lock_lib = struct(
 def _npm_translate_lock_impl(rctx):
     rctx.report_progress("Initializing")
 
-    state = npm_translate_lock_state.new(rctx)
+    state = npm_translate_lock_state.new(rctx.name, rctx, rctx.attr, rctx.attr.bzlmod)
 
     # If a pnpm lock file has not been specified then we need to bootstrap by running `pnpm
     # import` in the user's repository

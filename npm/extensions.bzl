@@ -3,12 +3,12 @@ See https://bazel.build/docs/bzlmod#extension-definition
 """
 
 load("@bazel_features//:features.bzl", "bazel_features")
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
+load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 load("//npm/private:utils.bzl", "utils")
@@ -84,38 +84,16 @@ def _npm_translate_lock_bzlmod(attr):
     )
 
 def _npm_lock_imports_bzlmod(module_ctx, attr):
-    lock_importers = {}
-    lock_packages = {}
-    lock_patched_dependencies = {}
-    lock_parse_err = None
-    if attr.use_starlark_yaml_parser:
-        lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_yaml(module_ctx.read(attr.pnpm_lock))
-    else:
-        is_windows = repo_utils.is_windows(module_ctx)
-        host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(module_ctx), ".exe" if is_windows else ""))
-        yq_args = [
-            str(module_ctx.path(host_yq)),
-            str(module_ctx.path(attr.pnpm_lock)),
-            "-o=json",
-        ]
-        result = module_ctx.execute(yq_args)
-        if result.return_code:
-            lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
-        else:
-            lock_importers, lock_packages, lock_patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+    state = npm_translate_lock_state.new(attr.name, module_ctx, attr, True)
 
-    if lock_parse_err != None:
-        msg = """
-{type}: pnpm-lock.yaml parse error: {error}`.
-""".format(type = "WARNING" if attr.update_pnpm_lock else "ERROR", error = lock_parse_err)
+    importers, packages = translate_to_transitive_closure(
+        state.importers(),
+        state.packages(),
+        attr.prod,
+        attr.dev,
+        attr.no_optional,
+    )
 
-        # buildifier: disable=print
-        if attr.update_pnpm_lock:
-            print(msg)
-        else:
-            fail(msg)
-
-    importers, packages = translate_to_transitive_closure(lock_importers, lock_packages, attr.prod, attr.dev, attr.no_optional)
     registries = {}
     npm_auth = {}
     if attr.npmrc:
@@ -148,7 +126,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
-        patched_dependencies = lock_patched_dependencies,
+        patched_dependencies = state.patched_dependencies(),
         root_package = attr.pnpm_lock.package,
         rctx_name = attr.name,
         attr = attr,
