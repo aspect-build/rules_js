@@ -40,15 +40,15 @@ importers:
         specifier: ~16.18.11
         version: registry.npmjs.org/@types/node@16.18.11
 
-  projects/a: {}
+  ../projects/a: {}
 
-  projects/b:
+  ../projects/b:
     dependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
 
-  projects/c:
+  ../projects/c:
     dependencies:
       '@scoped/a':
         specifier: link:../a
