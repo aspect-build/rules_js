@@ -162,6 +162,74 @@ def _convert_v6_packages(packages):
                 package_info[key] = dependencies
 
         result[_convert_pnpm_v6_package_name(package)] = package_info
+
+    return result
+
+def _convert_pnpm_v9_package_name(package_name):
+    # Covert a pnpm lock file v9 name/version@version string of the format
+    # @scope/name@version(@scope/name@version)(@scope/name@version)@version
+    # to a pnpm lock file v5 @scope/name/version_peer_version format that is compatible with rules_js.
+    package_name = _convert_pnpm_v6_version_peer_dep(package_name)
+    segments = package_name.rsplit("@", 1)
+    if len(segments) != 2:
+        msg = "unexpected pnpm versioned name {}".format(package_name)
+        fail(msg)
+    return "/%s/%s" % (segments[0], segments[1])
+
+# v9 importers are the same as v6 importers
+_convert_v9_importers = _convert_v6_importers
+
+def _convert_v9_packages(packages, snapshots):
+    # Convert pnpm lockfile v9 importers to a rules_js compatible format.
+
+    # v9 split package metadata (v6 "packages" field) into 2:
+    #
+    #  packages:
+    #    '@scoped/name@5.0.2'
+    #       hasBin
+    #       resolution (integrity etc)
+    #       peerDependencies which *might* be resolved
+    #
+    #  snapshots:
+    #    '@scoped/name@2.0.0(peer@2.0.2)'
+    #       dependencies:
+    #           a-dep@1.2.3
+    #           peer@2.0.2
+    #           b-dep@3.2.1(peer-b@4.5.6)
+    #
+    # Where the 'snapshots' keys contain the peer information while 'packages' contain the static information
+    # such as hasBin, resolution and peerDependencies that require resolution.
+
+    result = {}
+
+    # Snapshots contains the packages with the keys (which include peers) to return
+    for package, snapshot_info in snapshots.items():
+        # convert v6 package dependencies + optionalDependencies
+        for key in ["dependencies", "optionalDependencies"]:
+            deps = snapshot_info.get(key, None)
+            if deps != None:
+                dependencies = {}
+                for dep_name, dep_version in deps.items():
+                    dependencies[dep_name] = _convert_pnpm_v6_version_peer_dep(dep_version)
+                snapshot_info[key] = dependencies
+
+        # Strip peer-dep info off to get the raw package
+        package_version = package
+        if package_version[-1] == ")":
+            package_version = package_version[:package_version.find("(")]
+
+        # Metadata for this snapshot persisted in the 'packages'
+        package_info = packages[package_version]
+        if package_info == None:
+            msg = "Failed to find pnpm-lock snapshot %s (%s) in packages" % (package, package_version)
+            fail(msg)
+
+        # Also include the static data from the 'packages'
+        for info_name, info_value in package_info.items():
+            snapshot_info[info_name] = info_value
+
+        result[_convert_pnpm_v9_package_name(package)] = snapshot_info
+
     return result
 
 def _parse_pnpm_lock_json(content):
@@ -212,7 +280,11 @@ def _parse_pnpm_lock_common(parsed, err):
 
     packages = parsed.get("packages", {})
 
-    if lockfile_version >= 6.0:
+    if lockfile_version >= 9.0:
+        snapshots = parsed.get("snapshots", {})
+        importers = _convert_v9_importers(importers)
+        packages = _convert_v9_packages(packages, snapshots)
+    elif lockfile_version >= 6.0:
         # special handling for lockfile v6 which had breaking changes
         importers = _convert_v6_importers(importers)
         packages = _convert_v6_packages(packages)
@@ -229,8 +301,9 @@ def _assert_lockfile_version(version, testonly = False):
     #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
     #   6.0 - pnpm v8.0.0 bumped the lockfile version to 6.0; this included breaking changes
     #   6.1 - pnpm v8.6.0 bumped the lockfile version to 6.1
+    #   9.0 - pnpm v9.0.0 bumped the lockfile version to 9.0
     min_lock_version = 5.4
-    max_lock_version = 6.1
+    max_lock_version = 9.0
     msg = None
 
     if version < min_lock_version:
