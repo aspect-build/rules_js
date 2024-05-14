@@ -1,0 +1,6 @@
+load("@lock-v90//:defs.bzl", "npm_link_all_packages")
+load("//:lockfile-test.bzl", "lockfile_test")
+
+npm_link_all_packages()
+
+lockfile_test()

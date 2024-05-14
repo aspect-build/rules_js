@@ -278,7 +278,6 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
         optional_deps = package_info.get("optional_dependencies")
         dev = package_info.get("dev")
         optional = package_info.get("optional")
-        pnpm_patched = package_info.get("patched")
         requires_build = package_info.get("requires_build")
         transitive_closure = package_info.get("transitive_closure")
         resolution = package_info.get("resolution")
@@ -331,6 +330,9 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
 
         translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
 
+        pnpm_patch = patched_dependencies.get(friendly_name, {}).get("path", None)
+        pnpm_patched = pnpm_patch != None
+
         if len(translate_patches) > 0 and pnpm_patched:
             msg = """\
 ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(patches)` to the same package {pkg}.
@@ -341,7 +343,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
-            patch_path = "//%s:%s" % (attr.pnpm_lock.package, patched_dependencies.get(friendly_name).get("path"))
+            patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch)
             patches.append(patch_path)
 
             # pnpm patches are always applied with -p1
