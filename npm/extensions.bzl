@@ -134,7 +134,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         all_lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         registries = registries,
-        default_registry = utils.default_registry(),
+        default_registry = state.default_registry(),
         npm_auth = npm_auth,
     )
 
