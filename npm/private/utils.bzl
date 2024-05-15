@@ -288,7 +288,7 @@ def _parse_pnpm_lock_common(parsed, err):
 
     patched_dependencies = parsed.get("patchedDependencies", {})
 
-    return importers, packages, patched_dependencies, None
+    return importers, packages, patched_dependencies, lockfile_version, None
 
 def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):
