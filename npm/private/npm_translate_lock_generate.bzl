@@ -243,7 +243,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
 """.format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
-            link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "",
+            link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "\"\"",
             root_package = root_package,
             pnpm_lock_label = pnpm_lock_label,
         ),
