@@ -14516,21 +14516,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__meaning-of-life__1.0.0__-1287509853",
+        name = "npm__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "examples/npm_deps": ["meaning-of-life"],
         },
         package = "meaning-of-life",
-        version = "1.0.0_-1287509853",
+        version = "1.0.0_o3deharooos255qt5xdujc3cuq",
         url = "https://registry.npmjs.org/meaning-of-life/-/meaning-of-life-1.0.0.tgz",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==",
         transitive_closure = {
-            "meaning-of-life": ["1.0.0_-1287509853"],
+            "meaning-of-life": ["1.0.0_o3deharooos255qt5xdujc3cuq"],
         },
         patches = ["@@//:examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch", "@@//examples/npm_deps:patches/meaning-of-life@1.0.0-after_pnpm.patch"],
         patch_args = ["-p1"],
