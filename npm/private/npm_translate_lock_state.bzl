@@ -478,6 +478,7 @@ def _load_lockfile(priv, rctx, _, label_store):
     importers = {}
     packages = {}
     patched_dependencies = {}
+    lock_version = None
     lock_parse_err = None
 
     yq_args = [
@@ -489,8 +490,9 @@ def _load_lockfile(priv, rctx, _, label_store):
     if result.return_code:
         lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        importers, packages, patched_dependencies, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        importers, packages, patched_dependencies, lock_version, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
 
+    priv["lock_version"] = lock_version
     priv["importers"] = importers
     priv["packages"] = packages
     priv["patched_dependencies"] = patched_dependencies
@@ -522,6 +524,9 @@ def _default_registry(priv):
 
 def _link_workspace(priv):
     return priv["link_workspace"]
+
+def _lockfile_version(priv):
+    return priv["lock_version"]
 
 def _importers(priv):
     return priv["importers"]
@@ -583,6 +588,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
         link_workspace = lambda: _link_workspace(priv),
+        lockfile_version = lambda: _lockfile_version(priv),
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
         patched_dependencies = lambda: _patched_dependencies(priv),

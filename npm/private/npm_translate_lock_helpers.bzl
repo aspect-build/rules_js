@@ -565,6 +565,31 @@ def _normalize_bazelignore(lines):
     return result
 
 ################################################################################
+def _verify_lifecycle_hooks_specified(_, state):
+    # lockfiles <9.0 specify the `requiresBuild` flag in the lockfile.
+    #
+    # lockfiles >=9.0 no longer specify if packages have lifecycle hooks,
+    # and declaration of hooks must be done manually in the `pnpm.onlyBuiltDependencies`.
+    if state.lockfile_version() < 9.0:
+        return
+
+    if state.only_built_dependencies() == None:
+        fail("""\
+ERROR: pnpm.onlyBuiltDependencies required in pnpm workspace root package.json when using pnpm v9 or later
+
+As of pnpm v9, the lockfile no longer specifies if packages have lifecycle hooks.
+
+Packages that rules_js should generate lifecycle hook actions for must now be declared in
+pnpm.onlyBuiltDependencies in the pnpm workspace root package.json. See
+https://pnpm.io/package_json#pnpmonlybuiltdependencies for more information.
+
+Prior to pnpm v9, rules_js keyed off of the requiresBuild attribute in the pnpm lock
+file to determine if a lifecycle hook action should be generated for an npm package.
+See [pnpm #7707](https://github.com/pnpm/pnpm/issues/7707) for the reasons that pnpm
+removed the requiredBuild attribute from the lockfile in v9.
+""")
+
+################################################################################
 def _verify_patches(rctx, state):
     if rctx.attr.verify_patches and rctx.attr.patches != None:
         rctx.report_progress("Verifying patches in {}".format(state.label_store.relative_path("verify_patches")))
@@ -598,6 +623,7 @@ helpers = struct(
     link_package = _link_package,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
+    verify_lifecycle_hooks_specified = _verify_lifecycle_hooks_specified,
     verify_patches = _verify_patches,
 )
 
