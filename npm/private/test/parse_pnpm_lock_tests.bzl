@@ -69,6 +69,7 @@ def _parse_lockfile_v5_test_impl(ctx):
             },
         },
         {},
+        5.4,
         None,
     )
 
@@ -130,6 +131,7 @@ def _parse_lockfile_v6_test_impl(ctx):
             },
         },
         {},
+        6.0,
         None,
     )
 

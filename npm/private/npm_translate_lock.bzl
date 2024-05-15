@@ -114,6 +114,8 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     helpers.verify_patches(rctx, state)
 
+    helpers.verify_lifecycle_hooks_specified(rctx, state)
+
     rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
     importers, packages = translate_to_transitive_closure(
