@@ -55,6 +55,9 @@ def lockfile_test(name = "lockfile", node_modules = "node_modules"):
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/lc",
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
 
+            # TODO(2.0): normalized across lockfiles in lockfile v54+
+            # ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
+
             # TODO: differs across lockfile versions
             # Direct deps from custom registry
             # ":.aspect_rules_js/node_modules/@types+node@registry.npmjs.org+@types+node@16.18.11",

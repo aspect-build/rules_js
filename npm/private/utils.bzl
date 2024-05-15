@@ -78,6 +78,9 @@ def _convert_pnpm_v6_version_peer_dep(version):
     # version(@scope/peer@version)(@scope/peer@version)
     # to a pnpm lock file v5 version_peer_version that is compatible with rules_js.
     if version[-1] == ")":
+        # Drop the patch_hash= not present in v5 so (patch_hash=123) -> (123) like v5
+        version = version.replace("(patch_hash=", "(")
+
         # There is a peer dep if the string ends with ")"
         peer_dep_index = version.find("(")
         peer_dep = version[peer_dep_index:]
