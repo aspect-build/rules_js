@@ -1723,11 +1723,11 @@ def npm_repositories():
         integrity = "sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==",
         deps = {
             "string-width": "5.1.2",
-            "string-width-cjs": "/string-width/4.2.3",
+            "string-width-cjs": "/string-width@4.2.3",
             "strip-ansi": "7.1.0",
-            "strip-ansi-cjs": "/strip-ansi/6.0.1",
+            "strip-ansi-cjs": "/strip-ansi@6.0.1",
             "wrap-ansi": "8.1.0",
-            "wrap-ansi-cjs": "/wrap-ansi/7.0.0",
+            "wrap-ansi-cjs": "/wrap-ansi@7.0.0",
         },
         transitive_closure = {
             "@isaacs/cliui": ["8.0.2"],
@@ -17855,7 +17855,7 @@ def npm_repositories():
             "point-in-polygon": "1.1.0",
             "polybooljs": "1.2.0",
             "probe-image-size": "7.2.3",
-            "regl": "/@plotly/regl/2.1.2",
+            "regl": "/@plotly/regl@2.1.2",
             "regl-error2d": "2.0.12",
             "regl-line2d": "3.1.2",
             "regl-scatter2d": "3.3.1",

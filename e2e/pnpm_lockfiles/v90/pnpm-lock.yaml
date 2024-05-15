@@ -25,6 +25,9 @@ importers:
       '@scoped/b':
         specifier: link:../projects/b
         version: link:../projects/b
+      '@scoped/c':
+        specifier: file:../projects/c
+        version: file:../projects/c
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
@@ -100,6 +103,9 @@ packages:
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
     hasBin: true
 
+  '@scoped/c@file:../projects/c':
+    resolution: {directory: ../projects/c, type: directory}
+
   '@types/archiver@5.3.1':
     resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
 
@@ -174,6 +180,10 @@ snapshots:
       '@aspect-test/c': 2.0.2
 
   '@aspect-test/e@1.0.0': {}
+
+  '@scoped/c@file:../projects/c':
+    dependencies:
+      '@scoped/a': link:../a
 
   '@types/archiver@5.3.1':
     dependencies:

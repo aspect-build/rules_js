@@ -8,6 +8,7 @@
         "uvu": "0.5.6",
         "@scoped/a": "workspace:*",
         "@scoped/b": "link:../projects/b",
+        "@scoped/c": "file:../projects/c",
         "@scoped/d": "../projects/d"
     },
     "devDependencies": {
