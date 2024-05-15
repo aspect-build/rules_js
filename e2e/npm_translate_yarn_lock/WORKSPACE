@@ -19,6 +19,9 @@ npm_translate_lock(
     data = ["//:package.json"],
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
+    # Test that we can specify a version with an integrity by providing a (version, integrity) tuple.
+    # curl --silent https://registry.npmjs.org/pnpm | jq '.versions["8.15.8"].dist.integrity'
+    pnpm_version = ("8.15.8", "sha512-0aAp4aRHrZC8ls1YsPrUhtKZPVMYVjlve6vy2D6xgju4PFo9D8GPZ1stEDIdSesWH+zjb+gTSqWCPs0hX+7Tkg=="),
     preupdate = ["//:transform_package_json.js"],
     quiet = False,
     update_pnpm_lock = True,

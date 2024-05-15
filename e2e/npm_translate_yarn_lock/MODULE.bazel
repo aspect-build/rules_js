@@ -13,7 +13,8 @@ pnpm = use_extension(
 )
 pnpm.pnpm(
     name = "pnpm-old-version",
-    pnpm_version = "7.33.3",
+    pnpm_version = "8.15.8",
+    pnpm_version_integrity = "sha512-0aAp4aRHrZC8ls1YsPrUhtKZPVMYVjlve6vy2D6xgju4PFo9D8GPZ1stEDIdSesWH+zjb+gTSqWCPs0hX+7Tkg==",
 )
 use_repo(pnpm, "pnpm-old-version")
 
