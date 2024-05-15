@@ -16,11 +16,13 @@ importers:
       meaning-of-life: 1.0.0
       rollup: 3.2.5
       uvu: 0.5.6
+      uvu-alias: npm:uvu@0.5.6
     dependencies:
       '@aspect-test/a': 5.0.2
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 3.2.5
       uvu: 0.5.6
+      uvu-alias: /uvu/0.5.6
     optionalDependencies:
       '@aspect-test/c': 2.0.2
     devDependencies:

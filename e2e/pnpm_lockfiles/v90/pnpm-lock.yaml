@@ -28,6 +28,9 @@ importers:
       uvu:
         specifier: 0.5.6
         version: 0.5.6
+      uvu-alias:
+        specifier: npm:uvu@0.5.6
+        version: uvu@0.5.6
     optionalDependencies:
       '@aspect-test/c':
         specifier: '2.0'

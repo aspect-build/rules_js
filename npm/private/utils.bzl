@@ -89,19 +89,49 @@ def _convert_pnpm_v6_version_peer_dep(version):
         version = version.rstrip("_")
     return version
 
-def _convert_pnpm_v6_package_name(package_name):
-    # Covert a pnpm lock file v6 /name/version string of the format
-    # @scope/name@version(@scope/name@version)(@scope/name@version)
-    # to a pnpm lock file v5 @scope/name/version_peer_version format that is compatible with rules_js.
-    if package_name.startswith("/"):
-        package_name = _convert_pnpm_v6_version_peer_dep(package_name)
-        segments = package_name.rsplit("@", 1)
-        if len(segments) != 2:
-            msg = "unexpected pnpm versioned name {}".format(package_name)
-            fail(msg)
-        return "%s/%s" % (segments[0], segments[1])
-    else:
-        return _convert_pnpm_v6_version_peer_dep(package_name)
+def _convert_pnpm_v6_package_key(v):
+    # Convert a pnpm lock file v6 package key|version to a rules_js compatible ~v5 format.
+    #
+    # For example, keys may include:
+    # ```
+    #  importers:
+    #    __project__
+    #      dependencies:
+    #        pkg-a:
+    #          version: __imp_ver__ <--- package version
+    #  packages:
+    #     __pkg_key__:              <--- package key
+    #      dependencies:
+    #        pkg-b: __pkg_ver__     <--- package version
+    # ```
+    #
+    # Example __imp_ver__:
+    #   1.2.3
+    #   1.2.3(patch_hash=123)
+    #   /pkg@1.2.3
+    #   registry-url/pkg@16.18.11
+    #   link:../pkg
+    #
+    # Example __pkg_key__:
+    #   /pkg@version
+    #   /@scope/x@version
+    #   /pkg@version(patched_hash=456)
+    #   /pkg(@scoped/peer@version)(peer2@version)
+    #   registry.npmjs.org/@types/glob@8.1.0
+    #
+    # Examples __pkg_ver__:
+    #   1.2.3
+    #   1.2.3(peer@123)
+
+    # Normalize trailing (...) peer info
+    v = _convert_pnpm_v6_version_peer_dep(v)
+
+    # Convert pkg@version to ~v5 pkg/version
+    at_i = v.rfind("@")
+    if at_i != -1:
+        v = "%s/%s" % (v[0:at_i], v[at_i + 1:])
+
+    return v
 
 def _convert_v6_importers(importers):
     # Convert pnpm lockfile v6 importers to a rules_js compatible ~v5 format.
@@ -135,7 +165,7 @@ def _convert_v6_importers(importers):
             if deps != None:
                 result[import_path][key] = {}
                 for name, attributes in deps.items():
-                    result[import_path][key][name] = _convert_pnpm_v6_package_name(attributes.get("version"))
+                    result[import_path][key][name] = _convert_pnpm_v6_package_key(attributes.get("version"))
     return result
 
 def _convert_v6_packages(packages):
@@ -155,10 +185,10 @@ def _convert_v6_packages(packages):
             if deps != None:
                 dependencies = {}
                 for dep_name, dep_version in deps.items():
-                    dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
+                    dependencies[dep_name] = _convert_pnpm_v6_package_key(dep_version)
                 package_info[key] = dependencies
 
-        result[_convert_pnpm_v6_package_name(package)] = package_info
+        result[_convert_pnpm_v6_package_key(package)] = package_info
 
     return result
 

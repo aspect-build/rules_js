@@ -41,6 +41,7 @@ def lockfile_test(name = "lockfile", node_modules = "node_modules"):
             ":%s/@aspect-test/c" % node_modules,
             ":%s/rollup" % node_modules,
             ":%s/uvu" % node_modules,
+            ":%s/uvu-alias" % node_modules,
 
             # Targets within the virtual store...
             # Direct dep targets

@@ -5,7 +5,8 @@
         "@aspect-test/a": "^5.0.2",
         "rollup": "3.2.5",
         "meaning-of-life": "1.0.0",
-        "uvu": "0.5.6"
+        "uvu": "0.5.6",
+        "uvu-alias": "npm:uvu@0.5.6"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",
