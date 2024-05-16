@@ -157,6 +157,10 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
 
     for package_path, package_snapshot in lock_packages.items():
         package, package_info = _gather_package_info(package_path, package_snapshot)
+
+        if package in packages:
+            fail("Duplicate package {}\n1: {}\n2: {}".format(package, packages[package], package_info))
+
         packages[package] = package_info
 
         # tarbal versions
