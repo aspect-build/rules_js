@@ -47,6 +47,12 @@ npm.npm_translate_lock(
 )
 
 use_repo(npm, "npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+
+# Allows developers to get a local node_modules tree, using
+# bazel run -- @pnpm//:pnpm --dir $PWD install
+use_repo(pnpm, "pnpm")
 \`\`\`
 
 ## Using WORKSPACE
