@@ -50,8 +50,8 @@ use_repo(npm, "npm")
 
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 
-# Allows developers to get a local node_modules tree, using
-# bazel run -- @pnpm//:pnpm --dir $PWD install
+# Allows developers to use the matching pnpm version, for example:
+# bazel run -- @pnpm --dir $PWD install
 use_repo(pnpm, "pnpm")
 \`\`\`
 
