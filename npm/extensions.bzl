@@ -4,16 +4,17 @@ See https://bazel.build/docs/bzlmod#extension-definition
 
 load("@bazel_features//:features.bzl", "bazel_features")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
-load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 load("//npm/private:utils.bzl", "utils")
 
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
+_DEFAULT_PNPM_REPO_NAME = "pnpm"
 
 def _npm_extension_impl(module_ctx):
     for mod in module_ctx.modules:
@@ -250,22 +251,57 @@ npm = module_extension(
     },
 )
 
+# copied from https://github.com/bazelbuild/bazel-skylib/blob/b459822483e05da514b539578f81eeb8a705d600/lib/versions.bzl#L60
+# to avoid taking a dependency on skylib here
+def _parse_version(version):
+    return tuple([int(n) for n in version.split(".")])
+
 def _pnpm_extension_impl(module_ctx):
+    registrations = {}
+    integrity = {}
     for mod in module_ctx.modules:
         for attr in mod.tags.pnpm:
-            pnpm_repository(
-                name = attr.name,
-                pnpm_version = (
-                    (attr.pnpm_version, attr.pnpm_version_integrity) if attr.pnpm_version_integrity else attr.pnpm_version
-                ),
-            )
+            if attr.name != _DEFAULT_PNPM_REPO_NAME and not mod.is_root:
+                fail("""\
+                Only the root module may override the default name for the pnpm repository.
+                This prevents conflicting registrations in the global namespace of external repos.
+                """)
+            if attr.name not in registrations.keys():
+                registrations[attr.name] = []
+            registrations[attr.name].append(attr.pnpm_version)
+            if attr.pnpm_version_integrity:
+                integrity[attr.pnpm_version] = attr.pnpm_version_integrity
+    for name, versions in registrations.items():
+        # Use "Minimal Version Selection" like bzlmod does for resolving module conflicts
+        # Note, the 'sorted(list)' function in starlark doesn't allow us to provide a custom comparator
+        if len(versions) > 1:
+            selected = versions[0]
+            selected_tuple = _parse_version(selected)
+            for idx in range(1, len(versions)):
+                if _parse_version(versions[idx]) > selected_tuple:
+                    selected = versions[idx]
+                    selected_tuple = _parse_version(selected)
+
+            # buildifier: disable=print
+            print("NOTE: repo '{}' has multiple versions {}; selected {}".format(name, versions, selected))
+        else:
+            selected = versions[0]
+
+        pnpm_repository(
+            name = name,
+            pnpm_version = (selected, integrity[selected]) if selected in integrity.keys() else selected,
+        )
 
 pnpm = module_extension(
     implementation = _pnpm_extension_impl,
     tag_classes = {
         "pnpm": tag_class(
             attrs = {
-                "name": attr.string(),
+                "name": attr.string(
+                    doc = """Name of the generated repository, allowing more than one pnpm version to be registered.
+                        Overriding the default is only permitted in the root module.""",
+                    default = _DEFAULT_PNPM_REPO_NAME,
+                ),
                 "pnpm_version": attr.string(default = LATEST_PNPM_VERSION),
                 "pnpm_version_integrity": attr.string(),
             },

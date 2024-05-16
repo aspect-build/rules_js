@@ -49,6 +49,13 @@ use_repo(npm, "npm_meaning-of-life__links")
 
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 
+# Choose a different version of pnpm - note that only the "root" module may do this,
+# not some transitive dependency.
+pnpm.pnpm(
+    name = "pnpm",
+    pnpm_version = "8.15.2",
+)
+
 # Allows developers to run the identical version of pnpm for local workflows like
 # bazel run -- @pnpm --dir $PWD install
 use_repo(pnpm, "pnpm")
