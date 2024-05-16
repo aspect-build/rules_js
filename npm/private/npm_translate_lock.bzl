@@ -507,13 +507,7 @@ def npm_translate_lock(
 
             Can be left unspecified and the rules_js default `LATEST_PNPM_VERSION` will be used.
 
-            Use `use_pnpm` for bzlmod.
-
-        use_pnpm: label of the pnpm extension to use.
-
-            Can be left unspecified and the rules_js default pnpm extension (with the `LATEST_PNPM_VERSION`) will be used.
-
-            Use `pnpm_version` for non-bzlmod.
+        use_pnpm: label of the pnpm entry point to use.
 
         register_copy_directory_toolchains: if True, `@aspect_bazel_lib//lib:repositories.bzl` `register_copy_directory_toolchains()` is called if the toolchain is not already registered
 
