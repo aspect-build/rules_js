@@ -95,7 +95,10 @@ gazelle(
 
 buildifier(
     name = "buildifier",
-    exclude_patterns = ["./.git/*"],
+    exclude_patterns = [
+        "./.git/*",
+        "**/snapshots/**",
+    ],
     lint_mode = "fix",
     lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "fix",
@@ -104,7 +107,10 @@ buildifier(
 
 buildifier(
     name = "buildifier.check",
-    exclude_patterns = ["./.git/*"],
+    exclude_patterns = [
+        "./.git/*",
+        "**/snapshots/**",
+    ],
     lint_mode = "warn",
     lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "diff",
