@@ -97,6 +97,7 @@ npm_translate_lock(
         "//:package.json",
         "//:pnpm-workspace.yaml",
         "//examples/js_binary:package.json",
+        "//examples/linked_empty_node_modules:package.json",
         "//examples/macro:package.json",
         "//examples/npm_deps:package.json",
         "//examples/npm_package/libs/lib_a:package.json",
