@@ -4,10 +4,19 @@ local_path_override(
     path = "../..",
 )
 
+PNPM_LOCK_VERSIONS = [
+    "v54",
+    "v60",
+    "v61",
+    "v90",
+]
+
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.3")
 
 bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "6.1.0", dev_dependency = True)
+
+bazel_dep(name = "platforms", version = "0.0.5")
 
 node = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",
@@ -36,23 +45,20 @@ npm = use_extension(
         pnpm_lock = "//%s:pnpm-lock.yaml" % version,
         verify_node_modules_ignored = "//:.bazelignore",
     )
-    for version in [
-        "v54",
-        "v60",
-        "v61",
-        "v90",
-    ]
+    for version in PNPM_LOCK_VERSIONS
 ]
 
+# repos used by the lockfile tests
 [
     use_repo(
         npm,
         "lock-%s" % version,
+        "lock-%s__rollup__3.2.5" % version,
+        "lock-%s__rollup__3.2.5__links" % version,
+
+        # TODO: inconsistent across versions
+        # "lock-%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2" % version,
+        # "lock-%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2__links" % version,
     )
-    for version in [
-        "v54",
-        "v60",
-        "v61",
-        "v90",
-    ]
+    for version in PNPM_LOCK_VERSIONS
 ]

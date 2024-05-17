@@ -3,6 +3,13 @@ local_repository(
     path = "../..",
 )
 
+PNPM_LOCK_VERSIONS = [
+    "v54",
+    "v60",
+    "v61",
+    "v90",
+]
+
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 
 rules_js_dependencies()
@@ -23,12 +30,7 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
         pnpm_lock = "//%s:pnpm-lock.yaml" % version,
         verify_node_modules_ignored = "//:.bazelignore",
     )
-    for version in [
-        "v54",
-        "v60",
-        "v61",
-        "v90",
-    ]
+    for version in PNPM_LOCK_VERSIONS
 ]
 
 load("@lock-v54//:repositories.bzl", npm_repositories_v54 = "npm_repositories")
