@@ -16,9 +16,6 @@ importers:
       '@aspect-test/a':
         specifier: ^5.0.2
         version: 5.0.2
-      '@aspect-test/a2':
-        specifier: npm:@aspect-test/a
-        version: '@aspect-test/a@5.0.2'
       '@aspect-test/e':
         specifier: 1.0.0
         version: 1.0.0
@@ -42,8 +39,8 @@ importers:
         version: 0.5.6
     optionalDependencies:
       '@aspect-test/c':
-        specifier: '2.0'
-        version: 2.0.2
+        specifier: 2.0.0
+        version: 2.0.0
     devDependencies:
       '@aspect-test/b':
         specifier: 5.0.2
@@ -80,6 +77,10 @@ packages:
 
   '@aspect-test/b@5.0.2':
     resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
+    hasBin: true
+
+  '@aspect-test/c@2.0.0':
+    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
     hasBin: true
 
   '@aspect-test/c@2.0.2':
@@ -150,6 +151,9 @@ snapshots:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+
+  '@aspect-test/c@2.0.0':
+    optional: true
 
   '@aspect-test/c@2.0.2': {}
 

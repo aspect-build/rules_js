@@ -10,9 +10,8 @@ importers:
   .:
     specifiers:
       '@aspect-test/a': ^5.0.2
-      '@aspect-test/a2': npm:@aspect-test/a
       '@aspect-test/b': 5.0.2
-      '@aspect-test/c': '2.0'
+      '@aspect-test/c': 2.0.0
       '@scoped/a': workspace:*
       '@scoped/b': link:../projects/b
       '@scoped/d': ../projects/d
@@ -22,7 +21,6 @@ importers:
       uvu: 0.5.6
     dependencies:
       '@aspect-test/a': 5.0.2
-      '@aspect-test/a2': /@aspect-test/a/5.0.2
       '@scoped/a': link:../projects/a
       '@scoped/b': link:../projects/b
       '@scoped/d': link:../projects/d
@@ -30,10 +28,10 @@ importers:
       rollup: 3.2.5
       uvu: 0.5.6
     optionalDependencies:
-      '@aspect-test/c': 2.0.2
+      '@aspect-test/c': 2.0.0
     devDependencies:
       '@aspect-test/b': 5.0.2
-      '@types/node': registry.npmjs.org/@types/node/16.18.11
+      '@types/node': registry.npmjs.org/@types/node/16.18.97
 
   ../projects/a:
     specifiers: {}
@@ -73,6 +71,13 @@ packages:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
+
+  /@aspect-test/c/2.0.0:
+    resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
+    optional: true
 
   /@aspect-test/c/2.0.2:
     resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
@@ -146,8 +151,8 @@ packages:
       sade: 1.8.1
     dev: false
 
-  registry.npmjs.org/@types/node/16.18.11:
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  registry.npmjs.org/@types/node/16.18.97:
+    resolution: {integrity: sha512-4muilE1Lbfn57unR+/nT9AFjWk0MtWi5muwCEJqnOvfRQDbSfLCUdN7vCIg8TYuaANfhLOV85ve+FNpiUsbSRg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.97.tgz}
     name: '@types/node'
-    version: 16.18.11
+    version: 16.18.97
     dev: true
