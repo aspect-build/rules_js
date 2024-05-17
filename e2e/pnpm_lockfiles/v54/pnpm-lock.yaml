@@ -15,7 +15,8 @@ importers:
       '@scoped/a': workspace:*
       '@scoped/b': link:../projects/b
       '@scoped/d': ../projects/d
-      '@types/node': ~16.18.11
+      '@types/archiver': 5.3.1
+      '@types/node': 16.18.11
       meaning-of-life: 1.0.0
       rollup: 3.2.5
       uvu: 0.5.6
@@ -31,7 +32,8 @@ importers:
       '@aspect-test/c': 2.0.0
     devDependencies:
       '@aspect-test/b': 5.0.2
-      '@types/node': registry.npmjs.org/@types/node/16.18.97
+      '@types/archiver': registry.npmjs.org/@types/archiver/5.3.1
+      '@types/node': registry.npmjs.org/@types/node/16.18.11
 
   ../projects/a:
     specifiers: {}
@@ -151,8 +153,31 @@ packages:
       sade: 1.8.1
     dev: false
 
-  registry.npmjs.org/@types/node/16.18.97:
-    resolution: {integrity: sha512-4muilE1Lbfn57unR+/nT9AFjWk0MtWi5muwCEJqnOvfRQDbSfLCUdN7vCIg8TYuaANfhLOV85ve+FNpiUsbSRg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.97.tgz}
+  registry.npmjs.org/@types/archiver/5.3.1:
+    resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
+    name: '@types/archiver'
+    version: 5.3.1
+    dependencies:
+      '@types/glob': registry.npmjs.org/@types/glob/8.1.0
+    dev: true
+
+  registry.npmjs.org/@types/glob/8.1.0:
+    resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/glob/-/glob-8.1.0.tgz}
+    name: '@types/glob'
+    version: 8.1.0
+    dependencies:
+      '@types/minimatch': registry.npmjs.org/@types/minimatch/5.1.2
+      '@types/node': registry.npmjs.org/@types/node/16.18.11
+    dev: true
+
+  registry.npmjs.org/@types/minimatch/5.1.2:
+    resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
+    name: '@types/minimatch'
+    version: 5.1.2
+    dev: true
+
+  registry.npmjs.org/@types/node/16.18.11:
+    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
     name: '@types/node'
-    version: 16.18.97
+    version: 16.18.11
     dev: true

@@ -17,7 +17,7 @@ importers:
         specifier: ^5.0.2
         version: 5.0.2
       '@aspect-test/e':
-        specifier: 1.0.0
+        specifier: ~1.0.0
         version: 1.0.0
       '@scoped/a':
         specifier: workspace:*
@@ -45,9 +45,12 @@ importers:
       '@aspect-test/b':
         specifier: 5.0.2
         version: 5.0.2
+      '@types/archiver':
+        specifier: 5.3.1
+        version: 5.3.1
       '@types/node':
-        specifier: ~16.18.11
-        version: 16.18.97
+        specifier: 16.18.11
+        version: 16.18.11
 
   ../projects/a: {}
 
@@ -97,8 +100,17 @@ packages:
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
     hasBin: true
 
-  '@types/node@16.18.97':
-    resolution: {integrity: sha512-4muilE1Lbfn57unR+/nT9AFjWk0MtWi5muwCEJqnOvfRQDbSfLCUdN7vCIg8TYuaANfhLOV85ve+FNpiUsbSRg==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.97.tgz}
+  '@types/archiver@5.3.1':
+    resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
+
+  '@types/glob@8.1.0':
+    resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==, tarball: https://registry.npmjs.org/@types/glob/-/glob-8.1.0.tgz}
+
+  '@types/minimatch@5.1.2':
+    resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
+
+  '@types/node@16.18.11':
+    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
 
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
@@ -163,7 +175,18 @@ snapshots:
 
   '@aspect-test/e@1.0.0': {}
 
-  '@types/node@16.18.97': {}
+  '@types/archiver@5.3.1':
+    dependencies:
+      '@types/glob': 8.1.0
+
+  '@types/glob@8.1.0':
+    dependencies:
+      '@types/minimatch': 5.1.2
+      '@types/node': 16.18.11
+
+  '@types/minimatch@5.1.2': {}
+
+  '@types/node@16.18.11': {}
 
   dequal@2.0.3: {}
 
