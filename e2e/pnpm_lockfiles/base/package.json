@@ -3,7 +3,6 @@
     "private": true,
     "dependencies": {
         "@aspect-test/a": "^5.0.2",
-        "@aspect-test/a2": "npm:@aspect-test/a",
         "rollup": "3.2.5",
         "meaning-of-life": "1.0.0",
         "uvu": "0.5.6",
@@ -16,7 +15,7 @@
         "@types/node": "~16.18.11"
     },
     "optionalDependencies": {
-        "@aspect-test/c": "2.0"
+        "@aspect-test/c": "2.0.0"
     },
     "peerDependencies": {
         "@aspect-test/e": "1.0.0"
