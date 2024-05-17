@@ -19,7 +19,10 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", 
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.2.5__links//:defs.bzl", link_12 = "npm_link_imported_package_store", store_12 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_13 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__registry.npmjs.org_at_types_node_16.18.11__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__registry.npmjs.org_at_types_archiver_5.3.1__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__registry.npmjs.org_at_types_glob_8.1.0__links//:defs.bzl", store_16 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__registry.npmjs.org_at_types_minimatch_5.1.2__links//:defs.bzl", store_17 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__registry.npmjs.org_at_types_node_16.18.11__links//:defs.bzl", link_18 = "npm_link_imported_package_store", store_18 = "npm_imported_package_store")
 
 _LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/b", "projects/c", "projects/d"]
 
@@ -57,7 +60,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_12(name = "{}/rollup".format(name))
         store_13(name = "{}/sade".format(name))
         store_14(name = "{}/uvu".format(name))
-        store_15(name = "{}/@types/node".format(name))
+        store_15(name = "{}/@types/archiver".format(name))
+        store_16(name = "{}/@types/glob".format(name))
+        store_17(name = "{}/@types/minimatch".format(name))
+        store_18(name = "{}/@types/node".format(name))
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_0(name = "{}/@aspect-test/a".format(name))
@@ -78,7 +84,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
             link_14(name = "{}/uvu".format(name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
-            link_15(name = "{}/@types/node".format(name))
+            link_15(name = "{}/@types/archiver".format(name))
+            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
+            scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
+            link_18(name = "{}/@types/node".format(name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
 
@@ -216,6 +225,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
 
     for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:

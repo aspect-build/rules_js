@@ -12,13 +12,14 @@
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",
-        "@types/node": "~16.18.11"
+        "@types/node": "16.18.11",
+        "@types/archiver": "5.3.1"
     },
     "optionalDependencies": {
         "@aspect-test/c": "2.0.0"
     },
     "peerDependencies": {
-        "@aspect-test/e": "1.0.0"
+        "@aspect-test/e": "~1.0.0"
     },
     "pnpm": {
         "patchedDependencies": {
