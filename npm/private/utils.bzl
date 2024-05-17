@@ -161,7 +161,13 @@ def _convert_v6_packages(packages):
                     dependencies[dep_name] = _convert_pnpm_v6_package_name(dep_version)
                 package_info[key] = dependencies
 
-        result[_convert_pnpm_v6_package_name(package)] = package_info
+        package_key = _convert_pnpm_v6_package_name(package)
+
+        if package_key in result:
+            msg = "ERROR: duplicate package: {}\n\t{}\n\t{}".format(package_key, result[package_key], package_info)
+            fail(msg)
+
+        result[package_key] = package_info
 
     return result
 
@@ -228,7 +234,13 @@ def _convert_v9_packages(packages, snapshots):
         for info_name, info_value in package_info.items():
             snapshot_info[info_name] = info_value
 
-        result[_convert_pnpm_v9_package_name(package)] = snapshot_info
+        package_key = _convert_pnpm_v9_package_name(package)
+
+        if package_key in result:
+            msg = "ERROR: duplicate package: {}\n\t{}\n\t{}".format(package_key, result[package_key], snapshot_info)
+            fail(msg)
+
+        result[package_key] = snapshot_info
 
     return result
 
