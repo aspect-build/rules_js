@@ -269,8 +269,8 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
         importer_links[import_path] = links
 
     patches_used = []
-    result = []
-    for package, package_info in packages.items():
+    result = {}
+    for package_key, package_info in packages.items():
         name = package_info.get("name")
         version = package_info.get("version")
         friendly_version = package_info.get("friendly_version")
@@ -299,10 +299,10 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
 
         if resolution_type == "git":
             if not repo or not commit:
-                msg = "expected package {} resolution to have repo and commit fields when resolution type is git".format(package)
+                msg = "expected package {} resolution to have repo and commit fields when resolution type is git".format(package_key)
                 fail(msg)
         elif not integrity and not tarball:
-            msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package)
+            msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package_key)
             fail(msg)
 
         if attr.prod and dev:
@@ -383,7 +383,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         link_packages = {}
         for import_path, links in importer_links.items():
             linked_packages = links["packages"]
-            link_names = linked_packages.get(package, [])
+            link_names = linked_packages.get(package_key, [])
             if link_names:
                 link_packages[links["link_package"]] = link_names
 
@@ -440,7 +440,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
-        result.append(struct(
+        result_pkg = struct(
             custom_postinstall = custom_postinstall,
             deps = deps,
             integrity = integrity,
@@ -467,7 +467,15 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             package_info = package_info,
             dev = dev,
             replace_package = replace_package,
-        ))
+        )
+
+        if repo_name in result:
+            msg = "ERROR: duplicate package name: {}\n\t1: {}\n\t2: {}".format(repo_name, result[repo_name], result_pkg)
+            fail(msg)
+
+        result[repo_name] = result_pkg
+
+    result = result.values()
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too
     # easy to make a type in the patches keys or for a dep to change both of with could result

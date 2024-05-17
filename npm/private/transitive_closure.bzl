@@ -63,7 +63,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                 # Recurse into the next level of dependencies
                 stack.append(_get_package_info_deps(packages[package_key], no_optional))
             else:
-                msg = "Unknown package key: {} in {}".format(package_key, packages.keys())
+                msg = "Unknown package key: {} ({} @ {}) in {}".format(package_key, name, version, packages.keys())
                 fail(msg)
 
     result = dict()
@@ -155,12 +155,19 @@ def translate_to_transitive_closure(lock_importers, lock_packages, prod = False,
     package_version_map = {}
 
     for package_path, package_snapshot in lock_packages.items():
-        package, package_info = _gather_package_info(package_path, package_snapshot)
-        packages[package] = package_info
+        package_key, package_info = _gather_package_info(package_path, package_snapshot)
+
+        if package_key in packages:
+            msg = "ERROR: duplicate package info: {}\n\t{}\n\t{}".format(package_key, packages[package_key], package_info)
+
+            # buildifier: disable=print
+            print(msg)
+
+        packages[package_key] = package_info
 
         # tarbal versions
         if package_info["resolution"].get("tarball", None) and package_info["resolution"]["tarball"].startswith("file:"):
-            package_version_map[package] = package_info
+            package_version_map[package_key] = package_info
 
     # Collect deps of each importer (workspace projects)
     importers = {}
