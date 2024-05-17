@@ -16,9 +16,21 @@ importers:
       '@aspect-test/a':
         specifier: ^5.0.2
         version: 5.0.2
+      '@aspect-test/a2':
+        specifier: npm:@aspect-test/a
+        version: /@aspect-test/a@5.0.2
       '@aspect-test/e':
         specifier: 1.0.0
         version: 1.0.0
+      '@scoped/a':
+        specifier: workspace:*
+        version: link:../projects/a
+      '@scoped/b':
+        specifier: link:../projects/b
+        version: link:../projects/b
+      '@scoped/d':
+        specifier: ../projects/d
+        version: link:../projects/d
       meaning-of-life:
         specifier: 1.0.0
         version: 1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)
@@ -52,6 +64,12 @@ importers:
     dependencies:
       '@scoped/a':
         specifier: link:../a
+        version: link:../a
+
+  ../projects/d:
+    dependencies:
+      '@scoped/a':
+        specifier: workspace:*
         version: link:../a
 
 packages:

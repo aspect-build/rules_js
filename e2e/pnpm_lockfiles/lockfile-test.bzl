@@ -35,12 +35,29 @@ def lockfile_test(name = "lockfile", node_modules = "node_modules"):
             # The full node_modules target
             ":%s" % node_modules,
 
-            # Direct deps
+            # Direct 'dependencies'
             ":%s/@aspect-test/a" % node_modules,
+
+            # Direct 'devDependencies'
             ":%s/@aspect-test/b" % node_modules,
+
+            # Direct 'optionalDependencies'
             ":%s/@aspect-test/c" % node_modules,
+
+            # rollup has a 'optionalDependency' (fsevents)
             ":%s/rollup" % node_modules,
+
+            # uuv 'hasBin'
             ":%s/uvu" % node_modules,
+
+            # link:, workspace:, file:, ./rel/path
+            ":%s/@scoped/a" % node_modules,
+            ":%s/@scoped/b" % node_modules,
+            # ":%s/@scoped/c" % node_modules, TODO: see README
+            ":%s/@scoped/d" % node_modules,
+
+            # npm:
+            # ":%s/@aspect-test/c2" % node_modules,
 
             # Targets within the virtual store...
             # Direct dep targets
@@ -53,8 +70,8 @@ def lockfile_test(name = "lockfile", node_modules = "node_modules"):
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/lc",
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
 
-            # TODO(2.0): normalized across lockfiles in lockfile v54+
-            # ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
+            # Patched dependencies
+            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
 
             # TODO: differs across lockfile versions
             # Direct deps from custom registry
