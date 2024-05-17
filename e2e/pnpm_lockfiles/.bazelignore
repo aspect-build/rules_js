@@ -2,6 +2,7 @@ node_modules/
 projects/a/node_modules
 projects/b/node_modules
 projects/c/node_modules
+projects/d/node_modules
 v54/node_modules/
 v60/node_modules/
 v61/node_modules/
