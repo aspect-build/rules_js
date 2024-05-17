@@ -3,9 +3,13 @@
     "private": true,
     "dependencies": {
         "@aspect-test/a": "^5.0.2",
+        "@aspect-test/a2": "npm:@aspect-test/a",
         "rollup": "3.2.5",
         "meaning-of-life": "1.0.0",
-        "uvu": "0.5.6"
+        "uvu": "0.5.6",
+        "@scoped/a": "workspace:*",
+        "@scoped/b": "link:../projects/b",
+        "@scoped/d": "../projects/d"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",

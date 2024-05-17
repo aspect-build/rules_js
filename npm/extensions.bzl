@@ -12,7 +12,6 @@ load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "help
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
-load("//npm/private:utils.bzl", "utils")
 
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 

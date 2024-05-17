@@ -10,14 +10,22 @@ importers:
   .:
     specifiers:
       '@aspect-test/a': ^5.0.2
+      '@aspect-test/a2': npm:@aspect-test/a
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': '2.0'
+      '@scoped/a': workspace:*
+      '@scoped/b': link:../projects/b
+      '@scoped/d': ../projects/d
       '@types/node': ~16.18.11
       meaning-of-life: 1.0.0
       rollup: 3.2.5
       uvu: 0.5.6
     dependencies:
       '@aspect-test/a': 5.0.2
+      '@aspect-test/a2': /@aspect-test/a/5.0.2
+      '@scoped/a': link:../projects/a
+      '@scoped/b': link:../projects/b
+      '@scoped/d': link:../projects/d
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 3.2.5
       uvu: 0.5.6
@@ -39,6 +47,12 @@ importers:
   ../projects/c:
     specifiers:
       '@scoped/a': link:../a
+    dependencies:
+      '@scoped/a': link:../a
+
+  ../projects/d:
+    specifiers:
+      '@scoped/a': workspace:*
     dependencies:
       '@scoped/a': link:../a
 
