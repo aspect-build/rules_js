@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_import")
 This uses Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
 
-See &lt;https://blog.aspect.dev/configuring-bazels-downloader&gt; for more info about how it works
+See &lt;https://blog.aspect.build/configuring-bazels-downloader&gt; for more info about how it works
 and how to configure it.
 
 See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API to fetch npm packages
@@ -123,7 +123,7 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 1. Point bazel to the config with a line in .bazelrc like
 common --experimental_downloader_config=.bazel_downloader_config
 
-Read more about the downloader config: <https://blog.aspect.dev/configuring-bazels-downloader>
+Read more about the downloader config: <https://blog.aspect.build/configuring-bazels-downloader>
 
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 

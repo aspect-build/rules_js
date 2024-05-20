@@ -7,7 +7,7 @@ Stuck?
 -   See the [Frequently asked questions](./faq.md)
 -   Ask in `#javascript` on <http://slack.bazel.build>
 -   Check for [known issues](https://github.com/aspect-build/rules_js/issues)
--   Pay for support, provided by <https://aspect.dev>.
+-   Pay for support, provided by <https://aspect.build/services>.
 
 ## Installation
 
@@ -33,7 +33,7 @@ Authoring BUILD files by hand is a chore, so we recommend using the
 
 Other recommendations:
 
--   Put [common flags](https://blog.aspect.dev/bazelrc-flags) in your `.bazelrc` file.
+-   Put [common flags](https://blog.aspect.build/bazelrc-flags) in your `.bazelrc` file.
 -   Use [Renovate](https://docs.renovatebot.com/) to keep your Bazel dependencies up-to-date.
 
 ### Node.js
@@ -93,7 +93,7 @@ Technically, we run a port of pnpm rather than pnpm itself. Here are some design
 1. We re-use pnpm's resolver, by consuming the `pnpm-lock.yaml` file it produces.
 1. We use Bazel's downloader API to fetch package tarballs and extract them to external repositories.
    To modify the URLs Bazel uses to download packages (for example, to fetch from Artifactory), read
-   <https://blog.aspect.dev/configuring-bazels-downloader>.
+   <https://blog.aspect.build/configuring-bazels-downloader>.
 1. We re-use the [`@pnpm/lifecycle`](https://www.npmjs.com/package/@pnpm/lifecycle) package to perform postinstall steps.
    (These run as cacheable Bazel actions.)
 1. Finally, you link the `node_modules` tree by adding a `npm_link_package` or `npm_link_all_packages` in your `BUILD` file,
