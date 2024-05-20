@@ -32,7 +32,7 @@ load(":npm_translate_lock_generate.bzl", "generate_repository_files")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
-load(":pnpm_repository.bzl", "LATEST_PNPM_VERSION", _pnpm_repository = "pnpm_repository")
+load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", _pnpm_repository = "pnpm_repository")
 load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":utils.bzl", "utils")
 
@@ -181,7 +181,7 @@ def npm_translate_lock(
         quiet = True,
         external_repository_action_cache = utils.default_external_repository_action_cache(),
         link_workspace = None,
-        pnpm_version = LATEST_PNPM_VERSION,
+        pnpm_version = DEFAULT_PNPM_VERSION,
         use_pnpm = None,
         npm_package_target_name = "pkg",
         **kwargs):
@@ -492,7 +492,7 @@ def npm_translate_lock(
 
         pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
 
-            Can be left unspecified and the rules_js default `LATEST_PNPM_VERSION` will be used.
+            Can be left unspecified and the rules_js default `DEFAULT_PNPM_VERSION` will be used.
 
         use_pnpm: label of the pnpm entry point to use.
 

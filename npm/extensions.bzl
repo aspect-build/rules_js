@@ -4,7 +4,7 @@ See https://bazel.build/docs/bzlmod#extension-definition
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_features//:features.bzl", "bazel_features")
-load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock", "npm_translate_lock_lib")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
@@ -12,9 +12,10 @@ load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "help
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
-load("//npm/private:utils.bzl", "utils")
 
+DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
+
 _DEFAULT_PNPM_REPO_NAME = "pnpm"
 
 def _npm_extension_impl(module_ctx):
@@ -287,7 +288,7 @@ pnpm = module_extension(
                         Overriding the default is only permitted in the root module.""",
                     default = _DEFAULT_PNPM_REPO_NAME,
                 ),
-                "pnpm_version": attr.string(default = LATEST_PNPM_VERSION),
+                "pnpm_version": attr.string(default = DEFAULT_PNPM_VERSION),
                 "pnpm_version_integrity": attr.string(),
             },
         ),
