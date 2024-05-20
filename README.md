@@ -9,7 +9,7 @@ This ruleset is a high-performance and npm-compatible Bazel integration for Java
 
 Many companies are successfully building with rules_js. If you're getting value from the project, please let us know! Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_js/discussions/1000).
 
-<https://blog.aspect.dev/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
+<https://blog.aspect.build/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 
 Google does not fund development of rules_js. If your company benefits, please consider donating to continue development and maintenance work: <https://opencollective.com/aspect-build/projects/rules_js>
 
@@ -17,7 +17,7 @@ rules_js is just a part of what Aspect provides:
 
 -   _Need help?_
     -   Community support is available on the #javascript channel on [Bazel Slack](https://slack.bazel.build/)
-    -   This ruleset has commercial support provided by https://aspect.dev.
+    -   This ruleset has commercial support provided by https://aspect.build/services.
 -   See our other Bazel rules, especially those built for rules_js:
     -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
     -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)

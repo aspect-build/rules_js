@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 These use Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
 
-See <https://blog.aspect.dev/configuring-bazels-downloader> for more info about how it works
+See <https://blog.aspect.build/configuring-bazels-downloader> for more info about how it works
 and how to configure it.
 
 [`npm_translate_lock`](#npm_translate_lock) is the primary user-facing API.
