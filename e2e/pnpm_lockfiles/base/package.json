@@ -3,6 +3,9 @@
     "private": true,
     "dependencies": {
         "@aspect-test/a": "^5.0.2",
+        "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
+        "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
+        "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         "rollup": "3.2.5",
         "meaning-of-life": "1.0.0",
         "uvu": "0.5.6",

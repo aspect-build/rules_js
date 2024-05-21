@@ -77,8 +77,22 @@ def lockfile_test(name = None):
             # link:, workspace:, file:, ./rel/path
             ":node_modules/@scoped/a",
             ":node_modules/@scoped/b",
-            # ":node_modules/@scoped/c", TODO: see README
+            ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
+
+            # http:
+            ":node_modules/debug",
+            # TODO: differs across lockfile versions
+            ":.aspect_rules_js/node_modules/{}".format("debug@codeload.github.com+ngokevin+debug+tar.gz+9742c5f383a6f8046241920156236ade8ec30d53" if lock_version == "v90" else "debug@github.com+ngokevin+debug+9742c5f383a6f8046241920156236ade8ec30d53"),
+
+            # http: with some '@'s in the name + url/version
+            ":node_modules/jsonify",
+
+            # repo#hash
+            # (no protocol, assumed to be github repo + hash):
+            ":node_modules/hello",
+            # TODO: differs across lockfile versions
+            ":.aspect_rules_js/node_modules/{}".format("hello@gitpkg.vercel.app+EqualMa+gitpkg-hello+packages+hello" if lock_version == "v90" else "@gitpkg.vercel.app+EqualMa+gitpkg-hello+packages+hello"),
 
             # npm:
             # ":node_modules/@aspect-test/c2",

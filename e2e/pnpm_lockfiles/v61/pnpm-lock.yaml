@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+onlyBuiltDependencies:
+  - '@aspect-test/c'
+
 patchedDependencies:
   meaning-of-life@1.0.0:
     hash: o3deharooos255qt5xdujc3cuq
@@ -31,6 +34,15 @@ importers:
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
+      debug:
+        specifier: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
+        version: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
+      hello:
+        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
+        version: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
+      jsonify:
+        specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
+        version: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
       meaning-of-life:
         specifier: 1.0.0
         version: 1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)
@@ -132,7 +144,6 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
-    requiresBuild: true
     dev: false
     optional: true
 
@@ -149,6 +160,10 @@ packages:
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
+    dev: false
+
+  /ms@0.7.3:
+    resolution: {integrity: sha512-lrKNzMWqQZgwJahtrtrM+9NgOoDUveDrVmm5aGXrf3BdtL0mq7X6IVzoZaw+TfNti29eHd1/8GI+h45K5cQ6/w==}
     dev: false
 
   /rollup@3.2.5:
@@ -177,11 +192,36 @@ packages:
       sade: 1.8.1
     dev: false
 
+  '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz':
+    resolution: {tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
+    name: '@foo/jsonify'
+    version: 0.0.0
+    dev: false
+
+  '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello':
+    resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
+    name: hello
+    version: 1.0.0
+    dev: false
+
   file:../projects/c:
     resolution: {directory: ../projects/c, type: directory}
     name: '@scoped/c'
     dependencies:
       '@scoped/a': link:../a
+    dev: false
+
+  github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53:
+    resolution: {tarball: https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53}
+    name: debug
+    version: 2.6.3
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 0.7.3
     dev: false
 
   registry.npmjs.org/@types/archiver@5.3.1:
