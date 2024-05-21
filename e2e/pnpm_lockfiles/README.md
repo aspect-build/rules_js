@@ -13,3 +13,5 @@ TODO:
 -   npm: references: `@aspect-test/a2": "npm:@aspect-test/a"`
 
     No :node_modules/\* targets are generated for aliases to npm packages.
+
+    Note: _sometimes_ fails to install with pnpm9

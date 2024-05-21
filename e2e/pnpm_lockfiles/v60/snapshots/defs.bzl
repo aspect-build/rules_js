@@ -93,6 +93,41 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     if is_root:
         _npm_package_store(
+            name = ".aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+            src = "//projects/c:pkg",
+            package = "@scoped/c",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["<LOCKVERSION>"]:
+        if link_package == native.package_name():
+            # terminal target for direct dependencies
+            _npm_link_package_store(
+                name = "{}/@scoped/c".format(name),
+                src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/@scoped/c/dir".format(name),
+                srcs = [":{}/@scoped/c".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            link_targets.append(":{}/@scoped/c".format(name))
+            scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
+
+    if is_root:
+        _npm_package_store(
             name = ".aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
             src = "//projects/a:pkg",
             package = "@scoped/a",
@@ -227,6 +262,10 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+
+    for link_package in ["<LOCKVERSION>"]:
+        if link_package == bazel_package:
+            link_targets.append("//{}:{}/@scoped/c".format(bazel_package, name))
 
     for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:
         if link_package == bazel_package:

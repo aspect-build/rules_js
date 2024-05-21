@@ -101,9 +101,8 @@ def lockfile_test(name = None):
             # Direct deps from custom registry
             # ":.aspect_rules_js/node_modules/@types+node@registry.npmjs.org+@types+node@16.18.11",
 
-            # TODO: differs across lockfile versions
-            # Direct deps with peers differ across lockfile versions
-            # ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2",
+            # Direct deps with peers
+            ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",
         ],
     )
 
