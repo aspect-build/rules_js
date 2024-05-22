@@ -538,7 +538,7 @@ def _patched_dependencies(priv):
     return priv["patched_dependencies"]
 
 def _only_built_dependencies(priv):
-    return _root_package_json(priv).get("pnpm", {}).get("onlyBuildDependencies", None)
+    return _root_package_json(priv).get("pnpm", {}).get("onlyBuiltDependencies", None)
 
 def _num_patches(priv):
     return priv["num_patches"]
