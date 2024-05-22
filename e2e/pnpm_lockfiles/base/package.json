@@ -26,7 +26,7 @@
         "patchedDependencies": {
             "meaning-of-life@1.0.0": "patches/meaning-of-life@1.0.0-pnpm.patch"
         },
-        "onlyBuildDependencies": [
+        "onlyBuiltDependencies": [
             "@aspect-test/c"
         ]
     }
