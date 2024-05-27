@@ -3,7 +3,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:utils.bzl", "utils")
+load("//npm/private:utils.bzl", "utils", "utils_test")
 
 # buildifier: disable=function-docstring
 def test_strip_peer_dep_or_patched_version(ctx):
@@ -11,10 +11,10 @@ def test_strip_peer_dep_or_patched_version(ctx):
     asserts.equals(
         env,
         "21.1.0",
-        utils.strip_v5_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
+        utils_test.strip_v5_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
     )
-    asserts.equals(env, "1.0.0", utils.strip_v5_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
-    asserts.equals(env, "21.1.0", utils.strip_v5_peer_dep_or_patched_version("21.1.0"))
+    asserts.equals(env, "1.0.0", utils_test.strip_v5_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
+    asserts.equals(env, "21.1.0", utils_test.strip_v5_peer_dep_or_patched_version("21.1.0"))
     return unittest.end(env)
 
 def test_bazel_name(ctx):
@@ -80,10 +80,10 @@ def test_version_supported(ctx):
 # buildifier: disable=function-docstring
 def test_parse_package_name(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ("@scope", "package"), utils.parse_package_name("@scope/package"))
-    asserts.equals(env, ("@scope", "package/a"), utils.parse_package_name("@scope/package/a"))
-    asserts.equals(env, ("", "package"), utils.parse_package_name("package"))
-    asserts.equals(env, ("", "@package"), utils.parse_package_name("@package"))
+    asserts.equals(env, ("@scope", "package"), utils_test.parse_package_name("@scope/package"))
+    asserts.equals(env, ("@scope", "package/a"), utils_test.parse_package_name("@scope/package/a"))
+    asserts.equals(env, ("", "package"), utils_test.parse_package_name("package"))
+    asserts.equals(env, ("", "@package"), utils_test.parse_package_name("@package"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -92,32 +92,32 @@ def test_npm_registry_url(ctx):
     asserts.equals(
         env,
         "https://default",
-        utils.npm_registry_url("a", {}, "https://default"),
+        utils_test.npm_registry_url("a", {}, "https://default"),
     )
     asserts.equals(
         env,
         "http://default",
-        utils.npm_registry_url("a", {}, "http://default"),
+        utils_test.npm_registry_url("a", {}, "http://default"),
     )
     asserts.equals(
         env,
         "//default",
-        utils.npm_registry_url("a", {}, "//default"),
+        utils_test.npm_registry_url("a", {}, "//default"),
     )
     asserts.equals(
         env,
         "https://default",
-        utils.npm_registry_url("@a/b", {}, "https://default"),
+        utils_test.npm_registry_url("@a/b", {}, "https://default"),
     )
     asserts.equals(
         env,
         "https://default",
-        utils.npm_registry_url("@a/b", {"@ab": "not me"}, "https://default"),
+        utils_test.npm_registry_url("@a/b", {"@ab": "not me"}, "https://default"),
     )
     asserts.equals(
         env,
         "https://scoped-registry",
-        utils.npm_registry_url("@a/b", {"@a": "https://scoped-registry"}, "https://default"),
+        utils_test.npm_registry_url("@a/b", {"@a": "https://scoped-registry"}, "https://default"),
     )
     return unittest.end(env)
 

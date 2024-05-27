@@ -734,7 +734,6 @@ utils = struct(
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     friendly_name = _friendly_name,
     package_store_name = _package_store_name,
-    strip_v5_peer_dep_or_patched_version = _strip_v5_peer_dep_or_patched_version,
     make_symlink = _make_symlink,
     # Symlinked node_modules structure package store path under node_modules
     package_store_root = ".aspect_rules_js",
@@ -742,9 +741,7 @@ utils = struct(
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked npm package
     package_directory_output_group = "package_directory",
-    npm_registry_url = _npm_registry_url,
     npm_registry_download_url = _npm_registry_download_url,
-    parse_package_name = _parse_package_name,
     is_git_repository_url = _is_git_repository_url,
     to_registry_url = _to_registry_url,
     default_external_repository_action_cache = _default_external_repository_action_cache,
@@ -755,4 +752,11 @@ utils = struct(
     exists = _exists,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
+)
+
+# Exported only to be tested
+utils_test = struct(
+    npm_registry_url = _npm_registry_url,
+    parse_package_name = _parse_package_name,
+    strip_v5_peer_dep_or_patched_version = _strip_v5_peer_dep_or_patched_version,
 )
