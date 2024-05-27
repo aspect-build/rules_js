@@ -35,12 +35,12 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
         deps = stack.pop()
         for name in deps.keys():
             version = deps[name]
-            if version[0].isdigit():
-                package_key = utils.pnpm_name(name, version)
-            elif version.startswith("/"):
+            if version.startswith("/"):
                 # an aliased dependency
                 package_key = version[1:]
                 name, version = utils.parse_pnpm_package_key(name, version)
+            elif version[0].isdigit():
+                package_key = utils.pnpm_name(name, version)
             else:
                 package_key = version
             transitive_closure[name] = transitive_closure.get(name, [])
