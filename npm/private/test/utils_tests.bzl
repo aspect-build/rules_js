@@ -92,32 +92,32 @@ def test_npm_registry_url(ctx):
     asserts.equals(
         env,
         "https://default",
-        utils_test.npm_registry_url("a", {}, "https://default"),
+        utils.npm_registry_url("a", {}, "https://default"),
     )
     asserts.equals(
         env,
         "http://default",
-        utils_test.npm_registry_url("a", {}, "http://default"),
+        utils.npm_registry_url("a", {}, "http://default"),
     )
     asserts.equals(
         env,
         "//default",
-        utils_test.npm_registry_url("a", {}, "//default"),
+        utils.npm_registry_url("a", {}, "//default"),
     )
     asserts.equals(
         env,
         "https://default",
-        utils_test.npm_registry_url("@a/b", {}, "https://default"),
+        utils.npm_registry_url("@a/b", {}, "https://default"),
     )
     asserts.equals(
         env,
         "https://default",
-        utils_test.npm_registry_url("@a/b", {"@ab": "not me"}, "https://default"),
+        utils.npm_registry_url("@a/b", {"@ab": "not me"}, "https://default"),
     )
     asserts.equals(
         env,
         "https://scoped-registry",
-        utils_test.npm_registry_url("@a/b", {"@a": "https://scoped-registry"}, "https://default"),
+        utils.npm_registry_url("@a/b", {"@a": "https://scoped-registry"}, "https://default"),
     )
     return unittest.end(env)
 

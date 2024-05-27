@@ -4,11 +4,17 @@ local_path_override(
     path = "../..",
 )
 
+# The same primary lockfile across all versions
 PNPM_LOCK_VERSIONS = [
     "v54",
     "v60",
     "v61",
     "v90",
+]
+
+# Lockfiles with unique test cases
+PNPM_LOCK_TEST_CASES = [
+    "tarball-no-url-v54.yaml",
 ]
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.6")
@@ -61,4 +67,21 @@ npm = use_extension(
         # "lock-%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2__links" % version,
     )
     for version in PNPM_LOCK_VERSIONS
+]
+
+[
+    npm.npm_translate_lock(
+        name = lockfile.replace(".yaml", ""),
+        pnpm_lock = "//cases:%s" % lockfile,
+        verify_node_modules_ignored = "//:.bazelignore",
+    )
+    for lockfile in PNPM_LOCK_TEST_CASES
+]
+
+[
+    use_repo(
+        npm,
+        lockfile.replace(".yaml", ""),
+    )
+    for lockfile in PNPM_LOCK_TEST_CASES
 ]

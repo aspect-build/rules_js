@@ -15,3 +15,9 @@ TODO:
     No :node_modules/\* targets are generated for aliases to npm packages.
 
     Note: _sometimes_ fails to install with pnpm9
+
+## pnpm lockfile edge cases
+
+Unique test cases hard to cover with normal pnpm workspaces + package.json. Each
+test case is a pnpm-lock.yaml with a unique filename, see cases/BUILD for how the test
+cases run on each of those lockfiles.
