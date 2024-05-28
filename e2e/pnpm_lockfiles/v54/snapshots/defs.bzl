@@ -18,10 +18,10 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", 
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.2.5__links//:defs.bzl", link_11 = "npm_link_imported_package_store", store_11 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_12 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_13 = "npm_link_imported_package_store", store_13 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__registry.npmjs.org_at_types_archiver_5.3.1__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__registry.npmjs.org_at_types_glob_8.1.0__links//:defs.bzl", store_15 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__registry.npmjs.org_at_types_minimatch_5.1.2__links//:defs.bzl", store_16 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__registry.npmjs.org_at_types_node_16.18.11__links//:defs.bzl", link_17 = "npm_link_imported_package_store", store_17 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_15 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_16 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_17 = "npm_link_imported_package_store", store_17 = "npm_imported_package_store")
 
 _LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/b", "projects/c", "projects/d"]
 

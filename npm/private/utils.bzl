@@ -7,6 +7,8 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
+DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
+DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
@@ -33,6 +35,11 @@ def _bazel_name(name, version = None):
     if peer_version:
         escaped_version = "%s__%s" % (escaped_version, _sanitize_string(peer_version))
     return "%s__%s" % (escaped_name, escaped_version)
+
+def _strip_default_registry(version):
+    if version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
+        return version[len(DEFAULT_REGISTRY_DOMAIN_SLASH):]
+    return version
 
 def _strip_v5_peer_dep_or_patched_version(version):
     "Remove peer dependency or patched syntax from version string"
@@ -114,10 +121,17 @@ def _new_package_info(id, name, dependencies, optional_dependencies, peer_depend
         "resolution": resolution,
     }
 
+def _strip_v5_default_registry_to_version(name, version):
+    # Strip the default registry/name/ from the version string
+    pre = DEFAULT_REGISTRY_DOMAIN_SLASH + name + "/"
+    if version.startswith(pre):
+        return version[len(pre):]
+    return version
+
 def _convert_v5_importer_dependency_map(dep):
     result = {}
     for name, version in dep.items():
-        result[name] = _convert_pnpm_v5_version_deer_dep(version)
+        result[name] = _convert_pnpm_v5_version_deer_dep(_strip_v5_default_registry_to_version(name, version))
     return result
 
 def _convert_v5_importers(importers):
@@ -152,7 +166,7 @@ def _convert_pnpm_v5_version_deer_dep(version):
 def _convert_pnpm_v5_package_dependency_map(deps):
     result = {}
     for name, version in deps.items():
-        result[name] = _convert_pnpm_v5_version_deer_dep(version)
+        result[name] = _convert_pnpm_v5_version_deer_dep(_strip_v5_default_registry_to_version(name, version))
     return result
 
 def _convert_v5_v6_file_package(package_path, package_snapshot):
@@ -189,11 +203,11 @@ def _convert_v5_packages(packages):
         elif "name" in package_snapshot and "version" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
-            version = package_path
-            friendly_version = package_snapshot["version"]
-            package_key = package_path
+            version = _strip_v5_default_registry_to_version(name, package_snapshot["version"])
+            friendly_version = version
+            package_key = "{}@{}".format(name, version)
         elif package_path.startswith("/"):
-            # a simple /name@version
+            # a simple /name/version
             name, version = package_path[1:].rsplit("/", 1)
             friendly_version = _strip_v5_peer_dep_or_patched_version(version)
             package_key = "{}@{}".format(name, version)
@@ -245,16 +259,23 @@ def _convert_pnpm_v6_v9_version_peer_dep(version):
         version = version.rstrip("_")
     return version
 
+def _strip_v6_default_registry_to_version(name, version):
+    # Strip the default registry/name@ from the version string
+    pre = DEFAULT_REGISTRY_DOMAIN_SLASH + name + "@"
+    if version.startswith(pre):
+        return version[len(pre):]
+    return version
+
 def _convert_pnpm_v6_importer_dependency_map(deps):
     result = {}
     for name, attributes in deps.items():
-        result[name] = _convert_pnpm_v6_v9_version_peer_dep(attributes.get("version"))
+        result[name] = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, attributes.get("version")))
     return result
 
 def _convert_pnpm_v6_v9_package_dependency_map(deps):
     result = {}
     for name, version in deps.items():
-        result[name] = _convert_pnpm_v6_v9_version_peer_dep(version)
+        result[name] = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, version))
     return result
 
 def _convert_v6_importers(importers):
@@ -316,18 +337,18 @@ def _convert_v6_packages(packages):
         elif "name" in package_snapshot and "version" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
-            version = package_path
+            version = _strip_v6_default_registry_to_version(name, package_path)
             friendly_version = package_snapshot["version"]
-            package_key = package_path
+            package_key = _strip_default_registry(package_path)
         elif package_path.startswith("/"):
-            # an aliased dependency
+            # plain /pkg@version
             name, version = package_path[1:].rsplit("@", 1)
 
             # TODO: dont strip twice, but 'friendly_version' may have already been converted from v6
             friendly_version = _strip_v5_peer_dep_or_patched_version(_strip_v6_peer_dep_or_patched_version(version))
             package_key = "{}@{}".format(name, version)
         else:
-            msg = "unexpected package path: {}".format(package_path)
+            msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
 
         package_info = _new_package_info(
@@ -588,8 +609,8 @@ def _is_git_repository_url(url):
 def _to_registry_url(url):
     return "{}://{}".format(DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
 
-def _default_registry():
-    return _to_registry_url("registry.npmjs.org/")
+def _default_registry_url():
+    return _to_registry_url(DEFAULT_REGISTRY_DOMAIN_SLASH)
 
 def _hash(s):
     # Bazel's hash() resolves to a 32-bit signed integer [-2,147,483,648 to 2,147,483,647].
@@ -746,7 +767,7 @@ utils = struct(
     is_git_repository_url = _is_git_repository_url,
     to_registry_url = _to_registry_url,
     default_external_repository_action_cache = _default_external_repository_action_cache,
-    default_registry = _default_registry,
+    default_registry = _default_registry_url,
     hash = _hash,
     dicts_match = _dicts_match,
     reverse_force_copy = _reverse_force_copy,
