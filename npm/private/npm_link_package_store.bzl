@@ -92,7 +92,7 @@ def _npm_link_package_store_impl(ctx):
         )
         files.append(bin_file)
 
-    files_depset = depset(files)
+    files_depset = depset(files, transitive = [store_info.files])
 
     transitive_files_depset = depset(files, transitive = [store_info.transitive_files])
 

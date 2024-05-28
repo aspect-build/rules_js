@@ -26,6 +26,16 @@ npm_package(
     visibility = ["//visibility:public"],
 )
 
+npm_package(
+    name = "pkg_2",
+    srcs = [
+        ":lib_a",
+        ":node_modules/chalk",  # should be excluded
+        "//:node_modules/chalk",  # should be excluded
+    ],
+    visibility = ["//visibility:public"],
+)
+
 copy_to_directory(
     name = "expected_pkg",
     srcs = [
@@ -37,6 +47,12 @@ copy_to_directory(
 diff_test(
     name = "test_pkg",
     file1 = ":pkg",
+    file2 = ":expected_pkg",
+)
+
+diff_test(
+    name = "test_pkg_2",
+    file1 = ":pkg_2",
     file2 = ":expected_pkg",
 )
 
@@ -53,7 +69,6 @@ copy_to_directory(
     srcs = [
         "index.js",
         ":node_modules/chalk",
-        ":node_modules/chalk/dir",
         ":package.json",
     ],
 )
