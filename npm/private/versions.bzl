@@ -1,8 +1,8 @@
-"""Mirror npm registry metadata for the pnpm package.
+"""Mirror of npm registry metadata for the pnpm package.
 
-Update with:
-curl --silent https://registry.npmjs.org/pnpm | jq '[.versions[] | select(.version | test("^[0-9.]+$")) | {key: .version, value: .dist.integrity}] | sort_by(.key | split(".") | map(tonumber)) | from_entries'
+AUTO-GENERATED; do not edit
 """
+
 PNPM_VERSIONS = {
     "0.0.1": "sha512-mgy5Xs1F364ARoBPBAQRMui7HxSz5coQtTd/oJR7U87UpNyhDzBslu5WHhJ5Q5XBzqMVp/tEjBzW8H2ISUyCGw==",
     "0.16.0": "sha512-ndyRWZW+7wOqzor/DFCMTGSfP9LdFRui9VvPqRtVuPeNrzv+3f12615975J1gjKnI3Zzkv+0RG9fKqCqFYG+RA==",
@@ -814,4 +814,6 @@ PNPM_VERSIONS = {
     "9.0.6": "sha512-9thjEwlzIHy3ozbWtDmiQqJqyAaAd99TDWqGBpQZhT3B/+ZAKexZSpxQWjpBDRlkPIcKumd2Mw9c/dzxCpwWFw==",
     "9.1.0": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==",
     "9.1.1": "sha512-FOkVdZwR936sB/q6TQGcGT7IY3Ip5i7Jnu+3zzw7dcZER4grfEhRQkUe46a0CAWc37e3+gNBuXXxLQ92KccRlQ==",
+    "9.1.2": "sha512-En3IO56hDDK+ZdIqjvtKZfuVLo/vvf3tOb3DyX78MtMbSLAEIN8sEYes4oySHJAvDLWhNKTQMri1KVy/osaB4g==",
+    "9.1.3": "sha512-fC6gieGmrzBkCcT8jE8Il72sMrdyAWGWxGnZQo8f4tWiHa+K1lEnYmVKxkW12RNrshDsmgCvqNvEZ3hDujYuzQ==",
 }
