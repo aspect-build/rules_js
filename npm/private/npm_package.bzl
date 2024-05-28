@@ -39,41 +39,21 @@ _NPM_PACKAGE_FILES_ATTRS = {
     "include_sources": attr.bool(),
     "include_transitive_types": attr.bool(),
     "include_transitive_sources": attr.bool(),
+    "include_npm_sources": attr.bool(),
     "srcs": attr.label_list(allow_files = True),
 }
 
 def _npm_package_files_impl(ctx):
     files_depsets = []
 
-    if ctx.attr.include_transitive_sources:
-        # include all transitive sources (this includes direct sources)
-        files_depsets.extend([
-            target[JsInfo].transitive_sources
-            for target in ctx.attr.srcs
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-        ])
-    elif ctx.attr.include_sources:
-        # include only direct sources
-        files_depsets.extend([
-            target[JsInfo].sources
-            for target in ctx.attr.srcs
-            if JsInfo in target and hasattr(target[JsInfo], "sources")
-        ])
-
-    if ctx.attr.include_transitive_types:
-        # include all transitive types (this includes direct types)
-        files_depsets.extend([
-            target[JsInfo].transitive_types
-            for target in ctx.attr.srcs
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
-        ])
-    elif ctx.attr.include_types:
-        # include only direct types
-        files_depsets.extend([
-            target[JsInfo].types
-            for target in ctx.attr.srcs
-            if JsInfo in target and hasattr(target[JsInfo], "types")
-        ])
+    files_depsets.append(js_lib_helpers.gather_files_from_js_infos(
+        ctx.attr.srcs,
+        include_sources = ctx.attr.include_sources,
+        include_types = ctx.attr.include_types,
+        include_transitive_sources = ctx.attr.include_types,
+        include_transitive_types = ctx.attr.include_transitive_types,
+        include_npm_sources = ctx.attr.include_npm_sources,
+    ))
 
     if ctx.attr.include_runfiles:
         # include default runfiles from srcs
@@ -171,6 +151,7 @@ def npm_package(
         include_types = True,
         include_transitive_sources = True,
         include_transitive_types = True,
+        include_npm_sources = False,
         include_runfiles = False,
         hardlink = "auto",
         publishable = False,
@@ -214,18 +195,23 @@ def npm_package(
     `npm_package` makes use of `copy_to_directory`
     (https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory) under the hood,
     adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
-    `npm_package` includes `transitive_sources` and `transitive_types` files from `JsInfo` providers in srcs
+    `npm_package` includes direct and transitive sources and types files from `JsInfo` providers in srcs
     by default. The behavior of including sources and types from `JsInfo` can be configured
-    using the `include_sources`, `include_transitive_sources`, `include_types`, `include_transitive_types`
-    attributes.
+    using the `include_sources`, `include_transitive_sources`, `include_types`, `include_transitive_types`.
 
     The two `include*_types` options may cause type-check actions to run, which slows down your
     development round-trip.
     You can pass the Bazel option `--@aspect_rules_js//npm:exclude_types_from_npm_packages`
     to override these two attributes for an individual `bazel` invocation, avoiding the type-check.
 
-    `npm_package` also includes default runfiles from `srcs` by default which `copy_to_directory` does not. This behavior
-    can be configured with the `include_runfiles` attribute.
+    As of rules_js 2.0, the recommended solution for avoiding eager type-checking when linking
+    1p deps is to link `js_library` or any `JsInfo` producing targets directly without the
+    indirection of going through an `npm_package` target (see https://github.com/aspect-build/rules_js/pull/1646
+    for more details).
+
+    `npm_package` can also include npm packages sources and default runfiles from `srcs` which `copy_to_directory` does not.
+    These behaviors can be configured with the `include_npm_sourfes` and `include_runfiles` attributes
+    respectively.
 
     The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
     package and subpackages from being included.
@@ -404,13 +390,15 @@ def npm_package(
             since copies cannot be parallelized out as they are calculated. Instead all copy paths
             must be calculated before any copies can be started.
 
-        include_sources: When True, `sources` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
+        include_sources: When True, `sources` from `JsInfo` providers in `srcs` targets are included in the list of available files to copy.
 
-        include_types: When True, `types` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
+        include_types: When True, `types` from `JsInfo` providers in `srcs` targets are included in the list of available files to copy.
 
-        include_transitive_sources: When True, `transitive_sources` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
+        include_transitive_sources: When True, `transitive_sources` from `JsInfo` providers in `srcs` targets are included in the list of available files to copy.
 
-        include_transitive_types: When True, `transitive_types` from `JsInfo` providers in `data` targets are included in the list of available files to copy.
+        include_transitive_types: When True, `transitive_types` from `JsInfo` providers in `srcs` targets are included in the list of available files to copy.
+
+        include_npm_sources: When True, `npm_sources` from `JsInfo` providers in `srcs` targets are included in the list of available files to copy.
 
         include_runfiles: When True, default runfiles from `srcs` targets are included in the list of available files to copy.
 
@@ -458,6 +446,7 @@ def npm_package(
                 Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
                 "//conditions:default": include_transitive_types,
             }),
+            include_npm_sources = include_npm_sources,
             include_runfiles = include_runfiles,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
