@@ -10,17 +10,11 @@ Known issue: we sometimes see
 (00:55:55) ERROR: /mnt/ephemeral/workdir/BUILD.bazel:46:22: Copying directory aspect_rules_js~1.37.0~npm~npm__picocolors__1.0.0/package failed: Exec failed due to IOException: /mnt/ephemeral/output/__main__/execroot/_main/external/aspect_rules_js~1.37.0~npm~npm__picocolors__1.0.0/package (No such file or directory)
 ```
 
-This is not yet understood, but it seems to be related to "no-remote" execution requirements being dropped from copy actions created by `aspect_bazel_lib`, and likely tied to `remote_download_outputs=minimal|toplevel`.
-
-A workaround is to add to `.bazelrc`:
+This is most likely caused by https://github.com/bazelbuild/bazel/issues/22073. You can either update to Bazel 7.2.0rc1 or later or temporarily add this line to `.bazelrc`:
 
 ```
-common --modify_execution_info=CopyDirectory=+no-remote,CopyToDirectory=+no-remote,CopyFile=+no-remote
+common --noexperimental_merged_skyframe_analysis_execution
 ```
-
-> NB: `--modify_execution_info` is NOT additive, see [issue](https://github.com/bazelbuild/bazel/pull/16262)
-> This means you must take care to have the flag appear only once.
-> Use `--announce_rc` to diagnose where flag values are coming from.
 
 ## Why does my program fail with "Module not found"?
 
