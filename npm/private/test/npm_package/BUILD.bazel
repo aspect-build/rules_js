@@ -35,7 +35,31 @@ copy_to_directory(
 )
 
 diff_test(
-    name = "test",
+    name = "test_pkg",
+    file1 = ":pkg",
+    file2 = ":expected_pkg",
+)
+
+npm_package(
+    name = "pkg_with_node_modules",
+    srcs = [":lib_a"],
+    exclude_srcs_patterns = [],
+    include_npm_sources = True,
+    visibility = ["//visibility:public"],
+)
+
+copy_to_directory(
+    name = "expected_pkg_with_node_modules",
+    srcs = [
+        "index.js",
+        ":node_modules/chalk",
+        ":node_modules/chalk/dir",
+        ":package.json",
+    ],
+)
+
+diff_test(
+    name = "test_pkg_with_node_modules",
     file1 = ":pkg",
     file2 = ":expected_pkg",
 )
