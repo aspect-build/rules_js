@@ -1,0 +1,21 @@
+name: Mirror Releases
+on:
+    # Trigger manually in the UI
+    workflow_dispatch:
+    # Trigger daily at 06:45 UTC
+    schedule:
+        # * is a special character in YAML so you have to quote this string
+        - cron: '45 6 * * *'
+
+jobs:
+    mirror:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: |
+                  ./npm/private/versions_mirror.sh
+                  npx @bazel/buildifier npm/private/versions.bzl
+            - name: Create Pull Request
+              uses: peter-evans/create-pull-request@v5
+              with:
+                  commit-message: 'chore: mirror external releases'
