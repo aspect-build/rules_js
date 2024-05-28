@@ -741,6 +741,7 @@ utils = struct(
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked npm package
     package_directory_output_group = "package_directory",
+    npm_registry_url = _npm_registry_url,
     npm_registry_download_url = _npm_registry_download_url,
     is_git_repository_url = _is_git_repository_url,
     to_registry_url = _to_registry_url,
@@ -756,7 +757,6 @@ utils = struct(
 
 # Exported only to be tested
 utils_test = struct(
-    npm_registry_url = _npm_registry_url,
     parse_package_name = _parse_package_name,
     strip_v5_peer_dep_or_patched_version = _strip_v5_peer_dep_or_patched_version,
 )

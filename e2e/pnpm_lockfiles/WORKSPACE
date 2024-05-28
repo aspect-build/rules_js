@@ -3,11 +3,17 @@ local_repository(
     path = "../..",
 )
 
+# The same primary lockfile across all versions
 PNPM_LOCK_VERSIONS = [
     "v54",
     "v60",
     "v61",
     "v90",
+]
+
+# Lockfiles with unique test cases
+PNPM_LOCK_TEST_CASES = [
+    "tarball-no-url-v54.yaml",
 ]
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -45,3 +51,16 @@ npm_repositories_v60()
 npm_repositories_v61()
 
 npm_repositories_v90()
+
+[
+    npm_translate_lock(
+        name = lockfile.replace(".yaml", ""),
+        pnpm_lock = "//cases:%s" % lockfile,
+        verify_node_modules_ignored = "//:.bazelignore",
+    )
+    for lockfile in PNPM_LOCK_TEST_CASES
+]
+
+load("@tarball-no-url-v54//:repositories.bzl", npm_repositories_tarball_no_url_v54 = "npm_repositories")
+
+npm_repositories_tarball_no_url_v54()

@@ -1,0 +1,19 @@
+lockfileVersion: 5.4
+
+importers:
+    .:
+        specifiers:
+            '@aspect-build/a': 1.0.0
+        dependencies:
+            '@aspect-build/a': 1.0.0
+
+packages:
+    # This was found in https://github.com/aspect-build/rules_js/blob/795138561e878c09f0b62a25572358d64960d732/e2e/npm_translate_lock_auth/pnpm-lock.yaml
+    /@aspect-build/a/1.0.0:
+        resolution:
+            {
+                integrity: sha512-MYeL/yqAPYJXOnnSEOAdtQSu/8tiifFtKN6Jg/rgpKRqxKL8NVsQXrX9H2dlJ4mS23pu7VS0+i9mZNiRoCUYwg==,
+                tarball: '@aspect-test/a/-/a-1.0.0.tgz',
+            }
+        hasBin: true
+        dev: false
