@@ -36,10 +36,10 @@ def _bazel_name(name, version = None):
         escaped_version = "%s__%s" % (escaped_version, _sanitize_string(peer_version))
     return "%s__%s" % (escaped_name, escaped_version)
 
-def _strip_default_registry(version):
-    if version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
-        return version[len(DEFAULT_REGISTRY_DOMAIN_SLASH):]
-    return version
+def _to_package_key(name, version):
+    if not version[0].isdigit():
+        return version
+    return "{}@{}".format(name, version)
 
 def _strip_v5_peer_dep_or_patched_version(version):
     "Remove peer dependency or patched syntax from version string"
@@ -47,16 +47,6 @@ def _strip_v5_peer_dep_or_patched_version(version):
     # 21.1.0_rollup@2.70.2 becomes 21.1.0
     # 1.0.0_o3deharooos255qt5xdujc3cuq becomes 1.0.0
     index = version.find("_")
-    if index != -1:
-        return version[:index]
-    return version
-
-def _strip_v6_peer_dep_or_patched_version(version):
-    "Remove peer dependency or patched syntax from pnpm6+ version string"
-
-    # 21.1.0(rollup@2.70.2) becomes 21.1.0
-    # 21.1.0(patch_hash=...) becomes 21.1.0
-    index = version.find("(")
     if index != -1:
         return version[:index]
     return version
@@ -179,13 +169,11 @@ def _convert_v5_v6_file_package(package_path, package_snapshot):
     if _is_vendored_tarfile(package_snapshot):
         if "version" in package_snapshot:
             version = package_snapshot["version"]
-        package_key = "{}@{}".format(name, version)
         friendly_version = version
     else:
-        package_key = package_path
         friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
 
-    return package_key, name, version, friendly_version
+    return _to_package_key(name, version), name, version, friendly_version
 
 def _convert_v5_packages(packages):
     result = {}
@@ -196,23 +184,22 @@ def _convert_v5_packages(packages):
 
         package_path = _convert_pnpm_v5_version_deer_dep(package_path)
 
-        # Unique file handling
         if package_path.startswith("file:"):
             # direct reference to file
             package_key, name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
         elif "name" in package_snapshot and "version" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
-            version = _strip_v5_default_registry_to_version(name, package_snapshot["version"])
-            friendly_version = version
-            package_key = "{}@{}".format(name, version)
+            version = _strip_v5_default_registry_to_version(name, package_path)
+            friendly_version = package_snapshot["version"]
+            package_key = _to_package_key(name, version)
         elif package_path.startswith("/"):
-            # a simple /name/version
+            # a simple /name/version[_peer_info]
             name, version = package_path[1:].rsplit("/", 1)
             friendly_version = _strip_v5_peer_dep_or_patched_version(version)
-            package_key = "{}@{}".format(name, version)
+            package_key = _to_package_key(name, version)
         else:
-            msg = "unexpected package path: {}".format(package_path)
+            msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
 
         package_info = _new_package_info(
@@ -269,6 +256,7 @@ def _strip_v6_default_registry_to_version(name, version):
 def _convert_pnpm_v6_importer_dependency_map(deps):
     result = {}
     for name, attributes in deps.items():
+        # TODO: does not handle pnpm v9 `name: { version: realname@version }`
         result[name] = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, attributes.get("version")))
     return result
 
@@ -339,14 +327,12 @@ def _convert_v6_packages(packages):
             name = package_snapshot["name"]
             version = _strip_v6_default_registry_to_version(name, package_path)
             friendly_version = package_snapshot["version"]
-            package_key = _strip_default_registry(package_path)
+            package_key = _to_package_key(name, version)
         elif package_path.startswith("/"):
-            # plain /pkg@version
+            # plain /pkg@version(_peer_info)
             name, version = package_path[1:].rsplit("@", 1)
-
-            # TODO: dont strip twice, but 'friendly_version' may have already been converted from v6
-            friendly_version = _strip_v5_peer_dep_or_patched_version(_strip_v6_peer_dep_or_patched_version(version))
-            package_key = "{}@{}".format(name, version)
+            friendly_version = _strip_v5_peer_dep_or_patched_version(version)  # NOTE: already converted to v5 peer style
+            package_key = _to_package_key(name, version)
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
@@ -357,8 +343,8 @@ def _convert_v6_packages(packages):
             version = version,
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v6_v9_package_dependency_map(package_snapshot.get("dependencies", {})),
-            optional_dependencies = _convert_pnpm_v6_v9_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
             peer_dependencies = _convert_pnpm_v6_v9_package_dependency_map(package_snapshot.get("peerDependencies", {})),
+            optional_dependencies = _convert_pnpm_v6_v9_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
             dev = package_snapshot.get("dev", False),
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
@@ -379,13 +365,8 @@ def _convert_v6_packages(packages):
 def _convert_pnpm_v9_package_dependency_map(deps):
     result = {}
     for name, version in deps.items():
-        # Raw version or version(peers) or file reference
-        if version[0].isdigit() or version.startswith("file:") or version.startswith("link:"):
-            result[name] = _convert_pnpm_v6_v9_version_peer_dep(version)
-        else:
-            # Otherwise assume a reference to another package@version(...maybe peers...)
-            i = version.find("@", 1)
-            result[version[:i]] = _convert_pnpm_v6_v9_version_peer_dep(version[i + 1:])
+        # Otherwise assume a reference to another package@version(...maybe peers...)
+        result[name] = _convert_pnpm_v6_v9_version_peer_dep(version)
 
     return result
 
@@ -436,11 +417,16 @@ def _convert_v9_packages(packages, snapshots):
             fail(msg)
 
         # the raw name + version are the key, not including peerDeps+patch
-        name, friendly_version = static_key.rsplit("@", 1)
+        version_index = static_key.find("@", 1)
+        name = static_key[:version_index]
+        friendly_version = static_key[version_index + 1:]
         package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
 
         # Extract the version including peerDeps+patch from the key
-        version = package_key.rsplit("@", 1)[1]
+        version = package_key[package_key.find("@", 1) + 1:]
+
+        # Convert the package_key to a rules_js compatible format
+        package_key = _to_package_key(name, version)
 
         # package_data can have the resolved "version" for things like https:// deps
         if "version" in package_data:
@@ -564,7 +550,7 @@ def _package_store_name(name, version):
         return version.replace("/", "+")
     else:
         escaped_name = name.replace("/", "+")
-        escaped_version = version.replace("/", "+")
+        escaped_version = version.replace("://", "/").replace("/", "+")
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_path):

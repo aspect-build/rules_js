@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  is-number: file:../vendored/is-number
+  diff: https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz
+
 patchedDependencies:
   meaning-of-life@1.0.0:
     hash: o3deharooos255qt5xdujc3cuq
@@ -31,6 +35,18 @@ importers:
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
+      debug:
+        specifier: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
+        version: https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53
+      hello:
+        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
+        version: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
+      is-odd:
+        specifier: 3.0.1
+        version: 3.0.1
+      jsonify:
+        specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
+        version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
       meaning-of-life:
         specifier: 1.0.0
         version: 1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)
@@ -75,6 +91,8 @@ importers:
         specifier: workspace:*
         version: link:../a
 
+  ../vendored/is-number: {}
+
 packages:
 
   '@aspect-test/a@5.0.2':
@@ -103,6 +121,10 @@ packages:
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
     hasBin: true
 
+  '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz':
+    resolution: {tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
+    version: 0.0.0
+
   '@scoped/c@file:../projects/c':
     resolution: {directory: ../projects/c, type: directory}
 
@@ -118,18 +140,39 @@ packages:
   '@types/node@16.18.11':
     resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
 
+  debug@https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53:
+    resolution: {tarball: https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53}
+    version: 2.6.3
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
 
-  diff@5.2.0:
-    resolution: {integrity: sha512-uIFDxqpRZGZ6ThOk84hEfqWoHx2devRFvpTZcTHur85vImfaxUbTW9Ryh4CpCuDnToOP1CEtXKIgytHBPVff5A==}
+  diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz:
+    resolution: {tarball: https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz}
+    version: 5.2.0
     engines: {node: '>=0.3.1'}
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+
+  hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello:
+    resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
+    version: 1.0.0
+
+  is-number@file:../vendored/is-number:
+    resolution: {directory: ../vendored/is-number, type: directory}
+
+  is-odd@3.0.1:
+    resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==}
+    engines: {node: '>=4'}
 
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
@@ -141,6 +184,9 @@ packages:
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
+
+  ms@0.7.3:
+    resolution: {integrity: sha512-lrKNzMWqQZgwJahtrtrM+9NgOoDUveDrVmm5aGXrf3BdtL0mq7X6IVzoZaw+TfNti29eHd1/8GI+h45K5cQ6/w==}
 
   rollup@3.2.5:
     resolution: {integrity: sha512-/Ha7HhVVofduy+RKWOQJrxe4Qb3xyZo+chcpYiD8SoQa4AG7llhupUtyfKSSrdBM2mWJjhM8wZwmbY23NmlIYw==}
@@ -181,6 +227,8 @@ snapshots:
 
   '@aspect-test/e@1.0.0': {}
 
+  '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz': {}
+
   '@scoped/c@file:../projects/c':
     dependencies:
       '@scoped/a': link:../a
@@ -198,18 +246,32 @@ snapshots:
 
   '@types/node@16.18.11': {}
 
+  debug@https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53:
+    dependencies:
+      ms: 0.7.3
+
   dequal@2.0.3: {}
 
-  diff@5.2.0: {}
+  diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz: {}
 
   fsevents@2.3.3:
     optional: true
+
+  hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello: {}
+
+  is-number@file:../vendored/is-number: {}
+
+  is-odd@3.0.1:
+    dependencies:
+      is-number: file:../vendored/is-number
 
   kleur@4.1.5: {}
 
   meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq): {}
 
   mri@1.2.0: {}
+
+  ms@0.7.3: {}
 
   rollup@3.2.5:
     optionalDependencies:
@@ -222,6 +284,6 @@ snapshots:
   uvu@0.5.6:
     dependencies:
       dequal: 2.0.3
-      diff: 5.2.0
+      diff: https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz
       kleur: 4.1.5
       sade: 1.8.1
