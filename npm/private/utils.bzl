@@ -121,16 +121,19 @@ def _strip_v5_default_registry_to_version(name, version):
 def _convert_v5_importer_dependency_map(dep):
     result = {}
     for name, version in dep.items():
-        result[name] = _convert_pnpm_v5_version_deer_dep(_strip_v5_default_registry_to_version(name, version))
+        # conver v5 style aliases (/aliased/version) to v6+ style (/aliased@version)
+        if version.startswith("/"):
+            alias, version = version.rsplit("/", 1)
+            version = "{}@{}".format(alias, version)
+        else:
+            version = _convert_pnpm_v5_version_deer_dep(_strip_v5_default_registry_to_version(name, version))
+        result[name] = version
     return result
 
 def _convert_v5_importers(importers):
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
-            # TODO: normalize edge cases such as:
-            #  - deps with protocols
-            #  - ?
             dependencies = _convert_v5_importer_dependency_map(importer.get("dependencies", {})),
             dev_dependencies = _convert_v5_importer_dependency_map(importer.get("devDependencies", {})),
             optional_dependencies = _convert_v5_importer_dependency_map(importer.get("optionalDependencies", {})),
@@ -256,8 +259,15 @@ def _strip_v6_default_registry_to_version(name, version):
 def _convert_pnpm_v6_importer_dependency_map(deps):
     result = {}
     for name, attributes in deps.items():
-        # TODO: does not handle pnpm v9 `name: { version: realname@version }`
-        result[name] = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, attributes.get("version")))
+        version = attributes.get("version")
+
+        if version.startswith("/"):
+            version = version  # keep aliases as-is
+        else:
+            # TODO: does not handle pnpm v9 `name: { version: realname@version }`
+            version = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, version))
+
+        result[name] = version
     return result
 
 def _convert_pnpm_v6_v9_package_dependency_map(deps):
