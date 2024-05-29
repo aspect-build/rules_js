@@ -20,6 +20,9 @@ importers:
       '@aspect-test/a':
         specifier: ^5.0.2
         version: 5.0.2
+      '@aspect-test/a2':
+        specifier: npm:@aspect-test/a
+        version: '@aspect-test/a@5.0.2'
       '@aspect-test/e':
         specifier: ~1.0.0
         version: 1.0.0

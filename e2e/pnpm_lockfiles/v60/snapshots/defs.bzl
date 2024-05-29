@@ -79,6 +79,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_0(name = "{}/@aspect-test/a".format(name))
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            link_0(name = "{}/@aspect-test/a2".format(name))
+            link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
+            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
             link_1(name = "{}/@aspect-test/b".format(name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
@@ -283,6 +286,7 @@ def npm_link_targets(name = "node_modules", package = None):
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))

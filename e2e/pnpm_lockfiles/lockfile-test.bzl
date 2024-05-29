@@ -92,7 +92,7 @@ def lockfile_test(name = None):
             # ":node_modules/jsonify", TODO: v9
 
             # npm:
-            # ":node_modules/@aspect-test/c2",
+            ":node_modules/@aspect-test/a2",
 
             # Targets within the virtual store...
             # Direct dep targets

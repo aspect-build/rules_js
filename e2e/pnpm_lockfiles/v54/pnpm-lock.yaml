@@ -17,6 +17,7 @@ importers:
   .:
     specifiers:
       '@aspect-test/a': ^5.0.2
+      '@aspect-test/a2': npm:@aspect-test/a
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.0
       '@scoped/a': workspace:*
@@ -34,6 +35,7 @@ importers:
       uvu: 0.5.6
     dependencies:
       '@aspect-test/a': 5.0.2
+      '@aspect-test/a2': /@aspect-test/a/5.0.2
       '@scoped/a': link:../projects/a
       '@scoped/b': link:../projects/b
       '@scoped/c': file:../projects/c
