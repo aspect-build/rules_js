@@ -1,0 +1,9 @@
+{
+    "name": "is-number",
+    "description": "Returns true if the given input is typeof==number",
+    "version": "0.0.1",
+    "files": [
+        "index.js"
+    ],
+    "main": "index.js"
+}

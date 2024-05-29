@@ -10,20 +10,25 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.0__links/
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.2__links//:defs.bzl", store_3 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2__links//:defs.bzl", store_4 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__dequal__2.0.3__links//:defs.bzl", store_5 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__diff__5.2.0__links//:defs.bzl", store_6 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_7 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_6 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_7 = "npm_link_imported_package_store", store_7 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_8 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_9 = "npm_link_imported_package_store", store_9 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_10 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.2.5__links//:defs.bzl", link_11 = "npm_link_imported_package_store", store_11 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_12 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_13 = "npm_link_imported_package_store", store_13 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_15 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_16 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_17 = "npm_link_imported_package_store", store_17 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_11 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.2.5__links//:defs.bzl", link_12 = "npm_link_imported_package_store", store_12 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_13 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__diff__at_github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz__links//:defs.bzl", store_16 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hello__at_gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello__links//:defs.bzl", link_17 = "npm_link_imported_package_store", store_17 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__debug__github.com_ngokevin_debug_9742c5f383a6f8046241920156236ade8ec30d53__links//:defs.bzl", link_18 = "npm_link_imported_package_store", store_18 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_19 = "npm_link_imported_package_store", store_19 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_20 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_21 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_22 = "npm_link_imported_package_store", store_22 = "npm_imported_package_store")
 
-_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/b", "projects/c", "projects/d"]
+_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/b", "projects/c", "projects/d", "vendored/is-number"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -50,18 +55,23 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_3(name = "{}/@aspect-test/c".format(name))
         store_4(name = "{}/@aspect-test/d".format(name))
         store_5(name = "{}/dequal".format(name))
-        store_6(name = "{}/diff".format(name))
-        store_7(name = "{}/fsevents".format(name))
+        store_6(name = "{}/fsevents".format(name))
+        store_7(name = "{}/is-odd".format(name))
         store_8(name = "{}/kleur".format(name))
         store_9(name = "{}/meaning-of-life".format(name))
         store_10(name = "{}/mri".format(name))
-        store_11(name = "{}/rollup".format(name))
-        store_12(name = "{}/sade".format(name))
-        store_13(name = "{}/uvu".format(name))
-        store_14(name = "{}/@types/archiver".format(name))
-        store_15(name = "{}/@types/glob".format(name))
-        store_16(name = "{}/@types/minimatch".format(name))
-        store_17(name = "{}/@types/node".format(name))
+        store_11(name = "{}/ms".format(name))
+        store_12(name = "{}/rollup".format(name))
+        store_13(name = "{}/sade".format(name))
+        store_14(name = "{}/uvu".format(name))
+        store_15(name = "{}/@foo/jsonify".format(name))
+        store_16(name = "{}/diff".format(name))
+        store_17(name = "{}/hello".format(name))
+        store_18(name = "{}/debug".format(name))
+        store_19(name = "{}/@types/archiver".format(name))
+        store_20(name = "{}/@types/glob".format(name))
+        store_21(name = "{}/@types/minimatch".format(name))
+        store_22(name = "{}/@types/node".format(name))
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_0(name = "{}/@aspect-test/a".format(name))
@@ -73,16 +83,24 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_2(name = "{}/@aspect-test/c".format(name))
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            link_7(name = "{}/is-odd".format(name))
+            link_targets.append("//{}:{}/is-odd".format(bazel_package, name))
             link_9(name = "{}/meaning-of-life".format(name))
             link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
-            link_11(name = "{}/rollup".format(name))
+            link_12(name = "{}/rollup".format(name))
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-            link_13(name = "{}/uvu".format(name))
+            link_14(name = "{}/uvu".format(name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
-            link_14(name = "{}/@types/archiver".format(name))
+            link_15(name = "{}/jsonify".format(name))
+            link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
+            link_17(name = "{}/hello".format(name))
+            link_targets.append("//{}:{}/hello".format(bazel_package, name))
+            link_18(name = "{}/debug".format(name))
+            link_targets.append("//{}:{}/debug".format(bazel_package, name))
+            link_19(name = "{}/@types/archiver".format(name))
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
-            link_17(name = "{}/@types/node".format(name))
+            link_22(name = "{}/@types/node".format(name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
 
@@ -120,6 +138,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             )
             link_targets.append(":{}/@scoped/c".format(name))
             scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
+
+    if is_root:
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
+            src = "//vendored/is-number:pkg",
+            package = "is-number",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
     if is_root:
         _npm_package_store(
@@ -251,9 +280,13 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
+            link_targets.append("//{}:{}/is-odd".format(bazel_package, name))
             link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
             link_targets.append("//{}:{}/rollup".format(bazel_package, name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+            link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
+            link_targets.append("//{}:{}/hello".format(bazel_package, name))
+            link_targets.append("//{}:{}/debug".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
 

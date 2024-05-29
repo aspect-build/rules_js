@@ -81,6 +81,16 @@ def lockfile_test(name = None):
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
 
+            # Packages involving overrides
+            ":node_modules/is-odd",
+            ":.aspect_rules_js/node_modules/is-odd@3.0.1",
+            ":.aspect_rules_js/node_modules/is-number@0.0.0",
+
+            # Odd git/http versions
+            ":node_modules/debug",
+            ":node_modules/hello",
+            # ":node_modules/jsonify", TODO: v9
+
             # npm:
             # ":node_modules/@aspect-test/c2",
 
