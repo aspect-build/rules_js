@@ -12,6 +12,13 @@ DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
+def _sorted_map(m):
+    result = dict()
+    for key in sorted(m.keys()):
+        result[key] = m[key]
+
+    return result
+
 def _sanitize_string(string):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
     result = ""
@@ -519,6 +526,9 @@ def _parse_pnpm_lock_common(parsed, err):
         importers = _convert_v9_importers(importers)
         packages = _convert_v9_packages(packages, snapshots)
 
+    importers = _sorted_map(importers)
+    packages = _sorted_map(packages)
+
     return importers, packages, patched_dependencies, lockfile_version, None
 
 def _assert_lockfile_version(version, testonly = False):
@@ -745,6 +755,7 @@ def _is_tarball_extension(ext):
 
 utils = struct(
     bazel_name = _bazel_name,
+    sorted_map = _sorted_map,
     pnpm_name = _pnpm_name,
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_package_key = _parse_pnpm_package_key,
