@@ -47,6 +47,9 @@ importers:
       is-odd:
         specifier: 3.0.1
         version: 3.0.1
+      is-odd-alt-version:
+        specifier: npm:is-odd@^2.0.0
+        version: is-odd@2.0.0
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -73,6 +76,9 @@ importers:
       '@types/node':
         specifier: 16.18.11
         version: 16.18.11
+      alias-types-node:
+        specifier: npm:@types/node@~16.18.11
+        version: '@types/node@16.18.11'
 
   ../projects/a: {}
 
@@ -173,6 +179,10 @@ packages:
   is-number@file:../vendored/is-number:
     resolution: {directory: ../vendored/is-number, type: directory}
 
+  is-odd@2.0.0:
+    resolution: {integrity: sha512-OTiixgpZAT1M4NHgS5IguFp/Vz2VI3U7Goh4/HA1adtwyLtSBrxYlcSYkhpAE07s4fKEcjrFxyvtQBND4vFQyQ==}
+    engines: {node: '>=0.10.0'}
+
   is-odd@3.0.1:
     resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==}
     engines: {node: '>=4'}
@@ -263,6 +273,10 @@ snapshots:
   hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello: {}
 
   is-number@file:../vendored/is-number: {}
+
+  is-odd@2.0.0:
+    dependencies:
+      is-number: file:../vendored/is-number
 
   is-odd@3.0.1:
     dependencies:
