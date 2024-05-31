@@ -39,7 +39,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                 # an aliased dependency
                 package_key = version[4:]
                 name, version = utils.parse_pnpm_package_key(name, version)
-            elif version[0].isdigit():
+            elif version not in packages:
                 package_key = utils.pnpm_name(name, version)
             else:
                 package_key = version
@@ -47,7 +47,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
             if version in transitive_closure[name]:
                 continue
             transitive_closure[name].append(version)
-            if package_key.startswith("link:"):
+            if version.startswith("link:"):
                 # we don't need to drill down through first-party links for the transitive closure since there are no cycles
                 # allowed in first-party links
                 continue
