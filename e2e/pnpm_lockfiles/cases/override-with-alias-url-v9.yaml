@@ -1,0 +1,28 @@
+lockfileVersion: '9.0'
+
+settings:
+    autoInstallPeers: true
+    excludeLinksFromLockfile: false
+
+overrides:
+    # recommended workaround: https://github.com/lodash/lodash/issues/5809#issuecomment-1910560681
+    lodash.pick: https://github.com/lodash/lodash/archive/refs/tags/4.17.21.tar.gz
+
+importers:
+    .:
+        dependencies:
+            lodash.pick:
+                specifier: https://github.com/lodash/lodash/archive/refs/tags/4.17.21.tar.gz
+                version: lodash@https://github.com/lodash/lodash/archive/refs/tags/4.17.21.tar.gz
+
+packages:
+    lodash@https://github.com/lodash/lodash/archive/refs/tags/4.17.21.tar.gz:
+        resolution:
+            {
+                tarball: https://github.com/lodash/lodash/archive/refs/tags/4.17.21.tar.gz,
+            }
+        version: 4.17.21
+        engines: { node: '>=4.0.0' }
+
+snapshots:
+    lodash@https://github.com/lodash/lodash/archive/refs/tags/4.17.21.tar.gz: {}
