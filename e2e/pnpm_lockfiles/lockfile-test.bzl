@@ -104,7 +104,7 @@ def lockfile_test(name = None):
             # Odd git/http versions
             ":node_modules/debug",
             ":node_modules/hello",
-            # ":node_modules/jsonify", TODO: v9
+            ":node_modules/jsonify",
 
             # npm: alias
             ":node_modules/@aspect-test/a2",
