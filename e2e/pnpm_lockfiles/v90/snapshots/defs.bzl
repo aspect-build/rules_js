@@ -10,7 +10,7 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.0__links/
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.2__links//:defs.bzl", store_3 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2__links//:defs.bzl", store_4 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_e__1.0.0__links//:defs.bzl", link_5 = "npm_link_imported_package_store", store_5 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_6 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_6 = "npm_link_imported_package_store", store_6 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_7 = "npm_link_imported_package_store", store_7 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_8 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_9 = "npm_imported_package_store")
@@ -93,6 +93,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_5(name = "{}/@aspect-test/e".format(name))
             link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            link_6(name = "{}/jsonify".format(name))
+            link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
             link_7(name = "{}/@types/archiver".format(name))
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
@@ -294,6 +296,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
+            link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             link_targets.append("//{}:{}/alias-types-node".format(bazel_package, name))

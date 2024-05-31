@@ -194,7 +194,7 @@ def _convert_v5_v6_file_package(package_path, package_snapshot):
     else:
         friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
 
-    return _to_package_key(name, version), name, version, friendly_version
+    return name, version, friendly_version
 
 def _convert_v5_packages(packages):
     result = {}
@@ -207,21 +207,21 @@ def _convert_v5_packages(packages):
 
         if package_path.startswith("file:"):
             # direct reference to file
-            package_key, name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
+            name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
         elif "name" in package_snapshot and "version" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
             version = _strip_v5_default_registry_to_version(name, package_path)
             friendly_version = package_snapshot["version"]
-            package_key = _to_package_key(name, version)
         elif package_path.startswith("/"):
             # a simple /name/version[_peer_info]
             name, version = package_path[1:].rsplit("/", 1)
             friendly_version = _strip_v5_peer_dep_or_patched_version(version)
-            package_key = _to_package_key(name, version)
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
+
+        package_key = _to_package_key(name, version)
 
         package_info = _new_package_info(
             id = package_snapshot.get("id", None),
@@ -364,21 +364,21 @@ def _convert_v6_packages(packages):
 
         if package_path.startswith("file:"):
             # direct reference to file
-            package_key, name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
+            name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
         elif "name" in package_snapshot and "version" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
             version = _strip_v6_default_registry_to_version(name, package_path)
             friendly_version = package_snapshot["version"]
-            package_key = _to_package_key(name, version)
         elif package_path.startswith("/"):
             # plain /pkg@version(_peer_info)
             name, version = package_path[1:].rsplit("@", 1)
             friendly_version = _strip_v5_peer_dep_or_patched_version(version)  # NOTE: already converted to v5 peer style
-            package_key = _to_package_key(name, version)
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
+
+        package_key = _to_package_key(name, version)
 
         package_info = _new_package_info(
             id = package_snapshot.get("id", None),
@@ -500,9 +500,6 @@ def _convert_v9_packages(packages, snapshots):
 
         # package_data can have the resolved "version" for things like https:// deps
         friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
-
-        # Convert the package_key to a rules_js compatible format
-        package_key = _to_package_key(name, version)
 
         package_info = _new_package_info(
             id = package_data.get("id", None),  # TODO: does v9 have "id"?
