@@ -476,7 +476,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         result[repo_name] = result_pkg
 
-    result = result.values()
+    result = utils.sorted_map(result).values()
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too
     # easy to make a type in the patches keys or for a dep to change both of with could result

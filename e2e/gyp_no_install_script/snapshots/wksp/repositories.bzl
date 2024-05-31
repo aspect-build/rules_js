@@ -6,6 +6,141 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_import")
 # buildifier: disable=function-docstring
 def npm_repositories():
     npm_import(
+        name = "npm__abbrev__1.1.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "abbrev",
+        version = "1.1.1",
+        url = "https://registry.npmjs.org/abbrev/-/abbrev-1.1.1.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==",
+        transitive_closure = {
+            "abbrev": ["1.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__agent-base__6.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "agent-base",
+        version = "6.0.2",
+        url = "https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==",
+        deps = {
+            "debug": "4.3.4",
+        },
+        transitive_closure = {
+            "agent-base": ["6.0.2"],
+            "debug": ["4.3.4"],
+            "ms": ["2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__agentkeepalive__4.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "agentkeepalive",
+        version = "4.2.1",
+        url = "https://registry.npmjs.org/agentkeepalive/-/agentkeepalive-4.2.1.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-Zn4cw2NEqd+9fiSVWMscnjyQ1a8Yfoc5oBajLeo5w+YBHgDUcEBY2hS4YpTz6iN5f/2zQiktcuM6tS8x1p9dpA==",
+        deps = {
+            "debug": "4.3.4",
+            "depd": "1.1.2",
+            "humanize-ms": "1.2.1",
+        },
+        transitive_closure = {
+            "agentkeepalive": ["4.2.1"],
+            "debug": ["4.3.4"],
+            "depd": ["1.1.2"],
+            "humanize-ms": ["1.2.1"],
+            "ms": ["2.1.3", "2.1.2"],
+        },
+    )
+
+    npm_import(
+        name = "npm__aggregate-error__3.1.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "aggregate-error",
+        version = "3.1.0",
+        url = "https://registry.npmjs.org/aggregate-error/-/aggregate-error-3.1.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==",
+        deps = {
+            "clean-stack": "2.2.0",
+            "indent-string": "4.0.0",
+        },
+        transitive_closure = {
+            "aggregate-error": ["3.1.0"],
+            "clean-stack": ["2.2.0"],
+            "indent-string": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ansi-regex__5.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ansi-regex",
+        version = "5.0.1",
+        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
+        transitive_closure = {
+            "ansi-regex": ["5.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__aproba__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "aproba",
+        version = "2.0.0",
+        url = "https://registry.npmjs.org/aproba/-/aproba-2.0.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==",
+        transitive_closure = {
+            "aproba": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__are-we-there-yet__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "are-we-there-yet",
+        version = "3.0.1",
+        url = "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-3.0.1.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-QZW4EDmGwlYur0Yyf/b2uGucHQMa8aFUP7eu9ddR73vvhFyt4V0Vl3QHPcTNJ8l6qYOBdxgXdnBXQrHilfRQBg==",
+        deps = {
+            "delegates": "1.0.0",
+            "readable-stream": "3.6.1",
+        },
+        transitive_closure = {
+            "are-we-there-yet": ["3.0.1"],
+            "delegates": ["1.0.0"],
+            "inherits": ["2.0.4"],
+            "readable-stream": ["3.6.1"],
+            "safe-buffer": ["5.2.1"],
+            "string_decoder": ["1.3.0"],
+            "util-deprecate": ["1.0.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_gar_promisify__1.1.3",
         root_package = "",
         link_workspace = "",
@@ -87,141 +222,6 @@ def npm_repositories():
         integrity = "sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==",
         transitive_closure = {
             "@tootallnate/once": ["2.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__abbrev__1.1.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "abbrev",
-        version = "1.1.1",
-        url = "https://registry.npmjs.org/abbrev/-/abbrev-1.1.1.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==",
-        transitive_closure = {
-            "abbrev": ["1.1.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__agent-base__6.0.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "agent-base",
-        version = "6.0.2",
-        url = "https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==",
-        deps = {
-            "debug": "4.3.4",
-        },
-        transitive_closure = {
-            "agent-base": ["6.0.2"],
-            "debug": ["4.3.4"],
-            "ms": ["2.1.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__agentkeepalive__4.2.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "agentkeepalive",
-        version = "4.2.1",
-        url = "https://registry.npmjs.org/agentkeepalive/-/agentkeepalive-4.2.1.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-Zn4cw2NEqd+9fiSVWMscnjyQ1a8Yfoc5oBajLeo5w+YBHgDUcEBY2hS4YpTz6iN5f/2zQiktcuM6tS8x1p9dpA==",
-        deps = {
-            "debug": "4.3.4",
-            "depd": "1.1.2",
-            "humanize-ms": "1.2.1",
-        },
-        transitive_closure = {
-            "agentkeepalive": ["4.2.1"],
-            "debug": ["4.3.4"],
-            "depd": ["1.1.2"],
-            "humanize-ms": ["1.2.1"],
-            "ms": ["2.1.2", "2.1.3"],
-        },
-    )
-
-    npm_import(
-        name = "npm__aggregate-error__3.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "aggregate-error",
-        version = "3.1.0",
-        url = "https://registry.npmjs.org/aggregate-error/-/aggregate-error-3.1.0.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==",
-        deps = {
-            "clean-stack": "2.2.0",
-            "indent-string": "4.0.0",
-        },
-        transitive_closure = {
-            "aggregate-error": ["3.1.0"],
-            "clean-stack": ["2.2.0"],
-            "indent-string": ["4.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__ansi-regex__5.0.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "ansi-regex",
-        version = "5.0.1",
-        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
-        transitive_closure = {
-            "ansi-regex": ["5.0.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__aproba__2.0.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "aproba",
-        version = "2.0.0",
-        url = "https://registry.npmjs.org/aproba/-/aproba-2.0.0.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==",
-        transitive_closure = {
-            "aproba": ["2.0.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__are-we-there-yet__3.0.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "are-we-there-yet",
-        version = "3.0.1",
-        url = "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-3.0.1.tgz",
-        package_visibility = ["//visibility:public"],
-        integrity = "sha512-QZW4EDmGwlYur0Yyf/b2uGucHQMa8aFUP7eu9ddR73vvhFyt4V0Vl3QHPcTNJ8l6qYOBdxgXdnBXQrHilfRQBg==",
-        deps = {
-            "delegates": "1.0.0",
-            "readable-stream": "3.6.1",
-        },
-        transitive_closure = {
-            "are-we-there-yet": ["3.0.1"],
-            "delegates": ["1.0.0"],
-            "inherits": ["2.0.4"],
-            "readable-stream": ["3.6.1"],
-            "safe-buffer": ["5.2.1"],
-            "string_decoder": ["1.3.0"],
-            "util-deprecate": ["1.0.2"],
         },
     )
 
@@ -1087,7 +1087,7 @@ def npm_repositories():
             "minipass-sized": ["1.0.3"],
             "minizlib": ["2.1.2"],
             "mkdirp": ["1.0.4"],
-            "ms": ["2.1.2", "2.1.3"],
+            "ms": ["2.1.3", "2.1.2"],
             "negotiator": ["0.6.3"],
             "once": ["1.4.0"],
             "p-map": ["4.0.0"],
@@ -1469,7 +1469,7 @@ def npm_repositories():
             "minipass-sized": ["1.0.3"],
             "minizlib": ["2.1.2"],
             "mkdirp": ["1.0.4"],
-            "ms": ["2.1.2", "2.1.3"],
+            "ms": ["2.1.3", "2.1.2"],
             "negotiator": ["0.6.3"],
             "node-gyp": ["9.3.1"],
             "nopt": ["6.0.0"],
@@ -1831,7 +1831,7 @@ def npm_repositories():
             "minipass-sized": ["1.0.3"],
             "minizlib": ["2.1.2"],
             "mkdirp": ["1.0.4"],
-            "ms": ["2.1.2", "2.1.3"],
+            "ms": ["2.1.3", "2.1.2"],
             "nan": ["2.17.0"],
             "negotiator": ["0.6.3"],
             "node-gyp": ["9.3.1"],

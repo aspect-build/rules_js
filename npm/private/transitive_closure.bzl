@@ -66,11 +66,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                 msg = "Unknown package key: {} ({} @ {}) in {}".format(package_key, name, version, packages.keys())
                 fail(msg)
 
-    result = dict()
-    for key in sorted(transitive_closure.keys()):
-        result[key] = sorted(transitive_closure[key])
-
-    return result
+    return utils.sorted_map(transitive_closure)
 
 def _get_package_info_deps(package_info, no_optional):
     return package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
