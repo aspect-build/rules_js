@@ -1,5 +1,5 @@
 {
-    "name": "@scoped/c",
+    "name": "@scoped/d",
     "private": true,
     "dependencies": {
         "@scoped/a": "workspace:*"

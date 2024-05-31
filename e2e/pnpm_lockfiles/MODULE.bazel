@@ -15,6 +15,7 @@ PNPM_LOCK_VERSIONS = [
 # Lockfiles with unique test cases
 PNPM_LOCK_TEST_CASES = [
     "tarball-no-url-v54.yaml",
+    "override-with-alias-url-v9.yaml",
 ]
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
