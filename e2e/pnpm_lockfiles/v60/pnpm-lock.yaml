@@ -46,6 +46,9 @@ importers:
       is-odd:
         specifier: 3.0.1
         version: 3.0.1
+      is-odd-alt-version:
+        specifier: npm:is-odd@^2.0.0
+        version: /is-odd@2.0.0
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -71,6 +74,9 @@ importers:
         version: registry.npmjs.org/@types/archiver@5.3.1
       '@types/node':
         specifier: 16.18.11
+        version: registry.npmjs.org/@types/node@16.18.11
+      alias-types-node:
+        specifier: npm:@types/node@~16.18.11
         version: registry.npmjs.org/@types/node@16.18.11
 
   ../projects/a: {}
@@ -149,6 +155,13 @@ packages:
     os: [darwin]
     dev: false
     optional: true
+
+  /is-odd@2.0.0:
+    resolution: {integrity: sha512-OTiixgpZAT1M4NHgS5IguFp/Vz2VI3U7Goh4/HA1adtwyLtSBrxYlcSYkhpAE07s4fKEcjrFxyvtQBND4vFQyQ==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      is-number: file:../vendored/is-number
+    dev: false
 
   /is-odd@3.0.1:
     resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==}

@@ -26,9 +26,11 @@ importers:
       '@scoped/d': ../projects/d
       '@types/archiver': 5.3.1
       '@types/node': 16.18.11
+      alias-types-node: npm:@types/node@~16.18.11
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       hello: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       is-odd: 3.0.1
+      is-odd-alt-version: npm:is-odd@^2.0.0
       jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
       meaning-of-life: 1.0.0
       rollup: 3.2.5
@@ -43,6 +45,7 @@ importers:
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       hello: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       is-odd: 3.0.1
+      is-odd-alt-version: /is-odd/2.0.0
       jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 3.2.5
@@ -53,6 +56,7 @@ importers:
       '@aspect-test/b': 5.0.2
       '@types/archiver': registry.npmjs.org/@types/archiver/5.3.1
       '@types/node': registry.npmjs.org/@types/node/16.18.11
+      alias-types-node: registry.npmjs.org/@types/node/16.18.11
 
   ../projects/a:
     specifiers: {}
@@ -127,6 +131,13 @@ packages:
     os: [darwin]
     dev: false
     optional: true
+
+  /is-odd/2.0.0:
+    resolution: {integrity: sha512-OTiixgpZAT1M4NHgS5IguFp/Vz2VI3U7Goh4/HA1adtwyLtSBrxYlcSYkhpAE07s4fKEcjrFxyvtQBND4vFQyQ==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      is-number: file:../vendored/is-number
+    dev: false
 
   /is-odd/3.0.1:
     resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==}

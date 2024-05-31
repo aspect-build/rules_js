@@ -39,11 +39,13 @@ def lockfile_test(name = None):
     lock_version = name if name else native.package_name()
     lock_repo = "lock-%s" % lock_version
 
-    copy_file(
-        name = "copy-tests",
-        src = "//:base/patched-dependencies-test.js",
-        out = "patched-dependencies-test.js",
-    )
+    # Copy each test to this lockfile dir
+    for test in ["patched-dependencies-test.js", "aliases-test.js"]:
+        copy_file(
+            name = "copy-{}".format(test),
+            src = "//:base/{}".format(test),
+            out = test,
+        )
 
     js_test(
         name = "patch-test",
@@ -51,6 +53,19 @@ def lockfile_test(name = None):
             ":node_modules/meaning-of-life",
         ],
         entry_point = "patched-dependencies-test.js",
+    )
+
+    js_test(
+        name = "aliases-test",
+        data = [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/a2",
+            ":node_modules/@types/node",
+            ":node_modules/alias-types-node",
+            ":node_modules/is-odd",
+            ":node_modules/is-odd-alt-version",
+        ],
+        entry_point = "aliases-test.js",
     )
 
     build_test(
@@ -91,8 +106,13 @@ def lockfile_test(name = None):
             ":node_modules/hello",
             # ":node_modules/jsonify", TODO: v9
 
-            # npm:
+            # npm: alias
             ":node_modules/@aspect-test/a2",
+            # npm: alias to registry-scoped packages
+            ":node_modules/alias-types-node",
+            # npm: alias to alternate versions
+            ":node_modules/is-odd-alt-version",
+            ":.aspect_rules_js/node_modules/is-odd@2.0.0",
 
             # Targets within the virtual store...
             # Direct dep targets
