@@ -15,6 +15,7 @@ PNPM_LOCK_VERSIONS = [
 PNPM_LOCK_TEST_CASES = [
     "tarball-no-url-v54.yaml",
     "override-with-alias-url-v9.yaml",
+    "isaacs-cliui-v90.yaml",
 ]
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -62,9 +63,12 @@ npm_repositories_v90()
     for lockfile in PNPM_LOCK_TEST_CASES
 ]
 
+load("@isaacs-cliui-v90//:repositories.bzl", npm_repositories_isaacs_cliui_v90 = "npm_repositories")
 load("@override-with-alias-url-v9//:repositories.bzl", npm_repositories_override_with_alias_v90 = "npm_repositories")
 load("@tarball-no-url-v54//:repositories.bzl", npm_repositories_tarball_no_url_v54 = "npm_repositories")
 
 npm_repositories_tarball_no_url_v54()
 
 npm_repositories_override_with_alias_v90()
+
+npm_repositories_isaacs_cliui_v90()

@@ -16,6 +16,7 @@ PNPM_LOCK_VERSIONS = [
 PNPM_LOCK_TEST_CASES = [
     "tarball-no-url-v54.yaml",
     "override-with-alias-url-v9.yaml",
+    "isaacs-cliui-v90.yaml",
 ]
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")

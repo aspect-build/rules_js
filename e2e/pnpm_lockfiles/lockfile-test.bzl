@@ -64,6 +64,7 @@ def lockfile_test(name = None):
             ":node_modules/alias-types-node",
             ":node_modules/is-odd",
             ":node_modules/is-odd-alt-version",
+            ":node_modules/@isaacs/cliui",
         ],
         entry_point = "aliases-test.js",
     )
@@ -89,6 +90,9 @@ def lockfile_test(name = None):
 
             # uuv 'hasBin'
             ":node_modules/uvu",
+
+            # a package with various `npm:` cases
+            ":node_modules/@isaacs/cliui",
 
             # link:, workspace:, file:, ./rel/path
             ":node_modules/@scoped/a",

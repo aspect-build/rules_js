@@ -154,7 +154,7 @@ def _convert_pnpm_v5_version_peer_dep(version):
 def _convert_pnpm_v5_package_dependency_version(name, version):
     # an alias to an alternate package
     if version.startswith("/"):
-        alias, version = version[1:].rsplit("@", 1)
+        alias, version = version[1:].rsplit("/", 1)
         return "npm:{}@{}".format(alias, version)
 
     # Removing the default registry+name from the version string
@@ -396,16 +396,20 @@ def _convert_v6_packages(packages):
 
     return result
 
-def _convert_pnpm_v9_package_dependency_version(name, version):
+def _convert_pnpm_v9_package_dependency_version(snapshots, name, version):
+    # Detect when an alias is just a direct reference to another snapshot
+    if version in snapshots:
+        return "npm:{}".format(version)
+
     # Convert peer dependency data to rules_js ~v5 format
     version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
     return version
 
-def _convert_pnpm_v9_package_dependency_map(deps):
+def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
     result = {}
     for name, version in deps.items():
-        result[name] = _convert_pnpm_v9_package_dependency_version(name, version)
+        result[name] = _convert_pnpm_v9_package_dependency_version(snapshots, name, version)
     return result
 
 def _convert_pnpm_v9_importer_dependency_map(deps):
@@ -459,11 +463,17 @@ def _convert_v9_packages(packages, snapshots):
     #       peerDependencies which *might* be resolved
     #
     #  snapshots:
+    #    pkg@http://a/url
+    #       ...
+    #
     #    '@scoped/name@2.0.0(peer@2.0.2)'
     #       dependencies:
-    #           a-dep@1.2.3
-    #           peer@2.0.2
-    #           b-dep@3.2.1(peer-b@4.5.6)
+    #           a-dep: 1.2.3
+    #           peer: 2.0.2
+    #           b-dep: 3.2.1(peer-b@4.5.6)
+    #           alias: actual@1.2.3
+    #           l: file:../path/to/dir
+    #           x: https://a/url/v1.2.3.tar.gz
 
     result = {}
 
@@ -497,8 +507,8 @@ def _convert_v9_packages(packages, snapshots):
             name = name,
             version = version,
             friendly_version = friendly_version,
-            dependencies = _convert_pnpm_v9_package_dependency_map(package_snapshot.get("dependencies", {})),
-            optional_dependencies = _convert_pnpm_v9_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
+            dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("dependencies", {})),
+            optional_dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("optionalDependencies", {})),
             peer_dependencies = package_data.get("peerDependencies", {}),
             dev = None,  # TODO(pnpm9): must inspect importers.*.devDependencies?
             has_bin = package_data.get("hasBin", False),

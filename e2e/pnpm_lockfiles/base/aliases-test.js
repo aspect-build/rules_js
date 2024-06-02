@@ -22,3 +22,6 @@ if (
 ) {
     throw new Error('aliased `is-odd` as `is-odd-alt-version` are the same')
 }
+
+// `@isaacs/cliui` has transitive `npm:*` deps
+require('@isaacs/cliui')
