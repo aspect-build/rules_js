@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@isaacs-cliui-v90//:defs.bzl", isaacs_cliui_v90_link_all = "npm_link_all_packages")
 load("@override-with-alias-url-v9//:defs.bzl", override_with_alias_link_all = "npm_link_all_packages")
 load("@tarball-no-url-v54//:defs.bzl", tarball_no_url_link_all = "npm_link_all_packages")
 
@@ -21,5 +22,15 @@ build_test(
     targets = [
         ":override-with-alias-url-v9_modules",
         ":override-with-alias-url-v9_modules/lodash.pick",
+    ],
+)
+
+isaacs_cliui_v90_link_all(name = "isaacs_cliui_v90-modules")
+
+build_test(
+    name = "isaacs_cliui",
+    targets = [
+        ":isaacs_cliui_v90-modules",
+        ":isaacs_cliui_v90-modules/@isaacs/cliui",
     ],
 )
