@@ -125,10 +125,10 @@ sh_binary(
             dep_key = "{}+{}".format(name, version)
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
-                store_package, store_version = utils.parse_pnpm_package_key(raw_package, raw_version)
+                package_store_name = utils.package_store_name(raw_package, raw_version)
                 dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
                     root_package = root_package,
-                    package_store_name = utils.package_store_name(store_package, store_version),
+                    package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
                 )
                 if dep_store_target not in transitive_deps:
@@ -176,10 +176,10 @@ sh_binary(
                     if dep_importer in importers.keys():
                         raw_deps = importers.get(dep_importer).get("deps")
                     for raw_package, raw_version in raw_deps.items():
-                        store_package, store_version = utils.parse_pnpm_package_key(raw_package, raw_version)
+                        package_store_name = utils.package_store_name(raw_package, raw_version)
                         dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
                             root_package = root_package,
-                            package_store_name = utils.package_store_name(store_package, store_version),
+                            package_store_name = package_store_name,
                             package_store_root = utils.package_store_root,
                         )
                         if dep_store_target not in transitive_deps:

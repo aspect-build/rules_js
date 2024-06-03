@@ -35,16 +35,16 @@ def test_bazel_name(ctx):
 def test_pnpm_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope/y@1.1.1", utils.pnpm_name("@scope/y", "1.1.1"))
-    asserts.equals(env, ("@scope/y", "registry/@scope/y@1.1.1"), utils.parse_pnpm_package_key("@scope/y", "registry/@scope/y@1.1.1"))
-    asserts.equals(env, ("@scope/y", "1.1.1"), utils.parse_pnpm_package_key("@scope/y", "1.1.1"))
+    asserts.equals(env, "@scope+y@registry+@scope+y@1.1.1", utils.package_store_name("@scope/y", "registry/@scope/y@1.1.1"))
+    asserts.equals(env, "@scope+y@1.1.1", utils.package_store_name("@scope/y", "1.1.1"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
 def test_link_version(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ("@scope/y", "0.0.0"), utils.parse_pnpm_package_key("@scope/y", "link:foo"))
-    asserts.equals(env, ("@scope/y", "0.0.0"), utils.parse_pnpm_package_key("@scope/y", "file:bar"))
-    asserts.equals(env, ("@scope/y", "0.0.0"), utils.parse_pnpm_package_key("@scope/y", "file:@foo/bar"))
+    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "link:foo"))
+    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "file:bar"))
+    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "file:@foo/bar"))
     return unittest.end(env)
 
 def test_friendly_name(ctx):

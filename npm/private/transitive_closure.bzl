@@ -38,7 +38,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
             if version.startswith("npm:"):
                 # an aliased dependency
                 package_key = version[4:]
-                name, version = utils.parse_pnpm_package_key(name, version)
+                name, version = package_key.rsplit("@", 1)
             elif version not in packages:
                 package_key = utils.pnpm_name(name, version)
             else:

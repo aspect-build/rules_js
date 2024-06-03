@@ -62,15 +62,6 @@ def _pnpm_name(name, version):
     "Make a name/version pnpm-style name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _parse_pnpm_package_key(pnpm_name, pnpm_version):
-    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
-        return pnpm_name, "0.0.0"
-
-    if pnpm_version.startswith("npm:"):
-        return pnpm_version[4:].rsplit("@", 1)
-
-    return pnpm_name, pnpm_version
-
 # Metadata about a pnpm "project" (importer).
 #
 # Metadata may come from different locations depending on the lockfile, this struct should
@@ -614,8 +605,18 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _package_store_name(name, version):
+def _package_store_name(pnpm_name, pnpm_version):
     "Make a package store name for a given package and version"
+
+    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
+        name = pnpm_name
+        version = "0.0.0"
+    elif pnpm_version.startswith("npm:"):
+        name, version = pnpm_version[4:].rsplit("@", 1)
+    else:
+        name = pnpm_name
+        version = pnpm_version
+
     if version.startswith("@"):
         # Special case where the package name should _not_ be included in the package store name.
         # See https://github.com/aspect-build/rules_js/issues/423 for more context.
@@ -810,7 +811,6 @@ utils = struct(
     sorted_map = _sorted_map,
     pnpm_name = _pnpm_name,
     assert_lockfile_version = _assert_lockfile_version,
-    parse_pnpm_package_key = _parse_pnpm_package_key,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     friendly_name = _friendly_name,
     package_store_name = _package_store_name,

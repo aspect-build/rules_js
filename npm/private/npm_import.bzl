@@ -634,14 +634,14 @@ def _npm_import_links_rule_impl(rctx):
     deps = {}
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
+        package_store_name = utils.package_store_name(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
             dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
         else:
             dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/ref".format(link_root_name)"""
         dep_store_target = dep_store_target.format(
             root_package = rctx.attr.root_package,
-            package_store_name = utils.package_store_name(store_package, store_version),
+            package_store_name = package_store_name,
             package_store_root = utils.package_store_root,
         )
         ref_deps[dep_store_target] = ref_deps[dep_store_target] + [dep_name] if dep_store_target in ref_deps else [dep_name]
@@ -653,7 +653,6 @@ def _npm_import_links_rule_impl(rctx):
         # party npm deps; it is not used for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
-                store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
                 if dep_version.startswith("link:") or dep_version.startswith("file:"):
                     dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
                     lc_dep_store_target = dep_store_target
@@ -666,14 +665,16 @@ def _npm_import_links_rule_impl(rctx):
                         # of the lifecycle action
                         lc_dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/pkg_pre_lc_lite".format(link_root_name)"""
 
+                package_store_name = utils.package_store_name(dep_name, dep_version)
+
                 dep_store_target = dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    package_store_name = utils.package_store_name(store_package, store_version),
+                    package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
                 )
                 lc_dep_store_target = lc_dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    package_store_name = utils.package_store_name(store_package, store_version),
+                    package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
                 )
 
@@ -681,14 +682,13 @@ def _npm_import_links_rule_impl(rctx):
                 deps[dep_store_target] = deps[dep_store_target] + [dep_name] if dep_store_target in deps else [dep_name]
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
-            store_package, store_version = utils.parse_pnpm_package_key(dep_name, dep_version)
             if dep_version.startswith("link:") or dep_version.startswith("file:"):
                 dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
             else:
                 dep_store_target = """":{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
             dep_store_target = dep_store_target.format(
                 root_package = rctx.attr.root_package,
-                package_store_name = utils.package_store_name(store_package, store_version),
+                package_store_name = utils.package_store_name(dep_name, dep_version),
                 package_store_root = utils.package_store_root,
             )
             lc_deps[dep_store_target] = lc_deps[dep_store_target] + [dep_name] if dep_store_target in lc_deps else [dep_name]
