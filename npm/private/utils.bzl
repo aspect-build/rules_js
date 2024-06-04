@@ -319,8 +319,10 @@ def _convert_v6_importers(importers):
 def _convert_pnpm_v6_package_dependency_version(name, version):
     # an alias to an alternate package
     if version.startswith("/"):
-        alias, version = version[1:].rsplit("@", 1)
-        return "npm:{}@{}".format(alias, version)
+        # Convert peer dependency data to rules_js ~v5 format
+        version = _convert_pnpm_v6_v9_version_peer_dep(version[1:])
+
+        return "npm:{}".format(version)
 
     # Removing the default registry+name from the version string
     version = _strip_v6_default_registry_to_version(name, version)
@@ -398,13 +400,12 @@ def _convert_v6_packages(packages):
 
 def _convert_pnpm_v9_package_dependency_version(snapshots, name, version):
     # Detect when an alias is just a direct reference to another snapshot
-    if version in snapshots:
-        return "npm:{}".format(version)
+    is_alias = version in snapshots
 
     # Convert peer dependency data to rules_js ~v5 format
     version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
-    return version
+    return "npm:{}".format(version) if is_alias else version
 
 def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
     result = {}
@@ -418,13 +419,13 @@ def _convert_pnpm_v9_importer_dependency_map(deps):
         specifier = attributes.get("specifier")
         version = attributes.get("version")
 
+        # Transition version[(patch)(peer)(data)] to a rules_js version format
+        version = _convert_pnpm_v6_v9_version_peer_dep(version)
+
         if specifier.startswith("npm:"):
             # Keep the npm: specifier for aliased dependencies
             alias, version = version.rsplit("@", 1)
             version = "npm:{}@{}".format(alias, version)
-        else:
-            # Transition version[(patch)(peer)(data)] to a rules_js version format
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
         result[name] = version
     return result
