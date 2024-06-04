@@ -196,6 +196,7 @@ bzl_library(
         ":npm_translate_lock_macro_helpers",
         ":npm_translate_lock_state",
         ":npmrc",
+        ":pnpm",
         ":pnpm_repository",
         ":transitive_closure",
         ":utils",
@@ -216,6 +217,12 @@ bzl_library(
         "@aspect_bazel_lib//lib:utils",
         "@bazel_skylib//lib:types",
     ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+)
+
+bzl_library(
+    name = "pnpm",
+    srcs = ["pnpm.bzl"],
+    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(

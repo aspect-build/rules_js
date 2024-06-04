@@ -1,13 +1,13 @@
 "Unit tests for pnpm lock file parsing logic"
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:utils.bzl", "utils")
+load("//npm/private:pnpm.bzl", "pnpm", "pnpm_test")
 
 def _parse_empty_lock_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed_json_a = utils.parse_pnpm_lock_json("")
-    parsed_json_b = utils.parse_pnpm_lock_json("{}")
+    parsed_json_a = pnpm.parse_pnpm_lock_json("")
+    parsed_json_b = pnpm.parse_pnpm_lock_json("{}")
     expected = ({}, {}, {}, None)
 
     asserts.equals(env, expected, parsed_json_a)
@@ -50,7 +50,7 @@ expected_packages = {
 def _parse_lockfile_v5_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed_json = utils.parse_pnpm_lock_json("""\
+    parsed_json = pnpm.parse_pnpm_lock_json("""\
 {
   "lockfileVersion": 5.4,
   "specifiers": {
@@ -91,7 +91,7 @@ def _parse_lockfile_v5_test_impl(ctx):
 def _parse_lockfile_v6_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed_json = utils.parse_pnpm_lock_json("""\
+    parsed_json = pnpm.parse_pnpm_lock_json("""\
 {
   "lockfileVersion": "6.0",
   "dependencies": {
@@ -132,7 +132,7 @@ def _parse_lockfile_v6_test_impl(ctx):
 def _parse_lockfile_v9_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed_json = utils.parse_pnpm_lock_json("""\
+    parsed_json = pnpm.parse_pnpm_lock_json("""\
 {
   "lockfileVersion": "9.0",
   "settings": {
@@ -187,16 +187,52 @@ def _parse_lockfile_v9_test_impl(ctx):
 
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
+def _test_strip_peer_dep_or_patched_version(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(
+        env,
+        "21.1.0",
+        pnpm_test.strip_v5_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
+    )
+    asserts.equals(env, "1.0.0", pnpm_test.strip_v5_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
+    asserts.equals(env, "21.1.0", pnpm_test.strip_v5_peer_dep_or_patched_version("21.1.0"))
+    return unittest.end(env)
+
+# buildifier: disable=function-docstring
+def _test_version_supported(ctx):
+    env = unittest.begin(ctx)
+
+    # Unsupported versions + msgs
+    msg = pnpm.assert_lockfile_version(5.3, testonly = True)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 5.4, but found 5.3. Please upgrade to pnpm v7 or greater.", msg)
+    msg = pnpm.assert_lockfile_version(1.2, testonly = True)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 5.4, but found 1.2. Please upgrade to pnpm v7 or greater.", msg)
+    msg = pnpm.assert_lockfile_version(99.99, testonly = True)
+    asserts.equals(env, "npm_translate_lock currently supports a maximum lock_version of 9.0, but found 99.99. Please file an issue on rules_js", msg)
+
+    # supported versions
+    pnpm.assert_lockfile_version(5.4)
+    pnpm.assert_lockfile_version(6.0)
+    pnpm.assert_lockfile_version(6.1)
+    pnpm.assert_lockfile_version(9.0)
+
+    return unittest.end(env)
+
 a_test = unittest.make(_parse_empty_lock_test_impl, attrs = {})
 b_test = unittest.make(_parse_lockfile_v5_test_impl, attrs = {})
 c_test = unittest.make(_parse_lockfile_v6_test_impl, attrs = {})
 d_test = unittest.make(_parse_lockfile_v9_test_impl, attrs = {})
+e_test = unittest.make(_test_version_supported, attrs = {})
+f_test = unittest.make(_test_strip_peer_dep_or_patched_version, attrs = {})
 
 TESTS = [
     a_test,
     b_test,
     c_test,
     d_test,
+    e_test,
+    f_test,
 ]
 
 def parse_pnpm_lock_tests(name):

@@ -259,7 +259,7 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
                 # special case for alias dependencies such as npm:alias-to@version
                 maybe_package = dep_version[4:]
             elif dep_version not in packages:
-                maybe_package = utils.pnpm_name(dep_package, dep_version)
+                maybe_package = utils.package_key(dep_package, dep_version)
             else:
                 maybe_package = dep_version
             if maybe_package not in linked_packages:

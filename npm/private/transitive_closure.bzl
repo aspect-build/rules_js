@@ -40,7 +40,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                 package_key = version[4:]
                 name, version = package_key.rsplit("@", 1)
             elif version not in packages:
-                package_key = utils.pnpm_name(name, version)
+                package_key = utils.package_key(name, version)
             else:
                 package_key = version
             transitive_closure[name] = transitive_closure.get(name, [])
