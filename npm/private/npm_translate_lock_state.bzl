@@ -7,6 +7,7 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
+load(":pnpm.bzl", "pnpm")
 load(":repository_label_store.bzl", "repository_label_store")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 
@@ -490,7 +491,7 @@ def _load_lockfile(priv, rctx, _, label_store):
     if result.return_code:
         lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        importers, packages, patched_dependencies, lock_version, lock_parse_err = utils.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        importers, packages, patched_dependencies, lock_version, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
 
     priv["lock_version"] = lock_version
     priv["importers"] = importers

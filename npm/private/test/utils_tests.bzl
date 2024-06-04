@@ -6,17 +6,6 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:utils.bzl", "utils", "utils_test")
 
 # buildifier: disable=function-docstring
-def test_strip_peer_dep_or_patched_version(ctx):
-    env = unittest.begin(ctx)
-    asserts.equals(
-        env,
-        "21.1.0",
-        utils_test.strip_v5_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
-    )
-    asserts.equals(env, "1.0.0", utils_test.strip_v5_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
-    asserts.equals(env, "21.1.0", utils_test.strip_v5_peer_dep_or_patched_version("21.1.0"))
-    return unittest.end(env)
-
 def test_bazel_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
@@ -34,7 +23,7 @@ def test_bazel_name(ctx):
 # buildifier: disable=function-docstring
 def test_pnpm_name(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "@scope/y@1.1.1", utils.pnpm_name("@scope/y", "1.1.1"))
+    asserts.equals(env, "@scope/y@1.1.1", utils.package_key("@scope/y", "1.1.1"))
     asserts.equals(env, "@scope+y@registry+@scope+y@1.1.1", utils.package_store_name("@scope/y", "registry/@scope/y@1.1.1"))
     asserts.equals(env, "@scope+y@1.1.1", utils.package_store_name("@scope/y", "1.1.1"))
     return unittest.end(env)
@@ -55,26 +44,6 @@ def test_friendly_name(ctx):
 def test_package_store_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope+y@2.1.1", utils.package_store_name("@scope/y", "2.1.1"))
-    return unittest.end(env)
-
-# buildifier: disable=function-docstring
-def test_version_supported(ctx):
-    env = unittest.begin(ctx)
-
-    # Unsupported versions + msgs
-    msg = utils.assert_lockfile_version(5.3, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 5.4, but found 5.3. Please upgrade to pnpm v7 or greater.", msg)
-    msg = utils.assert_lockfile_version(1.2, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 5.4, but found 1.2. Please upgrade to pnpm v7 or greater.", msg)
-    msg = utils.assert_lockfile_version(99.99, testonly = True)
-    asserts.equals(env, "npm_translate_lock currently supports a maximum lock_version of 9.0, but found 99.99. Please file an issue on rules_js", msg)
-
-    # supported versions
-    utils.assert_lockfile_version(5.4)
-    utils.assert_lockfile_version(6.0)
-    utils.assert_lockfile_version(6.1)
-    utils.assert_lockfile_version(9.0)
-
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -156,12 +125,10 @@ def test_npm_registry_download_url(ctx):
     )
     return unittest.end(env)
 
-t0_test = unittest.make(test_strip_peer_dep_or_patched_version)
 t1_test = unittest.make(test_bazel_name)
 t2_test = unittest.make(test_pnpm_name)
 t3_test = unittest.make(test_friendly_name)
 t4_test = unittest.make(test_package_store_name)
-t5_test = unittest.make(test_version_supported)
 t6_test = unittest.make(test_parse_package_name)
 t7_test = unittest.make(test_npm_registry_download_url)
 t8_test = unittest.make(test_npm_registry_url)
@@ -170,12 +137,10 @@ t9_test = unittest.make(test_link_version)
 def utils_tests(name):
     unittest.suite(
         name,
-        t0_test,
         t1_test,
         t2_test,
         t3_test,
         t4_test,
-        t5_test,
         t6_test,
         t7_test,
         t8_test,
