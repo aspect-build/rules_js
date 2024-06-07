@@ -57,10 +57,10 @@ def _npm_package_files_impl(ctx):
 
     if ctx.attr.include_runfiles:
         # include default runfiles from srcs
-        files_depsets.extend([
-            target[DefaultInfo].default_runfiles.files
-            for target in ctx.attr.srcs
-        ])
+        for target in ctx.attr.srcs:
+            files_depsets.append(
+                target[DefaultInfo].default_runfiles.files,
+            )
 
     return DefaultInfo(
         files = depset(transitive = files_depsets),

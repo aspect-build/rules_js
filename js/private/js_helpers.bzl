@@ -182,10 +182,8 @@ def gather_runfiles(
     transitive_files_depsets = [sources]
 
     # Gather the default outputs of data targets
-    transitive_files_depsets.extend([
-        target[DefaultInfo].files
-        for target in data
-    ])
+    for target in data:
+        transitive_files_depsets.append(target[DefaultInfo].files)
 
     # Gather files from JsInfo providers of data & deps
     transitive_files_depsets.append(gather_files_from_js_infos(
@@ -272,34 +270,19 @@ def gather_files_from_js_infos(
         A depset of files
     """
     files_depsets = []
-    if include_sources:
-        files_depsets = [
-            target[JsInfo].sources
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "sources")
-        ]
-    if include_types:
-        files_depsets.extend([
-            target[JsInfo].types
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "types")
-        ])
-    if include_transitive_sources:
-        files_depsets.extend([
-            target[JsInfo].transitive_sources
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
-        ])
-    if include_transitive_types:
-        files_depsets.extend([
-            target[JsInfo].transitive_types
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
-        ])
-    if include_npm_sources:
-        files_depsets.extend([
-            target[JsInfo].npm_sources
-            for target in targets
-            if JsInfo in target and hasattr(target[JsInfo], "npm_sources")
-        ])
+
+    for target in targets:
+        if JsInfo in target:
+            js_info = target[JsInfo]
+            if include_sources and hasattr(js_info, "sources"):
+                files_depsets.append(js_info.sources)
+            if include_types and hasattr(js_info, "types"):
+                files_depsets.append(js_info.types)
+            if include_transitive_sources and hasattr(js_info, "transitive_sources"):
+                files_depsets.append(js_info.transitive_sources)
+            if include_transitive_types and hasattr(js_info, "transitive_types"):
+                files_depsets.append(js_info.transitive_types)
+            if include_npm_sources and hasattr(js_info, "npm_sources"):
+                files_depsets.append(js_info.npm_sources)
+
     return depset([], transitive = files_depsets)

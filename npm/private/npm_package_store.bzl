@@ -335,20 +335,16 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
     if package_store_directory:
         files.append(package_store_directory)
 
-    npm_package_store_infos.extend([
-        target[NpmPackageStoreInfo]
-        for target in ctx.attr.deps
-    ])
+    for target in ctx.attr.deps:
+        npm_package_store_infos.append(target[NpmPackageStoreInfo])
 
     for transitive_package_store_infos_depset in transitive_package_store_infos_depsets:
         for npm_package_store_info in transitive_package_store_infos_depset.to_list():
             npm_package_store_infos.append(npm_package_store_info)
 
     if ctx.attr.src:
-        transitive_files_depset = depset(files, transitive = transitive_files_depsets + [
-            npm_package_store_info.transitive_files
-            for npm_package_store_info in npm_package_store_infos
-        ])
+        for npm_package_store_info in npm_package_store_infos:
+            transitive_files_depsets.append(npm_package_store_info.transitive_files)
     else:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when ctx.attr.src is
         # _not_ set, this is a terminal 3p package with ctx.attr.deps being the transitive closure
@@ -357,10 +353,10 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # closure of all the entire package store deps, we can safely add just `files` from each of
         # these to `transitive_files_depset`; doing so reduces the size of `transitive_files_depset`
         # significantly and reduces analysis time and Bazel memory usage during analysis
-        transitive_files_depset = depset(files, transitive = transitive_files_depsets + [
-            npm_package_store_info.files
-            for npm_package_store_info in npm_package_store_infos
-        ])
+        for npm_package_store_info in npm_package_store_infos:
+            transitive_files_depsets.append(npm_package_store_info.files)
+
+    transitive_files_depset = depset(files, transitive = transitive_files_depsets)
 
     files_depset = depset(files)
 
