@@ -197,12 +197,16 @@ def gather_runfiles(
         include_npm_sources = include_npm_sources,
     ))
 
-    files_runfiles = []
-    for d in data_files:
-        if copy_data_files_to_bin and d.is_source and d not in no_copy_to_bin:
-            files_runfiles.append(copy_js_file_to_bin_action(ctx, d))
-        else:
-            files_runfiles.append(d)
+    # Use `data_files` as-is if `copy_data_files_to_bin` is False
+    if copy_data_files_to_bin:
+        files_runfiles = []
+        for d in data_files:
+            if d.is_source and d not in no_copy_to_bin:
+                files_runfiles.append(copy_js_file_to_bin_action(ctx, d))
+            else:
+                files_runfiles.append(d)
+    else:
+        files_runfiles = data_files
 
     if len(files_runfiles) > 0:
         transitive_files_depsets.append(depset(files_runfiles))
