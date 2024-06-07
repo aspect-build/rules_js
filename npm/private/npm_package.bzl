@@ -73,7 +73,7 @@ def _npm_package_impl(ctx):
     npm_package_store_infos = [
         target[JsInfo].npm_package_store_infos
         for target in ctx.attr.srcs
-        if JsInfo in target and hasattr(target[JsInfo], "npm_package_store_infos")
+        if JsInfo in target
     ]
     npm_package_store_infos.append(js_lib_helpers.gather_npm_package_store_infos(
         targets = ctx.attr.data,
