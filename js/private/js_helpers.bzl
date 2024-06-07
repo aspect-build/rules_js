@@ -49,11 +49,18 @@ def gather_npm_sources(srcs, deps):
         Depset of npm sources
     """
 
-    return depset(transitive = [
-        target[JsInfo].npm_sources
-        for target in srcs + deps
-        if JsInfo in target
-    ])
+    transitive = []
+
+    # Duplicate loops to avoid src + deps concat
+    for target in srcs:
+        if JsInfo in target:
+            transitive.append(target[JsInfo].npm_sources)
+
+    for target in deps:
+        if JsInfo in target:
+            transitive.append(target[JsInfo].npm_sources)
+
+    return depset([], transitive = transitive)
 
 def gather_npm_package_store_infos(targets):
     """Gathers NpmPackageStoreInfo providers from the list of targets
@@ -182,9 +189,12 @@ def gather_runfiles(
     for target in data:
         transitive_files_depsets.append(target[DefaultInfo].files)
 
+    # Avoid concatenating more then once
+    data_deps = data + deps
+
     # Gather files from JsInfo providers of data & deps
     transitive_files_depsets.append(gather_files_from_js_infos(
-        targets = data + deps,
+        targets = data_deps,
         include_sources = include_sources,
         include_types = include_types,
         include_transitive_sources = include_transitive_sources,
@@ -209,7 +219,7 @@ def gather_runfiles(
         transitive_files = depset(transitive = transitive_files_depsets),
     ).merge_all([
         target[DefaultInfo].default_runfiles
-        for target in data + deps
+        for target in data_deps
     ])
 
 LOG_LEVELS = {
