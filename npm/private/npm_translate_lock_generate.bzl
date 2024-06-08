@@ -88,9 +88,6 @@ def generate_repository_files(rctx, pnpm_lock_label, importers, packages, patche
 
     link_packages = [helpers.link_package(root_package, import_path) for import_path in importers.keys()]
 
-    defs_bzl_header = ["""# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")"""]
-
     fp_links = {}
     rctx_files = {
         "BUILD.bazel": [
@@ -197,10 +194,6 @@ sh_binary(
                         "deps": transitive_deps,
                     }
 
-    if fp_links:
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
-
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(link_packages = str(link_packages))
 
     npm_link_targets_bzl = [
@@ -241,6 +234,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         ),
     ]
 
+    defs_bzl_header = []
     stores_bzl = []
     links_bzl = {}
     links_targets_bzl = {}
@@ -417,6 +411,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     )""")
 
     npm_link_targets_bzl.append("""    return link_targets""")
+
+    defs_bzl_header.append("")
+    defs_bzl_header.append("# buildifier: disable=bzl-visibility")
+    defs_bzl_header.append("""load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")""")
+    if fp_links:
+        defs_bzl_header.append("")
+        defs_bzl_header.append("# buildifier: disable=bzl-visibility")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")""")
+        defs_bzl_header.append("")
+        defs_bzl_header.append("# buildifier: disable=bzl-visibility")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
     rctx_files[rctx.attr.defs_bzl_filename] = [
         "\n".join(defs_bzl_header),
