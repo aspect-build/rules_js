@@ -92,39 +92,27 @@ WARNING: js_info 'transitive_npm_linked_package_files' is deprecated. Use 'npm_s
         msg = "Expected target to be a Label but got {}".format(type(target))
         fail(msg)
 
-    if sources == None:
-        sources = depset()
-    elif type(sources) != "depset":
+    if sources != None and type(sources) != "depset":
         msg = "Expected sources to be a depset but got {}".format(type(sources))
         fail(msg)
 
-    if types == None:
-        types = depset()
-    elif type(types) != "depset":
+    if types != None and type(types) != "depset":
         msg = "Expected types to be a depset but got {}".format(type(types))
         fail(msg)
 
-    if transitive_sources == None:
-        transitive_sources = depset()
-    elif type(transitive_sources) != "depset":
+    if transitive_sources != None and type(transitive_sources) != "depset":
         msg = "Expected transitive_sources to be a depset but got {}".format(type(transitive_sources))
         fail(msg)
 
-    if transitive_types == None:
-        transitive_types = depset()
-    elif type(transitive_types) != "depset":
+    if transitive_types != None and type(transitive_types) != "depset":
         msg = "Expected transitive_types to be a depset but got {}".format(type(transitive_types))
         fail(msg)
 
-    if npm_sources == None:
-        npm_sources = depset()
-    elif type(npm_sources) != "depset":
+    if npm_sources != None and type(npm_sources) != "depset":
         msg = "Expected npm_sources to be a depset but got {}".format(type(npm_sources))
         fail(msg)
 
-    if npm_package_store_infos == None:
-        npm_package_store_infos = depset()
-    elif type(npm_package_store_infos) != "depset":
+    if npm_package_store_infos != None and type(npm_package_store_infos) != "depset":
         msg = "Expected npm_package_store_infos to be a depset but got {}".format(type(npm_package_store_infos))
         fail(msg)
 

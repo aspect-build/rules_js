@@ -265,17 +265,19 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 # party npm deps; it is not used for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
 
-        for store in ctx.attr.src[NpmPackageInfo].npm_package_store_infos.to_list():
-            dep_package = store.package
-            dep_package_store_directory = store.package_store_directory
+        src_npm_package_store_infos = ctx.attr.src[NpmPackageInfo].npm_package_store_infos
+        if src_npm_package_store_infos != None:
+            for store in src_npm_package_store_infos.to_list():
+                dep_package = store.package
+                dep_package_store_directory = store.package_store_directory
 
-            # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
-            # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
-            if dep_package_store_directory not in linked_package_store_directories:
-                # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_package)
-                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
-                npm_package_store_infos.append(store)
+                # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
+                # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
+                if dep_package_store_directory not in linked_package_store_directories:
+                    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+                    dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_package)
+                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
+                    npm_package_store_infos.append(store)
     elif ctx.attr.src and JsInfo in ctx.attr.src:
         jsinfo = ctx.attr.src[JsInfo]
 

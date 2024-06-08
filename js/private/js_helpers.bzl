@@ -19,7 +19,7 @@ def gather_transitive_sources(sources, targets):
     transitive = [
         target[JsInfo].transitive_sources
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
+        if JsInfo in target and target[JsInfo].transitive_sources != None
     ]
     return depset([], transitive = [sources] + transitive)
 
@@ -38,7 +38,7 @@ def gather_transitive_types(types, targets):
     transitive = [
         target[JsInfo].transitive_types
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
+        if JsInfo in target and target[JsInfo].transitive_types != None
     ]
     return depset([], transitive = [types] + transitive)
 
@@ -56,7 +56,7 @@ def gather_npm_sources(srcs, deps):
     return depset([], transitive = [
         target[JsInfo].npm_sources
         for target in srcs + deps
-        if JsInfo in target and hasattr(target[JsInfo], "npm_sources")
+        if JsInfo in target and target[JsInfo].npm_sources != None
     ])
 
 def gather_npm_package_store_infos(targets):
@@ -73,7 +73,7 @@ def gather_npm_package_store_infos(targets):
     npm_package_store_infos = [
         target[JsInfo].npm_package_store_infos
         for target in targets
-        if JsInfo in target
+        if JsInfo in target and target[JsInfo].npm_package_store_infos
     ]
 
     return depset([], transitive = npm_package_store_infos)
@@ -275,15 +275,15 @@ def gather_files_from_js_infos(
     for target in targets:
         if JsInfo in target:
             js_info = target[JsInfo]
-            if include_sources and hasattr(js_info, "sources"):
+            if include_sources and js_info.sources != None:
                 files_depsets.append(js_info.sources)
-            if include_types and hasattr(js_info, "types"):
+            if include_types and js_info.types != None:
                 files_depsets.append(js_info.types)
-            if include_transitive_sources and hasattr(js_info, "transitive_sources"):
+            if include_transitive_sources and js_info.transitive_sources != None:
                 files_depsets.append(js_info.transitive_sources)
-            if include_transitive_types and hasattr(js_info, "transitive_types"):
+            if include_transitive_types and js_info.transitive_types != None:
                 files_depsets.append(js_info.transitive_types)
-            if include_npm_sources and hasattr(js_info, "npm_sources"):
+            if include_npm_sources and js_info.npm_sources != None:
                 files_depsets.append(js_info.npm_sources)
 
     return depset([], transitive = files_depsets)
