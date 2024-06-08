@@ -204,33 +204,34 @@ def _js_library_impl(ctx):
         files = ctx.files.types,
     )
 
+    # Direct sources and types
     sources = depset(transitive = [sources, additional_sources])
     types = depset(transitive = [types, additional_sources, additional_types])
 
-    srcs_types_deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps
-
+    # Transitive sources and types
     transitive_sources = [sources]
     transitive_types = [types]
+
+    # npm providers
     npm_sources = []
     npm_package_store_infos = []
+
+    # Concat the srcs+types+deps once
+    srcs_types_deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps
+
+    # Collect transitive sources, types and npm providers from srcs+types+deps
     for target in srcs_types_deps:
         if JsInfo in target:
-            info = target[JsInfo]
-            if hasattr(info, "transitive_sources"):
-                transitive_sources.append(info.transitive_sources)
-            if hasattr(info, "transitive_types"):
-                transitive_types.append(info.transitive_types)
-            if hasattr(info, "npm_sources"):
-                npm_sources.append(info.npm_sources)
-            if hasattr(info, "npm_package_store_infos"):
-                npm_package_store_infos.append(info.npm_package_store_infos)
+            jsinfo = target[JsInfo]
+            transitive_sources.append(jsinfo.transitive_sources)
+            transitive_types.append(jsinfo.transitive_types)
+            npm_sources.append(jsinfo.npm_sources)
+            npm_package_store_infos.append(jsinfo.npm_package_store_infos)
 
     # Also add npm_package_store_infos from ctx.attr.data
     for target in ctx.attr.data:
         if JsInfo in target:
-            info = target[JsInfo]
-            if hasattr(info, "npm_package_store_infos"):
-                npm_package_store_infos.append(info.npm_package_store_infos)
+            npm_package_store_infos.append(target[JsInfo].npm_package_store_infos)
 
     transitive_sources = depset(transitive = transitive_sources)
     transitive_types = depset(transitive = transitive_types)

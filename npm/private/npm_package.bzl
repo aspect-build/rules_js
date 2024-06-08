@@ -16,7 +16,6 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:versions.bzl", "versions")
 load("//js:defs.bzl", "js_binary")
 load("//js:libs.bzl", "js_lib_helpers")
-load("//js:providers.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
 # Pull in all copy_to_directory attributes except for exclude_prefixes
@@ -70,11 +69,9 @@ def _npm_package_impl(ctx):
     dst = ctx.actions.declare_directory(ctx.attr.out if ctx.attr.out else ctx.attr.name)
 
     # forward all npm_package_store_infos
-    npm_package_store_infos = [
-        target[JsInfo].npm_package_store_infos
-        for target in ctx.attr.srcs + ctx.attr.data
-        if JsInfo in target
-    ]
+    npm_package_store_infos = js_lib_helpers.gather_npm_package_store_infos(
+        targets = ctx.attr.srcs + ctx.attr.data,
+    )
 
     copy_to_directory_bin_action(
         ctx,
@@ -106,7 +103,7 @@ def _npm_package_impl(ctx):
             package = ctx.attr.package,
             version = ctx.attr.version,
             src = dst,
-            npm_package_store_infos = depset(transitive = npm_package_store_infos),
+            npm_package_store_infos = npm_package_store_infos,
         ),
     ]
 

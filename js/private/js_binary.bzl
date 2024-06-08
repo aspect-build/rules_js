@@ -525,10 +525,8 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     runfiles = gather_runfiles(
         ctx = ctx,
-        sources = [],
         data = ctx.attr.data,
         data_files = [entry_point] + ctx.files.data,
-        deps = [],
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
         include_sources = ctx.attr.include_sources,
