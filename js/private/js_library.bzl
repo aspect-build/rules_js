@@ -24,7 +24,7 @@ js_library(
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
-load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
+load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_runfiles_optimized", "gather_transitive_sources", "gather_transitive_types")
 load(":js_info.bzl", "JsInfo", "js_info")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
@@ -128,6 +128,16 @@ a runtime dependency on this target.
         doc = """When True, `data` files are copied to the Bazel output tree before being passed as inputs to runfiles.""",
         default = True,
     ),
+    "optimized_runfiles_collection": attr.bool(
+        doc = """Enable optimized runfiles collection where only default_runfiles
+        of `deps` & `data` targets are gathered.
+
+        Under the hood this disables the defense-in-depth against `data` & `deps` targets not supplying all required runfiles,
+        where runfiles collection also gathers the transitive sources & transitive npm sources from the `JsInfo` providers of
+        `data` & `deps` targets.
+        """,
+        default = True,
+    ),
 }
 
 def _gather_sources_and_types(ctx, targets, files):
@@ -226,20 +236,31 @@ def _js_library_impl(ctx):
         targets = ctx.attr.srcs + ctx.attr.data + ctx.attr.deps,
     )
 
-    runfiles = gather_runfiles(
-        ctx = ctx,
-        sources = transitive_sources,
-        data = ctx.attr.data,
-        deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
-        data_files = ctx.files.data,
-        copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
-        no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_sources = True,
-        include_types = False,
-        include_transitive_sources = True,
-        include_transitive_types = False,
-        include_npm_sources = True,
-    )
+    if ctx.attr.optimized_runfiles_collection:
+        runfiles = gather_runfiles_optimized(
+            ctx = ctx,
+            sources = transitive_sources,
+            data = ctx.attr.data,
+            deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
+            data_files = ctx.files.data,
+            copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+            no_copy_to_bin = ctx.files.no_copy_to_bin,
+        )
+    else:
+        runfiles = gather_runfiles(
+            ctx = ctx,
+            sources = transitive_sources,
+            data = ctx.attr.data,
+            deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
+            data_files = ctx.files.data,
+            copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+            no_copy_to_bin = ctx.files.no_copy_to_bin,
+            include_sources = True,
+            include_types = False,
+            include_transitive_sources = True,
+            include_transitive_types = False,
+            include_npm_sources = True,
+        )
 
     return [
         js_info(

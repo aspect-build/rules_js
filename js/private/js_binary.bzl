@@ -21,7 +21,7 @@ load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
-load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles", "gather_runfiles_optimized")
 
 _DOC = """Execute a program in the Node.js runtime.
 
@@ -256,6 +256,16 @@ _ATTRS = {
         imports may escape the execroot by following symlinks into the source tree. When set to True, such a program
         would escape the sandbox but will end up in the output tree where `node_modules` and other inputs required
         will be available.
+        """,
+        default = True,
+    ),
+    "optimized_runfiles_collection": attr.bool(
+        doc = """Enable optimized runfiles collection where only default_runfiles
+        of `deps` & `data` targets are gathered.
+
+        Under the hood this disables the defense-in-depth against `data` & `deps` targets not supplying all required runfiles,
+        where runfiles collection also gathers the transitive sources & transitive npm sources from the `JsInfo` providers of
+        `data` & `deps` targets.
         """,
         default = True,
     ),
@@ -523,20 +533,33 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
                 fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
             launcher_files.extend(nodeinfo.npm_files)
 
-    runfiles = gather_runfiles(
-        ctx = ctx,
-        sources = [],
-        data = ctx.attr.data,
-        data_files = [entry_point] + ctx.files.data,
-        deps = [],
-        copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
-        no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_sources = ctx.attr.include_sources,
-        include_types = ctx.attr.include_types,
-        include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_transitive_types = ctx.attr.include_transitive_types,
-        include_npm_sources = ctx.attr.include_npm_sources,
-    ).merge(ctx.runfiles(
+    if ctx.attr.optimized_runfiles_collection:
+        runfiles = gather_runfiles_optimized(
+            ctx = ctx,
+            sources = depset(),
+            data = ctx.attr.data,
+            data_files = [entry_point] + ctx.files.data,
+            deps = [],
+            copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+            no_copy_to_bin = ctx.files.no_copy_to_bin,
+        )
+    else:
+        runfiles = gather_runfiles(
+            ctx = ctx,
+            sources = [],
+            data = ctx.attr.data,
+            data_files = [entry_point] + ctx.files.data,
+            deps = [],
+            copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+            no_copy_to_bin = ctx.files.no_copy_to_bin,
+            include_sources = ctx.attr.include_sources,
+            include_types = ctx.attr.include_types,
+            include_transitive_sources = ctx.attr.include_transitive_sources,
+            include_transitive_types = ctx.attr.include_transitive_types,
+            include_npm_sources = ctx.attr.include_npm_sources,
+        )
+
+    runfiles = runfiles.merge(ctx.runfiles(
         files = launcher_files,
         transitive_files = transitive_launcher_files,
     ))

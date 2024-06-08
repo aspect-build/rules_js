@@ -114,6 +114,73 @@ this option is not needed.
 
     return copy_file_to_bin_action(ctx, file)
 
+def gather_runfiles_optimized(
+        ctx,
+        sources,
+        data,
+        deps,
+        data_files = [],
+        copy_data_files_to_bin = False,
+        no_copy_to_bin = []):
+    """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
+
+    See https://bazel.build/extending/rules#runfiles for more info on providing runfiles in build rules.
+
+    Args:
+        ctx: the rule context
+
+        sources: list or depset of files which should be included in runfiles
+
+        data: list of data targets; default outputs and transitive runfiles are gather from these targets
+
+            See https://bazel.build/reference/be/common-definitions#typical.data and
+            https://bazel.build/concepts/dependencies#data-dependencies for more info and guidance
+            on common usage of the `data` attribute in build rules.
+
+        deps: list of dependency targets; only transitive runfiles are gather from these targets
+
+        data_files: a list of data files which should be included in runfiles
+
+            Data files that are source files are copied to the Bazel output tree when
+            `copy_data_files_to_bin` is set to `True`.
+
+        copy_data_files_to_bin: When True, `data_files` that are source files and are copied to the
+            Bazel output tree before being passed to returned runfiles.
+
+        no_copy_to_bin: List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
+
+            This is useful for exceptional cases where a `copy_data_files_to_bin` is not possible or not suitable for an input
+            file such as a file in an external repository. In most cases, this option is not needed.
+            See `copy_data_files_to_bin` docstring for more info.
+
+    Returns:
+        A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
+    """
+
+    # Includes sources
+    if type(sources) == "list":
+        sources = depset(sources)
+    transitive_files_depsets = [sources]
+
+    files_runfiles = []
+    for d in data_files:
+        if copy_data_files_to_bin and d.is_source and d not in no_copy_to_bin:
+            files_runfiles.append(copy_js_file_to_bin_action(ctx, d))
+        else:
+            files_runfiles.append(d)
+
+    if len(files_runfiles) > 0:
+        transitive_files_depsets.append(depset(files_runfiles))
+
+    # Merge in transitive runfiles of data & deps.
+    return ctx.runfiles(
+        files = files_runfiles,
+        transitive_files = depset(transitive = transitive_files_depsets),
+    ).merge_all([
+        target[DefaultInfo].default_runfiles
+        for target in data + deps
+    ])
+
 def gather_runfiles(
         ctx,
         sources,
@@ -129,7 +196,7 @@ def gather_runfiles(
         include_npm_sources = True):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
-    As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
+    As a defense-in-depth against `data` & `deps` targets not supplying all required runfiles, also
     gathers the transitive sources & transitive npm sources from the `JsInfo` providers of
     `data` & `deps` targets.
 
@@ -140,20 +207,20 @@ def gather_runfiles(
 
         sources: list or depset of files which should be included in runfiles
 
-        deps: list of dependency targets; only transitive runfiles are gather from these targets
-
         data: list of data targets; default outputs and transitive runfiles are gather from these targets
 
             See https://bazel.build/reference/be/common-definitions#typical.data and
             https://bazel.build/concepts/dependencies#data-dependencies for more info and guidance
             on common usage of the `data` attribute in build rules.
 
+        deps: list of dependency targets; only transitive runfiles are gather from these targets
+
         data_files: a list of data files which should be included in runfiles
 
             Data files that are source files are copied to the Bazel output tree when
             `copy_data_files_to_bin` is set to `True`.
 
-        copy_data_files_to_bin: When True, `data` files that are source files and are copied to the
+        copy_data_files_to_bin: When True, `data_files` that are source files and are copied to the
             Bazel output tree before being passed to returned runfiles.
 
         no_copy_to_bin: List of files to not copy to the Bazel output tree when `copy_data_to_bin` is True.
