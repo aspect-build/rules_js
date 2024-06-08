@@ -204,9 +204,6 @@ def gather_runfiles(
         else:
             files_runfiles.append(d)
 
-    if len(files_runfiles) > 0:
-        transitive_files_depsets.append(depset(files_runfiles))
-
     # Merge the above with the transitive runfiles of data & deps.
     return ctx.runfiles(
         files = files_runfiles,
