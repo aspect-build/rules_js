@@ -212,16 +212,16 @@ def _npm_package_store_impl(ctx):
                 # `chmod -R a+X` to fix up these packages (https://stackoverflow.com/a/14634721).
                 # See https://github.com/aspect-build/rules_js/issues/1637 for more info.
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+                args = ctx.actions.args()
+                args.add(bsdtar.tarinfo.binary)
+                args.add(src)
+                args.add(package_store_directory.path)  # Need to use `.path` due to: Error in add: Cannot add directories to Args#add since they may expand to multiple values. Either use Args#add_all (if you want expansion) or args.add(directory.path).
                 ctx.actions.run_shell(
                     tools = [bsdtar.tarinfo.binary],
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
                     command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3 && chmod -R a+X $3",
-                    arguments = [
-                        bsdtar.tarinfo.binary.path,
-                        src.path,
-                        package_store_directory.path,
-                    ],
+                    arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                 )
