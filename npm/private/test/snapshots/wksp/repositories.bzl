@@ -18892,6 +18892,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__pngjs__5.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["pngjs"],
+        },
+        package = "pngjs",
+        version = "5.0.0",
+        url = "https://registry.npmjs.org/pngjs/-/pngjs-5.0.0.tgz",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==",
+        transitive_closure = {
+            "pngjs": ["5.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__point-in-polygon__1.1.0",
         root_package = "",
         link_workspace = "",
