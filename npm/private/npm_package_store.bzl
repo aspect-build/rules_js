@@ -151,6 +151,33 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     ),
 }
 
+def _fast_symlink(ctx, symlink_path, target_path, prefix):
+    symlink = ctx.actions.declare_symlink(symlink_path)
+    symlink_path = symlink.path
+
+    total = len(symlink_path)
+    for i in range(total):
+        if symlink_path[i] != target_path[i]:
+            for j in range(i, 0, -1):
+                if symlink_path[j] == "/":
+                    break
+            break
+    new_target_path = prefix + target_path[j:]
+
+    ctx.actions.symlink(
+        output = symlink,
+        target_path = new_target_path,
+    )
+    return symlink
+
+def _fast_join(path, *others):
+    result = path
+
+    for p in others:
+        result += "/" + p
+
+    return result
+
 def _npm_package_store_impl(ctx):
     if ctx.attr.src:
         if NpmPackageInfo in ctx.attr.src:
@@ -324,8 +351,12 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 if dep_ref_def_package_store_directory:
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
                         # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                        dep_ref_dep_symlink_path = paths.join("node_modules", utils.package_store_root, dep_package_store_name, "node_modules", dep_ref_dep_alias)
-                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path))
+                        dep_ref_dep_symlink_path = _fast_join("node_modules", utils.package_store_root, dep_package_store_name, "node_modules", dep_ref_dep_alias)
+                        if "/" in dep_ref_dep_alias:
+                            prefix = "../../.."
+                        else:
+                            prefix = "../.."
+                        files.append(_fast_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path, prefix))
     else:
         # We should _never_ get here
         fail("Internal error")
