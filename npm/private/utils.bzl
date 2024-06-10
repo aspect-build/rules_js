@@ -21,8 +21,7 @@ def _sorted_map(m):
 def _sanitize_string(string):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
     result = ""
-    for i in range(0, len(string)):
-        c = string[i]
+    for c in string.elems():
         if c == "@" and (not result or result[-1] == "_"):
             result += "at"
         if not c.isalnum() and c != "-" and c != "_" and c != ".":
