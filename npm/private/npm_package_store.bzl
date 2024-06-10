@@ -1,7 +1,6 @@
 "npm_package_store rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
@@ -189,14 +188,19 @@ def _npm_package_store_impl(ctx):
 
     # the path to the package store location for this package
     # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-    package_store_directory_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", package)
+    package_store_directory_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, package)
 
     if ctx.attr.src and NpmPackageInfo in ctx.attr.src:
         # output the package as a TreeArtifact to its package store location
-        if ctx.label.workspace_name:
-            expected_short_path = paths.join("..", ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
+        if ctx.label.workspace_name and ctx.label.package:
+            expected_short_path = "../{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
+        elif ctx.label.workspace_name:
+            expected_short_path = "../{}/{}".format(ctx.label.workspace_name, package_store_directory_path)
+        elif ctx.label.package:
+            expected_short_path = "{}/{}".format(ctx.label.package, package_store_directory_path)
         else:
-            expected_short_path = paths.join(ctx.label.package, package_store_directory_path)
+            expected_short_path = package_store_directory_path
+
         src = ctx.attr.src[NpmPackageInfo].src
         if src.short_path == expected_short_path:
             # the input is already the desired output; this is the pattern for
@@ -252,7 +256,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
                     # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                    dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_alias)
+                    dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_alias)
                     files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
@@ -269,24 +273,25 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
             if dep_package_store_directory not in linked_package_store_directories:
                 # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                dep_symlink_path = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", dep_package)
+                dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_package)
                 files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
                 npm_package_store_infos.append(store)
     elif ctx.attr.src and JsInfo in ctx.attr.src:
+        jsinfo = ctx.attr.src[JsInfo]
+
         # Symlink to the directory of the target that created this JsInfo
         if ctx.label.workspace_name:
-            symlink_path = paths.join("external", ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
+            symlink_path = "external/{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
         else:
-            symlink_path = paths.join(ctx.label.package, package_store_directory_path)
-        transitive_files_depsets.append(ctx.attr.src[JsInfo].transitive_sources)
-        transitive_files_depsets.append(ctx.attr.src[JsInfo].transitive_types)
-        transitive_package_store_infos_depsets.append(ctx.attr.src[JsInfo].npm_package_store_infos)
-        if ctx.attr.src[JsInfo].target.workspace_name:
-            target_path = paths.join(ctx.bin_dir.path, "external", ctx.attr.src[JsInfo].target.workspace_name, ctx.attr.src[JsInfo].target.package)
-            package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+            symlink_path = "{}/{}".format(ctx.label.package or ".", package_store_directory_path)
+        transitive_files_depsets.append(jsinfo.transitive_sources)
+        transitive_files_depsets.append(jsinfo.transitive_types)
+        transitive_package_store_infos_depsets.append(jsinfo.npm_package_store_infos)
+        if jsinfo.target.workspace_name:
+            target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.workspace_name, jsinfo.target.package)
         else:
-            target_path = paths.join(ctx.bin_dir.path, ctx.attr.src[JsInfo].target.package)
-            package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+            target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
+        package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
     elif not ctx.attr.src:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
@@ -324,7 +329,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 if dep_ref_def_package_store_directory:
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
                         # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                        dep_ref_dep_symlink_path = paths.join("node_modules", utils.package_store_root, dep_package_store_name, "node_modules", dep_ref_dep_alias)
+                        dep_ref_dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, dep_package_store_name, dep_ref_dep_alias)
                         files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path))
     else:
         # We should _never_ get here
