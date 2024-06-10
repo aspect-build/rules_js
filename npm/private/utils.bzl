@@ -2,7 +2,6 @@
 
 load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
@@ -72,9 +71,6 @@ def _package_store_name(pnpm_name, pnpm_version):
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_path):
-    if not bazel_lib_utils.is_bazel_6_or_greater():
-        # ctx.actions.declare_symlink was added in Bazel 6
-        fail("A minimum version of Bazel 6 required to use rules_js")
     symlink = ctx.actions.declare_symlink(symlink_path)
     ctx.actions.symlink(
         output = symlink,
