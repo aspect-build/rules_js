@@ -13,6 +13,8 @@ JsInfo = provider(
     },
 )
 
+_EMPTY_DEPSET = depset()
+
 def js_info(
         target,
         sources = None,
@@ -93,37 +95,37 @@ WARNING: js_info 'transitive_npm_linked_package_files' is deprecated. Use 'npm_s
         fail(msg)
 
     if sources == None:
-        sources = depset()
+        sources = _EMPTY_DEPSET
     elif type(sources) != "depset":
         msg = "Expected sources to be a depset but got {}".format(type(sources))
         fail(msg)
 
     if types == None:
-        types = depset()
+        types = _EMPTY_DEPSET
     elif type(types) != "depset":
         msg = "Expected types to be a depset but got {}".format(type(types))
         fail(msg)
 
     if transitive_sources == None:
-        transitive_sources = depset()
+        transitive_sources = _EMPTY_DEPSET
     elif type(transitive_sources) != "depset":
         msg = "Expected transitive_sources to be a depset but got {}".format(type(transitive_sources))
         fail(msg)
 
     if transitive_types == None:
-        transitive_types = depset()
+        transitive_types = _EMPTY_DEPSET
     elif type(transitive_types) != "depset":
         msg = "Expected transitive_types to be a depset but got {}".format(type(transitive_types))
         fail(msg)
 
     if npm_sources == None:
-        npm_sources = depset()
+        npm_sources = _EMPTY_DEPSET
     elif type(npm_sources) != "depset":
         msg = "Expected npm_sources to be a depset but got {}".format(type(npm_sources))
         fail(msg)
 
     if npm_package_store_infos == None:
-        npm_package_store_infos = depset()
+        npm_package_store_infos = _EMPTY_DEPSET
     elif type(npm_package_store_infos) != "depset":
         msg = "Expected npm_package_store_infos to be a depset but got {}".format(type(npm_package_store_infos))
         fail(msg)
