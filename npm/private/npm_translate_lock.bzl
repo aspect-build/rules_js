@@ -25,6 +25,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](./npm_import) does this.
 """
 
+load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":list_sources.bzl", "list_sources")
@@ -504,6 +505,9 @@ def npm_translate_lock(
 
         **kwargs: Internal use only
     """
+    if not bazel_lib_utils.is_bazel_6_or_greater():
+        # ctx.actions.declare_symlink was added in Bazel 6
+        fail("A minimum version of Bazel 6 required to use rules_js")
 
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)
