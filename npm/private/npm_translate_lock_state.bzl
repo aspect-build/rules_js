@@ -591,6 +591,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
 
     return struct(
         label_store = label_store,  # pass-through access to the label store
+        rctx_name = rctx_name,
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
         link_workspace = lambda: _link_workspace(priv),
