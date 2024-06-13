@@ -547,9 +547,9 @@ def _to_apparent_repo_name(canonical_name):
     return canonical_name[max(canonical_name.rfind("~"), canonical_name.rfind("+")) + 1:]
 
 ################################################################################
-def _verify_node_modules_ignored(rctx, importers, root_package):
-    if rctx.attr.verify_node_modules_ignored != None:
-        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
+def _verify_node_modules_ignored(rctx, attrs, importers, root_package):
+    if attrs.verify_node_modules_ignored != None:
+        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(attrs.verify_node_modules_ignored)))
         if missing_ignores:
             msg = """
 
@@ -566,7 +566,7 @@ Possible fixes:
 {fixes}
                 """.format(
                 fixes = "\n".join(missing_ignores),
-                bazelignore = rctx.attr.verify_node_modules_ignored,
+                bazelignore = attrs.verify_node_modules_ignored,
                 repo = rctx.name,
             )
             fail(msg)
@@ -631,8 +631,8 @@ removed the requiresBuild attribute from the lockfile in v9.
 """)
 
 ################################################################################
-def _verify_patches(rctx, state):
-    if rctx.attr.verify_patches and rctx.attr.patches != None:
+def _verify_patches(rctx, attrs, state):
+    if attrs.verify_patches and attrs.patches != None:
         rctx.report_progress("Verifying patches in {}".format(state.label_store.relative_path("verify_patches")))
 
         # Patches in the patch list verification file
