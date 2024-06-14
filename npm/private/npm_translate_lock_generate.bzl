@@ -480,7 +480,7 @@ def _generate_repositories(rctx, npm_imports, pnpm_lock_label, link_workspace):
     is_gnu_tar = check_is_gnu_tar(rctx)
 
     for _, _import in enumerate(npm_imports):
-        repositories_bzl.append(_gen_npm_import(rctx, is_gnu_tar, is_gnu_tar, link_workspace))
+        repositories_bzl.append(_gen_npm_import(rctx, is_gnu_tar, _import, link_workspace))
 
     return repositories_bzl
 
