@@ -1,7 +1,10 @@
+"""Tar helpers."""
+
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 
+# TODO: use a hermetic tar from aspect_bazel_lib and remove this.
 def check_is_gnu_tar(rctx):
-    """# TODO: use a hermetic tar from aspect_bazel_lib and we can drop the "if _is_gnu_tar" branch
+    """Check if the host tar command is GNU tar.
 
     Args:
       rctx: the repository context

@@ -17,7 +17,7 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
-        is_gnu_tar = {gnu_tar},
+        is_gnu_tar = "{is_gnu_tar}",
         package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
     )
 """
@@ -477,10 +477,10 @@ def _generate_repositories(rctx, npm_imports, pnpm_lock_label, link_workspace):
         repositories_bzl.append("    pass")
         repositories_bzl.append("")
 
-    is_gnu_tar = check_is_gnu_tar(rctx)
+    is_gnu_tar = str(check_is_gnu_tar(rctx))
 
     for _, _import in enumerate(npm_imports):
-        repositories_bzl.append(_gen_npm_import(rctx, is_gnu_tar, is_gnu_tar, link_workspace))
+        repositories_bzl.append(_gen_npm_import(rctx, is_gnu_tar, _import, link_workspace))
 
     return repositories_bzl
 
