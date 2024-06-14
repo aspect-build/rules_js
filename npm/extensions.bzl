@@ -11,6 +11,7 @@ load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers 
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
+load("//npm/private:tar.bzl", "check_is_gnu_tar")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
@@ -133,6 +134,8 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         npm_auth = npm_auth,
     )
 
+    is_gnu_tar = str(check_is_gnu_tar(module_ctx))
+
     for i in imports:
         npm_import(
             name = i.name,
@@ -160,6 +163,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             replace_package = i.replace_package,
             root_package = i.root_package,
             transitive_closure = i.transitive_closure,
+            is_gnu_tar = is_gnu_tar,
             url = i.url,
             version = i.version,
         )
