@@ -437,7 +437,9 @@ def _download_and_extract_archive(rctx, package_json_only):
         canonical_id = download_url,
     )
 
-    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
+    is_windows = repo_utils.is_windows(rctx)
+
+    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not is_windows else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
         msg = "Failed to create package directory. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
@@ -445,7 +447,7 @@ def _download_and_extract_archive(rctx, package_json_only):
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
+    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
     if rctx.attr.is_gnu_tar == "True" or (rctx.attr.is_gnu_tar == "" and check_is_gnu_tar(rctx)):
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
@@ -469,7 +471,7 @@ def _download_and_extract_archive(rctx, package_json_only):
             msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
-    if not repo_utils.is_windows(rctx):
+    if not is_windows:
         # Some packages have directory permissions missing executable which
         # make the directories not listable. Fix these cases in order to be able
         # to execute the copy action. https://stackoverflow.com/a/14634721
