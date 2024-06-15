@@ -455,7 +455,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
-            lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env[0] == "true" if lifecycle_hooks else False,
+            lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env and lifecycle_hooks_use_default_shell_env[0] == "true",
             npm_auth = npm_auth_bearer,
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
@@ -519,9 +519,9 @@ def _to_apparent_repo_name(canonical_name):
     return canonical_name[canonical_name.rfind("~") + 1:]
 
 ################################################################################
-def _verify_node_modules_ignored(rctx, importers, root_package):
-    if rctx.attr.verify_node_modules_ignored != None:
-        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
+def _verify_node_modules_ignored(rctx, attr, importers, root_package):
+    if attr.verify_node_modules_ignored != None:
+        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(attr.verify_node_modules_ignored)))
         if missing_ignores:
             msg = """
 
@@ -537,7 +537,7 @@ Either add line(s) to {bazelignore}:
 or disable this check by setting `verify_node_modules_ignored = None` in `npm_translate_lock(name = "{repo}")`
                 """.format(
                 fixes = "\n".join(missing_ignores),
-                bazelignore = rctx.attr.verify_node_modules_ignored,
+                bazelignore = attr.verify_node_modules_ignored,
                 repo = rctx.name,
             )
             fail(msg)
@@ -599,8 +599,8 @@ removed the requiredBuild attribute from the lockfile in v9.
 """)
 
 ################################################################################
-def _verify_patches(rctx, state):
-    if rctx.attr.verify_patches and rctx.attr.patches != None:
+def _verify_patches(rctx, attr, state):
+    if attr.verify_patches and attr.patches != None:
         rctx.report_progress("Verifying patches in {}".format(state.label_store.relative_path("verify_patches")))
 
         # Patches in the patch list verification file

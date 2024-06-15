@@ -45,7 +45,6 @@ DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 _ATTRS = {
     "additional_file_contents": attr.string_list_dict(),
     "bins": attr.string_list_dict(),
-    "bzlmod": attr.bool(),
     "custom_postinstalls": attr.string_dict(),
     "data": attr.label_list(),
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
@@ -87,14 +86,26 @@ npm_translate_lock_lib = struct(
 )
 
 ################################################################################
-def _npm_translate_lock_impl(rctx):
+def npm_translate_lock_impl_helper(rctx, name, attr, bzlmod):
+    """
+    Helper function for implementing npm_translate_lock.
+
+    Args:
+        rctx: The repository context
+        name: The name
+        attr: The attributes of the repository rule or bzlmod tag class
+        bzlmod: Whether this is being called from a module extension
+
+    Returns:
+        Parsed lock state object.
+    """
     rctx.report_progress("Initializing")
 
-    state = npm_translate_lock_state.new(rctx.name, rctx, rctx.attr, rctx.attr.bzlmod)
+    state = npm_translate_lock_state.new(name, rctx, attr, bzlmod)
 
     # If a pnpm lock file has not been specified then we need to bootstrap by running `pnpm
     # import` in the user's repository
-    if not rctx.attr.pnpm_lock:
+    if not attr.pnpm_lock:
         _bootstrap_import(rctx, state)
 
     if state.should_update_pnpm_lock():
@@ -110,9 +121,9 @@ See https://github.com/aspect-build/rules_js/issues/1445
 """.format(state.label_store.relative_path("pnpm_lock"))
                 fail(msg)
 
-    helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
+    helpers.verify_node_modules_ignored(rctx, attr, state.importers(), state.root_package())
 
-    helpers.verify_patches(rctx, state)
+    helpers.verify_patches(rctx, attr, state)
 
     helpers.verify_lifecycle_hooks_specified(rctx, state)
 
@@ -121,15 +132,17 @@ See https://github.com/aspect-build/rules_js/issues/1445
     importers, packages = translate_to_transitive_closure(
         state.importers(),
         state.packages(),
-        rctx.attr.prod,
-        rctx.attr.dev,
-        rctx.attr.no_optional,
+        attr.prod,
+        attr.dev,
+        attr.no_optional,
     )
 
     rctx.report_progress("Generating starlark for npm dependencies")
 
     generate_repository_files(
         rctx,
+        name,
+        attr,
         state.label_store.label("pnpm_lock"),
         importers,
         packages,
@@ -140,7 +153,14 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.npm_registries(),
         state.npm_auth(),
         state.link_workspace(),
+        bzlmod = bzlmod,
     )
+
+    return state
+
+################################################################################
+def _npm_translate_lock_impl(rctx):
+    npm_translate_lock_impl_helper(rctx, rctx.attr.name, rctx.attr, False)
 
 npm_translate_lock_rule = repository_rule(
     implementation = _npm_translate_lock_impl,
@@ -511,13 +531,12 @@ def npm_translate_lock(
     repositories_bzl_filename = kwargs.pop("repositories_bzl_filename", None)
     defs_bzl_filename = kwargs.pop("defs_bzl_filename", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
-    bzlmod = kwargs.pop("bzlmod", False)
 
     if len(kwargs):
         msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
 
-    if not bzlmod and pnpm_version != None:
+    if pnpm_version != None:
         _pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
 
     if yarn_lock:
@@ -595,7 +614,6 @@ def npm_translate_lock(
         use_pnpm = use_pnpm,
         yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
-        bzlmod = bzlmod,
     )
 
 def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_patterns = []):
