@@ -71,9 +71,11 @@ def _package_store_name(pnpm_name, pnpm_version):
 
 def _make_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
+    new_target_path = relative_file(target_path, symlink.path)
+
     ctx.actions.symlink(
         output = symlink,
-        target_path = relative_file(target_path, symlink.path),
+        target_path = new_target_path,
     )
     return symlink
 

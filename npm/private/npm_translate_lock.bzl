@@ -509,6 +509,10 @@ def npm_translate_lock(
         # ctx.actions.declare_symlink was added in Bazel 6
         fail("A minimum version of Bazel 6 required to use rules_js")
 
+    if not bazel_lib_utils.is_bazel_6_or_greater():
+        # ctx.actions.declare_symlink was added in Bazel 6
+        fail("A minimum version of Bazel 6 required to use rules_js")
+
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)
     additional_file_contents = kwargs.pop("additional_file_contents", {})
