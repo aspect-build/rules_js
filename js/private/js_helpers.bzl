@@ -21,7 +21,7 @@ def gather_transitive_sources(sources, targets):
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "transitive_sources")
     ]
-    return depset([], transitive = [sources] + transitive)
+    return depset(transitive = [sources] + transitive)
 
 def gather_transitive_types(types, targets):
     """Gathers transitive types from a list of direct types and targets
@@ -40,7 +40,7 @@ def gather_transitive_types(types, targets):
         for target in targets
         if JsInfo in target and hasattr(target[JsInfo], "transitive_types")
     ]
-    return depset([], transitive = [types] + transitive)
+    return depset(transitive = [types] + transitive)
 
 def gather_npm_sources(srcs, deps):
     """Gathers npm sources from a list of srcs and deps targets
@@ -53,7 +53,7 @@ def gather_npm_sources(srcs, deps):
         Depset of npm sources
     """
 
-    return depset([], transitive = [
+    return depset(transitive = [
         target[JsInfo].npm_sources
         for target in srcs + deps
         if JsInfo in target and hasattr(target[JsInfo], "npm_sources")
@@ -76,7 +76,7 @@ def gather_npm_package_store_infos(targets):
         if JsInfo in target
     ]
 
-    return depset([], transitive = npm_package_store_infos)
+    return depset(transitive = npm_package_store_infos)
 
 def copy_js_file_to_bin_action(ctx, file):
     if ctx.label.workspace_name != file.owner.workspace_name or ctx.label.package != file.owner.package:
@@ -286,4 +286,4 @@ def gather_files_from_js_infos(
             if include_npm_sources and hasattr(js_info, "npm_sources"):
                 files_depsets.append(js_info.npm_sources)
 
-    return depset([], transitive = files_depsets)
+    return depset(transitive = files_depsets)
