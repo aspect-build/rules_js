@@ -179,14 +179,14 @@ def _gather_sources_and_types(ctx, targets, files):
     sources = depset(sources, transitive = [
         target[JsInfo].sources
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "sources")
+        if JsInfo in target
     ])
 
     # types as depset
     types = depset(types, transitive = [
         target[JsInfo].types
         for target in targets
-        if JsInfo in target and hasattr(target[JsInfo], "types")
+        if JsInfo in target
     ])
 
     return (sources, types)
