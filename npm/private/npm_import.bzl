@@ -30,6 +30,7 @@ load(
 )
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
+load("//npm/private:tar.bzl", "check_is_gnu_tar")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
@@ -386,20 +387,6 @@ def _fetch_git_repository(rctx):
     if not rctx.delete(git_metadata_folder):
         fail("Failed to delete .git folder in %s" % str(git_repo.directory))
 
-def _is_gnu_tar(rctx):
-    # We assume that any linux platform is using GNU tar.
-    if repo_utils.is_linux(rctx):
-        return True
-
-    # TODO: use a hermetic tar from aspect_bazel_lib and we can drop the "if _is_gnu_tar" branch
-    tar_args = ["tar", "--version"]
-    result = rctx.execute(tar_args)
-    if result.return_code:
-        msg = "Failed to determine tar version. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
-        fail(msg)
-
-    return "GNU tar" in result.stdout
-
 def _download_and_extract_archive(rctx, package_json_only):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
@@ -450,7 +437,9 @@ def _download_and_extract_archive(rctx, package_json_only):
         canonical_id = download_url,
     )
 
-    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not repo_utils.is_windows(rctx) else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
+    is_windows = repo_utils.is_windows(rctx)
+
+    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not is_windows else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
     result = rctx.execute(mkdir_args)
     if result.return_code:
         msg = "Failed to create package directory. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
@@ -458,9 +447,10 @@ def _download_and_extract_archive(rctx, package_json_only):
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", str(1), "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
+    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
-    if _is_gnu_tar(rctx):
+    is_gnu_tar = rctx.attr.is_gnu_tar == "True" or (rctx.attr.is_gnu_tar == "" and check_is_gnu_tar(rctx))
+    if is_gnu_tar:
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
         # extracting files into the directory. Delay permission restoration for directories until all files
         # have been extracted.
@@ -482,7 +472,7 @@ def _download_and_extract_archive(rctx, package_json_only):
             msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
-    if not repo_utils.is_windows(rctx):
+    if not is_windows:
         # Some packages have directory permissions missing executable which
         # make the directories not listable. Fix these cases in order to be able
         # to execute the copy action. https://stackoverflow.com/a/14634721
@@ -823,6 +813,10 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
+    "is_gnu_tar": attr.string(
+        # is_gnu_tar can be precomputed for performance, or left blank if unknown
+        values = ["True", "False", ""],
+    ),
 })
 
 def _get_bin_entries(pkg_json, package):
@@ -1136,6 +1130,7 @@ def npm_import(
 
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
+    is_gnu_tar = str(kwargs.pop("is_gnu_tar", ""))
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
@@ -1165,6 +1160,7 @@ def npm_import(
         ),
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
+        is_gnu_tar = is_gnu_tar,
     )
 
     has_custom_postinstall = not (not custom_postinstall)
