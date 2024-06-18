@@ -1130,7 +1130,7 @@ def npm_import(
 
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
-    is_gnu_tar = kwargs.pop("is_gnu_tar", "")
+    is_gnu_tar = str(kwargs.pop("is_gnu_tar", ""))
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
