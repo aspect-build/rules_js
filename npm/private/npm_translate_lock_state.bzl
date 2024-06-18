@@ -384,16 +384,21 @@ def _action_cache_miss(priv, rctx, label_store):
 
 ################################################################################
 def _write_action_cache(priv, rctx, label_store):
-    contents = [
-        "# @generated",
-        "# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").".format(helpers.to_apparent_repo_name(priv["rctx_name"]), str(label_store.label("pnpm_lock"))),
-        "# This file should be checked into version control along with the pnpm-lock.yaml file.",
-    ]
+    header = """# @generated
+# Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").
+# This file should be checked into version control along with the pnpm-lock.yaml file.
+""".format(helpers.to_apparent_repo_name(priv["rctx_name"]), str(label_store.label("pnpm_lock")))
+
+    contents = []
     for key, value in priv["input_hashes"].items():
         contents.append("{}={}".format(key, value))
+
+    # Sort to reduce diffs when the file is updated
+    contents = sorted(contents)
+
     rctx.file(
         label_store.repository_path("action_cache"),
-        "\n".join(contents) + "\n",
+        header + "\n".join(contents) + "\n",
     )
     utils.reverse_force_copy(
         rctx,
