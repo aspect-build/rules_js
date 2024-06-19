@@ -275,14 +275,17 @@ def gather_files_from_js_infos(
     for target in targets:
         if JsInfo in target:
             js_info = target[JsInfo]
-            if include_sources:
-                files_depsets.append(js_info.sources)
-            if include_types:
-                files_depsets.append(js_info.types)
+
             if include_transitive_sources:
                 files_depsets.append(js_info.transitive_sources)
+            elif include_sources:
+                files_depsets.append(js_info.sources)
+
             if include_transitive_types:
                 files_depsets.append(js_info.transitive_types)
+            elif include_types:
+                files_depsets.append(js_info.types)
+
             if include_npm_sources:
                 files_depsets.append(js_info.npm_sources)
 
