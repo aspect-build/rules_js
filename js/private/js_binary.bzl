@@ -122,17 +122,29 @@ _ATTRS = {
         doc = """Environment variables of the action.
 
         Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
-        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution.
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_env` is set to True.
         """,
     ),
-    "expand_args": attr.bool(default = True),
-    "expand_env": attr.bool(default = True),
+    "expand_args": attr.bool(
+        default = True,
+        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `fixed_args`.
+
+        This comes at some analysis-time cost even for a set of args that does not have any expansions.""",
+    ),
+    "expand_env": attr.bool(
+        default = True,
+        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `env`.
+
+        This comes at some analysis-time cost even for a set of envs that does not have any expansions.""",
+    ),
     "fixed_args": attr.string_list(
         doc = """Fixed command line arguments to pass to the Node.js when this
         binary target is executed.
 
         Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
-        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution.
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_args` is set to True.
 
         Unlike the built-in `args`, which are only passed to the target when it is
         executed either by the `bazel run` command or as a test, `fixed_args` are baked
