@@ -283,10 +283,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(package_scope = package_scope)
                         links_bzl[link_package].append(add_to_scoped_targets)
         for link_package in _import.link_packages.keys():
-            build_file = paths.normalize("{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel")
+            build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
             if build_file not in rctx_files:
                 rctx_files[build_file] = []
-            resolved_json_file_path = paths.normalize("{}/{}/{}".format(link_package, _import.package, _RESOLVED_JSON_FILENAME).lstrip("/"))
+            resolved_json_file_path = "{}/{}/{}".format(link_package, _import.package, _RESOLVED_JSON_FILENAME).lstrip("/")
             rctx.file(resolved_json_file_path, json.encode({
                 # Allow consumers to auto-detect this filetype
                 "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
@@ -306,7 +306,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                             package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
                         ),
                     ))
-                package_json_bzl_file_path = paths.normalize("{}/{}/{}".format(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(_import.package, _PACKAGE_JSON_BZL_FILENAME))
+                package_json_bzl_file_path = "{}/{}/{}".format(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(_import.package, _PACKAGE_JSON_BZL_FILENAME)
                 repo_package_json_bzl = "@@{repo_name}//{link_package}:{package_json_bzl}".format(
                     repo_name = _import.name,
                     link_package = link_package,

@@ -1,6 +1,5 @@
 "npm_link_package_store rule"
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//js:providers.bzl", "JsInfo", "js_info")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -84,7 +83,7 @@ def _npm_link_package_store_impl(ctx):
 
     for bin_name, bin_path in ctx.attr.bins.items():
         bin_file = ctx.actions.declare_file("node_modules/.bin/{}".format(bin_name))
-        bin_path = paths.normalize("../{}/{}".format(package, bin_path))
+        bin_path = "../{}/{}".format(package, bin_path)
         ctx.actions.write(
             bin_file,
             _BIN_TMPL.format(bin_path = bin_path),
