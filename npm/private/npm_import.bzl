@@ -28,7 +28,7 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
-load("//npm/private:tar.bzl", "check_is_gnu_tar")
+load("//npm/private:tar.bzl", "detect_system_tar")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -451,8 +451,8 @@ def _download_and_extract_archive(rctx, package_json_only):
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
     tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
-    is_gnu_tar = rctx.attr.is_gnu_tar == "True" or (rctx.attr.is_gnu_tar == "" and check_is_gnu_tar(rctx))
-    if is_gnu_tar:
+    system_tar = detect_system_tar(rctx) if rctx.attr.system_tar == "auto" else rctx.attr.system_tar
+    if system_tar == "gnu":
         # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
         # extracting files into the directory. Delay permission restoration for directories until all files
         # have been extracted.
@@ -812,9 +812,11 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
-    "is_gnu_tar": attr.string(
-        # is_gnu_tar can be precomputed for performance, or left blank if unknown
-        values = ["True", "False", ""],
+    "system_tar": attr.string(
+        # The system tar type can be precomputed for performance, or "auto" to
+        # determine at rule execution time.
+        values = ["gnu", "non-gnu", "auto"],
+        default = "auto",
     ),
 })
 
@@ -1129,7 +1131,7 @@ def npm_import(
 
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
-    is_gnu_tar = str(kwargs.pop("is_gnu_tar", ""))
+    system_tar = kwargs.pop("system_tar", "auto")
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
@@ -1159,7 +1161,7 @@ def npm_import(
         ),
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
-        is_gnu_tar = is_gnu_tar,
+        system_tar = system_tar,
     )
 
     has_custom_postinstall = not (not custom_postinstall)
