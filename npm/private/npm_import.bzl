@@ -28,9 +28,9 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
+load("//npm/private:tar.bzl", "check_is_gnu_tar")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
-load("//npm/private:tar.bzl", "check_is_gnu_tar")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
@@ -360,6 +360,8 @@ bzl_library(
 
 _TARBALL_FILENAME = "package.tgz"
 _EXTRACT_TO_DIRNAME = "package"
+_EXTRACT_TO_PACKAGE_JSON = "{}/package.json".format(_EXTRACT_TO_DIRNAME)
+_EXTRACT_TO_RULES_JS_METADATA = "{}/aspect_rules_js_metadata.json".format(_EXTRACT_TO_DIRNAME)
 _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
@@ -500,9 +502,7 @@ def _npm_import_rule_impl(rctx):
     # the patch targets the package.json itself
     patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
 
-    pkg_json_path = paths.join(_EXTRACT_TO_DIRNAME, "package.json")
-
-    pkg_json = json.decode(rctx.read(pkg_json_path))
+    pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
 
     bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
@@ -579,9 +579,9 @@ bin = bin_factory("node_modules")
                 bin_struct_fields = "\n".join(bin_struct_fields),
             ))
 
-            rctx_files[paths.join(link_package, _PACKAGE_JSON_BZL_FILENAME)] = bin_bzl
+            rctx_files["{}/{}".format(link_package, _PACKAGE_JSON_BZL_FILENAME) if link_package else _PACKAGE_JSON_BZL_FILENAME] = bin_bzl
 
-            build_file = paths.join(link_package, "BUILD.bazel")
+            build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
             if build_file not in rctx_files:
                 rctx_files[build_file] = [generated_by_prefix]
             if rctx.attr.generate_bzl_library_targets:
@@ -600,8 +600,7 @@ bin = bin_factory("node_modules")
         rules_js_metadata["scripts"]["custom_postinstall"] = rctx.attr.custom_postinstall
 
     if rules_js_metadata:
-        rules_js_json_path = paths.join(_EXTRACT_TO_DIRNAME, "aspect_rules_js_metadata.json")
-        rctx.file(rules_js_json_path, json.encode_indent(rules_js_metadata, indent = "  "))
+        rctx.file(_EXTRACT_TO_RULES_JS_METADATA, json.encode_indent(rules_js_metadata, indent = "  "))
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(contents))
@@ -687,7 +686,7 @@ def _npm_import_links_rule_impl(rctx):
     package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
 
     # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-    lifecycle_output_dir = paths.join("node_modules", utils.package_store_root, package_store_name, "node_modules", rctx.attr.package)
+    lifecycle_output_dir = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, rctx.attr.package)
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(utils.links_repo_suffix)]

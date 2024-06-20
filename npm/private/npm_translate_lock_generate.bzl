@@ -164,8 +164,9 @@ sh_binary(
                     fail(msg)
                 fp_links[dep_key]["link_packages"][link_package] = []
             elif dep_version.startswith("link:"):
-                dep_importer = paths.normalize(paths.join(import_path, dep_version[len("link:"):]))
-                dep_path = helpers.link_package(root_package, import_path, dep_version[len("link:"):])
+                dep_version = dep_version[len("link:"):]
+                dep_importer = paths.normalize("{}/{}".format(import_path, dep_version) if import_path else dep_version)
+                dep_path = helpers.link_package(root_package, import_path, dep_version)
                 dep_key = "{}+{}".format(dep_package, dep_path)
                 if dep_key in fp_links.keys():
                     fp_links[dep_key]["link_packages"][link_package] = []
@@ -282,10 +283,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(package_scope = package_scope)
                         links_bzl[link_package].append(add_to_scoped_targets)
         for link_package in _import.link_packages.keys():
-            build_file = paths.normalize(paths.join(link_package, "BUILD.bazel"))
+            build_file = paths.normalize("{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel")
             if build_file not in rctx_files:
                 rctx_files[build_file] = []
-            resolved_json_file_path = paths.normalize(paths.join(link_package, _import.package, _RESOLVED_JSON_FILENAME))
+            resolved_json_file_path = paths.normalize("{}/{}/{}".format(link_package, _import.package, _RESOLVED_JSON_FILENAME).lstrip("/"))
             rctx.file(resolved_json_file_path, json.encode({
                 # Allow consumers to auto-detect this filetype
                 "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
@@ -298,14 +299,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
                     rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
                         name = _import.package,
-                        src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
+                        src = ":{}/{}".format(_import.package, _PACKAGE_JSON_BZL_FILENAME),
                         dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
                             repo_name = helpers.to_apparent_repo_name(_import.name),
                             link_package = link_package,
                             package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
                         ),
                     ))
-                package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
+                package_json_bzl_file_path = paths.normalize("{}/{}/{}".format(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(_import.package, _PACKAGE_JSON_BZL_FILENAME))
                 repo_package_json_bzl = "@@{repo_name}//{link_package}:{package_json_bzl}".format(
                     repo_name = _import.name,
                     link_package = link_package,
