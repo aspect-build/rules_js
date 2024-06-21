@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 
 # TODO: use a hermetic tar from aspect_bazel_lib and remove this.
-def check_is_gnu_tar(rctx):
+def detect_system_tar(rctx):
     """Check if the host tar command is GNU tar.
 
     Args:
@@ -14,7 +14,7 @@ def check_is_gnu_tar(rctx):
 
     # We assume that any linux platform is using GNU tar.
     if repo_utils.is_linux(rctx):
-        return True
+        return "gnu"
 
     tar_args = ["tar", "--version"]
     result = rctx.execute(tar_args)
@@ -22,4 +22,4 @@ def check_is_gnu_tar(rctx):
         msg = "Failed to determine tar version. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
         fail(msg)
 
-    return "GNU tar" in result.stdout
+    return "gnu" if "GNU tar" in result.stdout else "non-gnu"
