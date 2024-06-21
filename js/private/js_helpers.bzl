@@ -8,39 +8,35 @@ def gather_transitive_sources(sources, targets):
     """Gathers transitive sources from a list of direct sources and targets
 
     Args:
-        sources: list or depset of direct sources which should be included in `transitive_sources`
+        sources: list of direct sources which should be included in `transitive_sources`
         targets: list of targets to gather `transitive_sources` from `JsInfo`
 
     Returns:
         A depset of transitive sources
     """
-    if type(sources) == "list":
-        sources = depset(sources)
     transitive = [
         target[JsInfo].transitive_sources
         for target in targets
         if JsInfo in target
     ]
-    return depset(transitive = [sources] + transitive)
+    return depset(sources, transitive = transitive)
 
 def gather_transitive_types(types, targets):
     """Gathers transitive types from a list of direct types and targets
 
     Args:
-        types: list or depset of direct sources which should be included in `transitive_types`
+        types: list of direct sources which should be included in `transitive_types`
         targets: list of targets to gather `transitive_types` from `JsInfo`
 
     Returns:
         A depset of transitive sources
     """
-    if type(types) == "list":
-        types = depset(types)
     transitive = [
         target[JsInfo].transitive_types
         for target in targets
         if JsInfo in target
     ]
-    return depset(transitive = [types] + transitive)
+    return depset(types, transitive = transitive)
 
 def gather_npm_sources(srcs, deps):
     """Gathers npm sources from a list of srcs and deps targets
@@ -116,9 +112,9 @@ this option is not needed.
 
 def gather_runfiles(
         ctx,
-        sources,
-        data,
-        deps,
+        sources = None,
+        data = [],
+        deps = [],
         data_files = [],
         copy_data_files_to_bin = False,
         no_copy_to_bin = [],
@@ -138,7 +134,7 @@ def gather_runfiles(
     Args:
         ctx: the rule context
 
-        sources: list or depset of files which should be included in runfiles
+        sources: depset which should be included in runfiles
 
         deps: list of dependency targets; only transitive runfiles are gather from these targets
 
@@ -176,10 +172,11 @@ def gather_runfiles(
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
     """
 
+    transitive_files_depsets = []
+
     # Includes sources
-    if type(sources) == "list":
-        sources = depset(sources)
-    transitive_files_depsets = [sources]
+    if sources:
+        transitive_files_depsets.append(sources)
 
     # Gather the default outputs of data targets
     for target in data:

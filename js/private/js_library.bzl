@@ -24,7 +24,7 @@ js_library(
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
-load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_npm_package_store_infos", "gather_npm_sources", "gather_runfiles", "gather_transitive_sources", "gather_transitive_types")
+load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_runfiles")
 load(":js_info.bzl", "JsInfo", "js_info")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
@@ -204,33 +204,45 @@ def _js_library_impl(ctx):
         files = ctx.files.types,
     )
 
+    # Direct sources and types
     sources = depset(transitive = [sources, additional_sources])
     types = depset(transitive = [types, additional_sources, additional_types])
 
-    transitive_sources = gather_transitive_sources(
-        sources = sources,
-        targets = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
-    )
+    # Transitive sources and types
+    transitive_sources = [sources]
+    transitive_types = [types]
 
-    transitive_types = gather_transitive_types(
-        types = types,
-        targets = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
-    )
+    # npm providers
+    npm_sources = []
+    npm_package_store_infos = []
 
-    npm_sources = gather_npm_sources(
-        srcs = ctx.attr.srcs + ctx.attr.types,
-        deps = ctx.attr.deps,
-    )
+    # Concat the srcs+types+deps once
+    srcs_types_deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps
 
-    npm_package_store_infos = gather_npm_package_store_infos(
-        targets = ctx.attr.srcs + ctx.attr.data + ctx.attr.deps,
-    )
+    # Collect transitive sources, types and npm providers from srcs+types+deps
+    for target in srcs_types_deps:
+        if JsInfo in target:
+            jsinfo = target[JsInfo]
+            transitive_sources.append(jsinfo.transitive_sources)
+            transitive_types.append(jsinfo.transitive_types)
+            npm_sources.append(jsinfo.npm_sources)
+            npm_package_store_infos.append(jsinfo.npm_package_store_infos)
+
+    # Also add npm_package_store_infos from ctx.attr.data
+    for target in ctx.attr.data:
+        if JsInfo in target:
+            npm_package_store_infos.append(target[JsInfo].npm_package_store_infos)
+
+    transitive_sources = depset(transitive = transitive_sources)
+    transitive_types = depset(transitive = transitive_types)
+    npm_sources = depset(transitive = npm_sources)
+    npm_package_store_infos = depset(transitive = npm_package_store_infos)
 
     runfiles = gather_runfiles(
         ctx = ctx,
         sources = transitive_sources,
         data = ctx.attr.data,
-        deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps,
+        deps = srcs_types_deps,
         data_files = ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
