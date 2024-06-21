@@ -515,13 +515,12 @@ def npm_translate_lock(
     repositories_bzl_filename = kwargs.pop("repositories_bzl_filename", None)
     defs_bzl_filename = kwargs.pop("defs_bzl_filename", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
-    bzlmod = kwargs.pop("bzlmod", False)
 
     if len(kwargs):
         msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
 
-    if not bzlmod and pnpm_version != None:
+    if pnpm_version != None:
         _pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
 
     if yarn_lock:
@@ -599,7 +598,7 @@ def npm_translate_lock(
         use_pnpm = use_pnpm,
         yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
-        bzlmod = bzlmod,
+        bzlmod = False,
     )
 
 def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_patterns = []):
