@@ -19,7 +19,6 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 
@@ -123,15 +122,29 @@ _ATTRS = {
         doc = """Environment variables of the action.
 
         Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
-        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution.
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_env` is set to True.
         """,
+    ),
+    "expand_args": attr.bool(
+        default = True,
+        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `fixed_args`.
+
+        This comes at some analysis-time cost even for a set of args that does not have any expansions.""",
+    ),
+    "expand_env": attr.bool(
+        default = True,
+        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `env`.
+
+        This comes at some analysis-time cost even for a set of envs that does not have any expansions.""",
     ),
     "fixed_args": attr.string_list(
         doc = """Fixed command line arguments to pass to the Node.js when this
         binary target is executed.
 
         Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
-        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution.
+        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_args` is set to True.
 
         Unlike the built-in `args`, which are only passed to the target when it is
         executed either by the `bazel run` command or as a test, `fixed_args` are baked
@@ -322,18 +335,24 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 def _deprecated_target_tool_path_to_short_path(tool_path):
     return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
+def _expand_env_if_needed(ctx, value):
+    if ctx.attr.expand_env:
+        return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
+    return value
+
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
     if is_windows:
         fixed_env = dict(fixed_env, **{"JS_BINARY__PATCH_NODE_FS": "0"})
 
-    envs = []
-    for (key, value) in dicts.add(fixed_env, ctx.attr.env).items():
-        envs.append(_ENV_SET.format(
-            var = key,
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")]),
-        ))
+    envs = [
+        _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
+        for key, value in fixed_env.items()
+    ] + [
+        _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
+        for key, value in ctx.attr.env.items()
+    ]
 
     # Add common and useful make variables to the environment
     makevars = {
@@ -380,10 +399,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
-        envs.append(_ENV_SET_IFF_NOT_SET.format(
-            var = "JS_BINARY__CHDIR",
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, ctx.attr.chdir, ctx.attr.data).split(" ")]),
-        ))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", value = _expand_env_if_needed(ctx, ctx.attr.chdir)))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
@@ -391,13 +407,12 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     node_options = []
     for node_option in ctx.attr.node_options:
-        node_options.append(_NODE_OPTION.format(
-            value = " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, node_option, ctx.attr.data).split(" ")]),
-        ))
+        node_options.append(_NODE_OPTION.format(value = _expand_env_if_needed(ctx, node_option)))
     if ctx.attr.preserve_symlinks_main and "--preserve-symlinks-main" not in node_options:
         node_options.append(_NODE_OPTION.format(value = "--preserve-symlinks-main"))
 
-    fixed_args_expanded = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
+    if ctx.attr.expand_args:
+        fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
 
     toolchain_files = []
     if is_windows:
@@ -455,7 +470,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
-        "{{fixed_args}}": " ".join(fixed_args_expanded),
+        "{{fixed_args}}": " ".join(fixed_args),
         "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,

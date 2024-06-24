@@ -61,3 +61,25 @@ assert_contains(
     actual = "locations_out",
     expected = "js/private/test/fixed_args/test.txt",
 )
+
+js_binary(
+    name = "locations_bin_no_expand",
+    data = ["test.txt"],
+    entry_point = "fixed_args.mjs",
+    expand_args = False,
+    fixed_args = [
+        "'$(rootpaths :test.txt)'",
+    ],
+)
+
+js_run_binary(
+    name = "run_locations_no_expand",
+    stdout = "locations_out_no_expand",
+    tool = ":locations_bin_no_expand",
+)
+
+assert_contains(
+    name = "locations_test_no_expand",
+    actual = "locations_out_no_expand",
+    expected = "$(rootpaths :test.txt)",
+)
