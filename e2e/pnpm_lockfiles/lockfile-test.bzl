@@ -61,6 +61,7 @@ def lockfile_test(name = None):
             ":node_modules/@aspect-test/a",
             ":node_modules/@aspect-test/a2",
             ":node_modules/@types/node",
+            ":node_modules/alias-only-sizzle",
             ":node_modules/alias-types-node",
             ":node_modules/is-odd",
             ":node_modules/is-odd-alt-version",
@@ -117,6 +118,10 @@ def lockfile_test(name = None):
             # npm: alias to alternate versions
             ":node_modules/is-odd-alt-version",
             ":.aspect_rules_js/node_modules/is-odd@2.0.0",
+
+            # npm: alias to package not listed elsewhere
+            ":node_modules/alias-only-sizzle",
+            ":.aspect_rules_js/node_modules/@types+sizzle@2.3.8",
 
             # Targets within the virtual store...
             # Direct dep targets

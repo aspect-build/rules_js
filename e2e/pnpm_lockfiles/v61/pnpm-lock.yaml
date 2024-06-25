@@ -82,6 +82,9 @@ importers:
       '@types/node':
         specifier: 16.18.11
         version: registry.npmjs.org/@types/node@16.18.11
+      alias-only-sizzle:
+        specifier: npm:@types/sizzle@~2.3.8
+        version: registry.npmjs.org/@types/sizzle@2.3.8
       alias-types-node:
         specifier: npm:@types/node@~16.18.11
         version: registry.npmjs.org/@types/node@16.18.11
@@ -406,4 +409,10 @@ packages:
     resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
     name: '@types/node'
     version: 16.18.11
+    dev: true
+
+  registry.npmjs.org/@types/sizzle@2.3.8:
+    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.8.tgz}
+    name: '@types/sizzle'
+    version: 2.3.8
     dev: true

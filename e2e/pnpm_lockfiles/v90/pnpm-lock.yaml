@@ -79,6 +79,9 @@ importers:
       '@types/node':
         specifier: 16.18.11
         version: 16.18.11
+      alias-only-sizzle:
+        specifier: npm:@types/sizzle@~2.3.8
+        version: '@types/sizzle@2.3.8'
       alias-types-node:
         specifier: npm:@types/node@~16.18.11
         version: '@types/node@16.18.11'
@@ -155,6 +158,9 @@ packages:
 
   '@types/node@16.18.11':
     resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+
+  '@types/sizzle@2.3.8':
+    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.8.tgz}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -334,6 +340,8 @@ snapshots:
   '@types/minimatch@5.1.2': {}
 
   '@types/node@16.18.11': {}
+
+  '@types/sizzle@2.3.8': {}
 
   ansi-regex@5.0.1: {}
 

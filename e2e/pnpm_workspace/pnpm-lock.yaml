@@ -79,12 +79,21 @@ importers:
       '@aspect-test/f':
         specifier: 1.0.0
         version: 1.0.0
+      alias-1:
+        specifier: npm:@types/sizzle@~2.3.8
+        version: /@types/sizzle@2.3.8
 
   lib/c:
     dependencies:
       '@aspect-test/f':
         specifier: 1.0.0
         version: 1.0.0
+
+  lib/d:
+    dependencies:
+      alias-2:
+        specifier: npm:@types/node@16.18.11
+        version: /@types/node@16.18.11
 
 packages:
 
@@ -135,6 +144,14 @@ packages:
   /@aspect-test/h@1.0.0:
     resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
     hasBin: true
+    dev: false
+
+  /@types/node@16.18.11:
+    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==}
+    dev: false
+
+  /@types/sizzle@2.3.8:
+    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
     dev: false
 
   /typescript@4.9.5:
