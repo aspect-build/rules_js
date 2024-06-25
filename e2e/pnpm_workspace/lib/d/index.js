@@ -1,10 +1,9 @@
 const packageJson = require('./package.json')
-const f = require('@aspect-test/f')
+const a2 = require('alias-2/package.json')
 module.exports = {
     id: () =>
         `${packageJson.name}@${
             packageJson.version ? packageJson.version : '0.0.0'
         }`,
-    idF: () => f.id(),
-    alias: () => require('alias-1/package.json').version,
+    idA: () => a2.name,
 }

@@ -22,10 +22,6 @@ BZL_FILES = {
     # hasBin, optional deps, deps
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__3.2.5__links//:defs.bzl",
     "rollup_package_json.bzl": "@REPO_NAME__rollup__3.2.5//VERSION:package_json.bzl",
-
-    # TODO: inconsistent across versions
-    # peers
-    # "aspect_test_d_defs.bzl": "@REPO_NAME__@aspect-test+d__2.0.0_@aspect-test+c__2.0.2//:defs.bzl",
 }
 
 def lockfile_test(name = None):
@@ -61,6 +57,7 @@ def lockfile_test(name = None):
             ":node_modules/@aspect-test/a",
             ":node_modules/@aspect-test/a2",
             ":node_modules/@types/node",
+            ":node_modules/alias-only-sizzle",
             ":node_modules/alias-types-node",
             ":node_modules/is-odd",
             ":node_modules/is-odd-alt-version",
@@ -118,6 +115,11 @@ def lockfile_test(name = None):
             ":node_modules/is-odd-alt-version",
             ":.aspect_rules_js/node_modules/is-odd@2.0.0",
 
+            # npm: alias to package not listed elsewhere
+            ":node_modules/alias-only-sizzle",
+            ":.aspect_rules_js/node_modules/@types+sizzle@2.3.8",
+            "@%s__at_types_sizzle__2.3.8//:pkg" % lock_repo,
+
             # Targets within the virtual store...
             # Direct dep targets
             ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2",
@@ -137,12 +139,14 @@ def lockfile_test(name = None):
 
             # Patched dependencies
             ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
+            "@%s__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq//:pkg" % lock_repo,
 
             # Direct deps from custom registry
             ":.aspect_rules_js/node_modules/@types+node@16.18.11",
 
             # Direct deps with peers
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",
+            "@%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2//:pkg" % lock_repo,
         ],
     )
 

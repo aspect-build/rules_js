@@ -25,3 +25,6 @@ if (
 
 // `@isaacs/cliui` has transitive `npm:*` deps
 require('@isaacs/cliui')
+
+// `alias-only-sizzle` aliases a package not declared elsewhere
+require('alias-only-sizzle/package.json')

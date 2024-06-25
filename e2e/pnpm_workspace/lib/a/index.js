@@ -10,6 +10,7 @@ module.exports = {
         }`,
     idE: () => e.id(),
     idLibB: () => libB.id(),
+    idLibTransitiveF: () => libB.idF(),
     idVendoredA: () => vendoredA.id(),
     idVendoredB: () => vendoredB.id(),
 }
