@@ -8,7 +8,10 @@
         "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
-        "rollup": "3.2.5",
+        "rollup": "2.14.0",
+        "rollup-plugin-with-peers": "npm:@rollup/plugin-typescript@8.2.1",
+        "tslib": "^2.6.3",
+        "typescript": "^5.4.5",
         "meaning-of-life": "1.0.0",
         "is-odd": "3.0.1",
         "is-odd-alt-version": "npm:is-odd@^2.0.0",
@@ -40,7 +43,8 @@
         ],
         "overrides": {
             "is-number": "file:../vendored/is-number",
-            "diff": "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"
+            "diff": "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
+            "fsevents": "^2.3"
         }
     }
 }

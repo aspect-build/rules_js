@@ -20,8 +20,8 @@ BZL_FILES = {
     "defs.bzl": "@REPO_NAME//:defs.bzl",
 
     # hasBin, optional deps, deps
-    "rollup_links_defs.bzl": "@REPO_NAME__rollup__3.2.5__links//:defs.bzl",
-    "rollup_package_json.bzl": "@REPO_NAME__rollup__3.2.5//VERSION:package_json.bzl",
+    "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
+    "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",
 }
 
 def lockfile_test(name = None):
@@ -84,6 +84,11 @@ def lockfile_test(name = None):
 
             # rollup has a 'optionalDependency' (fsevents)
             ":node_modules/rollup",
+
+            # npm: alias to a package that has many peers
+            ":node_modules/rollup-plugin-with-peers",
+            # underlying repo for the many-peers package
+            "@%s__at_rollup_plugin-typescript__8.2.1__%s//:pkg" % (lock_repo, "ommloj5qql5ba6x5wuiluawhoi" if lock_version == "v54" else "-1662662592" if lock_version == "v90" else "-1662692290"),
 
             # uuv 'hasBin'
             ":node_modules/uvu",
