@@ -434,9 +434,9 @@ fi
 
 if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_PATCHES
-    JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "js/private/node-patches/register.js")
+    JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "js/private/node-patches/register.cjs")
 else
-    export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/_main/js/private/node-patches/register.js"
+    export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/_main/js/private/node-patches/register.cjs"
 fi
 if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
     logf_fatal "node patches '%s' not found" "$JS_BINARY__NODE_PATCHES"

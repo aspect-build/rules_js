@@ -315,11 +315,11 @@ _ATTRS = {
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
-        default = [Label("@aspect_rules_js//js/private/node-patches:fs.js")],
+        default = [Label("@aspect_rules_js//js/private/node-patches:fs.cjs")],
     ),
     "_node_patches": attr.label(
         allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-patches:register.js"),
+        default = Label("@aspect_rules_js//js/private/node-patches:register.cjs"),
     ),
 }
 

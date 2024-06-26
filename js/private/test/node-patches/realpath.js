@@ -20,7 +20,7 @@ const withFixtures = require('inline-fixtures').withFixtures
 const path = require('path')
 const util = require('util')
 
-const patcher = require('../../node-patches/src/fs').patcher
+const patcher = require('../../node-patches/src/fs.cjs').patcher
 
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {
