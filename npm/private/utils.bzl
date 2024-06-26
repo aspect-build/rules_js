@@ -33,12 +33,14 @@ def _bazel_name(name, version = None):
     escaped_name = _sanitize_string(name)
     if not version:
         return escaped_name
-    version_segments = version.split("_")
-    escaped_version = _sanitize_string(version_segments[0])
-    peer_version = "_".join(version_segments[1:])
-    if peer_version:
-        escaped_version = "%s__%s" % (escaped_version, _sanitize_string(peer_version))
-    return "%s__%s" % (escaped_name, escaped_version)
+
+    # Add an extra _ before the first segment
+    version_segments_start = version.find("_")
+    if version_segments_start != -1:
+        version = version[:version_segments_start] + "_" + version[version_segments_start:]
+
+    # Separate name + version with extra _
+    return "%s__%s" % (escaped_name, _sanitize_string(version))
 
 def _package_key(name, version):
     "Make a name/version pnpm-style name for a package name and version"
@@ -79,10 +81,11 @@ def _make_symlink(ctx, symlink_path, target_path):
 
 def _parse_package_name(package):
     # Parse a @scope/name string and return a (scope, name) tuple
-    segments = package.split("/", 1)
-    if len(segments) == 2 and segments[0].startswith("@"):
-        return (segments[0], segments[1])
-    return ("", segments[0])
+    if package[0] == "@":
+        segments = package.split("/", 1)
+        if len(segments) == 2:
+            return (segments[0], segments[1])
+    return ("", package)
 
 def _npm_registry_url(package, registries, default_registry):
     (package_scope, _) = _parse_package_name(package)
