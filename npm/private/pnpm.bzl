@@ -223,9 +223,8 @@ def _convert_pnpm_v6_v9_version_peer_dep(version):
             # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
             # peer deps so we must hash here to prevent extremely long file paths that lead to
             # "File name too long) build failures.
-            peer_dep = "_" + utils.hash(peer_dep)
-        version = version[0:peer_dep_index] + utils.sanitize_string(peer_dep)
-        version = version.rstrip("_")
+            peer_dep = utils.hash(peer_dep)
+        version = version[0:peer_dep_index] + "_" + utils.sanitize_string(peer_dep)
     return version
 
 def _strip_v6_default_registry_to_version(name, version):
