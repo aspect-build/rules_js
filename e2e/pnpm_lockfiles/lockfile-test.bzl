@@ -20,8 +20,8 @@ BZL_FILES = {
     "defs.bzl": "@REPO_NAME//:defs.bzl",
 
     # hasBin, optional deps, deps
-    "rollup_links_defs.bzl": "@REPO_NAME__rollup__3.2.5__links//:defs.bzl",
-    "rollup_package_json.bzl": "@REPO_NAME__rollup__3.2.5//VERSION:package_json.bzl",
+    # "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.79.1__links//:defs.bzl",
+    # "rollup_package_json.bzl": "@REPO_NAME__rollup__2.79.1//VERSION:package_json.bzl",
 
     # TODO: inconsistent across versions
     # peers
@@ -88,6 +88,9 @@ def lockfile_test(name = None):
 
             # rollup has a 'optionalDependency' (fsevents)
             ":node_modules/rollup",
+
+            # rollup plugin that has many peers
+            ":node_modules/rollup-plugin-with-peers",
 
             # uuv 'hasBin'
             ":node_modules/uvu",

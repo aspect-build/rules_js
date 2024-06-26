@@ -63,8 +63,8 @@ npm = use_extension(
     use_repo(
         npm,
         "lock-%s" % version,
-        "lock-%s__rollup__3.2.5" % version,
-        "lock-%s__rollup__3.2.5__links" % version,
+        "lock-%s__rollup__2.14.0" % version,
+        "lock-%s__rollup__2.14.0__links" % version,
 
         # TODO: inconsistent across versions
         # "lock-%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2" % version,
