@@ -83,7 +83,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__acorn-import-assertions__1.8.0__acorn_8.8.2",
+        name = "npm__acorn-import-assertions__1.8.0_acorn_8.8.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -276,7 +276,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ajv-formats__2.1.1__ajv_8.12.0",
+        name = "npm__ajv-formats__2.1.1_ajv_8.12.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -303,7 +303,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ajv-keywords__3.5.2__ajv_6.12.6",
+        name = "npm__ajv-keywords__3.5.2_ajv_6.12.6",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -329,7 +329,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ajv-keywords__5.1.0__ajv_8.12.0",
+        name = "npm__ajv-keywords__5.1.0_ajv_8.12.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -985,7 +985,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2",
+        name = "npm__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -1218,7 +1218,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_babel_helper-compilation-targets__7.20.7__at_babel_core_7.21.0",
+        name = "npm__at_babel_helper-compilation-targets__7.20.7_at_babel_core_7.21.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -1696,7 +1696,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_babel_plugin-syntax-typescript__7.20.0__at_babel_core_7.21.0",
+        name = "npm__at_babel_plugin-syntax-typescript__7.20.0_at_babel_core_7.21.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -2905,7 +2905,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_fc681991e61c6808dd26012a2331f83671a11218__bufferutil_4.0.7",
+        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_fc681991e61c6808dd26012a2331f83671a11218_bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3100,7 +3100,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_mapbox_mapbox-gl-supported__1.5.0__mapbox-gl_1.10.1",
+        name = "npm__at_mapbox_mapbox-gl-supported__1.5.0_mapbox-gl_1.10.1",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -3561,7 +3561,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_puppeteer_browsers__0.5.0__typescript_4.9.5",
+        name = "npm__at_puppeteer_browsers__0.5.0_typescript_4.9.5",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -3643,7 +3643,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__21.1.0__rollup_2.70.2",
+        name = "npm__at_rollup_plugin-commonjs__21.1.0_rollup_2.70.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3700,7 +3700,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-commonjs__23.0.0_rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3749,7 +3749,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.2__rollup_3.2.5",
+        name = "npm__at_rollup_plugin-commonjs__23.0.2_rollup_3.2.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3797,7 +3797,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-json__5.0.0_rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3826,7 +3826,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.1__rollup_3.2.5",
+        name = "npm__at_rollup_plugin-json__5.0.1_rollup_3.2.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3856,7 +3856,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-node-resolve__15.0.0_rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3902,7 +3902,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.1__rollup_3.2.5",
+        name = "npm__at_rollup_plugin-node-resolve__15.0.1_rollup_3.2.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3948,7 +3948,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-terser__0.2.0__rollup_2.79.1",
+        name = "npm__at_rollup_plugin-terser__0.2.0_rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3992,7 +3992,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-typescript__10.0.1__500960093",
+        name = "npm__at_rollup_plugin-typescript__10.0.1_500960093",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -4034,7 +4034,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__3.1.0__rollup_2.70.2",
+        name = "npm__at_rollup_pluginutils__3.1.0_rollup_2.70.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -4087,7 +4087,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__5.0.2__rollup_2.79.1",
+        name = "npm__at_rollup_pluginutils__5.0.2_rollup_2.79.1",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -4116,7 +4116,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__5.0.2__rollup_3.2.5",
+        name = "npm__at_rollup_pluginutils__5.0.2_rollup_3.2.5",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -5229,7 +5229,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_vanilla-extract_webpack-plugin__2.2.0__webpack_5.76.3",
+        name = "npm__at_vanilla-extract_webpack-plugin__2.2.0_webpack_5.76.3",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -5851,7 +5851,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_webpack-cli_configtest__2.0.1__1256213976",
+        name = "npm__at_webpack-cli_configtest__2.0.1_1256213976",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -5986,7 +5986,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_webpack-cli_info__2.0.1__1256213976",
+        name = "npm__at_webpack-cli_info__2.0.1_1256213976",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -6121,7 +6121,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_webpack-cli_serve__2.0.1__1256213976",
+        name = "npm__at_webpack-cli_serve__2.0.1_1256213976",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -7487,7 +7487,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__chromium-bidi__0.4.7__devtools-protocol_0.0.1107588",
+        name = "npm__chromium-bidi__0.4.7_devtools-protocol_0.0.1107588",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -8466,7 +8466,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__css-loader__6.7.3__webpack_5.76.3",
+        name = "npm__css-loader__6.7.3_webpack_5.76.3",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -9183,7 +9183,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__debug__4.3.4__supports-color_8.1.1",
+        name = "npm__debug__4.3.4_supports-color_8.1.1",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -13644,7 +13644,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__icss-utils__5.1.0__postcss_8.4.21",
+        name = "npm__icss-utils__5.1.0_postcss_8.4.21",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -14569,7 +14569,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__isomorphic-ws__5.0.0__ws_8.13.0",
+        name = "npm__isomorphic-ws__5.0.0_ws_8.13.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -15984,7 +15984,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq",
+        name = "npm__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -16119,7 +16119,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mini-css-extract-plugin__2.7.5__webpack_5.76.3",
+        name = "npm__mini-css-extract-plugin__2.7.5_webpack_5.76.3",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -16767,12 +16767,12 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mobx-react-lite__3.4.0__mobx_6.3.0__react_17.0.2",
+        name = "npm__mobx-react-lite__3.4.0_mobx_6.3.0_react_17.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "mobx-react-lite",
-        version = "3.4.0_mobx_6.3.0__react_17.0.2",
+        version = "3.4.0_mobx_6.3.0_react_17.0.2",
         url = "https://registry.npmjs.org/mobx-react-lite/-/mobx-react-lite-3.4.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -16787,21 +16787,21 @@ def npm_repositories():
             "js-tokens": ["4.0.0"],
             "loose-envify": ["1.4.0"],
             "mobx": ["6.3.0"],
-            "mobx-react-lite": ["3.4.0_mobx_6.3.0__react_17.0.2"],
+            "mobx-react-lite": ["3.4.0_mobx_6.3.0_react_17.0.2"],
             "object-assign": ["4.1.1"],
             "react": ["17.0.2"],
         },
     )
 
     npm_import(
-        name = "npm__mobx-react__7.3.0__mobx_6.3.0__react_17.0.2",
+        name = "npm__mobx-react__7.3.0_mobx_6.3.0_react_17.0.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "examples/npm_deps": ["mobx-react"],
         },
         package = "mobx-react",
-        version = "7.3.0_mobx_6.3.0__react_17.0.2",
+        version = "7.3.0_mobx_6.3.0_react_17.0.2",
         url = "https://registry.npmjs.org/mobx-react/-/mobx-react-7.3.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -16810,15 +16810,15 @@ def npm_repositories():
         integrity = "sha512-RGEcwZokopqyJE5JPwXKB9FWMSqFM9NJVO2QPI+z6laJTJeBHqvPicjnKgY5mvihxTeXB1+72TnooqUePeGV1g==",
         deps = {
             "mobx": "6.3.0",
-            "mobx-react-lite": "3.4.0_mobx_6.3.0__react_17.0.2",
+            "mobx-react-lite": "3.4.0_mobx_6.3.0_react_17.0.2",
             "react": "17.0.2",
         },
         transitive_closure = {
             "js-tokens": ["4.0.0"],
             "loose-envify": ["1.4.0"],
             "mobx": ["6.3.0"],
-            "mobx-react": ["7.3.0_mobx_6.3.0__react_17.0.2"],
-            "mobx-react-lite": ["3.4.0_mobx_6.3.0__react_17.0.2"],
+            "mobx-react": ["7.3.0_mobx_6.3.0_react_17.0.2"],
+            "mobx-react-lite": ["3.4.0_mobx_6.3.0_react_17.0.2"],
             "object-assign": ["4.1.1"],
             "react": ["17.0.2"],
         },
@@ -16845,7 +16845,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mocha-junit-reporter__2.2.0__mocha_10.2.0",
+        name = "npm__mocha-junit-reporter__2.2.0_mocha_10.2.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -16955,7 +16955,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mocha-multi-reporters__1.5.1__181752652",
+        name = "npm__mocha-multi-reporters__1.5.1_181752652",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -17063,7 +17063,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__mocha__10.2.0__mocha-multi-reporters_1.5.1",
+        name = "npm__mocha__10.2.0_mocha-multi-reporters_1.5.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -19756,7 +19756,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__postcss-modules-extract-imports__3.0.0__postcss_8.4.21",
+        name = "npm__postcss-modules-extract-imports__3.0.0_postcss_8.4.21",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -19780,7 +19780,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__postcss-modules-local-by-default__4.0.0__postcss_8.4.21",
+        name = "npm__postcss-modules-local-by-default__4.0.0_postcss_8.4.21",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -19812,7 +19812,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__postcss-modules-scope__3.0.0__postcss_8.4.21",
+        name = "npm__postcss-modules-scope__3.0.0_postcss_8.4.21",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -19840,7 +19840,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__postcss-modules-values__4.0.0__postcss_8.4.21",
+        name = "npm__postcss-modules-values__4.0.0_postcss_8.4.21",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -20295,7 +20295,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__puppeteer-core__19.11.0__369149898",
+        name = "npm__puppeteer-core__19.11.0_369149898",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -20392,7 +20392,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__puppeteer__19.11.0__369149898",
+        name = "npm__puppeteer__19.11.0_369149898",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -23668,7 +23668,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__terser-webpack-plugin__5.3.6__webpack_5.76.3",
+        name = "npm__terser-webpack-plugin__5.3.6_webpack_5.76.3",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -24865,7 +24865,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__update-browserslist-db__1.0.10__browserslist_4.21.5",
+        name = "npm__update-browserslist-db__1.0.10_browserslist_4.21.5",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -25182,7 +25182,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7",
+        name = "npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -25233,7 +25233,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__webpack-cli__5.0.1__webpack_5.76.3",
+        name = "npm__webpack-cli__5.0.1_webpack_5.76.3",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -25426,7 +25426,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__webpack__5.76.3__webpack-cli_5.0.1",
+        name = "npm__webpack__5.76.3_webpack-cli_5.0.1",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -25825,7 +25825,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ws__7.5.9__bufferutil_4.0.7",
+        name = "npm__ws__7.5.9_bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {},
@@ -25848,7 +25848,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ws__8.13.0__bufferutil_4.0.7",
+        name = "npm__ws__8.13.0_bufferutil_4.0.7",
         root_package = "",
         link_workspace = "",
         link_packages = {},
