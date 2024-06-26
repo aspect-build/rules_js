@@ -508,8 +508,6 @@ def _npm_import_rule_impl(rctx):
 
     generated_by_prefix = _make_generated_by_prefix(rctx.attr.package, rctx.attr.version)
 
-    bazel_name = utils.bazel_name(rctx.attr.package, rctx.attr.version)
-
     rctx_files = {
         "BUILD.bazel": [
             generated_by_prefix,
@@ -540,7 +538,6 @@ def _npm_import_rule_impl(rctx):
                 bin_name = _sanitize_bin_name(name)
                 bin_bzl.append(
                     _BIN_MACRO_TMPL.format(
-                        bazel_name = bazel_name,
                         bin_name = bin_name,
                         bin_mnemonic = _mnemonic_for_bin(bin_name),
                         bin_path = bins[name],

@@ -350,14 +350,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         fp_path = fp_link.get("path")
         fp_link_packages = fp_link.get("link_packages").keys()
         fp_deps = fp_link.get("deps")
-        fp_bazel_name = utils.bazel_name(fp_package, fp_path)
         fp_target = "//{}:{}".format(
             fp_path,
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
 
         npm_link_all_packages_bzl.append(_FP_STORE_TMPL.format(
-            bazel_name = fp_bazel_name,
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
@@ -371,7 +369,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
         if len(fp_link_packages) > 0:
             npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
-                bazel_name = fp_bazel_name,
                 link_packages = fp_link_packages,
                 link_visibility = package_visibility,
                 name = fp_package,
