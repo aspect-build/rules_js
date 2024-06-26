@@ -139,14 +139,14 @@ def lockfile_test(name = None):
 
             # Patched dependencies
             ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
-            "@%s__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq//:pkg" % lock_repo,
+            "@%s__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq//:pkg" % lock_repo,
 
             # Direct deps from custom registry
             ":.aspect_rules_js/node_modules/@types+node@16.18.11",
 
             # Direct deps with peers
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",
-            "@%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2//:pkg" % lock_repo,
+            "@%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2//:pkg" % lock_repo,
         ],
     )
 
