@@ -215,7 +215,7 @@ use_repo(
     "npm__rollup__2.70.2",
     "npm__rollup__2.70.2__links",
     "npm__unused__0.2.2__links",
-    "npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7",
+    "npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.7",
 )
 
 # As an example, manually import a package using explicit coordinates.

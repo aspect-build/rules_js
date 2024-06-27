@@ -41,7 +41,7 @@ write_source_files(
         "snapshots/wksp/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
         "snapshots/wksp/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
         "snapshots/wksp/package_json.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
-        "snapshots/wksp/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
+        "snapshots/wksp/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.7//npm/private/test:package_json.bzl",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
@@ -59,7 +59,7 @@ write_source_files(
         "snapshots/bzlmod/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
         "snapshots/bzlmod/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
         "snapshots/bzlmod/package_json.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
-        "snapshots/bzlmod/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0__bufferutil_4.0.7//npm/private/test:package_json.bzl",
+        "snapshots/bzlmod/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.7//npm/private/test:package_json.bzl",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": [],
