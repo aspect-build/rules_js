@@ -26,7 +26,7 @@ def _sanitize_string(string):
         if not c.isalnum() and c != "-" and c != "_" and c != ".":
             c = "_"
         result += c
-    return result
+    return result.strip("_-")
 
 def _bazel_name(name, version = None):
     "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
