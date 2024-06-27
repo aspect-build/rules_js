@@ -3,11 +3,11 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 write_source_files(
     name = "checked_in_compile",
     files = {
-        "fs.js": "//js/private/node-patches/src:fs-generated.js",
+        "fs.cjs": "//js/private/node-patches/src:fs-generated.cjs",
     },
 )
 
 exports_files([
-    "fs.js",
-    "register.js",
+    "fs.cjs",
+    "register.cjs",
 ])

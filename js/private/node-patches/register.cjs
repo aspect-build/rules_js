@@ -1,4 +1,4 @@
-const patchfs = require('./fs').patcher
+const patchfs = require('./fs.cjs').patcher
 const {
     JS_BINARY__FS_PATCH_ROOTS,
     JS_BINARY__LOG_DEBUG,

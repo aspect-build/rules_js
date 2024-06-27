@@ -187,11 +187,11 @@ load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
 typescript_bin.tsc(
     name = "compile",
     srcs = [
-        "fs.ts",
+        "fs.cts",
         "tsconfig.json",
         "//:node_modules/@types/node",
     ],
-    outs = ["fs.js"],
+    outs = ["fs.cjs"],
     chdir = package_name(),
     args = ["-p", "tsconfig.json"],
 )

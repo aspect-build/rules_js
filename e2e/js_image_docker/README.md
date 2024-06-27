@@ -64,8 +64,8 @@ app
 |   |   `-- js
 |   |       `-- private
 |   |           `-- node-patches
-|   |               |-- fs.js
-|   |               `-- register.js
+|   |               |-- fs.cjs
+|   |               `-- register.cjs
 |   |-- bazel_tools
 |   |   `-- tools
 |   |       `-- bash
