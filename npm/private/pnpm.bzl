@@ -159,7 +159,11 @@ def _convert_v5_packages(packages):
 
         package_path = _convert_pnpm_v5_version_peer_dep(package_path)
 
-        if package_path.startswith("file:"):
+        if package_path.startswith("/"):
+            # a simple /name/version[_peer_info]
+            name, version = package_path[1:].rsplit("/", 1)
+            friendly_version = package_snapshot["version"] if "version" in package_snapshot else _strip_v5_peer_dep_or_patched_version(version)
+        elif package_path.startswith("file:"):
             # direct reference to file
             name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
         elif "name" in package_snapshot and "version" in package_snapshot:
@@ -167,10 +171,6 @@ def _convert_v5_packages(packages):
             name = package_snapshot["name"]
             version = _strip_v5_default_registry_to_version(name, package_path)
             friendly_version = package_snapshot["version"]
-        elif package_path.startswith("/"):
-            # a simple /name/version[_peer_info]
-            name, version = package_path[1:].rsplit("/", 1)
-            friendly_version = _strip_v5_peer_dep_or_patched_version(version)
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
@@ -320,7 +320,11 @@ def _convert_v6_packages(packages):
 
         package_path = _convert_pnpm_v6_v9_version_peer_dep(package_path)
 
-        if package_path.startswith("file:"):
+        if package_path.startswith("/"):
+            # plain /pkg@version(_peer_info)
+            name, version = package_path[1:].rsplit("@", 1)
+            friendly_version = package_snapshot["version"] if "version" in package_snapshot else _strip_v5_peer_dep_or_patched_version(version)  # NOTE: already converted to v5 peer style
+        elif package_path.startswith("file:"):
             # direct reference to file
             name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
         elif "name" in package_snapshot and "version" in package_snapshot:
@@ -328,10 +332,6 @@ def _convert_v6_packages(packages):
             name = package_snapshot["name"]
             version = _strip_v6_default_registry_to_version(name, package_path)
             friendly_version = package_snapshot["version"]
-        elif package_path.startswith("/"):
-            # plain /pkg@version(_peer_info)
-            name, version = package_path[1:].rsplit("@", 1)
-            friendly_version = _strip_v5_peer_dep_or_patched_version(version)  # NOTE: already converted to v5 peer style
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
