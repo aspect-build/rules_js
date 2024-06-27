@@ -13,6 +13,10 @@ def _to_package_key(name, version):
         return version
     return "{}@{}".format(name, version)
 
+def _split_name_at_version(name_version):
+    at = name_version.find("@", 1)
+    return name_version[:at], name_version[at + 1:]
+
 # Metadata about a pnpm "project" (importer).
 #
 # Metadata may come from different locations depending on the lockfile, this struct should
@@ -94,6 +98,7 @@ def _convert_v5_importer_dependency_map(specifiers, deps):
             # Keep the npm: specifier for aliased dependencies
             # convert v5 style aliases ([default_registry]/aliased/version) to npm:aliased@version
             alias, version = _strip_v5_v6_default_registry(version).lstrip("/").rsplit("/", 1)
+            version = _convert_pnpm_v5_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
         else:
             # Transition [registry/]name/version[_patch][_peer_data] to a rules_js version format
@@ -239,7 +244,8 @@ def _convert_pnpm_v6_importer_dependency_map(deps):
         if specifier.startswith("npm:"):
             # Keep the npm: specifier for aliased dependencies
             # convert v6 style aliases ([registry]/aliased@version) to npm:aliased@version
-            alias, version = _strip_v5_v6_default_registry(version).lstrip("/").rsplit("@", 1)
+            alias, version = _split_name_at_version(_strip_v5_v6_default_registry(version).lstrip("/"))
+            version = _convert_pnpm_v6_v9_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
         else:
             # Transition [registry/]name@version[(peer)(data)] to a rules_js version format
