@@ -32,13 +32,12 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #
 # Metadata may come from different locations depending on the lockfile, this struct should
 # have data normalized across lockfiles.
-def _new_package_info(id, name, dependencies, optional_dependencies, peer_dependencies, dev, has_bin, optional, requires_build, version, friendly_version, resolution):
+def _new_package_info(id, name, dependencies, optional_dependencies, dev, has_bin, optional, requires_build, version, friendly_version, resolution):
     return {
         "id": id,
         "name": name,
         "dependencies": dependencies,
         "optional_dependencies": optional_dependencies,
-        "peer_dependencies": peer_dependencies,
         "dev": dev,
         "has_bin": has_bin,
         "optional": optional,
@@ -188,7 +187,6 @@ def _convert_v5_packages(packages):
             version = version,
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("dependencies", {})),
-            peer_dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("peerDependencies", {})),
             optional_dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
             dev = package_snapshot.get("dev", False),
             has_bin = package_snapshot.get("hasBin", False),
@@ -349,7 +347,6 @@ def _convert_v6_packages(packages):
             version = version,
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("dependencies", {})),
-            peer_dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("peerDependencies", {})),
             optional_dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
             dev = package_snapshot.get("dev", False),
             has_bin = package_snapshot.get("hasBin", False),
@@ -482,7 +479,6 @@ def _convert_v9_packages(packages, snapshots):
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("dependencies", {})),
             optional_dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("optionalDependencies", {})),
-            peer_dependencies = package_data.get("peerDependencies", {}),
             dev = None,  # TODO(pnpm9): must inspect importers.*.devDependencies?
             has_bin = package_data.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
