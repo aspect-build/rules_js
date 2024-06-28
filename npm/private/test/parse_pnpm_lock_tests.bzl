@@ -34,7 +34,6 @@ expected_packages = {
             "@aspect-test/d": "2.0.0_at_aspect-test_c_1.0.0",
         },
         "optional_dependencies": {},
-        "peer_dependencies": {},
         "dev": False,
         "has_bin": True,
         "optional": False,
