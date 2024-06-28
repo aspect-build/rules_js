@@ -9,6 +9,7 @@ js_binary(
     args = ["foo"],
     data = [
         ":node_modules/@lib/c",
+        "//:node_modules/@aspect-test",
     ],
     entry_point = "main.js",
 )
@@ -18,6 +19,7 @@ js_test(
     args = ["foo"],
     data = [
         ":node_modules",
+        "//:node_modules/@aspect-test",
     ],
     entry_point = "main.js",
     log_level = "info",

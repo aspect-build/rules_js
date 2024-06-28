@@ -8,21 +8,26 @@ importers:
 
   ..:
     dependencies:
+      '@aspect-test/a':
+        specifier: 5.0.2
+        version: 5.0.2
       typescript:
         specifier: 4.9.5
         version: 4.9.5
+    optionalDependencies:
+      '@aspect-test/c':
+        specifier: 2.0.2
+        version: 2.0.2
+    devDependencies:
+      '@aspect-test/b':
+        specifier: 5.0.2
+        version: 5.0.2
 
   ../app/a:
     dependencies:
       '@aspect-test/a':
         specifier: 5.0.2
         version: 5.0.2
-      '@aspect-test/b':
-        specifier: 5.0.2
-        version: 5.0.2
-      '@aspect-test/c':
-        specifier: 2.0.2
-        version: 2.0.2
       '@aspect-test/g':
         specifier: 1.0.0
         version: 1.0.0
@@ -32,15 +37,6 @@ importers:
 
   ../app/b:
     dependencies:
-      '@aspect-test/a':
-        specifier: 5.0.2
-        version: 5.0.2
-      '@aspect-test/b':
-        specifier: 5.0.2
-        version: 5.0.2
-      '@aspect-test/c':
-        specifier: 2.0.2
-        version: 2.0.2
       '@aspect-test/h':
         specifier: 1.0.0
         version: 1.0.0
@@ -56,12 +52,6 @@ importers:
       '@aspect-test/a':
         specifier: 5.0.2
         version: 5.0.2
-      '@aspect-test/b':
-        specifier: 5.0.2
-        version: 5.0.2
-      '@aspect-test/c':
-        specifier: 2.0.2
-        version: 2.0.2
       '@aspect-test/g':
         specifier: 1.0.0
         version: 1.0.0
@@ -80,18 +70,30 @@ importers:
       vendored-a:
         specifier: file:../../vendored/a
         version: file:../vendored/a
+      vendored-b:
+        specifier: file:../../vendored/b
+        version: file:../vendored/b(@lib/b@lib+b)
 
   ../lib/b:
     dependencies:
       '@aspect-test/f':
         specifier: 1.0.0
         version: 1.0.0
+      alias-1:
+        specifier: npm:@types/sizzle@~2.3.8
+        version: /@types/sizzle@2.3.8
 
   ../lib/c:
     dependencies:
       '@aspect-test/f':
         specifier: 1.0.0
         version: 1.0.0
+
+  ../lib/d:
+    dependencies:
+      alias-2:
+        specifier: npm:@types/node@16.18.11
+        version: /@types/node@16.18.11
 
 packages:
 
@@ -102,7 +104,6 @@ packages:
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
-    dev: false
 
   /@aspect-test/b@5.0.2:
     resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
@@ -111,13 +112,11 @@ packages:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
-    dev: false
 
   /@aspect-test/c@2.0.2:
     resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
     requiresBuild: true
-    dev: false
 
   /@aspect-test/d@2.0.0(@aspect-test/c@2.0.2):
     resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
@@ -126,7 +125,6 @@ packages:
       '@aspect-test/c': x.x.x
     dependencies:
       '@aspect-test/c': 2.0.2
-    dev: false
 
   /@aspect-test/e@1.0.0:
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
@@ -148,6 +146,14 @@ packages:
     hasBin: true
     dev: false
 
+  /@types/node@16.18.11:
+    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==}
+    dev: false
+
+  /@types/sizzle@2.3.8:
+    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
+    dev: false
+
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
@@ -166,4 +172,14 @@ packages:
     name: vendored-a
     dependencies:
       '@aspect-test/f': 1.0.0
+    dev: false
+
+  file:../vendored/b(@lib/b@lib+b):
+    resolution: {directory: ../vendored/b, type: directory}
+    id: file:../vendored/b
+    name: vendored-b
+    peerDependencies:
+      '@lib/b': workspace:*
+    dependencies:
+      '@lib/b': link:../lib/b
     dev: false

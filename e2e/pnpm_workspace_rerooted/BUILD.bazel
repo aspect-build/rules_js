@@ -1,3 +1,6 @@
+# NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
@@ -15,4 +18,12 @@ sh_test(
         "@nodejs_linux_arm64//:node_files",
     ],
     toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+)
+
+build_test(
+    name = "aliases",
+    targets = [
+        "//lib/b:node_modules/alias-1",
+        "//lib/d:node_modules/alias-2",
+    ],
 )

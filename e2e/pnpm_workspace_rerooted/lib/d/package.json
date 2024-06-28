@@ -1,0 +1,7 @@
+{
+    "name": "@lib/d",
+    "private": true,
+    "dependencies": {
+        "alias-2": "npm:@types/node@16.18.11"
+    }
+}
