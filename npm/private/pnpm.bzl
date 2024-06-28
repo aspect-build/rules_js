@@ -51,9 +51,7 @@ def _new_package_info(id, name, dependencies, optional_dependencies, dev, has_bi
 
 def _strip_v5_v6_default_registry(name_version):
     # Strip the default registry from the name_version string
-    if name_version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
-        return name_version[len(DEFAULT_REGISTRY_DOMAIN_SLASH):]
-    return name_version
+    return name_version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH)
 
 def _convert_v5_v6_file_package(package_path, package_snapshot):
     if "name" not in package_snapshot:
@@ -82,11 +80,12 @@ def _strip_v5_peer_dep_or_patched_version(version):
     return version
 
 def _strip_v5_default_registry_to_version(name, version):
-    # Strip the default registry/name/ from the version string
-    pre = DEFAULT_REGISTRY_DOMAIN_SLASH + name + "/"
-    if version.startswith(pre):
-        return version[len(pre):]
-    return version
+    # Quick-exit if the version string does not start with the default registry
+    if not version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
+        return version
+
+    # Strip the default registry/name@ from the version string
+    return version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH + name + "/")
 
 def _convert_v5_importer_dependency_map(specifiers, deps):
     result = {}
@@ -226,11 +225,12 @@ def _convert_pnpm_v6_v9_version_peer_dep(version):
     return version
 
 def _strip_v6_default_registry_to_version(name, version):
+    # Quick-exit if the version string does not start with the default registry
+    if not version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
+        return version
+
     # Strip the default registry/name@ from the version string
-    pre = DEFAULT_REGISTRY_DOMAIN_SLASH + name + "@"
-    if version.startswith(pre):
-        return version[len(pre):]
-    return version
+    return version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH + name + "@")
 
 def _convert_pnpm_v6_importer_dependency_map(deps):
     result = {}
