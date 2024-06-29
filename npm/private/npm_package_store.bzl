@@ -191,6 +191,8 @@ def _npm_package_store_impl(ctx):
     package_store_directory_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, package)
 
     if ctx.attr.src and NpmPackageInfo in ctx.attr.src:
+        npm_pkg_info = ctx.attr.src[NpmPackageInfo]
+
         # output the package as a TreeArtifact to its package store location
         if ctx.label.workspace_name and ctx.label.package:
             expected_short_path = "../{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
@@ -201,7 +203,7 @@ def _npm_package_store_impl(ctx):
         else:
             expected_short_path = package_store_directory_path
 
-        src = ctx.attr.src[NpmPackageInfo].src
+        src = npm_pkg_info.src
         if src.short_path == expected_short_path:
             # the input is already the desired output; this is the pattern for
             # packages with lifecycle hooks
@@ -245,15 +247,15 @@ def _npm_package_store_impl(ctx):
         linked_package_store_directories = []
         for dep, _dep_aliases in ctx.attr.deps.items():
             dep_info = dep[NpmPackageStoreInfo]
+            dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
+            dep_package_store_directory = dep_info.package_store_directory
 
             # symlink the package's direct deps to its package store location
             if dep_info.root_package != ctx.label.package:
                 msg = """npm_package_store in %s package cannot depend on npm_package_store in %s package.
 deps of npm_package_store must be in the same package.""" % (ctx.label.package, dep_info.root_package)
                 fail(msg)
-            dep_package = dep_info.package
-            dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
-            dep_package_store_directory = dep_info.package_store_directory
+
             if dep_package_store_directory:
                 linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
@@ -267,17 +269,16 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 # party npm deps; it is not used for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
 
-        for store in ctx.attr.src[NpmPackageInfo].npm_package_store_infos.to_list():
-            dep_package = store.package
-            dep_package_store_directory = store.package_store_directory
+        for dep_info in npm_pkg_info.npm_package_store_infos.to_list():
+            dep_package_store_directory = dep_info.package_store_directory
 
             # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
             # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
             if dep_package_store_directory not in linked_package_store_directories:
                 # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_package)
+                dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_info.package)
                 files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
-                npm_package_store_infos.append(store)
+                npm_package_store_infos.append(dep_info)
     elif ctx.attr.src and JsInfo in ctx.attr.src:
         jsinfo = ctx.attr.src[JsInfo]
 
@@ -286,6 +287,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             symlink_path = "external/{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
         else:
             symlink_path = "{}/{}".format(ctx.label.package or ".", package_store_directory_path)
+
         transitive_files_depsets.append(jsinfo.transitive_sources)
         transitive_files_depsets.append(jsinfo.transitive_types)
         transitive_package_store_infos_depsets.append(jsinfo.npm_package_store_infos)
@@ -302,8 +304,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         deps_map = {}
         for dep, _dep_aliases in ctx.attr.deps.items():
             dep_info = dep[NpmPackageStoreInfo]
-            dep_package = dep_info.package
-            dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
 
             # create a map of deps that have package store directories
             if dep_info.package_store_directory:
@@ -312,15 +312,18 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not used for 1st party deps
+                dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
                 direct_ref_deps[dep] = dep_aliases
+
         for dep in ctx.attr.deps:
             dep_info = dep[NpmPackageStoreInfo]
             dep_package_store_name = utils.package_store_name(dep_info.package, dep_info.version)
-            dep_ref_deps = dep_info.ref_deps
+
             if package_store_name == dep_package_store_name:
                 # provide the node_modules directory for this package if found in the transitive_closure
                 package_store_directory = dep_info.package_store_directory
-            for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
+
+            for dep_ref_dep, dep_ref_dep_aliases in dep_info.ref_deps.items():
                 dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
                 if not dep_ref_dep_package_store_name in deps_map:
                     # This can happen in lifecycle npm package targets. We have no choice but to
