@@ -182,7 +182,6 @@ def _npm_package_store_impl(ctx):
 
     files = []
     transitive_files_depsets = []
-    transitive_package_store_infos_depsets = []
     npm_package_store_infos = []
     direct_ref_deps = {}
 
@@ -290,7 +289,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
         transitive_files_depsets.append(jsinfo.transitive_sources)
         transitive_files_depsets.append(jsinfo.transitive_types)
-        transitive_package_store_infos_depsets.append(jsinfo.npm_package_store_infos)
+        npm_package_store_infos.extend(jsinfo.npm_package_store_infos.to_list())
+
         if jsinfo.target.workspace_name:
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.workspace_name, jsinfo.target.package)
         else:
@@ -347,10 +347,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     for target in ctx.attr.deps:
         npm_package_store_infos.append(target[NpmPackageStoreInfo])
-
-    for transitive_package_store_infos_depset in transitive_package_store_infos_depsets:
-        for npm_package_store_info in transitive_package_store_infos_depset.to_list():
-            npm_package_store_infos.append(npm_package_store_info)
 
     if ctx.attr.src:
         for npm_package_store_info in npm_package_store_infos:
