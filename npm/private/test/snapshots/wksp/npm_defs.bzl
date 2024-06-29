@@ -988,7 +988,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
 
-_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_empty_node_modules", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
+_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_empty_node_modules", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -2288,7 +2288,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             tags = ["manual"],
         )
 
-    for link_package in ["examples/npm_deps", "js/private/test/image"]:
+    for link_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
         if link_package == native.package_name():
             # terminal target for direct dependencies
             _npm_link_package_store(
@@ -2308,6 +2308,41 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 tags = ["manual"],
             )
             link_targets.append(":{}/@mycorp/pkg-d".format(name))
+            scope_targets["@mycorp"] = scope_targets["@mycorp"] + [link_targets[-1]] if "@mycorp" in scope_targets else [link_targets[-1]]
+
+    if is_root:
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
+            src = "//examples/npm_package/packages/pkg_e:pkg",
+            package = "@mycorp/pkg-e",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name): "@mycorp/pkg-d",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["examples/npm_deps"]:
+        if link_package == native.package_name():
+            # terminal target for direct dependencies
+            _npm_link_package_store(
+                name = "{}/@mycorp/pkg-e".format(name),
+                src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/@mycorp/pkg-e/dir".format(name),
+                srcs = [":{}/@mycorp/pkg-e".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            link_targets.append(":{}/@mycorp/pkg-e".format(name))
             scope_targets["@mycorp"] = scope_targets["@mycorp"] + [link_targets[-1]] if "@mycorp" in scope_targets else [link_targets[-1]]
 
     if is_root:
@@ -2478,9 +2513,13 @@ def npm_link_targets(name = "node_modules", package = None):
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@mycorp/pkg-a".format(bazel_package, name))
 
-    for link_package in ["examples/npm_deps", "js/private/test/image"]:
+    for link_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@mycorp/pkg-d".format(bazel_package, name))
+
+    for link_package in ["examples/npm_deps"]:
+        if link_package == bazel_package:
+            link_targets.append("//{}:{}/@mycorp/pkg-e".format(bazel_package, name))
 
     for link_package in ["npm/private/test"]:
         if link_package == bazel_package:

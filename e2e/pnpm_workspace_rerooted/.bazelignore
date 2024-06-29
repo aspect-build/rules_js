@@ -4,6 +4,7 @@ node_modules/
 app/a/node_modules/
 app/b/node_modules/
 app/c/node_modules/
+app/d/node_modules/
 lib/a/node_modules/
 lib/b/node_modules/
 lib/c/node_modules/

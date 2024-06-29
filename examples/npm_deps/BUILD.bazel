@@ -279,3 +279,20 @@ js_test(
     ],
     entry_point = "case9.js",
 )
+
+#######################################
+# Case 10: use a first-party npm package a transitive dependency on a monorepo workspace from a js_library target
+
+write_file(
+    name = "write10",
+    out = "case10.js",
+    content = ["require('@mycorp/pkg-e')"],
+)
+
+js_test(
+    name = "test10",
+    data = [
+        ":node_modules/@mycorp/pkg-e",
+    ],
+    entry_point = "case10.js",
+)
