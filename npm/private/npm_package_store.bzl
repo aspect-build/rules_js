@@ -244,14 +244,16 @@ def _npm_package_store_impl(ctx):
 
         linked_package_store_directories = []
         for dep, _dep_aliases in ctx.attr.deps.items():
+            dep_info = dep[NpmPackageStoreInfo]
+
             # symlink the package's direct deps to its package store location
-            if dep[NpmPackageStoreInfo].root_package != ctx.label.package:
+            if dep_info.root_package != ctx.label.package:
                 msg = """npm_package_store in %s package cannot depend on npm_package_store in %s package.
-deps of npm_package_store must be in the same package.""" % (ctx.label.package, dep[NpmPackageStoreInfo].root_package)
+deps of npm_package_store must be in the same package.""" % (ctx.label.package, dep_info.root_package)
                 fail(msg)
-            dep_package = dep[NpmPackageStoreInfo].package
+            dep_package = dep_info.package
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
-            dep_package_store_directory = dep[NpmPackageStoreInfo].package_store_directory
+            dep_package_store_directory = dep_info.package_store_directory
             if dep_package_store_directory:
                 linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
@@ -299,23 +301,25 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # is not used for 1st party deps
         deps_map = {}
         for dep, _dep_aliases in ctx.attr.deps.items():
-            dep_package = dep[NpmPackageStoreInfo].package
+            dep_info = dep[NpmPackageStoreInfo]
+            dep_package = dep_info.package
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_package]
 
             # create a map of deps that have package store directories
-            if dep[NpmPackageStoreInfo].package_store_directory:
-                deps_map[utils.package_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)] = dep
+            if dep_info.package_store_directory:
+                deps_map[utils.package_store_name(dep_info.package, dep_info.version)] = dep
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
                 # for lifecycle hooks on 3rd party deps; it is not used for 1st party deps
                 direct_ref_deps[dep] = dep_aliases
         for dep in ctx.attr.deps:
-            dep_package_store_name = utils.package_store_name(dep[NpmPackageStoreInfo].package, dep[NpmPackageStoreInfo].version)
-            dep_ref_deps = dep[NpmPackageStoreInfo].ref_deps
+            dep_info = dep[NpmPackageStoreInfo]
+            dep_package_store_name = utils.package_store_name(dep_info.package, dep_info.version)
+            dep_ref_deps = dep_info.ref_deps
             if package_store_name == dep_package_store_name:
                 # provide the node_modules directory for this package if found in the transitive_closure
-                package_store_directory = dep[NpmPackageStoreInfo].package_store_directory
+                package_store_directory = dep_info.package_store_directory
             for dep_ref_dep, dep_ref_dep_aliases in dep_ref_deps.items():
                 dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
                 if not dep_ref_dep_package_store_name in deps_map:
