@@ -2,6 +2,7 @@
     "name": "@lib/d",
     "private": true,
     "dependencies": {
+        "@aspect-test/d": "^2.0.0",
         "alias-2": "npm:@types/node@16.18.11"
     }
 }

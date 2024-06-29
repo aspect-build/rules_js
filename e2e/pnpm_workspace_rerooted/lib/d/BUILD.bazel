@@ -11,6 +11,7 @@ js_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":node_modules/@aspect-test/d",
         ":node_modules/alias-2",
     ],
 )

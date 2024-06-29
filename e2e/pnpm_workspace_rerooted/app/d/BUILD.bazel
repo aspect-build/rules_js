@@ -1,0 +1,26 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+js_binary(
+    name = "main",
+    args = ["foo"],
+    data = [
+        ":node_modules/@aspect-test",
+        ":node_modules/@lib/d",
+        "//:node_modules/@aspect-test",
+    ],
+    entry_point = "main.js",
+)
+
+js_test(
+    name = "test",
+    args = ["foo"],
+    data = [
+        ":node_modules",
+        "//:node_modules/@aspect-test",
+    ],
+    entry_point = "main.js",
+    log_level = "info",
+)

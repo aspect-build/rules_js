@@ -5,12 +5,13 @@
 app/a/package.json=574382986
 app/b/package.json=795450875
 app/c/package.json=1357235418
+app/d/package.json=1859553579
 lib/a/package.json=1162557353
 lib/b/package.json=1612905941
 lib/c/package.json=1015268365
-lib/d/package.json=-1311314987
+lib/d/package.json=476969669
 package.json=-716078204
-pnpm-lock.yaml=793845425
+pnpm-lock.yaml=-1749700182
 pnpm-workspace.yaml=-67685769
 vendored/a/package.json=-174142441
 vendored/b/package.json=536664170
