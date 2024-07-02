@@ -18,9 +18,9 @@ http_archive(
 
 http_archive(
     name = "com_grail_bazel_toolchain",
-    sha256 = "a9fc7cf01d0ea0a935bd9e3674dd3103766db77dfc6aafcb447a7ddd6ca24a78",
-    strip_prefix = "toolchains_llvm-c65ef7a45907016a754e5bf5bfabac76eb702fd3",
-    urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/c65ef7a45907016a754e5bf5bfabac76eb702fd3.tar.gz"],
+    sha256 = "be5db5c9304381bb3e75e470454fcd1246a0712a5c772588cda90509bfe50904",
+    strip_prefix = "toolchains_llvm-1d685a99db5f1e6523c392e7dfaced583062cbc4",
+    urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/1d685a99db5f1e6523c392e7dfaced583062cbc4.tar.gz"],
 )
 
 _SYSROOT_LINUX_BUILD_FILE = """
