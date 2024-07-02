@@ -10,8 +10,10 @@ js_library(
         "package.json",
     ],
     visibility = ["//visibility:public"],
+    # because we're linking this js_library, we must explictly add our npm dependendies to `deps` so
+    # they are picked up my the linker. npm dependendies in `data` are not propogated through the
+    # linker when linking a js_libary.
     deps = [
-        ":node_modules/@aspect-test/d",
-        ":node_modules/alias-2",
+        ":node_modules",
     ],
 )

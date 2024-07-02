@@ -287,6 +287,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         else:
             symlink_path = "{}/{}".format(ctx.label.package or ".", package_store_directory_path)
 
+        transitive_files_depsets.append(jsinfo.npm_sources)
         transitive_files_depsets.append(jsinfo.transitive_sources)
         transitive_files_depsets.append(jsinfo.transitive_types)
         npm_package_store_infos.extend(jsinfo.npm_package_store_infos.to_list())

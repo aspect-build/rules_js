@@ -6,6 +6,7 @@ packages:
     - 'examples/npm_package/packages/pkg_a'
     - 'examples/npm_package/packages/pkg_b'
     - 'examples/npm_package/packages/pkg_d'
+    - 'examples/npm_package/packages/pkg_e'
     - 'examples/webpack_cli'
     - 'examples/linked_empty_node_modules'
     - 'js/private/coverage/bundle'

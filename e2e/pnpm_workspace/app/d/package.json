@@ -1,0 +1,8 @@
+{
+    "name": "@app/c",
+    "private": true,
+    "dependencies": {
+        "@aspect-test/g": "1.0.0",
+        "@lib/d": "workspace:*"
+    }
+}

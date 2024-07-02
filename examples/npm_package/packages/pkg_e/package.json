@@ -1,0 +1,7 @@
+{
+    "name": "@mycorp/pkg-e",
+    "private": true,
+    "dependencies": {
+        "@mycorp/pkg-d": "workspace:*"
+    }
+}

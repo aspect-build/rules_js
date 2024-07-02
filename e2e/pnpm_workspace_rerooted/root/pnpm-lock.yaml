@@ -59,6 +59,15 @@ importers:
         specifier: file:../../lib/c
         version: file:../lib/c
 
+  ../app/d:
+    dependencies:
+      '@aspect-test/g':
+        specifier: 1.0.0
+        version: 1.0.0
+      '@lib/d':
+        specifier: workspace:*
+        version: link:../../lib/d
+
   ../lib/a:
     dependencies:
       '@aspect-test/e':
@@ -91,6 +100,9 @@ importers:
 
   ../lib/d:
     dependencies:
+      '@aspect-test/d':
+        specifier: ^2.0.0
+        version: 2.0.0(@aspect-test/c@2.0.2)
       alias-2:
         specifier: npm:@types/node@16.18.11
         version: /@types/node@16.18.11
