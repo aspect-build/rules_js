@@ -2,9 +2,6 @@
     "name": "@app/b",
     "private": true,
     "dependencies": {
-        "@aspect-test/a": "5.0.2",
-        "@aspect-test/b": "5.0.2",
-        "@aspect-test/c": "2.0.2",
         "@aspect-test/h": "1.0.0",
         "@lib/b": "workspace:*",
         "@lib/b_alias": "workspace:@lib/b@*"

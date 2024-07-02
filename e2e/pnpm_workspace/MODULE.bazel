@@ -1,3 +1,5 @@
+# NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
+
 bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
 local_path_override(
     module_name = "aspect_rules_js",
@@ -42,6 +44,7 @@ npm.npm_translate_lock(
         "//lib/a:package.json",
         "//lib/b:package.json",
         "//lib/c:package.json",
+        "//lib/d:package.json",
         "//vendored/a:package.json",
         "//vendored/b:package.json",
     ],

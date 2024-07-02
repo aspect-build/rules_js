@@ -2,8 +2,7 @@
     "name": "@app/c",
     "private": true,
     "dependencies": {
-        "@aspect-test/a": "5.0.2",
         "@aspect-test/g": "1.0.0",
-        "@lib/c": "file:../../lib/c"
+        "@lib/d": "workspace:*"
     }
 }

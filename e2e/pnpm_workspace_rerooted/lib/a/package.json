@@ -4,6 +4,7 @@
     "dependencies": {
         "@aspect-test/e": "1.0.0",
         "@lib/b": "workspace:*",
-        "vendored-a": "file:../../vendored/a"
+        "vendored-a": "file:../../vendored/a",
+        "vendored-b": "file:../../vendored/b"
     }
 }

@@ -1,6 +1,13 @@
 {
     "private": true,
     "dependencies": {
-        "typescript": "4.9.5"
+        "typescript": "4.9.5",
+        "@aspect-test/a": "5.0.2"
+    },
+    "devDependencies": {
+        "@aspect-test/b": "5.0.2"
+    },
+    "optionalDependencies": {
+        "@aspect-test/c": "2.0.2"
     }
 }

@@ -1,5 +1,7 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
-load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library", "js_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 load("@npm//app/a:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
@@ -10,6 +12,7 @@ js_binary(
     data = [
         ":node_modules/@aspect-test",
         ":node_modules/@lib",
+        "//:node_modules/@aspect-test",
     ],
     entry_point = "main.js",
 )
@@ -19,6 +22,7 @@ js_test(
     args = ["foo"],
     data = [
         ":node_modules",
+        "//:node_modules/@aspect-test",
     ],
     entry_point = "main.js",
     log_level = "info",
@@ -26,4 +30,36 @@ js_test(
 
 aspect_test_a_bin.bin_a_test(
     name = "aspect_test_a_bin_test",
+)
+
+# test npm_link_targets() with 1p workspace linked deps
+NODE_MODULES = npm_link_targets()
+
+js_library(
+    name = "npm_link_targets_node_modules",
+    srcs = NODE_MODULES,
+)
+
+build_test(
+    name = "npm_link_targets_node_modules_build_test",
+    targets = [":npm_link_targets_node_modules"],
+)
+
+genquery(
+    name = "query_node_modules",
+    expression = "deps(//app/a:node_modules) - //app/a:node_modules",
+    scope = [":node_modules"],
+)
+
+genquery(
+    name = "query_npm_link_targets_node_modules",
+    expression = "deps(//app/a:npm_link_targets_node_modules) - //app/a:npm_link_targets_node_modules",
+    scope = [":npm_link_targets_node_modules"],
+)
+
+# Verifies that the targets list in :npm_link_targets_node_modules is the same as :node_modules
+diff_test(
+    name = "npm_link_targets_test",
+    file1 = "query_node_modules",
+    file2 = "query_npm_link_targets_node_modules",
 )
