@@ -1,3 +1,5 @@
+# NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
+
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
@@ -7,12 +9,12 @@ js_binary(
     name = "main",
     args = ["foo"],
     data = [
-        ":node_modules/@aspect-test/a",
-        ":node_modules/@aspect-test/b",
-        ":node_modules/@aspect-test/c",
         ":node_modules/@aspect-test/h",
         ":node_modules/@lib/b",
         ":node_modules/@lib/b_alias",
+        "//:node_modules/@aspect-test/a",
+        "//:node_modules/@aspect-test/b",
+        "//:node_modules/@aspect-test/c",
     ],
     entry_point = "main.js",
 )
@@ -22,7 +24,7 @@ js_test(
     args = ["foo"],
     data = [
         ":node_modules",
-        "//root:node_modules",
+        "//:node_modules",
     ],
     entry_point = "main.js",
     log_level = "info",

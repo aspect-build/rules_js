@@ -1,3 +1,5 @@
+// NOTE: keep in sync with e2e/pnpm_workspace_rerooted
+
 const packageJson = require('./package.json')
 const e = require('@aspect-test/e')
 const libB = require('@lib/b')
@@ -8,9 +10,5 @@ module.exports = {
         `${packageJson.name}@${
             packageJson.version ? packageJson.version : '0.0.0'
         }`,
-    idE: () => e.id(),
-    idLibB: () => libB.id(),
-    idLibTransitiveF: () => libB.idF(),
-    idVendoredA: () => vendoredA.id(),
-    idVendoredB: () => vendoredB.id(),
+    test: () => [e.id(), libB.id(), vendoredA.id(), vendoredB.id()].join(','),
 }
