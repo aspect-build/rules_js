@@ -449,7 +449,6 @@ def npm_package(
         )
         srcs = srcs + [files_target]
 
-    # TODO(2.0): switch to false
     if publishable:
         js_binary(
             name = "{}.publish".format(name),
