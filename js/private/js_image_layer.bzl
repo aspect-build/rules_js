@@ -13,7 +13,7 @@ js_image_layer(
 ```
 """
 
-load("@aspect_bazel_lib//lib:paths.bzl", "to_rlocation_path")
+load("@aspect_bazel_lib//lib:paths.bzl", "to_repository_relative_path", "to_rlocation_path")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DOC = """Create container image layers from js_binary targets.
@@ -310,8 +310,8 @@ def _build_layer(ctx, type, all_entries_json, entries, inputs):
     return output
 
 def _select_layer(layers, destination, file):
-    is_node = file.owner.workspace_name != "" and "/bin/nodejs/" in destination
-    is_js_patches = "/js/private/node-patches" in destination
+    is_node = _is_node(destination, file)
+    is_js_patches = _is_node_patches(destination)
     if is_node or is_js_patches:
         return layers.node
     is_package_store = "/.aspect_rules_js/" in destination
@@ -325,6 +325,15 @@ def _select_layer(layers, destination, file):
     if is_node_modules:
         return layers.node_modules
     return layers.app
+
+def _is_node_patches(destination):
+    return "/js/private/node-patches" in destination
+
+def _is_node(destination, file):
+    return file.owner.workspace_name != "" and "/bin/nodejs/" in destination
+
+def _is_node_wrapper(destination):
+    return "_node_bin/node" in destination
 
 def _js_image_layer_impl(ctx):
     if len(ctx.attr.binary) != 1:
@@ -364,13 +373,27 @@ def _js_image_layer_impl(ctx):
             inputs = [],
         ),
         app = struct(
-            entries = {binary_path: {"dest": launcher.path, "root": launcher.root.path}},
-            inputs = [launcher],
+            entries = {binary_path: {"dest": launcher.path, "root": launcher.root.path}} if not ctx.attr.pure else {},
+            inputs = [launcher] if not ctx.attr.pure else [],
         ),
     )
 
     for file in all_files.to_list():
-        destination = _runfile_path(ctx, file, runfiles_dir)
+        destination = ""
+        if ctx.attr.pure:
+            # Destination without runfiles
+            destination = paths.join(ctx.attr.root, to_repository_relative_path(file))
+        else:
+            destination = _runfile_path(ctx, file, runfiles_dir)
+
+        # Skip binary sh
+        if ctx.attr.pure and file.short_path == binary_default_info.files_to_run.executable.short_path:
+            continue
+
+        # Skip nodejs, nodejs patches and nodejs wrapper
+        if ctx.attr.pure and (_is_node(destination, file) or _is_node_patches(destination) or _is_node_wrapper(destination)):
+            continue
+
         entry = {
             "dest": file.path,
             "root": file.root.path,
@@ -378,6 +401,7 @@ def _js_image_layer_impl(ctx):
             "is_source": file.is_source,
             "is_directory": file.is_directory,
         }
+
         if destination == real_binary_path:
             entry["remove_non_hermetic_lines"] = True
 
@@ -489,6 +513,18 @@ js_image_layer_lib = struct(
         ),
         "platform": attr.label(
             doc = "Platform to transition.",
+        ),
+        "pure": attr.bool(
+            doc = """Generate layers without Bazel specific sources and NodeJS
+
+Remove from layers:
+- NodeJS
+- NodeJS patches
+- Bazel wrapper (js_binary)
+- Runfiles directories
+
+Required for using in distroless images.
+See https://github.com/GoogleContainerTools/distroless/blob/main/nodejs/README.md""",
         ),
         "generate_empty_layers": attr.bool(
             doc = """Generate layers even if they are empty.
