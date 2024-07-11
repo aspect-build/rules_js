@@ -53,7 +53,7 @@ importers:
         specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
         version: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       is-odd:
-        specifier: 3.0.1
+        specifier: npm:is-odd@3.0.1
         version: 3.0.1
       is-odd-alt-version:
         specifier: npm:is-odd@^2.0.0

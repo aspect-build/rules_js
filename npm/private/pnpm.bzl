@@ -92,7 +92,7 @@ def _convert_v5_importer_dependency_map(specifiers, deps):
     for name, version in deps.items():
         specifier = specifiers.get(name)
 
-        if specifier.startswith("npm:"):
+        if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
             # Keep the npm: specifier for aliased dependencies
             # convert v5 style aliases ([default_registry]/aliased/version) to npm:aliased@version
             alias, version = _strip_v5_v6_default_registry(version).lstrip("/").rsplit("/", 1)
@@ -238,7 +238,7 @@ def _convert_pnpm_v6_importer_dependency_map(deps):
         specifier = attributes.get("specifier")
         version = attributes.get("version")
 
-        if specifier.startswith("npm:"):
+        if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
             # Keep the npm: specifier for aliased dependencies
             # convert v6 style aliases ([registry]/aliased@version) to npm:aliased@version
             alias, version = _split_name_at_version(_strip_v5_v6_default_registry(version).lstrip("/"))
@@ -391,10 +391,9 @@ def _convert_pnpm_v9_importer_dependency_map(deps):
         # Transition version[(patch)(peer)(data)] to a rules_js version format
         version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
-        if specifier.startswith("npm:"):
+        if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
             # Keep the npm: specifier for aliased dependencies
-            alias, version = version.rsplit("@", 1)
-            version = "npm:{}@{}".format(alias, version)
+            version = "npm:{}".format(version)
 
         result[name] = version
     return result

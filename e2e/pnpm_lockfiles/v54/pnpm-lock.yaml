@@ -33,7 +33,7 @@ importers:
       alias-types-node: npm:@types/node@~16.18.11
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       hello: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
-      is-odd: 3.0.1
+      is-odd: npm:is-odd@3.0.1
       is-odd-alt-version: npm:is-odd@^2.0.0
       jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
       meaning-of-life: 1.0.0
