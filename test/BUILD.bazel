@@ -1,0 +1,26 @@
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+# load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+# load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+copy_to_directory(
+    name = "build",
+    srcs = ["file"],
+)
+
+genrule(
+    name = "gen_file",
+    outs = ["build/file"],
+    cmd = "echo 'foo' >$@",
+)
+
+# copy_file(
+#     name = "copy_file",
+#     src = "file",
+#     out = "build/file"
+# )
+
+# write_file(
+#     name = "write_file",
+#     out = "build/file",
+#     content = ["foobar"],
+# )
