@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 
 # buildifier: disable=bzl-visibility
-load("//js/private:js_info.bzl", "JsInfo", "js_info")
+load("//js/private:js_info.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -368,10 +368,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
     files_depset = depset(files)
 
     providers = [
-        js_info(
-            target = ctx.label,
-            npm_sources = transitive_files_depset,
-        ),
         DefaultInfo(
             files = files_depset,
             runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
