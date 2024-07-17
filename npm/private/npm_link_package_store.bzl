@@ -22,7 +22,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 _ATTRS = {
     "src": attr.label(
         doc = """The npm_package_store target to link as a direct dependency.""",
-        providers = [NpmPackageStoreInfo],
+        providers = [NpmPackageStoreInfo, JsInfo],
         mandatory = True,
     ),
     "package": attr.string(
@@ -61,6 +61,7 @@ exec node "$basedir/{bin_path}" "$@"
 
 def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
+    store_js_info = ctx.attr.src[JsInfo]
 
     package_store_directory = store_info.package_store_directory
     if not package_store_directory:
@@ -91,9 +92,11 @@ def _npm_link_package_store_impl(ctx):
         )
         files.append(bin_file)
 
-    files_depset = depset(files, transitive = [store_info.files])
-
-    transitive_files_depset = depset(files, transitive = [store_info.transitive_files])
+    files_depset = depset(files, transitive = [store_js_info.npm_sources, store_js_info.sources])
+    transitive_files_depset = depset(files, transitive = [
+        store_js_info.transitive_sources,
+        store_js_info.transitive_types,  # TODO: remove this to make the breaking change
+    ])
 
     providers = [
         DefaultInfo(

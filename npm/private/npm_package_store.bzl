@@ -105,7 +105,7 @@ _ATTRS = {
         > In contrast, Bazel makes it possible to make builds hermetic, which means that
         > all dependencies of a program must be declared when running in Bazel's sandbox.
         """,
-        providers = [NpmPackageStoreInfo],
+        providers = [NpmPackageStoreInfo, JsInfo],
     ),
     "package": attr.string(
         doc = """The package name to link to.
@@ -180,8 +180,13 @@ def _npm_package_store_impl(ctx):
     package_store_name = utils.package_store_name(package, version)
     package_store_directory = None
 
+    # files required to create the package store entry
     files = []
-    transitive_files_depsets = []
+
+    # JsInfo of the package and deps
+    js_infos = []
+
+    # NpmPackageStoreInfo of the package and deps
     npm_package_store_infos = []
     direct_ref_deps = {}
 
@@ -287,10 +292,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         else:
             symlink_path = "{}/{}".format(ctx.label.package or ".", package_store_directory_path)
 
-        transitive_files_depsets.append(jsinfo.npm_sources)
-        transitive_files_depsets.append(jsinfo.transitive_sources)
-        transitive_files_depsets.append(jsinfo.transitive_types)
-        npm_package_store_infos.extend(jsinfo.npm_package_store_infos.to_list())
+        js_infos.append(jsinfo)
 
         if jsinfo.target.workspace_name:
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.workspace_name, jsinfo.target.package)
@@ -347,11 +349,12 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         files.append(package_store_directory)
 
     for target in ctx.attr.deps:
+        js_infos.append(target[JsInfo])
         npm_package_store_infos.append(target[NpmPackageStoreInfo])
 
     if ctx.attr.src:
-        for npm_package_store_info in npm_package_store_infos:
-            transitive_files_depsets.append(npm_package_store_info.transitive_files)
+        sources_depset = depset(files, transitive = [jsinfo.transitive_sources for jsinfo in js_infos])
+        types_depset = depset(transitive = [jsinfo.transitive_types for jsinfo in js_infos])
     else:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when ctx.attr.src is
         # _not_ set, this is a terminal 3p package with ctx.attr.deps being the transitive closure
@@ -360,21 +363,32 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # closure of all the entire package store deps, we can safely add just `files` from each of
         # these to `transitive_files_depset`; doing so reduces the size of `transitive_files_depset`
         # significantly and reduces analysis time and Bazel memory usage during analysis
-        for npm_package_store_info in npm_package_store_infos:
-            transitive_files_depsets.append(npm_package_store_info.files)
+        sources_depset = depset(files, transitive = [jsinfo.sources for jsinfo in js_infos])
+        types_depset = depset(transitive = [jsinfo.types for jsinfo in js_infos])
 
-    transitive_files_depset = depset(files, transitive = transitive_files_depsets)
+    npm_sources = depset(files, transitive = [jsinfo.npm_sources for jsinfo in js_infos])
+    npm_package_store_infos = depset(npm_package_store_infos, transitive = [jsinfo.npm_package_store_infos for jsinfo in js_infos])
 
-    files_depset = depset(files)
+    # TODO: remove this to make the breaking change
+    sources_depset = depset(transitive = [sources_depset, types_depset])
 
     providers = [
         js_info(
             target = ctx.label,
-            npm_sources = transitive_files_depset,
+            npm_sources = npm_sources,
+            npm_package_store_infos = npm_package_store_infos,
+            sources = sources_depset,
+            transitive_sources = sources_depset,
+            types = types_depset,
+            transitive_types = types_depset,
         ),
         DefaultInfo(
-            files = files_depset,
-            runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
+            files = depset(files),
+            runfiles = ctx.runfiles(transitive_files = depset(files, transitive = [
+                sources_depset,
+                types_depset,  # TODO: remove this to make the breaking change
+                npm_sources,
+            ])),
         ),
         NpmPackageStoreInfo(
             root_package = ctx.label.package,
@@ -382,8 +396,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             version = version,
             ref_deps = direct_ref_deps,
             package_store_directory = package_store_directory,
-            files = files_depset,
-            transitive_files = transitive_files_depset,
             dev = ctx.attr.dev,
         ),
     ]
