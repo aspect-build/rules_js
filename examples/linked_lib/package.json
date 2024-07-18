@@ -1,0 +1,12 @@
+{
+    "name": "@lib/test2",
+    "private": true,
+    "dependencies": {
+        "@aspect-test/e": "1.0.0",
+        "alias-e": "npm:@aspect-test/e"
+    },
+    "devDependencies": {
+        "@types/node": "18.13.0",
+        "@aspect-test/f": "1.0.0"
+    }
+}

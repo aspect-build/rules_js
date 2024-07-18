@@ -1,6 +1,9 @@
 e2e/
 examples/js_binary/node_modules/
+examples/linked_consumer/node_modules
 examples/linked_empty_node_modules/node_modules
+examples/linked_lib/node_modules
+examples/linked_pkg/node_modules
 examples/macro/node_modules/
 examples/npm_deps/node_modules/
 examples/npm_package/libs/lib_a/node_modules/

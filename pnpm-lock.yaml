@@ -42,7 +42,48 @@ importers:
         specifier: workspace:*
         version: link:../npm_package/packages/pkg_a
 
+  examples/linked_consumer:
+    dependencies:
+      '@lib/test':
+        specifier: workspace:*
+        version: link:../linked_pkg
+      '@lib/test2':
+        specifier: workspace:*
+        version: link:../linked_lib
+
   examples/linked_empty_node_modules: {}
+
+  examples/linked_lib:
+    dependencies:
+      '@aspect-test/e':
+        specifier: 1.0.0
+        version: 1.0.0
+      alias-e:
+        specifier: npm:@aspect-test/e
+        version: /@aspect-test/e@1.0.0
+    devDependencies:
+      '@aspect-test/f':
+        specifier: 1.0.0
+        version: 1.0.0
+      '@types/node':
+        specifier: 18.13.0
+        version: 18.13.0
+
+  examples/linked_pkg:
+    dependencies:
+      '@aspect-test/e':
+        specifier: 1.0.0
+        version: 1.0.0
+      alias-e:
+        specifier: npm:@aspect-test/e
+        version: /@aspect-test/e@1.0.0
+    devDependencies:
+      '@aspect-test/f':
+        specifier: 1.0.0
+        version: 1.0.0
+      '@types/node':
+        specifier: 18.13.0
+        version: 18.13.0
 
   examples/macro:
     devDependencies:
@@ -410,6 +451,16 @@ packages:
       '@aspect-test/c': x.x.x
     dependencies:
       '@aspect-test/c': 2.0.2
+    dev: true
+
+  /@aspect-test/e@1.0.0:
+    resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
+    hasBin: true
+    dev: false
+
+  /@aspect-test/f@1.0.0:
+    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
+    hasBin: true
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -1335,6 +1386,9 @@ packages:
     dependencies:
       '@turf/helpers': 6.5.0
     dev: true
+
+  /@types/node@18.13.0:
+    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==, tarball: https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz}
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -4089,7 +4143,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': 18.13.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -7067,7 +7121,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@types/js-yaml': registry.npmjs.org/@types/js-yaml@4.0.5
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.13.0
       '@types/request': registry.npmjs.org/@types/request@2.48.8
       '@types/underscore': registry.npmjs.org/@types/underscore@1.11.4
       '@types/ws': registry.npmjs.org/@types/ws@8.5.5
@@ -7119,7 +7173,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics@4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv@3.1.4
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': 18.13.0
       '@types/responselike': registry.npmjs.org/@types/responselike@1.0.0
     dev: true
 
@@ -7167,7 +7221,7 @@ packages:
     version: 8.1.0
     dependencies:
       '@types/minimatch': registry.npmjs.org/@types/minimatch@5.1.2
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': 18.13.0
     dev: true
 
   registry.npmjs.org/@types/google-protobuf@3.15.6:
@@ -7204,7 +7258,7 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': 18.13.0
     dev: true
 
   registry.npmjs.org/@types/minimatch@5.1.2:
@@ -7228,6 +7282,13 @@ packages:
     resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
     name: '@types/node'
     version: 18.11.18
+    dev: true
+
+  registry.npmjs.org/@types/node@18.13.0:
+    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz}
+    name: '@types/node'
+    version: 18.13.0
+    dev: true
 
   registry.npmjs.org/@types/request@2.48.8:
     resolution: {integrity: sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/request/-/request-2.48.8.tgz}
@@ -7235,7 +7296,7 @@ packages:
     version: 2.48.8
     dependencies:
       '@types/caseless': registry.npmjs.org/@types/caseless@0.12.2
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.13.0
       '@types/tough-cookie': registry.npmjs.org/@types/tough-cookie@4.0.2
       form-data: 2.5.1
     dev: true
@@ -7251,7 +7312,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': 18.13.0
     dev: true
 
   registry.npmjs.org/@types/tar-stream@2.2.2:
@@ -7259,7 +7320,7 @@ packages:
     name: '@types/tar-stream'
     version: 2.2.2
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.11
+      '@types/node': 18.13.0
     dev: true
 
   registry.npmjs.org/@types/tough-cookie@4.0.2:
@@ -7279,7 +7340,7 @@ packages:
     name: '@types/ws'
     version: 8.5.5
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': registry.npmjs.org/@types/node@18.13.0
     dev: true
 
   registry.npmjs.org/@types/yauzl@2.10.0:
@@ -7288,6 +7349,6 @@ packages:
     version: 2.10.0
     requiresBuild: true
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.11.18
+      '@types/node': 18.13.0
     dev: true
     optional: true

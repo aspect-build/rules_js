@@ -1,0 +1,29 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+# A basic package with 2 simple dependencies (packages with no dependencies)
+# Exposed via js_library()
+js_library(
+    name = "pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":node_modules/@aspect-test/e",
+        ":node_modules/@aspect-test/f",
+        ":node_modules/@types/node",
+        ":node_modules/alias-e",
+    ],
+)
+
+# When using js_library() as a package it can also serve as a "lib".
+# Use an alias so both linked_lib and linked_pkg have the same target names.
+alias(
+    name = "lib",
+    actual = ":pkg",
+    visibility = ["//visibility:public"],
+)
