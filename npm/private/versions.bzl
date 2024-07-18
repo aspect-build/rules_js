@@ -805,6 +805,7 @@ PNPM_VERSIONS = {
     "8.15.6": "sha512-d7iem+d6Kwatj0A6Gcrl4il29hAj+YrTI9XDAZSVjrwC7gpq5dE+5FT2E05OjK8poF8LGg4dKxe8prah8RWfhg==",
     "8.15.7": "sha512-yFzSG22hAzIVaxyiqnnAph7nrS6wRTuIqymSienoypPmCRIyslwHy/YfbfdxKNnISeXJrG5EhU29IRxJ86Z63A==",
     "8.15.8": "sha512-0aAp4aRHrZC8ls1YsPrUhtKZPVMYVjlve6vy2D6xgju4PFo9D8GPZ1stEDIdSesWH+zjb+gTSqWCPs0hX+7Tkg==",
+    "8.15.9": "sha512-SZQ0ydj90aJ5Tr9FUrOyXApjOrzuW7Fee13pDzL0e1E6ypjNXP0AHDHw20VLw4BO3M1XhQHkyik6aBYWa72fgQ==",
     "9.0.0": "sha512-tBBnB8ciWxdIthWVlTzL6/+XtUrQXQAqo2NfYzucU81mb3zpuLxEcE8foEi5pJtVNxqy2enWZ9Hv4u8VFLzVEw==",
     "9.0.1": "sha512-+QSxM9aZQVsNmX7j8Fommv+9sCz2sif6A9hUg6jz387QuRYKfUd9wFGrZ6+L5EcFuf3xXyrjO8g7dohlKftLHQ==",
     "9.0.2": "sha512-i+3zHeQnBbl/+JMwu+F3lUrVcDqS+olL4PtNRbXfq1miH2WoQZrRyugt0W+sLUGow0N3XoDv59q22AsECNsv1g==",
