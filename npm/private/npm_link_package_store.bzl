@@ -22,7 +22,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 _ATTRS = {
     "src": attr.label(
         doc = """The npm_package_store target to link as a direct dependency.""",
-        providers = [NpmPackageStoreInfo],
+        providers = [NpmPackageStoreInfo, JsInfo],
         mandatory = True,
     ),
     "package": attr.string(
@@ -61,6 +61,7 @@ exec node "$basedir/{bin_path}" "$@"
 
 def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
+    store_js_info = ctx.attr.src[JsInfo]
 
     package_store_directory = store_info.package_store_directory
     if not package_store_directory:
@@ -91,11 +92,19 @@ def _npm_link_package_store_impl(ctx):
         )
         files.append(bin_file)
 
-    files_depset = depset(files, transitive = [store_info.files])
-
-    transitive_files_depset = depset(files, transitive = [store_info.transitive_files])
+    files_depset = depset(files, transitive = [
+        store_info.files,
+        store_js_info.npm_sources,
+        store_js_info.sources,
+    ])
+    transitive_files_depset = depset(files, transitive = [
+        store_info.transitive_files,
+        store_js_info.npm_sources,
+        store_js_info.transitive_sources,
+    ])
 
     providers = [
+        # TODO: delete? all rules_js+tests pass without...
         DefaultInfo(
             # Only provide direct files in DefaultInfo files
             files = files_depset,
@@ -105,6 +114,11 @@ def _npm_link_package_store_impl(ctx):
         ),
         js_info(
             target = ctx.label,
+            # TODO: if no other JsInfo properties are set, where do they come from?
+
+            # Add the additional files required for linking
+            # TODO: why does this need store_js_info.sources for rules_ts tests!?
+            # ... shouldn't sources=store_js_info.sources be used instead?
             npm_sources = transitive_files_depset,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
             npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
