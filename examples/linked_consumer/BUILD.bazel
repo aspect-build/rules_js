@@ -1,0 +1,24 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+# Exposed by js_library()
+js_test(
+    name = "direct",
+    data = [
+        "//examples/linked_lib:lib",
+        "//examples/linked_pkg:lib",
+    ],
+    entry_point = "test_file_all_linked.js",
+)
+
+# Exposed by linked npm deps
+js_test(
+    name = "pkg",
+    data = [
+        ":node_modules/@lib/test",
+        ":node_modules/@lib/test2",
+    ],
+    entry_point = "test_pkg_deps_linked.js",
+)

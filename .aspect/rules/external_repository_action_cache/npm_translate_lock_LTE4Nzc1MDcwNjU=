@@ -3,7 +3,10 @@
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=-2065072158
 examples/js_binary/package.json=-41174383
+examples/linked_consumer/package.json=-1109186228
 examples/linked_empty_node_modules/package.json=-1039372825
+examples/linked_lib/package.json=1590632845
+examples/linked_pkg/package.json=-726181961
 examples/macro/package.json=857146175
 examples/npm_deps/package.json=-929156430
 examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch=-442666336
@@ -24,5 +27,5 @@ npm/private/test/vendored/is-odd/package.json=1041695223
 npm/private/test/vendored/lodash-4.17.21.tgz=-1206623349
 npm/private/test/vendored/semver-max/package.json=578664053
 package.json=-275319675
-pnpm-lock.yaml=2129089772
-pnpm-workspace.yaml=-1282513813
+pnpm-lock.yaml=76490674
+pnpm-workspace.yaml=-884103165
