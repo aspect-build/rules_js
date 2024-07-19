@@ -55,9 +55,21 @@ importers:
       is-odd:
         specifier: npm:is-odd@3.0.1
         version: 3.0.1
-      is-odd-alt-version:
-        specifier: npm:is-odd@^2.0.0
+      is-odd-alias:
+        specifier: npm:is-odd
+        version: /is-odd@3.0.1
+      is-odd-v0:
+        specifier: npm:is-odd@0.1.0
+        version: /is-odd@0.1.0
+      is-odd-v1:
+        specifier: npm:is-odd@1.0.0
+        version: /is-odd@1.0.0
+      is-odd-v2:
+        specifier: npm:is-odd@2.0.0
         version: /is-odd@2.0.0
+      is-odd-v3:
+        specifier: npm:is-odd@3.0.0
+        version: /is-odd@3.0.0
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -276,8 +288,8 @@ packages:
       function-bind: 1.1.2
     dev: false
 
-  /is-core-module@2.14.0:
-    resolution: {integrity: sha512-a5dFJih5ZLYlRtDc0dZWP7RiKr6xIKzmn/oAYCDvdLThadVgyJwlaoQPmRtMSpz+rk0OGAgIu+TcM9HUF0fk1A==}
+  /is-core-module@2.15.0:
+    resolution: {integrity: sha512-Dd+Lb2/zvk9SKy1TGCt1wFJFo/MWBPMX5x7KcvLajWTGuomczdQX61PvY5yK6SVACwpoexWo81IfFyoKY2QnTA==}
     engines: {node: '>= 0.4'}
     dependencies:
       hasown: 2.0.2
@@ -288,9 +300,30 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
+  /is-odd@0.1.0:
+    resolution: {integrity: sha512-3RKAybrJxq3zCUC+TJ5Ao0sBsbacAT3OBeNVcCbsQsHUC70qWK2R4JsIvax4OTjeGWnB8FumAWATUtS1jd+KYw==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      is-number: file:../vendored/is-number
+    dev: false
+
+  /is-odd@1.0.0:
+    resolution: {integrity: sha512-yIhxkKCK7pZnj48WBvaTQ36Or7PymGYqmZrSNqkrhmU3pakkp2TWhuN7hH25bqJgH+Xq4IZ3QNd3+QVshldEHA==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      is-number: file:../vendored/is-number
+    dev: false
+
   /is-odd@2.0.0:
     resolution: {integrity: sha512-OTiixgpZAT1M4NHgS5IguFp/Vz2VI3U7Goh4/HA1adtwyLtSBrxYlcSYkhpAE07s4fKEcjrFxyvtQBND4vFQyQ==}
     engines: {node: '>=0.10.0'}
+    dependencies:
+      is-number: file:../vendored/is-number
+    dev: false
+
+  /is-odd@3.0.0:
+    resolution: {integrity: sha512-204vE5IJ0Cd6pA6x1dMyLooGk6/xeKuq90imFuJN/ndMDBP4Sk9tJpBlTedHPvt6KDbtTDTsjVzzgctFqNV7FQ==}
+    engines: {node: '>=4'}
     dependencies:
       is-number: file:../vendored/is-number
     dev: false
@@ -334,7 +367,7 @@ packages:
     resolution: {integrity: sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==}
     hasBin: true
     dependencies:
-      is-core-module: 2.14.0
+      is-core-module: 2.15.0
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: false

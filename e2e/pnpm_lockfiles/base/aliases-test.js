@@ -15,12 +15,22 @@ if (
     )
 }
 
-// `is-odd` and the aliased `is-odd-alt-version` should be different versions
+// `is-odd` and the aliased `is-odd-alias` should be different versions
 if (
-    require('is-odd/package.json').version ===
-    require('is-odd-alt-version/package.json').version
+    require('is-odd/package.json').version !== '3.0.1' ||
+    require('is-odd/package.json').version !==
+        require('is-odd-alias/package.json').version
 ) {
-    throw new Error('aliased `is-odd` as `is-odd-alt-version` are the same')
+    throw new Error('aliased `is-odd` as `is-odd-alias` should be the same')
+}
+
+if (
+    require('is-odd-v0/package.json').version[0] !== '0' ||
+    require('is-odd-v1/package.json').version[0] !== '1' ||
+    require('is-odd-v2/package.json').version[0] !== '2' ||
+    require('is-odd-v3/package.json').version[0] !== '3'
+) {
+    throw new Error('aliased `is-odd-v#` should have the correct version')
 }
 
 // `@isaacs/cliui` has transitive `npm:*` deps
