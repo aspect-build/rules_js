@@ -91,6 +91,9 @@ importers:
       rollup-plugin-with-peers:
         specifier: npm:@rollup/plugin-typescript@8.2.1
         version: '@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.6.3)(typescript@5.5.2)'
+      rollup3:
+        specifier: npm:rollup@3.29.4
+        version: rollup@3.29.4
       scoped/bad:
         specifier: link:../projects/b
         version: link:../projects/b
@@ -347,6 +350,11 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
 
+  rollup@3.29.4:
+    resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
+    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
+    hasBin: true
+
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
@@ -554,6 +562,10 @@ snapshots:
       supports-preserve-symlinks-flag: 1.0.0
 
   rollup@2.14.0:
+    optionalDependencies:
+      fsevents: 2.3.3
+
+  rollup@3.29.4:
     optionalDependencies:
       fsevents: 2.3.3
 

@@ -47,6 +47,7 @@ importers:
       meaning-of-life: 1.0.0
       rollup: 2.14.0
       rollup-plugin-with-peers: npm:@rollup/plugin-typescript@8.2.1
+      rollup3: npm:rollup@3.29.4
       scoped/bad: link:../projects/b
       tslib: ^2.6.3
       typescript: 5.5.2
@@ -75,6 +76,7 @@ importers:
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 2.14.0
       rollup-plugin-with-peers: /@rollup/plugin-typescript/8.2.1_ommloj5qql5ba6x5wuiluawhoi
+      rollup3: /rollup/3.29.4
       scoped/bad: link:../projects/b
       tslib: 2.6.3
       typescript: 5.5.2
@@ -348,6 +350,14 @@ packages:
   /rollup/2.14.0:
     resolution: {integrity: sha512-SUsFh2bBemQqCXOCBWRayjK3/6kNHVR8PbSKKYWIdI6e4zuGSW5B1hGVkFi40805dUrqosMLLxMuEyJMylC9YA==}
     engines: {node: '>=10.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: 2.3.3
+    dev: false
+
+  /rollup/3.29.4:
+    resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
+    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.3

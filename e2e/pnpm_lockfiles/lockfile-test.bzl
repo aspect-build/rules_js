@@ -21,10 +21,12 @@ BZL_FILES = {
 
     # resolved.json reference
     "is-odd_resolved.json": "@REPO_NAME//VERSION:is-odd/resolved.json",
+    "is-odd-v0_resolved.json": "@REPO_NAME//VERSION:is-odd-v0/resolved.json",
 
-    # hasBin, optional deps, deps
+    # hasBin, optional deps, deps and across versions
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
     "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",
+    "rollup3_package_json.bzl": "@REPO_NAME__rollup__3.29.4//VERSION:package_json.bzl",
 }
 
 def lockfile_test(name = None):
@@ -100,7 +102,7 @@ def lockfile_test(name = None):
             # npm: alias to a package that has many peers
             ":node_modules/rollup-plugin-with-peers",
             # underlying repo for the many-peers package
-            "@%s__at_rollup_plugin-typescript__8.2.1__%s//:pkg" % (lock_repo, "ommloj5qql5ba6x5wuiluawhoi" if lock_version == "v54" else "1662662592"),
+            "@%s__at_rollup_plugin-typescript__8.2.1__%s//:pkg" % (lock_repo, "ommloj5qql5ba6x5wuiluawhoi" if lock_version == "v54" else "1662662592" if lock_version == "v90" else "1813138439"),
 
             # uuv 'hasBin'
             ":node_modules/uvu",
