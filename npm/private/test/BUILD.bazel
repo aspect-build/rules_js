@@ -31,11 +31,23 @@ generated_pkg_json_test(name = "test_generated_pkg_json")
 
 npm_auth_test_suite()
 
+# Strip the system-dependent 'system_tar' attribute from the generated repositories.bzl
+genrule(
+    name = "npm_translate_lock_wksp-repositories",
+    srcs = ["@npm//:repositories.bzl"],
+    outs = ["wksp_repos_stripped.bzl"],
+    cmd = 'sed "s/system_tar = .*,/system_tar = \\"xxx\\",/" "$<" > "$@"',
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
 write_source_files(
     name = "write_npm_translate_lock_wksp",
     files = {
         "snapshots/wksp/npm_defs.bzl": "@npm//:defs.bzl",
-        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/wksp/repositories.bzl": ":npm_translate_lock_wksp-repositories",
         "snapshots/wksp/chalk_links_defs.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
         "snapshots/wksp/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/wksp/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
