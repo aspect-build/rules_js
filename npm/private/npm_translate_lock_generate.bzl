@@ -278,11 +278,15 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         ))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
+            build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
+            if build_file not in rctx_files:
+                rctx_files[build_file] = []
+            if link_package not in links_bzl:
+                links_bzl[link_package] = []
+            if link_package not in links_targets_bzl:
+                links_targets_bzl[link_package] = []
             for link_alias in link_aliases:
-                if link_package not in links_bzl:
-                    links_bzl[link_package] = []
-                if link_package not in links_targets_bzl:
-                    links_targets_bzl[link_package] = []
+                # link the alias to the underlying package
                 links_bzl[link_package].append("""            link_{i}(name = "{{}}/{name}".format(name))""".format(
                     i = i,
                     name = link_alias,
@@ -295,44 +299,43 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         package_scope = link_alias.split("/", 1)[0]
                         add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(package_scope = package_scope)
                         links_bzl[link_package].append(add_to_scoped_targets)
-        for link_package in _import.link_packages.keys():
-            build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
-            if build_file not in rctx_files:
-                rctx_files[build_file] = []
-            resolved_json_rel_path = "{}/{}".format(_import.package, _RESOLVED_JSON_FILENAME) if _import.package else _RESOLVED_JSON_FILENAME
-            resolved_json_file_path = "{}/{}".format(link_package, resolved_json_rel_path) if link_package else resolved_json_rel_path
-            rctx.file(resolved_json_file_path, json.encode({
-                # Allow consumers to auto-detect this filetype
-                "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
-                "version": _import.version,
-                "integrity": _import.integrity,
-            }))
-            rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_rel_path))
+                resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME) if _import.package else _RESOLVED_JSON_FILENAME
+                resolved_json_file_path = "{}/{}".format(link_package, resolved_json_rel_path) if link_package else resolved_json_rel_path
+                rctx.file(resolved_json_file_path, json.encode({
+                    # Allow consumers to auto-detect this filetype
+                    "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
+                    "version": _import.version,
+                    "integrity": _import.integrity,
+                }))
+                rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_rel_path))
             if _import.package_info.get("has_bin"):
                 if rctx.attr.generate_bzl_library_targets:
                     rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
-                    rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                        name = _import.package,
-                        src = ":" + paths.join(_import.package, _PACKAGE_JSON_BZL_FILENAME),
-                        dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
-                            repo_name = helpers.to_apparent_repo_name(_import.name),
-                            link_package = link_package,
-                            package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
+                    for link_alias in link_aliases:
+                        rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
+                            name = link_alias,
+                            src = ":" + paths.join(link_alias, _PACKAGE_JSON_BZL_FILENAME),
+                            dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
+                                repo_name = helpers.to_apparent_repo_name(_import.name),
+                                link_package = link_package,
+                                package_name = link_package.split("/")[-1] or link_alias.split("/")[-1],
+                            ),
+                        ))
+
+                for link_alias in link_aliases:
+                    package_json_bzl_file_path = paths.normalize(paths.join(link_package, link_alias, _PACKAGE_JSON_BZL_FILENAME))
+                    repo_package_json_bzl = "{at}{repo_name}//{link_package}:{package_json_bzl}".format(
+                        at = "@@" if utils.bzlmod_supported else "@",
+                        repo_name = _import.name,
+                        link_package = link_package,
+                        package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,
+                    )
+                    rctx.file(
+                        package_json_bzl_file_path,
+                        _BIN_TMPL.format(
+                            repo_package_json_bzl = repo_package_json_bzl,
                         ),
-                    ))
-                package_json_bzl_file_path = paths.normalize(paths.join(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME))
-                repo_package_json_bzl = "{at}{repo_name}//{link_package}:{package_json_bzl}".format(
-                    at = "@@" if utils.bzlmod_supported else "@",
-                    repo_name = _import.name,
-                    link_package = link_package,
-                    package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,
-                )
-                rctx.file(
-                    package_json_bzl_file_path,
-                    _BIN_TMPL.format(
-                        repo_package_json_bzl = repo_package_json_bzl,
-                    ),
-                )
+                    )
 
     if len(stores_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if is_root:""")
