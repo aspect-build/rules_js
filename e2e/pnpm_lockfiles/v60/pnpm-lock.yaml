@@ -18,6 +18,12 @@ importers:
 
   .:
     dependencies:
+      '@aspect-test-a-bad-scope':
+        specifier: npm:@aspect-test/a
+        version: /@aspect-test/a@5.0.2
+      '@aspect-test-custom-scope/a':
+        specifier: npm:@aspect-test/a
+        version: /@aspect-test/a@5.0.2
       '@aspect-test/a':
         specifier: ^5.0.2
         version: 5.0.2
@@ -42,6 +48,12 @@ importers:
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
+      aspect-test-a-no-scope:
+        specifier: npm:@aspect-test/a
+        version: /@aspect-test/a@5.0.2
+      aspect-test-a/no-at:
+        specifier: npm:@aspect-test/a
+        version: /@aspect-test/a@5.0.2
       debug:
         specifier: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
         version: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
@@ -78,6 +90,9 @@ importers:
       rollup-plugin-with-peers:
         specifier: npm:@rollup/plugin-typescript@8.2.1
         version: /@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.6.3)(typescript@5.5.2)
+      scoped/bad:
+        specifier: link:../projects/b
+        version: link:../projects/b
       tslib:
         specifier: ^2.6.3
         version: 2.6.3

@@ -5,6 +5,19 @@ if (require('@aspect-test/a') !== require('@aspect-test/a2')) {
     )
 }
 
+// Various other aliases with odd scoping
+for (const pkg of [
+    '@aspect-test/a2',
+    'aspect-test-a-no-scope',
+    'aspect-test-a/no-at',
+    '@aspect-test-a-bad-scope',
+    '@aspect-test-custom-scope/a',
+]) {
+    if (require('@aspect-test/a') !== require(pkg)) {
+        throw new Error(`${pkg} should be alias of @aspect-test/a`)
+    }
+}
+
 // `alias-types-node` and `@types/node` should be importable and equal
 if (
     require('alias-types-node/package.json') !==

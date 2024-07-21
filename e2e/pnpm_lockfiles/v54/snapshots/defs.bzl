@@ -149,12 +149,22 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_57(name = "{}/wrap-ansi".format(name))
     if link:
         if bazel_package == "<LOCKVERSION>":
+            link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
+            link_targets.append("//{}:{}/@aspect-test-a-bad-scope".format(bazel_package, name))
+            link_4(name = "{}/@aspect-test-custom-scope/a".format(name))
+            link_targets.append("//{}:{}/@aspect-test-custom-scope/a".format(bazel_package, name))
+            scope_targets["@aspect-test-custom-scope"] = scope_targets["@aspect-test-custom-scope"] + [link_targets[-1]] if "@aspect-test-custom-scope" in scope_targets else [link_targets[-1]]
             link_4(name = "{}/@aspect-test/a".format(name))
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
             link_4(name = "{}/@aspect-test/a2".format(name))
             link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            link_4(name = "{}/aspect-test-a-no-scope".format(name))
+            link_targets.append("//{}:{}/aspect-test-a-no-scope".format(bazel_package, name))
+            link_4(name = "{}/aspect-test-a/no-at".format(name))
+            link_targets.append("//{}:{}/aspect-test-a/no-at".format(bazel_package, name))
+            scope_targets["aspect-test-a"] = scope_targets["aspect-test-a"] + [link_targets[-1]] if "aspect-test-a" in scope_targets else [link_targets[-1]]
             link_5(name = "{}/@aspect-test/b".format(name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
@@ -354,6 +364,41 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(":{}/@scoped/d".format(name))
             scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
 
+    if is_root:
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+            src = "//projects/b:pkg",
+            package = "scoped/bad",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["<LOCKVERSION>"]:
+        if link_package == native.package_name():
+            # terminal target for direct dependencies
+            _npm_link_package_store(
+                name = "{}/scoped/bad".format(name),
+                src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/scoped/bad/dir".format(name),
+                srcs = [":{}/scoped/bad".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            link_targets.append(":{}/scoped/bad".format(name))
+            scope_targets["scoped"] = scope_targets["scoped"] + [link_targets[-1]] if "scoped" in scope_targets else [link_targets[-1]]
+
     for scope, scoped_targets in scope_targets.items():
         _js_library(
             name = "{}/{}".format(name, scope),
@@ -378,8 +423,12 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "<LOCKVERSION>":
+            link_targets.append("//{}:{}/@aspect-test-a-bad-scope".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test-custom-scope/a".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
+            link_targets.append("//{}:{}/aspect-test-a-no-scope".format(bazel_package, name))
+            link_targets.append("//{}:{}/aspect-test-a/no-at".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
             link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
@@ -418,4 +467,8 @@ def npm_link_targets(name = "node_modules", package = None):
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@scoped/d".format(bazel_package, name))
+
+    for link_package in ["<LOCKVERSION>"]:
+        if link_package == bazel_package:
+            link_targets.append("//{}:{}/scoped/bad".format(bazel_package, name))
     return link_targets
