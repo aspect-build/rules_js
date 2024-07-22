@@ -59,6 +59,10 @@ def lockfile_test(name = None):
         data = [
             ":node_modules/@aspect-test/a",
             ":node_modules/@aspect-test/a2",
+            ":node_modules/aspect-test-a-no-scope",
+            ":node_modules/aspect-test-a/no-at",
+            ":node_modules/@aspect-test-a-bad-scope",
+            ":node_modules/@aspect-test-custom-scope/a",
             ":node_modules/@types/node",
             ":node_modules/alias-only-sizzle",
             ":node_modules/alias-types-node",
@@ -80,6 +84,7 @@ def lockfile_test(name = None):
             ":node_modules",
 
             # Direct 'dependencies'
+            ":node_modules/@aspect-test",  # target for the scope
             ":node_modules/@aspect-test/a",
 
             # Direct 'devDependencies'
@@ -104,10 +109,12 @@ def lockfile_test(name = None):
             ":node_modules/@isaacs/cliui",
 
             # link:, workspace:, file:, ./rel/path
+            ":node_modules/@scoped",  # target for the scope
             ":node_modules/@scoped/a",
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
+            ":node_modules/scoped/bad",
 
             # Packages involving overrides
             ":node_modules/is-odd",
@@ -123,7 +130,13 @@ def lockfile_test(name = None):
             ":node_modules/@aspect-test/a2",
             # npm: alias to registry-scoped packages
             ":node_modules/alias-types-node",
-            ":node_modules/is-odd-alias",
+            # npm: alias adding/removing or odd @scopes
+            ":node_modules/aspect-test-a/no-at",
+            ":node_modules/aspect-test-a-no-scope",
+            ":node_modules/@aspect-test-a-bad-scope",
+            ":node_modules/@aspect-test-custom-scope",  # target for the scope
+            ":node_modules/@aspect-test-custom-scope/a",
+
             # npm: alias to alternate versions
             ":node_modules/is-odd-v0",
             ":node_modules/is-odd-v1",

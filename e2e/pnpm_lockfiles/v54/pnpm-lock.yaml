@@ -18,6 +18,8 @@ importers:
 
   .:
     specifiers:
+      '@aspect-test-a-bad-scope': npm:@aspect-test/a
+      '@aspect-test-custom-scope/a': npm:@aspect-test/a
       '@aspect-test/a': ^5.0.2
       '@aspect-test/a2': npm:@aspect-test/a
       '@aspect-test/b': 5.0.2
@@ -31,6 +33,8 @@ importers:
       '@types/node': 16.18.11
       alias-only-sizzle: npm:@types/sizzle@~2.3.8
       alias-types-node: npm:@types/node@~16.18.11
+      aspect-test-a-no-scope: npm:@aspect-test/a
+      aspect-test-a/no-at: npm:@aspect-test/a
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       hello: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       is-odd: npm:is-odd@3.0.1
@@ -43,10 +47,13 @@ importers:
       meaning-of-life: 1.0.0
       rollup: 2.14.0
       rollup-plugin-with-peers: npm:@rollup/plugin-typescript@8.2.1
+      scoped/bad: link:../projects/b
       tslib: ^2.6.3
       typescript: 5.5.2
       uvu: 0.5.6
     dependencies:
+      '@aspect-test-a-bad-scope': /@aspect-test/a/5.0.2
+      '@aspect-test-custom-scope/a': /@aspect-test/a/5.0.2
       '@aspect-test/a': 5.0.2
       '@aspect-test/a2': /@aspect-test/a/5.0.2
       '@isaacs/cliui': 8.0.2
@@ -54,6 +61,8 @@ importers:
       '@scoped/b': link:../projects/b
       '@scoped/c': file:../projects/c
       '@scoped/d': link:../projects/d
+      aspect-test-a-no-scope: /@aspect-test/a/5.0.2
+      aspect-test-a/no-at: /@aspect-test/a/5.0.2
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       hello: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       is-odd: 3.0.1
@@ -66,6 +75,7 @@ importers:
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 2.14.0
       rollup-plugin-with-peers: /@rollup/plugin-typescript/8.2.1_ommloj5qql5ba6x5wuiluawhoi
+      scoped/bad: link:../projects/b
       tslib: 2.6.3
       typescript: 5.5.2
       uvu: 0.5.6

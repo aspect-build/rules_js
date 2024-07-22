@@ -4,6 +4,10 @@
     "dependencies": {
         "@aspect-test/a": "^5.0.2",
         "@aspect-test/a2": "npm:@aspect-test/a",
+        "aspect-test-a-no-scope": "npm:@aspect-test/a",
+        "aspect-test-a/no-at": "npm:@aspect-test/a",
+        "@aspect-test-a-bad-scope": "npm:@aspect-test/a",
+        "@aspect-test-custom-scope/a": "npm:@aspect-test/a",
         "@isaacs/cliui": "8.0.2",
         "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
@@ -20,6 +24,7 @@
         "is-odd-v2": "npm:is-odd@2.0.0",
         "is-odd-v3": "npm:is-odd@3.0.0",
         "uvu": "0.5.6",
+        "scoped/bad": "link:../projects/b",
         "@scoped/a": "workspace:*",
         "@scoped/b": "link:../projects/b",
         "@scoped/c": "file:../projects/c",
