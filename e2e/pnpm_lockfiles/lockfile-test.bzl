@@ -19,6 +19,9 @@ BZL_FILES = {
     # global
     "defs.bzl": "@REPO_NAME//:defs.bzl",
 
+    # resolved.json reference
+    "is-odd_resolved.json": "@REPO_NAME//VERSION:is-odd/resolved.json",
+
     # hasBin, optional deps, deps
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
     "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",

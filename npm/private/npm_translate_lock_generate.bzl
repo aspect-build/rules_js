@@ -286,14 +286,15 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
             if build_file not in rctx_files:
                 rctx_files[build_file] = []
-            resolved_json_file_path = "{}/{}/{}".format(link_package, _import.package, _RESOLVED_JSON_FILENAME).lstrip("/")
+            resolved_json_rel_path = "{}/{}".format(_import.package, _RESOLVED_JSON_FILENAME) if _import.package else _RESOLVED_JSON_FILENAME
+            resolved_json_file_path = "{}/{}".format(link_package, resolved_json_rel_path) if link_package else resolved_json_rel_path
             rctx.file(resolved_json_file_path, json.encode({
                 # Allow consumers to auto-detect this filetype
                 "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
                 "version": _import.version,
                 "integrity": _import.integrity,
             }))
-            rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_file_path))
+            rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_rel_path))
             if _import.package_info.get("has_bin"):
                 if rctx.attr.generate_bzl_library_targets:
                     rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
