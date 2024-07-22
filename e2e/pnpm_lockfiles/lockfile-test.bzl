@@ -60,7 +60,11 @@ def lockfile_test(name = None):
             ":node_modules/alias-only-sizzle",
             ":node_modules/alias-types-node",
             ":node_modules/is-odd",
-            ":node_modules/is-odd-alt-version",
+            ":node_modules/is-odd-alias",
+            ":node_modules/is-odd-v0",
+            ":node_modules/is-odd-v1",
+            ":node_modules/is-odd-v2",
+            ":node_modules/is-odd-v3",
             ":node_modules/@isaacs/cliui",
         ],
         entry_point = "aliases-test.js",
@@ -116,9 +120,16 @@ def lockfile_test(name = None):
             ":node_modules/@aspect-test/a2",
             # npm: alias to registry-scoped packages
             ":node_modules/alias-types-node",
+            ":node_modules/is-odd-alias",
             # npm: alias to alternate versions
-            ":node_modules/is-odd-alt-version",
+            ":node_modules/is-odd-v0",
+            ":node_modules/is-odd-v1",
+            ":node_modules/is-odd-v2",
+            ":node_modules/is-odd-v3",
+            ":.aspect_rules_js/node_modules/is-odd@0.1.0",
+            ":.aspect_rules_js/node_modules/is-odd@1.0.0",
             ":.aspect_rules_js/node_modules/is-odd@2.0.0",
+            ":.aspect_rules_js/node_modules/is-odd@3.0.0",
 
             # npm: alias to package not listed elsewhere
             ":node_modules/alias-only-sizzle",

@@ -52,9 +52,21 @@ importers:
       is-odd:
         specifier: npm:is-odd@3.0.1
         version: 3.0.1
-      is-odd-alt-version:
-        specifier: npm:is-odd@^2.0.0
+      is-odd-alias:
+        specifier: npm:is-odd
+        version: is-odd@3.0.1
+      is-odd-v0:
+        specifier: npm:is-odd@0.1.0
+        version: is-odd@0.1.0
+      is-odd-v1:
+        specifier: npm:is-odd@1.0.0
+        version: is-odd@1.0.0
+      is-odd-v2:
+        specifier: npm:is-odd@2.0.0
         version: is-odd@2.0.0
+      is-odd-v3:
+        specifier: npm:is-odd@3.0.0
+        version: is-odd@3.0.0
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -259,8 +271,8 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
     version: 1.0.0
 
-  is-core-module@2.14.0:
-    resolution: {integrity: sha512-a5dFJih5ZLYlRtDc0dZWP7RiKr6xIKzmn/oAYCDvdLThadVgyJwlaoQPmRtMSpz+rk0OGAgIu+TcM9HUF0fk1A==}
+  is-core-module@2.15.0:
+    resolution: {integrity: sha512-Dd+Lb2/zvk9SKy1TGCt1wFJFo/MWBPMX5x7KcvLajWTGuomczdQX61PvY5yK6SVACwpoexWo81IfFyoKY2QnTA==}
     engines: {node: '>= 0.4'}
 
   is-fullwidth-code-point@3.0.0:
@@ -270,9 +282,21 @@ packages:
   is-number@file:../vendored/is-number:
     resolution: {directory: ../vendored/is-number, type: directory}
 
+  is-odd@0.1.0:
+    resolution: {integrity: sha512-3RKAybrJxq3zCUC+TJ5Ao0sBsbacAT3OBeNVcCbsQsHUC70qWK2R4JsIvax4OTjeGWnB8FumAWATUtS1jd+KYw==}
+    engines: {node: '>=0.10.0'}
+
+  is-odd@1.0.0:
+    resolution: {integrity: sha512-yIhxkKCK7pZnj48WBvaTQ36Or7PymGYqmZrSNqkrhmU3pakkp2TWhuN7hH25bqJgH+Xq4IZ3QNd3+QVshldEHA==}
+    engines: {node: '>=0.10.0'}
+
   is-odd@2.0.0:
     resolution: {integrity: sha512-OTiixgpZAT1M4NHgS5IguFp/Vz2VI3U7Goh4/HA1adtwyLtSBrxYlcSYkhpAE07s4fKEcjrFxyvtQBND4vFQyQ==}
     engines: {node: '>=0.10.0'}
+
+  is-odd@3.0.0:
+    resolution: {integrity: sha512-204vE5IJ0Cd6pA6x1dMyLooGk6/xeKuq90imFuJN/ndMDBP4Sk9tJpBlTedHPvt6KDbtTDTsjVzzgctFqNV7FQ==}
+    engines: {node: '>=4'}
 
   is-odd@3.0.1:
     resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==}
@@ -468,7 +492,7 @@ snapshots:
 
   hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello: {}
 
-  is-core-module@2.14.0:
+  is-core-module@2.15.0:
     dependencies:
       hasown: 2.0.2
 
@@ -476,7 +500,19 @@ snapshots:
 
   is-number@file:../vendored/is-number: {}
 
+  is-odd@0.1.0:
+    dependencies:
+      is-number: file:../vendored/is-number
+
+  is-odd@1.0.0:
+    dependencies:
+      is-number: file:../vendored/is-number
+
   is-odd@2.0.0:
+    dependencies:
+      is-number: file:../vendored/is-number
+
+  is-odd@3.0.0:
     dependencies:
       is-number: file:../vendored/is-number
 
@@ -498,7 +534,7 @@ snapshots:
 
   resolve@1.22.8:
     dependencies:
-      is-core-module: 2.14.0
+      is-core-module: 2.15.0
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
