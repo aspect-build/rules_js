@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
+packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -409,6 +409,8 @@ importers:
       chalk-alt:
         specifier: npm:chalk@5.1.1
         version: /chalk@5.1.1
+
+  npm/private/test/npm_package_publish: {}
 
 packages:
 

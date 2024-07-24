@@ -991,7 +991,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
 
-_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package"]
+_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
