@@ -2121,7 +2121,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/hello".format(bazel_package, name))
             link_503(name = "{}/handlebars-helpers/helper-date".format(name))
             link_targets.append("//{}:{}/handlebars-helpers/helper-date".format(bazel_package, name))
-            scope_targets["handlebars-helpers"] = scope_targets["handlebars-helpers"] + [link_targets[-1]] if "handlebars-helpers" in scope_targets else [link_targets[-1]]
             link_504(name = "{}/hot-shots".format(name))
             link_targets.append("//{}:{}/hot-shots".format(bazel_package, name))
             link_526(name = "{}/inline-fixtures".format(name))

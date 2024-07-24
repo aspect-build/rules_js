@@ -82,9 +82,9 @@ def _make_symlink(ctx, symlink_path, target_path):
 def _parse_package_name(package):
     # Parse a @scope/name string and return a (scope, name) tuple
     if package[0] == "@":
-        segments = package.split("/", 1)
-        if len(segments) == 2:
-            return (segments[0], segments[1])
+        scope_end = package.find("/", 1)
+        if scope_end > 0:
+            return (package[0:scope_end], package[scope_end + 1:])
     return ("", package)
 
 def _npm_registry_url(package, registries, default_registry):
