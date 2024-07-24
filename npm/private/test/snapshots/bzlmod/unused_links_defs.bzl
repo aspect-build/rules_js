@@ -155,8 +155,8 @@ def npm_link_imported_package(
             npm_link_imported_package_store(name = link_target_name)
             if False:
                 link_targets.append(":{}".format(link_target_name))
-                if len(link_alias.split("/", 1)) > 1:
-                    link_scope = link_alias.split("/", 1)[0]
+                link_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
+                if link_scope:
                     if link_scope not in scoped_targets:
                         scoped_targets[link_scope] = []
                     scoped_targets[link_scope].append(link_target_name)

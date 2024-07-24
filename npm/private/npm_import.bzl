@@ -261,8 +261,8 @@ def npm_link_imported_package(
             npm_link_imported_package_store(name = link_target_name)
             if {public_visibility}:
                 link_targets.append(":{{}}".format(link_target_name))
-                if len(link_alias.split("/", 1)) > 1:
-                    link_scope = link_alias.split("/", 1)[0]
+                link_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
+                if link_scope:
                     if link_scope not in scoped_targets:
                         scoped_targets[link_scope] = []
                     scoped_targets[link_scope].append(link_target_name)
@@ -584,7 +584,7 @@ bin = bin_factory("node_modules")
             if rctx.attr.generate_bzl_library_targets:
                 rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
                 rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                    name = link_package.split("/")[-1] or package_name_no_scope,
+                    name = link_package[link_package.rfind("/") + 1] if link_package else package_name_no_scope,
                     src = _PACKAGE_JSON_BZL_FILENAME,
                 ))
             rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))

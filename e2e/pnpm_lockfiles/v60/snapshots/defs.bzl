@@ -153,6 +153,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         if bazel_package == "<LOCKVERSION>":
             link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
             link_targets.append("//{}:{}/@aspect-test-a-bad-scope".format(bazel_package, name))
+            scope_targets["@aspect-test-a-bad-scop"] = scope_targets["@aspect-test-a-bad-scop"] + [link_targets[-1]] if "@aspect-test-a-bad-scop" in scope_targets else [link_targets[-1]]
             link_4(name = "{}/@aspect-test-custom-scope/a".format(name))
             link_targets.append("//{}:{}/@aspect-test-custom-scope/a".format(bazel_package, name))
             scope_targets["@aspect-test-custom-scope"] = scope_targets["@aspect-test-custom-scope"] + [link_targets[-1]] if "@aspect-test-custom-scope" in scope_targets else [link_targets[-1]]
@@ -166,7 +167,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/aspect-test-a-no-scope".format(bazel_package, name))
             link_4(name = "{}/aspect-test-a/no-at".format(name))
             link_targets.append("//{}:{}/aspect-test-a/no-at".format(bazel_package, name))
-            scope_targets["aspect-test-a"] = scope_targets["aspect-test-a"] + [link_targets[-1]] if "aspect-test-a" in scope_targets else [link_targets[-1]]
             link_5(name = "{}/@aspect-test/b".format(name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
             scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
@@ -402,7 +402,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 tags = ["manual"],
             )
             link_targets.append(":{}/scoped/bad".format(name))
-            scope_targets["scoped"] = scope_targets["scoped"] + [link_targets[-1]] if "scoped" in scope_targets else [link_targets[-1]]
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(

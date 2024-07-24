@@ -278,8 +278,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))""".format(pkg = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
-                    if len(link_alias.split("/", 1)) > 1:
-                        package_scope = link_alias.split("/", 1)[0]
+                    package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
+                    if package_scope:
                         add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(package_scope = package_scope)
                         links_bzl[link_package].append(add_to_scoped_targets)
         for link_package in _import.link_packages.keys():
@@ -304,7 +304,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
                             repo_name = helpers.to_apparent_repo_name(_import.name),
                             link_package = link_package,
-                            package_name = link_package.split("/")[-1] or _import.package.split("/")[-1],
+                            package_name = link_package[link_package.rfind("/") + 1] if link_package else _import.package.split("/")[-1],
                         ),
                     ))
                 package_json_bzl_file_path = "{}/{}/{}".format(link_package, _import.package, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(_import.package, _PACKAGE_JSON_BZL_FILENAME)
@@ -387,8 +387,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             if "//visibility:public" in package_visibility:
                 add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
                 npm_link_all_packages_bzl.append(add_to_link_targets)
-                if len(fp_package.split("/", 1)) > 1:
-                    package_scope = fp_package.split("/", 1)[0]
+                package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
+                if package_scope:
                     add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
                         package_scope = package_scope,
                     )
