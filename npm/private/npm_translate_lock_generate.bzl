@@ -44,7 +44,7 @@ _FP_STORE_TMPL = \
 _FP_DIRECT_TMPL = \
     """
     for link_package in {link_packages}:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{{}}/{name}".format(name),
@@ -214,12 +214,12 @@ def npm_link_targets(name = "node_modules", package = None):
         """\
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
-    root_package = "{root_package}"
     bazel_package = native.package_name()
+    root_package = "{root_package}"
     is_root = bazel_package == root_package
     link = bazel_package in _LINK_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (native.package_name(), {link_packages_comma_separated})
+        msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
     link_targets = []
     scope_targets = {{}}

@@ -995,12 +995,12 @@ _LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_consumer", "example
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
-    root_package = ""
     bazel_package = native.package_name()
+    root_package = ""
     is_root = bazel_package == root_package
     link = bazel_package in _LINK_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (native.package_name(), "'" + "', '".join(_LINK_PACKAGES) + "'")
+        msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
     link_targets = []
     scope_targets = {}
@@ -2285,7 +2285,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@mycorp/pkg-a".format(name),
@@ -2318,7 +2318,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["examples/linked_consumer"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@lib/test".format(name),
@@ -2353,7 +2353,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["examples/linked_consumer"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@lib/test2".format(name),
@@ -2389,7 +2389,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@mycorp/pkg-d".format(name),
@@ -2424,7 +2424,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["examples/npm_deps"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@mycorp/pkg-e".format(name),
@@ -2460,7 +2460,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["npm/private/test"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/test-npm_package".format(name),

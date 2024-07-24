@@ -44,11 +44,12 @@ def npm_link_package(
     Returns:
         Label of the npm_link_package_store if created, else None
     """
-    is_root = native.package_name() == root_package
+    bazel_package = native.package_name()
+    is_root = bazel_package == root_package
 
     if fail_if_no_link and not is_root and not link:
         msg = "Nothing to link in bazel package '{bazel_package}' for {name}. This is neither the root package nor a link package.".format(
-            bazel_package = native.package_name(),
+            bazel_package = bazel_package,
             name = name,
         )
         fail(msg)

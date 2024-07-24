@@ -72,12 +72,12 @@ _LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/b", "projects/c", "pr
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
-    root_package = "<LOCKVERSION>"
     bazel_package = native.package_name()
+    root_package = "<LOCKVERSION>"
     is_root = bazel_package == root_package
     link = bazel_package in _LINK_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~lock-<LOCKVERSION>//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '<LOCKVERSION>', pnpm workspace projects: %s" % (native.package_name(), "'" + "', '".join(_LINK_PACKAGES) + "'")
+        msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~lock-<LOCKVERSION>//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '<LOCKVERSION>', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
     link_targets = []
     scope_targets = {}
@@ -229,7 +229,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["<LOCKVERSION>"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@scoped/c".format(name),
@@ -273,7 +273,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@scoped/a".format(name),
@@ -308,7 +308,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["<LOCKVERSION>"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@scoped/b".format(name),
@@ -343,7 +343,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["<LOCKVERSION>"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/@scoped/d".format(name),
@@ -378,7 +378,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     for link_package in ["<LOCKVERSION>"]:
-        if link_package == native.package_name():
+        if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
                 name = "{}/scoped/bad".format(name),
