@@ -9,10 +9,11 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # Generated npm_package_store targets for npm package rollup@2.70.2
 # buildifier: disable=function-docstring
 def npm_imported_package_store(name):
+    bazel_package = native.package_name()
     root_package = ""
-    is_root = native.package_name() == root_package
+    is_root = bazel_package == root_package
     if not is_root:
-        msg = "No store links in bazel package '%s' for npm package npm package rollup@2.70.2. This is neither the root package nor a link package of this package." % native.package_name()
+        msg = "No store links in bazel package '%s' for npm package npm package rollup@2.70.2. This is neither the root package nor a link package of this package." % bazel_package
         fail(msg)
     if not name.endswith("/rollup"):
         msg = "name must end with one of '/rollup' when linking the store in package 'rollup'; recommended value is 'node_modules/rollup'"
@@ -74,11 +75,12 @@ def npm_imported_package_store(name):
 # Generated npm_package_store and npm_link_package_store targets for npm package rollup@2.70.2
 # buildifier: disable=function-docstring
 def npm_link_imported_package_store(name):
+    bazel_package = native.package_name()
     link_packages = {
         "examples/npm_deps": ["rollup"],
     }
-    if native.package_name() in link_packages:
-        link_aliases = link_packages[native.package_name()]
+    if bazel_package in link_packages:
+        link_aliases = link_packages[bazel_package]
     else:
         link_aliases = ["rollup"]
 
@@ -122,6 +124,7 @@ def npm_link_imported_package(
         name = "node_modules",
         link = None,
         fail_if_no_link = True):
+    bazel_package = native.package_name()
     root_package = ""
     link_packages = {
         "examples/npm_deps": ["rollup"],
@@ -130,11 +133,11 @@ def npm_link_imported_package(
     if link_packages and link != None:
         fail("link attribute cannot be specified when link_packages are set")
 
-    is_link = (link == True) or (link == None and native.package_name() in link_packages)
-    is_root = native.package_name() == root_package
+    is_link = (link == True) or (link == None and bazel_package in link_packages)
+    is_root = bazel_package == root_package
 
     if fail_if_no_link and not is_root and not link:
-        msg = "Nothing to link in bazel package '%s' for npm package npm package rollup@2.70.2. This is neither the root package nor a link package of this package." % native.package_name()
+        msg = "Nothing to link in bazel package '%s' for npm package npm package rollup@2.70.2. This is neither the root package nor a link package of this package." % bazel_package
         fail(msg)
 
     link_targets = []
@@ -142,8 +145,8 @@ def npm_link_imported_package(
 
     if is_link:
         link_aliases = []
-        if native.package_name() in link_packages:
-            link_aliases = link_packages[native.package_name()]
+        if bazel_package in link_packages:
+            link_aliases = link_packages[bazel_package]
         if not link_aliases:
             link_aliases = ["rollup"]
         for link_alias in link_aliases:
