@@ -47,7 +47,7 @@ _FP_DIRECT_TMPL = \
         if link_package == native.package_name():
             # terminal target for direct dependencies
             _npm_link_package_store(
-                name = "{{}}/{name}".format(name),
+                name = "{{}}/{pkg}".format(name),
                 src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
                 visibility = {link_visibility},
                 tags = ["manual"],
@@ -56,8 +56,8 @@ _FP_DIRECT_TMPL = \
             # filegroup target that provides a single file which is
             # package directory for use in $(execpath) and $(rootpath)
             native.filegroup(
-                name = "{{}}/{name}/dir".format(name),
-                srcs = [":{{}}/{name}".format(name)],
+                name = "{{}}/{pkg}/dir".format(name),
+                srcs = [":{{}}/{pkg}".format(name)],
                 output_group = "{package_directory_output_group}",
                 visibility = {link_visibility},
                 tags = ["manual"],
@@ -67,7 +67,7 @@ _FP_DIRECT_TARGET_TMPL = \
     """
     for link_package in {link_packages}:
         if link_package == bazel_package:
-            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))"""
+            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -259,9 +259,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 ),
             )
 
-        stores_bzl.append("""        store_{i}(name = "{{}}/{name}".format(name))""".format(
+        stores_bzl.append("""        store_{i}(name = "{{}}/{pkg}".format(name))""".format(
             i = i,
-            name = _import.package,
+            pkg = _import.package,
         ))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
@@ -270,12 +270,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     links_bzl[link_package] = []
                 if link_package not in links_targets_bzl:
                     links_targets_bzl[link_package] = []
-                links_bzl[link_package].append("""            link_{i}(name = "{{}}/{name}".format(name))""".format(
+                links_bzl[link_package].append("""            link_{i}(name = "{{}}/{pkg}".format(name))""".format(
                     i = i,
-                    name = link_alias,
+                    pkg = link_alias,
                 ))
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{name}".format(bazel_package, name))""".format(name = link_alias)
+                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))""".format(pkg = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     if len(link_alias.split("/", 1)) > 1:
@@ -372,7 +372,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
                 link_packages = fp_link_packages,
                 link_visibility = package_visibility,
-                name = fp_package,
+                pkg = fp_package,
                 package_directory_output_group = utils.package_directory_output_group,
                 root_package = root_package,
                 package_store_name = utils.package_store_name(fp_package, "0.0.0"),
@@ -381,11 +381,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
             npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
                 link_packages = fp_link_packages,
-                name = fp_package,
+                pkg = fp_package,
             ))
 
             if "//visibility:public" in package_visibility:
-                add_to_link_targets = """            link_targets.append(":{{}}/{name}".format(name))""".format(name = fp_package)
+                add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
                 npm_link_all_packages_bzl.append(add_to_link_targets)
                 if len(fp_package.split("/", 1)) > 1:
                     package_scope = fp_package.split("/", 1)[0]
