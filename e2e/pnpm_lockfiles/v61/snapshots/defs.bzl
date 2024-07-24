@@ -88,7 +88,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         new_link_targets, new_scope_targets = link_fn(name)
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
-            scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
+            if _scope not in scope_targets:
+                scope_targets[_scope] = []
+            scope_targets[_scope].extend(_targets)
 
     if is_root:
         store_0(name = "{}/ansi-regex".format(name))
@@ -155,42 +157,72 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         if bazel_package == "<LOCKVERSION>":
             link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
             link_targets.append("//{}:{}/@aspect-test-a-bad-scope".format(bazel_package, name))
-            scope_targets["@aspect-test-a-bad-scop"] = scope_targets["@aspect-test-a-bad-scop"] + [link_targets[-1]] if "@aspect-test-a-bad-scop" in scope_targets else [link_targets[-1]]
+            if "@aspect-test-a-bad-scop" not in scope_targets:
+                scope_targets["@aspect-test-a-bad-scop"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test-a-bad-scop"].append(link_targets[-1])
             link_4(name = "{}/@aspect-test-custom-scope/a".format(name))
             link_targets.append("//{}:{}/@aspect-test-custom-scope/a".format(bazel_package, name))
-            scope_targets["@aspect-test-custom-scope"] = scope_targets["@aspect-test-custom-scope"] + [link_targets[-1]] if "@aspect-test-custom-scope" in scope_targets else [link_targets[-1]]
+            if "@aspect-test-custom-scope" not in scope_targets:
+                scope_targets["@aspect-test-custom-scope"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test-custom-scope"].append(link_targets[-1])
             link_4(name = "{}/@aspect-test/a".format(name))
             link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
-            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
             link_4(name = "{}/@aspect-test/a2".format(name))
             link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
-            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
             link_4(name = "{}/aspect-test-a-no-scope".format(name))
             link_targets.append("//{}:{}/aspect-test-a-no-scope".format(bazel_package, name))
             link_4(name = "{}/aspect-test-a/no-at".format(name))
             link_targets.append("//{}:{}/aspect-test-a/no-at".format(bazel_package, name))
             link_5(name = "{}/@aspect-test/b".format(name))
             link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
-            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
             link_6(name = "{}/@aspect-test/c".format(name))
             link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
-            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
             link_9(name = "{}/@aspect-test/e".format(name))
             link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
-            scope_targets["@aspect-test"] = scope_targets["@aspect-test"] + [link_targets[-1]] if "@aspect-test" in scope_targets else [link_targets[-1]]
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
             link_10(name = "{}/jsonify".format(name))
             link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
             link_11(name = "{}/@isaacs/cliui".format(name))
             link_targets.append("//{}:{}/@isaacs/cliui".format(bazel_package, name))
-            scope_targets["@isaacs"] = scope_targets["@isaacs"] + [link_targets[-1]] if "@isaacs" in scope_targets else [link_targets[-1]]
+            if "@isaacs" not in scope_targets:
+                scope_targets["@isaacs"] = [link_targets[-1]]
+            else:
+                scope_targets["@isaacs"].append(link_targets[-1])
             link_12(name = "{}/rollup-plugin-with-peers".format(name))
             link_targets.append("//{}:{}/rollup-plugin-with-peers".format(bazel_package, name))
             link_14(name = "{}/@types/archiver".format(name))
             link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
-            scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
             link_18(name = "{}/@types/node".format(name))
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-            scope_targets["@types"] = scope_targets["@types"] + [link_targets[-1]] if "@types" in scope_targets else [link_targets[-1]]
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
             link_18(name = "{}/alias-types-node".format(name))
             link_targets.append("//{}:{}/alias-types-node".format(bazel_package, name))
             link_19(name = "{}/alias-only-sizzle".format(name))
@@ -257,7 +289,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 tags = ["manual"],
             )
             link_targets.append(":{}/@scoped/c".format(name))
-            scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_package_store(
@@ -301,7 +336,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 tags = ["manual"],
             )
             link_targets.append(":{}/@scoped/a".format(name))
-            scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_package_store(
@@ -336,7 +374,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 tags = ["manual"],
             )
             link_targets.append(":{}/@scoped/b".format(name))
-            scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_package_store(
@@ -371,7 +412,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 tags = ["manual"],
             )
             link_targets.append(":{}/@scoped/d".format(name))
-            scope_targets["@scoped"] = scope_targets["@scoped"] + [link_targets[-1]] if "@scoped" in scope_targets else [link_targets[-1]]
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_package_store(
