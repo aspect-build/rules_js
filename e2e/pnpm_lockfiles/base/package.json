@@ -13,6 +13,7 @@
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         "rollup": "2.14.0",
+        "rollup3": "npm:rollup@3.29.4",
         "rollup-plugin-with-peers": "npm:@rollup/plugin-typescript@8.2.1",
         "tslib": "^2.6.3",
         "typescript": "^5.4.5",
