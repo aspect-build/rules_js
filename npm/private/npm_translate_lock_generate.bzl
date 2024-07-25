@@ -78,6 +78,12 @@ _BZL_LIBRARY_TMPL = \
 )
 """
 
+_ADD_SCOPE_TARGET = """\
+            if "{package_scope}" not in scope_targets:
+                scope_targets["{package_scope}"] = [link_targets[-1]]
+            else:
+                scope_targets["{package_scope}"].append(link_targets[-1])"""
+
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 _RESOLVED_JSON_FILENAME = "resolved.json"
 
@@ -228,7 +234,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         new_link_targets, new_scope_targets = link_fn(name)
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
-            scope_targets[_scope] = scope_targets[_scope] + _targets if _scope in scope_targets else _targets
+            if _scope not in scope_targets:
+                scope_targets[_scope] = []
+            scope_targets[_scope].extend(_targets)
 """.format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
             link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "\"\"",
@@ -292,8 +300,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
                     if package_scope:
-                        add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(package_scope = package_scope)
-                        links_bzl[link_package].append(add_to_scoped_targets)
+                        links_bzl[link_package].append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
 
                 # the resolved.json for this alias of the package
                 resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME)
@@ -406,10 +413,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 npm_link_all_packages_bzl.append(add_to_link_targets)
                 package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                 if package_scope:
-                    add_to_scoped_targets = """            scope_targets["{package_scope}"] = scope_targets["{package_scope}"] + [link_targets[-1]] if "{package_scope}" in scope_targets else [link_targets[-1]]""".format(
-                        package_scope = package_scope,
-                    )
-                    npm_link_all_packages_bzl.append(add_to_scoped_targets)
+                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
