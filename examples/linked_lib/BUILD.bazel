@@ -9,6 +9,8 @@ js_library(
     name = "pkg",
     srcs = [
         "index.js",
+        "one.d.ts",
+        "one.js",
         "package.json",
     ],
     visibility = ["//visibility:public"],

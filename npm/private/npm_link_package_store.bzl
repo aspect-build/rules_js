@@ -22,7 +22,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 _ATTRS = {
     "src": attr.label(
         doc = """The npm_package_store target to link as a direct dependency.""",
-        providers = [NpmPackageStoreInfo],
+        providers = [NpmPackageStoreInfo, JsInfo],
         mandatory = True,
     ),
     "package": attr.string(
@@ -61,6 +61,7 @@ exec node "$basedir/{bin_path}" "$@"
 
 def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
+    store_js_info = ctx.attr.src[JsInfo]
 
     package_store_directory = store_info.package_store_directory
     if not package_store_directory:
@@ -91,11 +92,28 @@ def _npm_link_package_store_impl(ctx):
         )
         files.append(bin_file)
 
-    files_depset = depset(files, transitive = [store_info.files])
+    # All files required to run the package if consumed as `DefaultInfo`
+    files_depset = depset(files, transitive = [
+        store_info.files,
+        store_js_info.npm_sources,
+        store_js_info.sources,
+    ])
+    transitive_files_depset = depset(files, transitive = [
+        store_info.transitive_files,
+        store_js_info.npm_sources,
+        store_js_info.transitive_sources,
+    ])
 
-    transitive_files_depset = depset(files, transitive = [store_info.transitive_files])
+    # Additional npm_sources required to to run the package, in addition to other
+    # data included in JsInfo provider.
+    npm_sources = depset(files, transitive = [
+        store_info.transitive_files,
+        store_js_info.npm_sources,
+    ])
 
     providers = [
+        # Provide default info to allow consuming the package via `data` of rules
+        # not aware of JsInfo such as `sh_binary` etc.
         DefaultInfo(
             # Only provide direct files in DefaultInfo files
             files = files_depset,
@@ -105,7 +123,11 @@ def _npm_link_package_store_impl(ctx):
         ),
         js_info(
             target = ctx.label,
-            npm_sources = transitive_files_depset,
+            sources = store_js_info.sources,
+            transitive_sources = store_js_info.transitive_sources,
+            types = store_js_info.types,
+            transitive_types = store_js_info.transitive_types,
+            npm_sources = npm_sources,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
             npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
         ),
