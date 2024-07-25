@@ -82,6 +82,9 @@ importers:
       is-odd-v3:
         specifier: npm:is-odd@3.0.0
         version: /is-odd@3.0.0
+      jquery-git-ssh-e61fccb:
+        specifier: git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d
+        version: github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -519,6 +522,12 @@ packages:
     resolution: {directory: ../vendored/is-number, type: directory}
     name: is-number
     version: 0.0.1
+    dev: false
+
+  github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d}
+    name: jquery
+    version: 3.0.0-pre
     dev: false
 
   github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53:

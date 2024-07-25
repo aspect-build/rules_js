@@ -127,6 +127,7 @@ def lockfile_test(name = None):
             ":node_modules/debug",
             ":node_modules/hello",
             ":node_modules/jsonify",
+            ":node_modules/jquery-git-ssh-e61fccb",
 
             # npm: alias
             ":node_modules/@aspect-test/a2",
