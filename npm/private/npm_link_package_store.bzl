@@ -92,12 +92,35 @@ def _npm_link_package_store_impl(ctx):
         )
         files.append(bin_file)
 
+    # All files required to run the package if consumed as `DefaultInfo`
+    files_depset = depset(files, transitive = [
+        store_info.files,
+        store_js_info.npm_sources,
+        store_js_info.sources,
+    ])
+    transitive_files_depset = depset(files, transitive = [
+        store_info.transitive_files,
+        store_js_info.npm_sources,
+        store_js_info.transitive_sources,
+    ])
+
+    # Additional npm_sources required to to run the package, in addition to other
+    # data included in JsInfo provider.
     npm_sources = depset(files, transitive = [
         store_info.transitive_files,
         store_js_info.npm_sources,
     ])
 
     providers = [
+        # Provide default info to allow consuming the package via `data` of rules
+        # not aware of JsInfo such as `sh_binary` etc.
+        DefaultInfo(
+            # Only provide direct files in DefaultInfo files
+            files = files_depset,
+            # Include all transitives in runfiles so that this target can be used in the data
+            # of a generic binary target such as sh_binary
+            runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
+        ),
         js_info(
             target = ctx.label,
             sources = store_js_info.sources,
