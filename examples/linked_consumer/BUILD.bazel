@@ -1,4 +1,6 @@
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@aspect_rules_js//js:defs.bzl", "js_info_files", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
@@ -21,4 +23,78 @@ js_test(
         ":node_modules/@lib/test2",
     ],
     entry_point = "test_pkg_deps_linked.js",
+)
+
+# Test that sources & test can be pulled from a linked js_library the same
+# as they can be pulled out of an unlinked js_library
+js_info_files(
+    name = "unlinked_sources",
+    srcs = ["//examples/linked_lib:lib"],
+    include_npm_sources = False,
+    include_sources = True,
+    include_transitive_sources = True,
+    include_transitive_types = False,
+    include_types = False,
+)
+
+js_info_files(
+    name = "linked_sources",
+    srcs = [":node_modules/@lib/test2"],
+    include_npm_sources = False,
+    include_sources = True,
+    include_transitive_sources = True,
+    include_transitive_types = False,
+    include_types = False,
+)
+
+copy_to_directory(
+    name = "unlinked_sources_dir",
+    srcs = [":unlinked_sources"],
+)
+
+copy_to_directory(
+    name = "linked_sources_dir",
+    srcs = [":linked_sources"],
+)
+
+diff_test(
+    name = "sources_test",
+    file1 = ":unlinked_sources_dir",
+    file2 = ":linked_sources_dir",
+)
+
+js_info_files(
+    name = "linked_types",
+    srcs = [":node_modules/@lib/test2"],
+    include_npm_sources = False,
+    include_sources = False,
+    include_transitive_sources = False,
+    include_transitive_types = True,
+    include_types = True,
+)
+
+js_info_files(
+    name = "unlinked_types",
+    srcs = ["//examples/linked_lib:lib"],
+    include_npm_sources = False,
+    include_sources = False,
+    include_transitive_sources = False,
+    include_transitive_types = True,
+    include_types = True,
+)
+
+copy_to_directory(
+    name = "unlinked_types_dir",
+    srcs = [":unlinked_types"],
+)
+
+copy_to_directory(
+    name = "linked_types_dir",
+    srcs = [":linked_types"],
+)
+
+diff_test(
+    name = "types_test",
+    file1 = ":unlinked_types_dir",
+    file2 = ":linked_types_dir",
 )

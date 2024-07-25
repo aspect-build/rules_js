@@ -92,34 +92,19 @@ def _npm_link_package_store_impl(ctx):
         )
         files.append(bin_file)
 
-    files_depset = depset(files, transitive = [
-        store_info.files,
-        store_js_info.npm_sources,
-        store_js_info.sources,
-    ])
-    transitive_files_depset = depset(files, transitive = [
+    npm_sources = depset(files, transitive = [
         store_info.transitive_files,
         store_js_info.npm_sources,
-        store_js_info.transitive_sources,
     ])
 
     providers = [
-        # TODO: delete? all rules_js+tests pass without...
-        DefaultInfo(
-            # Only provide direct files in DefaultInfo files
-            files = files_depset,
-            # Include all transitives in runfiles so that this target can be used in the data
-            # of a generic binary target such as sh_binary
-            runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
-        ),
         js_info(
             target = ctx.label,
-            # TODO: if no other JsInfo properties are set, where do they come from?
-
-            # Add the additional files required for linking
-            # TODO: why does this need store_js_info.sources for rules_ts tests!?
-            # ... shouldn't sources=store_js_info.sources be used instead?
-            npm_sources = transitive_files_depset,
+            sources = store_js_info.sources,
+            transitive_sources = store_js_info.transitive_sources,
+            types = store_js_info.types,
+            transitive_types = store_js_info.transitive_types,
+            npm_sources = npm_sources,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
             npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
         ),
