@@ -5,7 +5,7 @@ js_library(
     name = "subdir",
     srcs = ["index.mjs"],
     data = [
-        "//lib",
+        "//lib:lib_pkg",
     ],
     visibility = ["//visibility:public"],
 )

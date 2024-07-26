@@ -15,11 +15,15 @@ console.log(c.id())
 import * as fp from '@e2e/lib'
 console.log('--@e2e/lib--')
 console.log(fp.id())
+import * as fpp from '@e2e/pkg'
+console.log('--@e2e/pkg--')
+console.log(fpp.id())
 import * as wrapper from '@e2e/wrapper-lib'
 console.log('--@e2e/wrapper-lib--')
 console.log(wrapper.id())
 console.log(wrapper.libId())
 console.log(wrapper.subdirId())
+console.log(wrapper.pkgId())
 import rulesFooA from '../../foo/node_modules/@aspect-test/a/index.js'
 console.log('--rulesFooA--')
 console.log(rulesFooA.id())
