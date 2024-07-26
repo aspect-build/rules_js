@@ -1,6 +1,6 @@
 import {
     isNodeModulePath,
-    is1pVirtualStoreDep,
+    is1pPackageStoreDep,
     friendlyFileSize,
 } from '../../js_run_devserver.mjs'
 
@@ -23,18 +23,18 @@ for (const p of isNodeModulePath_false) {
     }
 }
 
-// is1pVirtualStoreDep
-const is1pVirtualStoreDep_true = [
+// is1pPackageStoreDep
+const is1pPackageStoreDep_true = [
     'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
     'some/path/node_modules/.aspect_rules_js/mycorp-pkg@0.0.0/node_modules/mycorp-pkg',
 ]
-for (const p of is1pVirtualStoreDep_true) {
-    if (!is1pVirtualStoreDep(p)) {
+for (const p of is1pPackageStoreDep_true) {
+    if (!is1pPackageStoreDep(p)) {
         console.error(`ERROR: expected ${p} to be a 1p package store dep`)
         process.exit(1)
     }
 }
-const is1pVirtualStoreDep_false = [
+const is1pPackageStoreDep_false = [
     'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/mycorp/pkg',
     'some/path/node_modules/.aspect_rules_js/@mycorp+pkg0.0.0/node_modules/@mycorp/pkg',
     'some/path/node_modules/.aspect_rules_js/mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
@@ -46,8 +46,8 @@ const is1pVirtualStoreDep_false = [
     'some/path/node_modules/.aspect_rules_js/eval@0.1.6/node_modules/eval',
     'some/path/node_modules/.aspect_rules_js/eval@0.1.6/node_modules/acorn',
 ]
-for (const p of is1pVirtualStoreDep_false) {
-    if (is1pVirtualStoreDep(p)) {
+for (const p of is1pPackageStoreDep_false) {
+    if (is1pPackageStoreDep(p)) {
         console.error(`ERROR: expected ${p} to not be a 1p package store dep`)
         process.exit(1)
     }

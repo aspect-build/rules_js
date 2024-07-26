@@ -26,6 +26,7 @@ ibazel_pid="$!"
 function _exit {
     kill "$ibazel_pid"
     git checkout src/index.html >/dev/null 2>&1
+    git checkout mypkg/index.js >/dev/null 2>&1
     git checkout mylib/index.js >/dev/null 2>&1
     rm -f "$ibazel_logs"
 }
@@ -48,8 +49,15 @@ if ! curl http://localhost:8080/index.html --fail 2>/dev/null | grep "Getting St
     exit 1
 fi
 
+# from @mycorp/mypkg
 if ! curl http://localhost:8080/main.js --fail 2>/dev/null | grep "chalk.blue(packageJson.name)"; then
     echo "ERROR: Expected http://localhost:8080/main.js to contain 'chalk.blue(packageJson.name)'"
+    exit 1
+fi
+
+# from @mycorp/mylib
+if ! curl http://localhost:8080/main.js --fail 2>/dev/null | grep "chalk.green(packageJson.name)"; then
+    echo "ERROR: Expected http://localhost:8080/main.js to contain 'chalk.green(packageJson.name)'"
     exit 1
 fi
 
@@ -63,45 +71,69 @@ if ! curl http://localhost:8080/index.html --fail 2>/dev/null | grep "Goodbye"; 
     exit 1
 fi
 
-_sedi 's#blue#red#' mylib/index.js
+_sedi 's#blue#red#' mypkg/index.js
 
-echo "Waiting 5 seconds for ibazel rebuild after change to mylib/index.js..."
+echo "Waiting 5 seconds for ibazel rebuild after change to mypkg/index.js..."
 sleep 5
 
+# from @mycorp/mypkg
 if ! curl http://localhost:8080/main.js --fail 2>/dev/null | grep "chalk.red(packageJson.name)"; then
     echo "ERROR: Expected http://localhost:8080/main.js to contain 'chalk.red(packageJson.name)'"
     exit 1
 fi
 
+_sedi 's#green#cyan#' mylib/index.js
+
+echo "Waiting 5 seconds for ibazel rebuild after change to mylib/index.js..."
+sleep 5
+
+# from @mycorp/mylib
+if ! curl http://localhost:8080/main.js --fail 2>/dev/null | grep "chalk.cyan(packageJson.name)"; then
+    echo "ERROR: Expected http://localhost:8080/main.js to contain 'chalk.cyan(packageJson.name)'"
+    exit 1
+fi
+
 echo "Checking log file $ibazel_logs"
 
-count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib/index.js" "$ibazel_logs" || true)
+count=$(grep -c "Syncing symlink node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib (1p)" "$ibazel_logs" || true)
+if [[ "$count" -ne 1 ]]; then
+    echo "ERROR: expected to have synced @mycorp/mylib symlink 1 time but found ${count}"
+    exit 1
+fi
+
+count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js" "$ibazel_logs" || true)
 if [[ "$count" -ne 2 ]]; then
-    echo "ERROR: expected to have synced @mycorp/mylib/index.js 2 times but found ${count}"
+    echo "ERROR: expected to have synced @mycorp/mypkg/index.js 2 times but found ${count}"
     exit 1
 fi
 
-count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib/index.js since its timestamp has not changed" "$ibazel_logs" || true)
-if [[ "$count" -ne 1 ]]; then
-    echo "ERROR: expected to have skipped @mycorp/mylib/index.js due to timestamp 1 time but found ${count}"
+count=$(grep -c "Syncing file mylib/index.js" "$ibazel_logs" || true)
+if [[ "$count" -ne 2 ]]; then
+    echo "ERROR: expected to have synced mylib/index.js 2 times but found ${count}"
     exit 1
 fi
 
-count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib/package.json" "$ibazel_logs" || true)
-if [[ "$count" -ne 1 ]]; then
-    echo "ERROR: expected to have synced @mycorp/mylib/package.json 1 time but found ${count}"
+count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js since its timestamp has not changed" "$ibazel_logs" || true)
+if [[ "$count" -ne 2 ]]; then
+    echo "ERROR: expected to have skipped @mycorp/mypkg/index.js due to timestamp 2 times but found ${count}"
     exit 1
 fi
 
-count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib/package.json since its timestamp has not changed" "$ibazel_logs" || true)
+count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
-    echo "ERROR: expected to have skipped @mycorp/mylib/package.json due to timestamp 1 time but found ${count}"
+    echo "ERROR: expected to have synced @mycorp/mypkg/package.json 1 time but found ${count}"
     exit 1
 fi
 
-count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib/package.json since contents have not changed" "$ibazel_logs" || true)
+count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since its timestamp has not changed" "$ibazel_logs" || true)
+if [[ "$count" -ne 2 ]]; then
+    echo "ERROR: expected to have skipped @mycorp/mypkg/package.json due to timestamp 2 times but found ${count}"
+    exit 1
+fi
+
+count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since contents have not changed" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
-    echo "ERROR: expected to have skipped @mycorp/mylib/package.json due to contents 1 time but found ${count}"
+    echo "ERROR: expected to have skipped @mycorp/mypkg/package.json due to contents 1 times but found ${count}"
     exit 1
 fi
 
