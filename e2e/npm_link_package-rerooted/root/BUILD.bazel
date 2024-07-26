@@ -1,0 +1,54 @@
+load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@foo//:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+npm_link_package(
+    name = "node_modules/@e2e/lib",
+    src = "//root/lib:lib_pkg",
+    package = "@e2e/lib",
+    root_package = "root",
+)
+
+npm_link_package(
+    name = "node_modules/@e2e/pkg",
+    src = "//root/pkg:lib_pkg",
+    root_package = "root",
+)
+
+npm_link_package(
+    name = "node_modules/@e2e/wrapper-lib",
+    src = "//root/wrapper-lib:wrapper-lib_pkg",
+    root_package = "root",
+)
+
+aspect_test_a_bin.bin_a_test(
+    name = "aspect_test_a_bin_test",
+)
+
+output_files(
+    name = "e2e/lib-package_store_entry",
+    paths = [
+        "root/node_modules/.aspect_rules_js/@e2e+lib@0.0.0/node_modules/@e2e/lib",
+    ],
+    target = ":node_modules/@e2e/lib",
+)
+
+output_files(
+    name = "e2e/pkg-package_store_entry",
+    paths = [
+        "root/node_modules/.aspect_rules_js/@e2e+pkg@0.0.0/node_modules/@e2e/pkg",
+    ],
+    target = ":node_modules/@e2e/pkg",
+)
+
+build_test(
+    name = "package_store_targets_test",
+    targets = [
+        ":e2e/lib-package_store_entry",
+        ":e2e/pkg-package_store_entry",
+    ],
+)

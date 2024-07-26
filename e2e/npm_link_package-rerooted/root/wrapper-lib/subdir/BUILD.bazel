@@ -1,0 +1,11 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+# A basic single-file no dependencies js_library()
+js_library(
+    name = "subdir",
+    srcs = ["index.js"],
+    data = [
+        "//root/lib:lib_pkg",
+    ],
+    visibility = ["//visibility:public"],
+)

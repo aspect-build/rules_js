@@ -1,0 +1,15 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+js_library(
+    name = "lib_pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        # uvu is a runtime dependency of this package and should be linked into its direct dependencies
+        # by the downstream npm_link_package
+        "//root:node_modules/uvu",
+    ],
+)

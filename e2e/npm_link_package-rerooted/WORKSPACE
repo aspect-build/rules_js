@@ -1,0 +1,51 @@
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
+
+rules_js_register_toolchains(node_version = "16.14.2")
+
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
+
+npm_translate_lock(
+    name = "npm",
+    lifecycle_hooks_envs = {
+        "*": [
+            "aspect_test_id=testc",
+            "BUILD_VERSION=1",
+        ],
+        # Without APPDATA environment variable, sharp install will fail because of the binary can not
+        # be copied to ~/.npm folder which is readonly for bazel.
+        "sharp": ["APPDATA=."],
+    },
+    lifecycle_hooks_execution_requirements = {
+        "sharp": ["requires-network"],
+    },
+    npm_package_target_name = "{dirname}_pkg",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//root:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+load("@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
+
+local_repository(
+    name = "rules_foo",
+    path = "../rules_foo",
+)
+
+load("@rules_foo//foo:repositories.bzl", "foo_repositories")
+
+foo_repositories()
+
+load("@foo//:npm_repositories.bzl", foo_npm_repositories = "npm_repositories")
+
+foo_npm_repositories()
