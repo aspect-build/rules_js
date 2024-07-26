@@ -4,3 +4,4 @@ export const id = () => 'wrapper-lib'
 // See: https://nodejs.org/api/packages.html#exports
 export { id as subdirId } from './subdir/index.mjs'
 export { id as libId } from '@e2e/lib'
+export { id as pkgId } from '@e2e/pkg'

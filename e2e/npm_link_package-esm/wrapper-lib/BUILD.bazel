@@ -7,10 +7,14 @@ js_library(
     name = "js",
     srcs = [
         "index.mjs",
+        # NOTE: .mjs does not support index files unless it is alongside a package.json
+        # containing an `"exports": {".": "index.mjs"}`.
+        # See: https://nodejs.org/api/packages.html#exports
         "package.json",
     ],
     data = [
-        "//lib",
+        "//lib:lib_pkg",
+        "//pkg:lib_pkg",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -19,7 +23,7 @@ js_library(
 )
 
 npm_package(
-    name = "wrapper-lib",
+    name = "wrapper-lib_pkg",
     srcs = [":js"],
     package = "@e2e/wrapper-lib",
     visibility = ["//visibility:public"],

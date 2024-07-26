@@ -8,18 +8,21 @@ npm_link_all_packages(name = "node_modules")
 
 npm_link_package(
     name = "node_modules/@e2e/lib",
-    src = "//lib:lib_pkg",
+    src = "//root/lib:lib_pkg",
     package = "@e2e/lib",
+    root_package = "root",
 )
 
 npm_link_package(
     name = "node_modules/@e2e/pkg",
-    src = "//pkg:lib_pkg",
+    src = "//root/pkg:lib_pkg",
+    root_package = "root",
 )
 
 npm_link_package(
     name = "node_modules/@e2e/wrapper-lib",
-    src = "//wrapper-lib:wrapper-lib_pkg",
+    src = "//root/wrapper-lib:wrapper-lib_pkg",
+    root_package = "root",
 )
 
 aspect_test_a_bin.bin_a_test(
@@ -29,7 +32,7 @@ aspect_test_a_bin.bin_a_test(
 output_files(
     name = "e2e/lib-package_store_entry",
     paths = [
-        "node_modules/.aspect_rules_js/@e2e+lib@0.0.0/node_modules/@e2e/lib",
+        "root/node_modules/.aspect_rules_js/@e2e+lib@0.0.0/node_modules/@e2e/lib",
     ],
     target = ":node_modules/@e2e/lib",
 )
@@ -37,7 +40,7 @@ output_files(
 output_files(
     name = "e2e/pkg-package_store_entry",
     paths = [
-        "node_modules/.aspect_rules_js/@e2e+pkg@0.0.0/node_modules/@e2e/pkg",
+        "root/node_modules/.aspect_rules_js/@e2e+pkg@0.0.0/node_modules/@e2e/pkg",
     ],
     target = ":node_modules/@e2e/pkg",
 )

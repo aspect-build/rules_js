@@ -7,12 +7,12 @@ js_library(
     name = "js",
     srcs = ["index.js"],
     data = [
-        "//lib:lib_pkg",
-        "//pkg:lib_pkg",
+        "//root/lib:lib_pkg",
+        "//root/pkg:lib_pkg",
     ],
     visibility = ["//visibility:private"],
     deps = [
-        "//wrapper-lib/subdir",
+        "//root/wrapper-lib/subdir",
     ],
 )
 

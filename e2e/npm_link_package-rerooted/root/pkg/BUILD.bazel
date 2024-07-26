@@ -1,0 +1,18 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+npm_package(
+    name = "lib_pkg",
+    srcs = [
+        "index.js",
+        "package.json",
+    ],
+    data = [
+        # A locally linked package as a runtime dependency
+        "//root:node_modules/@e2e/lib",
+        # uvu is a runtime dependency of this package and should be linked into its direct dependencies
+        # by the downstream npm_link_package
+        "//root:node_modules/uvu",
+    ],
+    package = "@e2e/pkg",
+    visibility = ["//visibility:public"],
+)

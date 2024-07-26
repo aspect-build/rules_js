@@ -1,0 +1,34 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+
+js_binary(
+    name = "main",
+    args = ["foo"],
+    data = [
+        "//root:node_modules/@aspect-test/a",
+        "//root:node_modules/@aspect-test/b",
+        "//root:node_modules/@aspect-test/c",
+        "//root:node_modules/@e2e/lib",
+        "//root:node_modules/@e2e/pkg",
+        "//root:node_modules/@e2e/wrapper-lib",
+        "//root:node_modules/sharp",
+        "@foo//:node_modules/@aspect-test/a",
+    ],
+    entry_point = "main.js",
+)
+
+js_test(
+    name = "test",
+    args = ["foo"],
+    data = [
+        "//root:node_modules/@aspect-test/a",
+        "//root:node_modules/@aspect-test/b",
+        "//root:node_modules/@aspect-test/c",
+        "//root:node_modules/@e2e/lib",
+        "//root:node_modules/@e2e/pkg",
+        "//root:node_modules/@e2e/wrapper-lib",
+        "//root:node_modules/sharp",
+        "@foo//:node_modules/@aspect-test/a",
+    ],
+    entry_point = "main.js",
+    log_level = "info",
+)

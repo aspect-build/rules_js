@@ -292,10 +292,12 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         jsinfo = ctx.attr.src[JsInfo]
 
         # Symlink to the directory of the target that created this JsInfo
-        if ctx.label.workspace_name:
+        if ctx.label.workspace_name and ctx.label.package:
             symlink_path = "external/{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
+        elif ctx.label.workspace_name:
+            symlink_path = "external/{}/{}".format(ctx.label.workspace_name, package_store_directory_path)
         else:
-            symlink_path = "{}/{}".format(ctx.label.package or ".", package_store_directory_path)
+            symlink_path = package_store_directory_path
 
         # The package JsInfo including all direct and transitive sources, store info etc.
         js_infos.append(jsinfo)
