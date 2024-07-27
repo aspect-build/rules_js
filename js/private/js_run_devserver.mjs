@@ -246,8 +246,62 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
     }
 }
 
+// Delete files from sandbox
+async function deleteFiles(previousFiles, updatedFiles, sandbox) {
+    const startTime = perf_hooks.performance.now()
+
+    let totalDeleted = 0
+
+    // Remove files that were previously synced but are no longer in the updated list of files to sync
+    const updatedFilesSet = new Set(updatedFiles)
+    for (const f of previousFiles) {
+        if (updatedFilesSet.has(f)) {
+            continue
+        }
+
+        console.error(`Deleting ${f}`)
+
+        // clear any matching files or files rooted at this folder from the
+        // syncedTime and syncedChecksum maps
+        const srcPath = path.join(RUNFILES_ROOT, f)
+        for (const k of syncedTime.keys()) {
+            if (k == srcPath || k.startsWith(srcPath + '/')) {
+                syncedTime.delete(k)
+            }
+        }
+        for (const k of syncedChecksum.keys()) {
+            if (k == srcPath || k.startsWith(srcPath + '/')) {
+                syncedChecksum.delete(k)
+            }
+        }
+
+        // clear mkdirs if we have deleted any files so we re-populate on next sync
+        mkdirs.clear()
+
+        const rmPath = path.join(sandbox, f)
+        try {
+            fs.rmSync(rmPath, { recursive: true, force: true })
+        } catch (e) {
+            console.error(
+                `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
+            )
+        }
+        totalDeleted++
+    }
+
+    var endTime = perf_hooks.performance.now()
+
+    if (totalDeleted > 0) {
+        console.error(
+            `${totalDeleted} file${totalDeleted > 1 ? 's' : ''}/folder${
+                totalDeleted > 1 ? 's' : ''
+            } deleted in ${Math.round(endTime - startTime)} ms`
+        )
+    }
+}
+
 // Sync list of files to the sandbox
-async function sync(files, sandbox, writePerm) {
+async function syncFiles(files, sandbox, writePerm) {
     console.error(`+ Syncing ${files.length} files && folders...`)
     const startTime = perf_hooks.performance.now()
 
@@ -331,7 +385,7 @@ async function main(args, sandbox) {
 
     const config = JSON.parse(await fs.promises.readFile(configPath))
 
-    await sync(
+    await syncFiles(
         config.data_files,
         sandbox,
         config.grant_sandbox_write_permissions
@@ -402,14 +456,25 @@ async function main(args, sandbox) {
                         console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
                     }
                     // Chain promises via syncing.then()
-                    syncing = syncing.then(() =>
-                        sync(
-                            // Re-parse the config file to get the latest list of data files to copy
-                            JSON.parse(fs.readFileSync(configPath)).data_files,
+                    syncing = syncing.then(() => {
+                        // Re-parse the config file to get the latest list of data files to copy
+                        const updatedDataFiles = JSON.parse(
+                            fs.readFileSync(configPath)
+                        ).data_files
+                        // Remove files that were previously synced but are no longer in the updated list of files to sync
+                        deleteFiles(
+                            config.data_files,
+                            updatedDataFiles,
+                            sandbox
+                        )
+                        // Sync changed files
+                        config.data_files = updatedDataFiles
+                        syncFiles(
+                            config.data_files,
                             sandbox,
                             config.grant_sandbox_write_permissions
                         )
-                    )
+                    })
                     // Await promise to catch any exceptions, and wait for the
                     // sync to be complete before writing to stdin of the child
                     // process
