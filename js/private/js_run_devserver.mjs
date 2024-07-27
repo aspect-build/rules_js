@@ -54,7 +54,7 @@ export function isNodeModulePath(p) {
 
 // Determines if a file path is a 1p dep in the package store.
 // See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
-export function is1pVirtualStoreDep(p) {
+export function is1pPackageStoreDep(p) {
     // unscoped1p: https://regex101.com/r/hBR08J/1
     const unscoped1p =
         /^.+\/\.aspect_rules_js\/([^@\/]+)@0\.0\.0\/node_modules\/\1$/
@@ -248,25 +248,30 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
 
 // Sync list of files to the sandbox
 async function sync(files, sandbox, writePerm) {
-    console.error(`Syncing ${files.length} files && folders...`)
+    console.error(`+ Syncing ${files.length} files && folders...`)
     const startTime = perf_hooks.performance.now()
 
-    const [virtualStore1pFiles, remainingFiles] = partitionArray(
+    const [nodeModulesFiles, otherFiles] = partitionArray(
         files,
-        is1pVirtualStoreDep
+        isNodeModulePath
     )
 
-    if (virtualStore1pFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+    const [packageStore1pDeps, otherNodeModulesFiles] = partitionArray(
+        nodeModulesFiles,
+        is1pPackageStoreDep
+    )
+
+    // Sync non-node_modules files first since syncing 1p js_library linked node_modules symlinks
+    // requires the files they point to be in place.
+    if (otherFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
-            `Syncing ${virtualStore1pFiles.length} first party package store dep(s)`
+            `+ Syncing ${otherFiles.length} non-node_modules files & folders...`
         )
     }
 
-    // Sync first-party package store files first since correctly syncing direct 1p node_modules
-    // symlinks depends on checking if the package store synced files exist.
     let totalSynced = (
         await Promise.all(
-            virtualStore1pFiles.map(async (file) => {
+            otherFiles.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
                 return await syncRecursive(src, dst, sandbox, writePerm)
@@ -274,15 +279,34 @@ async function sync(files, sandbox, writePerm) {
         )
     ).reduce((s, t) => s + t, 0)
 
-    if (remainingFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+    // Sync first-party package store files before other node_modules files since correctly syncing
+    // direct 1p node_modules symlinks depends on checking if the package store synced files exist.
+    if (packageStore1pDeps.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
-            `Syncing ${remainingFiles.length} other files && folders...`
+            `+ Syncing ${packageStore1pDeps.length} first party package store dep(s)`
         )
     }
 
     totalSynced += (
         await Promise.all(
-            remainingFiles.map(async (file) => {
+            packageStore1pDeps.map(async (file) => {
+                const src = path.join(RUNFILES_ROOT, file)
+                const dst = path.join(sandbox, file)
+                return await syncRecursive(src, dst, sandbox, writePerm)
+            })
+        )
+    ).reduce((s, t) => s + t, 0)
+
+    // Finally sync all remaining node_modules files
+    if (otherNodeModulesFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+        console.error(
+            `+ Syncing ${otherNodeModulesFiles.length} other node_modules files`
+        )
+    }
+
+    totalSynced += (
+        await Promise.all(
+            otherNodeModulesFiles.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
                 return await syncRecursive(src, dst, sandbox, writePerm)
