@@ -23,6 +23,7 @@ js_run_devserver(
     ],
     data = [
         "package.json",
+        "src/404.html",
         "src/index.html",
         "src/index.js",
         "webpack.config.mjs",

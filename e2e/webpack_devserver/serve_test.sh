@@ -28,6 +28,7 @@ function _exit {
     git checkout src/index.html >/dev/null 2>&1
     git checkout mypkg/index.js >/dev/null 2>&1
     git checkout mylib/index.js >/dev/null 2>&1
+    git checkout BUILD.bazel >/dev/null 2>&1
     rm -f "$ibazel_logs"
 }
 trap _exit EXIT
@@ -93,47 +94,96 @@ if ! curl http://localhost:8080/main.js --fail 2>/dev/null | grep "chalk.cyan(pa
     exit 1
 fi
 
+_sedi 's#"src/404.html",##' BUILD.bazel
+
+echo "Waiting 10 seconds for ibazel rebuild after change to BUILD.bazel..."
+sleep 10
+
+git checkout BUILD.bazel >/dev/null 2>&1
+
+echo "Waiting 10 seconds for ibazel rebuild after change to BUILD.bazel..."
+sleep 10
+
 echo "Checking log file $ibazel_logs"
 
 count=$(grep -c "Syncing symlink node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib (1p)" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
     echo "ERROR: expected to have synced @mycorp/mylib symlink 1 time but found ${count}"
     exit 1
 fi
 
 count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js" "$ibazel_logs" || true)
 if [[ "$count" -ne 2 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
     echo "ERROR: expected to have synced @mycorp/mypkg/index.js 2 times but found ${count}"
     exit 1
 fi
 
 count=$(grep -c "Syncing file mylib/index.js" "$ibazel_logs" || true)
 if [[ "$count" -ne 2 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
     echo "ERROR: expected to have synced mylib/index.js 2 times but found ${count}"
     exit 1
 fi
 
 count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js since its timestamp has not changed" "$ibazel_logs" || true)
-if [[ "$count" -ne 2 ]]; then
-    echo "ERROR: expected to have skipped @mycorp/mypkg/index.js due to timestamp 2 times but found ${count}"
+if [[ "$count" -ne 4 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
+    echo "ERROR: expected to have skipped @mycorp/mypkg/index.js due to timestamp 4 times but found ${count}"
     exit 1
 fi
 
 count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
     echo "ERROR: expected to have synced @mycorp/mypkg/package.json 1 time but found ${count}"
     exit 1
 fi
 
 count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since its timestamp has not changed" "$ibazel_logs" || true)
-if [[ "$count" -ne 2 ]]; then
-    echo "ERROR: expected to have skipped @mycorp/mypkg/package.json due to timestamp 2 times but found ${count}"
+if [[ "$count" -ne 4 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
+    echo "ERROR: expected to have skipped @mycorp/mypkg/package.json due to timestamp 4 times but found ${count}"
     exit 1
 fi
 
 count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since contents have not changed" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
     echo "ERROR: expected to have skipped @mycorp/mypkg/package.json due to contents 1 times but found ${count}"
+    exit 1
+fi
+
+count=$(grep -c "Deleting src/404.html" "$ibazel_logs" || true)
+if [[ "$count" -ne 1 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
+    echo "ERROR: expected to have deleted src/404.html 1 time but found ${count}"
+    exit 1
+fi
+
+count=$(grep -c "Syncing file src/404.html" "$ibazel_logs" || true)
+if [[ "$count" -ne 2 ]]; then
+    echo "==========="
+    cat "$ibazel_logs"
+    echo "==========="
+    echo "ERROR: expected to have synced src/404.html 2 times but found ${count}"
     exit 1
 fi
 
