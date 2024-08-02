@@ -7,14 +7,14 @@ def _webpack_bundle_analyzer_internal(name, link_root_name, **kwargs):
     store_target_name = ".aspect_rules_js/{}/webpack-bundle-analyzer@4.5.0_bufferutil_4.0.7".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@//:{}/dir".format(store_target_name),
+        directory = "@@//:{}/dir".format(store_target_name),
         path = "lib/bin/analyzer.js",
         tags = ["manual"],
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = ["@//:{}".format(store_target_name)],
+        data = ["@@//:{}".format(store_target_name)],
         include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )
@@ -29,14 +29,14 @@ def _webpack_bundle_analyzer_test_internal(name, link_root_name, **kwargs):
     store_target_name = ".aspect_rules_js/{}/webpack-bundle-analyzer@4.5.0_bufferutil_4.0.7".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@//:{}/dir".format(store_target_name),
+        directory = "@@//:{}/dir".format(store_target_name),
         path = "lib/bin/analyzer.js",
         tags = ["manual"],
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@//:{}".format(store_target_name)],
+        data = kwargs.pop("data", []) + ["@@//:{}".format(store_target_name)],
         **kwargs
     )
 
@@ -44,14 +44,14 @@ def _webpack_bundle_analyzer_binary_internal(name, link_root_name, **kwargs):
     store_target_name = ".aspect_rules_js/{}/webpack-bundle-analyzer@4.5.0_bufferutil_4.0.7".format(link_root_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@//:{}/dir".format(store_target_name),
+        directory = "@@//:{}/dir".format(store_target_name),
         path = "lib/bin/analyzer.js",
         tags = ["manual"],
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@//:{}".format(store_target_name)],
+        data = kwargs.pop("data", []) + ["@@//:{}".format(store_target_name)],
         **kwargs
     )
 
