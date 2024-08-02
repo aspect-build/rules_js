@@ -57,3 +57,8 @@ build_test(
     name = "node_modules_test",
     targets = ["//:node_modules"],
 )
+
+build_test(
+    name = "other_module_binary_test",
+    targets = ["@other_module//:pyright"],
+)

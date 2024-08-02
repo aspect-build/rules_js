@@ -1,0 +1,12 @@
+module(name = "other_module")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm_other_module",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm_other_module")
