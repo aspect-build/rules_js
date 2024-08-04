@@ -57,3 +57,9 @@ build_test(
     name = "node_modules_test",
     targets = ["//:node_modules"],
 )
+
+# Verifies that a `js_binary` target from another module can be built
+build_test(
+    name = "other_module_binary_test",
+    targets = ["@other_module//:pyright"],
+)
