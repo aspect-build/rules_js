@@ -19,7 +19,7 @@ js_image_layer(
 ## js_image_layer
 
 <pre>
-js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-generate_empty_layers">generate_empty_layers</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-platform">platform</a>, <a href="#js_image_layer-root">root</a>)
+js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-generate_empty_layers">generate_empty_layers</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-platform">platform</a>, <a href="#js_image_layer-pure">pure</a>, <a href="#js_image_layer-root">root</a>)
 </pre>
 
 Create container image layers from js_binary targets.
@@ -272,6 +272,7 @@ container_image(
 | <a id="js_image_layer-generate_empty_layers"></a>generate_empty_layers |  Generate layers even if they are empty.<br><br>Helpful when using js_image_layer with rules_docker. See https://github.com/aspect-build/rules_js/pull/1714 for more info   | Boolean | optional |  `False`  |
 | <a id="js_image_layer-owner"></a>owner |  Owner of the entries, in `GID:UID` format. By default `0:0` (root, root) is used.   | String | optional |  `"0:0"`  |
 | <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
+| <a id="js_image_layer-pure"></a>pure |  Generate layers without Bazel specific sources and NodeJS<br><br>Remove from layers: - NodeJS - NodeJS patches - Bazel wrapper (js_binary) - Runfiles directories<br><br>Required for using in distroless images. See https://github.com/GoogleContainerTools/distroless/blob/main/nodejs/README.md   | Boolean | optional |  `False`  |
 | <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional |  `""`  |
 
 

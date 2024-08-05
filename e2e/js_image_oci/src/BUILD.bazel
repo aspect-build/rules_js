@@ -42,6 +42,25 @@ js_binary(
     entry_point = "main.js",
 )
 
+js_binary(
+    name = "bin_pure",
+    args = ["foo"],
+    chdir = package_name(),
+    # skip copying so we can test external source directories
+    copy_data_to_bin = False,
+    data = [
+        "ascii.art",
+        ":proto",
+        "//:node_modules/@mycorp/pkg-a",
+        "//:node_modules/@mycorp/pkg-b",
+        "//:node_modules/chalk",
+        "@repo//:dir",
+        "@repo//:source_txt",
+        "@repo//:sources",
+    ],
+    entry_point = "main-pure.js",
+)
+
 # FIXME: due to bzlmod Node.js toolchain issuehttps://github.com/aspect-build/rules_js/issues/1530,
 # on MacOS, this target must be built with `--extra_toolchains` to select right the linux Node.js
 # toolchain for the image layer:
@@ -53,6 +72,18 @@ js_image_layer(
         "@platforms//cpu:arm64": ":linux_arm64",
         "@platforms//cpu:x86_64": ":linux_amd64",
     }),
+    root = "/app",
+    visibility = ["//visibility:__pkg__"],
+)
+
+js_image_layer(
+    name = "layers_pure",
+    binary = ":bin_pure",
+    platform = select({
+        "@platforms//cpu:arm64": ":linux_arm64",
+        "@platforms//cpu:x86_64": ":linux_amd64",
+    }),
+    pure = True,
     root = "/app",
     visibility = ["//visibility:__pkg__"],
 )
@@ -75,10 +106,31 @@ oci_image(
     }),
 )
 
+oci_image(
+    name = "image_pure",
+    # Pure js_image_layer bring only build result and deps, so we need nodejs in our image
+    base = "@distroless_node",
+    # By default, entrypoint is nodejs
+    cmd = ["src/main-pure.js"],
+    tars = [
+        ":layers_pure",
+    ],
+    visibility = ["//visibility:public"],
+    workdir = "/app",
+)
+
 container_structure_test(
     name = "image_test",
     configs = ["test.yaml"],
     image = ":image",
+    # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
+    tags = ["no-remote-exec"],
+)
+
+container_structure_test(
+    name = "image_pure_test",
+    configs = ["test-pure.yaml"],
+    image = ":image_pure",
     # ./image_test.image: line 214: /usr/bin/docker: No such file or directory
     tags = ["no-remote-exec"],
 )
@@ -92,4 +144,11 @@ oci_tarball(
     name = "image_tarball",
     image = ":image",
     repo_tags = ["e2e_js_image_oci:latest"],
+)
+
+# bazel run //src:image_pure_tarball --extra_toolchains=@nodejs_toolchains//:linux_arm64_toolchain_target
+oci_tarball(
+    name = "image_pure_tarball",
+    image = ":image_pure",
+    repo_tags = ["e2e_js_image_oci_pure:latest"],
 )

@@ -67,6 +67,19 @@ oci_pull(
     ],
 )
 
+oci_pull(
+    name = "distroless_node",
+    digest = "sha256:3cb543d5a3cec9ec76500f597fb9f71b7f2fc85e2845d6537debd387336f97c1",
+    image = "gcr.io/distroless/nodejs18-debian12",
+    platforms = [
+        "linux/amd64",
+        "linux/arm/v7",
+        "linux/arm64/v8",
+        "linux/ppc64le",
+        "linux/s390x",
+    ],
+)
+
 ###
 # Setup container_structure_test
 ###

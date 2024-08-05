@@ -1,0 +1,19 @@
+schemaVersion: 2.0.0
+
+commandTests:
+    - name: 'smoke'
+      command: '/nodejs/bin/node'
+      args: ['/app/src/main-pure.js']
+      expectedOutput:
+          [
+              'OS',
+              ' CWD    /app',
+              '@mycorp/pkg-a acorn@7.4.0',
+              '@mycorp/pkg-a uuid@9.0.1',
+              '@mycorp/pkg-b acorn@7.4.0',
+              '@mycorp/pkg-b uuid@8.3.2',
+              ' SOURCE CHECK    true',
+              ' DIRECTORY CHECK    true',
+              ' PROTO CHECK    true',
+              ' SOURCE DIRECTORY CHECK    true',
+          ]
