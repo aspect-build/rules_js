@@ -102,7 +102,7 @@ def lockfile_test(name = None):
             # npm: alias to a package that has many peers
             ":node_modules/rollup-plugin-with-peers",
             # underlying repo for the many-peers package
-            "@%s__at_rollup_plugin-typescript__8.2.1__%s//:pkg" % (lock_repo, "ommloj5qql5ba6x5wuiluawhoi" if lock_version == "v54" else "1662662592" if lock_version == "v90" else "1813138439"),
+            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (lock_repo, "ommloj5qql5ba6x5wuiluawhoi" if lock_version == "v54" else "1662662592" if lock_version == "v90" else "1813138439"),
 
             # uuv 'hasBin'
             ":node_modules/uvu",
@@ -174,14 +174,14 @@ def lockfile_test(name = None):
 
             # Patched dependencies
             ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
-            "@%s__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq//:pkg" % lock_repo,
+            "@%s__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq//:pkg" % lock_repo,
 
             # Direct deps from custom registry
             ":.aspect_rules_js/node_modules/@types+node@16.18.11",
 
             # Direct deps with peers
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",
-            "@%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2//:pkg" % lock_repo,
+            "@%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2//:pkg" % lock_repo,
         ],
     )
 

@@ -118,18 +118,26 @@ def _convert_v5_importers(importers):
     return result
 
 def _convert_pnpm_v5_version_peer_dep(version):
-    # Covert a pnpm lock file v5 version string of the format
-    # 1.2.3_@scope+peer@2.0.2_@scope+peer@4.5.6
-    # to a version_peer_version that is compatible with rules_js.
+    # Convert a pnpm lock file v5 dependency version string to a format
+    # compatible with rules_js.
+    #
+    # Example versions:
+    #  1.2.3
+    #  1.2.3_@scope+peer@2.0.2_@scope+peer@4.5.6
+    #  2.0.0_@aspect-test+c@2.0.2
+    #  3.1.0_rollup@2.14.0
+    #  4.5.6_o3deharooos255qt5xdujc3cuq
 
     # If there is a suffix to the version
     peer_dep_index = version.find("_")
     if peer_dep_index != -1:
         # if the suffix contains an @version (not just a _patchhash)
-        peer_dep_index = version.find("@", peer_dep_index)
-        if peer_dep_index != -1:
+        peer_dep_at_index = version.find("@", peer_dep_index)
+        if peer_dep_at_index != -1:
             peer_dep = version[peer_dep_index:]
-            version = version[0:peer_dep_index] + utils.sanitize_string(peer_dep)
+            peer_dep = peer_dep.replace("_@", "_at_").replace("@", "_").replace("/", "_").replace("+", "_")
+
+            version = version[0:peer_dep_index] + peer_dep
 
     return version
 
@@ -206,9 +214,13 @@ def _convert_v5_packages(packages):
 ######################### Lockfile v6 #########################
 
 def _convert_pnpm_v6_v9_version_peer_dep(version):
-    # Covert a pnpm lock file v6 version string of the format
-    # 1.2.3(@scope/peer@2.0.2)(@scope/peer@4.5.6)
-    # to a version_peer_version that is compatible with rules_js.
+    # Convert a pnpm lock file v6-9+ version string to a format compatible
+    # with rules_js.
+    #
+    # Examples:
+    #   1.2.3
+    #   1.2.3(@scope/peer@2.0.2)(@scope/peer@4.5.6)
+    #   4.5.6(patch_hash=o3deharooos255qt5xdujc3cuq)
     if version[-1] == ")":
         # Drop the patch_hash= not present in v5 so (patch_hash=123) -> (123) like v5
         version = version.replace("(patch_hash=", "(")
@@ -221,7 +233,9 @@ def _convert_pnpm_v6_v9_version_peer_dep(version):
             # peer deps so we must hash here to prevent extremely long file paths that lead to
             # "File name too long) build failures.
             peer_dep = utils.hash(peer_dep)
-        version = version[0:peer_dep_index] + "_" + utils.sanitize_string(peer_dep)
+        else:
+            peer_dep = peer_dep.replace("(@", "(_at_").replace(")(", "_").replace("@", "_").replace("/", "_")
+        version = version[0:peer_dep_index] + "_" + peer_dep.strip("_-()")
     return version
 
 def _strip_v6_default_registry_to_version(name, version):

@@ -75,17 +75,17 @@ npm = use_extension(
         "lock-%s__at_types_sizzle__2.3.8__links" % version,
 
         # Dep with peers
-        "lock-%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2" % version,
-        "lock-%s__at_aspect-test_d__2.0.0__at_aspect-test_c_2.0.2__links" % version,
+        "lock-%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2" % version,
+        "lock-%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links" % version,
 
         # Deep with many peers
-        "lock-%s__at_rollup_plugin-typescript__8.2.1__%s" % (
+        "lock-%s__at_rollup_plugin-typescript__8.2.1_%s" % (
             version,
             "ommloj5qql5ba6x5wuiluawhoi" if version == "v54" else "1662662592" if version == "v90" else "1813138439",
         ),
 
         # Dep with patch
-        "lock-%s__meaning-of-life__1.0.0__o3deharooos255qt5xdujc3cuq" % version,
+        "lock-%s__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq" % version,
     )
     for version in PNPM_LOCK_VERSIONS
 ]
