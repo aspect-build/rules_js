@@ -7,7 +7,7 @@ load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_features//:features.bzl", "bazel_features")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
-load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "npm_translate_lock_rule")
+load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_bzlmod_impl", "npm_translate_lock_lib", "npm_translate_lock_verify")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
@@ -27,12 +27,7 @@ def _npm_extension_impl(module_ctx):
 
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(attr)
-
-            # We cannot read the pnpm_lock file before it has been bootstrapped.
-            # See comment in e2e/update_pnpm_lock_with_import/test.sh.
-            if attr.pnpm_lock:
-                _npm_lock_imports_bzlmod(module_ctx, attr)
+            _npm_translate_lock_bzlmod(module_ctx, attr)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -43,41 +38,14 @@ def _npm_extension_impl(module_ctx):
         )
     return module_ctx.extension_metadata()
 
-def _npm_translate_lock_bzlmod(attr):
-    npm_translate_lock_rule(
-        name = attr.name,
-        bins = attr.bins,
-        custom_postinstalls = attr.custom_postinstalls,
-        data = attr.data,
-        dev = attr.dev,
-        external_repository_action_cache = attr.external_repository_action_cache,
-        generate_bzl_library_targets = attr.generate_bzl_library_targets,
-        link_workspace = attr.link_workspace,
-        no_optional = attr.no_optional,
-        npmrc = attr.npmrc,
-        npm_package_lock = attr.npm_package_lock,
-        npm_package_target_name = attr.npm_package_target_name,
-        package_visibility = attr.package_visibility,
-        patches = attr.patches,
-        patch_args = attr.patch_args,
-        pnpm_lock = attr.pnpm_lock,
-        use_pnpm = attr.use_pnpm,
-        preupdate = attr.preupdate,
-        prod = attr.prod,
-        public_hoist_packages = attr.public_hoist_packages,
-        quiet = attr.quiet,
-        replace_packages = attr.replace_packages,
-        root_package = attr.root_package,
-        update_pnpm_lock = attr.update_pnpm_lock,
-        use_home_npmrc = attr.use_home_npmrc,
-        verify_node_modules_ignored = attr.verify_node_modules_ignored,
-        verify_patches = attr.verify_patches,
-        yarn_lock = attr.yarn_lock,
-        bzlmod = True,
-    )
+def _npm_translate_lock_bzlmod(module_ctx, attr):
+    module_ctx.report_progress("Initializing")
 
-def _npm_lock_imports_bzlmod(module_ctx, attr):
     state = npm_translate_lock_state.new(attr.name, module_ctx, attr, True)
+
+    npm_translate_lock_verify(module_ctx, attr, state)
+
+    module_ctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
     importers, packages = translate_to_transitive_closure(
         state.importers(),
@@ -87,6 +55,14 @@ def _npm_lock_imports_bzlmod(module_ctx, attr):
         attr.no_optional,
     )
 
+    npm_translate_lock_bzlmod_impl(module_ctx, attr, state, importers, packages)
+
+    # We cannot read the pnpm_lock file before it has been bootstrapped.
+    # See comment in e2e/update_pnpm_lock_with_import/test.sh.
+    if attr.pnpm_lock:
+        _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages)
+
+def _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages):
     registries = {}
     npm_auth = {}
     if attr.npmrc:
