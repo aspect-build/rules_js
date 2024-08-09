@@ -21,7 +21,7 @@
         "regl": "npm:@plotly/regl@2.1.2",
         "segfault-handler": "1.3.0",
         "semver-first-satisfied": "1.1.0",
-        "syncpack": "git+https://github.com/JamieMason/syncpack.git#c245af8ea73ce3345d92bbda6c684092a841e262",
+        "syncpack": "git+https://github.com/JamieMason/syncpack.git#80a102f5f13fbe98b9b661833e8a1bab6c42ac18",
         "typescript": "*",
         "unused": "latest",
         "test-npm_package": "workspace:*",
