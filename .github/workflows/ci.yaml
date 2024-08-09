@@ -207,7 +207,7 @@ jobs:
 
             # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
             # which exercises fetching a git repository via ssh.
-            - uses: webfactory/ssh-agent@v0.8.0
+            - uses: webfactory/ssh-agent@v0.9.0
               env:
                   ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
               if: env.ASPECT_GHTESTER_SSH_KEY != ''
