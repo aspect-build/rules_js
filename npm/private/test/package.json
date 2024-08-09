@@ -25,7 +25,7 @@
         "typescript": "*",
         "unused": "latest",
         "test-npm_package": "workspace:*",
-        "webpack-bundle-analyzer": "4.5.0",
+        "webpack-bundle-analyzer": "4.10.2",
         "pngjs": "5.0.0"
     }
 }
