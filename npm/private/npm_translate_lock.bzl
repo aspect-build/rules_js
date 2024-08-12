@@ -53,7 +53,7 @@ _ATTRS = {
     "dev": attr.bool(),
     "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache()),
     "generate_bzl_library_targets": attr.bool(),
-    "replace_packages": attr.string_dict(),
+    "replace_packages": attr.label_keyed_string_dict(),
     "lifecycle_hooks_envs": attr.string_list_dict(),
     "lifecycle_hooks_execution_requirements": attr.string_list_dict(),
     "lifecycle_hooks_use_default_shell_env": attr.string_dict(),
@@ -129,11 +129,17 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     rctx.report_progress("Generating starlark for npm dependencies")
 
+    replace_packages = {}
+    for package, versions in rctx.attr.replace_packages.items():
+        for v in json.decode(versions):
+            replace_packages[v] = package
+
     generate_repository_files(
         rctx,
         state.label_store.label("pnpm_lock"),
         importers,
         packages,
+        replace_packages,
         state.patched_dependencies(),
         state.only_built_dependencies(),
         state.root_package(),
@@ -560,6 +566,8 @@ def npm_translate_lock(
         lifecycle_hooks_use_default_shell_env,
     )
 
+    label_keyed_replace_packages = helpers.reverse_label_to_strings(replace_packages)
+
     npm_translate_lock_rule(
         name = name,
         pnpm_lock = pnpm_lock,
@@ -580,7 +588,7 @@ def npm_translate_lock(
         lifecycle_hooks_envs = lifecycle_hooks_envs,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
-        replace_packages = replace_packages,
+        replace_packages = label_keyed_replace_packages,
         bins = bins_string_list_dict,
         verify_node_modules_ignored = verify_node_modules_ignored,
         verify_patches = verify_patches,

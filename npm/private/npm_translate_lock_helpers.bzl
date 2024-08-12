@@ -58,13 +58,13 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
             if additive:
                 if type(v) == "list":
                     result.extend(v)
-                elif type(v) == "string":
+                elif type(v) == "string" or type(v) == "Label":
                     result.append(v)
                 else:
                     fail("expected value to be list or string")
             elif type(v) == "list":
                 result = v
-            elif type(v) == "string":
+            elif type(v) == "string" or type(v) == "Label":
                 result = [v]
             else:
                 fail("expected value to be list or string")
@@ -236,7 +236,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
+def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -362,12 +362,11 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
-        # gather replace packages
-        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
-        if len(replace_packages) > 1:
+        replace_package, _ = _gather_values_from_matching_names(True, replace_packages, name, friendly_name, unfriendly_name)
+        if len(replace_package) > 1:
             msg = "Multiple package replacements found for package {}".format(name)
             fail(msg)
-        replace_package = replace_packages[0] if replace_packages else None
+        replace_package = replace_package[0] if replace_package else None
 
         # gather custom postinstalls
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
@@ -573,6 +572,23 @@ def _normalize_bazelignore(lines):
             result.append(line.rstrip(strip_trailing_chars))
     return result
 
+def _label_to_string(label):
+    if type(label) == "string":
+        return label
+
+    return "@@{}//{}:{}".format(label.repo_name, label.package, label.name)
+
+def _reverse_label_to_strings(m):
+    label_keyed = {}
+    for lbl, vals in m.items():
+        if not vals in label_keyed:
+            label_keyed[vals] = json.encode([_label_to_string(lbl)])
+        else:
+            pkgs = json.decode(label_keyed[vals])
+            pkgs.append(_label_to_string(lbl))
+            label_keyed[vals] = json.encode(pkgs)
+    return label_keyed
+
 ################################################################################
 def _verify_lifecycle_hooks_specified(_, state):
     # lockfiles <9.0 specify the `requiresBuild` flag in the lockfile.
@@ -630,6 +646,7 @@ helpers = struct(
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
     link_package = _link_package,
+    reverse_label_to_strings = _reverse_label_to_strings,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
     verify_lifecycle_hooks_specified = _verify_lifecycle_hooks_specified,

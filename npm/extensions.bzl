@@ -44,6 +44,8 @@ def _npm_extension_impl(module_ctx):
     return module_ctx.extension_metadata()
 
 def _npm_translate_lock_bzlmod(attr):
+    label_keyed_replace_packages = npm_translate_lock_helpers.reverse_label_to_strings(attr.replace_packages)
+
     npm_translate_lock_rule(
         name = attr.name,
         bins = attr.bins,
@@ -66,7 +68,7 @@ def _npm_translate_lock_bzlmod(attr):
         prod = attr.prod,
         public_hoist_packages = attr.public_hoist_packages,
         quiet = attr.quiet,
-        replace_packages = attr.replace_packages,
+        replace_packages = label_keyed_replace_packages,
         root_package = attr.root_package,
         update_pnpm_lock = attr.update_pnpm_lock,
         use_home_npmrc = attr.use_home_npmrc,
@@ -119,6 +121,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
+        replace_packages = attr.replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
         root_package = attr.pnpm_lock.package,
@@ -206,6 +209,7 @@ def _npm_translate_lock_attrs():
     attrs["lifecycle_hooks_exclude"] = attr.string_list(default = [])
     attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = True)
     attrs["run_lifecycle_hooks"] = attr.bool(default = True)
+    attrs["replace_packages"] = attr.string_dict(default = {})
 
     # Args defaulted differently by the macro
     attrs["npm_package_target_name"] = attr.string(default = "pkg")
