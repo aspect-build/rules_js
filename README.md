@@ -1,23 +1,23 @@
 # Bazel rules for JavaScript
 
-This ruleset is a high-performance and npm-compatible Bazel integration for JavaScript.
+This ruleset is a high-performance Bazel integration for JavaScript, based on the [pnpm package manager](https://pnpm.io).
 
 -   Lazy: only fetches/installs npm packages needed for the requested build/test targets.
 -   Correct: works seamlessly with node.js module resolution. For example there are no pathMapping issues with TypeScript `rootDirs`.
 -   Fast: Bazel's sandbox only sees npm packages as directories, not individual files.
+    <https://blog.aspect.build/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
 -   Supports npm "workspaces": nested npm packages in a monorepo.
 
 Many companies are successfully building with rules_js. If you're getting value from the project, please let us know! Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_js/discussions/1000).
 
-<https://blog.aspect.build/rulesjs-npm-benchmarks> shows benchmarks for fetching, installing, and linking packages under rules_js as well as typical alternatives like npm and yarn.
+rules_js is just a part Aspect's monorepo developer platform:
 
-Google does not fund development of rules_js. If your company benefits, please consider donating to continue development and maintenance work: <https://opencollective.com/aspect-build/projects/rules_js>
-
-rules_js is just a part of what Aspect provides:
-
+-   [Aspect Workflows](https://docs.aspect.build/workflows) delivers on Bazel's promises of speed and cost-savings.
+    It provides Continuous Integration and Delivery, including Remote Cache and Remote Build Execution (RBE).
+    Best of all, it includes all the expertise that you expect from the team at Aspect!
 -   _Need help?_
-    -   Community support is available on the #javascript channel on [Bazel Slack](https://slack.bazel.build/)
-    -   This ruleset has commercial support provided by https://aspect.build/services.
+    -   Best-effort community support is available on the #javascript channel on [Bazel Slack](https://slack.bazel.build/)
+    -   Commercial support as a Slack Connect channel is offered by https://aspect.build/services.
 -   See our other Bazel rules, especially those built for rules_js:
     -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
     -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
@@ -28,6 +28,7 @@ rules_js is just a part of what Aspect provides:
     -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
     -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
     -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
+    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
 
 ## Bazel compatibility
 
@@ -35,7 +36,6 @@ The ruleset is known to work with:
 
 -   Bazel 7 using WORKSPACE and Bzlmod _(tested on CI)_
 -   Bazel 6 using WORKSPACE and Bzlmod _(tested on CI)_
--   Bazel 5 using WORKSPACE _(no longer tested on CI)_
 
 > [!NOTE]
 > Remote Execution (RBE) requires at least Bazel [6.0](https://blog.bazel.build/2022/12/19/bazel-6.0.html).
@@ -46,13 +46,12 @@ The ruleset is known to work with:
 
 ## Installation
 
-From the release you wish to use:
-<https://github.com/aspect-build/rules_js/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
+Follow instructions from the release you wish to use:
+<https://github.com/aspect-build/rules_js/releases>.
 
 To use a commit rather than a release, you can point at any SHA of the repo.
 
-For example to use commit `abc123`:
+For example, to use commit `abc123` with `WORKSPACE`:
 
 1. Replace `url = "https://github.com/aspect-build/rules_js/releases/download/v0.1.0/rules_js-v0.1.0.tar.gz"`
    with a GitHub-provided source archive like
