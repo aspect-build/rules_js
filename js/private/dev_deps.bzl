@@ -54,13 +54,6 @@ def rules_js_dev_dependencies():
     )
 
     http_archive(
-        name = "chalk_501",
-        integrity = "sha256-/nD5GSp77HDNFDwIL68S5PbS+8gefWkube2iIr80/x4=",
-        url = "https://registry.npmjs.org/chalk/-/chalk-5.0.1.tgz",
-        build_file = "//npm/private/test:vendored/chalk-5.0.1.BUILD",
-    )
-
-    http_archive(
         name = "com_grail_bazel_toolchain",
         sha256 = "a9fc7cf01d0ea0a935bd9e3674dd3103766db77dfc6aafcb447a7ddd6ca24a78",
         strip_prefix = "toolchains_llvm-c65ef7a45907016a754e5bf5bfabac76eb702fd3",

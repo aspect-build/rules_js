@@ -7350,7 +7350,6 @@ def npm_repositories():
         transitive_closure = {
             "chalk": ["5.0.1"],
         },
-        replace_package = "@chalk_501//:pkg",
     )
 
     npm_import(

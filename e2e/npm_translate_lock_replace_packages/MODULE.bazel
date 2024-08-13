@@ -1,0 +1,42 @@
+module(
+    name = "e2e_npm_translate_lock_replace_packages",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "platforms", version = "0.0.5")
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
+npm.npm_translate_lock(
+    name = "npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    replace_packages = {
+        "chalk@5.3.0": "@chalk_501//:pkg",
+    },
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "chalk_501",
+    build_file = "//:chalk-5.0.1.BUILD",
+    dev_dependency = True,
+    integrity = "sha256-/nD5GSp77HDNFDwIL68S5PbS+8gefWkube2iIr80/x4=",
+    url = "https://registry.npmjs.org/chalk/-/chalk-5.0.1.tgz",
+)
+
+use_repo(npm, "npm")
