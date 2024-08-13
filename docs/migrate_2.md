@@ -22,7 +22,9 @@ Any rules_js user is likely to encounter these changes which require some edits 
 
 ### npm_translate_lock
 
-The label used to link a package, [`npm_package_target_name`](https://docs.aspect.build/rulesets/aspect_rules_js/docs/npm_translate_lock/#npm_package_target_name) has changed to `pkg` (#1684). You should change your `npm_package` rules to have `name = 'pkg'`, see [examples](https://github.com/aspect-build/rules_js/pull/1684/files#diff-d13f73189fcb63af69a6bfa0eb9cb61e71d6466d2eac4c1051674b73976a1cfe).
+The default label used to link a package has changed to `pkg` (#1684).
+You can change your `npm_package` rules to have `name = 'pkg'`, see [examples](https://github.com/aspect-build/rules_js/pull/1684/files#diff-d13f73189fcb63af69a6bfa0eb9cb61e71d6466d2eac4c1051674b73976a1cfe).
+Alternatively, set the attribute [`npm_package_target_name`](https://docs.aspect.build/rulesets/aspect_rules_js/docs/npm_translate_lock/#npm_package_target_name) back to match the folder name to restore the rules_js 1.0 behavior where `{dirname}` was the default.
 
 The `update_pnpm_lock` default value is now `False` rather than based on presence of `npm_package_lock` or `yarn_lock`. (#1624)
 
