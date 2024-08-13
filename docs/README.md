@@ -7,13 +7,12 @@ Stuck?
 -   See the [Frequently asked questions](./faq.md)
 -   Ask in `#javascript` on <http://slack.bazel.build>
 -   Check for [known issues](https://github.com/aspect-build/rules_js/issues)
--   Pay for support, provided by <https://aspect.build/services>.
+-   Sign up for commercial support, provided as a Slack Connect channel by <https://aspect.build/services>.
 
 ## Installation
 
-From the release you wish to use:
-<https://github.com/aspect-build/rules_js/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
+Follow instructions in the release you wish to use:
+<https://github.com/aspect-build/rules_js/releases>.
 
 ## Usage
 
@@ -38,7 +37,7 @@ Other recommendations:
 
 ### Node.js
 
-rules_js depends on rules_nodejs version 5.0 or greater.
+rules_js depends on rules_nodejs version 6.1.0 or greater.
 
 Installation is included in the `WORKSPACE` snippet you pasted from the Installation instructions above.
 
@@ -305,6 +304,7 @@ Aspect has written a number of these based on rules_js, such as:
 -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for <https://terser.org/> - a JavaScript minifier
 -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
 -   [rules_deno](https://github.com/aspect-build/rules_deno) - Bazel rules for Deno http://deno.land
+-   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
 
 You can also write your own custom rule, though this is an advanced topic and not covered in this documentation.
 
@@ -363,6 +363,12 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 [bazel macros]: https://bazel.build/rules/macros
 [gazelle]: https://github.com/bazelbuild/bazel-gazelle
 [stardoc]: https://github.com/bazelbuild/stardoc
+
+### CI/CD setup
+
+We recommend using [Aspect Workflows](https://docs.aspect.build/workflows) which provides a pool of warm Bazel CI runners
+for your existing CI system. This provides the promised Bazel speed and cost savings, with very little work required from your
+developer infrastructure team!
 
 ### Debugging
 
