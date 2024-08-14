@@ -1,0 +1,68 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+js_test(
+    name = "test",
+    data = [
+        "package.json",
+        ":node_modules",
+    ],
+    entry_point = "main.js",
+)
+
+npm_package(
+    name = "npm-pkg",
+    srcs = [
+        "main.js",
+        "package.json",
+    ],
+)
+
+build_test(
+    name = "node_modules_test",
+    targets = [
+        ":node_modules",
+        ":npm-pkg",
+    ],
+)
+
+# Strip the system-dependent 'system_tar' attribute from the generated repositories.bzl
+genrule(
+    name = "npm_translate_lock_wksp-repositories",
+    srcs = ["@npm//:repositories.bzl"],
+    outs = ["wksp_repos_stripped.bzl"],
+    cmd = 'sed "s/system_tar = .*,/system_tar = \\"xxx\\",/" "$<" > "$@"',
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+write_source_files(
+    name = "write_npm_translate_lock_wksp",
+    files = {
+        "snapshots/wksp/npm_defs.bzl": "@npm//:defs.bzl",
+        "snapshots/wksp/repositories.bzl": ":npm_translate_lock_wksp-repositories",
+    },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+write_source_files(
+    name = "write_npm_translate_lock_bzlmod",
+    files = {
+        # NOTE: @npm//:repositories.bzl not generated for bzlmod
+        "snapshots/bzlmod/npm_defs.bzl": "@npm//:defs.bzl",
+    },
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)

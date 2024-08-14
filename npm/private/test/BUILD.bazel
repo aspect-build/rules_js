@@ -45,7 +45,6 @@ write_source_files(
     files = {
         "snapshots/wksp/npm_defs.bzl": "@npm//:defs.bzl",
         "snapshots/wksp/repositories.bzl": ":npm_translate_lock_wksp-repositories",
-        "snapshots/wksp/chalk_links_defs.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
         "snapshots/wksp/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/wksp/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
         "snapshots/wksp/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
@@ -63,7 +62,6 @@ write_source_files(
     files = {
         # NOTE: @npm//:repositories.bzl not generated for bzlmod
         "snapshots/bzlmod/npm_defs.bzl": "@npm//:defs.bzl",
-        "snapshots/bzlmod/chalk_links_defs.bzl": "@npm__chalk__5.0.1__links//:defs.bzl",
         "snapshots/bzlmod/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/bzlmod/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
         "snapshots/bzlmod/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
