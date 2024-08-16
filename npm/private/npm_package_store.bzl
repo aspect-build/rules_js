@@ -233,7 +233,7 @@ def _npm_package_store_impl(ctx):
                     tools = [bsdtar.tarinfo.binary],
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
-                    command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3 && chmod -R a+X $3",
+                    command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3 && chmod -R a+X $3/*",
                     arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
