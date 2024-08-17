@@ -1,0 +1,7 @@
+{
+    "name": "@examples/runfiles",
+    "private": true,
+    "dependencies": {
+        "@bazel/runfiles": "^6.3.0"
+    }
+}

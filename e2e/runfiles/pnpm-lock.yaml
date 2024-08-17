@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@bazel/runfiles':
+        specifier: ^6.3.0
+        version: 6.3.0
+
+packages:
+
+  '@bazel/runfiles@6.3.0':
+    resolution: {integrity: sha512-2Q+KC0ys+BLIBp6zsI8E6htEw1/R1cjA1Yt+3JiqdEB597aGpZKiJJP6FeJSA4LIAWlH/FDVDtgvJ77eeLNyiA==}
+
+snapshots:
+
+  '@bazel/runfiles@6.3.0': {}
