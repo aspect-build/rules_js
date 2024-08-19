@@ -33,6 +33,10 @@ Bazel option to see more detail about the selection.
 All [common binary attributes](https://bazel.build/reference/be/common-definitions#common-attributes-binaries) are supported
 including `args` as the list of arguments passed Node.js.
 
+Node.js execution is performed by a shell script that sets environment variables and runs the Node.js binary with the `entry_point` script.
+The shell script is located relative to the directory containing the `js_binary` at `\\{name\\}_/\\{name\\}` similar to other rulesets
+such as rules_go. See [PR #1690](https://github.com/aspect-build/rules_js/pull/1690) for more information on this naming scheme.
+
 The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
 
 * JS_BINARY__BINDIR: the WORKSPACE-relative Bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_binary` target
