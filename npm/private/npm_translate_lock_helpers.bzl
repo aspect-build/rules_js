@@ -586,6 +586,9 @@ def _verify_lifecycle_hooks_specified(_, state):
         fail("""\
 ERROR: pnpm.onlyBuiltDependencies required in pnpm workspace root package.json when using pnpm v9 or later
 
+The root package.json must be alongside the pnpm-lock.yaml file and contain a pnpm.onlyBuiltDependencies and
+will be automatically detected even if not explicitly added to data attribute.
+
 As of pnpm v9, the lockfile no longer specifies if packages have lifecycle hooks.
 
 Packages that rules_js should generate lifecycle hook actions for must now be declared in
@@ -595,7 +598,7 @@ https://pnpm.io/package_json#pnpmonlybuiltdependencies for more information.
 Prior to pnpm v9, rules_js keyed off of the requiresBuild attribute in the pnpm lock
 file to determine if a lifecycle hook action should be generated for an npm package.
 See [pnpm #7707](https://github.com/pnpm/pnpm/issues/7707) for the reasons that pnpm
-removed the requiredBuild attribute from the lockfile in v9.
+removed the requiresBuild attribute from the lockfile in v9.
 """)
 
 ################################################################################
