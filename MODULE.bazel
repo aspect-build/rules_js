@@ -122,6 +122,7 @@ npm.npm_translate_lock(
     custom_postinstalls = {
         "@aspect-test/c": "echo moo > cow.txt",
         "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
+        "pngjs": "chmod -R a+X *",  # fixes malformed tarball content file permissions in this package after extraction (see https://github.com/aspect-build/rules_js/issues/1637 for more details)
     },
     data = [
         "//:examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch",
