@@ -221,9 +221,7 @@ def _npm_package_store_impl(ctx):
                 # npm packages are always published with one top-level directory inside the tarball,
                 # tho the name is not predictable we can use the --strip-components 1 argument with
                 # tar to strip one directory level. Some packages have directory permissions missing
-                # executable which make the directories not listable (pngjs@5.0.0 for example). Run
-                # `chmod -R a+X` to fix up these packages (https://stackoverflow.com/a/14634721).
-                # See https://github.com/aspect-build/rules_js/issues/1637 for more info.
+                # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
                 args = ctx.actions.args()
                 args.add(bsdtar.tarinfo.binary)
@@ -233,7 +231,7 @@ def _npm_package_store_impl(ctx):
                     tools = [bsdtar.tarinfo.binary],
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
-                    command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3 && chmod -R a+X $3/*",
+                    command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3",
                     arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
