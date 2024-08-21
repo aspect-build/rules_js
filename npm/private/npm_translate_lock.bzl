@@ -52,6 +52,7 @@ _ATTRS = {
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
     "dev": attr.bool(),
     "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache()),
+    "fix_malformed_tars": attr.string_list(),
     "generate_bzl_library_targets": attr.bool(),
     "replace_packages": attr.string_dict(),
     "lifecycle_hooks_envs": attr.string_list_dict(),
@@ -175,6 +176,7 @@ def npm_translate_lock(
         lifecycle_hooks_execution_requirements = {},
         lifecycle_hooks_no_sandbox = True,
         lifecycle_hooks_use_default_shell_env = {},
+        fix_malformed_tars = [],
         replace_packages = {},
         bins = {},
         verify_node_modules_ignored = None,
@@ -389,6 +391,19 @@ def npm_translate_lock(
 
             Read more: [lifecycles](/docs/pnpm.md#lifecycles)
 
+        fix_malformed_tars: A list of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
+            to repair with `chmod -R a+X *` after extract.
+
+            Some npm packages have incorrect file perimssions in their archives which need
+            to be repaired after extraction.
+
+            Fixing malformed packages is exposed as an opt-in instead of a blanket fix for all packages
+            because for packages with a large number of files, `chmod -R a+X *` will exceed MAX_ARGS and
+            running `chmod -R a+X *` on the package directory itself is not an option because the output
+            directory of the extract action is write-protected on some remote execution environments
+
+            See https://github.com/aspect-build/rules_js/issues/1637 for more details.
+
         replace_packages: A dict of package names to npm_package targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
 
             The injected npm_package targets may optionally contribute transitive npm package dependencies on top
@@ -580,6 +595,7 @@ def npm_translate_lock(
         lifecycle_hooks_envs = lifecycle_hooks_envs,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
+        fix_malformed_tars = fix_malformed_tars,
         replace_packages = replace_packages,
         bins = bins_string_list_dict,
         verify_node_modules_ignored = verify_node_modules_ignored,

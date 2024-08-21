@@ -71,6 +71,13 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
     return (result, keys)
 
 ################################################################################
+def _has_matching_names(package_list, *names):
+    for name in names:
+        if name and name in package_list:
+            return True
+    return False
+
+################################################################################
 def _get_npm_auth(npmrc, npmrc_path, environ):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
@@ -408,6 +415,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             lifecycle_hooks_execution_requirements = []
             lifecycle_hooks_use_default_shell_env = False
 
+        fix_malformed_tars = _has_matching_names(attr.fix_malformed_tars, "*", name, friendly_name, unfriendly_name)
+
         bins = {}
         matching_bins, _ = _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name, unfriendly_name)
         for bin in matching_bins:
@@ -456,6 +465,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
             lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env and lifecycle_hooks_use_default_shell_env[0] == "true",
+            fix_malformed_tars = fix_malformed_tars,
             npm_auth = npm_auth_bearer,
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
@@ -627,6 +637,7 @@ To disable this check, remove the `verify_patches` attribute from `npm_translate
 
 helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,
+    has_matching_names = _has_matching_names,
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
     link_package = _link_package,

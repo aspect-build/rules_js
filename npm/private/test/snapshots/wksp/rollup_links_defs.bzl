@@ -36,6 +36,7 @@ def npm_imported_package_store(name):
         package = "rollup",
         version = "2.70.2",
         dev = True,
+        fix_malformed_tars = False,
         tags = ["manual"],
     )
 
@@ -47,6 +48,7 @@ def npm_imported_package_store(name):
         version = "2.70.2",
         dev = True,
         deps = ref_deps,
+        fix_malformed_tars = False,
         tags = ["manual"],
     )
 
@@ -58,6 +60,7 @@ def npm_imported_package_store(name):
         version = "2.70.2",
         dev = True,
         deps = deps,
+        fix_malformed_tars = False,
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )

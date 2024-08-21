@@ -73,6 +73,7 @@ def npm_imported_package_store(name):
         package = "{package}",
         version = "{version}",
         dev = {dev},
+        fix_malformed_tars = {fix_malformed_tars},
         tags = ["manual"],
     )
 
@@ -84,6 +85,7 @@ def npm_imported_package_store(name):
         version = "{version}",
         dev = {dev},
         deps = ref_deps,
+        fix_malformed_tars = {fix_malformed_tars},
         tags = ["manual"],
     )
 
@@ -95,6 +97,7 @@ def npm_imported_package_store(name):
         version = "{version}",
         dev = {dev},
         deps = deps,
+        fix_malformed_tars = {fix_malformed_tars},
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
@@ -120,6 +123,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         version = "{version}",
         dev = {dev},
         deps = ref_deps,
+        fix_malformed_tars = {fix_malformed_tars},
         tags = ["manual"],
     )
 
@@ -130,6 +134,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         version = "{version}",
         dev = {dev},
         deps = lc_deps,
+        fix_malformed_tars = {fix_malformed_tars},
         tags = ["manual"],
     )
 
@@ -768,6 +773,7 @@ def _npm_import_links_rule_impl(rctx):
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
+        fix_malformed_tars = rctx.attr.fix_malformed_tars,
     )
 
     npm_link_package_bzl = [
@@ -800,6 +806,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "dev": attr.bool(),
+    "fix_malformed_tars": attr.bool(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),

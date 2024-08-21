@@ -148,6 +148,9 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     "verbose": attr.bool(
         doc = """If true, prints out verbose logs to stdout""",
     ),
+    "fix_malformed_tars": attr.bool(
+        doc = """TODO""",
+    ),
 }
 
 def _npm_package_store_impl(ctx):
@@ -229,11 +232,14 @@ def _npm_package_store_impl(ctx):
                 args.add(bsdtar.tarinfo.binary)
                 args.add(src)
                 args.add(package_store_directory.path)  # Need to use `.path` due to: Error in add: Cannot add directories to Args#add since they may expand to multiple values. Either use Args#add_all (if you want expansion) or args.add(directory.path).
+                cmd = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3"
+                if ctx.attr.fix_malformed_tars:
+                    cmd += " && chmod -R a+X $3/*"
                 ctx.actions.run_shell(
                     tools = [bsdtar.tarinfo.binary],
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
-                    command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3 && chmod -R a+X $3/*",
+                    command = cmd,
                     arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),

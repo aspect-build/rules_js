@@ -525,6 +525,8 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         lifecycle_hooks_execution_requirements = %s,""" % _import.lifecycle_hooks_execution_requirements) if _import.lifecycle_hooks else ""
     maybe_lifecycle_hooks_use_default_shell_env = ("""
         lifecycle_hooks_use_default_shell_env = True,""") if _import.lifecycle_hooks_use_default_shell_env else ""
+    maybe_fix_malformed_tars = ("""
+        fix_malformed_tars = True,""") if _import.fix_malformed_tars else ""
     maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
     maybe_generate_bzl_library_targets = ("""
@@ -558,6 +560,7 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         maybe_lifecycle_hooks_env = maybe_lifecycle_hooks_env,
         maybe_lifecycle_hooks_execution_requirements = maybe_lifecycle_hooks_execution_requirements,
         maybe_lifecycle_hooks_use_default_shell_env = maybe_lifecycle_hooks_use_default_shell_env,
+        maybe_fix_malformed_tars = maybe_fix_malformed_tars,
         maybe_npm_auth = maybe_npm_auth,
         maybe_npm_auth_basic = maybe_npm_auth_basic,
         maybe_npm_auth_password = maybe_npm_auth_password,
