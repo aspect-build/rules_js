@@ -223,16 +223,21 @@ def _npm_package_store_impl(ctx):
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
-                args = ctx.actions.args()
-                args.add(bsdtar.tarinfo.binary)
-                args.add(src)
-                args.add(package_store_directory.path)  # Need to use `.path` due to: Error in add: Cannot add directories to Args#add since they may expand to multiple values. Either use Args#add_all (if you want expansion) or args.add(directory.path).
-                ctx.actions.run_shell(
-                    tools = [bsdtar.tarinfo.binary],
+                ctx.actions.run(
+                    executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
-                    command = "$1 --extract --no-same-owner --no-same-permissions --strip-components 1 --file $2 --directory $3",
-                    arguments = [args],
+                    arguments = [
+                        "--extract",
+                        "--no-same-owner",
+                        "--no-same-permissions",
+                        "--strip-components",
+                        "1",
+                        "--file",
+                        src.path,
+                        "--directory",
+                        package_store_directory.path,
+                    ],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                 )
