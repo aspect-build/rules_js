@@ -5,11 +5,17 @@ workspaces:
         label: rules_js
         tasks:
             - test:
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe
     e2e/bzlmod:
         icon: bazel
         tasks:
             - test:
                   queue: aspect-default
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -23,6 +29,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -39,6 +48,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-default
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -80,6 +92,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -93,6 +108,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -106,6 +124,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -201,6 +222,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -214,6 +238,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -227,6 +254,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -240,6 +270,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
@@ -253,6 +286,9 @@ workspaces:
         tasks:
             - test:
                   queue: aspect-medium
+                  bazel:
+                        flags:
+                              - --config=aspect_rbe                  
             - format:
                   without: true
             - buildifier:
