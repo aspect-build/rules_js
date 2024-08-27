@@ -34,21 +34,6 @@ jobs:
                   )
                   printf -v j '{%s},' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
-            - id: config
-              name: Prepare 'config' matrix axis
-              # Only run on main branch (or PR branches that contain 'rbe') to reduce the matrix size for PRs.
-              # Don't run RBE if there is no API key which is the case on forks.
-              run: |
-                  a=( local )
-                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"rbe"* ]]; then
-                    if [[ "${{ env.BUILDBUDDY_API_KEY }}" ]]; then
-                      a+=( rbe )
-                    fi
-                  fi
-                  printf -v j '"%s",' "${a[@]}"
-                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
-              env:
-                  BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
             - id: folder
               name: Prepare 'folder' matrix axis
               run: |
@@ -146,10 +131,6 @@ jobs:
                           major: 6
                     - bzlmod: 1
                       folder: e2e/npm_translate_lock_replace_packages
-                    # Don't run RBE tests with Bazel 6 to reduce the size of the test matrix
-                    - bazel-version:
-                          major: 6
-                      config: rbe
                     # Don't run bzlmod tests with Bazel 6 to reduce the size of the test matrix
                     - bazel-version:
                           major: 6
@@ -247,18 +228,6 @@ jobs:
                   # root .bazelrc brings these in with try-imports. In this CI workflows, we explicitly
                   # bring in the version specific bazelrc file with --bazelrc when we invoke bazel.
                   rm ${GITHUB_WORKSPACE//\\/\/}/.aspect/bazelrc/bazel*.bazelrc
-
-            - name: Write RBE credentials
-              # Writes RBE credential files
-              if: matrix.config == 'rbe'
-              working-directory: ${{ matrix.folder }}
-              shell: bash
-              run: |
-                  touch $HOME/.bazelrc
-                  chmod 0600 $HOME/.bazelrc
-                  echo "build --remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY" > $HOME/.bazelrc
-              env:
-                  BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
 
             # TODO: remove this block once we have Aspect CLI Windows releases
             - name: Don't use Aspect CLI on Windows
