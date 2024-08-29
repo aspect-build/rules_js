@@ -226,6 +226,10 @@ $ bazel query @npm//... --output=location | grep bzl_library
 
 This shows locations on disk where the npm packages can be loaded.
 
+> [!NOTE]
+> These queries only work when `generate_bzl_library_targets = True` is passed to `npm_translate_lock`.
+> If you get no results, check the settings in your `MODULE.bazel` or `WORKSPACE` file and try again.
+
 To see the definition of one of these targets, you can run another `bazel query`:
 
 ```shell
