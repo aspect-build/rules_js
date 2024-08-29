@@ -1,10 +1,10 @@
 {
     "private": true,
     "devDependencies": {
+        "@eslint/js": "9.9.1",
         "@types/node": "16.18.11",
         "chalk": "5.1.1",
         "eslint": "9.9.1",
-        "eslint/js": "9.9.1",
         "prettier": "3.3.3",
         "prettier-plugin-sh": "0.14.0",
         "eslint-plugin-simple-import-sort": "12.1.1",
