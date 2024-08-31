@@ -9,6 +9,7 @@ npm_link_all_packages(name = "node_modules")
 js_library(
     name = "lib_a",
     srcs = [
+        ":index.d.ts",
         ":index.js",
         ":package.json",
     ],
@@ -18,6 +19,12 @@ js_library(
         ":node_modules/chalk",
         "//:node_modules/chalk",
     ],
+)
+
+# Wrap lib_a in another library to test transitive dependencies
+js_library(
+    name = "lib_a_a",
+    deps = [":lib_a"],
 )
 
 npm_package(
@@ -39,6 +46,7 @@ npm_package(
 copy_to_directory(
     name = "expected_pkg",
     srcs = [
+        "index.d.ts",
         "index.js",
         ":package.json",
     ],
@@ -54,6 +62,86 @@ diff_test(
     name = "test_pkg_2",
     file1 = ":pkg_2",
     file2 = ":expected_pkg",
+)
+
+npm_package(
+    name = "pkg_3",
+    srcs = [
+        ":lib_a",
+    ],
+    include_transitive_types = False,
+    include_types = False,
+    visibility = ["//visibility:public"],
+)
+
+npm_package(
+    name = "pkg_4",
+    srcs = [
+        ":lib_a_a",
+    ],
+    include_transitive_types = False,
+    include_types = True,  # should not include transitive
+    visibility = ["//visibility:public"],
+)
+
+copy_to_directory(
+    name = "expected_no-types_pkg",
+    srcs = [
+        "index.js",
+        ":package.json",
+    ],
+)
+
+diff_test(
+    name = "test_pkg_3",
+    file1 = ":pkg_3",
+    file2 = ":expected_no-types_pkg",
+)
+
+diff_test(
+    name = "test_pkg_4",
+    file1 = ":pkg_4",
+    file2 = ":expected_no-types_pkg",
+)
+
+npm_package(
+    name = "pkg_5",
+    srcs = [
+        ":lib_a",
+    ],
+    include_sources = False,
+    include_transitive_sources = False,
+    visibility = ["//visibility:public"],
+)
+
+npm_package(
+    name = "pkg_6",
+    srcs = [
+        ":lib_a_a",
+    ],
+    include_sources = True,  # should not include transitive
+    include_transitive_sources = False,
+    visibility = ["//visibility:public"],
+)
+
+copy_to_directory(
+    name = "expected_no-sources_pkg",
+    srcs = [
+        "index.d.ts",
+        ":package.json",
+    ],
+)
+
+diff_test(
+    name = "test_pkg_5",
+    file1 = ":pkg_5",
+    file2 = ":expected_pkg",  # NOTE: includes everything because .js is in the DefaultInfo
+)
+
+diff_test(
+    name = "test_pkg_6",
+    file1 = ":pkg_6",
+    file2 = ":expected_no-sources_pkg",
 )
 
 npm_package(
