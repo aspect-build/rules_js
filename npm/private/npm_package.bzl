@@ -49,7 +49,7 @@ def _npm_package_files_impl(ctx):
         ctx.attr.srcs,
         include_sources = ctx.attr.include_sources,
         include_types = ctx.attr.include_types,
-        include_transitive_sources = ctx.attr.include_types,
+        include_transitive_sources = ctx.attr.include_transitive_sources,
         include_transitive_types = ctx.attr.include_transitive_types,
         include_npm_sources = ctx.attr.include_npm_sources,
     ))
