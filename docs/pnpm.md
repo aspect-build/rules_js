@@ -194,7 +194,9 @@ git config --global merge.ours.driver true
 
 ### Patching via pnpm.patchedDependencies
 
-Patches included in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies) are automatically applied. These patches must be included in the `data` attribute of `npm_translate_lock`, for example:
+Patches included in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies) are automatically applied by rules_js.
+
+These patches must be included in the `data` attribute of `npm_translate_lock`, for example:
 
 ```json
 {
@@ -215,6 +217,12 @@ npm_translate_lock(
     ],
 )
 ```
+
+Patching applied by rules_js may slightly deviate from standard pnpm patching behavior.
+The [bazel-lib patch util](https://docs.aspect.build/rulesets/aspect_bazel_lib/docs/repo_utils/#patch)
+is used for patching within rules_js instead of the internal pnpm patching mechanism.
+For example a bad patch file may be partially applied when using pnpm outside of bazel but fail
+when applied by rules_js, see [rules_js #1915](https://github.com/aspect-build/rules_js/issues/1915).
 
 ### Patching via `patches` attribute
 
