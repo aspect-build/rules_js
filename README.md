@@ -1,4 +1,4 @@
-# Bazel rules for JavaScript
+# Bazel rules for JavaScript!
 
 This ruleset is a high-performance Bazel integration for JavaScript, based on the [pnpm package manager](https://pnpm.io).
 
