@@ -4,3 +4,6 @@ configure:
         go: false
         kotlin: false
         protobuf: true
+lint:
+  aspects:
+    - //tools/lint:linters.bzl%eslint

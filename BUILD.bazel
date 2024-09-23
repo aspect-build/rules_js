@@ -121,3 +121,21 @@ alias(
     name = "format",
     actual = "//tools:format",
 )
+
+js_library(
+    name = "eslintrc",
+    srcs = ["eslint.config.mjs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:node_modules/@eslint/js",
+        "//:node_modules/eslint-plugin-simple-import-sort",
+        "//:node_modules/eslint-plugin-unused-imports",
+        "//:node_modules/globals",
+    ],
+)
+
+js_library(
+    name = "prettierrc",
+    srcs = [".prettierrc.cjs"],
+    visibility = ["//visibility:public"],
+)

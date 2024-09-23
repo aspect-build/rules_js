@@ -1,25 +1,23 @@
-"""BUILD definition for the formatter binary
-This is in its own package because it has so many loading-time symbols,
-we don't want to trigger eager fetches of these for builds that don't want to run format.
-"""
+load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@npm//:prettier/package_json.bzl", prettier = "bin")
 
-load("@aspect_rules_lint//format:defs.bzl", "multi_formatter_binary")
+package(default_visibility = ["//visibility:public"])
 
-package(default_visibility = ["//:__subpackages__"])
-
-alias(
-    name = "shfmt",
-    actual = select({
-        "@bazel_tools//src/conditions:darwin_arm64": "@shfmt_darwin_aarch64//file:shfmt",
-        "@bazel_tools//src/conditions:darwin_x86_64": "@shfmt_darwin_x86_64//file:shfmt",
-        "@bazel_tools//src/conditions:linux_aarch64": "@shfmt_linux_aarch64//file:shfmt",
-        "@bazel_tools//src/conditions:linux_x86_64": "@shfmt_linux_x86_64//file:shfmt",
-        "//conditions:default": ":noop",
-    }),
+prettier.prettier_binary(
+    name = "prettier",
+    data = [
+        "//:prettierrc",
+    ],
+    # Allow the binary to be run outside bazel
+    env = {"BAZEL_BINDIR": "."},
 )
 
-multi_formatter_binary(
+format_multirun(
     name = "format",
-    sh = ":shfmt",
+    css = ":prettier",
+    go = "@go_sdk//:bin/gofmt",
+    html = ":prettier",
+    javascript = ":prettier",
+    shell = "@aspect_rules_lint//format:shfmt",
     starlark = "@buildifier_prebuilt//:buildifier",
 )

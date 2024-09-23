@@ -213,12 +213,12 @@ load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains
 buildifier_prebuilt_register_toolchains()
 
 # rules_lint
-load(
-    "@aspect_rules_lint//format:repositories.bzl",
-    "fetch_shfmt",
-)
+# load(
+#     "@aspect_rules_lint//format:repositories.bzl",
+#     "fetch_shfmt",
+# )
 
-fetch_shfmt()
+# fetch_shfmt()
 
 load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
 
