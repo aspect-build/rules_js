@@ -487,6 +487,7 @@ TESTS = [
     j_test,
 ]
 
+# buildifier: disable=function-docstring
 def parse_pnpm_lock_tests(name):
     tests = []
     for index, test_rule in enumerate(TESTS):
