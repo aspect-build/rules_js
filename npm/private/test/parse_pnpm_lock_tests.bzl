@@ -154,7 +154,7 @@ def _parse_lockfile_v6_test_impl(ctx):
             "@aspect-test/a": {
                 "specifier": "5.0.0",
                 "version": "5.0.0",
-            }
+            },
         },
         "packages": {
             "/@aspect-test/a@5.0.0": {
@@ -170,7 +170,7 @@ def _parse_lockfile_v6_test_impl(ctx):
                     # `npm_translate_lock` will likewise replace the peer dependency component with a hash if too long.
                     "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)",
                 },
-                "dev": False
+                "dev": False,
             },
         },
     }))
@@ -194,7 +194,7 @@ def _parse_lockfile_v6_local_injected_test_impl(ctx):
         "lockfileVersion": "6.0",
         "settings": {
             "autoInstallPeers": True,
-            "excludeLinksFromLockfile": False
+            "excludeLinksFromLockfile": False,
         },
         "importers": {
             ".": {},
@@ -202,51 +202,51 @@ def _parse_lockfile_v6_local_injected_test_impl(ctx):
                 "dependencies": {
                     "b": {
                         "specifier": "workspace:*",
-                        "version": "file:packages/b(typescript@5.6.2)"
-                    }
+                        "version": "file:packages/b(typescript@5.6.2)",
+                    },
                 },
                 "dependenciesMeta": {
                     "b": {
-                        "injected": True
-                    }
-                }
+                        "injected": True,
+                    },
+                },
             },
             "packages/b": {
                 "dependencies": {
                     "typescript": {
                         "specifier": "^5.6.2",
-                        "version": "5.6.2"
-                    }
-                }
-            }
+                        "version": "5.6.2",
+                    },
+                },
+            },
         },
         "packages": {
             "/typescript@5.6.2": {
                 "resolution": {
-                    "integrity": "sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw=="
+                    "integrity": "sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==",
                 },
                 "engines": {
-                    "node": ">=14.17"
+                    "node": ">=14.17",
                 },
                 "hasBin": True,
-                "dev": False
+                "dev": False,
             },
             "file:packages/b(typescript@5.6.2)": {
                 "resolution": {
                     "directory": "packages/b",
-                    "type": "directory"
+                    "type": "directory",
                 },
                 "id": "file:packages/b",
                 "name": "b",
                 "peerDependencies": {
-                    "typescript": "^5.6.2"
+                    "typescript": "^5.6.2",
                 },
                 "dependencies": {
-                    "typescript": "5.6.2"
+                    "typescript": "5.6.2",
                 },
-                "dev": False
-            }
-        }
+                "dev": False,
+            },
+        },
     }))
 
     expected = (
@@ -254,7 +254,7 @@ def _parse_lockfile_v6_local_injected_test_impl(ctx):
         expected_packages_injected,
         {},
         6.0,
-        None
+        None,
     )
 
     asserts.equals(env, expected, parsed_json)
@@ -380,7 +380,7 @@ def _parse_lockfile_v9_injected_local_test_impl(ctx):
                 "id": "b@file:packages/b",
                 "dependencies": {
                     "typescript": "5.6.2",
-                }
+                },
             },
             "typescript@5.6.2": {},
         },
@@ -402,7 +402,7 @@ def _parse_lockfile_v9_injected_local_test_impl(ctx):
         v9_expected_packages,
         {},
         9.0,
-        None
+        None,
     )
 
     asserts.equals(env, expected, parsed_json)

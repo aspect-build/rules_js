@@ -509,10 +509,12 @@ def _convert_v9_packages(packages, snapshots):
         friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
         package_id = package_snapshot.get("id", None)
+
         # match v6 lockfile behaviour with id
         if package_id != None and "file:" in package_id:
             # Remove package name from id
             package_id = package_id[len(name) + 1:]
+
         # ensure local packages always have an id, so that peer dependencies don't cause issues
         if package_id == None and "file:" in package_key:
             resolution = package_data.get("resolution")
