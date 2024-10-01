@@ -11,6 +11,7 @@ js_test(
         ":node_modules/@bazel/runfiles",
     ],
     entry_point = "test.js",
+    tags = ["skip-on-bazel8"],
     # @bazel/runfiles seems broken with non-bzlmod + bazel7
     # https://github.com/bazel-contrib/rules_nodejs/issues/3797
     target_compatible_with = select({

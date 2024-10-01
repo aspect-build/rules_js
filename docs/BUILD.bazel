@@ -5,6 +5,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//js/private:js_binary",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -14,6 +15,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//js/private:js_library",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -23,6 +25,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//js/private:js_run_binary",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -33,6 +36,7 @@ stardoc_with_diff_test(
     symbol_names = ["js_run_devserver"],
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -42,6 +46,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//js/private:js_info_files",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -51,6 +56,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//js/private:js_image_layer",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -60,6 +66,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//npm/private:npm_package",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -69,6 +76,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//npm/private:npm_link_package",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -78,6 +86,7 @@ stardoc_with_diff_test(
     bzl_library_target = "//npm/private:npm_translate_lock_generate.docs",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -90,6 +99,7 @@ stardoc_with_diff_test(
     ],
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -103,6 +113,7 @@ stardoc_with_diff_test(
     ],
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )
@@ -111,6 +122,7 @@ update_docs(
     name = "update",
     tags = [
         "skip-on-bazel6",
+        "skip-on-bazel8",
         "skip-on-rbe",
     ],
 )

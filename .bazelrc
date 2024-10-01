@@ -11,8 +11,7 @@ import %workspace%/.aspect/bazelrc/performance.bazelrc
 # We have some empty globs in rules_js
 common --noincompatible_disallow_empty_glob
 
-# Don't try and auto detect the cc toolchain, as we use our llvm.
-build --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+# Enable cc toolchain resolution to be on par with bazel8 which enables it by default
 build --incompatible_enable_cc_toolchain_resolution
 
 # Mock versioning command to test the --stamp behavior
