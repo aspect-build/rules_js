@@ -516,7 +516,8 @@ def _is_url(url):
 
 ################################################################################
 def _to_apparent_repo_name(canonical_name):
-    return canonical_name[canonical_name.rfind("~") + 1:]
+    # Bazel 7 uses `~` as the canonical name separator by default, Bazel 8 always uses `+`.
+    return canonical_name[max(canonical_name.rfind("~"), canonical_name.rfind("+")) + 1:]
 
 ################################################################################
 def _verify_node_modules_ignored(rctx, importers, root_package):
