@@ -100,7 +100,7 @@ rules_js replaces some parts of [bazelbuild/rules_nodejs](http://github.com/baze
 | Toolchain and core providers    | `rules_nodejs`                | `rules_nodejs`          |
 
 The common layer here is the `rules_nodejs` Bazel module, documented as the "core" in
-https://bazelbuild.github.io/rules_nodejs/:
+https://bazel-contrib.github.io/rules_nodejs/:
 
 > It is currently useful for Bazel Rules developers who want to make their own JavaScript support.
 

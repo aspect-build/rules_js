@@ -44,9 +44,9 @@ Installation is included in the `WORKSPACE` snippet you pasted from the Installa
 **API docs:**
 
 -   Choosing the version of Node.js:
-    <https://bazelbuild.github.io/rules_nodejs/install.html>
--   Rules API: <https://bazelbuild.github.io/rules_nodejs/Core.html>
--   The Node.js toolchain: <https://bazelbuild.github.io/rules_nodejs/Toolchains.html>
+    <https://bazel-contrib.github.io/rules_nodejs/install.html>
+-   Rules API: <https://bazel-contrib.github.io/rules_nodejs/Core.html>
+-   The Node.js toolchain: <https://bazel-contrib.github.io/rules_nodejs/Toolchains.html>
 
 ### Fetch third-party packages from npm
 
