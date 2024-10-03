@@ -313,3 +313,24 @@ jobs:
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
                   XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
+
+    # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
+    # on "all matrix jobs were successful".
+    conclusion:
+        needs: test
+        runs-on: ubuntu-latest
+        if: always()
+        steps:
+            - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3.0.3
+
+            # Note: possible conclusion values:
+            # https://github.com/technote-space/workflow-conclusion-action/blob/main/src/constant.ts
+            - name: report success
+              if: ${{ env.WORKFLOW_CONCLUSION == 'success' }}
+              working-directory: /tmp
+              run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 0
+
+            - name: report failure
+              if: ${{ env.WORKFLOW_CONCLUSION == 'failure' }}
+              working-directory: /tmp
+              run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 1
