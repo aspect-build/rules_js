@@ -1,0 +1,23 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+
+js_test(
+    name = "runfiles",
+    data = [
+        "test_fixture.md",
+        "test_fixture.md.generated_file_suffix",
+        ":node_modules/@bazel/runfiles",
+    ],
+    entry_point = "test.js",
+)
+
+# Path of file must start similar to `test_fixture.md` in order to regression-test a
+# scenario where the runfile resolution would accidentally resolve the path to
+# `test_fixture.md` through a runfile manifest entry that starts similarly.
+genrule(
+    name = "gen-data",
+    outs = ["test_fixture.md.generated_file_suffix"],
+    cmd = """echo "Generated" > $@""",
+)

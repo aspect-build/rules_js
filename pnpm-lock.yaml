@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
+packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -183,6 +183,12 @@ importers:
       '@mycorp/pkg-d':
         specifier: workspace:*
         version: link:../pkg_d
+
+  examples/runfiles:
+    dependencies:
+      '@bazel/runfiles':
+        specifier: ^6.3.0
+        version: 6.3.0
 
   examples/webpack_cli:
     dependencies:
@@ -680,6 +686,10 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
     dev: true
+
+  /@bazel/runfiles@6.3.0:
+    resolution: {integrity: sha512-2Q+KC0ys+BLIBp6zsI8E6htEw1/R1cjA1Yt+3JiqdEB597aGpZKiJJP6FeJSA4LIAWlH/FDVDtgvJ77eeLNyiA==}
+    dev: false
 
   /@bcoe/v8-coverage@0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
