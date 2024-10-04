@@ -262,7 +262,10 @@ pnpm = module_extension(
                         Overriding the default is only permitted in the root module.""",
                     default = DEFAULT_PNPM_REPO_NAME,
                 ),
-                "pnpm_version": attr.string(default = DEFAULT_PNPM_VERSION),
+                "pnpm_version": attr.string(
+                    doc = "pnpm version to use. The string `latest` will be resolved to LATEST_PNPM_VERSION.",
+                    default = DEFAULT_PNPM_VERSION,
+                ),
                 "pnpm_version_integrity": attr.string(),
             },
         ),

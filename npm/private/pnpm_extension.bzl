@@ -1,5 +1,7 @@
 """pnpm extension logic (the extension itself is in npm/extensions.bzl)."""
 
+load(":pnpm_repository.bzl", "LATEST_PNPM_VERSION")
+
 DEFAULT_PNPM_REPO_NAME = "pnpm"
 
 # copied from https://github.com/bazelbuild/bazel-skylib/blob/b459822483e05da514b539578f81eeb8a705d600/lib/versions.bzl#L60
@@ -36,7 +38,12 @@ def resolve_pnpm_repositories(modules):
                 """)
             if attr.name not in registrations.keys():
                 registrations[attr.name] = []
-            registrations[attr.name].append(attr.pnpm_version)
+
+            v = attr.pnpm_version
+            if v == "latest":
+                v = LATEST_PNPM_VERSION
+
+            registrations[attr.name].append(v)
             if attr.pnpm_version_integrity:
                 integrity[attr.pnpm_version] = attr.pnpm_version_integrity
     for name, versions in registrations.items():

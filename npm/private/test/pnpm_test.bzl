@@ -2,6 +2,7 @@
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
+load("//npm/private:pnpm_repository.bzl", "LATEST_PNPM_VERSION")
 
 def _fake_pnpm_tag(version, name = DEFAULT_PNPM_REPO_NAME, integrity = None):
     return struct(
@@ -65,6 +66,25 @@ def _override(ctx):
         ],
     )
 
+def _latest(ctx):
+    # Test the "latest" magic version,
+    #
+    # The test case is not entirely realistic: In reality, we'd have at least two tags:
+    # - The one of the root module (present in the test)
+    # - The one from rules_js (omitted in the test).
+    #
+    # We do this, to avoid `notes` that are dependent on `LATEST_PNPM_VERSION`.
+    # Otherwise we'd have to either:
+    # - Use regexes to check notes.
+    # - Accept a brittle test.
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": LATEST_PNPM_VERSION},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(version = "latest")),
+        ],
+    )
+
 def _custom_name(ctx):
     return _resolve_test(
         ctx,
@@ -113,6 +133,7 @@ def _integrity_conflict(ctx):
 
 basic_test = unittest.make(_basic)
 override_test = unittest.make(_override)
+latest_test = unittest.make(_latest)
 custom_name_test = unittest.make(_custom_name)
 integrity_conflict_test = unittest.make(_integrity_conflict)
 
@@ -121,6 +142,7 @@ def pnpm_tests(name):
         name,
         basic_test,
         override_test,
+        latest_test,
         custom_name_test,
         integrity_conflict_test,
     )
