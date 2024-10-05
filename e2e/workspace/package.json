@@ -1,6 +1,6 @@
 {
     "private": true,
     "dependencies": {
-        "color": "*"
+        "color": "^4.2.3"
     }
 }
