@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "dependencies": {
-        "@types/node": "16.18.11",
+        "@types/node": "16.18.112",
         "jasmine": "5.1.0"
     }
 }
