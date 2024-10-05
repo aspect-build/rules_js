@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
+packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -242,13 +242,13 @@ importers:
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: 23.0.7
-        version: 23.0.7(rollup@3.29.5)
+        version: 23.0.7(rollup@2.79.2)
       '@rollup/plugin-node-resolve':
         specifier: 15.3.0
-        version: 15.3.0(rollup@3.29.5)
+        version: 15.3.0(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@3.29.5)(tslib@2.6.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.2)(tslib@2.6.0)(typescript@4.9.5)
       '@types/archiver':
         specifier: 5.3.4
         version: 5.3.4
@@ -259,8 +259,8 @@ importers:
         specifier: 2.2.3
         version: 2.2.3
       rollup:
-        specifier: 3.29.5
-        version: 3.29.5
+        specifier: 2.79.2
+        version: 2.79.2
       tslib:
         specifier: 2.6.0
         version: 2.6.0
@@ -297,19 +297,19 @@ importers:
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: 23.0.7
-        version: 23.0.7(rollup@3.29.5)
+        version: 23.0.7(rollup@2.79.2)
       '@rollup/plugin-json':
         specifier: 5.0.2
-        version: 5.0.2(rollup@3.29.5)
+        version: 5.0.2(rollup@2.79.2)
       '@rollup/plugin-node-resolve':
         specifier: 15.3.0
-        version: 15.3.0(rollup@3.29.5)
+        version: 15.3.0(rollup@2.79.2)
       '@rollup/plugin-terser':
         specifier: 0.4.4
-        version: 0.4.4(rollup@3.29.5)
+        version: 0.4.4(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@3.29.5)(tslib@2.6.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.2)(tslib@2.6.0)(typescript@4.9.5)
       '@types/google-protobuf':
         specifier: 3.15.12
         version: 3.15.12
@@ -320,8 +320,8 @@ importers:
         specifier: 1.7.5
         version: 1.7.5
       rollup:
-        specifier: 3.29.5
-        version: 3.29.5
+        specifier: 2.79.2
+        version: 2.79.2
       tslib:
         specifier: 2.6.0
         version: 2.6.0
@@ -1219,6 +1219,24 @@ packages:
       rollup: 2.70.2
     dev: true
 
+  /@rollup/plugin-commonjs@23.0.7(rollup@2.79.2):
+    resolution: {integrity: sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^2.68.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.2(rollup@2.79.2)
+      commondir: 1.0.1
+      estree-walker: 2.0.2
+      glob: 8.1.0
+      is-reference: 1.2.1
+      magic-string: 0.27.0
+      rollup: 2.79.2
+    dev: true
+
   /@rollup/plugin-commonjs@23.0.7(rollup@3.29.5):
     resolution: {integrity: sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==}
     engines: {node: '>=14.0.0'}
@@ -1237,6 +1255,19 @@ packages:
       rollup: 3.29.5
     dev: true
 
+  /@rollup/plugin-json@5.0.2(rollup@2.79.2):
+    resolution: {integrity: sha512-D1CoOT2wPvadWLhVcmpkDnesTzjhNIQRWLsc3fA49IFOP2Y84cFOOJ+nKGYedvXHKUsPeq07HR4hXpBBr+CHlA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.2(rollup@2.79.2)
+      rollup: 2.79.2
+    dev: true
+
   /@rollup/plugin-json@5.0.2(rollup@3.29.5):
     resolution: {integrity: sha512-D1CoOT2wPvadWLhVcmpkDnesTzjhNIQRWLsc3fA49IFOP2Y84cFOOJ+nKGYedvXHKUsPeq07HR4hXpBBr+CHlA==}
     engines: {node: '>=14.0.0'}
@@ -1248,6 +1279,23 @@ packages:
     dependencies:
       '@rollup/pluginutils': 5.0.2(rollup@3.29.5)
       rollup: 3.29.5
+    dev: true
+
+  /@rollup/plugin-node-resolve@15.3.0(rollup@2.79.2):
+    resolution: {integrity: sha512-9eO5McEICxMzJpDW9OnMYSv4Sta3hmt7VtBFz5zR9273suNOydOyq/FrGeGy+KsTRFm8w0SLVhzig2ILFT63Ag==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^2.78.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.2(rollup@2.79.2)
+      '@types/resolve': 1.20.2
+      deepmerge: 4.3.0
+      is-module: 1.0.0
+      resolve: 1.22.1
+      rollup: 2.79.2
     dev: true
 
   /@rollup/plugin-node-resolve@15.3.0(rollup@3.29.5):
@@ -1267,7 +1315,7 @@ packages:
       rollup: 3.29.5
     dev: true
 
-  /@rollup/plugin-terser@0.4.4(rollup@3.29.5):
+  /@rollup/plugin-terser@0.4.4(rollup@2.79.2):
     resolution: {integrity: sha512-XHeJC5Bgvs8LfukDwWZp7yeqin6ns8RTl2B9avbejt6tZqsqvVoWI7ZTQrcNsfKEDWBTnTxM8nMDkO2IFFbd0A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1276,13 +1324,13 @@ packages:
       rollup:
         optional: true
     dependencies:
-      rollup: 3.29.5
+      rollup: 2.79.2
       serialize-javascript: 6.0.1
       smob: 1.5.0
       terser: 5.34.1
     dev: true
 
-  /@rollup/plugin-typescript@10.0.1(rollup@3.29.5)(tslib@2.6.0)(typescript@4.9.5):
+  /@rollup/plugin-typescript@10.0.1(rollup@2.79.2)(tslib@2.6.0)(typescript@4.9.5):
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1295,9 +1343,9 @@ packages:
       tslib:
         optional: true
     dependencies:
-      '@rollup/pluginutils': 5.0.2(rollup@3.29.5)
+      '@rollup/pluginutils': 5.0.2(rollup@2.79.2)
       resolve: 1.22.1
-      rollup: 3.29.5
+      rollup: 2.79.2
       tslib: 2.6.0
       typescript: 4.9.5
     dev: true
@@ -1312,6 +1360,21 @@ packages:
       estree-walker: 1.0.1
       picomatch: 2.3.1
       rollup: 2.70.2
+    dev: true
+
+  /@rollup/pluginutils@5.0.2(rollup@2.79.2):
+    resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.0
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+      rollup: 2.79.2
     dev: true
 
   /@rollup/pluginutils@5.0.2(rollup@3.29.5):
@@ -1417,14 +1480,6 @@ packages:
     dependencies:
       '@types/node': 18.19.54
     dev: true
-
-  /@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
-    requiresBuild: true
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
-    dev: true
-    optional: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -3222,7 +3277,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': 2.10.0
+      '@types/yauzl': registry.npmjs.org/@types/yauzl@2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5988,6 +6043,14 @@ packages:
       fsevents: 2.3.2
     dev: true
 
+  /rollup@2.79.2:
+    resolution: {integrity: sha512-fS6iqSPZDs3dr/y7Od6y5nha8dW1YnbgtsyotCVvoFGKbERG++CVRFv1meyGDE1SNItQA8BrnCw7ScdAhRJ3XQ==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
   /rollup@3.29.5:
     resolution: {integrity: sha512-GVsDdsbJzzy4S/v3dqWPJ7EfvZJfCHiDqe80IyrF59LYuP+e6U1LJoUqeuqRbwAWoMNoXivMNeNAOf5E22VA1w==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
@@ -7242,6 +7305,9 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       google-protobuf: 3.21.2
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
     dev: true
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
@@ -7424,3 +7490,13 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
+
+  registry.npmjs.org/@types/yauzl@2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
+    name: '@types/yauzl'
+    version: 2.10.0
+    requiresBuild: true
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
+    dev: true
+    optional: true
