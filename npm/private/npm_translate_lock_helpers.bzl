@@ -236,7 +236,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
+def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -363,11 +363,11 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
         # gather replace packages
-        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
-        if len(replace_packages) > 1:
+        replace_package, _ = _gather_values_from_matching_names(True, replace_packages, name, friendly_name, unfriendly_name)
+        if len(replace_package) > 1:
             msg = "Multiple package replacements found for package {}".format(name)
             fail(msg)
-        replace_package = replace_packages[0] if replace_packages else None
+        replace_package = replace_package[0] if replace_package else None
 
         # gather custom postinstalls
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
