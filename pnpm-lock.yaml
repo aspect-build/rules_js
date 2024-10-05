@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
+packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -1371,7 +1371,7 @@ packages:
       rollup:
         optional: true
     dependencies:
-      '@types/estree': registry.npmjs.org/@types/estree@1.0.0
+      '@types/estree': 1.0.0
       estree-walker: 2.0.2
       picomatch: 2.3.1
       rollup: 2.79.1
@@ -1480,14 +1480,6 @@ packages:
     dependencies:
       '@types/node': 18.19.54
     dev: true
-
-  /@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
-    requiresBuild: true
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
-    dev: true
-    optional: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -3285,7 +3277,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': 2.10.0
+      '@types/yauzl': registry.npmjs.org/@types/yauzl@2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -7313,6 +7305,9 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       google-protobuf: 3.21.2
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
     dev: true
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
@@ -7495,3 +7490,13 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
+
+  registry.npmjs.org/@types/yauzl@2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
+    name: '@types/yauzl'
+    version: 2.10.0
+    requiresBuild: true
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
+    dev: true
+    optional: true
