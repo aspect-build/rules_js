@@ -4169,7 +4169,7 @@ let CoverageSummary$3 = class CoverageSummary {
     constructor(obj) {
         if (!obj) {
             this.data = blankSummary();
-        } else if (obj instanceof CoverageSummary$3) {
+        } else if (obj instanceof CoverageSummary) {
             this.data = obj.data;
         } else {
             this.data = obj;
@@ -4339,7 +4339,7 @@ let FileCoverage$2 = class FileCoverage {
         }
         if (typeof pathOrObj === 'string') {
             this.data = emptyCoverage(pathOrObj, reportLogic);
-        } else if (pathOrObj instanceof FileCoverage$2) {
+        } else if (pathOrObj instanceof FileCoverage) {
             this.data = pathOrObj.data;
         } else if (typeof pathOrObj === 'object') {
             this.data = pathOrObj;
@@ -4611,7 +4611,7 @@ let CoverageMap$1 = class CoverageMap {
      * map's contents. This can be the raw global coverage object.
      */
     constructor(obj) {
-        if (obj instanceof CoverageMap$1) {
+        if (obj instanceof CoverageMap) {
             this.data = obj.data;
         } else {
             this.data = loadMap(obj);
@@ -4625,7 +4625,7 @@ let CoverageMap$1 = class CoverageMap {
      *  as needed.
      */
     merge(obj) {
-        const other = maybeConstruct(obj, CoverageMap$1);
+        const other = maybeConstruct(obj, CoverageMap);
         Object.values(other.data).forEach(fc => {
             this.addFileCoverage(fc);
         });
@@ -6824,7 +6824,7 @@ let FileWriter$1 = class FileWriter {
                 `Cannot create subdir writer for absolute path: ${subdir}`
             );
         }
-        return new FileWriter$1(`${this.baseDir}/${subdir}`);
+        return new FileWriter(`${this.baseDir}/${subdir}`);
     }
 
     /**
@@ -7189,7 +7189,7 @@ let Path$1 = class Path {
         }
         const p = this.v.slice();
         p.pop();
-        return new Path$1(p);
+        return new Path(p);
     }
 
     elements() {
@@ -7233,7 +7233,7 @@ let Path$1 = class Path {
                 break;
             }
         }
-        return new Path$1(ret);
+        return new Path(ret);
     }
 
     static compare(a, b) {
@@ -10715,21 +10715,21 @@ function nextChild(openRange, parentToNested) {
 
 var lib = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	emitForest: emitForest,
-	emitForestLines: emitForestLines,
-	parseFunctionRanges: parseFunctionRanges,
-	parseOffsets: parseOffsets,
+	RangeTree: RangeTree,
 	cloneFunctionCov: cloneFunctionCov,
 	cloneProcessCov: cloneProcessCov,
-	cloneScriptCov: cloneScriptCov,
 	cloneRangeCov: cloneRangeCov,
-	compareScriptCovs: compareScriptCovs,
+	cloneScriptCov: cloneScriptCov,
 	compareFunctionCovs: compareFunctionCovs,
 	compareRangeCovs: compareRangeCovs,
+	compareScriptCovs: compareScriptCovs,
+	emitForest: emitForest,
+	emitForestLines: emitForestLines,
 	mergeFunctionCovs: mergeFunctionCovs,
 	mergeProcessCovs: mergeProcessCovs,
 	mergeScriptCovs: mergeScriptCovs,
-	RangeTree: RangeTree
+	parseFunctionRanges: parseFunctionRanges,
+	parseOffsets: parseOffsets
 });
 
 var require$$11 = /*@__PURE__*/getAugmentedNamespace(lib);
