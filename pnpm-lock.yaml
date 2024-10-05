@@ -277,8 +277,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../examples/npm_package/packages/pkg_d
       acorn:
-        specifier: 8.8.2
-        version: 8.8.2
+        specifier: 8.12.1
+        version: 8.12.1
 
   js/private/test/js_run_devserver:
     dependencies:
@@ -1698,6 +1698,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
+
+  /acorn@8.12.1:
+    resolution: {integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
 
   /acorn@8.7.1:
     resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
@@ -4786,7 +4791,7 @@ packages:
   /mlly@1.1.1:
     resolution: {integrity: sha512-Jnlh4W/aI4GySPo6+DyTN17Q75KKbLTyFK8BrGhjNP4rxuUjbRWhE6gHg3bs33URWAF44FRm7gdQA348i3XxRw==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.12.1
       pathe: 1.1.0
       pkg-types: 1.0.2
       ufo: 1.1.0
@@ -6553,7 +6558,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.2
+      acorn: 8.12.1
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -6891,7 +6896,7 @@ packages:
     engines: {node: '>= 10.13.0'}
     hasBin: true
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.12.1
       acorn-walk: 8.2.0
       chalk: 4.1.2
       commander: 7.2.0
