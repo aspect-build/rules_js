@@ -55,9 +55,9 @@ def rules_js_dev_dependencies():
 
     http_archive(
         name = "com_grail_bazel_toolchain",
-        sha256 = "a9fc7cf01d0ea0a935bd9e3674dd3103766db77dfc6aafcb447a7ddd6ca24a78",
-        strip_prefix = "toolchains_llvm-c65ef7a45907016a754e5bf5bfabac76eb702fd3",
-        urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/c65ef7a45907016a754e5bf5bfabac76eb702fd3.tar.gz"],
+        sha256 = "7cc8dc4959c241aa3962df949581854fc3b37189d4bbe013a317f5408e156c42",
+        strip_prefix = "toolchains_llvm-6edc43be7e52d9f44bc842a9956bd40213b972b1",
+        urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/6edc43be7e52d9f44bc842a9956bd40213b972b1.tar.gz"],
     )
 
     http_archive(
