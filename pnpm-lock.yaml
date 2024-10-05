@@ -21,8 +21,8 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: 16.18.112
+        version: 16.18.112
       chalk:
         specifier: 5.1.1
         version: 5.1.1
@@ -250,14 +250,14 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5)
       '@types/archiver':
-        specifier: 5.3.1
-        version: registry.npmjs.org/@types/archiver@5.3.1
+        specifier: 5.3.4
+        version: 5.3.4
       '@types/node':
-        specifier: 18.11.11
-        version: registry.npmjs.org/@types/node@18.11.11
+        specifier: 18.19.54
+        version: 18.19.54
       '@types/tar-stream':
-        specifier: 2.2.2
-        version: registry.npmjs.org/@types/tar-stream@2.2.2
+        specifier: 2.2.3
+        version: 2.2.3
       rollup:
         specifier: 2.79.1
         version: 2.79.1
@@ -277,14 +277,14 @@ importers:
         specifier: workspace:*
         version: link:../../../../examples/npm_package/packages/pkg_d
       acorn:
-        specifier: 8.8.2
-        version: 8.8.2
+        specifier: 8.12.1
+        version: 8.12.1
 
   js/private/test/js_run_devserver:
     dependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: 16.18.112
+        version: 16.18.112
       jasmine:
         specifier: 5.1.0
         version: 5.1.0
@@ -311,11 +311,11 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(rollup@2.79.1)(tslib@2.6.0)(typescript@4.9.5)
       '@types/google-protobuf':
-        specifier: 3.15.6
-        version: registry.npmjs.org/@types/google-protobuf@3.15.6
+        specifier: 3.15.12
+        version: 3.15.12
       '@types/node':
-        specifier: 18.11.18
-        version: registry.npmjs.org/@types/node@18.11.18
+        specifier: 18.19.54
+        version: 18.19.54
       abortcontroller-polyfill:
         specifier: 1.7.5
         version: 1.7.5
@@ -1422,8 +1422,39 @@ packages:
       '@turf/helpers': 6.5.0
     dev: true
 
+  /@types/archiver@5.3.4:
+    resolution: {integrity: sha512-Lj7fLBIMwYFgViVVZHEdExZC3lVYsl+QL0VmdNdIzGZH544jHveYWij6qdnBgJQDnR7pMKliN9z2cPZFEbhyPw==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.4.tgz}
+    dependencies:
+      '@types/readdir-glob': 1.1.5
+    dev: true
+
+  /@types/google-protobuf@3.15.12:
+    resolution: {integrity: sha512-40um9QqwHjRS92qnOaDpL7RmDK15NuZYo9HihiJRbYkMQZlWnuH8AdvbMy8/o6lgLmKbDUKa+OALCltHdbOTpQ==, tarball: https://registry.npmjs.org/@types/google-protobuf/-/google-protobuf-3.15.12.tgz}
+    dev: true
+
+  /@types/node@16.18.112:
+    resolution: {integrity: sha512-EKrbKUGJROm17+dY/gMi31aJlGLJ75e1IkTojt9n6u+hnaTBDs+M1bIdOawpk2m6YUAXq/R2W0SxCng1tndHCg==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.112.tgz}
+
   /@types/node@18.13.0:
     resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==, tarball: https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz}
+    dev: true
+
+  /@types/node@18.19.54:
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
+    dependencies:
+      undici-types: 5.26.5
+
+  /@types/readdir-glob@1.1.5:
+    resolution: {integrity: sha512-raiuEPUYqXu+nvtY2Pe8s8FEmZ3x5yAH4VkLdihcPdalvsHltomrRC9BzuStrJ9yk06470hS0Crw0f1pXqD+Hg==, tarball: https://registry.npmjs.org/@types/readdir-glob/-/readdir-glob-1.1.5.tgz}
+    dependencies:
+      '@types/node': 18.19.54
+    dev: true
+
+  /@types/tar-stream@2.2.3:
+    resolution: {integrity: sha512-if3mugZfjVkXOMZdFjIHySxY13r6GXPpyOlsDmLffvyI7tLz9wXE8BFjNivXsvUeyJ1KNlOpfLnag+ISmxgxPw==, tarball: https://registry.npmjs.org/@types/tar-stream/-/tar-stream-2.2.3.tgz}
+    dependencies:
+      '@types/node': 18.19.54
+    dev: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -1667,6 +1698,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
+
+  /acorn@8.12.1:
+    resolution: {integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
 
   /acorn@8.7.1:
     resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
@@ -4198,7 +4234,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 18.13.0
+      '@types/node': 18.19.54
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -4755,7 +4791,7 @@ packages:
   /mlly@1.1.1:
     resolution: {integrity: sha512-Jnlh4W/aI4GySPo6+DyTN17Q75KKbLTyFK8BrGhjNP4rxuUjbRWhE6gHg3bs33URWAF44FRm7gdQA348i3XxRw==}
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.12.1
       pathe: 1.1.0
       pkg-types: 1.0.2
       ufo: 1.1.0
@@ -6522,7 +6558,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.2
+      acorn: 8.12.1
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -6706,6 +6742,9 @@ packages:
       through: 2.3.8
     dev: true
 
+  /undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   /undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
     dev: true
@@ -6857,7 +6896,7 @@ packages:
     engines: {node: '>= 10.13.0'}
     hasBin: true
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.12.1
       acorn-walk: 8.2.0
       chalk: 4.1.2
       commander: 7.2.0
@@ -7253,7 +7292,6 @@ packages:
     id: github.com/kubernetes-client/javascript/bd6ab5810d013103d244ddaebe0304649c012b38
     name: '@kubernetes/client-node'
     version: 0.22.0
-    prepare: true
     requiresBuild: true
     dependencies:
       '@types/js-yaml': registry.npmjs.org/@types/js-yaml@4.0.5
@@ -7292,14 +7330,6 @@ packages:
       ms: 0.7.3
     dev: true
 
-  registry.npmjs.org/@types/archiver@5.3.1:
-    resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
-    name: '@types/archiver'
-    version: 5.3.1
-    dependencies:
-      '@types/glob': registry.npmjs.org/@types/glob@8.1.0
-    dev: true
-
   registry.npmjs.org/@types/cacheable-request@6.0.3:
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/cacheable-request/-/cacheable-request-6.0.3.tgz}
     name: '@types/cacheable-request'
@@ -7307,7 +7337,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics@4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv@3.1.4
-      '@types/node': 18.13.0
+      '@types/node': 18.19.54
       '@types/responselike': registry.npmjs.org/@types/responselike@1.0.0
     dev: true
 
@@ -7349,21 +7379,6 @@ packages:
     name: '@types/estree'
     version: 1.0.0
 
-  registry.npmjs.org/@types/glob@8.1.0:
-    resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/glob/-/glob-8.1.0.tgz}
-    name: '@types/glob'
-    version: 8.1.0
-    dependencies:
-      '@types/minimatch': registry.npmjs.org/@types/minimatch@5.1.2
-      '@types/node': 18.13.0
-    dev: true
-
-  registry.npmjs.org/@types/google-protobuf@3.15.6:
-    resolution: {integrity: sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/google-protobuf/-/google-protobuf-3.15.6.tgz}
-    name: '@types/google-protobuf'
-    version: 3.15.6
-    dev: true
-
   registry.npmjs.org/@types/http-cache-semantics@4.0.1:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/http-cache-semantics/-/http-cache-semantics-4.0.1.tgz}
     name: '@types/http-cache-semantics'
@@ -7392,36 +7407,15 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': 18.13.0
+      '@types/node': 18.19.54
     dev: true
 
-  registry.npmjs.org/@types/minimatch@5.1.2:
-    resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
-    name: '@types/minimatch'
-    version: 5.1.2
-    dev: true
-
-  registry.npmjs.org/@types/node@16.18.11:
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  registry.npmjs.org/@types/node@18.19.54:
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
     name: '@types/node'
-    version: 16.18.11
-
-  registry.npmjs.org/@types/node@18.11.11:
-    resolution: {integrity: sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.11.tgz}
-    name: '@types/node'
-    version: 18.11.11
-    dev: true
-
-  registry.npmjs.org/@types/node@18.11.18:
-    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
-    name: '@types/node'
-    version: 18.11.18
-    dev: true
-
-  registry.npmjs.org/@types/node@18.13.0:
-    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz}
-    name: '@types/node'
-    version: 18.13.0
+    version: 18.19.54
+    dependencies:
+      undici-types: 5.26.5
     dev: true
 
   registry.npmjs.org/@types/node@22.7.4:
@@ -7438,7 +7432,7 @@ packages:
     version: 2.48.8
     dependencies:
       '@types/caseless': registry.npmjs.org/@types/caseless@0.12.2
-      '@types/node': registry.npmjs.org/@types/node@18.13.0
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
       '@types/tough-cookie': registry.npmjs.org/@types/tough-cookie@4.0.2
       form-data: 2.5.1
     dev: true
@@ -7454,15 +7448,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': 18.13.0
-    dev: true
-
-  registry.npmjs.org/@types/tar-stream@2.2.2:
-    resolution: {integrity: sha512-1AX+Yt3icFuU6kxwmPakaiGrJUwG44MpuiqPg4dSolRFk6jmvs4b3IbUol9wKDLIgU76gevn3EwE8y/DkSJCZQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/tar-stream/-/tar-stream-2.2.2.tgz}
-    name: '@types/tar-stream'
-    version: 2.2.2
-    dependencies:
-      '@types/node': 18.13.0
+      '@types/node': 18.19.54
     dev: true
 
   registry.npmjs.org/@types/tough-cookie@4.0.2:
@@ -7482,7 +7468,7 @@ packages:
     name: '@types/ws'
     version: 8.5.5
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.13.0
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
 
   registry.npmjs.org/@types/yauzl@2.10.0:
@@ -7491,6 +7477,6 @@ packages:
     version: 2.10.0
     requiresBuild: true
     dependencies:
-      '@types/node': 18.13.0
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
     optional: true
