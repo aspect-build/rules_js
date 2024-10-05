@@ -16,6 +16,8 @@ load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 ## npm_link_all_packages
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_translate_lock_generate.docs.bzl", "npm_link_all_packages")
+
 npm_link_all_packages(<a href="#npm_link_all_packages-name">name</a>, <a href="#npm_link_all_packages-imported_links">imported_links</a>)
 </pre>
 
@@ -48,6 +50,8 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
 ## npm_link_targets
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_translate_lock_generate.docs.bzl", "npm_link_targets")
+
 npm_link_targets(<a href="#npm_link_targets-name">name</a>, <a href="#npm_link_targets-package">package</a>)
 </pre>
 
