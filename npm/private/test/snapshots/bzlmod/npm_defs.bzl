@@ -495,7 +495,7 @@ load("@@_main~npm~npm__glsl-tokenizer__2.1.5__links//:defs.bzl", store_491 = "np
 load("@@_main~npm~npm__glslify-bundle__5.1.1__links//:defs.bzl", store_492 = "npm_imported_package_store")
 load("@@_main~npm~npm__glslify-deps__1.3.2__links//:defs.bzl", store_493 = "npm_imported_package_store")
 load("@@_main~npm~npm__glslify__7.1.1__links//:defs.bzl", store_494 = "npm_imported_package_store")
-load("@@_main~npm~npm__google-protobuf__3.21.2__links//:defs.bzl", link_495 = "npm_link_imported_package_store", store_495 = "npm_imported_package_store")
+load("@@_main~npm~npm__google-protobuf__3.21.4__links//:defs.bzl", link_495 = "npm_link_imported_package_store", store_495 = "npm_imported_package_store")
 load("@@_main~npm~npm__got__10.7.0__links//:defs.bzl", store_496 = "npm_imported_package_store")
 load("@@_main~npm~npm__graceful-fs__4.2.10__links//:defs.bzl", store_497 = "npm_imported_package_store")
 load("@@_main~npm~npm__grid-index__1.1.0__links//:defs.bzl", store_498 = "npm_imported_package_store")

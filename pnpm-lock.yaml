@@ -292,8 +292,8 @@ importers:
   js/private/worker/src:
     dependencies:
       google-protobuf:
-        specifier: 3.21.2
-        version: 3.21.2
+        specifier: 3.21.4
+        version: 3.21.4
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: 23.0.7
@@ -3776,8 +3776,8 @@ packages:
       xtend: 4.0.2
     dev: true
 
-  /google-protobuf@3.21.2:
-    resolution: {integrity: sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==}
+  /google-protobuf@3.21.4:
+    resolution: {integrity: sha512-MnG7N936zcKTco4Jd2PX2U96Kf9PxygAPKBug+74LHzmHXmceN16MmRcdgZv+DGef/S9YvQAfRsNCn4cjf9yyQ==}
 
   /got@10.7.0:
     resolution: {integrity: sha512-aWTDeNw9g+XqEZNcTjMMZSy7B7yE9toWOFYip7ofFTLleJhvZwUxxTxkTpKvF+p1SAA4VHmuEy7PiHTHyq8tJg==}
@@ -7304,7 +7304,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
-      google-protobuf: 3.21.2
+      google-protobuf: 3.21.4
     transitivePeerDependencies:
       - encoding
       - supports-color
