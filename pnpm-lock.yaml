@@ -248,7 +248,7 @@ importers:
         version: 15.3.0(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.2)(tslib@2.6.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5)
       '@types/archiver':
         specifier: 5.3.4
         version: 5.3.4
@@ -262,8 +262,8 @@ importers:
         specifier: 2.79.2
         version: 2.79.2
       tslib:
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -309,7 +309,7 @@ importers:
         version: 0.4.4(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.2)(tslib@2.6.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5)
       '@types/google-protobuf':
         specifier: 3.15.12
         version: 3.15.12
@@ -323,8 +323,8 @@ importers:
         specifier: 2.79.2
         version: 2.79.2
       tslib:
-        specifier: 2.6.0
-        version: 2.6.0
+        specifier: 2.7.0
+        version: 2.7.0
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -1330,7 +1330,7 @@ packages:
       terser: 5.34.1
     dev: true
 
-  /@rollup/plugin-typescript@10.0.1(rollup@2.79.2)(tslib@2.6.0)(typescript@4.9.5):
+  /@rollup/plugin-typescript@10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5):
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1346,7 +1346,7 @@ packages:
       '@rollup/pluginutils': 5.0.2(rollup@2.79.2)
       resolve: 1.22.1
       rollup: 2.79.2
-      tslib: 2.6.0
+      tslib: 2.7.0
       typescript: 4.9.5
     dev: true
 
@@ -6693,8 +6693,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib@2.6.0:
-    resolution: {integrity: sha512-7At1WUettjcSRHXCyYtTselblcHl9PJFFVKiCAy/bY97+BPZXSQ2wbq0P9s8tK2G7dFQfNnlJnPAiArVBVBsfA==}
+  /tslib@2.7.0:
+    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
     dev: true
 
   /tunnel-agent@0.6.0:
@@ -7332,7 +7332,7 @@ packages:
       rfc4648: 1.5.2
       stream-buffers: 3.0.2
       tar: 7.4.3
-      tslib: 2.6.0
+      tslib: 2.7.0
       typescript: 4.9.5
       ws: 8.18.0(bufferutil@4.0.8)
     optionalDependencies:
