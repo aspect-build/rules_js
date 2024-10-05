@@ -5,6 +5,7 @@
         "config:base",
         ":preserveSemverRanges",
         ":rebaseStalePrs",
+        ":disableDigestUpdates",
         "schedule:weekly",
         "group:recommended",
         "group:monorepos",
