@@ -7,6 +7,8 @@ Helper rule to gather files from JsInfo providers of targets and provide them as
 ## js_info_files
 
 <pre>
+load("@aspect_rules_js//js/private:js_info_files.bzl", "js_info_files")
+
 js_info_files(<a href="#js_info_files-name">name</a>, <a href="#js_info_files-srcs">srcs</a>, <a href="#js_info_files-include_npm_sources">include_npm_sources</a>, <a href="#js_info_files-include_sources">include_sources</a>, <a href="#js_info_files-include_transitive_sources">include_transitive_sources</a>,
               <a href="#js_info_files-include_transitive_types">include_transitive_types</a>, <a href="#js_info_files-include_types">include_types</a>)
 </pre>

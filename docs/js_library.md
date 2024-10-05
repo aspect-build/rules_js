@@ -29,6 +29,8 @@ js_library(
 ## js_library
 
 <pre>
+load("@aspect_rules_js//js/private:js_library.bzl", "js_library")
+
 js_library(<a href="#js_library-name">name</a>, <a href="#js_library-deps">deps</a>, <a href="#js_library-srcs">srcs</a>, <a href="#js_library-data">data</a>, <a href="#js_library-copy_data_to_bin">copy_data_to_bin</a>, <a href="#js_library-no_copy_to_bin">no_copy_to_bin</a>, <a href="#js_library-types">types</a>)
 </pre>
 
@@ -66,6 +68,8 @@ for more context on why we do this.
 ## js_library_lib.implementation
 
 <pre>
+load("@aspect_rules_js//js/private:js_library.bzl", "js_library_lib")
+
 js_library_lib.implementation(<a href="#js_library_lib.implementation-ctx">ctx</a>)
 </pre>
 
