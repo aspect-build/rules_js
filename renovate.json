@@ -20,7 +20,9 @@
         "**/node_modules/**",
         "**/bower_components/**",
         "e2e/**",
-        "examples/**"
+        "examples/**",
+        "js/private/test/**",
+        "npm/private/test/**"
     ],
 
     "timezone": "America/Los_Angeles",
