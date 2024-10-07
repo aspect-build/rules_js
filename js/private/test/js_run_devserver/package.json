@@ -4,6 +4,6 @@
     "private": true,
     "dependencies": {
         "@types/node": "16.18.112",
-        "jasmine": "5.1.0"
+        "jasmine": "5.3.1"
     }
 }
