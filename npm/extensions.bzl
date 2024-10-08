@@ -11,8 +11,8 @@ load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "npm_tran
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
-load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
+load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:tar.bzl", "detect_system_tar")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 
