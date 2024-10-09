@@ -207,10 +207,14 @@ jobs:
             - name: Mount bazel caches
               uses: actions/cache@v4
               with:
+                  # Cache the --dist_cache and --repository_cache directories (see ci.bazelrc)
+                  # and the default bazel output (https://bazel.build/remote/output-directories#layout)
+                  # and bazelisk cache.
                   path: |
                       ~/.cache/bazel-disk-cache
                       ~/.cache/bazel-repository-cache
-                      ~/.cache/xdg-cache
+                      ~/.cache/bazel
+                      ~/.cache/bazelisk
                   key: >-
                       bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
                       ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
@@ -257,7 +261,6 @@ jobs:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
             - name: Check that unused npm packages were not fetched
               if: matrix.os != 'windows'
@@ -301,7 +304,6 @@ jobs:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
             - name: ./test.sh
               # Run if there is a test.sh file in the folder.
@@ -315,7 +317,6 @@ jobs:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
