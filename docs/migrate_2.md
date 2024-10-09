@@ -103,8 +103,7 @@ However if you have written your own custom rules based on rules_js, changes may
 
 ### Other
 
-- refactor: rename `gather_files_from_js_providers` to `gather_files_from_js_info` ([#1617](https://github.com/aspect-build/rules_js/pull/1617))
-- refactor: rename `gather_files_from_js_info` to `gather_files_from_js_infos` ([#1665](https://github.com/aspect-build/rules_js/pull/1665))
+- refactor: rename `gather_files_from_js_providers` to `gather_files_from_js_infos` ([#1617](https://github.com/aspect-build/rules_js/pull/1617), [#1665](https://github.com/aspect-build/rules_js/pull/1665))
 - refactor: remove `utils.home_directory` and use `get_home_directory` from Aspect bazel-lib utils instead ([#1606](https://github.com/aspect-build/rules_js/pull/1606))
 - refactor: remove `//js:enable_runfiles` and use `@aspect_bazel_lib//lib:enable_runfiles` instead ([#1605](https://github.com/aspect-build/rules_js/pull/1605))
 - fix: drop `.sh` extension from `js_binary`, `merger` and `js_image_layer` launchers ([#1586](https://github.com/aspect-build/rules_js/pull/1586))
