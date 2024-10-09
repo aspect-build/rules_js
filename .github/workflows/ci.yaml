@@ -103,7 +103,6 @@ jobs:
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
         outputs:
             bazel-version: ${{ steps.bazel-version.outputs.res }}
-            config: ${{ steps.config.outputs.res }}
             folder: ${{ steps.folder.outputs.res }}
             os: ${{ steps.os.outputs.res }}
 
@@ -117,7 +116,6 @@ jobs:
                 bazel-version: ${{ fromJSON(needs.matrix-prep.outputs.bazel-version) }}
                 bzlmod: [1, 0]
                 os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
-                config: ${{ fromJSON(needs.matrix-prep.outputs.config) }}
                 folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
                     # Exclude Windows default, will opt-in to includes
@@ -210,11 +208,11 @@ jobs:
                       ~/.cache/bazel-repository-cache
                       ~/.cache/xdg-cache
                   key: >-
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
                       ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
                       ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/.bazeliskrc', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
 
             - name: Configure Bazel version
               working-directory: ${{ matrix.folder }}
@@ -246,9 +244,9 @@ jobs:
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.aspect/bazelrc/ci.bazelrc \
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
                     test \
-                    --config=${{ matrix.config }} \
-                    --test_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --build_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --config=local \
+                    --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --enable_bzlmod=${{ matrix.bzlmod }} \
                     //...
               env:
@@ -280,7 +278,7 @@ jobs:
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               # Don't run coverage on Windows. It is currently broken.
-              if: matrix.config == 'local' && matrix.os != 'windows'
+              if: matrix.os != 'windows'
               working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
@@ -289,9 +287,9 @@ jobs:
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.aspect/bazelrc/ci.bazelrc \
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
                     coverage \
-                    --config=${{ matrix.config }} \
-                    --test_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --build_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --config=local \
+                    --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --enable_bzlmod=${{ matrix.bzlmod }} \
                     --instrument_test_targets \
                     //...
