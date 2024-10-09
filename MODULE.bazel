@@ -46,7 +46,7 @@ use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 ####### Dev dependencies ########
 
-bazel_dep(name = "aspect_rules_lint", version = "0.12.0", dev_dependency = True)
+bazel_dep(name = "aspect_rules_lint", version = "1.0.2", dev_dependency = True)
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.7.1", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "7.3.1", dev_dependency = True)
 bazel_dep(name = "gazelle", version = "0.39.1", dev_dependency = True, repo_name = "bazel_gazelle")
