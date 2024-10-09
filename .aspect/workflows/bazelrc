@@ -7,9 +7,9 @@ common --build_event_binary_file=build_event_log.bin
 common --build_event_binary_file_path_conversion=false
 common --build_event_publish_all_actions=true
 
-common:aspect_rbe --extra_execution_platforms=@aspect_bazel_lib//platforms:x86_64_linux_remote
-common:aspect_rbe --host_platform=@aspect_bazel_lib//platforms:x86_64_linux_remote
-common:aspect_rbe --remote_executor=unix:///mnt/ephemeral/buildbarn/.cache/bb_clientd/grpc
-common:aspect_rbe --genrule_strategy=remote,local
-common:aspect_rbe --jobs=32
-common:aspect_rbe --remote_timeout=3600
+common:rbe --extra_execution_platforms=@aspect_bazel_lib//platforms:x86_64_linux_remote
+common:rbe --host_platform=@aspect_bazel_lib//platforms:x86_64_linux_remote
+common:rbe --remote_executor=unix:///mnt/ephemeral/buildbarn/.cache/bb_clientd/grpc
+common:rbe --genrule_strategy=remote,local
+common:rbe --jobs=32
+common:rbe --remote_timeout=3600
