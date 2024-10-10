@@ -216,10 +216,20 @@ buildifier_prebuilt_register_toolchains()
 # rules_lint
 load(
     "@aspect_rules_lint//format:repositories.bzl",
-    "fetch_shfmt",
+    "rules_lint_dependencies",
 )
 
-fetch_shfmt()
+rules_lint_dependencies()
+
+load("@rules_multitool//multitool:multitool.bzl", "multitool")
+
+multitool(
+    name = "multitool",
+    lockfiles = [
+        "@aspect_rules_lint//format:multitool.lock.json",
+        "@aspect_rules_lint//lint:multitool.lock.json",
+    ],
+)
 
 load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
 
