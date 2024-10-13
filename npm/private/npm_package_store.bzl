@@ -238,6 +238,9 @@ def _npm_package_store_impl(ctx):
                         "--directory",
                         package_store_directory.path,
                     ],
+                    execution_requirements = {
+                        "no-remote-cache": "1",
+                    }
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                 )
