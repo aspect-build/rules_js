@@ -240,7 +240,7 @@ def _npm_package_store_impl(ctx):
                     ],
                     execution_requirements = {
                         "no-remote-cache": "1",
-                    }
+                    },
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                 )
