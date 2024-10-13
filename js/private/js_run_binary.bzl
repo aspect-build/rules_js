@@ -1,6 +1,6 @@
 """Runs a js_binary as a build action.
 
-This macro wraps Aspect bazel-lib's run_binary (https://github.com/aspect-build/bazel-lib/blob/main/lib/run_binary.bzl)
+This macro wraps Aspect bazel-lib's run_binary (https://github.com/bazel-contrib/bazel-lib/blob/main/lib/run_binary.bzl)
 and adds attributes and features specific to rules_js's js_binary.
 
 Load this with,
@@ -71,7 +71,7 @@ def js_run_binary(
         tool: The tool to run in the action.
 
             Should be a `js_binary` rule. Use Aspect bazel-lib's run_binary
-            (https://github.com/aspect-build/bazel-lib/blob/main/lib/run_binary.bzl)
+            (https://github.com/bazel-contrib/bazel-lib/blob/main/lib/run_binary.bzl)
             for other *_binary rule types.
 
         env: Environment variables of the action.

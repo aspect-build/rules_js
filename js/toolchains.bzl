@@ -29,7 +29,7 @@ def rules_js_register_toolchains(
     https://docs.aspect.build/rulesets/rules_nodejs/docs/core#node_repositories.
 
     Additional required toolchains (jq, yq, copy_directory and copy_to_directory) come
-    from [Aspect bazel-lib](https://docs.aspect.build/rulesets/aspect_bazel_lib).
+    from [Aspect bazel-lib](https://github.com/bazel-contrib/bazel-lib).
 
     Args:
         node_download_auth: Auth to use for all url requests when downloading Node
