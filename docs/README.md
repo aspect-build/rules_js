@@ -165,7 +165,7 @@ copied to this location.
 Our custom rules will take care of copying their sources to the `bazel-bin` output folder automatically.
 However this only works when those sources are under the same `BUILD` file as the target that does
 the copying. If you have a source file in another `BUILD` file, you'll need to explicitly copy that
-with a rule like [`copy_to_bin`](https://docs.aspect.build/aspect-build/bazel-lib/v1.0.0/docs/copy_to_bin-docgen.html#copy_to_bin).
+with a rule like [`copy_to_bin`](https://docs.aspect.build/bazel-contrib/bazel-lib/v1.0.0/docs/copy_to_bin-docgen.html#copy_to_bin).
 
 **API docs:**
 
