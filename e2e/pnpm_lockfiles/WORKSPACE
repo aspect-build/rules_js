@@ -19,6 +19,8 @@ PNPM_LOCK_TEST_CASES = [
     "docusaurus-direct-peer-v6.yaml",
     "docusaurus-direct-peer-v9.yaml",
     "versionless-patch-v9.yaml",
+    "vendored-files-v6.yaml",
+    "vendored-files-v9.yaml",
 ]
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -60,6 +62,11 @@ npm_repositories_v90()
 [
     npm_translate_lock(
         name = lockfile.replace(".yaml", ""),
+        data = [
+            "//vendored:lodash-4.17.19.tgz",
+            "//vendored:lodash-4.17.20.tgz",
+            "//vendored:lodash-4.17.21.tgz",
+        ],
         pnpm_lock = "//cases:%s" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )
@@ -72,6 +79,8 @@ load("@isaacs-cliui-v90//:repositories.bzl", npm_repositories_isaacs_cliui_v90 =
 load("@override-with-alias-url-v9//:repositories.bzl", npm_repositories_override_with_alias_v90 = "npm_repositories")
 load("@tarball-no-url-v54//:repositories.bzl", npm_repositories_tarball_no_url_v54 = "npm_repositories")
 load("@versionless-patch-v9//:repositories.bzl", npm_repositories_versionless_patch_v9 = "npm_repositories")
+load("@vendored-files-v6//:repositories.bzl", npm_repositories_vendored_files_v6 = "npm_repositories")
+load("@vendored-files-v9//:repositories.bzl", npm_repositories_vendored_files_v9 = "npm_repositories")
 
 npm_repositories_tarball_no_url_v54()
 
@@ -84,3 +93,7 @@ npm_repositories_direct_with_peers_v6()
 npm_repositories_direct_with_peers_v9()
 
 npm_repositories_versionless_patch_v9()
+
+npm_repositories_vendored_files_v6()
+
+npm_repositories_vendored_files_v9()

@@ -14,6 +14,7 @@ npm = use_extension(
 npm.npm_translate_lock(
     name = "npm",
     data = [
+        "//:lodash-4.17.21.tgz",
         "//:package.json",
     ],
     npmrc = "//:.npmrc",

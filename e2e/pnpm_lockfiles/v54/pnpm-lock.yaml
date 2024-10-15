@@ -45,6 +45,7 @@ importers:
       is-odd-v3: npm:is-odd@3.0.0
       jquery-git-ssh-e61fccb: git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d
       jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
+      lodash: file:../vendored/lodash-4.17.21.tgz
       meaning-of-life: 1.0.0
       rollup: 2.14.0
       rollup-plugin-with-peers: npm:@rollup/plugin-typescript@8.2.1
@@ -75,6 +76,7 @@ importers:
       is-odd-v3: /is-odd/3.0.0
       jquery-git-ssh-e61fccb: github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d
       jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
+      lodash: file:../vendored/lodash-4.17.21.tgz
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
       rollup: 2.14.0
       rollup-plugin-with-peers: /@rollup/plugin-typescript/8.2.1_3vgsug3mjv7wvue74swjdxifxy
@@ -490,6 +492,12 @@ packages:
     resolution: {directory: ../vendored/is-number, type: directory}
     name: is-number
     version: 0.0.1
+    dev: false
+
+  file:../vendored/lodash-4.17.21.tgz:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:../vendored/lodash-4.17.21.tgz}
+    name: lodash
+    version: 4.17.21
     dev: false
 
   github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d:

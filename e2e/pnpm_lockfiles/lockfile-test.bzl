@@ -117,13 +117,17 @@ def lockfile_test(npm_link_all_packages, name = None):
             # a package with various `npm:` cases
             ":node_modules/@isaacs/cliui",
 
-            # link:, workspace:, file:, ./rel/path
+            # link:, workspace:, file:dir, ./rel/path
             ":node_modules/@scoped",  # target for the scope
             ":node_modules/@scoped/a",
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
             ":node_modules/scoped/bad",
+
+            # file:tarball
+            ":node_modules/lodash",
+            ":.aspect_rules_js/node_modules/lodash@4.17.21",
 
             # Packages involving overrides
             ":node_modules/is-odd",

@@ -9,3 +9,8 @@ build_test(
         ":node_modules",
     ],
 )
+
+exports_files([
+    "package.json",
+    "lodash-4.17.21.tgz",
+])

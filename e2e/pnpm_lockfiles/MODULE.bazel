@@ -20,6 +20,8 @@ PNPM_LOCK_TEST_CASES = [
     "docusaurus-direct-peer-v6.yaml",
     "docusaurus-direct-peer-v9.yaml",
     "versionless-patch-v9.yaml",
+    "vendored-files-v6.yaml",
+    "vendored-files-v9.yaml",
 ]
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
@@ -94,6 +96,11 @@ npm = use_extension(
 [
     npm.npm_translate_lock(
         name = lockfile.replace(".yaml", ""),
+        data = [
+            "//vendored:lodash-4.17.19.tgz",
+            "//vendored:lodash-4.17.20.tgz",
+            "//vendored:lodash-4.17.21.tgz",
+        ],
         pnpm_lock = "//cases:%s" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )
