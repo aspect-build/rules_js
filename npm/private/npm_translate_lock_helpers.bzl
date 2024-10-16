@@ -283,10 +283,6 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
         transitive_closure = package_info.get("transitive_closure")
         resolution = package_info.get("resolution")
 
-        if version.startswith("file:"):
-            # this package is treated as a first-party dep
-            continue
-
         resolution_type = resolution.get("type", None)
         if resolution_type == "directory":
             # this package is treated as a first-party dep
