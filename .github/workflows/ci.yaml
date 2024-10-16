@@ -156,6 +156,10 @@ jobs:
                           major: 6
                       bzlmod: 0
                       folder: e2e/gyp_no_install_script
+                    # @bazel/runfiles seems broken with non-bzlmod + bazel7
+                    # https://github.com/bazel-contrib/rules_nodejs/issues/3797
+                    - bzlmod: 0
+                      folder: e2e/runfiles
                 include:
                     - bazel-version:
                           major: 7
