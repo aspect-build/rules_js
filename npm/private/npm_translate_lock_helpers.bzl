@@ -427,7 +427,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
                 else:
                     url = tarball
             elif tarball.startswith("file:"):
-                url = tarball
+                file_path = tarball[5:]
+                file_path = paths.normalize(paths.join(root_package, file_path))
+                url = "file:{}".format(file_path)
             else:
                 if not registry:
                     registry = utils.npm_registry_url(name, registries, default_registry)
