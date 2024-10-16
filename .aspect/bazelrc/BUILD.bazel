@@ -12,4 +12,9 @@ write_aspect_bazelrc_presets(
         "javascript",
         "performance",
     ],
+    # Disable the tests with non-bzlmod which may have a different @aspect_bazel_lib version
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
