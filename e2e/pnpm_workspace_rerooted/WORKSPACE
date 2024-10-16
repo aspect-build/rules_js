@@ -34,6 +34,7 @@ npm_translate_lock(
         "//lib/c:package.json",
         "//lib/d:package.json",
         "//root:pnpm-workspace.yaml",
+        "//vendored:lodash-4.17.19.tgz",
         "//vendored/a:package.json",
         "//vendored/b:package.json",
     ],
