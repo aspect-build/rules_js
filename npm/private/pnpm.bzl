@@ -566,7 +566,37 @@ def _parse_lockfile(parsed, err):
     importers = utils.sorted_map(importers)
     packages = utils.sorted_map(packages)
 
+    _validate_lockfile_data(importers, packages)
+
     return importers, packages, patched_dependencies, lockfile_version, None
+
+def _validate_lockfile_data(importers, packages):
+    for name, deps in importers.items():
+        _validate_lockfile_deps(packages, "importer", name, deps["dependencies"])
+        _validate_lockfile_deps(packages, "importer", name, deps["dev_dependencies"])
+        _validate_lockfile_deps(packages, "importer", name, deps["optional_dependencies"])
+
+    for name, info in packages.items():
+        _validate_lockfile_deps(packages, "package", name, info["dependencies"])
+        _validate_lockfile_deps(packages, "package", name, info["optional_dependencies"])
+
+def _validate_lockfile_deps(packages, importer_type, importer, deps):
+    for dep, version in deps.items():
+        if version.startswith("npm:"):
+            version = version[4:]
+
+        if version not in packages and not (version.startswith("file:") or version.startswith("link:")) and not ("{}@{}".format(dep, version) in packages):
+            msg = "ERROR: {} '{}' depends on package '{}' at version '{}' which is not in the packages: {}".format(
+                importer_type,
+                importer,
+                dep,
+                version,
+                packages.keys(),
+            )
+
+            # TODO: fail instead of print
+            # buildifier: disable=print
+            print(msg)
 
 def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):
