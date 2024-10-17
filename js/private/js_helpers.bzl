@@ -232,7 +232,7 @@ def envs_for_log_level(log_level):
         A list of environment variables to set to turn on the js_binary runtime
         logs for the given log level. Typically, they are each set to "1".
     """
-    if log_level not in LOG_LEVELS.keys():
+    if LOG_LEVELS.get(log_level, 0) == 0:
         msg = "log_level must be one of {} but got {}".format(LOG_LEVELS.keys(), log_level)
         fail(msg)
     envs = []

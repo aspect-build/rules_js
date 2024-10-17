@@ -174,12 +174,12 @@ sh_binary(
                 dep_importer = paths.normalize("{}/{}".format(import_path, dep_version) if import_path else dep_version)
                 dep_path = helpers.link_package(root_package, import_path, dep_version)
                 dep_key = "{}+{}".format(dep_package, dep_path)
-                if dep_key in fp_links.keys():
+                if fp_links.get(dep_key, False):
                     fp_links[dep_key]["link_packages"][link_package] = True
                 else:
                     transitive_deps = {}
                     raw_deps = {}
-                    if dep_importer in importers.keys():
+                    if importers.get(dep_importer, False):
                         raw_deps = importers.get(dep_importer).get("deps")
                     for raw_package, raw_version in raw_deps.items():
                         package_store_name = utils.package_store_name(raw_package, raw_version)
@@ -457,7 +457,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     ]
 
     for filename, contents in rctx.attr.additional_file_contents.items():
-        if not filename in rctx_files.keys():
+        if not rctx_files.get(filename, False):
             rctx_files[filename] = contents
         elif filename.endswith(".bzl"):
             # bzl files are special cased since all load statements must go at the top

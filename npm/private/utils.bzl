@@ -197,7 +197,7 @@ def _replace_npmrc_token_envvar(token, npmrc_path, environ):
         # ${NPM_TOKEN} -> NPM_TOKEN
         # $NPM_TOKEN -> NPM_TOKEN
         token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-        if token in environ.keys() and environ[token]:
+        if environ.get(token, False):
             token = environ[token]
         else:
             # buildifier: disable=print

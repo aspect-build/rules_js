@@ -535,7 +535,7 @@ def _parse_lockfile(parsed, err):
 
     if not types.is_dict(parsed):
         return {}, {}, {}, "lockfile should be a starlark dict"
-    if "lockfileVersion" not in parsed.keys():
+    if not parsed.get("lockfileVersion", False):
         return {}, {}, {}, "expected lockfileVersion key in lockfile"
 
     # Lockfile version may be a float such as 5.4 or a string such as '6.0'
