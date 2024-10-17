@@ -162,11 +162,11 @@ build_test(
 assert_contains(
     name = "regexy-args-1",
     actual = ":regexy-stdout",
-    expected = "--arg1='/{{[{]?(.*?)[}]?}}/'",
+    expected = "--arg1=/{{[{]?(.*?)[}]?}}/",
 )
 
 assert_contains(
     name = "regexy-args-2",
     actual = ":regexy-stdout",
-    expected = "--arg2='/{%(.*?)%}/'",
+    expected = "--arg2=/{%(.*?)%}/",
 )
