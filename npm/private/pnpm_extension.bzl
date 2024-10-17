@@ -36,7 +36,7 @@ def resolve_pnpm_repositories(modules):
                 Only the root module may override the default name for the pnpm repository.
                 This prevents conflicting registrations in the global namespace of external repos.
                 """)
-            if attr.name not in registrations.keys():
+            if not registrations.get(attr.name, False):
                 registrations[attr.name] = []
 
             v = attr.pnpm_version
