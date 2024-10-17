@@ -85,6 +85,9 @@ importers:
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
+      lodash:
+        specifier: file:../vendored/lodash-4.17.21.tgz
+        version: file:../vendored/lodash-4.17.21.tgz
       meaning-of-life:
         specifier: 1.0.0
         version: 1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)
@@ -93,7 +96,7 @@ importers:
         version: 2.14.0
       rollup-plugin-with-peers:
         specifier: npm:@rollup/plugin-typescript@8.2.1
-        version: '@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.6.3)(typescript@5.5.2)'
+        version: '@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.8.0)(typescript@5.5.2)'
       rollup3:
         specifier: npm:rollup@3.29.4
         version: rollup@3.29.4
@@ -102,7 +105,7 @@ importers:
         version: link:../projects/b
       tslib:
         specifier: ^2.6.3
-        version: 2.6.3
+        version: 2.8.0
       typescript:
         specifier: 5.5.2
         version: 5.5.2
@@ -227,8 +230,8 @@ packages:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
 
-  ansi-regex@6.0.1:
-    resolution: {integrity: sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==}
+  ansi-regex@6.1.0:
+    resolution: {integrity: sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
@@ -292,8 +295,8 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
     version: 1.0.0
 
-  is-core-module@2.15.0:
-    resolution: {integrity: sha512-Dd+Lb2/zvk9SKy1TGCt1wFJFo/MWBPMX5x7KcvLajWTGuomczdQX61PvY5yK6SVACwpoexWo81IfFyoKY2QnTA==}
+  is-core-module@2.15.1:
+    resolution: {integrity: sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==}
     engines: {node: '>= 0.4'}
 
   is-fullwidth-code-point@3.0.0:
@@ -330,6 +333,10 @@ packages:
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
+
+  lodash@file:../vendored/lodash-4.17.21.tgz:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:../vendored/lodash-4.17.21.tgz}
+    version: 4.17.21
 
   meaning-of-life@1.0.0:
     resolution: {integrity: sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==}
@@ -386,8 +393,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  tslib@2.6.3:
-    resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
+  tslib@2.8.0:
+    resolution: {integrity: sha512-jWVzBLplnCmoaTr13V9dYbiQ99wvZRd0vNWaDRg+aVYRcjDF3nDksxFDE/+fkXnKhpnUUkmx5pK/v8mCtLVqZA==}
 
   typescript@5.5.2:
     resolution: {integrity: sha512-NcRtPEOsPFFWjobJEtfihkLCZCXZt/os3zf8nTxjVH3RvTSxjrCamJpbExGvYOF+tFHc3pA65qpdwPbzjohhew==}
@@ -443,12 +450,12 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.6.3)(typescript@5.5.2)':
+  '@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.8.0)(typescript@5.5.2)':
     dependencies:
       '@rollup/pluginutils': 3.1.0(rollup@2.14.0)
       resolve: 1.22.8
       rollup: 2.14.0
-      tslib: 2.6.3
+      tslib: 2.8.0
       typescript: 5.5.2
 
   '@rollup/pluginutils@3.1.0(rollup@2.14.0)':
@@ -481,7 +488,7 @@ snapshots:
 
   ansi-regex@5.0.1: {}
 
-  ansi-regex@6.0.1: {}
+  ansi-regex@6.1.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -522,7 +529,7 @@ snapshots:
 
   hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello: {}
 
-  is-core-module@2.15.0:
+  is-core-module@2.15.1:
     dependencies:
       hasown: 2.0.2
 
@@ -554,6 +561,8 @@ snapshots:
 
   kleur@4.1.5: {}
 
+  lodash@file:../vendored/lodash-4.17.21.tgz: {}
+
   meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq): {}
 
   mri@1.2.0: {}
@@ -566,7 +575,7 @@ snapshots:
 
   resolve@1.22.8:
     dependencies:
-      is-core-module: 2.15.0
+      is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
@@ -600,11 +609,11 @@ snapshots:
 
   strip-ansi@7.1.0:
     dependencies:
-      ansi-regex: 6.0.1
+      ansi-regex: 6.1.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  tslib@2.6.3: {}
+  tslib@2.8.0: {}
 
   typescript@5.5.2: {}
 

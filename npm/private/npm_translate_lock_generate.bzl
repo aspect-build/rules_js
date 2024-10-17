@@ -166,7 +166,7 @@ sh_binary(
                     dep_path = helpers.link_package(root_package, dep_version[len("file:"):])
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
-                    msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
+                    msg = "Expected file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
                     fail(msg)
                 fp_links[dep_key]["link_packages"][link_package] = []
             elif dep_version.startswith("link:"):

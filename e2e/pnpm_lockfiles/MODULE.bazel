@@ -19,6 +19,8 @@ PNPM_LOCK_TEST_CASES = [
     "isaacs-cliui-v90.yaml",
     "docusaurus-direct-peer-v6.yaml",
     "docusaurus-direct-peer-v9.yaml",
+    "vendored-files-v6.yaml",
+    "vendored-files-v9.yaml",
 ]
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
@@ -81,7 +83,7 @@ npm = use_extension(
         # Deep with many peers
         "lock-%s__at_rollup_plugin-typescript__8.2.1_%s" % (
             version,
-            "ommloj5qql5ba6x5wuiluawhoi" if version == "v54" else "1662662592" if version == "v90" else "1813138439",
+            "7f3ueovs674nryaiv3k7rfzidm" if version == "v54" else "217335199" if version == "v90" else "1813138439",
         ),
 
         # Dep with patch
@@ -93,6 +95,11 @@ npm = use_extension(
 [
     npm.npm_translate_lock(
         name = lockfile.replace(".yaml", ""),
+        data = [
+            "//vendored:lodash-4.17.19.tgz",
+            "//vendored:lodash-4.17.20.tgz",
+            "//vendored:lodash-4.17.21.tgz",
+        ],
         pnpm_lock = "//cases:%s" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )
