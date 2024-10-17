@@ -128,7 +128,7 @@ jobs:
                     # Don't run replace_packages test with bzlmod+Bazel 6 due to use of Bazel 7 bzlmod features
                     - bazel-version:
                           major: 6
-                    - bzlmod: 1
+                      bzlmod: 1
                       folder: e2e/npm_translate_lock_replace_packages
                     # Don't run bzlmod tests with Bazel 6 to reduce the size of the test matrix
                     - bazel-version:
