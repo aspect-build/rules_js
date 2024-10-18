@@ -1,49 +1,85 @@
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load(":docs.bzl", "stardoc_with_diff_test", "update_docs")
 
 stardoc_with_diff_test(
     name = "js_binary",
     bzl_library_target = "//js/private:js_binary",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "js_library",
     bzl_library_target = "//js/private:js_library",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "js_run_binary",
     bzl_library_target = "//js/private:js_run_binary",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "js_run_devserver",
     bzl_library_target = "//js/private:js_run_devserver",
     symbol_names = ["js_run_devserver"],
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "js_info_files",
     bzl_library_target = "//js/private:js_info_files",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "js_image_layer",
     bzl_library_target = "//js/private:js_image_layer",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "npm_package",
     bzl_library_target = "//npm/private:npm_package",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "npm_link_package",
     bzl_library_target = "//npm/private:npm_link_package",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
     name = "npm_link_all_packages",
     bzl_library_target = "//npm/private:npm_translate_lock_generate.docs",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 stardoc_with_diff_test(
@@ -51,6 +87,10 @@ stardoc_with_diff_test(
     bzl_library_target = "//npm/private:npm_import",
     symbol_names = [
         "npm_import",
+    ],
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
     ],
 )
 
@@ -61,10 +101,18 @@ stardoc_with_diff_test(
         "list_patches",
         "npm_translate_lock",
     ],
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 update_docs(
     name = "update",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 # Demonstration delivery target for Aspect Workflows.
@@ -73,7 +121,11 @@ sh_binary(
     name = "docs_delivery_only_on_change",
     srcs = ["delivery.sh"],
     data = glob(["*.md"]),
-    tags = ["deliverable"],
+    tags = [
+        "deliverable",
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )
 
 # Demonstration delivery target for Aspect Workflows.
@@ -82,4 +134,8 @@ sh_binary(
     name = "docs_delivery",
     srcs = ["delivery.sh"],
     data = glob(["*.md"]),
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
 )

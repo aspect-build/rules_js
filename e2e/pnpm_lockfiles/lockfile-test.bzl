@@ -209,8 +209,11 @@ def lockfile_test(name = None):
                 for f in BZL_FILES.keys()
             ],
         ),
+        # Target names may be different on workspace vs bzlmod
         target_compatible_with = select({
             "@aspect_bazel_lib//lib:bzlmod": [],
             "//conditions:default": ["@platforms//:incompatible"],
         }),
+        # Target names may be different on bazel versions
+        tags = ["skip-on-bazel6"],
     )

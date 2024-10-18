@@ -51,6 +51,8 @@ write_source_file(
     testonly = True,
     in_file = ":checksum_gen",
     out_file = "checksum.expected",
+    # Under bazel6 bzlmod name differs
+    tags = ["skip-on-bazel6"],
     # Under bzlmod workspace name is a fixed string `_main` which differs from WORKSPACE
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": [],
