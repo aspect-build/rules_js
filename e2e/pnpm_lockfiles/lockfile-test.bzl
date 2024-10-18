@@ -102,7 +102,7 @@ def lockfile_test(name = None):
             # npm: alias to a package that has many peers
             ":node_modules/rollup-plugin-with-peers",
             # underlying repo for the many-peers package
-            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (lock_repo, "ommloj5qql5ba6x5wuiluawhoi" if lock_version == "v54" else "1662662592" if lock_version == "v90" else "1813138439"),
+            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (lock_repo, "7f3ueovs674nryaiv3k7rfzidm" if lock_version == "v54" else "217335199" if lock_version == "v90" else "1813138439"),
 
             # uuv 'hasBin'
             ":node_modules/uvu",
@@ -110,13 +110,17 @@ def lockfile_test(name = None):
             # a package with various `npm:` cases
             ":node_modules/@isaacs/cliui",
 
-            # link:, workspace:, file:, ./rel/path
+            # link:, workspace:, file:dir, ./rel/path
             ":node_modules/@scoped",  # target for the scope
             ":node_modules/@scoped/a",
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
             ":node_modules/scoped/bad",
+
+            # file:tarball
+            ":node_modules/lodash",
+            ":.aspect_rules_js/node_modules/lodash@4.17.21",
 
             # Packages involving overrides
             ":node_modules/is-odd",
