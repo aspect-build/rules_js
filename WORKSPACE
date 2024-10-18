@@ -200,6 +200,10 @@ load("@io_bazel_stardoc//:deps.bzl", "stardoc_external_deps")
 
 stardoc_external_deps()
 
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+
+bazel_features_deps()
+
 load("@stardoc_maven//:defs.bzl", stardoc_pinned_maven_install = "pinned_maven_install")
 
 stardoc_pinned_maven_install()

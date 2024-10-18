@@ -34,6 +34,7 @@ write_source_files(
     files = {
         "snapshots/wksp/launcher.sh": ":shell_launcher_sed",
     },
+    tags = ["skip-on-bazel6"],
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],
@@ -45,6 +46,7 @@ write_source_files(
     files = {
         "snapshots/bzlmod/launcher.sh": ":shell_launcher_sed",
     },
+    tags = ["skip-on-bazel6"],
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": [],
         "//conditions:default": ["@platforms//:incompatible"],
