@@ -176,14 +176,14 @@ jobs:
                 include:
                     - bazel-version:
                           major: 7
-                          version: 7.3.2
+                          version: 7.4.0rc4
                       bzlmod: 1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 7
-                          version: 7.3.2
+                          version: 7.4.0rc4
                       bzlmod: 1
                       os: macos
                       config: local
