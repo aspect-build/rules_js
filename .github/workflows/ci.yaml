@@ -30,6 +30,7 @@ jobs:
                   m=${v::1}
                   a=(
                     "major:$m, version:\"$v\""
+                    "major:8, version:\"8.0.0-pre.20240925.4\""
                     "major:6, version:\"6.5.0\""
                   )
                   printf -v j '{%s},' "${a[@]}"
@@ -135,6 +136,9 @@ jobs:
                     - bazel-version:
                           major: 6
                       bzlmod: 0
+                    # Don't run tests with Bazel 8 pre-releases by default
+                    - bazel-version:
+                          major: 8
                     # Don't run workspace smoke test under bzlmod
                     - bzlmod: 1
                       folder: e2e/workspace
@@ -174,6 +178,13 @@ jobs:
                     - bzlmod: 0
                       folder: e2e/runfiles
                 include:
+                    # Include only the bzlmod unit tests with bazel8
+                    - bazel-version:
+                          major: 8
+                      bzlmod: 1
+                      folder: .
+                      os: ubuntu
+                      config: local
                     - bazel-version:
                           major: 7
                           version: 7.3.2
