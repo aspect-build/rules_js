@@ -250,7 +250,7 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
 async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const startTime = perf_hooks.performance.now()
 
-    let totalDeleted = 0
+    const deletions = []
 
     // Remove files that were previously synced but are no longer in the updated list of files to sync
     const updatedFilesSet = new Set(updatedFiles)
@@ -279,18 +279,22 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
         mkdirs.clear()
 
         const rmPath = path.join(sandbox, f)
-        try {
-            fs.rmSync(rmPath, { recursive: true, force: true })
-        } catch (e) {
-            console.error(
-                `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
-            )
-        }
-        totalDeleted++
+        deletions.push(
+            fs.promises
+                .rm(rmPath, { recursive: true, force: true })
+                .catch((e) =>
+                    console.error(
+                        `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
+                    )
+                )
+        )
     }
+
+    await Promise.all(deletions)
 
     var endTime = perf_hooks.performance.now()
 
+    const totalDeleted = deletions.length
     if (totalDeleted > 0) {
         console.error(
             `${totalDeleted} file${totalDeleted > 1 ? 's' : ''}/folder${
