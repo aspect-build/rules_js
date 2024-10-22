@@ -447,38 +447,44 @@ async function main(args, sandbox) {
             process.exit(code)
         })
 
+        // Process stdin data in order using a promise chain.
         let syncing = Promise.resolve()
         process.stdin.on('data', async (chunk) => {
+            return (syncing = syncing.then(() => processChunk(chunk)))
+        })
+
+        async function processChunk(chunk) {
             try {
                 const chunkString = chunk.toString()
                 if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
                     if (process.env.JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
                     }
-                    // Chain promises via syncing.then()
-                    syncing = syncing.then(() => {
-                        // Re-parse the config file to get the latest list of data files to copy
-                        const updatedDataFiles = JSON.parse(
-                            fs.readFileSync(configPath)
-                        ).data_files
-                        // Remove files that were previously synced but are no longer in the updated list of files to sync
-                        deleteFiles(
-                            config.data_files,
-                            updatedDataFiles,
-                            sandbox
-                        )
-                        // Sync changed files
-                        config.data_files = updatedDataFiles
-                        syncFiles(
-                            config.data_files,
-                            sandbox,
-                            config.grant_sandbox_write_permissions
-                        )
-                    })
-                    // Await promise to catch any exceptions, and wait for the
+
+                    const oldFiles = config.data_files
+
+                    // Re-parse the config file to get the latest list of data files to copy
+                    const updatedDataFiles = JSON.parse(
+                        await fs.promises.readFile(configPath)
+                    ).data_files
+
+                    // Await promises to catch any exceptions, and wait for the
                     // sync to be complete before writing to stdin of the child
                     // process
-                    await syncing
+                    await Promise.all([
+                        // Remove files that were previously synced but are no longer in the updated list of files to sync
+                        deleteFiles(oldFiles, updatedDataFiles, sandbox),
+
+                        // Sync changed files
+                        syncFiles(
+                            updatedDataFiles,
+                            sandbox,
+                            config.grant_sandbox_write_permissions
+                        ),
+                    ])
+
+                    // The latest state of copied data files
+                    config.data_files = updatedDataFiles
                 } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
                     if (process.env.JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_STARTED')
@@ -499,7 +505,7 @@ async function main(args, sandbox) {
                 )
                 process.exit(1)
             }
-        })
+        }
     })
 }
 
