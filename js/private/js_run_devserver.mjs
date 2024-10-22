@@ -302,7 +302,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 
 // Sync list of files to the sandbox
 async function syncFiles(files, sandbox, writePerm) {
-    console.error(`+ Syncing ${files.length} files && folders...`)
+    console.error(`+ Syncing ${files.length} files & folders...`)
     const startTime = perf_hooks.performance.now()
 
     const [nodeModulesFiles, otherFiles] = partitionArray(
