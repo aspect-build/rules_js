@@ -87,6 +87,8 @@ underlying npm packages.
 Supports running with [ibazel](https://github.com/bazelbuild/bazel-watcher).
 Only `data` files that change on incremental builds are synchronized when running with ibazel.
 
+Note that the use of `alias` targets is not supported by ibazel: https://github.com/bazelbuild/bazel-watcher/issues/100
+
 
 **PARAMETERS**
 
