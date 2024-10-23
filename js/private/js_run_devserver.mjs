@@ -184,14 +184,13 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
             }
             return (
                 await Promise.all(
-                    contents.map(
-                        async (entry) =>
-                            await syncRecursive(
-                                path.join(src, entry),
-                                path.join(dst, entry),
-                                sandbox,
-                                writePerm
-                            )
+                    contents.map((entry) =>
+                        syncRecursive(
+                            path.join(src, entry),
+                            path.join(dst, entry),
+                            sandbox,
+                            writePerm
+                        )
                     )
                 )
             ).reduce((s, t) => s + t, 0)
@@ -250,7 +249,7 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
 async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const startTime = perf_hooks.performance.now()
 
-    let totalDeleted = 0
+    const deletions = []
 
     // Remove files that were previously synced but are no longer in the updated list of files to sync
     const updatedFilesSet = new Set(updatedFiles)
@@ -279,18 +278,22 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
         mkdirs.clear()
 
         const rmPath = path.join(sandbox, f)
-        try {
-            fs.rmSync(rmPath, { recursive: true, force: true })
-        } catch (e) {
-            console.error(
-                `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
-            )
-        }
-        totalDeleted++
+        deletions.push(
+            fs.promises
+                .rm(rmPath, { recursive: true, force: true })
+                .catch((e) =>
+                    console.error(
+                        `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
+                    )
+                )
+        )
     }
+
+    await Promise.all(deletions)
 
     var endTime = perf_hooks.performance.now()
 
+    const totalDeleted = deletions.length
     if (totalDeleted > 0) {
         console.error(
             `${totalDeleted} file${totalDeleted > 1 ? 's' : ''}/folder${
@@ -302,8 +305,10 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 
 // Sync list of files to the sandbox
 async function syncFiles(files, sandbox, writePerm) {
-    console.error(`+ Syncing ${files.length} files && folders...`)
+    console.error(`+ Syncing ${files.length} files & folders...`)
     const startTime = perf_hooks.performance.now()
+
+    let syncPromises = []
 
     const [nodeModulesFiles, otherFiles] = partitionArray(
         files,
@@ -323,15 +328,13 @@ async function syncFiles(files, sandbox, writePerm) {
         )
     }
 
-    let totalSynced = (
-        await Promise.all(
-            otherFiles.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
-                const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, sandbox, writePerm)
-            })
-        )
-    ).reduce((s, t) => s + t, 0)
+    syncPromises = syncPromises.concat(
+        otherFiles.map((file) => {
+            const src = path.join(RUNFILES_ROOT, file)
+            const dst = path.join(sandbox, file)
+            return syncRecursive(src, dst, sandbox, writePerm)
+        })
+    )
 
     // Sync first-party package store files before other node_modules files since correctly syncing
     // direct 1p node_modules symlinks depends on checking if the package store synced files exist.
@@ -341,15 +344,13 @@ async function syncFiles(files, sandbox, writePerm) {
         )
     }
 
-    totalSynced += (
-        await Promise.all(
-            packageStore1pDeps.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
-                const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, sandbox, writePerm)
-            })
-        )
-    ).reduce((s, t) => s + t, 0)
+    syncPromises = syncPromises.concat(
+        packageStore1pDeps.map((file) => {
+            const src = path.join(RUNFILES_ROOT, file)
+            const dst = path.join(sandbox, file)
+            return syncRecursive(src, dst, sandbox, writePerm)
+        })
+    )
 
     // Finally sync all remaining node_modules files
     if (otherNodeModulesFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
@@ -358,15 +359,18 @@ async function syncFiles(files, sandbox, writePerm) {
         )
     }
 
-    totalSynced += (
-        await Promise.all(
-            otherNodeModulesFiles.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
-                const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, sandbox, writePerm)
-            })
-        )
-    ).reduce((s, t) => s + t, 0)
+    syncPromises = syncPromises.concat(
+        otherNodeModulesFiles.map((file) => {
+            const src = path.join(RUNFILES_ROOT, file)
+            const dst = path.join(sandbox, file)
+            return syncRecursive(src, dst, sandbox, writePerm)
+        })
+    )
+
+    const totalSynced = (await Promise.all(syncPromises)).reduce(
+        (s, t) => s + t,
+        0
+    )
 
     var endTime = perf_hooks.performance.now()
     console.error(
