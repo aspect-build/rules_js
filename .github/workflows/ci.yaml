@@ -60,6 +60,7 @@ jobs:
                     e2e/pnpm_workspace
                     e2e/pnpm_workspace_deps
                     e2e/pnpm_workspace_rerooted
+                    e2e/runfiles
                     e2e/rules_foo
                     e2e/stamped_package_json
                     e2e/update_pnpm_lock
@@ -102,7 +103,6 @@ jobs:
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
         outputs:
             bazel-version: ${{ steps.bazel-version.outputs.res }}
-            config: ${{ steps.config.outputs.res }}
             folder: ${{ steps.folder.outputs.res }}
             os: ${{ steps.os.outputs.res }}
 
@@ -116,7 +116,6 @@ jobs:
                 bazel-version: ${{ fromJSON(needs.matrix-prep.outputs.bazel-version) }}
                 bzlmod: [1, 0]
                 os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
-                config: ${{ fromJSON(needs.matrix-prep.outputs.config) }}
                 folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
                     # Exclude Windows default, will opt-in to includes
@@ -129,12 +128,13 @@ jobs:
                     # Don't run replace_packages test with bzlmod+Bazel 6 due to use of Bazel 7 bzlmod features
                     - bazel-version:
                           major: 6
-                    - bzlmod: 1
+                      bzlmod: 1
                       folder: e2e/npm_translate_lock_replace_packages
-                    # Don't run bzlmod tests with Bazel 6 to reduce the size of the test matrix
+                    # Don't run workspace tests with Bazel 6 to reduce the size of the test matrix
+                    # and remove the need for bazel 6 workspace support for local development.
                     - bazel-version:
                           major: 6
-                      bzlmod: 1
+                      bzlmod: 0
                     # Don't run workspace smoke test under bzlmod
                     - bzlmod: 1
                       folder: e2e/workspace
@@ -151,23 +151,39 @@ jobs:
                       folder: e2e/npm_link_package
                     - bzlmod: 1
                       folder: e2e/rules_foo
-                    # gyp_no_install_script is broken in an usual way on 6.5.0
+                    # gyp_no_install_script+patch_from_repo+js_run_devserver are broken in an usual way on 6.5.0
                     # that is not worth investigating as we're dropping Bazel 6 support soon
                     - bazel-version:
                           major: 6
-                      bzlmod: 0
                       folder: e2e/gyp_no_install_script
+                    - bazel-version:
+                          major: 6
+                      folder: e2e/patch_from_repo
+                    # devservers on bazel6+bzlmod also broken in an odd way
+                    - bazel-version:
+                          major: 6
+                      folder: e2e/js_run_devserver
+                    - bazel-version:
+                          major: 6
+                      folder: e2e/webpack_devserver
+                    - bazel-version:
+                          major: 6
+                      folder: e2e/webpack_devserver_esm
+                    # @bazel/runfiles seems broken with non-bzlmod + bazel7
+                    # https://github.com/bazel-contrib/rules_nodejs/issues/3797
+                    - bzlmod: 0
+                      folder: e2e/runfiles
                 include:
                     - bazel-version:
                           major: 7
-                          version: 7.1.1
+                          version: 7.3.2
                       bzlmod: 1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 7
-                          version: 7.1.1
+                          version: 7.3.2
                       bzlmod: 1
                       os: macos
                       config: local
@@ -194,7 +210,7 @@ jobs:
 
             # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
             # which exercises fetching a git repository via ssh.
-            - uses: webfactory/ssh-agent@v0.8.0
+            - uses: webfactory/ssh-agent@v0.9.0
               env:
                   ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
               if: env.ASPECT_GHTESTER_SSH_KEY != ''
@@ -204,16 +220,20 @@ jobs:
             - name: Mount bazel caches
               uses: actions/cache@v4
               with:
+                  # Cache the --dist_cache and --repository_cache directories (see ci.bazelrc)
+                  # and the default bazel output (https://bazel.build/remote/output-directories#layout)
+                  # and bazelisk cache.
                   path: |
                       ~/.cache/bazel-disk-cache
                       ~/.cache/bazel-repository-cache
-                      ~/.cache/xdg-cache
+                      ~/.cache/bazel
+                      ~/.cache/bazelisk
                   key: >-
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
                       ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
                       ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/.bazeliskrc', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.config }}-${{ matrix.folder }}-
+                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
 
             - name: Configure Bazel version
               working-directory: ${{ matrix.folder }}
@@ -245,16 +265,15 @@ jobs:
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.aspect/bazelrc/ci.bazelrc \
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
                     test \
-                    --config=${{ matrix.config }} \
-                    --test_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --build_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --config=local \
+                    --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --enable_bzlmod=${{ matrix.bzlmod }} \
                     //...
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
             - name: Check that unused npm packages were not fetched
               if: matrix.os != 'windows'
@@ -279,7 +298,7 @@ jobs:
               # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               # Don't run coverage on Windows. It is currently broken.
-              if: matrix.config == 'local' && matrix.os != 'windows'
+              if: matrix.os != 'windows'
               working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
@@ -288,9 +307,9 @@ jobs:
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.aspect/bazelrc/ci.bazelrc \
                     --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
                     coverage \
-                    --config=${{ matrix.config }} \
-                    --test_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --build_tag_filters=-skip-on-${{ matrix.config }},-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --config=local \
+                    --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --enable_bzlmod=${{ matrix.bzlmod }} \
                     --instrument_test_targets \
                     //...
@@ -298,7 +317,6 @@ jobs:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
 
             - name: ./test.sh
               # Run if there is a test.sh file in the folder.
@@ -312,4 +330,24 @@ jobs:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
+
+    # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
+    # on "all matrix jobs were successful".
+    conclusion:
+        needs: test
+        runs-on: ubuntu-latest
+        if: always()
+        steps:
+            - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3.0.3
+
+            # Note: possible conclusion values:
+            # https://github.com/technote-space/workflow-conclusion-action/blob/main/src/constant.ts
+            - name: report success
+              if: ${{ env.WORKFLOW_CONCLUSION == 'success' }}
+              working-directory: /tmp
+              run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 0
+
+            - name: report failure
+              if: ${{ env.WORKFLOW_CONCLUSION == 'failure' }}
+              working-directory: /tmp
+              run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 1

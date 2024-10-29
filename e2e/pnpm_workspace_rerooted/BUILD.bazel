@@ -27,3 +27,10 @@ build_test(
         "//lib/d:node_modules/alias-2",
     ],
 )
+
+build_test(
+    name = "vendored",
+    targets = [
+        "//:node_modules/lodash",
+    ],
+)

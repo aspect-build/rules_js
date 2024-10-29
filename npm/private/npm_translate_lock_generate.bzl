@@ -168,14 +168,14 @@ sh_binary(
                 if not dep_key in fp_links.keys():
                     msg = "Expected to find: referenced package {} in first-party links".format(dep_key)
                     fail(msg)
-                fp_links[dep_key]["link_packages"][link_package] = []
+                fp_links[dep_key]["link_packages"][link_package] = True
             elif dep_version.startswith("link:"):
                 dep_version = dep_version[len("link:"):]
                 dep_importer = paths.normalize("{}/{}".format(import_path, dep_version) if import_path else dep_version)
                 dep_path = helpers.link_package(root_package, import_path, dep_version)
                 dep_key = "{}+{}".format(dep_package, dep_path)
                 if dep_key in fp_links.keys():
-                    fp_links[dep_key]["link_packages"][link_package] = []
+                    fp_links[dep_key]["link_packages"][link_package] = True
                 else:
                     transitive_deps = {}
                     raw_deps = {}
@@ -199,7 +199,7 @@ sh_binary(
                     fp_links[dep_key] = {
                         "package": dep_package,
                         "path": dep_path,
-                        "link_packages": {link_package: []},
+                        "link_packages": {link_package: True},
                         "deps": transitive_deps,
                     }
 

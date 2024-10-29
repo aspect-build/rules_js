@@ -140,6 +140,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__acorn__8.12.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/test/image": ["acorn"],
+        },
+        package = "acorn",
+        version = "8.12.1",
+        url = "https://registry.npmjs.org/acorn/-/acorn-8.12.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        generate_bzl_library_targets = True,
+        integrity = "sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==",
+        transitive_closure = {
+            "acorn": ["8.12.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__acorn__8.7.1",
         root_package = "",
         link_workspace = "",
@@ -166,7 +185,6 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "examples/npm_package/packages/pkg_b": ["acorn"],
-            "js/private/test/image": ["acorn"],
         },
         package = "acorn",
         version = "8.8.2",
@@ -1917,6 +1935,25 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_bazel_runfiles__6.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "examples/runfiles": ["@bazel/runfiles"],
+        },
+        package = "@bazel/runfiles",
+        version = "6.3.0",
+        url = "https://registry.npmjs.org/@bazel/runfiles/-/runfiles-6.3.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        generate_bzl_library_targets = True,
+        integrity = "sha512-2Q+KC0ys+BLIBp6zsI8E6htEw1/R1cjA1Yt+3JiqdEB597aGpZKiJJP6FeJSA4LIAWlH/FDVDtgvJ77eeLNyiA==",
+        transitive_closure = {
+            "@bazel/runfiles": ["6.3.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_bcoe_v8-coverage__0.2.3",
         root_package = "",
         link_workspace = "",
@@ -1990,6 +2027,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_aix-ppc64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/aix-ppc64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-WtKdFM7ls47zkKHFVzMz8opM7LkcsIp9amDUBIAWirg70RM71WRSjdILPsY5Uv1D42ZpUfaPILDlfactHgsRkw==",
+        transitive_closure = {
+            "@esbuild/aix-ppc64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_android-arm64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2004,6 +2061,26 @@ def npm_repositories():
         integrity = "sha512-MIGl6p5sc3RDTLLkYL1MyL8BMRN4tLMRCn+yRJJmEDvYZ2M7tmAf80hx1kbNEUX2KJ50RRtxZ4JHLvCfuB6kBg==",
         transitive_closure = {
             "@esbuild/android-arm64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_android-arm64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/android-arm64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-Vsm497xFM7tTIPYK9bNTYJyF/lsP590Qc1WxJdlB6ljCbdZKU9SY8i7+Iin4kyhV/KV5J2rOKsBQbB77Ab7L/w==",
+        transitive_closure = {
+            "@esbuild/android-arm64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2030,6 +2107,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_android-arm__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/android-arm",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-arAtTPo76fJ/ICkXWetLCc9EwEHKaeya4vMrReVlEIUCAUncH7M4bhMQ+M9Vf+FFOZJdTNMXNBrWwW+OXWpSew==",
+        transitive_closure = {
+            "@esbuild/android-arm": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_android-x64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2044,6 +2141,26 @@ def npm_repositories():
         integrity = "sha512-a3kTv3m0Ghh4z1DaFEuEDfz3OLONKuFvI4Xqczqx4BqLyuFaFkuaG4j2MtA6fuWEFeC5x9IvqnX7drmRq/fyAQ==",
         transitive_closure = {
             "@esbuild/android-x64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_android-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/android-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-t8GrvnFkiIY7pa7mMgJd7p8p8qqYIz1NYiAoKc75Zyv73L3DZW++oYMSHPRarcotTKuSs6m3hTOa5CKHaS02TQ==",
+        transitive_closure = {
+            "@esbuild/android-x64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2070,6 +2187,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_darwin-arm64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/darwin-arm64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-CKyDpRbK1hXwv79soeTJNHb5EiG6ct3efd/FTPdzOWdbZZfGhpbcqIpiD0+vwmpu0wTIL97ZRPZu8vUt46nBSw==",
+        transitive_closure = {
+            "@esbuild/darwin-arm64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_darwin-x64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2084,6 +2221,26 @@ def npm_repositories():
         integrity = "sha512-2By45OBHulkd9Svy5IOCZt376Aa2oOkiE9QWUK9fe6Tb+WDr8hXL3dpqi+DeLiMed8tVXspzsTAvd0jUl96wmg==",
         transitive_closure = {
             "@esbuild/darwin-x64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_darwin-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/darwin-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-rgtz6flkVkh58od4PwTRqxbKH9cOjaXCMZgWD905JOzjFKW+7EiUObfd/Kav+A6Gyud6WZk9w+xu6QLytdi2OA==",
+        transitive_closure = {
+            "@esbuild/darwin-x64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2110,6 +2267,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_freebsd-arm64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/freebsd-arm64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-6Mtdq5nHggwfDNLAHkPlyLBpE5L6hwsuXZX8XNmHno9JuL2+bg2BX5tRkwjyfn6sKbxZTq68suOjgWqCicvPXA==",
+        transitive_closure = {
+            "@esbuild/freebsd-arm64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_freebsd-x64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2124,6 +2301,26 @@ def npm_repositories():
         integrity = "sha512-8ScTdNJl5idAKjH8zGAsN7RuWcyHG3BAvMNpKOBaqqR7EbUhhVHOqXRdL7oZvz8WNHL2pr5+eIT5c65kA6NHug==",
         transitive_closure = {
             "@esbuild/freebsd-x64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_freebsd-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/freebsd-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-D3H+xh3/zphoX8ck4S2RxKR6gHlHDXXzOf6f/9dbFt/NRBDIE33+cVa49Kil4WUjxMGW0ZIYBYtaGCa2+OsQwQ==",
+        transitive_closure = {
+            "@esbuild/freebsd-x64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2150,6 +2347,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_linux-arm64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-arm64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-TDijPXTOeE3eaMkRYpcy3LarIg13dS9wWHRdwYRnzlwlA370rNdZqbcp0WTyyV/k2zSxfko52+C7jU5F9Tfj1g==",
+        transitive_closure = {
+            "@esbuild/linux-arm64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_linux-arm__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2164,6 +2381,26 @@ def npm_repositories():
         integrity = "sha512-iihzrWbD4gIT7j3caMzKb/RsFFHCwqqbrbH9SqUSRrdXkXaygSZCZg1FybsZz57Ju7N/SHEgPyaR0LZ8Zbe9gQ==",
         transitive_closure = {
             "@esbuild/linux-arm": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_linux-arm__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-arm",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-gJKIi2IjRo5G6Glxb8d3DzYXlxdEj2NlkixPsqePSZMhLudqPhtZ4BUrpIuTjJYXxvF9njql+vRjB2oaC9XpBw==",
+        transitive_closure = {
+            "@esbuild/linux-arm": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2190,6 +2427,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_linux-ia32__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-ia32",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-K40ip1LAcA0byL05TbCQ4yJ4swvnbzHscRmUilrmP9Am7//0UjPreh4lpYzvThT2Quw66MhjG//20mrufm40mA==",
+        transitive_closure = {
+            "@esbuild/linux-ia32": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_linux-loong64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2204,6 +2461,26 @@ def npm_repositories():
         integrity = "sha512-dTzNnQwembNDhd654cA4QhbS9uDdXC3TKqMJjgOWsC0yNCbpzfWoXdZvp0mY7HU6nzk5E0zpRGGx3qoQg8T2DQ==",
         transitive_closure = {
             "@esbuild/linux-loong64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_linux-loong64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-loong64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-0mswrYP/9ai+CU0BzBfPMZ8RVm3RGAN/lmOMgW4aFUSOQBjA31UP8Mr6DDhWSuMwj7jaWOT0p0WoZ6jeHhrD7g==",
+        transitive_closure = {
+            "@esbuild/linux-loong64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2230,6 +2507,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_linux-mips64el__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-mips64el",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-hIKvXm0/3w/5+RDtCJeXqMZGkI2s4oMUGj3/jM0QzhgIASWrGO5/RlzAzm5nNh/awHE0A19h/CvHQe6FaBNrRA==",
+        transitive_closure = {
+            "@esbuild/linux-mips64el": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_linux-ppc64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2244,6 +2541,26 @@ def npm_repositories():
         integrity = "sha512-dzS678gYD1lJsW73zrFhDApLVdM3cUF2MvAa1D8K8KtcSKdLBPP4zZSLy6LFZ0jYqQdQ29bjAHJDgz0rVbLB3g==",
         transitive_closure = {
             "@esbuild/linux-ppc64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_linux-ppc64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-ppc64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-HcZh5BNq0aC52UoocJxaKORfFODWXZxtBaaZNuN3PUX3MoDsChsZqopzi5UupRhPHSEHotoiptqikjN/B77mYQ==",
+        transitive_closure = {
+            "@esbuild/linux-ppc64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2270,6 +2587,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_linux-riscv64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-riscv64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-bEh7dMn/h3QxeR2KTy1DUszQjUrIHPZKyO6aN1X4BCnhfYhuQqedHaa5MxSQA/06j3GpiIlFGSsy1c7Gf9padw==",
+        transitive_closure = {
+            "@esbuild/linux-riscv64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_linux-s390x__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2284,6 +2621,26 @@ def npm_repositories():
         integrity = "sha512-gzy7nUTO4UA4oZ2wAMXPNBGTzZFP7mss3aKR2hH+/4UUkCOyqmjXiKpzGrY2TlEUhbbejzXVKKGazYcQTZWA/w==",
         transitive_closure = {
             "@esbuild/linux-s390x": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_linux-s390x__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-s390x",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-ZcQ6+qRkw1UcZGPyrCiHHkmBaj9SiCD8Oqd556HldP+QlpUIe2Wgn3ehQGVoPOvZvtHm8HPx+bH20c9pvbkX3g==",
+        transitive_closure = {
+            "@esbuild/linux-s390x": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2310,6 +2667,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_linux-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-vbutsFqQ+foy3wSSbmjBXXIJ6PL3scghJoM8zCL142cGaZKAdCZHyf+Bpu/MmX9zT9Q0zFBVKb36Ma5Fzfa8xA==",
+        transitive_closure = {
+            "@esbuild/linux-x64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_netbsd-x64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2324,6 +2701,46 @@ def npm_repositories():
         integrity = "sha512-/PzmzD/zyAeTUsduZa32bn0ORug+Jd1EGGAUJvqfeixoEISYpGnAezN6lnJoskauoai0Jrs+XSyvDhppCPoKOA==",
         transitive_closure = {
             "@esbuild/netbsd-x64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_netbsd-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/netbsd-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-hjQ0R/ulkO8fCYFsG0FZoH+pWgTTDreqpqY7UnQntnaKv95uP5iW3+dChxnx7C3trQQU40S+OgWhUVwCjVFLvg==",
+        transitive_closure = {
+            "@esbuild/netbsd-x64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_openbsd-arm64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/openbsd-arm64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-MD9uzzkPQbYehwcN583yx3Tu5M8EIoTD+tUgKF982WYL9Pf5rKy9ltgD0eUgs8pvKnmizxjXZyLt0z6DC3rRXg==",
+        transitive_closure = {
+            "@esbuild/openbsd-arm64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2350,6 +2767,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_openbsd-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/openbsd-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-4ir0aY1NGUhIC1hdoCzr1+5b43mw99uNwVzhIq1OY3QcEwPDO3B7WNXBzaKY5Nsf1+N11i1eOfFcq+D/gOS15Q==",
+        transitive_closure = {
+            "@esbuild/openbsd-x64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_sunos-x64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2364,6 +2801,26 @@ def npm_repositories():
         integrity = "sha512-xtVUiev38tN0R3g8VhRfN7Zl42YCJvyBhRKw1RJjwE1d2emWTVToPLNEQj/5Qxc6lVFATDiy6LjVHYhIPrLxzw==",
         transitive_closure = {
             "@esbuild/sunos-x64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_sunos-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/sunos-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-jVzdzsbM5xrotH+W5f1s+JtUy1UWgjU0Cf4wMvffTB8m6wP5/kx0KiaLHlbJO+dMgtxKV8RQ/JvtlFcdZ1zCPA==",
+        transitive_closure = {
+            "@esbuild/sunos-x64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2390,6 +2847,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_win32-arm64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/win32-arm64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-iKc8GAslzRpBytO2/aN3d2yb2z8XTVfNV0PjGlCxKo5SgWmNXx82I/Q3aG1tFfS+A2igVCY97TJ8tnYwpUWLCA==",
+        transitive_closure = {
+            "@esbuild/win32-arm64": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_win32-ia32__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2410,6 +2887,26 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_esbuild_win32-ia32__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/win32-ia32",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-vQW36KZolfIudCcTnaTpmLQ24Ha1RjygBo39/aLkM2kmjkWmZGEJ5Gn9l5/7tzXA42QGIoWbICfg6KLLkIw6yw==",
+        transitive_closure = {
+            "@esbuild/win32-ia32": ["0.24.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
         name = "npm__at_esbuild_win32-x64__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -2424,6 +2921,26 @@ def npm_repositories():
         integrity = "sha512-y+EHuSchhL7FjHgvQL/0fnnFmO4T1bhvWANX6gcnqTjtnKWbTvUMCpGnv2+t+31d7RzyEAYAd4u2fnIhHL6N/Q==",
         transitive_closure = {
             "@esbuild/win32-x64": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "npm__at_esbuild_win32-x64__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/win32-x64",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-7IAFPrjSQIJrGsK6flwg7NFmwBoSTyF3rl7If0hNUFQU4ilTsEPL6GuMuU9BfIWVVGuRnuIidkSMC+c0Otu8IA==",
+        transitive_closure = {
+            "@esbuild/win32-x64": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -2462,7 +2979,7 @@ def npm_repositories():
             "@types/cacheable-request": ["6.0.3"],
             "@types/http-cache-semantics": ["4.0.1"],
             "@types/keyv": ["3.1.4"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/responselike": ["1.0.0"],
             "abbrev": ["1.1.1"],
             "ajv": ["6.12.6"],
@@ -2610,6 +3127,7 @@ def npm_repositories():
             "tunnel-agent": ["0.6.0"],
             "tweetnacl": ["0.14.5"],
             "type-fest": ["0.10.0"],
+            "undici-types": ["5.26.5"],
             "universalify": ["0.1.2"],
             "uri-js": ["4.4.1"],
             "util-deprecate": ["1.0.2"],
@@ -2738,6 +3256,28 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_isaacs_fs-minipass__4.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@isaacs/fs-minipass",
+        version = "4.0.1",
+        url = "https://registry.npmjs.org/@isaacs/fs-minipass/-/fs-minipass-4.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==",
+        deps = {
+            "minipass": "7.1.2",
+        },
+        transitive_closure = {
+            "@isaacs/fs-minipass": ["4.0.1"],
+            "minipass": ["7.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_istanbuljs_schema__0.1.3",
         root_package = "",
         link_workspace = "",
@@ -2805,6 +3345,33 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_jridgewell_gen-mapping__0.3.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/gen-mapping",
+        version = "0.3.5",
+        url = "https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.3.5.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==",
+        deps = {
+            "@jridgewell/set-array": "1.2.1",
+            "@jridgewell/sourcemap-codec": "1.4.14",
+            "@jridgewell/trace-mapping": "0.3.25",
+        },
+        transitive_closure = {
+            "@jridgewell/gen-mapping": ["0.3.5"],
+            "@jridgewell/resolve-uri": ["3.1.0"],
+            "@jridgewell/set-array": ["1.2.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "@jridgewell/trace-mapping": ["0.3.25"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_jridgewell_resolve-uri__3.1.0",
         root_package = "",
         link_workspace = "",
@@ -2839,6 +3406,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_jridgewell_set-array__1.2.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/set-array",
+        version = "1.2.1",
+        url = "https://registry.npmjs.org/@jridgewell/set-array/-/set-array-1.2.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-R8gLRTZeyp03ymzP/6Lil/28tGeGEzhx1q2k703KGWRAI1VdvPIXdG70VJc2pAMw3NA6JKL5hhFu1sJX0Mnn/A==",
+        transitive_closure = {
+            "@jridgewell/set-array": ["1.2.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_jridgewell_source-map__0.3.2",
         root_package = "",
         link_workspace = "",
@@ -2861,6 +3446,33 @@ def npm_repositories():
             "@jridgewell/source-map": ["0.3.2"],
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "@jridgewell/trace-mapping": ["0.3.17"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jridgewell_source-map__0.3.6",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/source-map",
+        version = "0.3.6",
+        url = "https://registry.npmjs.org/@jridgewell/source-map/-/source-map-0.3.6.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-1ZJTZebgqllO79ue2bm3rIGud/bOe0pP5BjSRCRxxYkEZS8STV7zN84UBbiYu7jy+eCKSnVIUgoWWE/tt+shMQ==",
+        deps = {
+            "@jridgewell/gen-mapping": "0.3.5",
+            "@jridgewell/trace-mapping": "0.3.25",
+        },
+        transitive_closure = {
+            "@jridgewell/gen-mapping": ["0.3.5"],
+            "@jridgewell/resolve-uri": ["3.1.0"],
+            "@jridgewell/set-array": ["1.2.1"],
+            "@jridgewell/source-map": ["0.3.6"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "@jridgewell/trace-mapping": ["0.3.25"],
         },
     )
 
@@ -2905,15 +3517,83 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_fc681991e61c6808dd26012a2331f83671a11218_bufferutil_4.0.7",
+        name = "npm__at_jridgewell_trace-mapping__0.3.25",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jridgewell/trace-mapping",
+        version = "0.3.25",
+        url = "https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.25.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==",
+        deps = {
+            "@jridgewell/resolve-uri": "3.1.0",
+            "@jridgewell/sourcemap-codec": "1.4.14",
+        },
+        transitive_closure = {
+            "@jridgewell/resolve-uri": ["3.1.0"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "@jridgewell/trace-mapping": ["0.3.25"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jsep-plugin_assignment__1.2.1_jsep_1.3.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jsep-plugin/assignment",
+        version = "1.2.1_jsep_1.3.9",
+        url = "https://registry.npmjs.org/@jsep-plugin/assignment/-/assignment-1.2.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-gaHqbubTi29aZpVbBlECRpmdia+L5/lh2BwtIJTmtxdbecEyyX/ejAOg7eQDGNvGOUmPY7Z2Yxdy9ioyH/VJeA==",
+        deps = {
+            "jsep": "1.3.9",
+        },
+        transitive_closure = {
+            "@jsep-plugin/assignment": ["1.2.1_jsep_1.3.9"],
+            "jsep": ["1.3.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_jsep-plugin_regex__1.0.3_jsep_1.3.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@jsep-plugin/regex",
+        version = "1.0.3_jsep_1.3.9",
+        url = "https://registry.npmjs.org/@jsep-plugin/regex/-/regex-1.0.3.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-XfZgry4DwEZvSFtS/6Y+R48D7qJYJK6R9/yJFyUFHCIUMEEHuJ4X95TDgJp5QkmzfLYvapMPzskV5HpIDrREug==",
+        deps = {
+            "jsep": "1.3.9",
+        },
+        transitive_closure = {
+            "@jsep-plugin/regex": ["1.0.3_jsep_1.3.9"],
+            "jsep": ["1.3.9"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_kubernetes_client-node__github.com_kubernetes-client_javascript_bd6ab5810d013103d244ddaebe0304649c012b38_bufferutil_4.0.8",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["@kubernetes/client-node"],
         },
         package = "@kubernetes/client-node",
-        version = "github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil_4.0.7",
-        url = "https://codeload.github.com/kubernetes-client/javascript/tar.gz/fc681991e61c6808dd26012a2331f83671a11218",
+        version = "github.com/kubernetes-client/javascript/bd6ab5810d013103d244ddaebe0304649c012b38_bufferutil_4.0.8",
+        url = "https://codeload.github.com/kubernetes-client/javascript/tar.gz/bd6ab5810d013103d244ddaebe0304649c012b38",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
@@ -2921,34 +3601,39 @@ def npm_repositories():
         deps = {
             "openid-client": "5.4.0",
             "@types/js-yaml": "4.0.5",
-            "@types/node": "18.13.0",
+            "@types/node": "22.7.4",
             "@types/request": "2.48.8",
             "@types/underscore": "1.11.4",
             "@types/ws": "8.5.5",
             "byline": "5.0.0",
-            "isomorphic-ws": "5.0.0_ws_8.13.0",
+            "isomorphic-ws": "5.0.0_ws_8.18.0",
             "js-yaml": "4.1.0",
-            "jsonpath-plus": "7.2.0",
+            "jsonpath-plus": "9.0.0",
             "request": "2.88.2",
             "rfc4648": "1.5.2",
             "stream-buffers": "3.0.2",
-            "tar": "6.1.13",
-            "tmp-promise": "3.0.3",
-            "tslib": "2.6.0",
+            "tar": "7.4.3",
+            "tslib": "2.7.0",
             "typescript": "4.9.5",
-            "underscore": "1.13.6",
-            "ws": "8.13.0_bufferutil_4.0.7",
+            "ws": "8.18.0_bufferutil_4.0.8",
         },
         transitive_closure = {
-            "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/fc681991e61c6808dd26012a2331f83671a11218_bufferutil_4.0.7"],
+            "@isaacs/cliui": ["8.0.2"],
+            "@isaacs/fs-minipass": ["4.0.1"],
+            "@jsep-plugin/assignment": ["1.2.1_jsep_1.3.9"],
+            "@jsep-plugin/regex": ["1.0.3_jsep_1.3.9"],
+            "@kubernetes/client-node": ["github.com/kubernetes-client/javascript/bd6ab5810d013103d244ddaebe0304649c012b38_bufferutil_4.0.8"],
+            "@pkgjs/parseargs": ["0.11.0"],
             "@types/caseless": ["0.12.2"],
             "@types/js-yaml": ["4.0.5"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["22.7.4", "18.19.54"],
             "@types/request": ["2.48.8"],
             "@types/tough-cookie": ["4.0.2"],
             "@types/underscore": ["1.11.4"],
             "@types/ws": ["8.5.5"],
             "ajv": ["6.12.6"],
+            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-styles": ["4.3.0", "6.2.1"],
             "argparse": ["2.0.1"],
             "asn1": ["0.2.6"],
             "assert-plus": ["1.0.0"],
@@ -2957,83 +3642,93 @@ def npm_repositories():
             "aws4": ["1.12.0"],
             "balanced-match": ["1.0.2"],
             "bcrypt-pbkdf": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "bufferutil": ["4.0.7"],
+            "brace-expansion": ["2.0.1"],
+            "bufferutil": ["4.0.8"],
             "byline": ["5.0.0"],
             "caseless": ["0.12.0"],
-            "chownr": ["2.0.0"],
+            "chownr": ["3.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
             "combined-stream": ["1.0.8"],
-            "concat-map": ["0.0.1"],
             "core-util-is": ["1.0.2"],
+            "cross-spawn": ["7.0.3"],
             "dashdash": ["1.14.1"],
             "delayed-stream": ["1.0.0"],
+            "eastasianwidth": ["0.2.0"],
             "ecc-jsbn": ["0.1.2"],
+            "emoji-regex": ["8.0.0", "9.2.2"],
             "extend": ["3.0.2"],
             "extsprintf": ["1.3.0"],
             "fast-deep-equal": ["3.1.3"],
             "fast-json-stable-stringify": ["2.1.0"],
+            "foreground-child": ["3.1.1"],
             "forever-agent": ["0.6.1"],
             "form-data": ["2.5.1", "2.3.3"],
-            "fs-minipass": ["2.1.0"],
-            "fs.realpath": ["1.0.0"],
             "getpass": ["0.1.7"],
-            "glob": ["7.2.3"],
+            "glob": ["10.4.5"],
             "har-schema": ["2.0.0"],
             "har-validator": ["5.1.5"],
             "http-signature": ["1.2.0"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
+            "is-fullwidth-code-point": ["3.0.0"],
             "is-typedarray": ["1.0.0"],
-            "isomorphic-ws": ["5.0.0_ws_8.13.0"],
+            "isexe": ["2.0.0"],
+            "isomorphic-ws": ["5.0.0_ws_8.18.0"],
             "isstream": ["0.1.2"],
+            "jackspeak": ["3.4.3"],
             "jose": ["4.12.0"],
             "js-yaml": ["4.1.0"],
             "jsbn": ["0.1.1"],
+            "jsep": ["1.3.9"],
             "json-schema": ["0.4.0"],
             "json-schema-traverse": ["0.4.1"],
             "json-stringify-safe": ["5.0.1"],
-            "jsonpath-plus": ["7.2.0"],
+            "jsonpath-plus": ["9.0.0"],
             "jsprim": ["1.4.2"],
-            "lru-cache": ["6.0.0"],
+            "lru-cache": ["6.0.0", "10.4.3"],
             "mime-db": ["1.52.0"],
             "mime-types": ["2.1.35"],
-            "minimatch": ["3.1.2"],
-            "minipass": ["3.3.6", "4.2.4"],
-            "minizlib": ["2.1.2"],
-            "mkdirp": ["1.0.4"],
+            "minimatch": ["9.0.5"],
+            "minipass": ["7.1.2"],
+            "minizlib": ["3.0.1"],
+            "mkdirp": ["3.0.1"],
             "node-gyp-build": ["4.6.0"],
             "oauth-sign": ["0.9.0"],
             "object-hash": ["2.2.0"],
             "oidc-token-hash": ["5.0.1"],
-            "once": ["1.4.0"],
             "openid-client": ["5.4.0"],
-            "path-is-absolute": ["1.0.1"],
+            "package-json-from-dist": ["1.0.1"],
+            "path-key": ["3.1.1"],
+            "path-scurry": ["1.11.1"],
             "performance-now": ["2.1.0"],
             "psl": ["1.9.0"],
             "punycode": ["2.3.0"],
             "qs": ["6.5.3"],
             "request": ["2.88.2"],
             "rfc4648": ["1.5.2"],
-            "rimraf": ["3.0.2"],
+            "rimraf": ["5.0.10"],
             "safe-buffer": ["5.2.1"],
             "safer-buffer": ["2.1.2"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "signal-exit": ["4.1.0"],
             "sshpk": ["1.17.0"],
             "stream-buffers": ["3.0.2"],
-            "tar": ["6.1.13"],
-            "tmp": ["0.2.1"],
-            "tmp-promise": ["3.0.3"],
+            "string-width": ["5.1.2", "4.2.3"],
+            "strip-ansi": ["7.1.0", "6.0.1"],
+            "tar": ["7.4.3"],
             "tough-cookie": ["2.5.0"],
-            "tslib": ["2.6.0"],
+            "tslib": ["2.7.0"],
             "tunnel-agent": ["0.6.0"],
             "tweetnacl": ["0.14.5"],
             "typescript": ["4.9.5"],
-            "underscore": ["1.13.6"],
+            "undici-types": ["6.19.8", "5.26.5"],
             "uri-js": ["4.4.1"],
             "uuid": ["3.4.0"],
             "verror": ["1.10.0"],
-            "wrappy": ["1.0.2"],
-            "ws": ["8.13.0_bufferutil_4.0.7"],
-            "yallist": ["4.0.0"],
+            "which": ["2.0.2"],
+            "wrap-ansi": ["8.1.0", "7.0.0"],
+            "ws": ["8.18.0_bufferutil_4.0.8"],
+            "yallist": ["4.0.0", "5.0.0"],
         },
         lifecycle_hooks = ["build"],
         lifecycle_hooks_execution_requirements = [],
@@ -3586,7 +4281,7 @@ def npm_repositories():
         },
         transitive_closure = {
             "@puppeteer/browsers": ["0.5.0_typescript_4.9.5"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/yauzl": ["2.10.0"],
             "agent-base": ["6.0.2"],
             "ansi-regex": ["5.0.1"],
@@ -3632,6 +4327,7 @@ def npm_repositories():
             "through": ["2.3.8"],
             "typescript": ["4.9.5"],
             "unbzip2-stream": ["1.4.3"],
+            "undici-types": ["5.26.5"],
             "util-deprecate": ["1.0.2"],
             "wrap-ansi": ["7.0.0"],
             "wrappy": ["1.0.2"],
@@ -3700,7 +4396,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.0_rollup_2.79.1",
+        name = "npm__at_rollup_plugin-commonjs__23.0.7_rollup_2.79.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3708,25 +4404,26 @@ def npm_repositories():
             "js/private/worker/src": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "23.0.0_rollup_2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.0.tgz",
+        version = "23.0.7_rollup_2.79.2",
+        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.7.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-JbrTRyDNtLQj/rhl7RFUuYXwQ2fac+33oLDAu2k++WD95zweyo28UAomLVA0JMGx4vmCa7Nw4T6k/1F6lelExg==",
+        integrity = "sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==",
         deps = {
-            "@rollup/pluginutils": "4.2.1",
+            "@rollup/pluginutils": "5.0.2_rollup_2.79.2",
             "commondir": "1.0.1",
             "estree-walker": "2.0.2",
             "glob": "8.1.0",
             "is-reference": "1.2.1",
-            "magic-string": "0.26.7",
-            "rollup": "2.79.1",
+            "magic-string": "0.27.0",
+            "rollup": "2.79.2",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.0_rollup_2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "@rollup/plugin-commonjs": ["23.0.7_rollup_2.79.2"],
+            "@rollup/pluginutils": ["5.0.2_rollup_2.79.2"],
             "@types/estree": ["1.0.0"],
             "balanced-match": ["1.0.2"],
             "brace-expansion": ["2.0.1"],
@@ -3738,43 +4435,43 @@ def npm_repositories():
             "inflight": ["1.0.6"],
             "inherits": ["2.0.4"],
             "is-reference": ["1.2.1"],
-            "magic-string": ["0.26.7"],
+            "magic-string": ["0.27.0"],
             "minimatch": ["5.1.6"],
             "once": ["1.4.0"],
             "picomatch": ["2.3.1"],
-            "rollup": ["2.79.1"],
-            "sourcemap-codec": ["1.4.8"],
+            "rollup": ["2.79.2"],
             "wrappy": ["1.0.2"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-commonjs__23.0.2_rollup_3.2.5",
+        name = "npm__at_rollup_plugin-commonjs__23.0.7_rollup_3.29.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-commonjs"],
         },
         package = "@rollup/plugin-commonjs",
-        version = "23.0.2_rollup_3.2.5",
-        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.2.tgz",
+        version = "23.0.7_rollup_3.29.5",
+        url = "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-23.0.7.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-e9ThuiRf93YlVxc4qNIurvv+Hp9dnD+4PjOqQs5vAYfcZ3+AXSrcdzXnVjWxcGQOa6KGJFcRZyUI3ktWLavFjg==",
+        integrity = "sha512-hsSD5Qzyuat/swzrExGG5l7EuIlPhwTsT7KwKbSCQzIcJWjRxiimi/0tyMYY2bByitNb3i1p+6JWEDGa0NvT0Q==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup_3.2.5",
+            "@rollup/pluginutils": "5.0.2_rollup_3.29.5",
             "commondir": "1.0.1",
             "estree-walker": "2.0.2",
             "glob": "8.1.0",
             "is-reference": "1.2.1",
-            "magic-string": "0.26.7",
-            "rollup": "3.2.5",
+            "magic-string": "0.27.0",
+            "rollup": "3.29.5",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.2_rollup_3.2.5"],
-            "@rollup/pluginutils": ["5.0.2_rollup_3.2.5"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "@rollup/plugin-commonjs": ["23.0.7_rollup_3.29.5"],
+            "@rollup/pluginutils": ["5.0.2_rollup_3.29.5"],
             "@types/estree": ["1.0.0"],
             "balanced-match": ["1.0.2"],
             "brace-expansion": ["2.0.1"],
@@ -3786,77 +4483,77 @@ def npm_repositories():
             "inflight": ["1.0.6"],
             "inherits": ["2.0.4"],
             "is-reference": ["1.2.1"],
-            "magic-string": ["0.26.7"],
+            "magic-string": ["0.27.0"],
             "minimatch": ["5.1.6"],
             "once": ["1.4.0"],
             "picomatch": ["2.3.1"],
-            "rollup": ["3.2.5"],
-            "sourcemap-codec": ["1.4.8"],
+            "rollup": ["3.29.5"],
             "wrappy": ["1.0.2"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.0_rollup_2.79.1",
+        name = "npm__at_rollup_plugin-json__5.0.2_rollup_2.79.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["@rollup/plugin-json"],
         },
         package = "@rollup/plugin-json",
-        version = "5.0.0_rollup_2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.0.tgz",
+        version = "5.0.2_rollup_2.79.2",
+        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.2.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-LsWDA5wJs/ggzakVuKQhZo7HPRcQZgBa3jWIVxQSFxaRToUGNi8ZBh3+k/gQ+1eInVYJgn4WBRCUkmoDrmmGzw==",
+        integrity = "sha512-D1CoOT2wPvadWLhVcmpkDnesTzjhNIQRWLsc3fA49IFOP2Y84cFOOJ+nKGYedvXHKUsPeq07HR4hXpBBr+CHlA==",
         deps = {
-            "@rollup/pluginutils": "4.2.1",
-            "rollup": "2.79.1",
+            "@rollup/pluginutils": "5.0.2_rollup_2.79.2",
+            "rollup": "2.79.2",
         },
         transitive_closure = {
-            "@rollup/plugin-json": ["5.0.0_rollup_2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
+            "@rollup/plugin-json": ["5.0.2_rollup_2.79.2"],
+            "@rollup/pluginutils": ["5.0.2_rollup_2.79.2"],
+            "@types/estree": ["1.0.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
             "picomatch": ["2.3.1"],
-            "rollup": ["2.79.1"],
+            "rollup": ["2.79.2"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-json__5.0.1_rollup_3.2.5",
+        name = "npm__at_rollup_plugin-json__5.0.2_rollup_3.29.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-json"],
         },
         package = "@rollup/plugin-json",
-        version = "5.0.1_rollup_3.2.5",
-        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.1.tgz",
+        version = "5.0.2_rollup_3.29.5",
+        url = "https://registry.npmjs.org/@rollup/plugin-json/-/plugin-json-5.0.2.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-QCwhZZLvM8nRcTHyR1vOgyTMiAnjiNj1ebD/BMRvbO1oc/z14lZH6PfxXeegee2B6mky/u9fia4fxRM4TqrUaw==",
+        integrity = "sha512-D1CoOT2wPvadWLhVcmpkDnesTzjhNIQRWLsc3fA49IFOP2Y84cFOOJ+nKGYedvXHKUsPeq07HR4hXpBBr+CHlA==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup_3.2.5",
-            "rollup": "3.2.5",
+            "@rollup/pluginutils": "5.0.2_rollup_3.29.5",
+            "rollup": "3.29.5",
         },
         transitive_closure = {
-            "@rollup/plugin-json": ["5.0.1_rollup_3.2.5"],
-            "@rollup/pluginutils": ["5.0.2_rollup_3.2.5"],
+            "@rollup/plugin-json": ["5.0.2_rollup_3.29.5"],
+            "@rollup/pluginutils": ["5.0.2_rollup_3.29.5"],
             "@types/estree": ["1.0.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
             "picomatch": ["2.3.1"],
-            "rollup": ["3.2.5"],
+            "rollup": ["3.29.5"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.0_rollup_2.79.1",
+        name = "npm__at_rollup_plugin-node-resolve__15.3.0_rollup_2.79.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -3864,135 +4561,130 @@ def npm_repositories():
             "js/private/worker/src": ["@rollup/plugin-node-resolve"],
         },
         package = "@rollup/plugin-node-resolve",
-        version = "15.0.0_rollup_2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.0.0.tgz",
+        version = "15.3.0_rollup_2.79.2",
+        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.3.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-iwJbzfTzlzDDQcGmkS7EkCKwe2kSkdBrjX87Fy/KrNjr6UNnLpod0t6X66e502LRe5JJCA4FFqrEscWPnZAkig==",
+        integrity = "sha512-9eO5McEICxMzJpDW9OnMYSv4Sta3hmt7VtBFz5zR9273suNOydOyq/FrGeGy+KsTRFm8w0SLVhzig2ILFT63Ag==",
         deps = {
-            "@rollup/pluginutils": "4.2.1",
+            "@rollup/pluginutils": "5.0.2_rollup_2.79.2",
             "@types/resolve": "1.20.2",
             "deepmerge": "4.3.0",
-            "is-builtin-module": "3.2.1",
             "is-module": "1.0.0",
             "resolve": "1.22.1",
-            "rollup": "2.79.1",
+            "rollup": "2.79.2",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["15.0.0_rollup_2.79.1"],
-            "@rollup/pluginutils": ["4.2.1"],
+            "@rollup/plugin-node-resolve": ["15.3.0_rollup_2.79.2"],
+            "@rollup/pluginutils": ["5.0.2_rollup_2.79.2"],
+            "@types/estree": ["1.0.0"],
             "@types/resolve": ["1.20.2"],
-            "builtin-modules": ["3.3.0"],
             "deepmerge": ["4.3.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
             "function-bind": ["1.1.1"],
             "has": ["1.0.3"],
-            "is-builtin-module": ["3.2.1"],
             "is-core-module": ["2.11.0"],
             "is-module": ["1.0.0"],
             "path-parse": ["1.0.7"],
             "picomatch": ["2.3.1"],
             "resolve": ["1.22.1"],
-            "rollup": ["2.79.1"],
+            "rollup": ["2.79.2"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-node-resolve__15.0.1_rollup_3.2.5",
+        name = "npm__at_rollup_plugin-node-resolve__15.3.0_rollup_3.29.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["@rollup/plugin-node-resolve"],
         },
         package = "@rollup/plugin-node-resolve",
-        version = "15.0.1_rollup_3.2.5",
-        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.0.1.tgz",
+        version = "15.3.0_rollup_3.29.5",
+        url = "https://registry.npmjs.org/@rollup/plugin-node-resolve/-/plugin-node-resolve-15.3.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-ReY88T7JhJjeRVbfCyNj+NXAG3IIsVMsX9b5/9jC98dRP8/yxlZdz7mHZbHk5zHr24wZZICS5AcXsFZAXYUQEg==",
+        integrity = "sha512-9eO5McEICxMzJpDW9OnMYSv4Sta3hmt7VtBFz5zR9273suNOydOyq/FrGeGy+KsTRFm8w0SLVhzig2ILFT63Ag==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup_3.2.5",
+            "@rollup/pluginutils": "5.0.2_rollup_3.29.5",
             "@types/resolve": "1.20.2",
             "deepmerge": "4.3.0",
-            "is-builtin-module": "3.2.1",
             "is-module": "1.0.0",
             "resolve": "1.22.1",
-            "rollup": "3.2.5",
+            "rollup": "3.29.5",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["15.0.1_rollup_3.2.5"],
-            "@rollup/pluginutils": ["5.0.2_rollup_3.2.5"],
+            "@rollup/plugin-node-resolve": ["15.3.0_rollup_3.29.5"],
+            "@rollup/pluginutils": ["5.0.2_rollup_3.29.5"],
             "@types/estree": ["1.0.0"],
             "@types/resolve": ["1.20.2"],
-            "builtin-modules": ["3.3.0"],
             "deepmerge": ["4.3.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
             "function-bind": ["1.1.1"],
             "has": ["1.0.3"],
-            "is-builtin-module": ["3.2.1"],
             "is-core-module": ["2.11.0"],
             "is-module": ["1.0.0"],
             "path-parse": ["1.0.7"],
             "picomatch": ["2.3.1"],
             "resolve": ["1.22.1"],
-            "rollup": ["3.2.5"],
+            "rollup": ["3.29.5"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-terser__0.2.0_rollup_2.79.1",
+        name = "npm__at_rollup_plugin-terser__0.4.4_rollup_2.79.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["@rollup/plugin-terser"],
         },
         package = "@rollup/plugin-terser",
-        version = "0.2.0_rollup_2.79.1",
-        url = "https://registry.npmjs.org/@rollup/plugin-terser/-/plugin-terser-0.2.0.tgz",
+        version = "0.4.4_rollup_2.79.2",
+        url = "https://registry.npmjs.org/@rollup/plugin-terser/-/plugin-terser-0.4.4.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-UBr4WNXBFipKW2C2db9JIzIdq9bFZsaTZwKeAd9Y0N9Pv9G2XgRhaimGdotx1+Wf/2XTuTJ+FVS2SO+y2WyiUQ==",
+        integrity = "sha512-XHeJC5Bgvs8LfukDwWZp7yeqin6ns8RTl2B9avbejt6tZqsqvVoWI7ZTQrcNsfKEDWBTnTxM8nMDkO2IFFbd0A==",
         deps = {
-            "rollup": "2.79.1",
+            "rollup": "2.79.2",
             "serialize-javascript": "6.0.1",
-            "smob": "0.0.6",
-            "terser": "5.16.5",
+            "smob": "1.5.0",
+            "terser": "5.34.1",
         },
         transitive_closure = {
-            "@jridgewell/gen-mapping": ["0.3.2"],
+            "@jridgewell/gen-mapping": ["0.3.5"],
             "@jridgewell/resolve-uri": ["3.1.0"],
-            "@jridgewell/set-array": ["1.1.2"],
-            "@jridgewell/source-map": ["0.3.2"],
+            "@jridgewell/set-array": ["1.2.1"],
+            "@jridgewell/source-map": ["0.3.6"],
             "@jridgewell/sourcemap-codec": ["1.4.14"],
-            "@jridgewell/trace-mapping": ["0.3.17"],
-            "@rollup/plugin-terser": ["0.2.0_rollup_2.79.1"],
-            "acorn": ["8.8.2"],
+            "@jridgewell/trace-mapping": ["0.3.25"],
+            "@rollup/plugin-terser": ["0.4.4_rollup_2.79.2"],
+            "acorn": ["8.12.1"],
             "buffer-from": ["1.1.2"],
             "commander": ["2.20.3"],
             "fsevents": ["2.3.2"],
             "randombytes": ["2.1.0"],
-            "rollup": ["2.79.1"],
+            "rollup": ["2.79.2"],
             "safe-buffer": ["5.2.1"],
             "serialize-javascript": ["6.0.1"],
-            "smob": ["0.0.6"],
+            "smob": ["1.5.0"],
             "source-map": ["0.6.1"],
             "source-map-support": ["0.5.21"],
-            "terser": ["5.16.5"],
+            "terser": ["5.34.1"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_plugin-typescript__10.0.1_500960093",
+        name = "npm__at_rollup_plugin-typescript__10.0.1_574194173",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -4000,7 +4692,7 @@ def npm_repositories():
             "js/private/worker/src": ["@rollup/plugin-typescript"],
         },
         package = "@rollup/plugin-typescript",
-        version = "10.0.1_500960093",
+        version = "10.0.1_574194173",
         url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-10.0.1.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -4008,15 +4700,15 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==",
         deps = {
-            "@rollup/pluginutils": "5.0.2_rollup_2.79.1",
+            "@rollup/pluginutils": "5.0.2_rollup_2.79.2",
             "resolve": "1.22.1",
-            "rollup": "2.79.1",
-            "tslib": "2.6.0",
+            "rollup": "2.79.2",
+            "tslib": "2.7.0",
             "typescript": "4.9.5",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": ["10.0.1_500960093"],
-            "@rollup/pluginutils": ["5.0.2_rollup_2.79.1"],
+            "@rollup/plugin-typescript": ["10.0.1_574194173"],
+            "@rollup/pluginutils": ["5.0.2_rollup_2.79.2"],
             "@types/estree": ["1.0.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
@@ -4026,9 +4718,9 @@ def npm_repositories():
             "path-parse": ["1.0.7"],
             "picomatch": ["2.3.1"],
             "resolve": ["1.22.1"],
-            "rollup": ["2.79.1"],
+            "rollup": ["2.79.2"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
-            "tslib": ["2.6.0"],
+            "tslib": ["2.7.0"],
             "typescript": ["4.9.5"],
         },
     )
@@ -4063,36 +4755,12 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__4.2.1",
+        name = "npm__at_rollup_pluginutils__5.0.2_rollup_2.79.2",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@rollup/pluginutils",
-        version = "4.2.1",
-        url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-4.2.1.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==",
-        deps = {
-            "estree-walker": "2.0.2",
-            "picomatch": "2.3.1",
-        },
-        transitive_closure = {
-            "@rollup/pluginutils": ["4.2.1"],
-            "estree-walker": ["2.0.2"],
-            "picomatch": ["2.3.1"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_rollup_pluginutils__5.0.2_rollup_2.79.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@rollup/pluginutils",
-        version = "5.0.2_rollup_2.79.1",
+        version = "5.0.2_rollup_2.79.2",
         url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-5.0.2.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -4103,25 +4771,25 @@ def npm_repositories():
             "@types/estree": "1.0.0",
             "estree-walker": "2.0.2",
             "picomatch": "2.3.1",
-            "rollup": "2.79.1",
+            "rollup": "2.79.2",
         },
         transitive_closure = {
-            "@rollup/pluginutils": ["5.0.2_rollup_2.79.1"],
+            "@rollup/pluginutils": ["5.0.2_rollup_2.79.2"],
             "@types/estree": ["1.0.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
             "picomatch": ["2.3.1"],
-            "rollup": ["2.79.1"],
+            "rollup": ["2.79.2"],
         },
     )
 
     npm_import(
-        name = "npm__at_rollup_pluginutils__5.0.2_rollup_3.2.5",
+        name = "npm__at_rollup_pluginutils__5.0.2_rollup_3.29.5",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "@rollup/pluginutils",
-        version = "5.0.2_rollup_3.2.5",
+        version = "5.0.2_rollup_3.29.5",
         url = "https://registry.npmjs.org/@rollup/pluginutils/-/pluginutils-5.0.2.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -4132,15 +4800,15 @@ def npm_repositories():
             "@types/estree": "1.0.0",
             "estree-walker": "2.0.2",
             "picomatch": "2.3.1",
-            "rollup": "3.2.5",
+            "rollup": "3.29.5",
         },
         transitive_closure = {
-            "@rollup/pluginutils": ["5.0.2_rollup_3.2.5"],
+            "@rollup/pluginutils": ["5.0.2_rollup_3.29.5"],
             "@types/estree": ["1.0.0"],
             "estree-walker": ["2.0.2"],
             "fsevents": ["2.3.2"],
             "picomatch": ["2.3.1"],
-            "rollup": ["3.2.5"],
+            "rollup": ["3.29.5"],
         },
     )
 
@@ -4315,28 +4983,28 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_types_archiver__5.3.1",
+        name = "npm__at_types_archiver__5.3.4",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/image": ["@types/archiver"],
         },
         package = "@types/archiver",
-        version = "5.3.1",
-        url = "https://registry.yarnpkg.com/@types/archiver/-/archiver-5.3.1.tgz",
+        version = "5.3.4",
+        url = "https://registry.npmjs.org/@types/archiver/-/archiver-5.3.4.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==",
+        integrity = "sha512-Lj7fLBIMwYFgViVVZHEdExZC3lVYsl+QL0VmdNdIzGZH544jHveYWij6qdnBgJQDnR7pMKliN9z2cPZFEbhyPw==",
         deps = {
-            "@types/glob": "8.1.0",
+            "@types/readdir-glob": "1.1.5",
         },
         transitive_closure = {
-            "@types/archiver": ["5.3.1"],
-            "@types/glob": ["8.1.0"],
-            "@types/minimatch": ["5.1.2"],
-            "@types/node": ["18.13.0"],
+            "@types/archiver": ["5.3.4"],
+            "@types/node": ["18.19.54"],
+            "@types/readdir-glob": ["1.1.5"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -4356,15 +5024,16 @@ def npm_repositories():
         deps = {
             "@types/http-cache-semantics": "4.0.1",
             "@types/keyv": "3.1.4",
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
             "@types/responselike": "1.0.0",
         },
         transitive_closure = {
             "@types/cacheable-request": ["6.0.3"],
             "@types/http-cache-semantics": ["4.0.1"],
             "@types/keyv": ["3.1.4"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/responselike": ["1.0.0"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -4478,6 +5147,7 @@ def npm_repositories():
         url = "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
+        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==",
         transitive_closure = {
@@ -4486,46 +5156,22 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__at_types_glob__8.1.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/glob",
-        version = "8.1.0",
-        url = "https://registry.yarnpkg.com/@types/glob/-/glob-8.1.0.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==",
-        deps = {
-            "@types/minimatch": "5.1.2",
-            "@types/node": "18.13.0",
-        },
-        transitive_closure = {
-            "@types/glob": ["8.1.0"],
-            "@types/minimatch": ["5.1.2"],
-            "@types/node": ["18.13.0"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_google-protobuf__3.15.6",
+        name = "npm__at_types_google-protobuf__3.15.12",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["@types/google-protobuf"],
         },
         package = "@types/google-protobuf",
-        version = "3.15.6",
-        url = "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.6.tgz",
+        version = "3.15.12",
+        url = "https://registry.npmjs.org/@types/google-protobuf/-/google-protobuf-3.15.12.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw==",
+        integrity = "sha512-40um9QqwHjRS92qnOaDpL7RmDK15NuZYo9HihiJRbYkMQZlWnuH8AdvbMy8/o6lgLmKbDUKa+OALCltHdbOTpQ==",
         transitive_closure = {
-            "@types/google-protobuf": ["3.15.6"],
+            "@types/google-protobuf": ["3.15.12"],
         },
     )
 
@@ -4613,34 +5259,17 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==",
         deps = {
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
         },
         transitive_closure = {
             "@types/keyv": ["3.1.4"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
     npm_import(
-        name = "npm__at_types_minimatch__5.1.2",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "@types/minimatch",
-        version = "5.1.2",
-        url = "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==",
-        transitive_closure = {
-            "@types/minimatch": ["5.1.2"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__16.18.11",
+        name = "npm__at_types_node__16.18.112",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -4648,54 +5277,14 @@ def npm_repositories():
             "js/private/test/js_run_devserver": ["@types/node"],
         },
         package = "@types/node",
-        version = "16.18.11",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-16.18.11.tgz",
+        version = "16.18.112",
+        url = "https://registry.npmjs.org/@types/node/-/node-16.18.112.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         generate_bzl_library_targets = True,
-        integrity = "sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==",
+        integrity = "sha512-EKrbKUGJROm17+dY/gMi31aJlGLJ75e1IkTojt9n6u+hnaTBDs+M1bIdOawpk2m6YUAXq/R2W0SxCng1tndHCg==",
         transitive_closure = {
-            "@types/node": ["16.18.11"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__18.11.11",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/image": ["@types/node"],
-        },
-        package = "@types/node",
-        version = "18.11.11",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.11.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==",
-        transitive_closure = {
-            "@types/node": ["18.11.11"],
-        },
-    )
-
-    npm_import(
-        name = "npm__at_types_node__18.11.18",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "js/private/worker/src": ["@types/node"],
-        },
-        package = "@types/node",
-        version = "18.11.18",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==",
-        transitive_closure = {
-            "@types/node": ["18.11.18"],
+            "@types/node": ["16.18.112"],
         },
     )
 
@@ -4709,7 +5298,7 @@ def npm_repositories():
         },
         package = "@types/node",
         version = "18.13.0",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-18.13.0.tgz",
+        url = "https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
@@ -4717,6 +5306,76 @@ def npm_repositories():
         integrity = "sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==",
         transitive_closure = {
             "@types/node": ["18.13.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_node__18.19.54",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "js/private/image": ["@types/node"],
+            "js/private/worker/src": ["@types/node"],
+        },
+        package = "@types/node",
+        version = "18.19.54",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-18.19.54.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==",
+        deps = {
+            "undici-types": "5.26.5",
+        },
+        transitive_closure = {
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_node__22.7.4",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/node",
+        version = "22.7.4",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-22.7.4.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-y+NPi1rFzDs1NdQHHToqeiX2TIS79SWEAw9GYhkkx8bD0ChpfqC+n2j5OXOCpzfojBEBt6DnEnnG9MY0zk1XLg==",
+        deps = {
+            "undici-types": "6.19.8",
+        },
+        transitive_closure = {
+            "@types/node": ["22.7.4"],
+            "undici-types": ["6.19.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__at_types_readdir-glob__1.1.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@types/readdir-glob",
+        version = "1.1.5",
+        url = "https://registry.npmjs.org/@types/readdir-glob/-/readdir-glob-1.1.5.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-raiuEPUYqXu+nvtY2Pe8s8FEmZ3x5yAH4VkLdihcPdalvsHltomrRC9BzuStrJ9yk06470hS0Crw0f1pXqD+Hg==",
+        deps = {
+            "@types/node": "18.19.54",
+        },
+        transitive_closure = {
+            "@types/node": ["18.19.54"],
+            "@types/readdir-glob": ["1.1.5"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -4735,13 +5394,13 @@ def npm_repositories():
         integrity = "sha512-whjk1EDJPcAR2kYHRbFl/lKeeKYTi05A15K9bnLInCVroNDCtXce57xKdI0/rQaA3K+6q0eFyUBPmqfSndUZdQ==",
         deps = {
             "@types/caseless": "0.12.2",
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
             "@types/tough-cookie": "4.0.2",
             "form-data": "2.5.1",
         },
         transitive_closure = {
             "@types/caseless": ["0.12.2"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/request": ["2.48.8"],
             "@types/tough-cookie": ["4.0.2"],
             "asynckit": ["0.4.0"],
@@ -4750,6 +5409,7 @@ def npm_repositories():
             "form-data": ["2.5.1"],
             "mime-db": ["1.52.0"],
             "mime-types": ["2.1.35"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -4760,7 +5420,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/resolve",
         version = "1.20.2",
-        url = "https://registry.yarnpkg.com/@types/resolve/-/resolve-1.20.2.tgz",
+        url = "https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
@@ -4785,35 +5445,37 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==",
         deps = {
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
         },
         transitive_closure = {
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/responselike": ["1.0.0"],
+            "undici-types": ["5.26.5"],
         },
     )
 
     npm_import(
-        name = "npm__at_types_tar-stream__2.2.2",
+        name = "npm__at_types_tar-stream__2.2.3",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/image": ["@types/tar-stream"],
         },
         package = "@types/tar-stream",
-        version = "2.2.2",
-        url = "https://registry.yarnpkg.com/@types/tar-stream/-/tar-stream-2.2.2.tgz",
+        version = "2.2.3",
+        url = "https://registry.npmjs.org/@types/tar-stream/-/tar-stream-2.2.3.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-1AX+Yt3icFuU6kxwmPakaiGrJUwG44MpuiqPg4dSolRFk6jmvs4b3IbUol9wKDLIgU76gevn3EwE8y/DkSJCZQ==",
+        integrity = "sha512-if3mugZfjVkXOMZdFjIHySxY13r6GXPpyOlsDmLffvyI7tLz9wXE8BFjNivXsvUeyJ1KNlOpfLnag+ISmxgxPw==",
         deps = {
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
         },
         transitive_closure = {
-            "@types/node": ["18.13.0"],
-            "@types/tar-stream": ["2.2.2"],
+            "@types/node": ["18.19.54"],
+            "@types/tar-stream": ["2.2.3"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -4867,11 +5529,12 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==",
         deps = {
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
         },
         transitive_closure = {
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/ws": ["8.5.5"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -4889,11 +5552,12 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==",
         deps = {
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
         },
         transitive_closure = {
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/yauzl": ["2.10.0"],
+            "undici-types": ["5.26.5"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -5156,7 +5820,7 @@ def npm_repositories():
             "@vanilla-extract/css": ["1.9.5"],
             "@vanilla-extract/integration": ["6.1.0"],
             "@vanilla-extract/private": ["1.0.3"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.12.1"],
             "ahocorasick": ["1.0.2"],
             "ansi-styles": ["3.2.1", "4.3.0"],
             "browserslist": ["4.21.5"],
@@ -5310,7 +5974,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@vanilla-extract/babel-plugin-debug-ids": ["1.0.1"],
             "@vanilla-extract/css": ["1.9.5"],
             "@vanilla-extract/integration": ["6.1.0"],
@@ -5336,7 +6000,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.12.1", "8.8.2"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ahocorasick": ["1.0.2"],
             "ajv": ["6.12.6"],
@@ -5448,6 +6112,7 @@ def npm_repositories():
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
             "to-fast-properties": ["2.0.0"],
             "ufo": ["1.1.0"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -5878,7 +6543,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -5899,7 +6564,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -5973,6 +6638,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -6013,7 +6679,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -6034,7 +6700,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -6108,6 +6774,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -6148,7 +6815,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -6169,7 +6836,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -6243,6 +6910,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -6890,47 +7558,29 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__bufferutil__4.0.7",
+        name = "npm__bufferutil__4.0.8",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["bufferutil"],
         },
         package = "bufferutil",
-        version = "4.0.7",
-        url = "https://registry.npmjs.org/bufferutil/-/bufferutil-4.0.7.tgz",
+        version = "4.0.8",
+        url = "https://registry.npmjs.org/bufferutil/-/bufferutil-4.0.8.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-kukuqc39WOHtdxtw4UScxF/WVnMFVSQVKhtx3AjZJzhd0RGZZldcrfSEbVsWWe6KNH253574cq5F+wpv0G9pJw==",
+        integrity = "sha512-4T53u4PdgsXqKaIctwF8ifXlRTTmEPJ8iEPWFdGZvcf7sbwYo6FKFEX9eNNAnzFZ7EzJAQ3CJeOtCRA4rDp7Pw==",
         deps = {
             "node-gyp-build": "4.6.0",
         },
         transitive_closure = {
-            "bufferutil": ["4.0.7"],
+            "bufferutil": ["4.0.8"],
             "node-gyp-build": ["4.6.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__builtin-modules__3.3.0",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "builtin-modules",
-        version = "3.3.0",
-        url = "https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==",
-        transitive_closure = {
-            "builtin-modules": ["3.3.0"],
-        },
     )
 
     npm_import(
@@ -7137,10 +7787,11 @@ def npm_repositories():
         },
         transitive_closure = {
             "@types/keyv": ["3.1.4"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "cacheable-lookup": ["2.0.1"],
             "json-buffer": ["3.0.1"],
             "keyv": ["4.5.2"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -7465,6 +8116,24 @@ def npm_repositories():
         integrity = "sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==",
         transitive_closure = {
             "chownr": ["2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__chownr__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "chownr",
+        version = "3.0.0",
+        url = "https://registry.npmjs.org/chownr/-/chownr-3.0.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==",
+        transitive_closure = {
+            "chownr": ["3.0.0"],
         },
     )
 
@@ -8501,7 +9170,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -8522,7 +9191,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -8610,6 +9279,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "util-deprecate": ["1.0.2"],
@@ -10155,470 +10825,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__esbuild-android-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-android-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-android-64/-/esbuild-android-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-aRFxR3scRKkbmNuGAK+Gee3+yFxkTJO/cx83Dkyzo4CnQl/2zVSurtG6+G86EQIZ+w+VYngVyK7P3HyTBKu3nw==",
-        transitive_closure = {
-            "esbuild-android-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-android-arm64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-android-arm64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-android-arm64/-/esbuild-android-arm64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-L2NgQRWuHFI89IIZIlpAcINy9FvBk6xFVZ7xGdOwIm8VyhX1vNCEqUJO3DPSSy945Gzdg98cxtNt8Grv1CsyhA==",
-        transitive_closure = {
-            "esbuild-android-arm64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-darwin-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-darwin-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-5JJvgXkX87Pd1Og0u/NJuO7TSqAikAcQQ74gyJ87bqWRVeouky84ICoV4sN6VV53aTW+NE87qLdGY4QA2S7KNA==",
-        transitive_closure = {
-            "esbuild-darwin-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-darwin-arm64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-darwin-arm64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-darwin-arm64/-/esbuild-darwin-arm64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-eqF+OejMI3mC5Dlo9Kdq/Ilbki9sQBw3QlHW3wjLmsLh+quNfHmGMp3Ly1eWm981iGBMdbtSS9+LRvR2T8B3eQ==",
-        transitive_closure = {
-            "esbuild-darwin-arm64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-freebsd-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-freebsd-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-freebsd-64/-/esbuild-freebsd-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-epnPbhZUt93xV5cgeY36ZxPXDsQeO55DppzsIgWM8vgiG/Rz+qYDLmh5ts3e+Ln1wA9dQ+nZmVHw+RjaW3I5Ig==",
-        transitive_closure = {
-            "esbuild-freebsd-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-freebsd-arm64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-freebsd-arm64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-/9icXUYJWherhk+y5fjPI5yNUdFPtXHQlwP7/K/zg8t8lQdHVj20SqU9/udQmeUo5pDFHMYzcEFfJqgOVeKNNQ==",
-        transitive_closure = {
-            "esbuild-freebsd-arm64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-32__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-32",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-32/-/esbuild-linux-32-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-QfgfeNHRFvr2XeHFzP8kOZVnal3QvST3A0cgq32ZrHjSMFTdgXhMhmWdKzRXP/PKcfv3e2OW9tT9PpcjNvaq6g==",
-        transitive_closure = {
-            "esbuild-linux-32": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-64/-/esbuild-linux-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-uuZHNmqcs+Bj1qiW9k/HZU3FtIHmYiuxZ/6Aa+/KHb/pFKr7R3aVqvxlAudYI9Fw3St0VCPfv7QBpUITSmBR1Q==",
-        transitive_closure = {
-            "esbuild-linux-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-arm64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-arm64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-arm64/-/esbuild-linux-arm64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-HlMGZTEsBrXrivr64eZ/EO0NQM8H8DuSENRok9d+Jtvq8hOLzrxfsAT9U94K3KOGk2XgCmkaI2KD8hX7F97lvA==",
-        transitive_closure = {
-            "esbuild-linux-arm64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-arm__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-arm",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-arm/-/esbuild-linux-arm-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-FiFvQe8J3VKTDXG01JbvoVRXQ0x6UZwyrU4IaLBZeq39Bsbatd94Fuc3F1RGqPF5RbIWW7RvkVQjn79ejzysnA==",
-        transitive_closure = {
-            "esbuild-linux-arm": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-mips64le__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-mips64le",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-mips64le/-/esbuild-linux-mips64le-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-qd1dLf2v7QBiI5wwfil9j0HG/5YMFBAmMVmdeokbNAMbcg49p25t6IlJFXAeLzogv1AvgaXRXvgFNhScYEUXGQ==",
-        transitive_closure = {
-            "esbuild-linux-mips64le": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-ppc64le__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-ppc64le",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-mnbEm7o69gTl60jSuK+nn+pRsRHGtDPfzhrqEUXyCl7CTOCLtWN2bhK8bgsdp6J/2NyS/wHBjs1x8aBWwP2X9Q==",
-        transitive_closure = {
-            "esbuild-linux-ppc64le": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-riscv64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-riscv64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-riscv64/-/esbuild-linux-riscv64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-+p6YKYbuV72uikChRk14FSyNJZ4WfYkffj6Af0/Tw63/6TJX6TnIKE+6D3xtEc7DeDth1fjUOEqm+ApKFXbbVQ==",
-        transitive_closure = {
-            "esbuild-linux-riscv64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-linux-s390x__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-linux-s390x",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-linux-s390x/-/esbuild-linux-s390x-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-0zUsiDkGJiMHxBQ7JDU8jbaanUY975CdOW1YDrurjrM0vWHfjv9tLQsW9GSyEb/heSK1L5gaweRjzfUVBFoybQ==",
-        transitive_closure = {
-            "esbuild-linux-s390x": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-netbsd-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-netbsd-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-netbsd-64/-/esbuild-netbsd-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-cljBAApVwkpnJZfnRVThpRBGzCi+a+V9Ofb1fVkKhtrPLDYlHLrSYGtmnoTVWDQdU516qYI8+wOgcGZ4XIZh0Q==",
-        transitive_closure = {
-            "esbuild-netbsd-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-openbsd-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-openbsd-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-openbsd-64/-/esbuild-openbsd-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-CDswYr2PWPGEPpLDUO50mL3WO/07EMjnZDNKpmaxUPsrW+kVM3LoAqr/CE8UbzugpEiflYqJsGPLirThRB18IQ==",
-        transitive_closure = {
-            "esbuild-openbsd-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-sunos-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-sunos-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-sunos-64/-/esbuild-sunos-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-2mfIoYW58gKcC3bck0j7lD3RZkqYA7MmujFYmSn9l6TiIcAMpuEvqksO+ntBgbLep/eyjpgdplF7b+4T9VJGOA==",
-        transitive_closure = {
-            "esbuild-sunos-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-windows-32__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-windows-32",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-windows-32/-/esbuild-windows-32-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-L2BmEeFZATAvU+FJzJiRLFUP+d9RHN+QXpgaOrs2klshoAm1AE6Us4X6fS9k33Uy5SzScn2TpcgecbqJza1Hjw==",
-        transitive_closure = {
-            "esbuild-windows-32": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-windows-64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-windows-64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-Khy4wVmebnzue8aeSXLC+6clo/hRYeNIm0DyikoEqX+3w3rcvrhzpoix0S+MF9vzh6JFskkIGD7Zx47ODJNyCw==",
-        transitive_closure = {
-            "esbuild-windows-64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild-windows-arm64__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "esbuild-windows-arm64",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild-windows-arm64/-/esbuild-windows-arm64-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-k3FGCNmHBkqdJXuJszdWciAH77PukEyDsdIryEHn9cKLQFxzhT39dSumeTuggaQcXY57UlmLGIkklWZo2qzHpw==",
-        transitive_closure = {
-            "esbuild-windows-arm64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-    )
-
-    npm_import(
-        name = "npm__esbuild__0.14.38",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {
-            "npm/private/test": ["esbuild"],
-        },
-        package = "esbuild",
-        version = "0.14.38",
-        url = "https://registry.npmjs.org/esbuild/-/esbuild-0.14.38.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-12fzJ0fsm7gVZX1YQ1InkOE5f9Tl7cgf6JPYXRJtPIoE0zkWAbHdPHVPPaLi9tYAcEBqheGzqLn/3RdTOyBfcA==",
-        deps = {
-            "esbuild-android-64": "0.14.38",
-            "esbuild-android-arm64": "0.14.38",
-            "esbuild-darwin-64": "0.14.38",
-            "esbuild-darwin-arm64": "0.14.38",
-            "esbuild-freebsd-64": "0.14.38",
-            "esbuild-freebsd-arm64": "0.14.38",
-            "esbuild-linux-32": "0.14.38",
-            "esbuild-linux-64": "0.14.38",
-            "esbuild-linux-arm": "0.14.38",
-            "esbuild-linux-arm64": "0.14.38",
-            "esbuild-linux-mips64le": "0.14.38",
-            "esbuild-linux-ppc64le": "0.14.38",
-            "esbuild-linux-riscv64": "0.14.38",
-            "esbuild-linux-s390x": "0.14.38",
-            "esbuild-netbsd-64": "0.14.38",
-            "esbuild-openbsd-64": "0.14.38",
-            "esbuild-sunos-64": "0.14.38",
-            "esbuild-windows-32": "0.14.38",
-            "esbuild-windows-64": "0.14.38",
-            "esbuild-windows-arm64": "0.14.38",
-        },
-        transitive_closure = {
-            "esbuild": ["0.14.38"],
-            "esbuild-android-64": ["0.14.38"],
-            "esbuild-android-arm64": ["0.14.38"],
-            "esbuild-darwin-64": ["0.14.38"],
-            "esbuild-darwin-arm64": ["0.14.38"],
-            "esbuild-freebsd-64": ["0.14.38"],
-            "esbuild-freebsd-arm64": ["0.14.38"],
-            "esbuild-linux-32": ["0.14.38"],
-            "esbuild-linux-64": ["0.14.38"],
-            "esbuild-linux-arm": ["0.14.38"],
-            "esbuild-linux-arm64": ["0.14.38"],
-            "esbuild-linux-mips64le": ["0.14.38"],
-            "esbuild-linux-ppc64le": ["0.14.38"],
-            "esbuild-linux-riscv64": ["0.14.38"],
-            "esbuild-linux-s390x": ["0.14.38"],
-            "esbuild-netbsd-64": ["0.14.38"],
-            "esbuild-openbsd-64": ["0.14.38"],
-            "esbuild-sunos-64": ["0.14.38"],
-            "esbuild-windows-32": ["0.14.38"],
-            "esbuild-windows-64": ["0.14.38"],
-            "esbuild-windows-arm64": ["0.14.38"],
-        },
-        lifecycle_hooks = ["preinstall", "install", "postinstall"],
-        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
-    )
-
-    npm_import(
         name = "npm__esbuild__0.16.17",
         root_package = "",
         link_workspace = "",
@@ -10679,6 +10885,78 @@ def npm_repositories():
             "@esbuild/win32-ia32": ["0.16.17"],
             "@esbuild/win32-x64": ["0.16.17"],
             "esbuild": ["0.16.17"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
+    )
+
+    npm_import(
+        name = "npm__esbuild__0.24.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["esbuild"],
+        },
+        package = "esbuild",
+        version = "0.24.0",
+        url = "https://registry.npmjs.org/esbuild/-/esbuild-0.24.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-FuLPevChGDshgSicjisSooU0cemp/sGXR841D5LHMB7mTVOmsEHcAxaH3irL53+8YDIeVNQEySh4DaYU/iuPqQ==",
+        deps = {
+            "@esbuild/aix-ppc64": "0.24.0",
+            "@esbuild/android-arm": "0.24.0",
+            "@esbuild/android-arm64": "0.24.0",
+            "@esbuild/android-x64": "0.24.0",
+            "@esbuild/darwin-arm64": "0.24.0",
+            "@esbuild/darwin-x64": "0.24.0",
+            "@esbuild/freebsd-arm64": "0.24.0",
+            "@esbuild/freebsd-x64": "0.24.0",
+            "@esbuild/linux-arm": "0.24.0",
+            "@esbuild/linux-arm64": "0.24.0",
+            "@esbuild/linux-ia32": "0.24.0",
+            "@esbuild/linux-loong64": "0.24.0",
+            "@esbuild/linux-mips64el": "0.24.0",
+            "@esbuild/linux-ppc64": "0.24.0",
+            "@esbuild/linux-riscv64": "0.24.0",
+            "@esbuild/linux-s390x": "0.24.0",
+            "@esbuild/linux-x64": "0.24.0",
+            "@esbuild/netbsd-x64": "0.24.0",
+            "@esbuild/openbsd-arm64": "0.24.0",
+            "@esbuild/openbsd-x64": "0.24.0",
+            "@esbuild/sunos-x64": "0.24.0",
+            "@esbuild/win32-arm64": "0.24.0",
+            "@esbuild/win32-ia32": "0.24.0",
+            "@esbuild/win32-x64": "0.24.0",
+        },
+        transitive_closure = {
+            "@esbuild/aix-ppc64": ["0.24.0"],
+            "@esbuild/android-arm": ["0.24.0"],
+            "@esbuild/android-arm64": ["0.24.0"],
+            "@esbuild/android-x64": ["0.24.0"],
+            "@esbuild/darwin-arm64": ["0.24.0"],
+            "@esbuild/darwin-x64": ["0.24.0"],
+            "@esbuild/freebsd-arm64": ["0.24.0"],
+            "@esbuild/freebsd-x64": ["0.24.0"],
+            "@esbuild/linux-arm": ["0.24.0"],
+            "@esbuild/linux-arm64": ["0.24.0"],
+            "@esbuild/linux-ia32": ["0.24.0"],
+            "@esbuild/linux-loong64": ["0.24.0"],
+            "@esbuild/linux-mips64el": ["0.24.0"],
+            "@esbuild/linux-ppc64": ["0.24.0"],
+            "@esbuild/linux-riscv64": ["0.24.0"],
+            "@esbuild/linux-s390x": ["0.24.0"],
+            "@esbuild/linux-x64": ["0.24.0"],
+            "@esbuild/netbsd-x64": ["0.24.0"],
+            "@esbuild/openbsd-arm64": ["0.24.0"],
+            "@esbuild/openbsd-x64": ["0.24.0"],
+            "@esbuild/sunos-x64": ["0.24.0"],
+            "@esbuild/win32-arm64": ["0.24.0"],
+            "@esbuild/win32-ia32": ["0.24.0"],
+            "@esbuild/win32-x64": ["0.24.0"],
+            "esbuild": ["0.24.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox", "requires-network"],
@@ -11074,7 +11352,7 @@ def npm_repositories():
             "yauzl": "2.10.0",
         },
         transitive_closure = {
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/yauzl": ["2.10.0"],
             "buffer-crc32": ["0.2.13"],
             "debug": ["4.3.4_supports-color_8.1.1"],
@@ -11088,6 +11366,7 @@ def npm_repositories():
             "pend": ["1.2.0"],
             "pump": ["3.0.0"],
             "supports-color": ["8.1.1"],
+            "undici-types": ["5.26.5"],
             "wrappy": ["1.0.2"],
             "yauzl": ["2.10.0"],
         },
@@ -12316,6 +12595,60 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__glob__10.4.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "glob",
+        version = "10.4.5",
+        url = "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==",
+        deps = {
+            "foreground-child": "3.1.1",
+            "jackspeak": "3.4.3",
+            "minimatch": "9.0.5",
+            "minipass": "7.1.2",
+            "package-json-from-dist": "1.0.1",
+            "path-scurry": "1.11.1",
+        },
+        transitive_closure = {
+            "@isaacs/cliui": ["8.0.2"],
+            "@pkgjs/parseargs": ["0.11.0"],
+            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-styles": ["4.3.0", "6.2.1"],
+            "balanced-match": ["1.0.2"],
+            "brace-expansion": ["2.0.1"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "cross-spawn": ["7.0.3"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["8.0.0", "9.2.2"],
+            "foreground-child": ["3.1.1"],
+            "glob": ["10.4.5"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "isexe": ["2.0.0"],
+            "jackspeak": ["3.4.3"],
+            "lru-cache": ["10.4.3"],
+            "minimatch": ["9.0.5"],
+            "minipass": ["7.1.2"],
+            "package-json-from-dist": ["1.0.1"],
+            "path-key": ["3.1.1"],
+            "path-scurry": ["1.11.1"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "signal-exit": ["4.1.0"],
+            "string-width": ["5.1.2", "4.2.3"],
+            "strip-ansi": ["7.1.0", "6.0.1"],
+            "which": ["2.0.2"],
+            "wrap-ansi": ["8.1.0", "7.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__glob__7.2.0",
         root_package = "",
         link_workspace = "",
@@ -12905,21 +13238,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__google-protobuf__3.21.2",
+        name = "npm__google-protobuf__3.21.4",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/worker/src": ["google-protobuf"],
         },
         package = "google-protobuf",
-        version = "3.21.2",
-        url = "https://registry.npmjs.org/google-protobuf/-/google-protobuf-3.21.2.tgz",
+        version = "3.21.4",
+        url = "https://registry.npmjs.org/google-protobuf/-/google-protobuf-3.21.4.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         generate_bzl_library_targets = True,
-        integrity = "sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==",
+        integrity = "sha512-MnG7N936zcKTco4Jd2PX2U96Kf9PxygAPKBug+74LHzmHXmceN16MmRcdgZv+DGef/S9YvQAfRsNCn4cjf9yyQ==",
         transitive_closure = {
-            "google-protobuf": ["3.21.2"],
+            "google-protobuf": ["3.21.4"],
         },
     )
 
@@ -12961,7 +13294,7 @@ def npm_repositories():
             "@types/cacheable-request": ["6.0.3"],
             "@types/http-cache-semantics": ["4.0.1"],
             "@types/keyv": ["3.1.4"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/responselike": ["1.0.0"],
             "cacheable-lookup": ["2.0.1"],
             "cacheable-request": ["7.0.2"],
@@ -12987,6 +13320,7 @@ def npm_repositories():
             "responselike": ["2.0.1"],
             "to-readable-stream": ["2.1.0"],
             "type-fest": ["0.10.0"],
+            "undici-types": ["5.26.5"],
             "wrappy": ["1.0.2"],
         },
     )
@@ -14044,28 +14378,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__is-builtin-module__3.2.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "is-builtin-module",
-        version = "3.2.1",
-        url = "https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==",
-        deps = {
-            "builtin-modules": "3.3.0",
-        },
-        transitive_closure = {
-            "builtin-modules": ["3.3.0"],
-            "is-builtin-module": ["3.2.1"],
-        },
-    )
-
-    npm_import(
         name = "npm__is-core-module__2.11.0",
         root_package = "",
         link_workspace = "",
@@ -14568,12 +14880,12 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__isomorphic-ws__5.0.0_ws_8.13.0",
+        name = "npm__isomorphic-ws__5.0.0_ws_8.18.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "isomorphic-ws",
-        version = "5.0.0_ws_8.13.0",
+        version = "5.0.0_ws_8.18.0",
         url = "https://registry.npmjs.org/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -14581,13 +14893,13 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==",
         deps = {
-            "ws": "8.13.0_bufferutil_4.0.7",
+            "ws": "8.18.0_bufferutil_4.0.8",
         },
         transitive_closure = {
-            "bufferutil": ["4.0.7"],
-            "isomorphic-ws": ["5.0.0_ws_8.13.0"],
+            "bufferutil": ["4.0.8"],
+            "isomorphic-ws": ["5.0.0_ws_8.18.0"],
             "node-gyp-build": ["4.6.0"],
-            "ws": ["8.13.0_bufferutil_4.0.7"],
+            "ws": ["8.18.0_bufferutil_4.0.8"],
         },
     )
 
@@ -14715,6 +15027,40 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__jackspeak__3.4.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "jackspeak",
+        version = "3.4.3",
+        url = "https://registry.npmjs.org/jackspeak/-/jackspeak-3.4.3.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==",
+        deps = {
+            "@pkgjs/parseargs": "0.11.0",
+            "@isaacs/cliui": "8.0.2",
+        },
+        transitive_closure = {
+            "@isaacs/cliui": ["8.0.2"],
+            "@pkgjs/parseargs": ["0.11.0"],
+            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-styles": ["4.3.0", "6.2.1"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["8.0.0", "9.2.2"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "jackspeak": ["3.4.3"],
+            "string-width": ["5.1.2", "4.2.3"],
+            "strip-ansi": ["7.1.0", "6.0.1"],
+            "wrap-ansi": ["8.1.0", "7.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__jasmine-core__5.1.0",
         root_package = "",
         link_workspace = "",
@@ -14831,16 +15177,17 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==",
         deps = {
-            "@types/node": "18.13.0",
+            "@types/node": "18.19.54",
             "merge-stream": "2.0.0",
             "supports-color": "8.1.1",
         },
         transitive_closure = {
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "has-flag": ["4.0.0"],
             "jest-worker": ["27.5.1"],
             "merge-stream": ["2.0.0"],
             "supports-color": ["8.1.1"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -14919,6 +15266,24 @@ def npm_repositories():
         integrity = "sha512-UVU9dibq2JcFWxQPA6KCqj5O42VOmAY3zQUfEKxU0KpTGXwNoCjkX1e13eHNvw/xPynt6pU0rZ1htjWTNTSXsg==",
         transitive_closure = {
             "jsbn": ["0.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__jsep__1.3.9",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "jsep",
+        version = "1.3.9",
+        url = "https://registry.npmjs.org/jsep/-/jsep-1.3.9.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-i1rBX5N7VPl0eYb6+mHNp52sEuaS2Wi8CDYx1X5sn9naevL78+265XJqy1qENEk7mRKwS06NHpUqiBwR7qeodw==",
+        transitive_closure = {
+            "jsep": ["1.3.9"],
         },
     )
 
@@ -15170,6 +15535,32 @@ def npm_repositories():
         integrity = "sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==",
         transitive_closure = {
             "jsonpath-plus": ["7.2.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__jsonpath-plus__9.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "jsonpath-plus",
+        version = "9.0.0",
+        url = "https://registry.npmjs.org/jsonpath-plus/-/jsonpath-plus-9.0.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-bqE77VIDStrOTV/czspZhTn+o27Xx9ZJRGVkdVShEtPoqsIx5yALv3lWVU6y+PqYvWPJNWE7ORCQheQkEe0DDA==",
+        deps = {
+            "@jsep-plugin/assignment": "1.2.1_jsep_1.3.9",
+            "@jsep-plugin/regex": "1.0.3_jsep_1.3.9",
+            "jsep": "1.3.9",
+        },
+        transitive_closure = {
+            "@jsep-plugin/assignment": ["1.2.1_jsep_1.3.9"],
+            "@jsep-plugin/regex": ["1.0.3_jsep_1.3.9"],
+            "jsep": ["1.3.9"],
+            "jsonpath-plus": ["9.0.0"],
         },
     )
 
@@ -15555,6 +15946,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__lru-cache__10.4.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "lru-cache",
+        version = "10.4.3",
+        url = "https://registry.npmjs.org/lru-cache/-/lru-cache-10.4.3.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==",
+        transitive_closure = {
+            "lru-cache": ["10.4.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__lru-cache__5.1.1",
         root_package = "",
         link_workspace = "",
@@ -15638,24 +16047,24 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__magic-string__0.26.7",
+        name = "npm__magic-string__0.27.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "magic-string",
-        version = "0.26.7",
-        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/magic-string/-/magic-string-0.27.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==",
+        integrity = "sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==",
         deps = {
-            "sourcemap-codec": "1.4.8",
+            "@jridgewell/sourcemap-codec": "1.4.14",
         },
         transitive_closure = {
-            "magic-string": ["0.26.7"],
-            "sourcemap-codec": ["1.4.8"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "magic-string": ["0.27.0"],
         },
     )
 
@@ -16148,7 +16557,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -16169,7 +16578,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6", "8.12.0"],
             "ajv-formats": ["2.1.1_ajv_8.12.0"],
@@ -16246,6 +16655,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -16369,6 +16779,29 @@ def npm_repositories():
             "balanced-match": ["1.0.2"],
             "brace-expansion": ["2.0.1"],
             "minimatch": ["9.0.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minimatch__9.0.5",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minimatch",
+        version = "9.0.5",
+        url = "https://registry.npmjs.org/minimatch/-/minimatch-9.0.5.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==",
+        deps = {
+            "brace-expansion": "2.0.1",
+        },
+        transitive_closure = {
+            "balanced-match": ["1.0.2"],
+            "brace-expansion": ["2.0.1"],
+            "minimatch": ["9.0.5"],
         },
     )
 
@@ -16613,6 +17046,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__minipass__7.1.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minipass",
+        version = "7.1.2",
+        url = "https://registry.npmjs.org/minipass/-/minipass-7.1.2.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==",
+        transitive_closure = {
+            "minipass": ["7.1.2"],
+        },
+    )
+
+    npm_import(
         name = "npm__minizlib__1.3.3",
         root_package = "",
         link_workspace = "",
@@ -16657,6 +17108,58 @@ def npm_repositories():
             "minipass": ["3.3.6"],
             "minizlib": ["2.1.2"],
             "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__minizlib__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "minizlib",
+        version = "3.0.1",
+        url = "https://registry.npmjs.org/minizlib/-/minizlib-3.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-umcy022ILvb5/3Djuu8LWeqUa8D68JaBzlttKeMWen48SjabqS3iY5w/vzeMzMUNhLDifyhbOwKDSznB1vvrwg==",
+        deps = {
+            "minipass": "7.1.2",
+            "rimraf": "5.0.10",
+        },
+        transitive_closure = {
+            "@isaacs/cliui": ["8.0.2"],
+            "@pkgjs/parseargs": ["0.11.0"],
+            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-styles": ["4.3.0", "6.2.1"],
+            "balanced-match": ["1.0.2"],
+            "brace-expansion": ["2.0.1"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "cross-spawn": ["7.0.3"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["8.0.0", "9.2.2"],
+            "foreground-child": ["3.1.1"],
+            "glob": ["10.4.5"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "isexe": ["2.0.0"],
+            "jackspeak": ["3.4.3"],
+            "lru-cache": ["10.4.3"],
+            "minimatch": ["9.0.5"],
+            "minipass": ["7.1.2"],
+            "minizlib": ["3.0.1"],
+            "package-json-from-dist": ["1.0.1"],
+            "path-key": ["3.1.1"],
+            "path-scurry": ["1.11.1"],
+            "rimraf": ["5.0.10"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "signal-exit": ["4.1.0"],
+            "string-width": ["5.1.2", "4.2.3"],
+            "strip-ansi": ["7.1.0", "6.0.1"],
+            "which": ["2.0.2"],
+            "wrap-ansi": ["8.1.0", "7.0.0"],
         },
     )
 
@@ -16737,6 +17240,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__mkdirp__3.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mkdirp",
+        version = "3.0.1",
+        url = "https://registry.npmjs.org/mkdirp/-/mkdirp-3.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==",
+        transitive_closure = {
+            "mkdirp": ["3.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__mlly__1.1.1",
         root_package = "",
         link_workspace = "",
@@ -16750,13 +17271,13 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-Jnlh4W/aI4GySPo6+DyTN17Q75KKbLTyFK8BrGhjNP4rxuUjbRWhE6gHg3bs33URWAF44FRm7gdQA348i3XxRw==",
         deps = {
-            "acorn": "8.8.2",
+            "acorn": "8.12.1",
             "pathe": "1.1.0",
             "pkg-types": "1.0.2",
             "ufo": "1.1.0",
         },
         transitive_closure = {
-            "acorn": ["8.8.2"],
+            "acorn": ["8.12.1"],
             "jsonc-parser": ["3.2.0"],
             "mlly": ["1.1.1"],
             "pathe": ["1.1.0"],
@@ -18947,6 +19468,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__package-json-from-dist__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "package-json-from-dist",
+        version = "1.0.1",
+        url = "https://registry.npmjs.org/package-json-from-dist/-/package-json-from-dist-1.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==",
+        transitive_closure = {
+            "package-json-from-dist": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__parent-module__1.0.1",
         root_package = "",
         link_workspace = "",
@@ -19175,6 +19714,30 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__path-scurry__1.11.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "path-scurry",
+        version = "1.11.1",
+        url = "https://registry.npmjs.org/path-scurry/-/path-scurry-1.11.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==",
+        deps = {
+            "lru-cache": "10.4.3",
+            "minipass": "7.1.2",
+        },
+        transitive_closure = {
+            "lru-cache": ["10.4.3"],
+            "minipass": ["7.1.2"],
+            "path-scurry": ["1.11.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__path-type__4.0.0",
         root_package = "",
         link_workspace = "",
@@ -19387,7 +19950,7 @@ def npm_repositories():
             "pathe": "1.1.0",
         },
         transitive_closure = {
-            "acorn": ["8.8.2"],
+            "acorn": ["8.12.1"],
             "jsonc-parser": ["3.2.0"],
             "mlly": ["1.1.1"],
             "pathe": ["1.1.0"],
@@ -20107,7 +20670,7 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         deps = {
             "@mapbox/node-pre-gyp": "1.0.10",
-            "google-protobuf": "3.21.2",
+            "google-protobuf": "3.21.4",
         },
         transitive_closure = {
             "@mapbox/node-pre-gyp": ["1.0.10"],
@@ -20130,7 +20693,7 @@ def npm_repositories():
             "fs.realpath": ["1.0.0"],
             "gauge": ["3.0.2"],
             "glob": ["7.2.3"],
-            "google-protobuf": ["3.21.2"],
+            "google-protobuf": ["3.21.4"],
             "has-flag": ["4.0.0"],
             "has-unicode": ["2.0.1"],
             "https-proxy-agent": ["5.0.1"],
@@ -20294,18 +20857,18 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__puppeteer-core__19.11.0_369149898",
+        name = "npm__puppeteer-core__19.11.1_777974123",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "puppeteer-core",
-        version = "19.11.0_369149898",
-        url = "https://registry.npmjs.org/puppeteer-core/-/puppeteer-core-19.11.0.tgz",
+        version = "19.11.1_777974123",
+        url = "https://registry.npmjs.org/puppeteer-core/-/puppeteer-core-19.11.1.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-UBlwpyTEKcaOt7bIWWhlhIXDlFbR1wVBcxpMibBhImwagkwDB8ld8ehT5dOdfKIcCHjxXzVEaMtgDKzfwcf7Rg==",
+        integrity = "sha512-qcuC2Uf0Fwdj9wNtaTZ2OvYRraXpAK+puwwVW8ofOhOgLPZyz1c68tsorfIZyCUOpyBisjr+xByu7BMbEYMepA==",
         deps = {
             "@puppeteer/browsers": "0.5.0_typescript_4.9.5",
             "chromium-bidi": "0.4.7_devtools-protocol_0.0.1107588",
@@ -20318,11 +20881,11 @@ def npm_repositories():
             "tar-fs": "2.1.1",
             "typescript": "4.9.5",
             "unbzip2-stream": "1.4.3",
-            "ws": "8.13.0_bufferutil_4.0.7",
+            "ws": "8.13.0_bufferutil_4.0.8",
         },
         transitive_closure = {
             "@puppeteer/browsers": ["0.5.0_typescript_4.9.5"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/yauzl": ["2.10.0"],
             "agent-base": ["6.0.2"],
             "ansi-regex": ["5.0.1"],
@@ -20331,7 +20894,7 @@ def npm_repositories():
             "bl": ["4.1.0"],
             "buffer": ["5.7.1"],
             "buffer-crc32": ["0.2.13"],
-            "bufferutil": ["4.0.7"],
+            "bufferutil": ["4.0.8"],
             "chownr": ["1.1.4"],
             "chromium-bidi": ["0.4.7_devtools-protocol_0.0.1107588"],
             "cliui": ["8.0.1"],
@@ -20363,7 +20926,7 @@ def npm_repositories():
             "progress": ["2.0.3"],
             "proxy-from-env": ["1.1.0"],
             "pump": ["3.0.0"],
-            "puppeteer-core": ["19.11.0_369149898"],
+            "puppeteer-core": ["19.11.1_777974123"],
             "readable-stream": ["3.6.1"],
             "require-directory": ["2.1.1"],
             "safe-buffer": ["5.2.1"],
@@ -20377,12 +20940,13 @@ def npm_repositories():
             "tr46": ["0.0.3"],
             "typescript": ["4.9.5"],
             "unbzip2-stream": ["1.4.3"],
+            "undici-types": ["5.26.5"],
             "util-deprecate": ["1.0.2"],
             "webidl-conversions": ["3.0.1"],
             "whatwg-url": ["5.0.0"],
             "wrap-ansi": ["7.0.0"],
             "wrappy": ["1.0.2"],
-            "ws": ["8.13.0_bufferutil_4.0.7"],
+            "ws": ["8.13.0_bufferutil_4.0.8"],
             "y18n": ["5.0.8"],
             "yargs": ["17.7.1"],
             "yargs-parser": ["21.1.1"],
@@ -20391,34 +20955,34 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__puppeteer__19.11.0_369149898",
+        name = "npm__puppeteer__19.11.1_777974123",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["puppeteer"],
         },
         package = "puppeteer",
-        version = "19.11.0_369149898",
-        url = "https://registry.npmjs.org/puppeteer/-/puppeteer-19.11.0.tgz",
+        version = "19.11.1_777974123",
+        url = "https://registry.npmjs.org/puppeteer/-/puppeteer-19.11.1.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-xE0BTOFIR/fEXEHQNfGGMWGr3IQBB2AY760K+pE11kjBKe5P0jivzWG1LHr0TA1/xiHxu9nAhQzv5zh2Dy0YEQ==",
+        integrity = "sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==",
         deps = {
             "@puppeteer/browsers": "0.5.0_typescript_4.9.5",
             "cosmiconfig": "8.1.3",
             "https-proxy-agent": "5.0.1",
             "progress": "2.0.3",
             "proxy-from-env": "1.1.0",
-            "puppeteer-core": "19.11.0_369149898",
+            "puppeteer-core": "19.11.1_777974123",
         },
         transitive_closure = {
             "@babel/code-frame": ["7.18.6"],
             "@babel/helper-validator-identifier": ["7.19.1"],
             "@babel/highlight": ["7.18.6"],
             "@puppeteer/browsers": ["0.5.0_typescript_4.9.5"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@types/yauzl": ["2.10.0"],
             "agent-base": ["6.0.2"],
             "ansi-regex": ["5.0.1"],
@@ -20428,7 +20992,7 @@ def npm_repositories():
             "bl": ["4.1.0"],
             "buffer": ["5.7.1"],
             "buffer-crc32": ["0.2.13"],
-            "bufferutil": ["4.0.7"],
+            "bufferutil": ["4.0.8"],
             "callsites": ["3.1.0"],
             "chalk": ["2.4.2"],
             "chownr": ["1.1.4"],
@@ -20474,8 +21038,8 @@ def npm_repositories():
             "progress": ["2.0.3"],
             "proxy-from-env": ["1.1.0"],
             "pump": ["3.0.0"],
-            "puppeteer": ["19.11.0_369149898"],
-            "puppeteer-core": ["19.11.0_369149898"],
+            "puppeteer": ["19.11.1_777974123"],
+            "puppeteer-core": ["19.11.1_777974123"],
             "readable-stream": ["3.6.1"],
             "require-directory": ["2.1.1"],
             "resolve-from": ["4.0.0"],
@@ -20490,12 +21054,13 @@ def npm_repositories():
             "tr46": ["0.0.3"],
             "typescript": ["4.9.5"],
             "unbzip2-stream": ["1.4.3"],
+            "undici-types": ["5.26.5"],
             "util-deprecate": ["1.0.2"],
             "webidl-conversions": ["3.0.1"],
             "whatwg-url": ["5.0.0"],
             "wrap-ansi": ["7.0.0"],
             "wrappy": ["1.0.2"],
-            "ws": ["8.13.0_bufferutil_4.0.7"],
+            "ws": ["8.13.0_bufferutil_4.0.8"],
             "y18n": ["5.0.8"],
             "yargs": ["17.7.1"],
             "yargs-parser": ["21.1.1"],
@@ -21725,6 +22290,56 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__rimraf__5.0.10",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "rimraf",
+        version = "5.0.10",
+        url = "https://registry.npmjs.org/rimraf/-/rimraf-5.0.10.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-l0OE8wL34P4nJH/H2ffoaniAokM2qSmrtXHmlpvYr5AVVX8msAyW0l8NVJFDxlSK4u3Uh/f41cQheDVdnYijwQ==",
+        deps = {
+            "glob": "10.4.5",
+        },
+        transitive_closure = {
+            "@isaacs/cliui": ["8.0.2"],
+            "@pkgjs/parseargs": ["0.11.0"],
+            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-styles": ["4.3.0", "6.2.1"],
+            "balanced-match": ["1.0.2"],
+            "brace-expansion": ["2.0.1"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "cross-spawn": ["7.0.3"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["8.0.0", "9.2.2"],
+            "foreground-child": ["3.1.1"],
+            "glob": ["10.4.5"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "isexe": ["2.0.0"],
+            "jackspeak": ["3.4.3"],
+            "lru-cache": ["10.4.3"],
+            "minimatch": ["9.0.5"],
+            "minipass": ["7.1.2"],
+            "package-json-from-dist": ["1.0.1"],
+            "path-key": ["3.1.1"],
+            "path-scurry": ["1.11.1"],
+            "rimraf": ["5.0.10"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "signal-exit": ["4.1.0"],
+            "string-width": ["5.1.2", "4.2.3"],
+            "strip-ansi": ["7.1.0", "6.0.1"],
+            "which": ["2.0.2"],
+            "wrap-ansi": ["8.1.0", "7.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__rollup__2.70.2",
         root_package = "",
         link_workspace = "",
@@ -21749,7 +22364,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__rollup__2.79.1",
+        name = "npm__rollup__2.79.2",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -21757,43 +22372,43 @@ def npm_repositories():
             "js/private/worker/src": ["rollup"],
         },
         package = "rollup",
-        version = "2.79.1",
-        url = "https://registry.npmjs.org/rollup/-/rollup-2.79.1.tgz",
+        version = "2.79.2",
+        url = "https://registry.npmjs.org/rollup/-/rollup-2.79.2.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==",
+        integrity = "sha512-fS6iqSPZDs3dr/y7Od6y5nha8dW1YnbgtsyotCVvoFGKbERG++CVRFv1meyGDE1SNItQA8BrnCw7ScdAhRJ3XQ==",
         deps = {
             "fsevents": "2.3.2",
         },
         transitive_closure = {
             "fsevents": ["2.3.2"],
-            "rollup": ["2.79.1"],
+            "rollup": ["2.79.2"],
         },
     )
 
     npm_import(
-        name = "npm__rollup__3.2.5",
+        name = "npm__rollup__3.29.5",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "js/private/coverage/bundle": ["rollup"],
         },
         package = "rollup",
-        version = "3.2.5",
-        url = "https://registry.npmjs.org/rollup/-/rollup-3.2.5.tgz",
+        version = "3.29.5",
+        url = "https://registry.npmjs.org/rollup/-/rollup-3.29.5.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-/Ha7HhVVofduy+RKWOQJrxe4Qb3xyZo+chcpYiD8SoQa4AG7llhupUtyfKSSrdBM2mWJjhM8wZwmbY23NmlIYw==",
+        integrity = "sha512-GVsDdsbJzzy4S/v3dqWPJ7EfvZJfCHiDqe80IyrF59LYuP+e6U1LJoUqeuqRbwAWoMNoXivMNeNAOf5E22VA1w==",
         deps = {
             "fsevents": "2.3.2",
         },
         transitive_closure = {
             "fsevents": ["2.3.2"],
-            "rollup": ["3.2.5"],
+            "rollup": ["3.29.5"],
         },
     )
 
@@ -22455,20 +23070,20 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__smob__0.0.6",
+        name = "npm__smob__1.5.0",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "smob",
-        version = "0.0.6",
-        url = "https://registry.npmjs.org/smob/-/smob-0.0.6.tgz",
+        version = "1.5.0",
+        url = "https://registry.npmjs.org/smob/-/smob-1.5.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-V21+XeNni+tTyiST1MHsa84AQhT1aFZipzPpOFAVB8DkHzwJyjjAmt9bgwnuZiZWnIbMo2duE29wybxv/7HWUw==",
+        integrity = "sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==",
         transitive_closure = {
-            "smob": ["0.0.6"],
+            "smob": ["1.5.0"],
         },
     )
 
@@ -23667,6 +24282,67 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__tar__7.4.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "tar",
+        version = "7.4.3",
+        url = "https://registry.npmjs.org/tar/-/tar-7.4.3.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==",
+        deps = {
+            "@isaacs/fs-minipass": "4.0.1",
+            "chownr": "3.0.0",
+            "minipass": "7.1.2",
+            "minizlib": "3.0.1",
+            "mkdirp": "3.0.1",
+            "yallist": "5.0.0",
+        },
+        transitive_closure = {
+            "@isaacs/cliui": ["8.0.2"],
+            "@isaacs/fs-minipass": ["4.0.1"],
+            "@pkgjs/parseargs": ["0.11.0"],
+            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-styles": ["4.3.0", "6.2.1"],
+            "balanced-match": ["1.0.2"],
+            "brace-expansion": ["2.0.1"],
+            "chownr": ["3.0.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "cross-spawn": ["7.0.3"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["8.0.0", "9.2.2"],
+            "foreground-child": ["3.1.1"],
+            "glob": ["10.4.5"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "isexe": ["2.0.0"],
+            "jackspeak": ["3.4.3"],
+            "lru-cache": ["10.4.3"],
+            "minimatch": ["9.0.5"],
+            "minipass": ["7.1.2"],
+            "minizlib": ["3.0.1"],
+            "mkdirp": ["3.0.1"],
+            "package-json-from-dist": ["1.0.1"],
+            "path-key": ["3.1.1"],
+            "path-scurry": ["1.11.1"],
+            "rimraf": ["5.0.10"],
+            "shebang-command": ["2.0.0"],
+            "shebang-regex": ["3.0.0"],
+            "signal-exit": ["4.1.0"],
+            "string-width": ["5.1.2", "4.2.3"],
+            "strip-ansi": ["7.1.0", "6.0.1"],
+            "tar": ["7.4.3"],
+            "which": ["2.0.2"],
+            "wrap-ansi": ["8.1.0", "7.0.0"],
+            "yallist": ["5.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__terser-webpack-plugin__5.3.6_webpack_5.76.3",
         root_package = "",
         link_workspace = "",
@@ -23698,7 +24374,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -23719,7 +24395,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -23793,6 +24469,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -23819,7 +24496,7 @@ def npm_repositories():
         integrity = "sha512-qcwfg4+RZa3YvlFh0qjifnzBHjKGNbtDo9yivMqMFDy9Q6FSaQWSB/j1xKhsoUFJIqDOM3TsN6D5xbrMrFcHbg==",
         deps = {
             "@jridgewell/source-map": "0.3.2",
-            "acorn": "8.8.2",
+            "acorn": "8.12.1",
             "commander": "2.20.3",
             "source-map-support": "0.5.21",
         },
@@ -23830,12 +24507,47 @@ def npm_repositories():
             "@jridgewell/source-map": ["0.3.2"],
             "@jridgewell/sourcemap-codec": ["1.4.14"],
             "@jridgewell/trace-mapping": ["0.3.17"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.12.1"],
             "buffer-from": ["1.1.2"],
             "commander": ["2.20.3"],
             "source-map": ["0.6.1"],
             "source-map-support": ["0.5.21"],
             "terser": ["5.16.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__terser__5.34.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "terser",
+        version = "5.34.1",
+        url = "https://registry.npmjs.org/terser/-/terser-5.34.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-FsJZ7iZLd/BXkz+4xrRTGJ26o/6VTjQytUk8b8OxkwcD2I+79VPJlz7qss1+zE7h8GNIScFqXcDyJ/KqBYZFVA==",
+        deps = {
+            "@jridgewell/source-map": "0.3.6",
+            "acorn": "8.12.1",
+            "commander": "2.20.3",
+            "source-map-support": "0.5.21",
+        },
+        transitive_closure = {
+            "@jridgewell/gen-mapping": ["0.3.5"],
+            "@jridgewell/resolve-uri": ["3.1.0"],
+            "@jridgewell/set-array": ["1.2.1"],
+            "@jridgewell/source-map": ["0.3.6"],
+            "@jridgewell/sourcemap-codec": ["1.4.14"],
+            "@jridgewell/trace-mapping": ["0.3.25"],
+            "acorn": ["8.12.1"],
+            "buffer-from": ["1.1.2"],
+            "commander": ["2.20.3"],
+            "source-map": ["0.6.1"],
+            "source-map-support": ["0.5.21"],
+            "terser": ["5.34.1"],
         },
     )
 
@@ -24022,40 +24734,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__tmp-promise__3.0.3",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "tmp-promise",
-        version = "3.0.3",
-        url = "https://registry.npmjs.org/tmp-promise/-/tmp-promise-3.0.3.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-RwM7MoPojPxsOBYnyd2hy0bxtIlVrihNs9pj5SUvY8Zz1sQcQG2tG1hSr8PDxfgEB8RNKDhqbIlroIarSNDNsQ==",
-        deps = {
-            "tmp": "0.2.1",
-        },
-        transitive_closure = {
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "concat-map": ["0.0.1"],
-            "fs.realpath": ["1.0.0"],
-            "glob": ["7.2.3"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "rimraf": ["3.0.2"],
-            "tmp": ["0.2.1"],
-            "tmp-promise": ["3.0.3"],
-            "wrappy": ["1.0.2"],
-        },
-    )
-
-    npm_import(
         name = "npm__tmp__0.0.33",
         root_package = "",
         link_workspace = "",
@@ -24074,39 +24752,6 @@ def npm_repositories():
         transitive_closure = {
             "os-tmpdir": ["1.0.2"],
             "tmp": ["0.0.33"],
-        },
-    )
-
-    npm_import(
-        name = "npm__tmp__0.2.1",
-        root_package = "",
-        link_workspace = "",
-        link_packages = {},
-        package = "tmp",
-        version = "0.2.1",
-        url = "https://registry.npmjs.org/tmp/-/tmp-0.2.1.tgz",
-        system_tar = "xxx",
-        package_visibility = ["//visibility:public"],
-        dev = True,
-        generate_bzl_library_targets = True,
-        integrity = "sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ==",
-        deps = {
-            "rimraf": "3.0.2",
-        },
-        transitive_closure = {
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["1.1.11"],
-            "concat-map": ["0.0.1"],
-            "fs.realpath": ["1.0.0"],
-            "glob": ["7.2.3"],
-            "inflight": ["1.0.6"],
-            "inherits": ["2.0.4"],
-            "minimatch": ["3.1.2"],
-            "once": ["1.4.0"],
-            "path-is-absolute": ["1.0.1"],
-            "rimraf": ["3.0.2"],
-            "tmp": ["0.2.1"],
-            "wrappy": ["1.0.2"],
         },
     )
 
@@ -24309,7 +24954,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__tslib__2.6.0",
+        name = "npm__tslib__2.7.0",
         root_package = "",
         link_workspace = "",
         link_packages = {
@@ -24317,15 +24962,15 @@ def npm_repositories():
             "js/private/worker/src": ["tslib"],
         },
         package = "tslib",
-        version = "2.6.0",
-        url = "https://registry.npmjs.org/tslib/-/tslib-2.6.0.tgz",
+        version = "2.7.0",
+        url = "https://registry.npmjs.org/tslib/-/tslib-2.7.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-7At1WUettjcSRHXCyYtTselblcHl9PJFFVKiCAy/bY97+BPZXSQ2wbq0P9s8tK2G7dFQfNnlJnPAiArVBVBsfA==",
+        integrity = "sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==",
         transitive_closure = {
-            "tslib": ["2.6.0"],
+            "tslib": ["2.7.0"],
         },
     )
 
@@ -24599,20 +25244,37 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__underscore__1.13.6",
+        name = "npm__undici-types__5.26.5",
         root_package = "",
         link_workspace = "",
         link_packages = {},
-        package = "underscore",
-        version = "1.13.6",
-        url = "https://registry.npmjs.org/underscore/-/underscore-1.13.6.tgz",
+        package = "undici-types",
+        version = "5.26.5",
+        url = "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        generate_bzl_library_targets = True,
+        integrity = "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==",
+        transitive_closure = {
+            "undici-types": ["5.26.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__undici-types__6.19.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "undici-types",
+        version = "6.19.8",
+        url = "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         dev = True,
         generate_bzl_library_targets = True,
-        integrity = "sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==",
+        integrity = "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==",
         transitive_closure = {
-            "underscore": ["1.13.6"],
+            "undici-types": ["6.19.8"],
         },
     )
 
@@ -25181,14 +25843,14 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.7",
+        name = "npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8",
         root_package = "",
         link_workspace = "",
         link_packages = {
             "npm/private/test": ["webpack-bundle-analyzer"],
         },
         package = "webpack-bundle-analyzer",
-        version = "4.5.0_bufferutil_4.0.7",
+        version = "4.5.0_bufferutil_4.0.8",
         url = "https://registry.npmjs.org/webpack-bundle-analyzer/-/webpack-bundle-analyzer-4.5.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -25196,7 +25858,7 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-GUMZlM3SKwS8Z+CKeIFx7CVoHn3dXFcUAjT/dcZQQmfSZGvitPfMob2ipjai7ovFFqPvTqkEZ/leL4O0YOdAYQ==",
         deps = {
-            "acorn": "8.8.2",
+            "acorn": "8.12.1",
             "acorn-walk": "8.2.0",
             "chalk": "4.1.2",
             "commander": "7.2.0",
@@ -25204,14 +25866,14 @@ def npm_repositories():
             "lodash": "4.17.21",
             "opener": "1.5.2",
             "sirv": "1.0.19",
-            "ws": "7.5.9_bufferutil_4.0.7",
+            "ws": "7.5.9_bufferutil_4.0.8",
         },
         transitive_closure = {
             "@polka/url": ["1.0.0-next.21"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.12.1"],
             "acorn-walk": ["8.2.0"],
             "ansi-styles": ["4.3.0"],
-            "bufferutil": ["4.0.7"],
+            "bufferutil": ["4.0.8"],
             "chalk": ["4.1.2"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
@@ -25226,8 +25888,8 @@ def npm_repositories():
             "sirv": ["1.0.19"],
             "supports-color": ["7.2.0"],
             "totalist": ["1.1.0"],
-            "webpack-bundle-analyzer": ["4.5.0_bufferutil_4.0.7"],
-            "ws": ["7.5.9_bufferutil_4.0.7"],
+            "webpack-bundle-analyzer": ["4.5.0_bufferutil_4.0.8"],
+            "ws": ["7.5.9_bufferutil_4.0.8"],
         },
     )
 
@@ -25273,7 +25935,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -25294,7 +25956,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -25368,6 +26030,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -25477,7 +26140,7 @@ def npm_repositories():
             "@types/eslint-scope": ["3.7.4"],
             "@types/estree": ["1.0.0", "0.0.51"],
             "@types/json-schema": ["7.0.11"],
-            "@types/node": ["18.13.0"],
+            "@types/node": ["18.19.54"],
             "@webassemblyjs/ast": ["1.11.1"],
             "@webassemblyjs/floating-point-hex-parser": ["1.11.1"],
             "@webassemblyjs/helper-api-error": ["1.11.1"],
@@ -25498,7 +26161,7 @@ def npm_repositories():
             "@webpack-cli/serve": ["2.0.1_1256213976"],
             "@xtuc/ieee754": ["1.2.0"],
             "@xtuc/long": ["4.2.2"],
-            "acorn": ["8.8.2"],
+            "acorn": ["8.8.2", "8.12.1"],
             "acorn-import-assertions": ["1.8.0_acorn_8.8.2"],
             "ajv": ["6.12.6"],
             "ajv-keywords": ["3.5.2_ajv_6.12.6"],
@@ -25572,6 +26235,7 @@ def npm_repositories():
             "tapable": ["2.2.1"],
             "terser": ["5.16.5"],
             "terser-webpack-plugin": ["5.3.6_webpack_5.76.3"],
+            "undici-types": ["5.26.5"],
             "update-browserslist-db": ["1.0.10_browserslist_4.21.5"],
             "uri-js": ["4.4.1"],
             "watchpack": ["2.4.0"],
@@ -25824,12 +26488,12 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "npm__ws__7.5.9_bufferutil_4.0.7",
+        name = "npm__ws__7.5.9_bufferutil_4.0.8",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "ws",
-        version = "7.5.9_bufferutil_4.0.7",
+        version = "7.5.9_bufferutil_4.0.8",
         url = "https://registry.npmjs.org/ws/-/ws-7.5.9.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -25837,22 +26501,22 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==",
         deps = {
-            "bufferutil": "4.0.7",
+            "bufferutil": "4.0.8",
         },
         transitive_closure = {
-            "bufferutil": ["4.0.7"],
+            "bufferutil": ["4.0.8"],
             "node-gyp-build": ["4.6.0"],
-            "ws": ["7.5.9_bufferutil_4.0.7"],
+            "ws": ["7.5.9_bufferutil_4.0.8"],
         },
     )
 
     npm_import(
-        name = "npm__ws__8.13.0_bufferutil_4.0.7",
+        name = "npm__ws__8.13.0_bufferutil_4.0.8",
         root_package = "",
         link_workspace = "",
         link_packages = {},
         package = "ws",
-        version = "8.13.0_bufferutil_4.0.7",
+        version = "8.13.0_bufferutil_4.0.8",
         url = "https://registry.npmjs.org/ws/-/ws-8.13.0.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
@@ -25860,12 +26524,35 @@ def npm_repositories():
         generate_bzl_library_targets = True,
         integrity = "sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==",
         deps = {
-            "bufferutil": "4.0.7",
+            "bufferutil": "4.0.8",
         },
         transitive_closure = {
-            "bufferutil": ["4.0.7"],
+            "bufferutil": ["4.0.8"],
             "node-gyp-build": ["4.6.0"],
-            "ws": ["8.13.0_bufferutil_4.0.7"],
+            "ws": ["8.13.0_bufferutil_4.0.8"],
+        },
+    )
+
+    npm_import(
+        name = "npm__ws__8.18.0_bufferutil_4.0.8",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "ws",
+        version = "8.18.0_bufferutil_4.0.8",
+        url = "https://registry.npmjs.org/ws/-/ws-8.18.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==",
+        deps = {
+            "bufferutil": "4.0.8",
+        },
+        transitive_closure = {
+            "bufferutil": ["4.0.8"],
+            "node-gyp-build": ["4.6.0"],
+            "ws": ["8.18.0_bufferutil_4.0.8"],
         },
     )
 
@@ -25972,6 +26659,24 @@ def npm_repositories():
         integrity = "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==",
         transitive_closure = {
             "yallist": ["4.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "npm__yallist__5.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "yallist",
+        version = "5.0.0",
+        url = "https://registry.npmjs.org/yallist/-/yallist-5.0.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==",
+        transitive_closure = {
+            "yallist": ["5.0.0"],
         },
     )
 

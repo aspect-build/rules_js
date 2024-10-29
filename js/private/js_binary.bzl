@@ -109,7 +109,7 @@ _ATTRS = {
         This must be a target that provides a single file or a `DirectoryPathInfo`
         from `@aspect_bazel_lib//lib::directory_path.bzl`.
         
-        See https://github.com/aspect-build/bazel-lib/blob/main/docs/directory_path.md
+        See https://github.com/bazel-contrib/bazel-lib/blob/main/docs/directory_path.md
         for more info on creating a target that provides a `DirectoryPathInfo`.
         """,
         mandatory = True,
@@ -289,7 +289,7 @@ _ATTRS = {
     "node_toolchain": attr.label(
         doc = """The Node.js toolchain to use for this target.
 
-        See https://bazelbuild.github.io/rules_nodejs/Toolchains.html
+        See https://bazel-contrib.github.io/rules_nodejs/Toolchains.html
 
         Typically this is left unset so that Bazel automatically selects the right Node.js toolchain
         for the target platform. See https://bazel.build/extending/toolchains#toolchain-resolution

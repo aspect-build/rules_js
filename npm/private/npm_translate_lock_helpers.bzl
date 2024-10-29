@@ -283,10 +283,6 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
         transitive_closure = package_info.get("transitive_closure")
         resolution = package_info.get("resolution")
 
-        if version.startswith("file:"):
-            # this package is treated as a first-party dep
-            continue
-
         resolution_type = resolution.get("type", None)
         if resolution_type == "directory":
             # this package is treated as a first-party dep
@@ -431,7 +427,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
                 else:
                     url = tarball
             elif tarball.startswith("file:"):
-                url = tarball
+                file_path = tarball[5:]
+                file_path = paths.normalize(paths.join(root_package, file_path))
+                url = "file:{}".format(file_path)
             else:
                 if not registry:
                     registry = utils.npm_registry_url(name, registries, default_registry)
@@ -516,7 +514,8 @@ def _is_url(url):
 
 ################################################################################
 def _to_apparent_repo_name(canonical_name):
-    return canonical_name[canonical_name.rfind("~") + 1:]
+    # Bazel 7 uses `~` as the canonical name separator by default, Bazel 8 always uses `+`.
+    return canonical_name[max(canonical_name.rfind("~"), canonical_name.rfind("+")) + 1:]
 
 ################################################################################
 def _verify_node_modules_ignored(rctx, importers, root_package):

@@ -17,20 +17,22 @@ jobs:
             - name: Mount bazel caches
               uses: actions/cache@v4
               with:
+                  # Cache the --dist_cache and --repository_cache directories (see ci.bazelrc)
+                  # and the default bazel output (https://bazel.build/remote/output-directories#layout)
+                  # and bazelisk cache.
                   path: |
                       ~/.cache/bazel-disk-cache
                       ~/.cache/bazel-repository-cache
-                      ~/.cache/xdg-cache
+                      ~/.cache/bazel
+                      ~/.cache/bazelisk
                   key: bazel-cache-release-${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}
                   restore-keys: bazel-cache-release-
             - name: bazel test //...
-              env:
-                  XDG_CACHE_HOME: ~/.cache/xdg-cache # bazelisk will download bazel to here
               run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
             - name: Prepare release
               run: .github/workflows/release_prep.sh ${{ env.GITHUB_REF_NAME }} > release_notes.txt
             - name: Release
-              uses: softprops/action-gh-release@v1
+              uses: softprops/action-gh-release@v2
               with:
                   # Use GH feature to populate the changelog automatically
                   generate_release_notes: true

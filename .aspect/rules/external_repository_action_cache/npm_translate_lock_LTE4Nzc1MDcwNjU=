@@ -1,5 +1,5 @@
 # @generated
-# Input hashes for repository rule npm_translate_lock(name = "npm", pnpm_lock = "@//:pnpm-lock.yaml").
+# Input hashes for repository rule npm_translate_lock(name = "npm", pnpm_lock = "@@//:pnpm-lock.yaml").
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=-2065072158
 examples/js_binary/package.json=-41174383
@@ -15,18 +15,19 @@ examples/npm_package/packages/pkg_a/package.json=1006424040
 examples/npm_package/packages/pkg_b/package.json=1041247977
 examples/npm_package/packages/pkg_d/package.json=1110895851
 examples/npm_package/packages/pkg_e/package.json=-2145239245
+examples/runfiles/package.json=-1545884645
 examples/webpack_cli/package.json=1911342006
-js/private/coverage/bundle/package.json=-1543718929
-js/private/image/package.json=-1260474848
-js/private/test/image/package.json=-687546763
-js/private/test/js_run_devserver/package.json=-260856079
-js/private/worker/src/package.json=1608383745
+js/private/coverage/bundle/package.json=-24783848
+js/private/image/package.json=-789619063
+js/private/test/image/package.json=1430754959
+js/private/test/js_run_devserver/package.json=-381403605
+js/private/worker/src/package.json=-1243560410
 npm/private/test/npm_package/package.json=-1991705133
 npm/private/test/npm_package_publish/package.json=-646566766
-npm/private/test/package.json=600650131
+npm/private/test/package.json=248936204
 npm/private/test/vendored/is-odd/package.json=1041695223
 npm/private/test/vendored/lodash-4.17.21.tgz=-1206623349
 npm/private/test/vendored/semver-max/package.json=578664053
-package.json=-275319675
-pnpm-lock.yaml=1584807079
+package.json=1510979981
+pnpm-lock.yaml=1138016668
 pnpm-workspace.yaml=-762451270

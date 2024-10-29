@@ -89,6 +89,7 @@ npm_translate_lock(
         "//examples/npm_package/packages/pkg_b:package.json",
         "//examples/npm_package/packages/pkg_d:package.json",
         "//examples/npm_package/packages/pkg_e:package.json",
+        "//examples/runfiles:package.json",
         "//examples/webpack_cli:package.json",
         "//js/private/coverage/bundle:package.json",
         "//js/private/image:package.json",
@@ -199,6 +200,10 @@ load("@io_bazel_stardoc//:deps.bzl", "stardoc_external_deps")
 
 stardoc_external_deps()
 
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+
+bazel_features_deps()
+
 load("@stardoc_maven//:defs.bzl", stardoc_pinned_maven_install = "pinned_maven_install")
 
 stardoc_pinned_maven_install()
@@ -215,10 +220,20 @@ buildifier_prebuilt_register_toolchains()
 # rules_lint
 load(
     "@aspect_rules_lint//format:repositories.bzl",
-    "fetch_shfmt",
+    "rules_lint_dependencies",
 )
 
-fetch_shfmt()
+rules_lint_dependencies()
+
+load("@rules_multitool//multitool:multitool.bzl", "multitool")
+
+multitool(
+    name = "multitool",
+    lockfiles = [
+        "@aspect_rules_lint//format:multitool.lock.json",
+        "@aspect_rules_lint//lint:multitool.lock.json",
+    ],
+)
 
 load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
 
