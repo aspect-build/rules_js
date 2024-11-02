@@ -355,7 +355,7 @@ WARNING: Implicitly using patch file `{patch}` since the `{package_json}` file c
                     package_json = label_store.label("package_json_root"),
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, label_store, patch_key)
+            _copy_input_file(priv, rctx, attr, label_store, patch_key)
 
 ################################################################################
 def _has_input_hash(priv, path):
