@@ -10,12 +10,14 @@ exports_files(
 
 # Allows for faster dev roundtrip by excluding type-checking from libraries that are
 # internally used via npm_package
+# TODO(3.0): remove
 bool_flag(
     name = "exclude_types_from_npm_packages",
     build_setting_default = False,
     visibility = ["//visibility:public"],
 )
 
+# TODO(3.0): remove
 config_setting(
     name = "exclude_types_from_npm_packages_flag",
     flag_values = {":exclude_types_from_npm_packages": "true"},
