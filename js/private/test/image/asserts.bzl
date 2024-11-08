@@ -28,7 +28,10 @@ layers = [
     "package_store_1p",
     "package_store_3p",
     "node_modules",
-    "app",
+    # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
+    # we need to exlude it from checksums
+    # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
+    # "app",
 ]
 
 # buildifier: disable=function-docstring
@@ -76,11 +79,14 @@ def assert_checksum(name, image_layer):
         testonly = True,
         srcs = [image_layer],
         outs = [name + ".checksums"],
+        # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
+        # we need to exlude it from checksums
+        # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
         cmd = """
 COREUTILS_BIN=$$(realpath $(COREUTILS_BIN)) &&
 RESULT="$$($$COREUTILS_BIN sha256sum $(SRCS))"
 BINDIR="$(BINDIR)/"
-echo "$${RESULT//$$BINDIR/}" > $@
+echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
     """,
         output_to_bindir = True,
         toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
