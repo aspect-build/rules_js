@@ -326,6 +326,9 @@ def _select_layer(layers, destination, file):
         return layers.node_modules
     return layers.app
 
+def _repo_mapping_manifest(files_to_run):
+    return getattr(files_to_run, "repo_mapping_manifest", None)
+
 def _js_image_layer_impl(ctx):
     if len(ctx.attr.binary) != 1:
         fail("binary attribute has more than one transition")
@@ -343,7 +346,12 @@ def _js_image_layer_impl(ctx):
     real_binary_path = _runfile_path(ctx, binary_default_info.files_to_run.executable, runfiles_dir)
     launcher = _write_laucher(ctx, real_binary_path)
 
-    all_files = depset(transitive = [binary_default_info.files, binary_default_info.default_runfiles.files])
+    repo_mapping = _repo_mapping_manifest(binary_default_info.files_to_run)
+
+    all_files = depset(
+        [repo_mapping] if repo_mapping else [],
+        transitive = [binary_default_info.files, binary_default_info.default_runfiles.files],
+    )
     all_entries = {}
 
     layers = struct(
