@@ -20,6 +20,12 @@ platform(
     ],
 )
 
+# All these golden files can be updated with
+# bazel run //js/private/test/image:default_test_update_all --enable_bzlmod
+# bazel run //js/private/test/image:custom_owner_test_update_all --enable_bzlmod
+# bazel run //js/private/test/image:default_test_update_all --noenable_bzlmod
+# bazel run //js/private/test/image:custom_owner_test_update_all --noenable_bzlmod
+
 # Case 0: reproducibility guarantees
 make_js_image_layer(
     name = "cksum",
