@@ -414,4 +414,4 @@ so you can launch into a debugging session directly from the
 
 ## Troubleshooting
 
-See [docs/troubleshooting.md](docs/troubleshooting.md).
+See [troubleshooting.md](troubleshooting.md).
