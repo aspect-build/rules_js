@@ -305,7 +305,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 }
 
 // Sync list of files to the sandbox
-async function syncFiles(files, sandbox, writePerm) {
+async function syncFiles(files, sandbox, writePerm, directSync) {
     console.error(`+ Syncing ${files.length} files & folders...`)
     const startTime = perf_hooks.performance.now()
 
@@ -327,10 +327,15 @@ async function syncFiles(files, sandbox, writePerm) {
         )
     }
 
+    let otherFilesSrcDir = RUNFILES_ROOT
+    if (directSync) {
+        otherFilesSrcDir = process.env.BUILD_WORKSPACE_DIRECTORY
+    }
+
     let totalSynced = (
         await Promise.all(
             otherFiles.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
+                const src = path.join(otherFilesSrcDir, file)
                 const dst = path.join(sandbox, file)
                 return await syncRecursive(src, dst, sandbox, writePerm)
             })
@@ -460,11 +465,13 @@ async function main(args, sandbox) {
         async function processChunk(chunk) {
             try {
                 const chunkString = chunk.toString()
-                if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
-                    if (process.env.JS_BINARY__LOG_DEBUG) {
-                        console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
-                    }
-
+                const triggerSync = chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS') || (chunkString.includes('IBAZEL_BUILD_STARTED') && config.direct_sync)
+                
+                if (process.env.JS_BINARY__LOG_DEBUG) {
+                    console.error(chunkString)
+                }
+                
+                if (triggerSync) {
                     const oldFiles = config.data_files
 
                     // Re-parse the config file to get the latest list of data files to copy
@@ -483,16 +490,13 @@ async function main(args, sandbox) {
                         syncFiles(
                             updatedDataFiles,
                             sandbox,
-                            config.grant_sandbox_write_permissions
+                            config.grant_sandbox_write_permissions,
+                            config.direct_sync,
                         ),
                     ])
 
                     // The latest state of copied data files
                     config.data_files = updatedDataFiles
-                } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
-                    if (process.env.JS_BINARY__LOG_DEBUG) {
-                        console.error('IBAZEL_BUILD_STARTED')
-                    }
                 }
 
                 // Forward stdin to the subprocess. See comment about

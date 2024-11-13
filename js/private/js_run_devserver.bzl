@@ -17,6 +17,7 @@ _attrs = dicts.add(js_binary_lib.attrs, {
         default = True,
     ),
     "grant_sandbox_write_permissions": attr.bool(),
+    "direct_sync": attr.bool(),
     "allow_execroot_entry_point_with_no_copy_data_to_bin": attr.bool(),
     "command": attr.string(),
 })
@@ -91,6 +92,8 @@ def _js_run_devserver_impl(ctx):
         config["command"] = ctx.attr.command
     if ctx.attr.grant_sandbox_write_permissions:
         config["grant_sandbox_write_permissions"] = "1"
+    if ctx.attr.direct_sync:
+        config["direct_sync"] = True
 
     ctx.actions.write(config_file, json.encode(config))
 
