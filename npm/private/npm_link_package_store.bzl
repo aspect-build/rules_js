@@ -67,10 +67,10 @@ def _npm_link_package_store_impl(ctx):
     if not package_store_directory:
         fail("src must be a npm_link_package that provides a package_store_directory")
 
-    if package_store_directory.owner.workspace_name != ctx.label.workspace_name:
+    if package_store_directory.owner.repo_name != ctx.label.repo_name:
         msg = "expected package_store_directory to be in the same workspace as the link target '{}' but found '{}'".format(
-            ctx.label.workspace_name,
-            package_store_directory.owner.workspace_name,
+            ctx.label.repo_name,
+            package_store_directory.owner.repo_name,
         )
         fail(msg)
 

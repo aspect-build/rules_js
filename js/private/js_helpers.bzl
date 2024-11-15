@@ -75,7 +75,7 @@ def gather_npm_package_store_infos(targets):
     return depset(transitive = npm_package_store_infos)
 
 def copy_js_file_to_bin_action(ctx, file):
-    if ctx.label.workspace_name != file.owner.workspace_name or ctx.label.package != file.owner.package:
+    if ctx.label.repo_name != file.owner.repo_name or ctx.label.package != file.owner.package:
         msg = """
 
 Expected to find source file {file_basename} in '{this_package}', but instead it is in '{file_package}'.
@@ -101,9 +101,9 @@ this option is not needed.
 
 """.format(
             file_basename = file.basename,
-            file_package = "%s//%s" % (file.owner.workspace_name, file.owner.package),
+            file_package = "%s//%s" % (file.owner.repo_name, file.owner.package),
             new_target_name = file.basename.replace(".", "_"),
-            this_package = "%s//%s" % (ctx.label.workspace_name, ctx.label.package),
+            this_package = "%s//%s" % (ctx.label.repo_name, ctx.label.package),
             this_target = ctx.label,
         )
         fail(msg)
