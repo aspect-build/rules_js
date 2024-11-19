@@ -18,7 +18,7 @@ rules_js is just a part Aspect's monorepo developer platform:
 -   _Need help?_
     -   Best-effort community support is available on the #javascript channel on [Bazel Slack](https://slack.bazel.build/)
     -   Commercial support as a Slack Connect channel is offered by https://aspect.build/services.
--   See our other Bazel rules, especially those built for rules_js:
+-   See [Aspect's Bazel rules](https://docs.aspect.build/rules), especially those built for rules_js:
     -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
     -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
     -   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
@@ -48,20 +48,6 @@ The ruleset is known to work with:
 
 Follow instructions from the release you wish to use:
 <https://github.com/aspect-build/rules_js/releases>.
-
-To use a commit rather than a release, you can point at any SHA of the repo.
-
-For example, to use commit `abc123` with `WORKSPACE`:
-
-1. Replace `url = "https://github.com/aspect-build/rules_js/releases/download/v0.1.0/rules_js-v0.1.0.tar.gz"`
-   with a GitHub-provided source archive like
-   `url = "https://github.com/aspect-build/rules_js/archive/abc123.tar.gz"`
-1. Replace `strip_prefix = "rules_js-0.1.0"` with `strip_prefix = "rules_js-abc123"`
-1. Update the `sha256`. The easiest way to do this is to comment out the line, then Bazel will
-   print a message with the correct value.
-
-> Note that GitHub source archives don't have a strong guarantee on the sha256 stability, see
-> <https://github.blog/2023-02-21-update-on-the-future-stability-of-source-code-archives-and-hashes>
 
 ## Usage
 
