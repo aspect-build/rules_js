@@ -42,6 +42,22 @@ importers:
         specifier: workspace:*
         version: link:../npm_package/packages/pkg_a
 
+  examples/js_lib_pkg/a:
+    devDependencies:
+      '@types/node':
+        specifier: 18.19.54
+        version: registry.npmjs.org/@types/node@18.19.54
+
+  examples/js_lib_pkg/b:
+    dependencies:
+      js_lib_pkg_a:
+        specifier: workspace:*
+        version: link:../a
+    devDependencies:
+      '@types/node':
+        specifier: 18.19.54
+        version: registry.npmjs.org/@types/node@18.19.54
+
   examples/linked_consumer:
     dependencies:
       '@lib/test':
@@ -1680,11 +1696,12 @@ packages:
     resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
     dependencies:
       undici-types: 5.26.5
+    dev: true
 
   /@types/readdir-glob@1.1.5:
     resolution: {integrity: sha512-raiuEPUYqXu+nvtY2Pe8s8FEmZ3x5yAH4VkLdihcPdalvsHltomrRC9BzuStrJ9yk06470hS0Crw0f1pXqD+Hg==, tarball: https://registry.npmjs.org/@types/readdir-glob/-/readdir-glob-1.1.5.tgz}
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
 
   /@types/resolve@1.20.2:
@@ -1694,7 +1711,7 @@ packages:
   /@types/tar-stream@2.2.3:
     resolution: {integrity: sha512-if3mugZfjVkXOMZdFjIHySxY13r6GXPpyOlsDmLffvyI7tLz9wXE8BFjNivXsvUeyJ1KNlOpfLnag+ISmxgxPw==, tarball: https://registry.npmjs.org/@types/tar-stream/-/tar-stream-2.2.3.tgz}
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
@@ -4288,7 +4305,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -7402,7 +7419,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics@4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv@3.1.4
-      '@types/node': 18.19.54
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
       '@types/responselike': registry.npmjs.org/@types/responselike@1.0.0
     dev: true
 
@@ -7473,7 +7490,7 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
 
   registry.npmjs.org/@types/node@18.19.54:
@@ -7482,7 +7499,6 @@ packages:
     version: 18.19.54
     dependencies:
       undici-types: 5.26.5
-    dev: true
 
   registry.npmjs.org/@types/node@22.7.4:
     resolution: {integrity: sha512-y+NPi1rFzDs1NdQHHToqeiX2TIS79SWEAw9GYhkkx8bD0ChpfqC+n2j5OXOCpzfojBEBt6DnEnnG9MY0zk1XLg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-22.7.4.tgz}
@@ -7508,7 +7524,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
 
   registry.npmjs.org/@types/tough-cookie@4.0.2:

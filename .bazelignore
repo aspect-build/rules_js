@@ -1,5 +1,7 @@
 e2e/
 examples/js_binary/node_modules/
+examples/js_lib_pkg/a/node_modules
+examples/js_lib_pkg/b/node_modules
 examples/linked_consumer/node_modules
 examples/linked_empty_node_modules/node_modules
 examples/linked_lib/node_modules
