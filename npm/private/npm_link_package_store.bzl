@@ -119,7 +119,7 @@ def _npm_link_package_store_impl(ctx):
             files = files_depset,
             # Include all transitives in runfiles so that this target can be used in the data
             # of a generic binary target such as sh_binary
-            runfiles = ctx.runfiles(transitive_files = transitive_files_depset),
+            runfiles = ctx.runfiles(transitive_files = transitive_files_depset).merge(ctx.attr.src[DefaultInfo].default_runfiles),
         ),
         js_info(
             target = ctx.label,
