@@ -406,6 +406,12 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             dev = ctx.attr.dev,
         ),
     ]
+
+    if ctx.attr.src:
+        providers.append(DefaultInfo(
+            runfiles = ctx.attr.src[DefaultInfo].default_runfiles,
+        ))
+
     if package_store_directory and package_store_directory.is_directory:
         # Provide an output group that provides a single file which is the
         # package directory for use in $(execpath) and $(rootpath).

@@ -1,5 +1,6 @@
 packages:
     - 'examples/*'
+    - 'examples/js_lib_pkg/*'
     - 'examples/npm_package/libs/*'
     - 'examples/npm_package/packages/*'
     - 'js/private/coverage/bundle'

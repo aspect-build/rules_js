@@ -1016,7 +1016,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
 
-_LINK_PACKAGES = ["", "examples/js_binary", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -2361,6 +2361,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@types"].append(link_targets[-1])
             link_580(name = "{}/jasmine".format(name))
             link_targets.append("//{}:{}/jasmine".format(bazel_package, name))
+        elif bazel_package == "examples/js_lib_pkg/a":
+            link_202(name = "{}/@types/node".format(name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
+        elif bazel_package == "examples/js_lib_pkg/b":
+            link_202(name = "{}/@types/node".format(name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "examples/webpack_cli":
             link_214(name = "{}/@vanilla-extract/css".format(name))
             link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name))
@@ -2460,6 +2474,38 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 visibility = ["//examples:__subpackages__"],
                 tags = ["manual"],
             )
+
+    if is_root:
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
+            src = "//examples/js_lib_pkg/a:pkg",
+            package = "js_lib_pkg_a",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["examples/js_lib_pkg/b"]:
+        if link_package == bazel_package:
+            # terminal target for direct dependencies
+            _npm_link_package_store(
+                name = "{}/js_lib_pkg_a".format(name),
+                src = "//:.aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/js_lib_pkg_a/dir".format(name),
+                srcs = [":{}/js_lib_pkg_a".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            link_targets.append(":{}/js_lib_pkg_a".format(name))
 
     if is_root:
         _npm_package_store(
@@ -2772,6 +2818,10 @@ def npm_link_targets(name = "node_modules", package = None):
         elif bazel_package == "js/private/test/js_run_devserver":
             link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
             link_targets.append("//{}:{}/jasmine".format(bazel_package, name))
+        elif bazel_package == "examples/js_lib_pkg/a":
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+        elif bazel_package == "examples/js_lib_pkg/b":
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
         elif bazel_package == "examples/webpack_cli":
             link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name))
             link_targets.append("//{}:{}/@vanilla-extract/webpack-plugin".format(bazel_package, name))
@@ -2793,6 +2843,10 @@ def npm_link_targets(name = "node_modules", package = None):
     for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@mycorp/pkg-a".format(bazel_package, name))
+
+    for link_package in ["examples/js_lib_pkg/b"]:
+        if link_package == bazel_package:
+            link_targets.append("//{}:{}/js_lib_pkg_a".format(bazel_package, name))
 
     for link_package in ["examples/linked_consumer"]:
         if link_package == bazel_package:

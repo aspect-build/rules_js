@@ -5314,6 +5314,8 @@ def npm_repositories():
         root_package = "",
         link_workspace = "",
         link_packages = {
+            "examples/js_lib_pkg/a": ["@types/node"],
+            "examples/js_lib_pkg/b": ["@types/node"],
             "js/private/image": ["@types/node"],
             "js/private/worker/src": ["@types/node"],
         },
@@ -5322,7 +5324,6 @@ def npm_repositories():
         url = "https://registry.yarnpkg.com/@types/node/-/node-18.19.54.tgz",
         system_tar = "xxx",
         package_visibility = ["//visibility:public"],
-        dev = True,
         generate_bzl_library_targets = True,
         integrity = "sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==",
         deps = {

@@ -1,0 +1,9 @@
+{
+    "name": "js_lib_pkg_b",
+    "dependencies": {
+        "js_lib_pkg_a": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "18.19.54"
+    }
+}
