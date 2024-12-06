@@ -1,6 +1,7 @@
 **/pnpm-lock.yaml
 docs/*_*.md
 e2e/**/*-docs.md
+e2e/pnpm_lockfiles/cases/*.yaml
 examples/**/*-docs.md
 js/private/coverage/coverage.js
 js/private/node-patches/fs.cjs

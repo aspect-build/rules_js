@@ -5,7 +5,7 @@ load(":utils.bzl", "DEFAULT_REGISTRY_DOMAIN_SLASH", "utils")
 
 def _is_vendored_tarfile(package_snapshot):
     if "resolution" in package_snapshot:
-        return "tarball" in package_snapshot["resolution"]
+        return "tarball" in package_snapshot["resolution"] and package_snapshot["resolution"]["tarball"].startswith("file:")
     return False
 
 def _to_package_key(name, version):
@@ -461,9 +461,9 @@ def _convert_v9_packages(packages, snapshots):
     result = {}
 
     # Snapshots contains the packages with the keys (which include peers) to return
-    for package_key, package_snapshot in snapshots.items():
-        peer_meta_index = package_key.find("(")
-        static_key = package_key[:peer_meta_index] if peer_meta_index > 0 else package_key
+    for package_path, package_snapshot in snapshots.items():
+        peer_meta_index = package_path.find("(")
+        static_key = package_path[:peer_meta_index] if peer_meta_index > 0 else package_path
         if not static_key in packages:
             msg = "package {} not found in pnpm 'packages'".format(static_key)
             fail(msg)
@@ -474,16 +474,22 @@ def _convert_v9_packages(packages, snapshots):
             msg = "package {} has no resolution field".format(static_key)
             fail(msg)
 
-        # the raw name + version are the key, not including peerDeps+patch
+        package_key = _convert_pnpm_v6_v9_version_peer_dep(package_path)
+
+        # the raw name + version are the static_key, not including peerDeps+patch
         version_index = static_key.index("@", 1)
         name = static_key[:version_index]
-        package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
 
-        # Extract the version including peerDeps+patch from the key
+        # Extract the version including peerDeps+patch from the package_key
         version = package_key[package_key.index("@", 1) + 1:]
 
         # package_data can have the resolved "version" for things like https:// deps
         friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
+
+        # direct reference to tarball files: use the friendly_version to align with pnpm <v9 which
+        # uses the resolved version in the package store.
+        if _is_vendored_tarfile(package_data):
+            version = friendly_version
 
         package_info = _new_package_info(
             id = package_data.get("id", None),  # TODO: does v9 have "id"?

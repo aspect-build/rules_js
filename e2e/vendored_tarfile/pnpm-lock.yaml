@@ -1,17 +1,23 @@
-lockfileVersion: 5.4
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
   .:
-    specifiers:
-      lodash: file:lodash-4.17.21.tgz
     dependencies:
-      lodash: file:lodash-4.17.21.tgz
+      lodash:
+        specifier: file:lodash-4.17.21.tgz
+        version: file:lodash-4.17.21.tgz
 
 packages:
 
-  file:lodash-4.17.21.tgz:
+  lodash@file:lodash-4.17.21.tgz:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:lodash-4.17.21.tgz}
-    name: lodash
     version: 4.17.21
-    dev: false
+
+snapshots:
+
+  lodash@file:lodash-4.17.21.tgz: {}
