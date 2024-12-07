@@ -841,4 +841,5 @@ PNPM_VERSIONS = {
     "9.14.2": "sha512-biuvd9Brk2IpQVLIUcTyeO3jerHro6Vf2jF6SheyCfTbuXP7JQp3q8Rjo0H8sfF/F8+iQJHE6zGc2g2bhCeDhw==",
     "9.14.3": "sha512-wPU+6ZR37ZabgrKJrQEaXRa/FiPJV+fynqvo0MALV0wpuMf1T2xn7nEMc/KFyBVNB85EtG/iwO60dqkEQbrDcQ==",
     "9.14.4": "sha512-yBgLP75OS8oCyUI0cXiWtVKXQKbLrfGfp4JUJwQD6i8n1OHUagig9WyJtj3I6/0+5TMm2nICc3lOYgD88NGEqw==",
+    "9.15.0": "sha512-duI3l2CkMo7EQVgVvNZije5yevN3mqpMkU45RBVsQpmSGon5djge4QfUHxLPpLZmgcqccY8GaPoIMe1MbYulbA==",
 }
