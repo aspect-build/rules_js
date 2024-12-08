@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
+packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -266,8 +266,8 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5)
       '@types/archiver':
-        specifier: 5.3.4
-        version: 5.3.4
+        specifier: 6.0.3
+        version: 6.0.3
       '@types/node':
         specifier: 18.19.54
         version: 18.19.54
@@ -1672,8 +1672,8 @@ packages:
       '@turf/helpers': 6.5.0
     dev: true
 
-  /@types/archiver@5.3.4:
-    resolution: {integrity: sha512-Lj7fLBIMwYFgViVVZHEdExZC3lVYsl+QL0VmdNdIzGZH544jHveYWij6qdnBgJQDnR7pMKliN9z2cPZFEbhyPw==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.4.tgz}
+  /@types/archiver@6.0.3:
+    resolution: {integrity: sha512-a6wUll6k3zX6qs5KlxIggs1P1JcYJaTCx2gnlr+f0S1yd2DoaEwoIK10HmBaLnZwWneBz+JBm0dwcZu0zECBcQ==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-6.0.3.tgz}
     dependencies:
       '@types/readdir-glob': 1.1.5
     dev: true
@@ -1696,12 +1696,11 @@ packages:
     resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
     dependencies:
       undici-types: 5.26.5
-    dev: true
 
   /@types/readdir-glob@1.1.5:
     resolution: {integrity: sha512-raiuEPUYqXu+nvtY2Pe8s8FEmZ3x5yAH4VkLdihcPdalvsHltomrRC9BzuStrJ9yk06470hS0Crw0f1pXqD+Hg==, tarball: https://registry.npmjs.org/@types/readdir-glob/-/readdir-glob-1.1.5.tgz}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
     dev: true
 
   /@types/resolve@1.20.2:
@@ -1713,6 +1712,14 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
+
+  /@types/yauzl@2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
+    requiresBuild: true
+    dependencies:
+      '@types/node': 18.19.54
+    dev: true
+    optional: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -3334,7 +3341,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': registry.npmjs.org/@types/yauzl@2.10.0
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4305,7 +4312,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -7362,9 +7369,6 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       google-protobuf: 3.21.4
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
     dev: true
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
@@ -7419,7 +7423,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmjs.org/@types/http-cache-semantics@4.0.1
       '@types/keyv': registry.npmjs.org/@types/keyv@3.1.4
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
       '@types/responselike': registry.npmjs.org/@types/responselike@1.0.0
     dev: true
 
@@ -7490,7 +7494,7 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
     dev: true
 
   registry.npmjs.org/@types/node@18.19.54:
@@ -7499,6 +7503,7 @@ packages:
     version: 18.19.54
     dependencies:
       undici-types: 5.26.5
+    dev: true
 
   registry.npmjs.org/@types/node@22.7.4:
     resolution: {integrity: sha512-y+NPi1rFzDs1NdQHHToqeiX2TIS79SWEAw9GYhkkx8bD0ChpfqC+n2j5OXOCpzfojBEBt6DnEnnG9MY0zk1XLg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-22.7.4.tgz}
@@ -7514,7 +7519,7 @@ packages:
     version: 2.48.8
     dependencies:
       '@types/caseless': registry.npmjs.org/@types/caseless@0.12.2
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
       '@types/tough-cookie': registry.npmjs.org/@types/tough-cookie@4.0.2
       form-data: 2.5.1
     dev: true
@@ -7524,7 +7529,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.0
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
     dev: true
 
   registry.npmjs.org/@types/tough-cookie@4.0.2:
@@ -7544,15 +7549,5 @@ packages:
     name: '@types/ws'
     version: 8.5.5
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
+      '@types/node': 18.19.54
     dev: true
-
-  registry.npmjs.org/@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
-    name: '@types/yauzl'
-    version: 2.10.0
-    requiresBuild: true
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
-    dev: true
-    optional: true
