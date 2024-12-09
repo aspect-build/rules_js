@@ -1,0 +1,31 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+onlyBuiltDependencies: []
+
+importers:
+
+  .:
+    dependencies:
+      is-number:
+        specifier: file:../vendored/is-number
+        version: file:../vendored/is-number
+      lodash:
+        specifier: file:../vendored/lodash-4.17.19.tgz
+        version: file:../vendored/lodash-4.17.19.tgz
+
+packages:
+
+  file:../vendored/is-number:
+    resolution: {directory: ../vendored/is-number, type: directory}
+    name: is-number
+    dev: false
+
+  file:../vendored/lodash-4.17.19.tgz:
+    resolution: {integrity: sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==, tarball: file:../vendored/lodash-4.17.19.tgz}
+    name: lodash
+    version: 4.17.19
+    dev: false
