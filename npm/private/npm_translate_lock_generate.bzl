@@ -5,7 +5,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
-load(":utils.bzl", "utils")
+load(":utils.bzl", "DEFAULT_LINKED_VERSION", "utils")
 
 ################################################################################
 _NPM_IMPORT_TMPL = \
@@ -35,10 +35,16 @@ _FP_STORE_TMPL = \
             name = "{package_store_root}/{{}}/{package_store_name}".format(name),
             src = "{npm_package_target}",
             package = "{package}",
-            version = "0.0.0",
+            version = "{version}",
             deps = {deps},
             visibility = ["//visibility:public"],
             tags = ["manual"],
+        )"""
+_FP_DEFAULT_VERSION_ALIAS_TMPL = \
+    """
+        native.alias(
+            name = "{package_store_root}/{{}}/{default_version_name}".format(name),
+            actual = "{package_store_root}/{{}}/{package_store_name}".format(name),
         )"""
 
 _FP_DIRECT_TMPL = \
@@ -144,11 +150,17 @@ sh_binary(
             # collapse link aliases lists into to acomma separated strings
             for dep_store_target in transitive_deps.keys():
                 transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+
+            # Some file links may have a version specified
+            friendly_version = package_info.get("friendly_version", DEFAULT_LINKED_VERSION)
+            friendly_version = DEFAULT_LINKED_VERSION if friendly_version.startswith("file:") else friendly_version
+
             fp_links[dep_key] = {
                 "package": name,
                 "path": dep_path,
                 "link_packages": {},
                 "deps": transitive_deps,
+                "version": friendly_version,
             }
 
     # Look for first-party links in importers
@@ -372,6 +384,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
+        fp_version = fp_link.get("version", DEFAULT_LINKED_VERSION)
         fp_path = fp_link.get("path")
         fp_link_packages = fp_link.get("link_packages").keys()
         fp_deps = fp_link.get("deps")
@@ -384,9 +397,21 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
-            package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+            version = fp_version,
+            package_store_name = utils.package_store_name(fp_package, fp_version),
             package_store_root = utils.package_store_root,
         ))
+
+        # References to this package may be linked use file: or link: and not know
+        # the version number when the dependency is declared in the package.json.
+        if fp_version != DEFAULT_LINKED_VERSION:
+            npm_link_all_packages_bzl.append(_FP_DEFAULT_VERSION_ALIAS_TMPL.format(
+                package = fp_package,
+                version = fp_version,
+                default_version_name = utils.package_store_name(fp_package, DEFAULT_LINKED_VERSION),
+                package_store_name = utils.package_store_name(fp_package, fp_version),
+                package_store_root = utils.package_store_root,
+            ))
 
         package_visibility, _ = helpers.gather_values_from_matching_names(True, rctx.attr.package_visibility, "*", fp_package)
         if len(package_visibility) == 0:
@@ -399,7 +424,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 pkg = fp_package,
                 package_directory_output_group = utils.package_directory_output_group,
                 root_package = root_package,
-                package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                package_store_name = utils.package_store_name(fp_package, fp_version),
                 package_store_root = utils.package_store_root,
             ))
 

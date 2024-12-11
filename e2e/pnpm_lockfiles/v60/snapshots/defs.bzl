@@ -300,13 +300,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     if is_root:
         _npm_package_store(
-            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
+            name = ".aspect_rules_js/{}/is-number@0.0.1".format(name),
             src = "//vendored/is-number:pkg",
             package = "is-number",
-            version = "0.0.0",
+            version = "0.0.1",
             deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
+        )
+
+        native.alias(
+            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
+            actual = ".aspect_rules_js/{}/is-number@0.0.1".format(name),
         )
 
     if is_root:
