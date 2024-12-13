@@ -30,7 +30,6 @@ bin_factory = _bin_factory
 
 _FP_STORE_TMPL = \
     """
-    if is_root:
         _npm_package_store(
             name = "{package_store_root}/{{}}/{package_store_name}".format(name),
             src = "{npm_package_target}",
@@ -216,8 +215,7 @@ def npm_link_targets(name = "node_modules", package = None):
 """,
     ]
 
-    npm_link_all_packages_bzl = [
-        """\
+    npm_link_all_packages_bzl_init = """\
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
     bazel_package = native.package_name()
@@ -238,12 +236,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets[_scope] = []
             scope_targets[_scope].extend(_targets)
 """.format(
-            defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
-            link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "\"\"",
-            root_package = root_package,
-            pnpm_lock_label = pnpm_lock_label,
-        ),
-    ]
+        defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
+        link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "\"\"",
+        root_package = root_package,
+        pnpm_lock_label = pnpm_lock_label,
+    )
+
+    npm_link_all_packages_is_root = []
+    npm_link_all_packages_bzl = []
 
     defs_bzl_header = []
     stores_bzl = []
@@ -344,9 +344,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         ),
                     )
 
-    if len(stores_bzl) > 0:
-        npm_link_all_packages_bzl.append("""    if is_root:""")
-        npm_link_all_packages_bzl.extend(stores_bzl)
+    npm_link_all_packages_is_root.extend(stores_bzl)
 
     if len(links_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if link:""")
@@ -380,7 +378,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
 
-        npm_link_all_packages_bzl.append(_FP_STORE_TMPL.format(
+        npm_link_all_packages_is_root.append(_FP_STORE_TMPL.format(
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
@@ -445,11 +443,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
 
+    if len(npm_link_all_packages_is_root) > 0:
+        npm_link_all_packages_is_root.insert(0, "    if is_root:")
+
     rctx_files[rctx.attr.defs_bzl_filename] = [
         "\n".join(defs_bzl_header),
         "",
         npm_link_packages_const,
         "",
+        npm_link_all_packages_bzl_init,
+        "\n".join(npm_link_all_packages_is_root),
         "\n".join(npm_link_all_packages_bzl),
         "",
         "\n".join(npm_link_targets_bzl),

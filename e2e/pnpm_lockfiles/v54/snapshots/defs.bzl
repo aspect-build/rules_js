@@ -153,6 +153,74 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_57(name = "{}/uvu".format(name))
         store_58(name = "{}/wrap-ansi".format(name))
         store_59(name = "{}/wrap-ansi".format(name))
+
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+            src = "//projects/c:pkg",
+            package = "@scoped/c",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
+            src = "//vendored/is-number:pkg",
+            package = "is-number",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+            src = "//projects/a:pkg",
+            package = "@scoped/a",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+            src = "//projects/b:pkg",
+            package = "@scoped/b",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+            src = "//projects/d:pkg",
+            package = "@scoped/d",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+            src = "//projects/b:pkg",
+            package = "scoped/bad",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
@@ -252,19 +320,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_57(name = "{}/uvu".format(name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
 
-    if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
-            src = "//projects/c:pkg",
-            package = "@scoped/c",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
             # terminal target for direct dependencies
@@ -289,28 +344,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@scoped"] = [link_targets[-1]]
             else:
                 scope_targets["@scoped"].append(link_targets[-1])
-
-    if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
-            src = "//vendored/is-number:pkg",
-            package = "is-number",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-    if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
-            src = "//projects/a:pkg",
-            package = "@scoped/a",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:
         if link_package == bazel_package:
@@ -337,19 +370,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             else:
                 scope_targets["@scoped"].append(link_targets[-1])
 
-    if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
-            src = "//projects/b:pkg",
-            package = "@scoped/b",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
             # terminal target for direct dependencies
@@ -375,19 +395,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             else:
                 scope_targets["@scoped"].append(link_targets[-1])
 
-    if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
-            src = "//projects/d:pkg",
-            package = "@scoped/d",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
             # terminal target for direct dependencies
@@ -412,19 +419,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@scoped"] = [link_targets[-1]]
             else:
                 scope_targets["@scoped"].append(link_targets[-1])
-
-    if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
-            src = "//projects/b:pkg",
-            package = "scoped/bad",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
