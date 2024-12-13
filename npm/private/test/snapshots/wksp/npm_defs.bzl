@@ -2524,167 +2524,160 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_675(name = "{}/mocha".format(name))
             link_targets.append("//{}:{}/mocha".format(bazel_package, name))
 
-    for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/@mycorp/pkg-a".format(name),
-                src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
-                visibility = ["//examples:__subpackages__"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@mycorp/pkg-a".format(name),
+            src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
+            visibility = ["//examples:__subpackages__"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/@mycorp/pkg-a/dir".format(name),
-                srcs = [":{}/@mycorp/pkg-a".format(name)],
-                output_group = "package_directory",
-                visibility = ["//examples:__subpackages__"],
-                tags = ["manual"],
-            )
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@mycorp/pkg-a/dir".format(name),
+            srcs = [":{}/@mycorp/pkg-a".format(name)],
+            output_group = "package_directory",
+            visibility = ["//examples:__subpackages__"],
+            tags = ["manual"],
+        )
 
-    for link_package in ["examples/js_lib_pkg/b"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/js_lib_pkg_a".format(name),
-                src = "//:.aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["examples/js_lib_pkg/b"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/js_lib_pkg_a".format(name),
+            src = "//:.aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/js_lib_pkg_a/dir".format(name),
-                srcs = [":{}/js_lib_pkg_a".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/js_lib_pkg_a".format(name))
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/js_lib_pkg_a/dir".format(name),
+            srcs = [":{}/js_lib_pkg_a".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/js_lib_pkg_a".format(name))
 
-    for link_package in ["examples/linked_consumer"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/@lib/test".format(name),
-                src = "//:.aspect_rules_js/{}/@lib+test@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["examples/linked_consumer"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@lib/test".format(name),
+            src = "//:.aspect_rules_js/{}/@lib+test@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/@lib/test/dir".format(name),
-                srcs = [":{}/@lib/test".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/@lib/test".format(name))
-            if "@lib" not in scope_targets:
-                scope_targets["@lib"] = [link_targets[-1]]
-            else:
-                scope_targets["@lib"].append(link_targets[-1])
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@lib/test/dir".format(name),
+            srcs = [":{}/@lib/test".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/@lib/test".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
 
-    for link_package in ["examples/linked_consumer"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/@lib/test2".format(name),
-                src = "//:.aspect_rules_js/{}/@lib+test2@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["examples/linked_consumer"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@lib/test2".format(name),
+            src = "//:.aspect_rules_js/{}/@lib+test2@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/@lib/test2/dir".format(name),
-                srcs = [":{}/@lib/test2".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/@lib/test2".format(name))
-            if "@lib" not in scope_targets:
-                scope_targets["@lib"] = [link_targets[-1]]
-            else:
-                scope_targets["@lib"].append(link_targets[-1])
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@lib/test2/dir".format(name),
+            srcs = [":{}/@lib/test2".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/@lib/test2".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
 
-    for link_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/@mycorp/pkg-d".format(name),
-                src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@mycorp/pkg-d".format(name),
+            src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/@mycorp/pkg-d/dir".format(name),
-                srcs = [":{}/@mycorp/pkg-d".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/@mycorp/pkg-d".format(name))
-            if "@mycorp" not in scope_targets:
-                scope_targets["@mycorp"] = [link_targets[-1]]
-            else:
-                scope_targets["@mycorp"].append(link_targets[-1])
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@mycorp/pkg-d/dir".format(name),
+            srcs = [":{}/@mycorp/pkg-d".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/@mycorp/pkg-d".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
-    for link_package in ["examples/npm_deps"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/@mycorp/pkg-e".format(name),
-                src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["examples/npm_deps"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@mycorp/pkg-e".format(name),
+            src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/@mycorp/pkg-e/dir".format(name),
-                srcs = [":{}/@mycorp/pkg-e".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/@mycorp/pkg-e".format(name))
-            if "@mycorp" not in scope_targets:
-                scope_targets["@mycorp"] = [link_targets[-1]]
-            else:
-                scope_targets["@mycorp"].append(link_targets[-1])
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@mycorp/pkg-e/dir".format(name),
+            srcs = [":{}/@mycorp/pkg-e".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/@mycorp/pkg-e".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
-    for link_package in ["npm/private/test"]:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{}/test-npm_package".format(name),
-                src = "//:.aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
+    if bazel_package in ["npm/private/test"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/test-npm_package".format(name),
+            src = "//:.aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{}/test-npm_package/dir".format(name),
-                srcs = [":{}/test-npm_package".format(name)],
-                output_group = "package_directory",
-                visibility = ["//visibility:public"],
-                tags = ["manual"],
-            )
-            link_targets.append(":{}/test-npm_package".format(name))
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/test-npm_package/dir".format(name),
+            srcs = [":{}/test-npm_package".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/test-npm_package".format(name))
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -2831,31 +2824,24 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name))
             link_targets.append("//{}:{}/mocha".format(bazel_package, name))
 
-    for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/@mycorp/pkg-a".format(bazel_package, name))
+    if bazel_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
+        link_targets.append("//{}:{}/@mycorp/pkg-a".format(bazel_package, name))
 
-    for link_package in ["examples/js_lib_pkg/b"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/js_lib_pkg_a".format(bazel_package, name))
+    if bazel_package in ["examples/js_lib_pkg/b"]:
+        link_targets.append("//{}:{}/js_lib_pkg_a".format(bazel_package, name))
 
-    for link_package in ["examples/linked_consumer"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/@lib/test".format(bazel_package, name))
+    if bazel_package in ["examples/linked_consumer"]:
+        link_targets.append("//{}:{}/@lib/test".format(bazel_package, name))
 
-    for link_package in ["examples/linked_consumer"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/@lib/test2".format(bazel_package, name))
+    if bazel_package in ["examples/linked_consumer"]:
+        link_targets.append("//{}:{}/@lib/test2".format(bazel_package, name))
 
-    for link_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/@mycorp/pkg-d".format(bazel_package, name))
+    if bazel_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
+        link_targets.append("//{}:{}/@mycorp/pkg-d".format(bazel_package, name))
 
-    for link_package in ["examples/npm_deps"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/@mycorp/pkg-e".format(bazel_package, name))
+    if bazel_package in ["examples/npm_deps"]:
+        link_targets.append("//{}:{}/@mycorp/pkg-e".format(bazel_package, name))
 
-    for link_package in ["npm/private/test"]:
-        if link_package == bazel_package:
-            link_targets.append("//{}:{}/test-npm_package".format(bazel_package, name))
+    if bazel_package in ["npm/private/test"]:
+        link_targets.append("//{}:{}/test-npm_package".format(bazel_package, name))
     return link_targets

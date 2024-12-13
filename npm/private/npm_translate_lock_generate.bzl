@@ -42,31 +42,29 @@ _FP_STORE_TMPL = \
 
 _FP_DIRECT_TMPL = \
     """
-    for link_package in {link_packages}:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{{}}/{pkg}".format(name),
-                src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
-                visibility = {link_visibility},
-                tags = ["manual"],
-            )
+    if bazel_package in {link_packages}:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{{}}/{pkg}".format(name),
+            src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
+            visibility = {link_visibility},
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{{}}/{pkg}/dir".format(name),
-                srcs = [":{{}}/{pkg}".format(name)],
-                output_group = "{package_directory_output_group}",
-                visibility = {link_visibility},
-                tags = ["manual"],
-            )"""
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{{}}/{pkg}/dir".format(name),
+            srcs = [":{{}}/{pkg}".format(name)],
+            output_group = "{package_directory_output_group}",
+            visibility = {link_visibility},
+            tags = ["manual"],
+        )"""
 
 _FP_DIRECT_TARGET_TMPL = \
     """
-    for link_package in {link_packages}:
-        if link_package == bazel_package:
-            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
+    if bazel_package in {link_packages}:
+        link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -77,7 +75,13 @@ _BZL_LIBRARY_TMPL = \
 )
 """
 
-_ADD_SCOPE_TARGET = """\
+_ADD_SCOPE_TARGET2 = """\
+        if "{package_scope}" not in scope_targets:
+            scope_targets["{package_scope}"] = [link_targets[-1]]
+        else:
+            scope_targets["{package_scope}"].append(link_targets[-1])"""
+
+_ADD_SCOPE_TARGET3 = """\
             if "{package_scope}" not in scope_targets:
                 scope_targets["{package_scope}"] = [link_targets[-1]]
             else:
@@ -300,7 +304,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
                     if package_scope:
-                        links_bzl[link_package].append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
+                        links_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
 
                 # the resolved.json for this alias of the package
                 resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME)
@@ -407,11 +411,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             ))
 
             if "//visibility:public" in package_visibility:
-                add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+                add_to_link_targets = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
                 npm_link_all_packages_bzl.append(add_to_link_targets)
                 package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                 if package_scope:
-                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
+                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET2.format(package_scope = package_scope))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
