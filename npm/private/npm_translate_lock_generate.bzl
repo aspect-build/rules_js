@@ -30,15 +30,15 @@ bin_factory = _bin_factory
 
 _FP_STORE_TMPL = \
     """
-        _npm_package_store(
-            name = "{package_store_root}/{{}}/{package_store_name}".format(name),
-            src = "{npm_package_target}",
-            package = "{package}",
-            version = "0.0.0",
-            deps = {deps},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )"""
+    _npm_package_store(
+        name = "{package_store_root}/{{}}/{package_store_name}".format(name),
+        src = "{npm_package_target}",
+        package = "{package}",
+        version = "0.0.0",
+        deps = {deps},
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )"""
 
 _FP_DIRECT_TMPL = \
     """
@@ -248,9 +248,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     npm_link_all_packages_is_root = []
     npm_link_all_packages_bzl = []
+    npm_link_all_packages_stores_bzl = []
 
     defs_bzl_header = []
-    stores_bzl = []
     links_bzl = {}
     links_targets_bzl = {}
     for (i, _import) in enumerate(npm_imports):
@@ -271,7 +271,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 ),
             )
 
-        stores_bzl.append("""        store_{i}(name = "{{}}/{pkg}".format(name))""".format(
+        npm_link_all_packages_stores_bzl.append("""    store_{i}(name = "{{}}/{pkg}".format(name))""".format(
             i = i,
             pkg = _import.package,
         ))
@@ -348,7 +348,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                         ),
                     )
 
-    npm_link_all_packages_is_root.extend(stores_bzl)
+    if len(npm_link_all_packages_stores_bzl) > 0:
+        npm_link_all_packages_stores_bzl.insert(0, "def _npm_link_all_packages_store(name):")
+        npm_link_all_packages_is_root.append("""        _npm_link_all_packages_store(name = name)""")
 
     if len(links_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if link:""")
@@ -382,8 +384,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
 
-        npm_link_all_packages_is_root.append(_FP_STORE_TMPL.format(
-            deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
+        npm_link_all_packages_stores_bzl.append(_FP_STORE_TMPL.format(
+            deps = starlark_codegen_utils.to_dict_attr(fp_deps, 2, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
             package_store_name = utils.package_store_name(fp_package, "0.0.0"),
@@ -460,6 +462,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         "\n".join(npm_link_all_packages_bzl),
         "",
         "\n".join(npm_link_targets_bzl),
+        "",
+        "\n".join(npm_link_all_packages_stores_bzl),
         "",
     ]
 

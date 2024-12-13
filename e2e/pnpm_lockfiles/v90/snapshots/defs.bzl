@@ -94,135 +94,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets[_scope].extend(_targets)
 
     if is_root:
-        store_0(name = "{}/ansi-regex".format(name))
-        store_1(name = "{}/ansi-regex".format(name))
-        store_2(name = "{}/ansi-styles".format(name))
-        store_3(name = "{}/ansi-styles".format(name))
-        store_4(name = "{}/@aspect-test/a".format(name))
-        store_5(name = "{}/@aspect-test/b".format(name))
-        store_6(name = "{}/@aspect-test/c".format(name))
-        store_7(name = "{}/@aspect-test/c".format(name))
-        store_8(name = "{}/@aspect-test/d".format(name))
-        store_9(name = "{}/@aspect-test/e".format(name))
-        store_10(name = "{}/@foo/jsonify".format(name))
-        store_11(name = "{}/@isaacs/cliui".format(name))
-        store_12(name = "{}/@rollup/plugin-typescript".format(name))
-        store_13(name = "{}/@rollup/pluginutils".format(name))
-        store_14(name = "{}/@types/archiver".format(name))
-        store_15(name = "{}/@types/estree".format(name))
-        store_16(name = "{}/@types/glob".format(name))
-        store_17(name = "{}/@types/minimatch".format(name))
-        store_18(name = "{}/@types/node".format(name))
-        store_19(name = "{}/@types/sizzle".format(name))
-        store_20(name = "{}/color-convert".format(name))
-        store_21(name = "{}/color-name".format(name))
-        store_22(name = "{}/debug".format(name))
-        store_23(name = "{}/dequal".format(name))
-        store_24(name = "{}/diff".format(name))
-        store_25(name = "{}/eastasianwidth".format(name))
-        store_26(name = "{}/emoji-regex".format(name))
-        store_27(name = "{}/emoji-regex".format(name))
-        store_28(name = "{}/estree-walker".format(name))
-        store_29(name = "{}/fsevents".format(name))
-        store_30(name = "{}/function-bind".format(name))
-        store_31(name = "{}/hasown".format(name))
-        store_32(name = "{}/hello".format(name))
-        store_33(name = "{}/is-core-module".format(name))
-        store_34(name = "{}/is-fullwidth-code-point".format(name))
-        store_35(name = "{}/is-odd".format(name))
-        store_36(name = "{}/is-odd".format(name))
-        store_37(name = "{}/is-odd".format(name))
-        store_38(name = "{}/is-odd".format(name))
-        store_39(name = "{}/is-odd".format(name))
-        store_40(name = "{}/jquery".format(name))
-        store_41(name = "{}/kleur".format(name))
-        store_42(name = "{}/meaning-of-life".format(name))
-        store_43(name = "{}/mri".format(name))
-        store_44(name = "{}/ms".format(name))
-        store_45(name = "{}/path-parse".format(name))
-        store_46(name = "{}/picomatch".format(name))
-        store_47(name = "{}/resolve".format(name))
-        store_48(name = "{}/rollup".format(name))
-        store_49(name = "{}/rollup".format(name))
-        store_50(name = "{}/sade".format(name))
-        store_51(name = "{}/string-width".format(name))
-        store_52(name = "{}/string-width".format(name))
-        store_53(name = "{}/strip-ansi".format(name))
-        store_54(name = "{}/strip-ansi".format(name))
-        store_55(name = "{}/supports-preserve-symlinks-flag".format(name))
-        store_56(name = "{}/tslib".format(name))
-        store_57(name = "{}/typescript".format(name))
-        store_58(name = "{}/uvu".format(name))
-        store_59(name = "{}/wrap-ansi".format(name))
-        store_60(name = "{}/wrap-ansi".format(name))
-
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
-            src = "//projects/c:pkg",
-            package = "@scoped/c",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
-            src = "//vendored/is-number:pkg",
-            package = "is-number",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
-            src = "//projects/a:pkg",
-            package = "@scoped/a",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
-            src = "//projects/b:pkg",
-            package = "@scoped/b",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
-            src = "//projects/d:pkg",
-            package = "@scoped/d",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
-            src = "//projects/b:pkg",
-            package = "scoped/bad",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
+        _npm_link_all_packages_store(name = name)
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
@@ -515,3 +387,134 @@ def npm_link_targets(name = "node_modules", package = None):
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append("//{}:{}/scoped/bad".format(bazel_package, name))
     return link_targets
+
+def _npm_link_all_packages_store(name):
+    store_0(name = "{}/ansi-regex".format(name))
+    store_1(name = "{}/ansi-regex".format(name))
+    store_2(name = "{}/ansi-styles".format(name))
+    store_3(name = "{}/ansi-styles".format(name))
+    store_4(name = "{}/@aspect-test/a".format(name))
+    store_5(name = "{}/@aspect-test/b".format(name))
+    store_6(name = "{}/@aspect-test/c".format(name))
+    store_7(name = "{}/@aspect-test/c".format(name))
+    store_8(name = "{}/@aspect-test/d".format(name))
+    store_9(name = "{}/@aspect-test/e".format(name))
+    store_10(name = "{}/@foo/jsonify".format(name))
+    store_11(name = "{}/@isaacs/cliui".format(name))
+    store_12(name = "{}/@rollup/plugin-typescript".format(name))
+    store_13(name = "{}/@rollup/pluginutils".format(name))
+    store_14(name = "{}/@types/archiver".format(name))
+    store_15(name = "{}/@types/estree".format(name))
+    store_16(name = "{}/@types/glob".format(name))
+    store_17(name = "{}/@types/minimatch".format(name))
+    store_18(name = "{}/@types/node".format(name))
+    store_19(name = "{}/@types/sizzle".format(name))
+    store_20(name = "{}/color-convert".format(name))
+    store_21(name = "{}/color-name".format(name))
+    store_22(name = "{}/debug".format(name))
+    store_23(name = "{}/dequal".format(name))
+    store_24(name = "{}/diff".format(name))
+    store_25(name = "{}/eastasianwidth".format(name))
+    store_26(name = "{}/emoji-regex".format(name))
+    store_27(name = "{}/emoji-regex".format(name))
+    store_28(name = "{}/estree-walker".format(name))
+    store_29(name = "{}/fsevents".format(name))
+    store_30(name = "{}/function-bind".format(name))
+    store_31(name = "{}/hasown".format(name))
+    store_32(name = "{}/hello".format(name))
+    store_33(name = "{}/is-core-module".format(name))
+    store_34(name = "{}/is-fullwidth-code-point".format(name))
+    store_35(name = "{}/is-odd".format(name))
+    store_36(name = "{}/is-odd".format(name))
+    store_37(name = "{}/is-odd".format(name))
+    store_38(name = "{}/is-odd".format(name))
+    store_39(name = "{}/is-odd".format(name))
+    store_40(name = "{}/jquery".format(name))
+    store_41(name = "{}/kleur".format(name))
+    store_42(name = "{}/meaning-of-life".format(name))
+    store_43(name = "{}/mri".format(name))
+    store_44(name = "{}/ms".format(name))
+    store_45(name = "{}/path-parse".format(name))
+    store_46(name = "{}/picomatch".format(name))
+    store_47(name = "{}/resolve".format(name))
+    store_48(name = "{}/rollup".format(name))
+    store_49(name = "{}/rollup".format(name))
+    store_50(name = "{}/sade".format(name))
+    store_51(name = "{}/string-width".format(name))
+    store_52(name = "{}/string-width".format(name))
+    store_53(name = "{}/strip-ansi".format(name))
+    store_54(name = "{}/strip-ansi".format(name))
+    store_55(name = "{}/supports-preserve-symlinks-flag".format(name))
+    store_56(name = "{}/tslib".format(name))
+    store_57(name = "{}/typescript".format(name))
+    store_58(name = "{}/uvu".format(name))
+    store_59(name = "{}/wrap-ansi".format(name))
+    store_60(name = "{}/wrap-ansi".format(name))
+
+    _npm_package_store(
+        name = ".aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+        src = "//projects/c:pkg",
+        package = "@scoped/c",
+        version = "0.0.0",
+        deps = {
+            "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+        },
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+    _npm_package_store(
+        name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
+        src = "//vendored/is-number:pkg",
+        package = "is-number",
+        version = "0.0.0",
+        deps = {},
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+    _npm_package_store(
+        name = ".aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+        src = "//projects/a:pkg",
+        package = "@scoped/a",
+        version = "0.0.0",
+        deps = {},
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+    _npm_package_store(
+        name = ".aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+        src = "//projects/b:pkg",
+        package = "@scoped/b",
+        version = "0.0.0",
+        deps = {
+            "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+        },
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+    _npm_package_store(
+        name = ".aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+        src = "//projects/d:pkg",
+        package = "@scoped/d",
+        version = "0.0.0",
+        deps = {
+            "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+        },
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+    _npm_package_store(
+        name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+        src = "//projects/b:pkg",
+        package = "scoped/bad",
+        version = "0.0.0",
+        deps = {
+            "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+        },
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
