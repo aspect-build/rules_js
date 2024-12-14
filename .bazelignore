@@ -25,3 +25,4 @@ node_modules/
 npm/private/test/node_modules/
 npm/private/test/npm_package/node_modules/
 npm/private/test/npm_package_publish/node_modules
+.git
