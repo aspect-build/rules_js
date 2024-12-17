@@ -395,6 +395,15 @@ def _js_image_layer_impl(ctx):
         layer.entries[destination] = entry
         layer.inputs.append(file)
 
+    if repo_mapping:
+        destination = paths.join(runfiles_dir, "_repo_mapping")
+        entry = {
+            "dest": repo_mapping.path,
+            "root": repo_mapping.root.path,
+        }
+        all_entries[destination] = entry
+        layers.app.entries[destination] = entry
+
     all_entries_json = ctx.actions.declare_file("{}_all_entries.json".format(ctx.label.name))
     ctx.actions.write(all_entries_json, content = json.encode(all_entries))
 
