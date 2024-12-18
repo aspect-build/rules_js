@@ -4,7 +4,7 @@
         "@types/node": "16.18.112",
         "chalk": "5.1.1",
         "inline-fixtures": "1.1.0",
-        "jsonpath-plus": "7.2.0",
+        "jsonpath-plus": "10.2.0",
         "typescript": "4.9.5"
     },
     "pnpm": {
