@@ -518,6 +518,10 @@ async function main(args, sandbox) {
         // short-circuit for unit tests
         return
     let sandbox
+
+    // Callback to cleanup the sandbox if it exists, once and only once.
+    onProcessEnd(() => sandbox && removeSandbox(sandbox) && (sandbox = null))
+
     try {
         sandbox = path.join(
             await fs.promises.mkdtemp(
@@ -531,15 +535,30 @@ async function main(args, sandbox) {
     } catch (e) {
         console.error(e)
         process.exit(1)
-    } finally {
-        try {
-            if (sandbox) {
-                await fs.promises.rm(sandbox, { recursive: true })
-            }
-        } catch (e) {
-            console.error(
-                `An error has occurred while removing the sandbox folder at ${sandbox}. Error: ${e}`
-            )
-        }
     }
 })()
+
+function removeSandbox(sandbox) {
+    try {
+        if (sandbox) {
+            // Must be synchronous when invoked from process exit handler
+            fs.rmSync(sandbox, { force: true, recursive: true })
+        }
+    } catch (e) {
+        console.error(
+            `An error has occurred while removing the sandbox folder at ${sandbox}. Error: ${e}`
+        )
+        return false
+    }
+    return true
+}
+
+function onProcessEnd(callback) {
+    // node process exit
+    process.on('exit', callback)
+
+    // ctrl+c event
+    process.on('SIGINT', callback)
+
+    // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
+}
