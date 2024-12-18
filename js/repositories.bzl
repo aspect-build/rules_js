@@ -16,14 +16,14 @@ def rules_js_dependencies():
 
     http_archive(
         name = "rules_nodejs",
-        sha256 = "83d2bb029c2a9a06a474c8748d1221a92a7ca02222dcf49a0b567825c4e3f1ce",
-        strip_prefix = "rules_nodejs-6.3.0",
-        url = "https://github.com/bazel-contrib/rules_nodejs/releases/download/v6.3.0/rules_nodejs-v6.3.0.tar.gz",
+        sha256 = "158619723f1d8bd535dd6b93521f4e03cf24a5e107126d05685fbd9540ccad10",
+        strip_prefix = "rules_nodejs-6.3.2",
+        url = "https://github.com/bazel-contrib/rules_nodejs/releases/download/v6.3.2/rules_nodejs-v6.3.2.tar.gz",
     )
 
     http_archive(
         name = "aspect_bazel_lib",
-        sha256 = "f93d386d8d0b0149031175e81df42a488be4267c3ca2249ba5321c23c60bc1f0",
-        strip_prefix = "bazel-lib-2.9.1",
-        url = "https://github.com/bazel-contrib/bazel-lib/releases/download/v2.9.1/bazel-lib-v2.9.1.tar.gz",
+        sha256 = "7b39d9f38b82260a8151b18dd4a6219d2d7fc4a0ac313d4f5a630ae6907d205d",
+        strip_prefix = "bazel-lib-2.10.0",
+        url = "https://github.com/bazel-contrib/bazel-lib/releases/download/v2.10.0/bazel-lib-v2.10.0.tar.gz",
     )
