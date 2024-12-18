@@ -238,6 +238,7 @@ def _npm_package_store_impl(ctx):
                         "--directory",
                         package_store_directory.path,
                     ],
+                    env = {"LC_ALL": "en_US.UTF-8"},
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                 )
