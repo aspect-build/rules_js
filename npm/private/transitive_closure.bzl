@@ -102,22 +102,19 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
         opt_deps = {} if no_optional else lock_importer.get("optional_dependencies")
 
         deps = dicts.add(prod_deps, opt_deps)
-        all_deps = dicts.add(prod_deps, dev_deps, opt_deps)
 
         # Package versions mapped to alternate versions
         for info in package_version_map.values():
             if info["name"] in deps:
                 deps[info["name"]] = info["version"]
-            if info["name"] in all_deps:
-                all_deps[info["name"]] = info["version"]
+            if info["name"] in dev_deps:
+                dev_deps[info["name"]] = info["version"]
 
         importers_deps[importPath] = {
             # deps this importer should pass on if it is linked as a first-party package; this does
             # not include devDependencies
             "deps": deps,
-            # all deps of this importer to link in the node_modules folder of that Bazel package and
-            # make available to all build targets; this includes devDependencies
-            "all_deps": all_deps,
+            "dev_deps": dev_deps,
         }
 
     # Collect transitive dependencies for each package
