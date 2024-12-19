@@ -240,6 +240,10 @@ def _npm_package_store_impl(ctx):
                     ],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
+                    # Allow users to set --action_env=LC_ALL=C.UTF-8 for example,
+                    # on systems where default locale is wrong.
+                    # See https://github.com/aspect-build/rules_js/issues/2039
+                    use_default_shell_env = True,
                 )
             else:
                 copy_directory_bin_action(
