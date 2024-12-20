@@ -1102,7 +1102,7 @@ def npm_import(
 
         package_visibility: Visibility of generated node_module link targets.
 
-        patch_tool: The patch tool.
+        patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
 
         patch_args: Arguments to pass to the patch tool.
 

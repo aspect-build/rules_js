@@ -279,7 +279,7 @@ def npm_translate_lock(
 
             Read more: [patching](/docs/pnpm.md#patching)
 
-        patch_tool: The patch tool.
+        patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
 
         patch_args: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list arguments to pass to the patch tool. The most specific match wins.
