@@ -148,6 +148,7 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     "verbose": attr.bool(
         doc = """If true, prints out verbose logs to stdout""",
     ),
+    "_macos_constraint": attr.label(default = "@platforms//os:macos"),
 }
 
 def _npm_package_store_impl(ctx):
@@ -223,6 +224,7 @@ def _npm_package_store_impl(ctx):
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+                is_macos = ctx.target_platform_has_constraint(ctx.attr._macos_constraint[platform_common.ConstraintValueInfo])
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
@@ -240,10 +242,16 @@ def _npm_package_store_impl(ctx):
                     ],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
-                    # Allow users to set --action_env=LC_ALL=C.UTF-8 for example,
-                    # on systems where default locale is wrong.
-                    # See https://github.com/aspect-build/rules_js/issues/2039
-                    use_default_shell_env = True,
+                    # Workaround https://github.com/bazelbuild/bazel-central-registry/issues/2256
+                    # Always override the locale to give better hermeticity.
+                    # See https://github.com/bazelbuild/rules_java/blob/767e4410850453a10ccf89aa1cededf9de05c72e/toolchains/utf8_environment.bzl
+                    env = {
+                        "LC_CTYPE": "C" if is_macos else
+                        # # macOS doesn't have the C.UTF-8 locale, but en_US.UTF-8 is available and works the same way.
+                        #"en_US.UTF-8" if is_macos
+                        # The default UTF-8 locale on all recent Linux distributions. It is also available in Cygwin and MSYS2.
+                        "C.UTF-8",
+                    },
                 )
             else:
                 copy_directory_bin_action(
