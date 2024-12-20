@@ -15,7 +15,7 @@ PNPM_LOCK_VERSIONS = [
     "v90",
 ]
 
-BZL_FILES = {
+BZLMOD_FILES = {
     # global
     "defs.bzl": "@REPO_NAME//:defs.bzl",
 
@@ -27,6 +27,10 @@ BZL_FILES = {
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
     "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",
     "rollup3_package_json.bzl": "@REPO_NAME__rollup__3.29.4//VERSION:package_json.bzl",
+}
+
+WKSP_FILES = {
+    "repositories.bzl": "@REPO_NAME//:repositories.bzl",
 }
 
 def lockfile_test(name = None):
@@ -195,7 +199,7 @@ def lockfile_test(name = None):
             cmd = 'sed "s/{}/<LOCKVERSION>/g" "$<" > "$@"'.format(lock_version),
             visibility = ["//visibility:private"],
         )
-        for (out, what) in BZL_FILES.items()
+        for (out, what) in BZLMOD_FILES.items()
     ]
 
     write_source_files(
@@ -206,13 +210,50 @@ def lockfile_test(name = None):
                     "snapshots/%s" % f,
                     ":extract-%s" % f,
                 )
-                for f in BZL_FILES.keys()
+                for f in BZLMOD_FILES.keys()
             ],
         ),
         # Target names may be different on workspace vs bzlmod
         target_compatible_with = select({
             "@aspect_bazel_lib//lib:bzlmod": [],
             "//conditions:default": ["@platforms//:incompatible"],
+        }),
+        # Target names may be different on bazel versions
+        tags = ["skip-on-bazel6"],
+    )
+
+    # buildifier: disable=no-effect
+    [
+        native.genrule(
+            name = "extract-%s" % out,
+            srcs = [what.replace("VERSION", lock_version).replace("REPO_NAME", lock_repo)],
+            outs = ["snapshot-extracted-%s" % out],
+            cmd = 'sed "s/{}/<LOCKVERSION>/g" "$<" | sed "s/system_tar = \\".*\\"/system_tar = \\"<TAR>\\"/" > "$@"'.format(lock_version),
+            visibility = ["//visibility:private"],
+            # Target names may be different on workspace vs bzlmod
+            target_compatible_with = select({
+                "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+                "//conditions:default": [],
+            }),
+        )
+        for (out, what) in WKSP_FILES.items()
+    ]
+
+    write_source_files(
+        name = "wksp-repos",
+        files = dict(
+            [
+                (
+                    "snapshots/%s" % f,
+                    ":extract-%s" % f,
+                )
+                for f in WKSP_FILES.keys()
+            ],
+        ),
+        # Target names may be different on workspace vs bzlmod
+        target_compatible_with = select({
+            "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+            "//conditions:default": [],
         }),
         # Target names may be different on bazel versions
         tags = ["skip-on-bazel6"],
