@@ -1,4 +1,7 @@
 {
     "name": "@scoped/a",
-    "private": true
+    "private": true,
+    "dependencies": {
+        "@types/node": "16.18.11"
+    }
 }
