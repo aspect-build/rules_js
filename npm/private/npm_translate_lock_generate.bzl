@@ -18,7 +18,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         system_tar = "{system_tar}",
-        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
+        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
     )
 """
 
@@ -511,6 +511,8 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
     maybe_transitive_closure = ("""
         transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
+    maybe_patch_tool = ("""
+        patch_tool = "%s",""" % _import.patch_tool) if _import.patch_tool else ""
     maybe_patches = ("""
         patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
     maybe_patch_args = ("""
@@ -562,6 +564,7 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         maybe_npm_auth_basic = maybe_npm_auth_basic,
         maybe_npm_auth_password = maybe_npm_auth_password,
         maybe_npm_auth_username = maybe_npm_auth_username,
+        maybe_patch_tool = maybe_patch_tool,
         maybe_patch_args = maybe_patch_args,
         maybe_patches = maybe_patches,
         maybe_replace_package = maybe_replace_package,
