@@ -4,6 +4,8 @@ load("@docusaurus-direct-peer-v9//:defs.bzl", docusaurus_direct_with_peers_v9_li
 load("@isaacs-cliui-v90//:defs.bzl", isaacs_cliui_v90_link_all = "npm_link_all_packages")
 load("@override-with-alias-url-v9//:defs.bzl", override_with_alias_link_all = "npm_link_all_packages")
 load("@tarball-no-url-v54//:defs.bzl", tarball_no_url_link_all = "npm_link_all_packages")
+load("@vendored-files-v6//:defs.bzl", vendored_files_v6_link_all = "npm_link_all_packages")
+load("@vendored-files-v9//:defs.bzl", vendored_files_v9_link_all = "npm_link_all_packages")
 
 exports_files(glob(["*.yaml"]))
 
@@ -50,5 +52,31 @@ build_test(
         # TODO: causes 'conflicting actions' error
         # ":docusaurus_direct_with_peers_v6-modules",
         # ":docusaurus_direct_with_peers_v6-modules/@docusaurus/module-type-aliases",
+    ],
+)
+
+vendored_files_v6_link_all(name = "vendored-files-v6-modules")
+
+build_test(
+    name = "vendored-files-v6",
+    targets = [
+        ":vendored-files-v6-modules",
+        ":vendored-files-v6-modules/lodash",
+        ":vendored-files-v6-modules/is-number",
+        ":.aspect_rules_js/vendored-files-v6-modules/lodash@4.17.19",
+        ":.aspect_rules_js/vendored-files-v6-modules/is-number@0.0.0",
+    ],
+)
+
+vendored_files_v9_link_all(name = "vendored-files-v9-modules")
+
+build_test(
+    name = "vendored-files-v9",
+    targets = [
+        ":vendored-files-v9-modules",
+        ":vendored-files-v9-modules/lodash",
+        ":vendored-files-v9-modules/is-number",
+        ":.aspect_rules_js/vendored-files-v9-modules/lodash@4.17.20",
+        ":.aspect_rules_js/vendored-files-v9-modules/is-number@0.0.0",
     ],
 )

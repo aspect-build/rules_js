@@ -1,0 +1,31 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      is-number:
+        specifier: file:../vendored/is-number
+        version: file:../vendored/is-number
+      lodash:
+        specifier: file:../vendored/lodash-4.17.20.tgz
+        version: file:../vendored/lodash-4.17.20.tgz
+
+packages:
+
+  is-number@file:../vendored/is-number:
+    resolution: {directory: ../vendored/is-number, type: directory}
+
+  lodash@file:../vendored/lodash-4.17.20.tgz:
+    resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==, tarball: file:../vendored/lodash-4.17.20.tgz}
+    version: 4.17.20
+
+snapshots:
+
+  is-number@file:../vendored/is-number: {}
+
+  lodash@file:../vendored/lodash-4.17.20.tgz: {}
