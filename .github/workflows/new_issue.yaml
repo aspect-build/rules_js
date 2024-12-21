@@ -11,7 +11,7 @@ jobs:
             issues: write
         steps:
             # https://docs.github.com/en/actions/managing-issues-and-pull-requests/adding-labels-to-issues
-            - uses: actions/github-script@v6
+            - uses: actions/github-script@v7
               with:
                   script: |
                       github.rest.issues.addLabels({
