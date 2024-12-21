@@ -452,7 +452,7 @@ def _download_and_extract_archive(rctx, package_json_only):
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
+    tar_args = ["tar", "--extract", "--file", _TARBALL_FILENAME, "--strip-components", "1", "--directory", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
 
     system_tar = detect_system_tar(rctx) if rctx.attr.system_tar == "auto" else rctx.attr.system_tar
     if system_tar == "gnu":

@@ -85,6 +85,9 @@ build_test(
         # puppeteer: has a bin entry in the transitive closure with two segments: @puppeteer/browsers in https://unpkg.com/@puppeteer/browsers@0.5.0/package.json
         # segfault-handler: has a node-gyp install step
         ":node_modules",
+
+        # @fastify/send (@3.3.0) contains spaces and a ☃ character in paths
+        ":node_modules/@fastify/send",
     ],
 )
 
