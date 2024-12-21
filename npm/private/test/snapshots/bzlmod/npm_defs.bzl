@@ -616,7 +616,7 @@ load("@@_main~npm~npm__loader-utils__2.0.4__links//:defs.bzl", store_612 = "npm_
 load("@@_main~npm~npm__locate-path__5.0.0__links//:defs.bzl", store_613 = "npm_imported_package_store")
 load("@@_main~npm~npm__locate-path__6.0.0__links//:defs.bzl", store_614 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash.merge__4.6.2__links//:defs.bzl", store_615 = "npm_imported_package_store")
-load("@@_main~npm~npm__lodash__4.17.21__links//:defs.bzl", link_616 = "npm_link_imported_package_store", store_616 = "npm_imported_package_store")
+load("@@_main~npm~npm__lodash__4.17.21__links//:defs.bzl", store_616 = "npm_imported_package_store")
 load("@@_main~npm~npm__log-symbols__4.1.0__links//:defs.bzl", store_617 = "npm_imported_package_store")
 load("@@_main~npm~npm__loose-envify__1.4.0__links//:defs.bzl", store_618 = "npm_imported_package_store")
 load("@@_main~npm~npm__lowercase-keys__2.0.0__links//:defs.bzl", store_619 = "npm_imported_package_store")
@@ -1019,7 +1019,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 _LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(name = "node_modules", imported_links = [], prod = False, dev = False):
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -2048,371 +2048,369 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if link:
         if bazel_package == "js/private/worker/src":
             link_2(name = "{}/abortcontroller-polyfill".format(name))
-            link_targets.append("//{}:{}/abortcontroller-polyfill".format(bazel_package, name))
+            link_targets.append("//{}:{}/abortcontroller-polyfill".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_167(name = "{}/@rollup/plugin-commonjs".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_169(name = "{}/@rollup/plugin-json".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_171(name = "{}/@rollup/plugin-node-resolve".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_173(name = "{}/@rollup/plugin-terser".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-terser".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-terser".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_174(name = "{}/@rollup/plugin-typescript".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_194(name = "{}/@types/google-protobuf".format(name))
-            link_targets.append("//{}:{}/@types/google-protobuf".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/google-protobuf".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_202(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_499(name = "{}/google-protobuf".format(name))
-            link_targets.append("//{}:{}/google-protobuf".format(bazel_package, name))
+            link_targets.append("//{}:{}/google-protobuf".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_835(name = "{}/rollup".format(name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_934(name = "{}/tslib".format(name))
-            link_targets.append("//{}:{}/tslib".format(bazel_package, name))
+            link_targets.append("//{}:{}/tslib".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_945(name = "{}/typescript".format(name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/test/image":
             link_7(name = "{}/acorn".format(name))
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/npm_deps":
             link_8(name = "{}/acorn".format(name))
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_43(name = "{}/@aspect-test/a".format(name))
-            link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_45(name = "{}/@aspect-test/c".format(name))
-            link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_128(name = "{}/@gregmagolan/test-b".format(name))
-            link_targets.append("//{}:{}/@gregmagolan/test-b".format(bazel_package, name))
+            link_targets.append("//{}:{}/@gregmagolan/test-b".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@gregmagolan" not in scope_targets:
                 scope_targets["@gregmagolan"] = [link_targets[-1]]
             else:
                 scope_targets["@gregmagolan"].append(link_targets[-1])
             link_166(name = "{}/@rollup/plugin-commonjs".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_359(name = "{}/debug".format(name))
-            link_targets.append("//{}:{}/debug".format(bazel_package, name))
+            link_targets.append("//{}:{}/debug".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_635(name = "{}/meaning-of-life".format(name))
-            link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
+            link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_671(name = "{}/mobx-react".format(name))
-            link_targets.append("//{}:{}/mobx-react".format(bazel_package, name))
+            link_targets.append("//{}:{}/mobx-react".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_672(name = "{}/mobx".format(name))
-            link_targets.append("//{}:{}/mobx".format(bazel_package, name))
+            link_targets.append("//{}:{}/mobx".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_687(name = "{}/ms".format(name))
-            link_targets.append("//{}:{}/ms".format(bazel_package, name))
+            link_targets.append("//{}:{}/ms".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_803(name = "{}/react".format(name))
-            link_targets.append("//{}:{}/react".format(bazel_package, name))
+            link_targets.append("//{}:{}/react".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_834(name = "{}/rollup".format(name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_963(name = "{}/uvu".format(name))
-            link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+            link_targets.append("//{}:{}/uvu".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/npm_package/packages/pkg_a":
             link_8(name = "{}/acorn".format(name))
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_962(name = "{}/uuid".format(name))
-            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/npm_package/packages/pkg_d":
             link_8(name = "{}/acorn".format(name))
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_962(name = "{}/uuid".format(name))
-            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/npm_package/packages/pkg_b":
             link_9(name = "{}/acorn".format(name))
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_962(name = "{}/uuid".format(name))
-            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/linked_lib":
             link_47(name = "{}/@aspect-test/e".format(name))
-            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_47(name = "{}/alias-e".format(name))
-            link_targets.append("//{}:{}/alias-e".format(bazel_package, name))
+            link_targets.append("//{}:{}/alias-e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_48(name = "{}/@aspect-test/f".format(name))
-            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_201(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "examples/linked_pkg":
             link_47(name = "{}/@aspect-test/e".format(name))
-            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_47(name = "{}/alias-e".format(name))
-            link_targets.append("//{}:{}/alias-e".format(bazel_package, name))
+            link_targets.append("//{}:{}/alias-e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_48(name = "{}/@aspect-test/f".format(name))
-            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_201(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "examples/runfiles":
             link_73(name = "{}/@bazel/runfiles".format(name))
-            link_targets.append("//{}:{}/@bazel/runfiles".format(bazel_package, name))
+            link_targets.append("//{}:{}/@bazel/runfiles".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             if "@bazel" not in scope_targets:
                 scope_targets["@bazel"] = [link_targets[-1]]
             else:
                 scope_targets["@bazel"].append(link_targets[-1])
         elif bazel_package == "npm/private/test":
             link_124(name = "{}/@figma/nodegit".format(name))
-            link_targets.append("//{}:{}/@figma/nodegit".format(bazel_package, name))
+            link_targets.append("//{}:{}/@figma/nodegit".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@figma" not in scope_targets:
                 scope_targets["@figma"] = [link_targets[-1]]
             else:
                 scope_targets["@figma"].append(link_targets[-1])
             link_145(name = "{}/@kubernetes/client-node".format(name))
-            link_targets.append("//{}:{}/@kubernetes/client-node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@kubernetes/client-node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@kubernetes" not in scope_targets:
                 scope_targets["@kubernetes"] = [link_targets[-1]]
             else:
                 scope_targets["@kubernetes"].append(link_targets[-1])
             link_163(name = "{}/@plotly/regl".format(name))
-            link_targets.append("//{}:{}/@plotly/regl".format(bazel_package, name))
+            link_targets.append("//{}:{}/@plotly/regl".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@plotly" not in scope_targets:
                 scope_targets["@plotly"] = [link_targets[-1]]
             else:
                 scope_targets["@plotly"].append(link_targets[-1])
             link_163(name = "{}/regl".format(name))
-            link_targets.append("//{}:{}/regl".format(bazel_package, name))
+            link_targets.append("//{}:{}/regl".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_267(name = "{}/bufferutil".format(name))
-            link_targets.append("//{}:{}/bufferutil".format(bazel_package, name))
+            link_targets.append("//{}:{}/bufferutil".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_361(name = "{}/debug".format(name))
-            link_targets.append("//{}:{}/debug".format(bazel_package, name))
+            link_targets.append("//{}:{}/debug".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_409(name = "{}/esbuild".format(name))
-            link_targets.append("//{}:{}/esbuild".format(bazel_package, name))
+            link_targets.append("//{}:{}/esbuild".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_514(name = "{}/hello".format(name))
-            link_targets.append("//{}:{}/hello".format(bazel_package, name))
+            link_targets.append("//{}:{}/hello".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_515(name = "{}/handlebars-helpers/helper-date".format(name))
-            link_targets.append("//{}:{}/handlebars-helpers/helper-date".format(bazel_package, name))
+            link_targets.append("//{}:{}/handlebars-helpers/helper-date".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_516(name = "{}/hot-shots".format(name))
-            link_targets.append("//{}:{}/hot-shots".format(bazel_package, name))
+            link_targets.append("//{}:{}/hot-shots".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_538(name = "{}/inline-fixtures".format(name))
-            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name))
+            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_595(name = "{}/json-stable-stringify".format(name))
-            link_targets.append("//{}:{}/json-stable-stringify".format(bazel_package, name))
-            link_616(name = "{}/lodash".format(name))
-            link_targets.append("//{}:{}/lodash".format(bazel_package, name))
+            link_targets.append("//{}:{}/json-stable-stringify".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_702(name = "{}/node-gyp".format(name))
-            link_targets.append("//{}:{}/node-gyp".format(bazel_package, name))
+            link_targets.append("//{}:{}/node-gyp".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_768(name = "{}/plotly.js".format(name))
-            link_targets.append("//{}:{}/plotly.js".format(bazel_package, name))
+            link_targets.append("//{}:{}/plotly.js".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_769(name = "{}/pngjs".format(name))
-            link_targets.append("//{}:{}/pngjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/pngjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_787(name = "{}/protoc-gen-grpc".format(name))
-            link_targets.append("//{}:{}/protoc-gen-grpc".format(bazel_package, name))
+            link_targets.append("//{}:{}/protoc-gen-grpc".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_795(name = "{}/puppeteer".format(name))
-            link_targets.append("//{}:{}/puppeteer".format(bazel_package, name))
+            link_targets.append("//{}:{}/puppeteer".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_846(name = "{}/segfault-handler".format(name))
-            link_targets.append("//{}:{}/segfault-handler".format(bazel_package, name))
+            link_targets.append("//{}:{}/segfault-handler".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_847(name = "{}/semver-first-satisfied".format(name))
-            link_targets.append("//{}:{}/semver-first-satisfied".format(bazel_package, name))
+            link_targets.append("//{}:{}/semver-first-satisfied".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_902(name = "{}/syncpack".format(name))
-            link_targets.append("//{}:{}/syncpack".format(bazel_package, name))
+            link_targets.append("//{}:{}/syncpack".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_945(name = "{}/typescript".format(name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_956(name = "{}/unused".format(name))
             link_971(name = "{}/webpack-bundle-analyzer".format(name))
-            link_targets.append("//{}:{}/webpack-bundle-analyzer".format(bazel_package, name))
+            link_targets.append("//{}:{}/webpack-bundle-analyzer".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/image":
             link_167(name = "{}/@rollup/plugin-commonjs".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_171(name = "{}/@rollup/plugin-node-resolve".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_174(name = "{}/@rollup/plugin-typescript".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_186(name = "{}/@types/archiver".format(name))
-            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_202(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_208(name = "{}/@types/tar-stream".format(name))
-            link_targets.append("//{}:{}/@types/tar-stream".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/tar-stream".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_835(name = "{}/rollup".format(name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_908(name = "{}/tar-stream".format(name))
-            link_targets.append("//{}:{}/tar-stream".format(bazel_package, name))
+            link_targets.append("//{}:{}/tar-stream".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_934(name = "{}/tslib".format(name))
-            link_targets.append("//{}:{}/tslib".format(bazel_package, name))
+            link_targets.append("//{}:{}/tslib".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_945(name = "{}/typescript".format(name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/coverage/bundle":
             link_168(name = "{}/@rollup/plugin-commonjs".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_170(name = "{}/@rollup/plugin-json".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_172(name = "{}/@rollup/plugin-node-resolve".format(name))
-            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@rollup" not in scope_targets:
                 scope_targets["@rollup"] = [link_targets[-1]]
             else:
                 scope_targets["@rollup"].append(link_targets[-1])
             link_269(name = "{}/c8".format(name))
-            link_targets.append("//{}:{}/c8".format(bazel_package, name))
+            link_targets.append("//{}:{}/c8".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_836(name = "{}/rollup".format(name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "":
             link_200(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_281(name = "{}/chalk".format(name))
-            link_targets.append("//{}:{}/chalk".format(bazel_package, name))
+            link_targets.append("//{}:{}/chalk".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_537(name = "{}/inline-fixtures".format(name))
-            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name))
+            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_601(name = "{}/jsonpath-plus".format(name))
-            link_targets.append("//{}:{}/jsonpath-plus".format(bazel_package, name))
+            link_targets.append("//{}:{}/jsonpath-plus".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_945(name = "{}/typescript".format(name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/test/js_run_devserver":
             link_200(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_580(name = "{}/jasmine".format(name))
-            link_targets.append("//{}:{}/jasmine".format(bazel_package, name))
+            link_targets.append("//{}:{}/jasmine".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/js_lib_pkg/a":
             link_202(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "examples/js_lib_pkg/b":
             link_202(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "examples/webpack_cli":
             link_214(name = "{}/@vanilla-extract/css".format(name))
-            link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name))
+            link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             if "@vanilla-extract" not in scope_targets:
                 scope_targets["@vanilla-extract"] = [link_targets[-1]]
             else:
                 scope_targets["@vanilla-extract"].append(link_targets[-1])
             link_218(name = "{}/@vanilla-extract/webpack-plugin".format(name))
-            link_targets.append("//{}:{}/@vanilla-extract/webpack-plugin".format(bazel_package, name))
+            link_targets.append("//{}:{}/@vanilla-extract/webpack-plugin".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             if "@vanilla-extract" not in scope_targets:
                 scope_targets["@vanilla-extract"] = [link_targets[-1]]
             else:
                 scope_targets["@vanilla-extract"].append(link_targets[-1])
             link_332(name = "{}/css-loader".format(name))
-            link_targets.append("//{}:{}/css-loader".format(bazel_package, name))
+            link_targets.append("//{}:{}/css-loader".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_633(name = "{}/mathjs".format(name))
-            link_targets.append("//{}:{}/mathjs".format(bazel_package, name))
+            link_targets.append("//{}:{}/mathjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_642(name = "{}/mini-css-extract-plugin".format(name))
-            link_targets.append("//{}:{}/mini-css-extract-plugin".format(bazel_package, name))
+            link_targets.append("//{}:{}/mini-css-extract-plugin".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_972(name = "{}/webpack-cli".format(name))
-            link_targets.append("//{}:{}/webpack-cli".format(bazel_package, name))
+            link_targets.append("//{}:{}/webpack-cli".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_975(name = "{}/webpack".format(name))
-            link_targets.append("//{}:{}/webpack".format(bazel_package, name))
+            link_targets.append("//{}:{}/webpack".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/npm_package/libs/lib_a":
             link_280(name = "{}/chalk".format(name))
-            link_targets.append("//{}:{}/chalk".format(bazel_package, name))
+            link_targets.append("//{}:{}/chalk".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "npm/private/test/npm_package":
             link_280(name = "{}/chalk".format(name))
-            link_targets.append("//{}:{}/chalk".format(bazel_package, name))
+            link_targets.append("//{}:{}/chalk".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
             link_281(name = "{}/chalk-alt".format(name))
-            link_targets.append("//{}:{}/chalk-alt".format(bazel_package, name))
+            link_targets.append("//{}:{}/chalk-alt".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/macro":
             link_673(name = "{}/mocha-junit-reporter".format(name))
-            link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name))
+            link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_674(name = "{}/mocha-multi-reporters".format(name))
-            link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name))
+            link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
             link_675(name = "{}/mocha".format(name))
-            link_targets.append("//{}:{}/mocha".format(bazel_package, name))
+            link_targets.append("//{}:{}/mocha".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
 
     if is_root:
         _npm_package_store(
@@ -2711,7 +2709,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     )
 
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
+    if prod and dev:
+        fail("prod and dev attributes cannot both be set to true")
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -2719,126 +2719,125 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "js/private/worker/src":
-            link_targets.append("//{}:{}/abortcontroller-polyfill".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-terser".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/google-protobuf".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-            link_targets.append("//{}:{}/google-protobuf".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-            link_targets.append("//{}:{}/tslib".format(bazel_package, name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/abortcontroller-polyfill".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-terser".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/google-protobuf".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/google-protobuf".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/tslib".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/test/image":
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/npm_deps":
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
-            link_targets.append("//{}:{}/@gregmagolan/test-b".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
-            link_targets.append("//{}:{}/debug".format(bazel_package, name))
-            link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
-            link_targets.append("//{}:{}/mobx-react".format(bazel_package, name))
-            link_targets.append("//{}:{}/mobx".format(bazel_package, name))
-            link_targets.append("//{}:{}/ms".format(bazel_package, name))
-            link_targets.append("//{}:{}/react".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-            link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@gregmagolan/test-b".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/debug".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/mobx-react".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/mobx".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/ms".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/react".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/uvu".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/npm_package/packages/pkg_a":
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/npm_package/packages/pkg_d":
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/npm_package/packages/pkg_b":
-            link_targets.append("//{}:{}/acorn".format(bazel_package, name))
-            link_targets.append("//{}:{}/uuid".format(bazel_package, name))
+            link_targets.append("//{}:{}/acorn".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/uuid".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/linked_lib":
-            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
-            link_targets.append("//{}:{}/alias-e".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/alias-e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/linked_pkg":
-            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name))
-            link_targets.append("//{}:{}/alias-e".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@aspect-test/e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/alias-e".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/@aspect-test/f".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/runfiles":
-            link_targets.append("//{}:{}/@bazel/runfiles".format(bazel_package, name))
+            link_targets.append("//{}:{}/@bazel/runfiles".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "npm/private/test":
-            link_targets.append("//{}:{}/@figma/nodegit".format(bazel_package, name))
-            link_targets.append("//{}:{}/@kubernetes/client-node".format(bazel_package, name))
-            link_targets.append("//{}:{}/@plotly/regl".format(bazel_package, name))
-            link_targets.append("//{}:{}/regl".format(bazel_package, name))
-            link_targets.append("//{}:{}/bufferutil".format(bazel_package, name))
-            link_targets.append("//{}:{}/debug".format(bazel_package, name))
-            link_targets.append("//{}:{}/esbuild".format(bazel_package, name))
-            link_targets.append("//{}:{}/hello".format(bazel_package, name))
-            link_targets.append("//{}:{}/handlebars-helpers/helper-date".format(bazel_package, name))
-            link_targets.append("//{}:{}/hot-shots".format(bazel_package, name))
-            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name))
-            link_targets.append("//{}:{}/json-stable-stringify".format(bazel_package, name))
-            link_targets.append("//{}:{}/lodash".format(bazel_package, name))
-            link_targets.append("//{}:{}/node-gyp".format(bazel_package, name))
-            link_targets.append("//{}:{}/plotly.js".format(bazel_package, name))
-            link_targets.append("//{}:{}/pngjs".format(bazel_package, name))
-            link_targets.append("//{}:{}/protoc-gen-grpc".format(bazel_package, name))
-            link_targets.append("//{}:{}/puppeteer".format(bazel_package, name))
-            link_targets.append("//{}:{}/segfault-handler".format(bazel_package, name))
-            link_targets.append("//{}:{}/semver-first-satisfied".format(bazel_package, name))
-            link_targets.append("//{}:{}/syncpack".format(bazel_package, name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
-            link_targets.append("//{}:{}/webpack-bundle-analyzer".format(bazel_package, name))
+            link_targets.append("//{}:{}/@figma/nodegit".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@kubernetes/client-node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@plotly/regl".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/regl".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/bufferutil".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/debug".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/esbuild".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/hello".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/handlebars-helpers/helper-date".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/hot-shots".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/json-stable-stringify".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/node-gyp".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/plotly.js".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/pngjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/protoc-gen-grpc".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/puppeteer".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/segfault-handler".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/semver-first-satisfied".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/syncpack".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/webpack-bundle-analyzer".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/image":
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/tar-stream".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-            link_targets.append("//{}:{}/tar-stream".format(bazel_package, name))
-            link_targets.append("//{}:{}/tslib".format(bazel_package, name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@types/tar-stream".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/tar-stream".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/tslib".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/coverage/bundle":
-            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name))
-            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name))
-            link_targets.append("//{}:{}/c8".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
+            link_targets.append("//{}:{}/@rollup/plugin-commonjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-json".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/@rollup/plugin-node-resolve".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/c8".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/rollup".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "":
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-            link_targets.append("//{}:{}/chalk".format(bazel_package, name))
-            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name))
-            link_targets.append("//{}:{}/jsonpath-plus".format(bazel_package, name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/chalk".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/inline-fixtures".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/jsonpath-plus".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/typescript".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "js/private/test/js_run_devserver":
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-            link_targets.append("//{}:{}/jasmine".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/jasmine".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/js_lib_pkg/a":
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/js_lib_pkg/b":
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/webpack_cli":
-            link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name))
-            link_targets.append("//{}:{}/@vanilla-extract/webpack-plugin".format(bazel_package, name))
-            link_targets.append("//{}:{}/css-loader".format(bazel_package, name))
-            link_targets.append("//{}:{}/mathjs".format(bazel_package, name))
-            link_targets.append("//{}:{}/mini-css-extract-plugin".format(bazel_package, name))
-            link_targets.append("//{}:{}/webpack-cli".format(bazel_package, name))
-            link_targets.append("//{}:{}/webpack".format(bazel_package, name))
+            link_targets.append("//{}:{}/@vanilla-extract/css".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/@vanilla-extract/webpack-plugin".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/css-loader".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/mathjs".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/mini-css-extract-plugin".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/webpack-cli".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/webpack".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
         elif bazel_package == "examples/npm_package/libs/lib_a":
-            link_targets.append("//{}:{}/chalk".format(bazel_package, name))
+            link_targets.append("//{}:{}/chalk".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "npm/private/test/npm_package":
-            link_targets.append("//{}:{}/chalk".format(bazel_package, name))
-            link_targets.append("//{}:{}/chalk-alt".format(bazel_package, name))
+            link_targets.append("//{}:{}/chalk".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
+            link_targets.append("//{}:{}/chalk-alt".format(bazel_package, name)) if (not prod and not dev) or (prod and not False) or (dev and False) else None
         elif bazel_package == "examples/macro":
-            link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name))
-            link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name))
-            link_targets.append("//{}:{}/mocha".format(bazel_package, name))
+            link_targets.append("//{}:{}/mocha-junit-reporter".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/mocha-multi-reporters".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
+            link_targets.append("//{}:{}/mocha".format(bazel_package, name)) if (not prod and not dev) or (prod and not True) or (dev and True) else None
 
     for link_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
         if link_package == bazel_package:

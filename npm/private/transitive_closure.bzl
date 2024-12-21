@@ -115,6 +115,7 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
             # deps this importer should pass on if it is linked as a first-party package; this does
             # not include devDependencies
             "deps": deps,
+            "dev_deps": dev_deps,
             # all deps of this importer to link in the node_modules folder of that Bazel package and
             # make available to all build targets; this includes devDependencies
             "all_deps": all_deps,

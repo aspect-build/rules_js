@@ -65,9 +65,8 @@ _FP_DIRECT_TMPL = \
 
 _FP_DIRECT_TARGET_TMPL = \
     """
-    for link_package in {link_packages}:
-        if link_package == bazel_package:
-            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
+    if bazel_package in {link_packages} and ((not prod and not dev) or {prod_or_dev}):
+        link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -148,67 +147,71 @@ sh_binary(
                 "package": name,
                 "path": dep_path,
                 "link_packages": {},
+                "link_dev_packages": {},
                 "deps": transitive_deps,
             }
 
     # Look for first-party links in importers
     for import_path, importer in importers.items():
-        dependencies = importer.get("all_deps")
-        if type(dependencies) != "dict":
-            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
-            fail(msg)
         link_package = helpers.link_package(root_package, import_path)
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("file:"):
-                if dep_version in packages and packages[dep_version]["id"]:
-                    dep_path = helpers.link_package(root_package, packages[dep_version]["id"][len("file:"):])
-                else:
-                    dep_path = helpers.link_package(root_package, dep_version[len("file:"):])
-                dep_key = "{}+{}".format(dep_package, dep_version)
-                if not dep_key in fp_links.keys():
-                    msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
-                    fail(msg)
-                fp_links[dep_key]["link_packages"][link_package] = True
-            elif dep_version.startswith("link:"):
-                dep_version = dep_version[len("link:"):]
-                dep_importer = paths.normalize("{}/{}".format(import_path, dep_version) if import_path else dep_version)
-                dep_path = helpers.link_package(root_package, import_path, dep_version)
-                dep_key = "{}+{}".format(dep_package, dep_path)
-                if fp_links.get(dep_key, False):
-                    fp_links[dep_key]["link_packages"][link_package] = True
-                else:
-                    transitive_deps = {}
-                    raw_deps = {}
-                    if importers.get(dep_importer, False):
-                        raw_deps = importers.get(dep_importer).get("deps")
-                    for raw_package, raw_version in raw_deps.items():
-                        package_store_name = utils.package_store_name(raw_package, raw_version)
-                        dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
-                            root_package = root_package,
-                            package_store_name = package_store_name,
-                            package_store_root = utils.package_store_root,
-                        )
-                        if dep_store_target not in transitive_deps:
-                            transitive_deps[dep_store_target] = [raw_package]
-                        else:
-                            transitive_deps[dep_store_target].append(raw_package)
+        for deps_type, link_type in [("deps", "link_packages"), ("dev_deps", "link_dev_packages")]:
+            dependencies = importer.get(deps_type)
+            if type(dependencies) != "dict":
+                msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
+                fail(msg)
+            for dep_package, dep_version in dependencies.items():
+                if dep_version.startswith("file:"):
+                    if dep_version in packages and packages[dep_version]["id"]:
+                        dep_path = helpers.link_package(root_package, packages[dep_version]["id"][len("file:"):])
+                    else:
+                        dep_path = helpers.link_package(root_package, dep_version[len("file:"):])
+                    dep_key = "{}+{}".format(dep_package, dep_version)
+                    if not dep_key in fp_links.keys():
+                        msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
+                        fail(msg)
+                    fp_links[dep_key][link_type][link_package] = True
+                elif dep_version.startswith("link:"):
+                    dep_version = dep_version[len("link:"):]
+                    dep_importer = paths.normalize("{}/{}".format(import_path, dep_version) if import_path else dep_version)
+                    dep_path = helpers.link_package(root_package, import_path, dep_version)
+                    dep_key = "{}+{}".format(dep_package, dep_path)
+                    if not fp_links.get(dep_key, False):
+                        transitive_deps = {}
+                        raw_deps = {}
+                        if importers.get(dep_importer, False):
+                            raw_deps = importers.get(dep_importer).get("deps")
+                        for raw_package, raw_version in raw_deps.items():
+                            package_store_name = utils.package_store_name(raw_package, raw_version)
+                            dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
+                                root_package = root_package,
+                                package_store_name = package_store_name,
+                                package_store_root = utils.package_store_root,
+                            )
+                            if dep_store_target not in transitive_deps:
+                                transitive_deps[dep_store_target] = [raw_package]
+                            else:
+                                transitive_deps[dep_store_target].append(raw_package)
 
-                    # collapse link aliases lists into to a comma separated strings
-                    for dep_store_target in transitive_deps.keys():
-                        transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
-                    fp_links[dep_key] = {
-                        "package": dep_package,
-                        "path": dep_path,
-                        "link_packages": {link_package: True},
-                        "deps": transitive_deps,
-                    }
+                        # collapse link aliases lists into to a comma separated strings
+                        for dep_store_target in transitive_deps.keys():
+                            transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+                        fp_links[dep_key] = {
+                            "package": dep_package,
+                            "path": dep_path,
+                            "link_packages": {},
+                            "link_dev_packages": {},
+                            "deps": transitive_deps,
+                        }
+                    fp_links[dep_key][link_type][link_package] = True
 
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(link_packages = str(link_packages))
 
     npm_link_targets_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
+    if prod and dev:
+        fail("prod and dev attributes cannot both be set to true")
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -219,7 +222,7 @@ def npm_link_targets(name = "node_modules", package = None):
     npm_link_all_packages_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(name = "node_modules", imported_links = [], prod = False, dev = False):
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
@@ -271,9 +274,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             i = i,
             pkg = _import.package,
         ))
-        for link_package, _link_aliases in _import.link_packages.items():
-            link_aliases = _link_aliases or [_import.package]
-
+        for link_package, link_names in _import.link_packages.items():
             # the build file for the package being linked
             build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
             if build_file not in rctx_files:
@@ -286,7 +287,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 links_targets_bzl[link_package] = []
 
             # for each alias of this package
-            for link_alias in link_aliases:
+            for link_name in link_names:
+                link_alias = link_name["pkg"]
+                dev = link_name["dev"]
+
                 # link the alias to the underlying package
                 links_bzl[link_package].append("""            link_{i}(name = "{{}}/{pkg}".format(name))""".format(
                     i = i,
@@ -295,7 +299,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
                 # expose the alias if public
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))""".format(pkg = link_alias)
+                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name)) if (not prod and not dev) or {prod_or_dev} else None""".format(pkg = link_alias, prod_or_dev = "dev" if dev else "prod")
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
@@ -319,19 +323,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 if rctx.attr.generate_bzl_library_targets:
                     rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
 
-                    for link_alias in link_aliases:
+                    for link_name in link_names:
                         rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                            name = link_alias,
-                            src = ":{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME),
+                            name = link_name["pkg"],
+                            src = ":{}/{}".format(link_name["pkg"], _PACKAGE_JSON_BZL_FILENAME),
                             dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
                                 repo_name = helpers.to_apparent_repo_name(_import.name),
                                 link_package = link_package,
-                                package_name = link_package[link_package.rfind("/") + 1] if link_package else link_alias.split("/")[-1],
+                                package_name = link_package[link_package.rfind("/") + 1] if link_package else link_name["pkg"].split("/")[-1],
                             ),
                         ))
 
-                for link_alias in link_aliases:
-                    package_json_bzl_file_path = "{}/{}/{}".format(link_package, link_alias, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME)
+                for link_name in link_names:
+                    package_json_bzl_file_path = "{}/{}/{}".format(link_package, link_name["pkg"], _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(link_name["pkg"], _PACKAGE_JSON_BZL_FILENAME)
                     repo_package_json_bzl = "@@{repo_name}//{link_package}:{package_json_bzl}".format(
                         repo_name = _import.name,
                         link_package = link_package,
@@ -373,7 +377,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
         fp_path = fp_link.get("path")
-        fp_link_packages = fp_link.get("link_packages").keys()
         fp_deps = fp_link.get("deps")
         fp_target = "//{}:{}".format(
             fp_path,
@@ -392,28 +395,31 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
-        if len(fp_link_packages) > 0:
-            npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
-                link_packages = fp_link_packages,
-                link_visibility = package_visibility,
-                pkg = fp_package,
-                package_directory_output_group = utils.package_directory_output_group,
-                root_package = root_package,
-                package_store_name = utils.package_store_name(fp_package, "0.0.0"),
-                package_store_root = utils.package_store_root,
-            ))
+        for link_type in ["link_packages", "link_dev_packages"]:
+            fp_link_packages = fp_link.get(link_type).keys()
+            if len(fp_link_packages) > 0:
+                npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
+                    link_packages = fp_link_packages,
+                    link_visibility = package_visibility,
+                    pkg = fp_package,
+                    package_directory_output_group = utils.package_directory_output_group,
+                    root_package = root_package,
+                    package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                    package_store_root = utils.package_store_root,
+                ))
 
-            npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
-                link_packages = fp_link_packages,
-                pkg = fp_package,
-            ))
+                npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
+                    link_packages = fp_link_packages,
+                    pkg = fp_package,
+                    prod_or_dev = "dev" if link_type == "link_dev_packages" else "prod",
+                ))
 
-            if "//visibility:public" in package_visibility:
-                add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-                npm_link_all_packages_bzl.append(add_to_link_targets)
-                package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
-                if package_scope:
-                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
+                if "//visibility:public" in package_visibility:
+                    add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+                    npm_link_all_packages_bzl.append(add_to_link_targets)
+                    package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
+                    if package_scope:
+                        npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
@@ -544,8 +550,11 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
     maybe_replace_package = ("""
         replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
 
+    link_packages = {}
+    for link_package, link_names in _import.link_packages.items():
+        link_packages[link_package] = [link_name["pkg"] for link_name in link_names]
     return _NPM_IMPORT_TMPL.format(
-        link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
+        link_packages = starlark_codegen_utils.to_dict_attr(link_packages, 2, quote_value = False),
         link_workspace = link_workspace,
         maybe_bins = maybe_bins,
         maybe_commit = maybe_commit,

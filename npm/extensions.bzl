@@ -134,6 +134,9 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     system_tar = detect_system_tar(module_ctx)
 
     for i in imports:
+        link_packages = {}
+        for link_package, link_names in i.link_packages.items():
+            link_packages[link_package] = [link_name["pkg"] for link_name in link_names]
         npm_import(
             name = i.name,
             bins = i.bins,
@@ -147,7 +150,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             lifecycle_hooks_env = i.lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements,
             lifecycle_hooks_use_default_shell_env = i.lifecycle_hooks_use_default_shell_env,
-            link_packages = i.link_packages,
+            link_packages = link_packages,
             # attr.pnpm_lock.workspace_name is a canonical repository name, so it needs to be qualified with an extra '@'.
             link_workspace = attr.link_workspace if attr.link_workspace else "@" + attr.pnpm_lock.workspace_name,
             npm_auth = i.npm_auth,
