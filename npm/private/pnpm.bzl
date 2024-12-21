@@ -28,11 +28,33 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
         "optional_dependencies": optional_dependencies,
     }
 
-# Metadata about a package.
-#
-# Metadata may come from different locations depending on the lockfile, this struct should
-# have data normalized across lockfiles.
 def _new_package_info(id, name, dependencies, optional_dependencies, dev, has_bin, optional, requires_build, version, friendly_version, resolution):
+    """
+    Metadata about a package.
+
+    Metadata may come from different locations depending on the lockfile, this struct should
+    have data normalized across lockfiles.
+
+    Args:
+        id: The package id, if present.
+            TODO Remove. Used for to resolve path of local packages, however `resolution` is a better source of truth.
+        name: The package name.
+        dependencies: A map of package dependencies.
+        optional_dependencies: A map of optional package dependencies.
+        dev: True if the package is a dev dependency, None otherwise.
+        has_bin: True if the package has a bin field.
+        optional: True if the package is an optional dependency.
+            Determines if package should be omitted `no_optional = True` specified.
+        requires_build: True if the package requires a build.
+            NOTE: With pnpm v9, this cannot be known ahead of time.
+        version: The resolved package version.
+            e.g. `file:packages/a`, `1.2.3`, `1.2.3_at_scope_peer_2.0.2`.
+        friendly_version: The package version, normalized for users. Used to target patches, etc.
+            e.g. `file:packages/a`, `1.2.3`.
+        resolution: The package resolution.
+            e.g. { integrity: "..." }
+            e.g. { type: "directory", directory: "packages/a" }
+    """
     return {
         "id": id,
         "name": name,
@@ -218,20 +240,20 @@ def _convert_pnpm_v6_v9_version_peer_dep(version):
     # with rules_js.
     #
     # Examples:
-    #   1.2.3
-    #   1.2.3(@scope/peer@2.0.2)(@scope/peer@4.5.6)
-    #   4.5.6(patch_hash=o3deharooos255qt5xdujc3cuq)
+    #   1.2.3 -> 1.2.3
+    #   1.2.3(@scope/peer@2.0.2)(@scope/peer@4.5.6) -> 1.2.3_2001974805
+    #   4.5.6(patch_hash=o3deharooos255qt5xdujc3cuq) -> 4.5.6_o3deharooos255qt5xdujc3cuq
     if version[-1] == ")":
         # Drop the patch_hash= not present in v5 so (patch_hash=123) -> (123) like v5
         version = version.replace("(patch_hash=", "(")
 
-        # There is a peer dep if the string ends with ")"
+        # There is a peer dep (or patch) if the string ends with ")"
         peer_dep_index = version.find("(")
         peer_dep = version[peer_dep_index:]
         if len(peer_dep) > 32:
             # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
             # peer deps so we must hash here to prevent extremely long file paths that lead to
-            # "File name too long) build failures.
+            # "File name too long" build failures.
             peer_dep = utils.hash(peer_dep)
         else:
             peer_dep = peer_dep.replace("(@", "(_at_").replace(")(", "_").replace("@", "_").replace("/", "_")
@@ -633,4 +655,5 @@ pnpm = struct(
 # Exported only to be tested
 pnpm_test = struct(
     strip_v5_peer_dep_or_patched_version = _strip_v5_peer_dep_or_patched_version,
+    convert_pnpm_v6_v9_version_peer_dep = _convert_pnpm_v6_v9_version_peer_dep,
 )
