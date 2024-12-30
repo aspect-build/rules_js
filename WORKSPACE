@@ -44,18 +44,6 @@ load("@aspect_bazel_lib//lib:host_repo.bzl", "host_repo")
 host_repo(name = "aspect_bazel_lib_host")
 
 ############################################
-# Gazelle, for generating bzl_library targets
-
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
-load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
-
-go_rules_dependencies()
-
-go_register_toolchains(version = "1.20.5")
-
-gazelle_dependencies()
-
-############################################
 # Example npm dependencies
 
 load("@aspect_rules_js//npm:repositories.bzl", "npm_import", "npm_translate_lock")
