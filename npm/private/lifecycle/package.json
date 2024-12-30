@@ -3,7 +3,7 @@
     "private": true,
     "dependencies": {
         "@pnpm/lifecycle": "14.1.7",
-        "@pnpm/logger": "5.0.0"
+        "@pnpm/logger": "5.2.0"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^24.1.0-0",
