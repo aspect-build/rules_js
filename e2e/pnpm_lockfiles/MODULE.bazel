@@ -81,7 +81,7 @@ npm = use_extension(
         # Deep with many peers
         "lock-%s__at_rollup_plugin-typescript__8.2.1_%s" % (
             version,
-            "ommloj5qql5ba6x5wuiluawhoi" if version == "v54" else "1662662592" if version == "v90" else "1813138439",
+            "3vgsug3mjv7wvue74swjdxifxy" if version == "v54" else "626159424" if version == "v90" else "1813138439",
         ),
 
         # Dep with patch
