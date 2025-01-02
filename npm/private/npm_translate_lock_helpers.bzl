@@ -447,6 +447,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             name = repo_name,
             package = name,
             package_visibility = package_visibility,
+            patch_tool = attr.patch_tool,
             patch_args = patch_args,
             patches = patches,
             root_package = root_package,
