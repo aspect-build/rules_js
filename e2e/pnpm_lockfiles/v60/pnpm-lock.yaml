@@ -131,11 +131,24 @@ importers:
 
   ../projects/a: {}
 
+  ../projects/a-types:
+    dependencies:
+      '@types/node':
+        specifier: 16.18.11
+        version: registry.npmjs.org/@types/node@16.18.11
+
   ../projects/b:
     dependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
+    devDependencies:
+      '@types/node':
+        specifier: 16.18.11
+        version: registry.npmjs.org/@types/node@16.18.11
+      a-types:
+        specifier: workspace:*
+        version: link:../a-types
 
   ../projects/c:
     dependencies:
@@ -573,7 +586,6 @@ packages:
     resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
     name: '@types/node'
     version: 16.18.11
-    dev: true
 
   registry.npmjs.org/@types/sizzle@2.3.9:
     resolution: {integrity: sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.9.tgz}

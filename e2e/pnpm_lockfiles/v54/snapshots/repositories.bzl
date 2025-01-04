@@ -390,13 +390,14 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["@types/node", "alias-types-node"],
+            "projects/a-types": ["@types/node"],
+            "projects/b": ["@types/node"],
         },
         package = "@types/node",
         version = "16.18.11",
         url = "https://registry.yarnpkg.com/@types/node/-/node-16.18.11.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==",
         transitive_closure = {
             "@types/node": ["16.18.11"],
