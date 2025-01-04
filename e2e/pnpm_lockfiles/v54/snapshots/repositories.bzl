@@ -22,18 +22,18 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__ansi-regex__6.0.1",
+        name = "lock-<LOCKVERSION>__ansi-regex__6.1.0",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "ansi-regex",
-        version = "6.0.1",
-        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.0.1.tgz",
+        version = "6.1.0",
+        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.1.0.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==",
+        integrity = "sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==",
         transitive_closure = {
-            "ansi-regex": ["6.0.1"],
+            "ansi-regex": ["6.1.0"],
         },
     )
 
@@ -224,7 +224,7 @@ def npm_repositories():
         },
         transitive_closure = {
             "@isaacs/cliui": ["8.0.2"],
-            "ansi-regex": ["5.0.1", "6.0.1"],
+            "ansi-regex": ["5.0.1", "6.1.0"],
             "ansi-styles": ["4.3.0", "6.2.1"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
@@ -238,40 +238,40 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_ommloj5qql5ba6x5wuiluawhoi",
+        name = "lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_3vgsug3mjv7wvue74swjdxifxy",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["rollup-plugin-with-peers"],
         },
         package = "@rollup/plugin-typescript",
-        version = "8.2.1_ommloj5qql5ba6x5wuiluawhoi",
+        version = "8.2.1_3vgsug3mjv7wvue74swjdxifxy",
         url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-8.2.1.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Qd2E1pleDR4bwyFxqbjt4eJf+wB0UKVMLc7/BAFDGVdAXQMCsD4DUv5/7/ww47BZCYxWtJqe1Lo0KVNswBJlRw==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup_2.14.0",
-            "resolve": "1.22.8",
+            "resolve": "1.22.10",
             "rollup": "2.14.0",
-            "tslib": "2.6.3",
+            "tslib": "2.8.1",
             "typescript": "5.5.2",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": ["8.2.1_ommloj5qql5ba6x5wuiluawhoi"],
+            "@rollup/plugin-typescript": ["8.2.1_3vgsug3mjv7wvue74swjdxifxy"],
             "@rollup/pluginutils": ["3.1.0_rollup_2.14.0"],
             "@types/estree": ["0.0.39"],
             "estree-walker": ["1.0.1"],
             "fsevents": ["2.3.3"],
             "function-bind": ["1.1.2"],
             "hasown": ["2.0.2"],
-            "is-core-module": ["2.15.0"],
+            "is-core-module": ["2.16.1"],
             "path-parse": ["1.0.7"],
             "picomatch": ["2.3.1"],
-            "resolve": ["1.22.8"],
+            "resolve": ["1.22.10"],
             "rollup": ["2.14.0"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
-            "tslib": ["2.6.3"],
+            "tslib": ["2.8.1"],
             "typescript": ["5.5.2"],
         },
     )
@@ -404,21 +404,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__at_types_sizzle__2.3.8",
+        name = "lock-<LOCKVERSION>__at_types_sizzle__2.3.9",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["alias-only-sizzle"],
         },
         package = "@types/sizzle",
-        version = "2.3.8",
-        url = "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.8.tgz",
+        version = "2.3.9",
+        url = "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.9.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         dev = True,
-        integrity = "sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==",
+        integrity = "sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==",
         transitive_closure = {
-            "@types/sizzle": ["2.3.8"],
+            "@types/sizzle": ["2.3.9"],
         },
     )
 
@@ -644,23 +644,23 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__is-core-module__2.15.0",
+        name = "lock-<LOCKVERSION>__is-core-module__2.16.1",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "is-core-module",
-        version = "2.15.0",
-        url = "https://registry.npmjs.org/is-core-module/-/is-core-module-2.15.0.tgz",
+        version = "2.16.1",
+        url = "https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-Dd+Lb2/zvk9SKy1TGCt1wFJFo/MWBPMX5x7KcvLajWTGuomczdQX61PvY5yK6SVACwpoexWo81IfFyoKY2QnTA==",
+        integrity = "sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==",
         deps = {
             "hasown": "2.0.2",
         },
         transitive_closure = {
             "function-bind": ["1.1.2"],
             "hasown": ["2.0.2"],
-            "is-core-module": ["2.15.0"],
+            "is-core-module": ["2.16.1"],
         },
     )
 
@@ -908,27 +908,27 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__resolve__1.22.8",
+        name = "lock-<LOCKVERSION>__resolve__1.22.10",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "resolve",
-        version = "1.22.8",
-        url = "https://registry.npmjs.org/resolve/-/resolve-1.22.8.tgz",
+        version = "1.22.10",
+        url = "https://registry.npmjs.org/resolve/-/resolve-1.22.10.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==",
+        integrity = "sha512-NPRy+/ncIMeDlTAsuqwKIiferiawhefFJtkNSW0qZJEqMEb+qBt/77B/jGeeek+F0uOeN05CDa6HXbbIgtVX4w==",
         deps = {
-            "is-core-module": "2.15.0",
+            "is-core-module": "2.16.1",
             "path-parse": "1.0.7",
             "supports-preserve-symlinks-flag": "1.0.0",
         },
         transitive_closure = {
             "function-bind": ["1.1.2"],
             "hasown": ["2.0.2"],
-            "is-core-module": ["2.15.0"],
+            "is-core-module": ["2.16.1"],
             "path-parse": ["1.0.7"],
-            "resolve": ["1.22.8"],
+            "resolve": ["1.22.10"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
         },
     )
@@ -1039,7 +1039,7 @@ def npm_repositories():
             "strip-ansi": "7.1.0",
         },
         transitive_closure = {
-            "ansi-regex": ["6.0.1"],
+            "ansi-regex": ["6.1.0"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["9.2.2"],
             "string-width": ["5.1.2"],
@@ -1079,10 +1079,10 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
         deps = {
-            "ansi-regex": "6.0.1",
+            "ansi-regex": "6.1.0",
         },
         transitive_closure = {
-            "ansi-regex": ["6.0.1"],
+            "ansi-regex": ["6.1.0"],
             "strip-ansi": ["7.1.0"],
         },
     )
@@ -1104,20 +1104,20 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__tslib__2.6.3",
+        name = "lock-<LOCKVERSION>__tslib__2.8.1",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["tslib"],
         },
         package = "tslib",
-        version = "2.6.3",
-        url = "https://registry.npmjs.org/tslib/-/tslib-2.6.3.tgz",
+        version = "2.8.1",
+        url = "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==",
+        integrity = "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
         transitive_closure = {
-            "tslib": ["2.6.3"],
+            "tslib": ["2.8.1"],
         },
     )
 
@@ -1214,7 +1214,7 @@ def npm_repositories():
             "strip-ansi": "7.1.0",
         },
         transitive_closure = {
-            "ansi-regex": ["6.0.1"],
+            "ansi-regex": ["6.1.0"],
             "ansi-styles": ["6.2.1"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["9.2.2"],
