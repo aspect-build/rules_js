@@ -132,11 +132,24 @@ importers:
 
   ../projects/a: {}
 
+  ../projects/a-types:
+    dependencies:
+      '@types/node':
+        specifier: 16.18.11
+        version: 16.18.11
+
   ../projects/b:
     dependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
+    devDependencies:
+      '@types/node':
+        specifier: 16.18.11
+        version: 16.18.11
+      a-types:
+        specifier: workspace:*
+        version: link:../a-types
 
   ../projects/c:
     dependencies:

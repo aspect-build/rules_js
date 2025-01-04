@@ -1,0 +1,7 @@
+{
+    "name": "a-types",
+    "private": true,
+    "dependencies": {
+        "@types/node": "16.18.11"
+    }
+}

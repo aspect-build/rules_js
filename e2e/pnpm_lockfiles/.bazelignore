@@ -1,6 +1,7 @@
 node_modules/
 cases/node_modules
 projects/a/node_modules
+projects/a-types/node_modules
 projects/b/node_modules
 projects/c/node_modules
 projects/d/node_modules

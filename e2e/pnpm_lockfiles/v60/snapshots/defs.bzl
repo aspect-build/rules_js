@@ -71,7 +71,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
 
-_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/b", "projects/c", "projects/d", "vendored/is-number"]
+_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "vendored/is-number"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -259,6 +259,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append("//{}:{}/typescript".format(bazel_package, name))
             link_58(name = "{}/uvu".format(name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+        elif bazel_package == "projects/a-types":
+            link_18(name = "{}/@types/node".format(name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
+        elif bazel_package == "projects/b":
+            link_18(name = "{}/@types/node".format(name))
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
 
     if is_root:
         _npm_package_store(
@@ -455,6 +469,40 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             )
             link_targets.append(":{}/scoped/bad".format(name))
 
+    if is_root:
+        _npm_package_store(
+            name = ".aspect_rules_js/{}/a-types@0.0.0".format(name),
+            src = "//projects/a-types:pkg",
+            package = "a-types",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@16.18.11".format(name): "@types/node",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    for link_package in ["projects/b"]:
+        if link_package == bazel_package:
+            # terminal target for direct dependencies
+            _npm_link_package_store(
+                name = "{}/a-types".format(name),
+                src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+
+            # filegroup target that provides a single file which is
+            # package directory for use in $(execpath) and $(rootpath)
+            native.filegroup(
+                name = "{}/a-types/dir".format(name),
+                srcs = [":{}/a-types".format(name)],
+                output_group = "package_directory",
+                visibility = ["//visibility:public"],
+                tags = ["manual"],
+            )
+            link_targets.append(":{}/a-types".format(name))
+
     for scope, scoped_targets in scope_targets.items():
         _js_library(
             name = "{}/{}".format(name, scope),
@@ -510,6 +558,10 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append("//{}:{}/tslib".format(bazel_package, name))
             link_targets.append("//{}:{}/typescript".format(bazel_package, name))
             link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+        elif bazel_package == "projects/a-types":
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+        elif bazel_package == "projects/b":
+            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
 
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
@@ -530,4 +582,8 @@ def npm_link_targets(name = "node_modules", package = None):
     for link_package in ["<LOCKVERSION>"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/scoped/bad".format(bazel_package, name))
+
+    for link_package in ["projects/b"]:
+        if link_package == bazel_package:
+            link_targets.append("//{}:{}/a-types".format(bazel_package, name))
     return link_targets

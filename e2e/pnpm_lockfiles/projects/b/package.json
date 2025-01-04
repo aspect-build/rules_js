@@ -3,5 +3,9 @@
     "private": true,
     "dependencies": {
         "@scoped/a": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "16.18.11",
+        "a-types": "workspace:*"
     }
 }
