@@ -1,6 +1,6 @@
 """Mirror of npm registry metadata for the pnpm package.
 
-AUTO-GENERATED; do not edit
+AUTO-GENERATED; do not edit.
 """
 
 PNPM_VERSIONS = {
