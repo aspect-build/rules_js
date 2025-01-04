@@ -65,6 +65,7 @@ _ATTRS = {
     "npm_package_target_name": attr.string(),
     "npmrc": attr.label(),
     "package_visibility": attr.string_list_dict(),
+    "patch_tool": attr.label(),
     "patch_args": attr.string_list_dict(),
     "patches": attr.string_list_dict(),
     "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs"),  # bzlmod pnpm extension
@@ -161,6 +162,7 @@ def npm_translate_lock(
         use_home_npmrc = None,
         data = [],
         patches = {},
+        patch_tool = None,
         patch_args = {"*": ["-p0"]},
         custom_postinstalls = {},
         package_visibility = {},
@@ -276,6 +278,8 @@ def npm_translate_lock(
             These patches are applied after any patches in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies).
 
             Read more: [patching](/docs/pnpm.md#patching)
+
+        patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
 
         patch_args: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list arguments to pass to the patch tool. The most specific match wins.
@@ -569,6 +573,7 @@ def npm_translate_lock(
         npmrc = npmrc,
         use_home_npmrc = use_home_npmrc,
         patches = patches,
+        patch_tool = patch_tool,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,
         package_visibility = package_visibility,
