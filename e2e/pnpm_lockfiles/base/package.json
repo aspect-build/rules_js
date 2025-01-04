@@ -36,7 +36,7 @@
         "@aspect-test/b": "5.0.2",
         "@types/node": "16.18.11",
         "@types/archiver": "5.3.1",
-        "alias-only-sizzle": "npm:@types/sizzle@~2.3.8",
+        "alias-only-sizzle": "npm:@types/sizzle@~2.3.9",
         "alias-types-node": "npm:@types/node@~16.18.11"
     },
     "optionalDependencies": {

@@ -71,8 +71,8 @@ npm = use_extension(
         "lock-%s__rollup__3.29.4__links" % version,
 
         # Dep only referenced via npm: should have the real package name in the repo name
-        "lock-%s__at_types_sizzle__2.3.8" % version,
-        "lock-%s__at_types_sizzle__2.3.8__links" % version,
+        "lock-%s__at_types_sizzle__2.3.9" % version,
+        "lock-%s__at_types_sizzle__2.3.9__links" % version,
 
         # Dep with peers
         "lock-%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2" % version,
@@ -81,7 +81,7 @@ npm = use_extension(
         # Deep with many peers
         "lock-%s__at_rollup_plugin-typescript__8.2.1_%s" % (
             version,
-            "ommloj5qql5ba6x5wuiluawhoi" if version == "v54" else "1662662592" if version == "v90" else "1813138439",
+            "3vgsug3mjv7wvue74swjdxifxy" if version == "v54" else "626159424" if version == "v90" else "1813138439",
         ),
 
         # Dep with patch
