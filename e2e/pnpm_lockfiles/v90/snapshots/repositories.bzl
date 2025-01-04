@@ -405,6 +405,8 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["@types/node", "alias-types-node"],
+            "projects/a-types": ["@types/node"],
+            "projects/b": ["@types/node"],
         },
         package = "@types/node",
         version = "16.18.11",
