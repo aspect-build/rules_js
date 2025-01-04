@@ -3,6 +3,7 @@
     "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
     "devDependencies": {
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
+        "@fastify/send": "3.3.0",
         "@figma/nodegit": "^0.28.0-figma.2",
         "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#bd6ab5810d013103d244ddaebe0304649c012b38",
         "@plotly/regl": "2.1.2",
