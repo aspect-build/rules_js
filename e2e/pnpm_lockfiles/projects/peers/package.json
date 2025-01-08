@@ -1,0 +1,15 @@
+{
+    "name": "@scoped/peers",
+    "private": true,
+    "description": "A package with peer dependencies including: workspace, link, also-in-dev, odd version specifiers",
+    "peerDependencies": {
+        "@scoped/a": "workspace:*",
+        "@scoped/b": "link:../b",
+        "@scoped/c": "link:../c",
+        "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
+        "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"
+    },
+    "devDependencies": {
+        "@scoped/c": "link:../c"
+    }
+}

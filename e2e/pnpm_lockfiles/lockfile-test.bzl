@@ -119,6 +119,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
+            ":node_modules/@scoped/peers",
             ":node_modules/scoped/bad",
 
             # Packages involving overrides

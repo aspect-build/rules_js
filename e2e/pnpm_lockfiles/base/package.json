@@ -30,7 +30,8 @@
         "@scoped/a": "workspace:*",
         "@scoped/b": "link:../projects/b",
         "@scoped/c": "file:../projects/c",
-        "@scoped/d": "../projects/d"
+        "@scoped/d": "../projects/d",
+        "@scoped/peers": "../projects/peers"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",

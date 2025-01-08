@@ -49,6 +49,9 @@ importers:
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
+      '@scoped/peers':
+        specifier: ../projects/peers
+        version: link:../projects/peers
       aspect-test-a-no-scope:
         specifier: npm:@aspect-test/a
         version: '@aspect-test/a@5.0.2'
@@ -162,6 +165,25 @@ importers:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
+
+  ../projects/peers:
+    dependencies:
+      '@scoped/a':
+        specifier: workspace:*
+        version: link:../a
+      '@scoped/b':
+        specifier: link:../b
+        version: link:../b
+      hello:
+        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
+        version: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
+      jsonify:
+        specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
+        version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
+    devDependencies:
+      '@scoped/c':
+        specifier: link:../c
+        version: link:../c
 
   ../vendored/is-number: {}
 

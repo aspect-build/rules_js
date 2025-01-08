@@ -29,6 +29,7 @@ importers:
       '@scoped/b': link:../projects/b
       '@scoped/c': file:../projects/c
       '@scoped/d': ../projects/d
+      '@scoped/peers': ../projects/peers
       '@types/archiver': 5.3.1
       '@types/node': 16.18.11
       alias-only-sizzle: npm:@types/sizzle@~2.3.9
@@ -63,6 +64,7 @@ importers:
       '@scoped/b': link:../projects/b
       '@scoped/c': file:../projects/c
       '@scoped/d': link:../projects/d
+      '@scoped/peers': link:../projects/peers
       aspect-test-a-no-scope: /@aspect-test/a/5.0.2
       aspect-test-a/no-at: /@aspect-test/a/5.0.2
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
@@ -123,6 +125,12 @@ importers:
       '@scoped/a': workspace:*
     dependencies:
       '@scoped/a': link:../a
+
+  ../projects/peers:
+    specifiers:
+      '@scoped/c': link:../c
+    devDependencies:
+      '@scoped/c': link:../c
 
   ../vendored/is-number:
     specifiers: {}

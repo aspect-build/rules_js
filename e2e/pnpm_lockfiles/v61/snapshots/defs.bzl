@@ -71,7 +71,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
 
-_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "vendored/is-number"]
+_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "projects/peers", "vendored/is-number"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -334,7 +334,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             tags = ["manual"],
         )
 
-    for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:
+    for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d", "projects/peers"]:
         if link_package == bazel_package:
             # terminal target for direct dependencies
             _npm_link_package_store(
@@ -567,7 +567,7 @@ def npm_link_targets(name = "node_modules", package = None):
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@scoped/c".format(bazel_package, name))
 
-    for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:
+    for link_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d", "projects/peers"]:
         if link_package == bazel_package:
             link_targets.append("//{}:{}/@scoped/a".format(bazel_package, name))
 
