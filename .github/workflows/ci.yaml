@@ -47,6 +47,7 @@ jobs:
                     e2e/npm_link_package
                     e2e/npm_link_package-esm
                     e2e/npm_translate_lock
+                    e2e/npm_translate_lock_disable_hooks
                     e2e/npm_translate_lock_empty
                     e2e/npm_translate_lock_multi
                     e2e/npm_translate_lock_partial_clone

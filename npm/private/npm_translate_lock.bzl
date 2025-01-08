@@ -581,7 +581,7 @@ def npm_translate_lock(
         public_hoist_packages = public_hoist_packages,
         dev = dev,
         no_optional = no_optional,
-        lifecycle_hooks = lifecycle_hooks,
+        lifecycle_hooks = lifecycle_hooks if lifecycle_hooks else {},
         lifecycle_hooks_envs = lifecycle_hooks_envs,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
