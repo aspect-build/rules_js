@@ -34,7 +34,7 @@ expected_packages = {
             "@aspect-test/d": "2.0.0_at_aspect-test_c_1.0.0",
         },
         "optional_dependencies": {},
-        "dev": False,
+        "dev_only": False,
         "has_bin": True,
         "optional": False,
         "requires_build": False,
@@ -171,7 +171,7 @@ def _parse_lockfile_v9_test_impl(ctx):
     # NOTE: unknown properties in >=v9
     v9_expected_packages = dict(expected_packages)
     v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
-    v9_expected_packages["@aspect-test/a@5.0.0"]["dev"] = None
+    v9_expected_packages["@aspect-test/a@5.0.0"]["dev_only"] = None
     v9_expected_packages["@aspect-test/a@5.0.0"]["requires_build"] = None
 
     expected = (
