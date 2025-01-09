@@ -189,6 +189,7 @@ npm.npm_translate_lock(
             "requires-network",
         ],
         "puppeteer": [
+            "no-remote",
             "no-sandbox",
             "requires-network",
         ],
