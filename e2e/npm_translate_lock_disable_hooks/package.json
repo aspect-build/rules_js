@@ -1,0 +1,10 @@
+{
+    "dependencies": {
+        "@aspect-test/c": "2.0.0"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@aspect-test/c"
+        ]
+    }
+}
