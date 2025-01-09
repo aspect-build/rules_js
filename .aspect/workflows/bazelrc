@@ -3,8 +3,8 @@ common --remote_download_outputs=minimal
 common --nobuild_runfile_links
 
 # remote execution
-common:rbe --extra_execution_platforms=//bazel/platforms:x86_64_linux_remote
-common:rbe --host_platform=//bazel/platforms:x86_64_linux_remote
+common:rbe --extra_execution_platforms=@aspect_rules_js//.aspect/workflows:x86_64_linux_remote
+common:rbe --host_platform=@aspect_rules_js//.aspect/workflows:x86_64_linux_remote
 common:rbe --remote_executor=unix:///mnt/ephemeral/buildbarn/.cache/bb_clientd/grpc
 common:rbe --genrule_strategy=remote,local
 common:rbe --jobs=32
