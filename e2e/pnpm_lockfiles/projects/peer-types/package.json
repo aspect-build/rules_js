@@ -2,11 +2,18 @@
     "name": "test-peer-types",
     "private": true,
     "description": "A package with peer dependencies including: workspace, link, also-in-dev, odd version specifiers",
-    "peerDependencies": {
+    "devDependencies": {
         "@scoped/a": "workspace:*",
         "@scoped/b": "link:../b",
         "@scoped/c": "file:../c",
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"
+    },
+    "peerDependencies": {
+        "@scoped/a": "workspace:*",
+        "@scoped/b": "*",
+        "@scoped/c": "*",
+        "hello": "*",
+        "jsonify": "*"
     }
 }

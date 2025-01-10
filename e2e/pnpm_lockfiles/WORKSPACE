@@ -9,6 +9,7 @@ PNPM_LOCK_VERSIONS = [
     "v60",
     "v61",
     "v90",
+    "v101",
 ]
 
 # Lockfiles with unique test cases
@@ -44,6 +45,7 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
     for version in PNPM_LOCK_VERSIONS
 ]
 
+load("@lock-v101//:repositories.bzl", npm_repositories_v100 = "npm_repositories")
 load("@lock-v54//:repositories.bzl", npm_repositories_v54 = "npm_repositories")
 load("@lock-v60//:repositories.bzl", npm_repositories_v60 = "npm_repositories")
 load("@lock-v61//:repositories.bzl", npm_repositories_v61 = "npm_repositories")
@@ -56,6 +58,8 @@ npm_repositories_v60()
 npm_repositories_v61()
 
 npm_repositories_v90()
+
+npm_repositories_v100()
 
 [
     npm_translate_lock(

@@ -115,7 +115,10 @@ def lockfile_test(npm_link_all_packages, name = None):
             # npm: alias to a package that has many peers
             ":node_modules/rollup-plugin-with-peers",
             # underlying repo for the many-peers package
-            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (lock_repo, "3vgsug3mjv7wvue74swjdxifxy" if lock_version == "v54" else "626159424" if lock_version == "v90" else "1813138439"),
+            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (
+                lock_repo,
+                "3vgsug3mjv7wvue74swjdxifxy" if lock_version == "v54" else "626159424" if (lock_version == "v90" or lock_version == "v101") else "1813138439" if (lock_version == "v61" or lock_version == "v60") else "unknown",
+            ),
 
             # uuv 'hasBin'
             ":node_modules/uvu",
@@ -198,8 +201,8 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":.aspect_rules_js/node_modules/lodash@4.17.21/dir",
 
             # Patched dependencies
-            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
-            "@%s__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq//:pkg" % lock_repo,
+            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
+            "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
 
             # Direct deps from custom registry
             ":.aspect_rules_js/node_modules/@types+node@16.18.11",

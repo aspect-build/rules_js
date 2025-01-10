@@ -10,6 +10,7 @@ PNPM_LOCK_VERSIONS = [
     "v60",
     "v61",
     "v90",
+    "v101",
 ]
 
 # Lockfiles with unique test cases
@@ -82,11 +83,14 @@ npm = use_extension(
         # Deep with many peers
         "lock-%s__at_rollup_plugin-typescript__8.2.1_%s" % (
             version,
-            "3vgsug3mjv7wvue74swjdxifxy" if version == "v54" else "626159424" if version == "v90" else "1813138439",
+            "3vgsug3mjv7wvue74swjdxifxy" if version == "v54" else "626159424" if (version == "v90" or version == "v101") else "1813138439" if (version == "v61" or version == "v60") else "unknown",
         ),
 
         # Dep with patch
-        "lock-%s__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq" % version,
+        "lock-%s__meaning-of-life__1.0.0_%s" % (
+            version,
+            "1541309197" if version == "v101" else "o3deharooos255qt5xdujc3cuq",
+        ),
     )
     for version in PNPM_LOCK_VERSIONS
 ]

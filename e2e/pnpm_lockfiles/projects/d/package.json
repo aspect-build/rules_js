@@ -5,6 +5,6 @@
         "@scoped/a": "workspace:*"
     },
     "peerDependencies": {
-        "@scoped/b": "link:../b"
+        "@scoped/b": "workspace:*"
     }
 }

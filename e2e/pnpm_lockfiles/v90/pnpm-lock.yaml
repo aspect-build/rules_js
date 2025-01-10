@@ -187,11 +187,11 @@ importers:
         specifier: workspace:*
         version: link:../a
       '@scoped/b':
-        specifier: link:../b
+        specifier: workspace:*
         version: link:../b
 
   ../projects/peer-types:
-    dependencies:
+    devDependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
