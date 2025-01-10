@@ -327,7 +327,7 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
 
         translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
 
-        pnpm_patch = patched_dependencies.get(friendly_name, {}).get("path", None)
+        pnpm_patch = patched_dependencies.get(friendly_name, patched_dependencies.get(name, None))
         pnpm_patched = pnpm_patch != None
 
         if len(translate_patches) > 0 and pnpm_patched:
@@ -340,7 +340,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
-            patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch)
+            patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch.get("path"))
             patches.append(patch_path)
 
             # pnpm patches are always applied with -p1

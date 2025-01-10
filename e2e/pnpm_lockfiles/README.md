@@ -12,3 +12,4 @@ cases run on each of those lockfiles.
 -   `override-with-alias-url-v9` - a package overridden with a different package
 -   `tarball-no-url-v54` - a package with a tarball but not a full URL
 -   `docusaurus-direct-peer-v*` - a direct dependency with a (peer=123) in the `importers` including within `npm:` dependencies
+-   `versionless-patch-v9`: pnpm v9.7+ allows patches without a version specifier
