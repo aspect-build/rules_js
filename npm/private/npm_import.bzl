@@ -63,7 +63,6 @@ def npm_imported_package_store(link_root_name):
         deps = {deps},
         ref_deps = {ref_deps},
         lc_deps = {lc_deps},
-        dev_only = {dev_only},
         has_lifecycle_build_target = {has_lifecycle_build_target},
         transitive_closure_pattern = {transitive_closure_pattern},
         npm_package_target = "{npm_package_target}",
@@ -86,7 +85,6 @@ def npm_imported_package_store_internal(
         deps,
         ref_deps,
         lc_deps,
-        dev_only,
         has_lifecycle_build_target,
         transitive_closure_pattern,
         npm_package_target,
@@ -116,7 +114,6 @@ def npm_imported_package_store_internal(
         name = "{}/ref".format(store_target_name),
         package = package,
         version = version,
-        dev_only = dev_only,
         tags = ["manual"],
         exclude_package_contents = exclude_package_contents,
     )
@@ -127,7 +124,6 @@ def npm_imported_package_store_internal(
         src = "{}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else npm_package_target,
         package = package,
         version = version,
-        dev_only = dev_only,
         deps = ref_deps,
         tags = ["manual"],
         exclude_package_contents = exclude_package_contents,
@@ -139,7 +135,6 @@ def npm_imported_package_store_internal(
         src = None if transitive_closure_pattern else npm_package_target,
         package = package,
         version = version,
-        dev_only = dev_only,
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
@@ -162,7 +157,6 @@ def npm_imported_package_store_internal(
             name = "{}/pkg_pre_lc_lite".format(store_target_name),
             package = package,
             version = version,
-            dev_only = dev_only,
             deps = ref_deps,
             tags = ["manual"],
             exclude_package_contents = exclude_package_contents,
@@ -173,7 +167,6 @@ def npm_imported_package_store_internal(
             name = "{}/pkg_pre_lc".format(store_target_name),
             package = package,
             version = version,
-            dev_only = dev_only,
             deps = lc_deps,
             tags = ["manual"],
             exclude_package_contents = exclude_package_contents,
@@ -892,7 +885,6 @@ def _npm_import_links_rule_impl(rctx):
         version = rctx.attr.version,
         package_store_name = package_store_name,
         bins = bins,
-        dev_only = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
         exclude_package_contents = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents),
     )
@@ -930,7 +922,6 @@ _COMMON_ATTRS = {
 _ATTRS_LINKS = _COMMON_ATTRS | {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
-    "dev": attr.bool(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(),
@@ -1023,7 +1014,6 @@ def npm_import(
         npm_auth_username = "",
         npm_auth_password = "",
         bins = {},
-        dev = False,
         exclude_package_contents = [],
         **kwargs):
     """Import a single npm package into Bazel.
@@ -1282,13 +1272,6 @@ def npm_import(
             from information in the pnpm lock file. That feature is currently blocked on
             https://github.com/pnpm/pnpm/issues/5131.
 
-        dev: Whether this npm package is a dev dependency
-
-            DEPRECATED: this field is deprecated and will be removed in a future release.
-
-            A package should be marked as a dev dependency as part of the dependency declaration,
-            not as part of the package definition or import.
-
         exclude_package_contents: List of glob patterns to exclude from the linked package.
 
             This is useful for excluding files that are not needed in the linked package.
@@ -1346,7 +1329,6 @@ def npm_import(
         name = "{}{}".format(name, utils.links_repo_suffix),
         package = package,
         version = version,
-        dev = dev,
         root_package = root_package,
         link_packages = link_packages,
         deps = deps,

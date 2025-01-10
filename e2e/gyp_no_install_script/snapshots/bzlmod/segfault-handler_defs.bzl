@@ -213,7 +213,6 @@ def npm_imported_package_store(link_root_name):
             ":.aspect_rules_js/{link_root_name}/yallist@5.0.0/pkg": "yallist",
             ":.aspect_rules_js/{link_root_name}/yallist@4.0.0/pkg": "yallist",
         },
-        dev_only = False,
         has_lifecycle_build_target = True,
         transitive_closure_pattern = True,
         npm_package_target = "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",

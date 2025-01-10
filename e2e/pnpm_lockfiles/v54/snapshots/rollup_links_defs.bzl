@@ -33,7 +33,6 @@ def npm_imported_package_store(link_root_name):
             ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
             ":.aspect_rules_js/{link_root_name}/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
         },
-        dev_only = False,
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0//:pkg",

@@ -40,7 +40,6 @@ def npm_imported_package_store(link_root_name):
             ":.aspect_rules_js/{link_root_name}/unused@0.2.2/pkg_pre_lc_lite": "unused",
             ":.aspect_rules_js/{link_root_name}/wordwrap@0.0.3/pkg": "wordwrap",
         },
-        dev_only = False,
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__unused__0.2.2//:pkg",

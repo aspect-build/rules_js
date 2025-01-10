@@ -416,7 +416,6 @@ def npm_repositories():
         version = "5.3.1",
         url = "https://registry.yarnpkg.com/@types/archiver/-/archiver-5.3.1.tgz",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==",
         deps = {
             "@types/glob": "8.1.0",
@@ -454,7 +453,6 @@ def npm_repositories():
         version = "8.1.0",
         url = "https://registry.yarnpkg.com/@types/glob/-/glob-8.1.0.tgz",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==",
         deps = {
             "@types/minimatch": "5.1.2",
@@ -477,7 +475,6 @@ def npm_repositories():
         version = "5.1.2",
         url = "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==",
         transitive_closure = {
             "@types/minimatch": ["5.1.2"],
@@ -518,7 +515,6 @@ def npm_repositories():
         version = "2.3.10",
         url = "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.10.tgz",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==",
         transitive_closure = {
             "@types/sizzle": ["2.3.10"],

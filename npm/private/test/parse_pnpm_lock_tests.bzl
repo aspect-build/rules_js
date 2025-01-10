@@ -30,7 +30,6 @@ expected_packages = {
         "name": "@aspect-test/a",
         "dependencies": {},
         "optional_dependencies": {},
-        "dev_only": False,
         "has_bin": True,
         "optional": False,
         "requires_build": False,
@@ -44,7 +43,6 @@ expected_packages = {
         "name": "lodash",
         "dependencies": {},
         "optional_dependencies": {},
-        "dev_only": False,
         "has_bin": False,
         "optional": False,
         "requires_build": False,
@@ -206,10 +204,8 @@ def _parse_lockfile_v9_test_impl(ctx):
     # NOTE: unknown properties in >=v9, convert to <v9 defaults for test assertions
     v9_expected_packages = dict(expected_packages)
     v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
-    v9_expected_packages["@aspect-test/a@5.0.0"]["dev_only"] = None
     v9_expected_packages["@aspect-test/a@5.0.0"]["requires_build"] = None
     v9_expected_packages["lodash@file:lodash-4.17.21.tgz"] = dict(v9_expected_packages["file:lodash-4.17.21.tgz"])
-    v9_expected_packages["lodash@file:lodash-4.17.21.tgz"]["dev_only"] = None
     v9_expected_packages["lodash@file:lodash-4.17.21.tgz"]["requires_build"] = None
     v9_expected_packages.pop("file:lodash-4.17.21.tgz")  # renamed with lodash@ in v9
 
