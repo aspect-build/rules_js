@@ -156,111 +156,111 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
-            link_targets.append("//{}:{}/@aspect-test-a-bad-scope".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test-a-bad-scope".format(name))
             if "@aspect-test-a-bad-scop" not in scope_targets:
                 scope_targets["@aspect-test-a-bad-scop"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test-a-bad-scop"].append(link_targets[-1])
             link_4(name = "{}/@aspect-test-custom-scope/a".format(name))
-            link_targets.append("//{}:{}/@aspect-test-custom-scope/a".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test-custom-scope/a".format(name))
             if "@aspect-test-custom-scope" not in scope_targets:
                 scope_targets["@aspect-test-custom-scope"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test-custom-scope"].append(link_targets[-1])
             link_4(name = "{}/@aspect-test/a".format(name))
-            link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test/a".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_4(name = "{}/@aspect-test/a2".format(name))
-            link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test/a2".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_4(name = "{}/aspect-test-a-no-scope".format(name))
-            link_targets.append("//{}:{}/aspect-test-a-no-scope".format(bazel_package, name))
+            link_targets.append(":{}/aspect-test-a-no-scope".format(name))
             link_4(name = "{}/aspect-test-a/no-at".format(name))
-            link_targets.append("//{}:{}/aspect-test-a/no-at".format(bazel_package, name))
+            link_targets.append(":{}/aspect-test-a/no-at".format(name))
             link_5(name = "{}/@aspect-test/b".format(name))
-            link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test/b".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_6(name = "{}/@aspect-test/c".format(name))
-            link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test/c".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_9(name = "{}/jsonify".format(name))
-            link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
+            link_targets.append(":{}/jsonify".format(name))
             link_10(name = "{}/@isaacs/cliui".format(name))
-            link_targets.append("//{}:{}/@isaacs/cliui".format(bazel_package, name))
+            link_targets.append(":{}/@isaacs/cliui".format(name))
             if "@isaacs" not in scope_targets:
                 scope_targets["@isaacs"] = [link_targets[-1]]
             else:
                 scope_targets["@isaacs"].append(link_targets[-1])
             link_11(name = "{}/rollup-plugin-with-peers".format(name))
-            link_targets.append("//{}:{}/rollup-plugin-with-peers".format(bazel_package, name))
+            link_targets.append(":{}/rollup-plugin-with-peers".format(name))
             link_13(name = "{}/@types/archiver".format(name))
-            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
+            link_targets.append(":{}/@types/archiver".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_17(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
             link_17(name = "{}/alias-types-node".format(name))
-            link_targets.append("//{}:{}/alias-types-node".format(bazel_package, name))
+            link_targets.append(":{}/alias-types-node".format(name))
             link_18(name = "{}/alias-only-sizzle".format(name))
-            link_targets.append("//{}:{}/alias-only-sizzle".format(bazel_package, name))
+            link_targets.append(":{}/alias-only-sizzle".format(name))
             link_21(name = "{}/debug".format(name))
-            link_targets.append("//{}:{}/debug".format(bazel_package, name))
+            link_targets.append(":{}/debug".format(name))
             link_31(name = "{}/hello".format(name))
-            link_targets.append("//{}:{}/hello".format(bazel_package, name))
+            link_targets.append(":{}/hello".format(name))
             link_34(name = "{}/is-odd-v0".format(name))
-            link_targets.append("//{}:{}/is-odd-v0".format(bazel_package, name))
+            link_targets.append(":{}/is-odd-v0".format(name))
             link_35(name = "{}/is-odd-v1".format(name))
-            link_targets.append("//{}:{}/is-odd-v1".format(bazel_package, name))
+            link_targets.append(":{}/is-odd-v1".format(name))
             link_36(name = "{}/is-odd-v2".format(name))
-            link_targets.append("//{}:{}/is-odd-v2".format(bazel_package, name))
+            link_targets.append(":{}/is-odd-v2".format(name))
             link_37(name = "{}/is-odd-v3".format(name))
-            link_targets.append("//{}:{}/is-odd-v3".format(bazel_package, name))
+            link_targets.append(":{}/is-odd-v3".format(name))
             link_38(name = "{}/is-odd".format(name))
-            link_targets.append("//{}:{}/is-odd".format(bazel_package, name))
+            link_targets.append(":{}/is-odd".format(name))
             link_38(name = "{}/is-odd-alias".format(name))
-            link_targets.append("//{}:{}/is-odd-alias".format(bazel_package, name))
+            link_targets.append(":{}/is-odd-alias".format(name))
             link_39(name = "{}/jquery-git-ssh-e61fccb".format(name))
-            link_targets.append("//{}:{}/jquery-git-ssh-e61fccb".format(bazel_package, name))
+            link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
             link_41(name = "{}/meaning-of-life".format(name))
-            link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
+            link_targets.append(":{}/meaning-of-life".format(name))
             link_47(name = "{}/rollup".format(name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
+            link_targets.append(":{}/rollup".format(name))
             link_48(name = "{}/rollup3".format(name))
-            link_targets.append("//{}:{}/rollup3".format(bazel_package, name))
+            link_targets.append(":{}/rollup3".format(name))
             link_55(name = "{}/tslib".format(name))
-            link_targets.append("//{}:{}/tslib".format(bazel_package, name))
+            link_targets.append(":{}/tslib".format(name))
             link_56(name = "{}/typescript".format(name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
+            link_targets.append(":{}/typescript".format(name))
             link_57(name = "{}/uvu".format(name))
-            link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+            link_targets.append(":{}/uvu".format(name))
         elif bazel_package == "projects/a-types":
             link_17(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "projects/b":
             link_17(name = "{}/@types/node".format(name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
@@ -513,56 +513,56 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "<LOCKVERSION>":
-            link_targets.append("//{}:{}/@aspect-test-a-bad-scope".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test-custom-scope/a".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/a".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/a2".format(bazel_package, name))
-            link_targets.append("//{}:{}/aspect-test-a-no-scope".format(bazel_package, name))
-            link_targets.append("//{}:{}/aspect-test-a/no-at".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/b".format(bazel_package, name))
-            link_targets.append("//{}:{}/@aspect-test/c".format(bazel_package, name))
-            link_targets.append("//{}:{}/jsonify".format(bazel_package, name))
-            link_targets.append("//{}:{}/@isaacs/cliui".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup-plugin-with-peers".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/archiver".format(bazel_package, name))
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
-            link_targets.append("//{}:{}/alias-types-node".format(bazel_package, name))
-            link_targets.append("//{}:{}/alias-only-sizzle".format(bazel_package, name))
-            link_targets.append("//{}:{}/debug".format(bazel_package, name))
-            link_targets.append("//{}:{}/hello".format(bazel_package, name))
-            link_targets.append("//{}:{}/is-odd-v0".format(bazel_package, name))
-            link_targets.append("//{}:{}/is-odd-v1".format(bazel_package, name))
-            link_targets.append("//{}:{}/is-odd-v2".format(bazel_package, name))
-            link_targets.append("//{}:{}/is-odd-v3".format(bazel_package, name))
-            link_targets.append("//{}:{}/is-odd".format(bazel_package, name))
-            link_targets.append("//{}:{}/is-odd-alias".format(bazel_package, name))
-            link_targets.append("//{}:{}/jquery-git-ssh-e61fccb".format(bazel_package, name))
-            link_targets.append("//{}:{}/meaning-of-life".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup".format(bazel_package, name))
-            link_targets.append("//{}:{}/rollup3".format(bazel_package, name))
-            link_targets.append("//{}:{}/tslib".format(bazel_package, name))
-            link_targets.append("//{}:{}/typescript".format(bazel_package, name))
-            link_targets.append("//{}:{}/uvu".format(bazel_package, name))
+            link_targets.append(":{}/@aspect-test-a-bad-scope".format(name))
+            link_targets.append(":{}/@aspect-test-custom-scope/a".format(name))
+            link_targets.append(":{}/@aspect-test/a".format(name))
+            link_targets.append(":{}/@aspect-test/a2".format(name))
+            link_targets.append(":{}/aspect-test-a-no-scope".format(name))
+            link_targets.append(":{}/aspect-test-a/no-at".format(name))
+            link_targets.append(":{}/@aspect-test/b".format(name))
+            link_targets.append(":{}/@aspect-test/c".format(name))
+            link_targets.append(":{}/jsonify".format(name))
+            link_targets.append(":{}/@isaacs/cliui".format(name))
+            link_targets.append(":{}/rollup-plugin-with-peers".format(name))
+            link_targets.append(":{}/@types/archiver".format(name))
+            link_targets.append(":{}/@types/node".format(name))
+            link_targets.append(":{}/alias-types-node".format(name))
+            link_targets.append(":{}/alias-only-sizzle".format(name))
+            link_targets.append(":{}/debug".format(name))
+            link_targets.append(":{}/hello".format(name))
+            link_targets.append(":{}/is-odd-v0".format(name))
+            link_targets.append(":{}/is-odd-v1".format(name))
+            link_targets.append(":{}/is-odd-v2".format(name))
+            link_targets.append(":{}/is-odd-v3".format(name))
+            link_targets.append(":{}/is-odd".format(name))
+            link_targets.append(":{}/is-odd-alias".format(name))
+            link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
+            link_targets.append(":{}/meaning-of-life".format(name))
+            link_targets.append(":{}/rollup".format(name))
+            link_targets.append(":{}/rollup3".format(name))
+            link_targets.append(":{}/tslib".format(name))
+            link_targets.append(":{}/typescript".format(name))
+            link_targets.append(":{}/uvu".format(name))
         elif bazel_package == "projects/a-types":
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append(":{}/@types/node".format(name))
         elif bazel_package == "projects/b":
-            link_targets.append("//{}:{}/@types/node".format(bazel_package, name))
+            link_targets.append(":{}/@types/node".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
-        link_targets.append("//{}:{}/@scoped/c".format(bazel_package, name))
+        link_targets.append(":{}/@scoped/c".format(name))
 
     if bazel_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d"]:
-        link_targets.append("//{}:{}/@scoped/a".format(bazel_package, name))
+        link_targets.append(":{}/@scoped/a".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
-        link_targets.append("//{}:{}/@scoped/b".format(bazel_package, name))
+        link_targets.append(":{}/@scoped/b".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
-        link_targets.append("//{}:{}/@scoped/d".format(bazel_package, name))
+        link_targets.append(":{}/@scoped/d".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
-        link_targets.append("//{}:{}/scoped/bad".format(bazel_package, name))
+        link_targets.append(":{}/scoped/bad".format(name))
 
     if bazel_package in ["projects/b"]:
-        link_targets.append("//{}:{}/a-types".format(bazel_package, name))
+        link_targets.append(":{}/a-types".format(name))
     return link_targets

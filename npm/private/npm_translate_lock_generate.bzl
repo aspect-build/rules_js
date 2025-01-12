@@ -65,7 +65,7 @@ _FP_DIRECT_TMPL = \
 _FP_DIRECT_TARGET_TMPL = \
     """
     if bazel_package in {link_packages}:
-        link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
+        link_targets.append(":{{}}/{pkg}".format(name))"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -299,7 +299,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
                 # expose the alias if public
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))""".format(pkg = link_alias)
+                    add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
