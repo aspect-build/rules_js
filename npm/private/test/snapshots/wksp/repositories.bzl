@@ -23339,7 +23339,9 @@ def npm_repositories():
         name = "npm__source-map-support__0.5.21",
         root_package = "",
         link_workspace = "",
-        link_packages = {},
+        link_packages = {
+            "examples/stack_traces": ["source-map-support"],
+        },
         package = "source-map-support",
         version = "0.5.21",
         url = "https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.21.tgz",

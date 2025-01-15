@@ -876,7 +876,7 @@ load("@@npm__smob__1.5.0__links//:defs.bzl", store_872 = "npm_imported_package_s
 load("@@npm__socks-proxy-agent__7.0.0__links//:defs.bzl", store_873 = "npm_imported_package_store")
 load("@@npm__socks__2.7.1__links//:defs.bzl", store_874 = "npm_imported_package_store")
 load("@@npm__source-map-js__1.0.2__links//:defs.bzl", store_875 = "npm_imported_package_store")
-load("@@npm__source-map-support__0.5.21__links//:defs.bzl", store_876 = "npm_imported_package_store")
+load("@@npm__source-map-support__0.5.21__links//:defs.bzl", link_876 = "npm_link_imported_package_store", store_876 = "npm_imported_package_store")
 load("@@npm__source-map__0.6.1__links//:defs.bzl", store_877 = "npm_imported_package_store")
 load("@@npm__sourcemap-codec__1.4.8__links//:defs.bzl", store_878 = "npm_imported_package_store")
 load("@@npm__sshpk__1.17.0__links//:defs.bzl", store_879 = "npm_imported_package_store")
@@ -1026,7 +1026,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
 
-_LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/image", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -2439,6 +2439,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(":{}/mocha-multi-reporters".format(name))
             link_682(name = "{}/mocha".format(name))
             link_targets.append(":{}/mocha".format(name))
+        elif bazel_package == "examples/stack_traces":
+            link_876(name = "{}/source-map-support".format(name))
+            link_targets.append(":{}/source-map-support".format(name))
 
     if is_root:
         _npm_package_store(
@@ -2859,6 +2862,8 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append(":{}/mocha-junit-reporter".format(name))
             link_targets.append(":{}/mocha-multi-reporters".format(name))
             link_targets.append(":{}/mocha".format(name))
+        elif bazel_package == "examples/stack_traces":
+            link_targets.append(":{}/source-map-support".format(name))
 
     if bazel_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
         link_targets.append(":{}/@mycorp/pkg-a".format(name))
