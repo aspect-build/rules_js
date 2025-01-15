@@ -250,6 +250,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__at_aspect-test_h__1.0.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["@aspect-test/h-is-only-optional"],
+        },
+        package = "@aspect-test/h",
+        version = "1.0.0",
+        url = "https://registry.npmjs.org/@aspect-test/h/-/h-1.0.0.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==",
+        transitive_closure = {
+            "@aspect-test/h": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
