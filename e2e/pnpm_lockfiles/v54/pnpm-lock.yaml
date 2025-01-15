@@ -24,6 +24,7 @@ importers:
       '@aspect-test/a2': npm:@aspect-test/a
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.0
+      '@aspect-test/h-is-only-optional': npm:@aspect-test/h@1.0.0
       '@isaacs/cliui': 8.0.2
       '@scoped/a': workspace:*
       '@scoped/b': link:../projects/b
@@ -95,6 +96,7 @@ importers:
       uvu: 0.5.6
     optionalDependencies:
       '@aspect-test/c': 2.0.0
+      '@aspect-test/h-is-only-optional': /@aspect-test/h/1.0.0
     devDependencies:
       '@aspect-test/b': 5.0.2
       '@types/archiver': registry.npmjs.org/@types/archiver/5.3.1
@@ -216,6 +218,12 @@ packages:
       '@aspect-test/c': x.x.x
     dependencies:
       '@aspect-test/c': 2.0.2
+
+  /@aspect-test/h/1.0.0:
+    resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
+    hasBin: true
+    dev: false
+    optional: true
 
   /@isaacs/cliui/8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
