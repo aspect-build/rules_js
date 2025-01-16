@@ -206,6 +206,12 @@ importers:
         specifier: ^6.3.0
         version: 6.3.0
 
+  examples/stack_traces:
+    devDependencies:
+      source-map-support:
+        specifier: ^0.5.21
+        version: 0.5.21
+
   examples/webpack_cli:
     dependencies:
       '@vanilla-extract/css':
