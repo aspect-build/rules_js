@@ -240,6 +240,13 @@ def _npm_package_store_impl(ctx):
                         "--directory",
                         package_store_directory.path,
                     ],
+                    # no need to cache tarball extraction for npm package remotely. Untar is faster than uploading/downloading
+                    # cache in most of the cases, and untar creates mutliple outputs and sometimes the number of the output can be massive
+                    # meaning it can takes much more time to upload the cache compared to the actual untar.
+                    # see https://github.com/aspect-build/rules_js/pull/1974
+                    execution_requirements = {
+                        "no-remote-cache": "1",
+                    },
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                     # Workaround https://github.com/bazelbuild/bazel-central-registry/issues/2256
