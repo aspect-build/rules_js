@@ -240,6 +240,7 @@ def _npm_package_store_impl(ctx):
                         "--directory",
                         package_store_directory.path,
                     ],
+                    toolchain = "@aspect_bazel_lib//lib:tar_toolchain_type",
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
                     # Workaround https://github.com/bazelbuild/bazel-central-registry/issues/2256
