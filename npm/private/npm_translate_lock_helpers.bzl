@@ -532,11 +532,12 @@ pnpm install will create nested node_modules, but not all of them are ignored by
 We recommend that all node_modules folders in the source tree be ignored,
 to avoid Bazel printing confusing error messages.
 
-Either add line(s) to {bazelignore}:
+Possible fixes:
+  - Upgrade to Bazel 8.0 and use ignore_directories(["**/node_modules"]) in REPO.bazel
+  - Disable this check by removing `verify_node_modules_ignored` in `npm_translate_lock(name = "{repo}")`
+  - Add line(s) to {bazelignore}:
 
 {fixes}
-
-or disable this check by setting `verify_node_modules_ignored = None` in `npm_translate_lock(name = "{repo}")`
                 """.format(
                 fixes = "\n".join(missing_ignores),
                 bazelignore = rctx.attr.verify_node_modules_ignored,
