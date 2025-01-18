@@ -6,7 +6,7 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
-load(":utils.bzl", "utils")
+load(":utils.bzl", "DEFAULT_LINKED_VERSION", "utils")
 
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
@@ -161,7 +161,7 @@ def _npm_package_store_impl(ctx):
                 msg = "Expected package to be specified in '{}' when src '{}' provides a JsInfo".format(ctx.label, ctx.attr.src[JsInfo].target)
                 fail(msg)
             package = ctx.attr.package
-            version = ctx.attr.version if ctx.attr.version else "0.0.0"
+            version = ctx.attr.version if ctx.attr.version else DEFAULT_LINKED_VERSION
         else:
             msg = "Expected src of '{}' to provide either NpmPackageInfo or JsInfo".format(ctx.label)
             fail(msg)
