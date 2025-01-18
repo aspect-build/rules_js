@@ -811,7 +811,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
-    "replace_package": attr.string(),
+    "replace_package": attr.label(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
