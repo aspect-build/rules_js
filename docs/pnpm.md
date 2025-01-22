@@ -323,7 +323,7 @@ npm_translate_lock(
         # Disable install and preinstall for this package, maybe they are broken
         "fum@0.0.1": ["postinstall"],
     },
-    lifecycle_hooks_envs: {
+    lifecycle_hooks_envs = {
         # Set some values for all hook actions
         "*": [
             "GLOBAL_KEY1=value1",
