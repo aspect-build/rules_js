@@ -35,6 +35,7 @@ def npm_imported_package_store(name):
         name = "{}/ref".format(store_target_name),
         package = "rollup",
         version = "2.14.0",
+        exclude_patterns = [],
         dev = False,
         tags = ["manual"],
     )
@@ -45,6 +46,7 @@ def npm_imported_package_store(name):
         src = "{}/pkg_lc".format(store_target_name) if False else "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0//:pkg",
         package = "rollup",
         version = "2.14.0",
+        exclude_patterns = [],
         dev = False,
         deps = ref_deps,
         tags = ["manual"],
@@ -56,6 +58,7 @@ def npm_imported_package_store(name):
         src = None if True else "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0//:pkg",
         package = "rollup",
         version = "2.14.0",
+        exclude_patterns = [],
         dev = False,
         deps = deps,
         visibility = ["//visibility:public"],
