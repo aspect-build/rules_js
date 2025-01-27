@@ -39,6 +39,7 @@ def npm_imported_package_store(name):
         name = "{}/ref".format(store_target_name),
         package = "unused",
         version = "0.2.2",
+        exclude_patterns = [],
         dev = True,
         tags = ["manual"],
     )
@@ -49,6 +50,7 @@ def npm_imported_package_store(name):
         src = "{}/pkg_lc".format(store_target_name) if False else "@@_main~npm~npm__unused__0.2.2//:pkg",
         package = "unused",
         version = "0.2.2",
+        exclude_patterns = [],
         dev = True,
         deps = ref_deps,
         tags = ["manual"],
@@ -60,6 +62,7 @@ def npm_imported_package_store(name):
         src = None if True else "@@_main~npm~npm__unused__0.2.2//:pkg",
         package = "unused",
         version = "0.2.2",
+        exclude_patterns = [],
         dev = True,
         deps = deps,
         visibility = ["//visibility:public"],
