@@ -35,6 +35,7 @@ def npm_imported_package_store(name):
         name = "{}/ref".format(store_target_name),
         package = "rollup",
         version = "2.70.2",
+        exclude_patterns = [],
         dev = True,
         tags = ["manual"],
     )
@@ -45,6 +46,7 @@ def npm_imported_package_store(name):
         src = "{}/pkg_lc".format(store_target_name) if False else "@@npm__rollup__2.70.2//:pkg",
         package = "rollup",
         version = "2.70.2",
+        exclude_patterns = [],
         dev = True,
         deps = ref_deps,
         tags = ["manual"],
@@ -56,6 +58,7 @@ def npm_imported_package_store(name):
         src = None if True else "@@npm__rollup__2.70.2//:pkg",
         package = "rollup",
         version = "2.70.2",
+        exclude_patterns = [],
         dev = True,
         deps = deps,
         visibility = ["//visibility:public"],
