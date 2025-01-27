@@ -68,6 +68,7 @@ _ATTRS = {
     "patch_tool": attr.label(),
     "patch_args": attr.string_list_dict(),
     "patches": attr.string_list_dict(),
+    "exclude_patterns": attr.string_list_dict(),
     "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs"),  # bzlmod pnpm extension
     "pnpm_lock": attr.label(),
     "preupdate": attr.label_list(),
@@ -165,6 +166,7 @@ def npm_translate_lock(
         use_home_npmrc = None,
         data = [],
         patches = {},
+        exclude_patterns = {},
         patch_tool = None,
         patch_args = {"*": ["-p0"]},
         custom_postinstalls = {},
@@ -282,6 +284,19 @@ def npm_translate_lock(
 
             Read more: [patching](/docs/pnpm.md#patching)
 
+        exclude_patterns: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
+            to a list of patterns to exclude from the package's generated node_modules link targets. Multiple matches are additive.
+
+            Versions must match if used.
+
+            For example,
+
+            ```
+            exclude_patterns = {
+                "@foo/bar": ["**/test/**"],
+                "@foo/car@2.0.0": ["**/README*"],
+            },
+            ```
         patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
 
         patch_args: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
@@ -576,6 +591,7 @@ def npm_translate_lock(
         npmrc = npmrc,
         use_home_npmrc = use_home_npmrc,
         patches = patches,
+        exclude_patterns = exclude_patterns,
         patch_tool = patch_tool,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,

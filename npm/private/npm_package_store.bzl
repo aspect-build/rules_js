@@ -107,6 +107,12 @@ _ATTRS = {
         """,
         providers = [NpmPackageStoreInfo, JsInfo],
     ),
+    "exclude_patterns": attr.string_list(
+        doc = """List of exclude patterns to exclude files from the package store.
+
+        The exclude patterns are relative to the package store directory.
+        """,
+    ),
     "package": attr.string(
         doc = """The package name to link to.
 
@@ -225,12 +231,14 @@ def _npm_package_store_impl(ctx):
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
                 is_macos = ctx.target_platform_has_constraint(ctx.attr._macos_constraint[platform_common.ConstraintValueInfo])
+                tar_exclude_patterns = (["--exclude"] + ctx.attr.exclude_patterns) if ctx.attr.exclude_patterns else []
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
                     arguments = [
                         "--extract",
+                    ] + tar_exclude_patterns + [
                         "--no-same-owner",
                         "--no-same-permissions",
                         "--strip-components",
