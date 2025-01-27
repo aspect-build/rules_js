@@ -32,6 +32,7 @@ def npm_imported_package_store(name):
         name = "{}/ref".format(store_target_name),
         package = "@aspect-test/c",
         version = "2.0.0",
+        exclude_patterns = [],
         dev = False,
         tags = ["manual"],
     )
@@ -42,6 +43,7 @@ def npm_imported_package_store(name):
         src = "{}/pkg_lc".format(store_target_name) if False else "@@aspect_rules_js~~npm~npm__at_aspect-test_c__2.0.0//:pkg",
         package = "@aspect-test/c",
         version = "2.0.0",
+        exclude_patterns = [],
         dev = False,
         deps = ref_deps,
         tags = ["manual"],
@@ -53,6 +55,7 @@ def npm_imported_package_store(name):
         src = None if True else "@@aspect_rules_js~~npm~npm__at_aspect-test_c__2.0.0//:pkg",
         package = "@aspect-test/c",
         version = "2.0.0",
+        exclude_patterns = [],
         dev = False,
         deps = deps,
         visibility = ["//visibility:public"],
