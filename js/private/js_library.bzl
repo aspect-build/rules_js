@@ -198,15 +198,14 @@ def _js_library_impl(ctx):
         files = ctx.files.srcs,
     )
 
-    additional_sources, additional_types = _gather_sources_and_types(
+    additional_types_sources, additional_types = _gather_sources_and_types(
         ctx = ctx,
         targets = ctx.attr.types,
         files = ctx.files.types,
     )
 
     # Direct sources and types
-    sources = depset(transitive = [sources, additional_sources])
-    types = depset(transitive = [types, additional_sources, additional_types])
+    types = depset(transitive = [types, additional_types_sources, additional_types])
 
     # Transitive sources and types
     transitive_sources = [sources]
@@ -216,15 +215,27 @@ def _js_library_impl(ctx):
     npm_sources = []
     npm_package_store_infos = []
 
-    # Concat the srcs+types+deps once
-    srcs_types_deps = ctx.attr.srcs + ctx.attr.types + ctx.attr.deps
+    # Concat the srcs+deps once
+    srcs_deps = ctx.attr.srcs + ctx.attr.deps
 
-    # Collect transitive sources, types and npm providers from srcs+types+deps
-    for target in srcs_types_deps:
+    # Collect transitive sources, types and npm providers from js_library(srcs+deps)
+    for target in srcs_deps:
         if JsInfo in target:
             jsinfo = target[JsInfo]
             transitive_sources.append(jsinfo.transitive_sources)
             transitive_types.append(jsinfo.transitive_types)
+            npm_sources.append(jsinfo.npm_sources)
+            npm_package_store_infos.append(jsinfo.npm_package_store_infos)
+
+    # Collect transitive types from js_library(types)
+    for target in ctx.attr.types:
+        if JsInfo in target:
+            jsinfo = target[JsInfo]
+            transitive_types.append(jsinfo.transitive_types)
+
+            # Collect npm_sources and npm_package_store_infos from js_library(types)
+            # NOTE: this causes type-only dependencies to be included in the JsInfo.npm_* and
+            # may cause unexpected compilation of targets considered by users to be "types".
             npm_sources.append(jsinfo.npm_sources)
             npm_package_store_infos.append(jsinfo.npm_package_store_infos)
 
@@ -242,7 +253,7 @@ def _js_library_impl(ctx):
         ctx = ctx,
         sources = transitive_sources,
         data = ctx.attr.data,
-        deps = srcs_types_deps,
+        deps = srcs_deps,
         data_files = ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
