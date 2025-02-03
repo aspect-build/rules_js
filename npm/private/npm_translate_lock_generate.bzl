@@ -16,6 +16,7 @@ _NPM_IMPORT_TMPL = \
         link_packages = {link_packages},
         package = "{package}",
         version = "{version}",
+        exclude_patterns = {exclude_patterns},
         url = "{url}",
         system_tar = "{system_tar}",
         package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
@@ -580,4 +581,5 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         system_tar = system_tar,
         url = _import.url,
         version = _import.version,
+        exclude_patterns = _import.exclude_patterns,
     )
