@@ -253,8 +253,9 @@ def _npm_package_store_impl(ctx):
                     # Workaround https://github.com/bazelbuild/bazel-central-registry/issues/2256
                     # Always override the locale to give better hermeticity.
                     # See https://github.com/bazelbuild/rules_java/blob/767e4410850453a10ccf89aa1cededf9de05c72e/toolchains/utf8_environment.bzl
+                    # and https://github.com/libarchive/libarchive/blob/65196fdd1a385f22114f245a9002ee8dc899f2c4/tar/bsdtar.c#L192
                     env = {
-                        "LC_CTYPE":
+                        "LC_ALL":
                         # # macOS doesn't have the C.UTF-8 locale, but en_US.UTF-8 is available and works the same way.
                         "en_US.UTF-8" if is_macos else
                         # The default UTF-8 locale on all recent Linux distributions. It is also available in Cygwin and MSYS2.
