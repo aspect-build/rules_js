@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
-TARGET_DIR="bazel-bin/node_modules/is-odd"
+TARGET_DIR="node_modules/is-odd"
 
 # Check if the directory exists
 if [[ ! -d "$TARGET_DIR" ]]; then
@@ -17,7 +17,7 @@ fi
 
 # Check if any README file exists
 if ls "$TARGET_DIR"/README* >/dev/null 2>&1; then
-    echo "Error: Unexpected README file found in $TARGET_DIR."
+    echo "Error: README file found in $TARGET_DIR, exclusion did not work."
     exit 1
 fi
 
