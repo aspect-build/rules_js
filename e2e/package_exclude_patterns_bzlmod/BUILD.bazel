@@ -4,7 +4,7 @@ npm_link_all_packages(name = "node_modules")
 
 sh_test(
     name = "test_sh",
-    srcs = ["test.sh"],
+    srcs = ["is-odd-exclude-test.sh"],
     data = [
         ":node_modules/is-odd",
     ],
