@@ -14,6 +14,7 @@ def npm_repositories():
         },
         package = "@aspect-test/c",
         version = "2.0.0",
+        exclude_patterns = [],
         url = "https://registry.npmjs.org/@aspect-test/c/-/c-2.0.0.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
