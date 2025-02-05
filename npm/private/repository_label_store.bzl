@@ -15,13 +15,13 @@ def _make_sibling_label(sibling_label, path):
     dirname = paths.dirname(sibling_label.name)
     if path.startswith("../"):
         # we have no idea what package this sibling is in so just assume the root package which works for repository rules
-        return Label("@@{}//:{}".format(sibling_label.workspace_name, paths.normalize(paths.join(sibling_label.package, dirname, path))))
+        return Label("@@{}//:{}".format(sibling_label.repo_name, paths.normalize(paths.join(sibling_label.package, dirname, path))))
     else:
-        return Label("@@{}//{}:{}".format(sibling_label.workspace_name, sibling_label.package, paths.join(dirname, path)))
+        return Label("@@{}//{}:{}".format(sibling_label.repo_name, sibling_label.package, paths.join(dirname, path)))
 
 ################################################################################
 def _seed_root(priv, rctx_path, label):
-    if priv["root"] and label.workspace_name != priv["root"]["workspace"]:
+    if priv["root"] and label.repo_name != priv["root"]["workspace"]:
         fail("cannot seed_root twice with different workspaces")
     if priv["root"]:
         # already seed_rooted with the same workspace
@@ -29,7 +29,7 @@ def _seed_root(priv, rctx_path, label):
     seed_root_path = str(rctx_path(label))
     seed_root_depth = len(paths.join(label.package, label.name).split("/"))
     priv["root"] = {
-        "workspace": label.workspace_name,
+        "workspace": label.repo_name,
         "path": "/".join(seed_root_path.split("/")[:-seed_root_depth]),
     }
 
