@@ -84,7 +84,7 @@ npm_link_package(
 
 buildifier(
     name = "buildifier",
-    exclude_package_contents = [
+    exclude_patterns = [
         "./.git/*",
         "**/snapshots/**",
     ],
@@ -96,7 +96,7 @@ buildifier(
 
 buildifier(
     name = "buildifier.check",
-    exclude_package_contents = [
+    exclude_patterns = [
         "./.git/*",
         "**/snapshots/**",
     ],
