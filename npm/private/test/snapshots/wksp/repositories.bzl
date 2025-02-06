@@ -8011,7 +8011,7 @@ def npm_repositories():
             "has-flag": ["3.0.0"],
             "supports-color": ["5.5.0"],
         },
-        exclude_patterns = ["**/README*"],
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -8038,7 +8038,7 @@ def npm_repositories():
             "has-flag": ["4.0.0"],
             "supports-color": ["7.2.0"],
         },
-        exclude_patterns = ["**/README*"],
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -8059,7 +8059,7 @@ def npm_repositories():
         transitive_closure = {
             "chalk": ["5.0.1"],
         },
-        exclude_patterns = ["**/README*"],
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -8080,7 +8080,7 @@ def npm_repositories():
         transitive_closure = {
             "chalk": ["5.1.1"],
         },
-        exclude_patterns = ["**/README*"],
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(

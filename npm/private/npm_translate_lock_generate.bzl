@@ -18,7 +18,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         system_tar = "{system_tar}",
-        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_patterns}
+        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_package_contents}
     )
 """
 
@@ -549,8 +549,8 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         dev = True,""") if _import.dev else ""
     maybe_replace_package = ("""
         replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
-    maybe_exclude_patterns = ("""
-        exclude_patterns = %s,""" % _import.exclude_patterns) if len(_import.exclude_patterns) > 0 else ""
+    maybe_exclude_package_contents = ("""
+        exclude_package_contents = %s,""" % _import.exclude_package_contents) if len(_import.exclude_package_contents) > 0 else ""
 
     return _NPM_IMPORT_TMPL.format(
         link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -582,5 +582,5 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         system_tar = system_tar,
         url = _import.url,
         version = _import.version,
-        maybe_exclude_patterns = maybe_exclude_patterns,
+        maybe_exclude_package_contents = maybe_exclude_package_contents,
     )

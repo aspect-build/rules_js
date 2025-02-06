@@ -91,7 +91,7 @@ npm_translate_lock(
         "//npm/private/test/vendored/is-odd:package.json",
         "//npm/private/test/vendored/semver-max:package.json",
     ],
-    exclude_patterns = {
+    exclude_package_contents = {
         "chalk": ["**/README*"],
     },
     generate_bzl_library_targets = True,

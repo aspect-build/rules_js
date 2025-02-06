@@ -68,7 +68,7 @@ _ATTRS = {
     "patch_tool": attr.label(),
     "patch_args": attr.string_list_dict(),
     "patches": attr.string_list_dict(),
-    "exclude_patterns": attr.string_list_dict(),
+    "exclude_package_contents": attr.string_list_dict(),
     "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs"),  # bzlmod pnpm extension
     "pnpm_lock": attr.label(),
     "preupdate": attr.label_list(),
@@ -166,7 +166,7 @@ def npm_translate_lock(
         use_home_npmrc = None,
         data = [],
         patches = {},
-        exclude_patterns = {},
+        exclude_package_contents = {},
         patch_tool = None,
         patch_args = {"*": ["-p0"]},
         custom_postinstalls = {},
@@ -284,7 +284,7 @@ def npm_translate_lock(
 
             Read more: [patching](/docs/pnpm.md#patching)
 
-        exclude_patterns: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
+        exclude_package_contents: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a list of patterns to exclude from the package's generated node_modules link targets. Multiple matches are additive.
 
             Versions must match if used.
@@ -292,7 +292,7 @@ def npm_translate_lock(
             For example,
 
             ```
-            exclude_patterns = {
+            exclude_package_contents = {
                 "@foo/bar": ["**/test/**"],
                 "@foo/car@2.0.0": ["**/README*"],
             },
@@ -591,7 +591,7 @@ def npm_translate_lock(
         npmrc = npmrc,
         use_home_npmrc = use_home_npmrc,
         patches = patches,
-        exclude_patterns = exclude_patterns,
+        exclude_package_contents = exclude_package_contents,
         patch_tool = patch_tool,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,
@@ -625,7 +625,7 @@ def npm_translate_lock(
         bzlmod = False,
     )
 
-def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_patterns = []):
+def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_package_contents = []):
     """Write a file containing a list of all patches in the current folder to the source tree.
 
     Use this together with the `verify_patches` attribute of `npm_translate_lock` to verify
@@ -636,17 +636,17 @@ def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exc
         name: Name of the target
         out: Name of file to write to the source tree. If unspecified, `name` is used
         include_patterns: Patterns to pass to a glob of patch files
-        exclude_patterns: Patterns to ignore in a glob of patch files
+        exclude_package_contents: Patterns to ignore in a glob of patch files
     """
     outfile = out if out else name
 
     # Ignore the patch list file we generate
-    exclude_patterns = exclude_patterns[:]
-    exclude_patterns.append(outfile)
+    exclude_package_contents = exclude_package_contents[:]
+    exclude_package_contents.append(outfile)
 
     list_sources(
         name = "%s_list" % name,
-        srcs = native.glob(include_patterns, exclude = exclude_patterns),
+        srcs = native.glob(include_patterns, exclude = exclude_package_contents),
     )
 
     write_source_file(
