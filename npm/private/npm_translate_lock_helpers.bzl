@@ -360,6 +360,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
+        # gather exclude patterns
+        exclude_package_contents, _ = _gather_values_from_matching_names(True, attr.exclude_package_contents, name, friendly_name, unfriendly_name)
+
         # gather replace packages
         replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
         if len(replace_packages) > 1:
@@ -452,6 +455,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             patch_tool = attr.patch_tool,
             patch_args = patch_args,
             patches = patches,
+            exclude_package_contents = exclude_package_contents,
             root_package = root_package,
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,

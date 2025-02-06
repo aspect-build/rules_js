@@ -91,6 +91,9 @@ npm_translate_lock(
         "//npm/private/test/vendored/is-odd:package.json",
         "//npm/private/test/vendored/semver-max:package.json",
     ],
+    exclude_package_contents = {
+        "chalk": ["**/README*"],
+    },
     generate_bzl_library_targets = True,
     lifecycle_hooks = {
         # We fetch @kubernetes/client-node from source and it has a `prepare` lifecycle hook that needs to be run

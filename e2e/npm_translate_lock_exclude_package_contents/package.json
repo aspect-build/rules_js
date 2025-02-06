@@ -1,0 +1,8 @@
+{
+    "dependencies": {
+        "is-odd": "3.0.1"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    }
+}
