@@ -4,7 +4,7 @@
     },
     "devDependencies": {
         "rollup": "2.79.2",
-        "@rollup/plugin-commonjs": "23.0.7",
+        "@rollup/plugin-commonjs": "28.0.2",
         "@rollup/plugin-node-resolve": "15.3.0",
         "@rollup/plugin-json": "5.0.2",
         "@types/google-protobuf": "3.15.12",
