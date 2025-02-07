@@ -233,10 +233,11 @@ def _npm_package_store_impl(ctx):
                 is_macos = ctx.target_platform_has_constraint(ctx.attr._macos_constraint[platform_common.ConstraintValueInfo])
 
                 tar_exclude_package_contents = []
-                if rctx.attr.exclude_package_contents:
-                    for pattern in rctx.attr.exclude_package_contents:
+                if ctx.attr.exclude_package_contents:
+                    for pattern in ctx.attr.exclude_package_contents:
                         tar_exclude_package_contents.append("--exclude")
                         tar_exclude_package_contents.append(pattern)
+
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
