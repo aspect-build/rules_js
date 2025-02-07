@@ -28,6 +28,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
 load(":npm_translate_lock_helpers.bzl", "helpers")
@@ -166,7 +167,7 @@ def npm_translate_lock(
         use_home_npmrc = None,
         data = [],
         patches = {},
-        exclude_package_contents = {},
+        exclude_package_contents = exclude_package_contents_default,
         patch_tool = None,
         patch_args = {"*": ["-p0"]},
         custom_postinstalls = {},

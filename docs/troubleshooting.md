@@ -165,3 +165,23 @@ If you are experiencing slower than expected builds, you can try disabling or re
 #### Jest
 
 See [rules_jest](https://github.com/aspect-build/rules_jest) specific [troubleshooting](https://docs.aspect.build/rulesets/aspect_rules_jest/docs/troubleshooting#performance).
+
+### Too much is downloaded from a package
+
+In some cases NPM dependencies bring too much not needed files in them, for example test code and images for documentation and so on.
+
+In these cases you can add such packages and the respective files/folders you want to exclude to your npm_translate_lock rule in the exclude_package_contents attribute like so:
+
+
+```starlark
+npm.npm_translate_lock(
+    ...
+    exclude_package_contents = {
+        "chalk": ["**/README*"],
+    },
+)
+```
+
+This example will remove the README file, regardless of its extension and its position inside any version of the library chalk.
+
+You can use this to remove whatever you find to be not needed for your project.
