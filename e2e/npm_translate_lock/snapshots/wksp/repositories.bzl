@@ -565,6 +565,7 @@ def npm_repositories():
             "is-number": ["6.0.0"],
             "is-odd": ["3.0.1"],
         },
+        exclude_package_contents = ["**/README*", "**/LICENSE*"],
     )
 
     npm_import(

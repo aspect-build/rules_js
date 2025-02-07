@@ -192,6 +192,7 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
+        ":exclude_package_contents_default.bzl",
         ":list_sources",
         ":npm_translate_lock_generate",
         ":npm_translate_lock_helpers",
