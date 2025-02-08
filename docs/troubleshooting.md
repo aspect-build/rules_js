@@ -166,9 +166,9 @@ If you are experiencing slower than expected builds, you can try disabling or re
 
 See [rules_jest](https://github.com/aspect-build/rules_jest) specific [troubleshooting](https://docs.aspect.build/rulesets/aspect_rules_jest/docs/troubleshooting#performance).
 
-### Too much is downloaded from a package
+### Unnecessary npm package content
 
-In some cases NPM dependencies bring too much not needed files in them, for example test code and images for documentation and so on.
+Npm packages sometimes include unnecessary files such as tests, test data etc. Large files or a large number of files can effect performance and are sometimes worth explicitly excluding content.
 
 In these cases you can add such packages and the respective files/folders you want to exclude to your npm_translate_lock rule in the exclude_package_contents attribute like so:
 
@@ -177,7 +177,7 @@ In these cases you can add such packages and the respective files/folders you wa
 npm.npm_translate_lock(
     ...
     exclude_package_contents = {
-        "chalk": ["**/README*"],
+        "resolve": ["**/test/*"],
     },
 )
 ```
