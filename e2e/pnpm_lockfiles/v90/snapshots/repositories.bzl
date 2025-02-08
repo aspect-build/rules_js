@@ -715,7 +715,6 @@ def npm_repositories():
             "is-number": ["file:../vendored/is-number"],
             "is-odd": ["0.1.0"],
         },
-        exclude_package_contents = ["**/README*", "**/LICENSE*"],
     )
 
     npm_import(
@@ -738,7 +737,6 @@ def npm_repositories():
             "is-number": ["file:../vendored/is-number"],
             "is-odd": ["1.0.0"],
         },
-        exclude_package_contents = ["**/README*", "**/LICENSE*"],
     )
 
     npm_import(
@@ -761,7 +759,6 @@ def npm_repositories():
             "is-number": ["file:../vendored/is-number"],
             "is-odd": ["2.0.0"],
         },
-        exclude_package_contents = ["**/README*", "**/LICENSE*"],
     )
 
     npm_import(
@@ -784,7 +781,6 @@ def npm_repositories():
             "is-number": ["file:../vendored/is-number"],
             "is-odd": ["3.0.0"],
         },
-        exclude_package_contents = ["**/README*", "**/LICENSE*"],
     )
 
     npm_import(
@@ -807,7 +803,6 @@ def npm_repositories():
             "is-number": ["file:../vendored/is-number"],
             "is-odd": ["3.0.1"],
         },
-        exclude_package_contents = ["**/README*", "**/LICENSE*"],
     )
 
     npm_import(
