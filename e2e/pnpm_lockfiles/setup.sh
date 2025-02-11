@@ -14,3 +14,6 @@ pushd base && npx pnpm@8.6.0 install --lockfile-only && mv pnpm-lock.yaml ../v61
 
 # pnpm v9.0.0 bumped the lockfile version to 9.0
 pushd base && npx pnpm@^9.0 install --lockfile-only && mv pnpm-lock.yaml ../v90 && popd
+
+# pnpm v10
+pushd base && npx pnpm@^10.0 install --lockfile-only && mv pnpm-lock.yaml ../v10 && popd
