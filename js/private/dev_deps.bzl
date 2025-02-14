@@ -30,9 +30,9 @@ def rules_js_dev_dependencies():
 
     http_archive(
         name = "buildifier_prebuilt",
-        sha256 = "7f85b688a4b558e2d9099340cfb510ba7179f829454fba842370bccffb67d6cc",
-        strip_prefix = "buildifier-prebuilt-7.3.1",
-        urls = ["http://github.com/keith/buildifier-prebuilt/archive/7.3.1.tar.gz"],
+        sha256 = "5dbf72e4f93917edfb91f53958d6289736adb845b2b89dbfb9bfc199a492030c",
+        strip_prefix = "buildifier-prebuilt-8.0.1",
+        urls = ["http://github.com/keith/buildifier-prebuilt/archive/8.0.1.tar.gz"],
     )
 
     http_archive(
