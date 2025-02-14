@@ -48,7 +48,6 @@ use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 bazel_dep(name = "aspect_rules_lint", version = "1.1.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "7.3.1", dev_dependency = True)
-bazel_dep(name = "rules_go", version = "0.50.1", dev_dependency = True)
 bazel_dep(name = "stardoc", version = "0.6.2", dev_dependency = True, repo_name = "io_bazel_stardoc")
 
 host = use_extension(
@@ -240,15 +239,3 @@ use_repo(
     "acorn__8.4.0",
     "acorn__8.4.0__links",
 )
-
-# Used by formatter
-go_sdk = use_extension(
-    "@rules_go//go:extensions.bzl",
-    "go_sdk",
-    dev_dependency = True,
-)
-go_sdk.download(
-    name = "go_sdk",
-    version = "1.20.3",
-)
-use_repo(go_sdk, "go_sdk")
