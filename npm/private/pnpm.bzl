@@ -32,13 +32,45 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #
 # Metadata may come from different locations depending on the lockfile, this struct should
 # have data normalized across lockfiles.
-def _new_package_info(id, name, dependencies, optional_dependencies, dev, has_bin, optional, requires_build, version, friendly_version, resolution):
+#
+# Args:
+#   id: a "universal identifier of the package" only present when the id is not the same as the key
+#       Normally present when the package is an odd version (such as file: or link: package) while
+#       also having peer dependencies in the key.
+#
+#       Removed in lockfile v9+ where snapshots/packages are separate.
+#
+#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathid
+#
+#   name:
+#   version:
+#   dependencies:
+#   optional_dependencies:
+#   friendly_version:
+#
+#   dev_only: True if the package is exclusively a dev dependency throughout the workspace
+#       Removed in lockfile v9+
+#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathdev
+#
+#   has_bin: True if the package has binaries
+#       See https://github.com/pnpm/spec/blob/master/lockfile/9.0.md#packagesdependencyidhasbin
+#
+#   optional: True if the package is exclusively an optional dependency throughout the workspace
+#       TODO: Removed in lockfile v9+?
+#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathoptional
+#
+#   requires_build: True if pnpm predicted the package requires a build step
+#       Removed in lockfile v9+
+#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathrequiresbuild
+#
+#   resolution: the lockfile resolution field
+def _new_package_info(id, name, dependencies, optional_dependencies, dev_only, has_bin, optional, requires_build, version, friendly_version, resolution):
     return {
         "id": id,
         "name": name,
         "dependencies": dependencies,
         "optional_dependencies": optional_dependencies,
-        "dev": dev,
+        "dev_only": dev_only,
         "has_bin": has_bin,
         "optional": optional,
         "requires_build": requires_build,
@@ -195,7 +227,7 @@ def _convert_v5_packages(packages):
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("dependencies", {})),
             optional_dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
-            dev = package_snapshot.get("dev", False),
+            dev_only = package_snapshot.get("dev", False),
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
@@ -362,7 +394,7 @@ def _convert_v6_packages(packages):
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("dependencies", {})),
             optional_dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
-            dev = package_snapshot.get("dev", False),
+            dev_only = package_snapshot.get("dev", False),
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
@@ -486,13 +518,13 @@ def _convert_v9_packages(packages, snapshots):
         friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
         package_info = _new_package_info(
-            id = package_data.get("id", None),  # TODO: does v9 have "id"?
+            id = None,  # pnpm v9+ no longer requires an id field
             name = name,
             version = version,
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("dependencies", {})),
             optional_dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("optionalDependencies", {})),
-            dev = None,  # TODO(pnpm9): must inspect importers.*.devDependencies?
+            dev_only = None,  # NOTE: pnpm v9+ no longer marks packages as dev-only
             has_bin = package_data.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = None,  # Unknown from lockfile in v9

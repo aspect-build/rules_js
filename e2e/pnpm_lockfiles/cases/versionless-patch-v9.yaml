@@ -1,0 +1,28 @@
+lockfileVersion: '9.0'
+
+settings:
+    autoInstallPeers: true
+    excludeLinksFromLockfile: false
+
+patchedDependencies:
+    '@aspect-test/e':
+        hash: nc75t5kilw6vcobzaxylgmmg74
+        path: patches/aspect-test-e-pnpm.patch
+
+importers:
+    .:
+        dependencies:
+            '@aspect-test/e':
+                specifier: ^1.0.0
+                version: 1.0.0(patch_hash=nc75t5kilw6vcobzaxylgmmg74)
+
+packages:
+    '@aspect-test/e@1.0.0':
+        resolution:
+            {
+                integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==,
+            }
+        hasBin: true
+
+snapshots:
+    '@aspect-test/e@1.0.0(patch_hash=nc75t5kilw6vcobzaxylgmmg74)': {}

@@ -72,6 +72,7 @@ def npm_imported_package_store(name):
         name = "{{}}/ref".format(store_target_name),
         package = "{package}",
         version = "{version}",
+        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         tags = ["manual"],
     )
@@ -82,6 +83,7 @@ def npm_imported_package_store(name):
         src = "{{}}/pkg_lc".format(store_target_name) if {has_lifecycle_build_target} else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
+        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
@@ -93,6 +95,7 @@ def npm_imported_package_store(name):
         src = None if {transitive_closure_pattern} else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
+        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = deps,
         visibility = ["//visibility:public"],
@@ -118,6 +121,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
         package = "{package}",
         version = "{version}",
+        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = ref_deps,
         tags = ["manual"],
@@ -128,6 +132,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         name = "{{}}/pkg_pre_lc".format(store_target_name),
         package = "{package}",
         version = "{version}",
+        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = lc_deps,
         tags = ["manual"],
@@ -452,7 +457,8 @@ def _download_and_extract_archive(rctx, package_json_only):
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    tar_args = ["tar", "-xf", _TARBALL_FILENAME, "--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"]
+    exclude_pattern_args = ["--exclude", rctx.attr.exclude_package_contents] if rctx.attr.exclude_package_contents else []
+    tar_args = ["tar", "-xf", _TARBALL_FILENAME] + ["--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"] + exclude_pattern_args
 
     system_tar = detect_system_tar(rctx) if rctx.attr.system_tar == "auto" else rctx.attr.system_tar
     if system_tar == "gnu":
@@ -503,7 +509,12 @@ def _npm_import_rule_impl(rctx):
 
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
-    patch(rctx, patch_args = rctx.attr.patch_args, patch_directory = _EXTRACT_TO_DIRNAME)
+    patch(
+        rctx,
+        patch_tool = rctx.path(rctx.attr.patch_tool) if rctx.attr.patch_tool else "patch",
+        patch_args = rctx.attr.patch_args,
+        patch_directory = _EXTRACT_TO_DIRNAME,
+    )
 
     pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
 
@@ -768,6 +779,7 @@ def _npm_import_links_rule_impl(rctx):
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
+        exclude_package_contents = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents),
     )
 
     npm_link_package_bzl = [
@@ -807,6 +819,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
+    "exclude_package_contents": attr.string_list(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
@@ -814,6 +827,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
+    "exclude_package_contents": attr.string(),
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
@@ -822,6 +836,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "npm_auth_basic": attr.string(),
     "npm_auth_password": attr.string(),
     "npm_auth_username": attr.string(),
+    "patch_tool": attr.label(),
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
@@ -886,6 +901,7 @@ def npm_import(
         commit = "",
         replace_package = None,
         package_visibility = ["//visibility:public"],
+        patch_tool = None,
         patch_args = ["-p0"],
         patches = [],
         custom_postinstall = "",
@@ -895,6 +911,7 @@ def npm_import(
         npm_auth_password = "",
         bins = {},
         dev = False,
+        exclude_package_contents = [],
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1095,6 +1112,8 @@ def npm_import(
 
         package_visibility: Visibility of generated node_module link targets.
 
+        patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
+
         patch_args: Arguments to pass to the patch tool.
 
             `-p1` will usually be needed for patches generated by git.
@@ -1139,6 +1158,16 @@ def npm_import(
 
         dev: Whether this npm package is a dev dependency
 
+        exclude_package_contents: List of glob patterns to exclude from the linked package.
+
+            This is useful for excluding files that are not needed in the linked package.
+
+            For example:
+
+            ```
+            exclude_package_contents = ["**/tests/**"]
+            ```
+
         **kwargs: Internal use only
     """
 
@@ -1161,6 +1190,7 @@ def npm_import(
         integrity = integrity,
         url = url,
         commit = commit,
+        patch_tool = patch_tool,
         patch_args = patch_args,
         patches = patches,
         custom_postinstall = custom_postinstall,
@@ -1198,4 +1228,5 @@ def npm_import(
         bins = bins,
         package_visibility = package_visibility,
         replace_package = replace_package,
+        exclude_package_contents = exclude_package_contents,
     )

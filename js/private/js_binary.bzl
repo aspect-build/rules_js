@@ -376,7 +376,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "JS_BINARY__PACKAGE": ctx.label.package,
         "JS_BINARY__TARGET_NAME": ctx.label.name,
         "JS_BINARY__TARGET": "{}//{}:{}".format(
-            "@" + ctx.label.workspace_name if ctx.label.workspace_name else "",
+            "@" + ctx.label.repo_name if ctx.label.repo_name else "",
             ctx.label.package,
             ctx.label.name,
         ),

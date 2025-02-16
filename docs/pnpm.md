@@ -72,7 +72,10 @@ npm_translate_lock(
     # Creates a new repository named "@npm" - you could choose any name you like
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
-    # Recommended attribute that also checks the .bazelignore file
+    # Bazel 7.x and earlier: this attribute checks the .bazelignore file covers all node_modules folders.
+    # Bazel 8.0 can use https://bazel.build/rules/lib/globals/repo#ignore_directories:
+    #   ignore_directories(["**/node_modules"])
+    # in REPO.bazel
     verify_node_modules_ignored = "//:.bazelignore",
 )
 ```
@@ -323,7 +326,7 @@ npm_translate_lock(
         # Disable install and preinstall for this package, maybe they are broken
         "fum@0.0.1": ["postinstall"],
     },
-    lifecycle_hooks_envs: {
+    lifecycle_hooks_envs = {
         # Set some values for all hook actions
         "*": [
             "GLOBAL_KEY1=value1",

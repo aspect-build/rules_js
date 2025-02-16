@@ -46,11 +46,8 @@ use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 ####### Dev dependencies ########
 
-bazel_dep(name = "aspect_rules_lint", version = "1.0.2", dev_dependency = True)
-bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.7.1", dev_dependency = True)
+bazel_dep(name = "aspect_rules_lint", version = "1.1.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "7.3.1", dev_dependency = True)
-bazel_dep(name = "gazelle", version = "0.39.1", dev_dependency = True, repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_go", version = "0.50.1", dev_dependency = True)
 bazel_dep(name = "stardoc", version = "0.6.2", dev_dependency = True, repo_name = "io_bazel_stardoc")
 
 host = use_extension(
@@ -154,6 +151,9 @@ npm.npm_translate_lock(
         "//npm/private/test/vendored/is-odd:package.json",
         "//npm/private/test/vendored/semver-max:package.json",
     ],
+    exclude_package_contents = {
+        "chalk": ["**/README*"],
+    },
     generate_bzl_library_targets = True,
     lifecycle_hooks = {
         # We fetch @kubernetes/client-node from source and it has a `prepare` lifecycle hook that needs to be run
@@ -191,6 +191,7 @@ npm.npm_translate_lock(
             "requires-network",
         ],
         "puppeteer": [
+            "no-remote",
             "no-sandbox",
             "requires-network",
         ],
@@ -238,15 +239,3 @@ use_repo(
     "acorn__8.4.0",
     "acorn__8.4.0__links",
 )
-
-# Used by formatter
-go_sdk = use_extension(
-    "@rules_go//go:extensions.bzl",
-    "go_sdk",
-    dev_dependency = True,
-)
-go_sdk.download(
-    name = "go_sdk",
-    version = "1.20.3",
-)
-use_repo(go_sdk, "go_sdk")

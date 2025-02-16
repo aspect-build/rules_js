@@ -1,0 +1,52 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+build_test(
+    name = "test",
+    targets = [
+        ":node_modules",
+    ],
+)
+
+genrule(
+    name = "snapshot-extracted-wksp",
+    srcs = ["@npm//:repositories.bzl"],
+    outs = ["snapshot-extracted-wksp.bzl"],
+    cmd = 'sed "s/system_tar = \\".*\\"/system_tar = \\"<TAR>\\"/" "$<" > "$@"',
+    # Target names may be different on workspace vs bzlmod
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:private"],
+)
+
+write_source_files(
+    name = "write_npm_translate_lock_wksp",
+    files = {
+        "snapshots/wksp/repositories.bzl": ":snapshot-extracted-wksp.bzl",
+    },
+    # Target names may be different on bazel versions
+    tags = ["skip-on-bazel6"],
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+write_source_files(
+    name = "write_npm_translate_lock_defs",
+    files = {
+        "snapshots/defs.bzl": "@npm//:defs.bzl",
+        "snapshots/aspect_test_c_links_defs.bzl": "@npm__at_aspect-test_c__2.0.0__links//:defs.bzl",
+    },
+    # Target names may be different on bazel versions
+    tags = ["skip-on-bazel6"],
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)

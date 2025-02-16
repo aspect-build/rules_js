@@ -1,6 +1,5 @@
 load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_imported_package")
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
-load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
@@ -81,16 +80,6 @@ npm_link_package(
 npm_link_package(
     name = "node_modules/@mycorp/pkg-c2",
     src = "//examples/npm_package/packages/pkg_c:pkg_c2",
-)
-
-gazelle_binary(
-    name = "gazelle_bin",
-    languages = ["@bazel_skylib_gazelle_plugin//bzl"],
-)
-
-gazelle(
-    name = "gazelle",
-    gazelle = "gazelle_bin",
 )
 
 buildifier(

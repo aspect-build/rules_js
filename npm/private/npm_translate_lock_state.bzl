@@ -188,7 +188,7 @@ def _init_importer_labels(priv, label_store):
 ################################################################################
 def _init_link_workspace(priv, _, attr, label_store):
     # initialize link_workspace either from pnpm_lock label or from override
-    priv["link_workspace"] = attr.link_workspace if attr.link_workspace else label_store.label("pnpm_lock").workspace_name
+    priv["link_workspace"] = attr.link_workspace if attr.link_workspace else label_store.label("pnpm_lock").repo_name
 
 ################################################################################
 def _init_external_repository_action_cache(priv, attr):

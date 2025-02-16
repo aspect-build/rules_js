@@ -2947,6 +2947,43 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__at_fastify_send__3.3.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {
+            "npm/private/test": ["@fastify/send"],
+        },
+        package = "@fastify/send",
+        version = "3.3.0",
+        url = "https://registry.npmjs.org/@fastify/send/-/send-3.3.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-hvrgPVG3oehn4wSPmRdqZcBCsEt7Lp6WOd6vsJ3Ms4hc5r5zouT9Ls9wq6R2tHMgJGHhNtsmd0CnhP7lmF7OTg==",
+        deps = {
+            "@lukeed/ms": "2.0.2",
+            "escape-html": "1.0.3",
+            "fast-decode-uri-component": "1.0.1",
+            "http-errors": "2.0.0",
+            "mime": "3.0.0",
+        },
+        transitive_closure = {
+            "@fastify/send": ["3.3.0"],
+            "@lukeed/ms": ["2.0.2"],
+            "depd": ["2.0.0"],
+            "escape-html": ["1.0.3"],
+            "fast-decode-uri-component": ["1.0.1"],
+            "http-errors": ["2.0.0"],
+            "inherits": ["2.0.4"],
+            "mime": ["3.0.0"],
+            "setprototypeof": ["1.2.0"],
+            "statuses": ["2.0.1"],
+            "toidentifier": ["1.0.1"],
+        },
+    )
+
+    npm_import(
         name = "npm__at_figma_nodegit__0.28.0-figma.2",
         root_package = "",
         link_workspace = "",
@@ -3732,6 +3769,24 @@ def npm_repositories():
         },
         lifecycle_hooks = ["build"],
         lifecycle_hooks_execution_requirements = [],
+    )
+
+    npm_import(
+        name = "npm__at_lukeed_ms__2.0.2",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "@lukeed/ms",
+        version = "2.0.2",
+        url = "https://registry.npmjs.org/@lukeed/ms/-/ms-2.0.2.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==",
+        transitive_closure = {
+            "@lukeed/ms": ["2.0.2"],
+        },
     )
 
     npm_import(
@@ -7956,6 +8011,7 @@ def npm_repositories():
             "has-flag": ["3.0.0"],
             "supports-color": ["5.5.0"],
         },
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -7982,6 +8038,7 @@ def npm_repositories():
             "has-flag": ["4.0.0"],
             "supports-color": ["7.2.0"],
         },
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -8002,6 +8059,7 @@ def npm_repositories():
         transitive_closure = {
             "chalk": ["5.0.1"],
         },
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -8022,6 +8080,7 @@ def npm_repositories():
         transitive_closure = {
             "chalk": ["5.1.1"],
         },
+        exclude_package_contents = ["**/README*"],
     )
 
     npm_import(
@@ -10118,6 +10177,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__depd__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "depd",
+        version = "2.0.0",
+        url = "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==",
+        transitive_closure = {
+            "depd": ["2.0.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__dequal__2.0.3",
         root_package = "",
         link_workspace = "",
@@ -10981,6 +11058,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__escape-html__1.0.3",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "escape-html",
+        version = "1.0.3",
+        url = "https://registry.npmjs.org/escape-html/-/escape-html-1.0.3.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==",
+        transitive_closure = {
+            "escape-html": ["1.0.3"],
+        },
+    )
+
+    npm_import(
         name = "npm__escape-latex__1.2.0",
         root_package = "",
         link_workspace = "",
@@ -11412,6 +11507,24 @@ def npm_repositories():
             "acorn": ["7.4.1"],
             "falafel": ["2.2.5"],
             "isarray": ["2.0.5"],
+        },
+    )
+
+    npm_import(
+        name = "npm__fast-decode-uri-component__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "fast-decode-uri-component",
+        version = "1.0.1",
+        url = "https://registry.npmjs.org/fast-decode-uri-component/-/fast-decode-uri-component-1.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-WKgKWg5eUxvRZGwW8FvfbaH7AXSh2cL+3j5fMGzUMCxWBJ3dV3a7Wz8y2f/uQ0e3B6WmodD3oS54jTQ9HVTIIg==",
+        transitive_closure = {
+            "fast-decode-uri-component": ["1.0.1"],
         },
     )
 
@@ -13812,6 +13925,36 @@ def npm_repositories():
         integrity = "sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==",
         transitive_closure = {
             "http-cache-semantics": ["4.1.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__http-errors__2.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "http-errors",
+        version = "2.0.0",
+        url = "https://registry.npmjs.org/http-errors/-/http-errors-2.0.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==",
+        deps = {
+            "depd": "2.0.0",
+            "inherits": "2.0.4",
+            "setprototypeof": "1.2.0",
+            "statuses": "2.0.1",
+            "toidentifier": "1.0.1",
+        },
+        transitive_closure = {
+            "depd": ["2.0.0"],
+            "http-errors": ["2.0.0"],
+            "inherits": ["2.0.4"],
+            "setprototypeof": ["1.2.0"],
+            "statuses": ["2.0.1"],
+            "toidentifier": ["1.0.1"],
         },
     )
 
@@ -16488,6 +16631,24 @@ def npm_repositories():
         transitive_closure = {
             "mime-db": ["1.52.0"],
             "mime-types": ["2.1.35"],
+        },
+    )
+
+    npm_import(
+        name = "npm__mime__3.0.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "mime",
+        version = "3.0.0",
+        url = "https://registry.npmjs.org/mime/-/mime-3.0.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==",
+        transitive_closure = {
+            "mime": ["3.0.0"],
         },
     )
 
@@ -22898,6 +23059,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "npm__setprototypeof__1.2.0",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "setprototypeof",
+        version = "1.2.0",
+        url = "https://registry.npmjs.org/setprototypeof/-/setprototypeof-1.2.0.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==",
+        transitive_closure = {
+            "setprototypeof": ["1.2.0"],
+        },
+    )
+
+    npm_import(
         name = "npm__shallow-clone__3.0.1",
         root_package = "",
         link_workspace = "",
@@ -23164,7 +23343,9 @@ def npm_repositories():
         name = "npm__source-map-support__0.5.21",
         root_package = "",
         link_workspace = "",
-        link_packages = {},
+        link_packages = {
+            "examples/stack_traces": ["source-map-support"],
+        },
         package = "source-map-support",
         version = "0.5.21",
         url = "https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.21.tgz",
@@ -23327,6 +23508,24 @@ def npm_repositories():
             "static-eval": ["2.1.0"],
             "type-check": ["0.3.2"],
             "word-wrap": ["1.2.3"],
+        },
+    )
+
+    npm_import(
+        name = "npm__statuses__2.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "statuses",
+        version = "2.0.1",
+        url = "https://registry.npmjs.org/statuses/-/statuses-2.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==",
+        transitive_closure = {
+            "statuses": ["2.0.1"],
         },
     )
 
@@ -24869,6 +25068,24 @@ def npm_repositories():
         transitive_closure = {
             "is-number": ["7.0.0"],
             "to-regex-range": ["5.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "npm__toidentifier__1.0.1",
+        root_package = "",
+        link_workspace = "",
+        link_packages = {},
+        package = "toidentifier",
+        version = "1.0.1",
+        url = "https://registry.npmjs.org/toidentifier/-/toidentifier-1.0.1.tgz",
+        system_tar = "xxx",
+        package_visibility = ["//visibility:public"],
+        dev = True,
+        generate_bzl_library_targets = True,
+        integrity = "sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==",
+        transitive_closure = {
+            "toidentifier": ["1.0.1"],
         },
     )
 

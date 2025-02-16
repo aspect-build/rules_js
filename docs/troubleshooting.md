@@ -138,6 +138,15 @@ eslint_bin.eslint_test(
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
 
+## Ugly stack traces
+
+Bazel's sandboxing and runfiles directory layouts can make stack traces and logs hard to read. This issue is common in many
+languages when used within bazel, not only JavaScript.
+
+One solution involving `Error.prepareStackTrace` was [suggested on bazelbuild slack](https://bazelbuild.slack.com/archives/CA31HN1T3/p1733518986229749?thread_ts=1733516180.969159&cid=CA31HN1T3) by [John Firebaugh](https://github.com/jfirebaugh). This overrides `Error.prepareStackTrace` to strip the bazel sandbox and runfiles paths from error stack traces. This also uses [`source-map-support`](https://www.npmjs.com/package/source-map-support) to also apply source maps to the stack traces.
+
+See [examples/stack_traces](../examples/stack_traces) for a working example.
+
 ## Performance
 
 For general bazel performance tips see the [Aspect bazelrc guide](https://docs.aspect.build/guides/bazelrc/#performance-options).

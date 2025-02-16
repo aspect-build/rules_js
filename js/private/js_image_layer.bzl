@@ -310,7 +310,7 @@ def _build_layer(ctx, type, all_entries_json, entries, inputs):
     return output
 
 def _select_layer(layers, destination, file):
-    is_node = file.owner.workspace_name != "" and "/bin/nodejs/" in destination
+    is_node = file.owner.repo_name != "" and "/bin/nodejs/" in destination
     is_js_patches = "/js/private/node-patches" in destination
     if is_node or is_js_patches:
         return layers.node
@@ -382,7 +382,7 @@ def _js_image_layer_impl(ctx):
         entry = {
             "dest": file.path,
             "root": file.root.path,
-            "is_external": file.owner.workspace_name != "",
+            "is_external": file.owner.repo_name != "",
             "is_source": file.is_source,
             "is_directory": file.is_directory,
         }
@@ -394,6 +394,15 @@ def _js_image_layer_impl(ctx):
         layer = _select_layer(layers, destination, file)
         layer.entries[destination] = entry
         layer.inputs.append(file)
+
+    if repo_mapping:
+        destination = paths.join(runfiles_dir, "_repo_mapping")
+        entry = {
+            "dest": repo_mapping.path,
+            "root": repo_mapping.root.path,
+        }
+        all_entries[destination] = entry
+        layers.app.entries[destination] = entry
 
     all_entries_json = ctx.actions.declare_file("{}_all_entries.json".format(ctx.label.name))
     ctx.actions.write(all_entries_json, content = json.encode(all_entries))

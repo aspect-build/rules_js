@@ -107,6 +107,12 @@ _ATTRS = {
         """,
         providers = [NpmPackageStoreInfo, JsInfo],
     ),
+    "exclude_package_contents": attr.string_list(
+        doc = """List of exclude patterns to exclude files from the package store.
+
+        The exclude patterns are relative to the package store directory.
+        """,
+    ),
     "package": attr.string(
         doc = """The package name to link to.
 
@@ -148,6 +154,7 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     "verbose": attr.bool(
         doc = """If true, prints out verbose logs to stdout""",
     ),
+    "_macos_constraint": attr.label(default = "@platforms//os:macos"),
 }
 
 def _npm_package_store_impl(ctx):
@@ -201,10 +208,10 @@ def _npm_package_store_impl(ctx):
         npm_pkg_info = ctx.attr.src[NpmPackageInfo]
 
         # output the package as a TreeArtifact to its package store location
-        if ctx.label.workspace_name and ctx.label.package:
-            expected_short_path = "../{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
-        elif ctx.label.workspace_name:
-            expected_short_path = "../{}/{}".format(ctx.label.workspace_name, package_store_directory_path)
+        if ctx.label.repo_name and ctx.label.package:
+            expected_short_path = "../{}/{}/{}".format(ctx.label.repo_name, ctx.label.package, package_store_directory_path)
+        elif ctx.label.repo_name:
+            expected_short_path = "../{}/{}".format(ctx.label.repo_name, package_store_directory_path)
         elif ctx.label.package:
             expected_short_path = "{}/{}".format(ctx.label.package, package_store_directory_path)
         else:
@@ -223,12 +230,15 @@ def _npm_package_store_impl(ctx):
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+                is_macos = ctx.target_platform_has_constraint(ctx.attr._macos_constraint[platform_common.ConstraintValueInfo])
+                tar_exclude_package_contents = (["--exclude"] + ctx.attr.exclude_package_contents) if ctx.attr.exclude_package_contents else []
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
                     outputs = [package_store_directory],
                     arguments = [
                         "--extract",
+                    ] + tar_exclude_package_contents + [
                         "--no-same-owner",
                         "--no-same-permissions",
                         "--strip-components",
@@ -240,6 +250,17 @@ def _npm_package_store_impl(ctx):
                     ],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
+                    # Workaround https://github.com/bazelbuild/bazel-central-registry/issues/2256
+                    # Always override the locale to give better hermeticity.
+                    # See https://github.com/bazelbuild/rules_java/blob/767e4410850453a10ccf89aa1cededf9de05c72e/toolchains/utf8_environment.bzl
+                    # and https://github.com/libarchive/libarchive/blob/65196fdd1a385f22114f245a9002ee8dc899f2c4/tar/bsdtar.c#L192
+                    env = {
+                        "LC_ALL":
+                        # # macOS doesn't have the C.UTF-8 locale, but en_US.UTF-8 is available and works the same way.
+                        "en_US.UTF-8" if is_macos else
+                        # The default UTF-8 locale on all recent Linux distributions. It is also available in Cygwin and MSYS2.
+                        "C.UTF-8",
+                    },
                 )
             else:
                 copy_directory_bin_action(
@@ -295,18 +316,18 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         jsinfo = ctx.attr.src[JsInfo]
 
         # Symlink to the directory of the target that created this JsInfo
-        if ctx.label.workspace_name and ctx.label.package:
-            symlink_path = "external/{}/{}/{}".format(ctx.label.workspace_name, ctx.label.package, package_store_directory_path)
-        elif ctx.label.workspace_name:
-            symlink_path = "external/{}/{}".format(ctx.label.workspace_name, package_store_directory_path)
+        if ctx.label.repo_name and ctx.label.package:
+            symlink_path = "external/{}/{}/{}".format(ctx.label.repo_name, ctx.label.package, package_store_directory_path)
+        elif ctx.label.repo_name:
+            symlink_path = "external/{}/{}".format(ctx.label.repo_name, package_store_directory_path)
         else:
             symlink_path = package_store_directory_path
 
         # The package JsInfo including all direct and transitive sources, store info etc.
         js_infos.append(jsinfo)
 
-        if jsinfo.target.workspace_name:
-            target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.workspace_name, jsinfo.target.package)
+        if jsinfo.target.repo_name:
+            target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.repo_name, jsinfo.target.package)
         else:
             target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
         package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)

@@ -18,7 +18,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         system_tar = "{system_tar}",
-        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}
+        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_package_contents}
     )
 """
 
@@ -43,31 +43,29 @@ _FP_STORE_TMPL = \
 
 _FP_DIRECT_TMPL = \
     """
-    for link_package in {link_packages}:
-        if link_package == bazel_package:
-            # terminal target for direct dependencies
-            _npm_link_package_store(
-                name = "{{}}/{pkg}".format(name),
-                src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
-                visibility = {link_visibility},
-                tags = ["manual"],
-            )
+    if bazel_package in {link_packages}:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{{}}/{pkg}".format(name),
+            src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
+            visibility = {link_visibility},
+            tags = ["manual"],
+        )
 
-            # filegroup target that provides a single file which is
-            # package directory for use in $(execpath) and $(rootpath)
-            native.filegroup(
-                name = "{{}}/{pkg}/dir".format(name),
-                srcs = [":{{}}/{pkg}".format(name)],
-                output_group = "{package_directory_output_group}",
-                visibility = {link_visibility},
-                tags = ["manual"],
-            )"""
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{{}}/{pkg}/dir".format(name),
+            srcs = [":{{}}/{pkg}".format(name)],
+            output_group = "{package_directory_output_group}",
+            visibility = {link_visibility},
+            tags = ["manual"],
+        )"""
 
 _FP_DIRECT_TARGET_TMPL = \
     """
-    for link_package in {link_packages}:
-        if link_package == bazel_package:
-            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))"""
+    if bazel_package in {link_packages}:
+        link_targets.append(":{{}}/{pkg}".format(name))"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -78,7 +76,13 @@ _BZL_LIBRARY_TMPL = \
 )
 """
 
-_ADD_SCOPE_TARGET = """\
+_ADD_SCOPE_TARGET2 = """\
+        if "{package_scope}" not in scope_targets:
+            scope_targets["{package_scope}"] = [link_targets[-1]]
+        else:
+            scope_targets["{package_scope}"].append(link_targets[-1])"""
+
+_ADD_SCOPE_TARGET3 = """\
             if "{package_scope}" not in scope_targets:
                 scope_targets["{package_scope}"] = [link_targets[-1]]
             else:
@@ -295,12 +299,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
                 # expose the alias if public
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_targets = """            link_targets.append("//{{}}:{{}}/{pkg}".format(bazel_package, name))""".format(pkg = link_alias)
+                    add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
                     if package_scope:
-                        links_bzl[link_package].append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
+                        links_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
 
                 # the resolved.json for this alias of the package
                 resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME)
@@ -409,11 +413,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             ))
 
             if "//visibility:public" in package_visibility:
-                add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+                add_to_link_targets = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
                 npm_link_all_packages_bzl.append(add_to_link_targets)
                 package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                 if package_scope:
-                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET.format(package_scope = package_scope))
+                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET2.format(package_scope = package_scope))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
@@ -511,6 +515,8 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
     maybe_transitive_closure = ("""
         transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
+    maybe_patch_tool = ("""
+        patch_tool = "%s",""" % _import.patch_tool) if _import.patch_tool else ""
     maybe_patches = ("""
         patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
     maybe_patch_args = ("""
@@ -543,6 +549,8 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         dev = True,""") if _import.dev else ""
     maybe_replace_package = ("""
         replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
+    maybe_exclude_package_contents = ("""
+        exclude_package_contents = %s,""" % _import.exclude_package_contents) if len(_import.exclude_package_contents) > 0 else ""
 
     return _NPM_IMPORT_TMPL.format(
         link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
@@ -562,6 +570,7 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         maybe_npm_auth_basic = maybe_npm_auth_basic,
         maybe_npm_auth_password = maybe_npm_auth_password,
         maybe_npm_auth_username = maybe_npm_auth_username,
+        maybe_patch_tool = maybe_patch_tool,
         maybe_patch_args = maybe_patch_args,
         maybe_patches = maybe_patches,
         maybe_replace_package = maybe_replace_package,
@@ -573,4 +582,5 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         system_tar = system_tar,
         url = _import.url,
         version = _import.version,
+        maybe_exclude_package_contents = maybe_exclude_package_contents,
     )

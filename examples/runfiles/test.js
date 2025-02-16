@@ -55,6 +55,18 @@ describe('runfile resolution', () => {
         )
     })
 
+    it('should properly resolve with the _main module alias', () => {
+        const testFixturePath = runfiles.resolve(
+            '_main/examples/runfiles/test_fixture.md'
+        )
+        const expectedPath = join(__dirname, 'test_fixture.md')
+
+        assert(
+            normalizePath(testFixturePath) == normalizePath(expectedPath),
+            `Expected the test fixture to be resolved next to the spec source file: ${testFixturePath} vs ${expectedPath}`
+        )
+    })
+
     it('should properly resolve a subdirectory of a runfile', () => {
         const packagePath = runfiles.resolve('aspect_rules_js/examples')
         // Alternate with trailing slash

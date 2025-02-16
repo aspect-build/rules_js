@@ -107,6 +107,25 @@ Assuming your `npm_translate_lock` was named `npm`, you can run:
 $ bazel fetch @npm//...
 ```
 
+### Using pnpm workspaces
+
+Here's an example `pnpm-workspace.yaml` file which will automatically discover all packages in the repository, based on the existence of a `package.json` file.
+Make sure to place this file at the root of the repository.
+
+```yaml
+packages:
+  # Include all directories in the workspace
+  - '*'
+  # Include all subdirectories at any depth
+  - '**/*'
+  # Exclude node_modules folders anywhere in the tree
+  - '!**/node_modules/**'
+  # Exclude node_modules folder in root
+  - '!node_modules'
+  # Exclude anything inside bazel dirs
+  - '!bazel-*/**'
+```
+
 ### Link the node_modules
 
 Next, we'll need to "link" these npm packages into a `node_modules` tree.

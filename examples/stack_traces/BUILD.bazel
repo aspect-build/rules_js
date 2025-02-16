@@ -1,0 +1,33 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+js_test(
+    name = "stack_traces",
+    data = [
+        ":library",
+
+        # Include the stack-traces library - this could be wrapped in a `js_test` macro
+        ":stack-traces",
+    ],
+    entry_point = "main.js",
+    node_options = [
+        # Load the stack-traces library at node startup time - this could be wrapped in a `js_test` macro
+        "--require",
+        "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/examples/stack_traces/stacks.cjs",
+    ],
+)
+
+js_library(
+    name = "library",
+    srcs = glob(["lib/**/*.js"]),
+)
+
+# Put the stacks.cjs in a `js_library` that can also declare any dependencies that
+# the --require script may have such as the source-map-support package.
+js_library(
+    name = "stack-traces",
+    srcs = ["stacks.cjs"],
+    deps = [":node_modules/source-map-support"],
+)
