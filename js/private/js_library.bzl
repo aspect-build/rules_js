@@ -258,12 +258,6 @@ def _js_library_impl(ctx):
             ctx,
             dependency_attributes = ["deps"],
             source_attributes = ["srcs"],
-            extensions = [
-                "mjs",
-                "cjs",
-                "js",
-                "jsx",
-            ],
         ),
         js_info(
             target = ctx.label,
