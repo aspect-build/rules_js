@@ -254,6 +254,11 @@ def _js_library_impl(ctx):
     )
 
     return [
+        coverage_common.instrumented_files_info(
+            ctx,
+            dependency_attributes = ["deps"],
+            source_attributes = ["srcs"],
+        ),
         js_info(
             target = ctx.label,
             sources = sources,
