@@ -586,6 +586,7 @@ def _js_binary_impl(ctx):
             coverage_common.instrumented_files_info(
                 ctx,
                 source_attributes = ["data"],
+                dependency_attributes = ["data"],
                 # TODO: check if there is more extensions
                 # TODO: .ts should not be here since we ought to only instrument transpiled files?
                 extensions = [

@@ -1,9 +1,21 @@
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
 
+js_library(
+    name = "lib",
+    srcs = ["coverage.js"],
+)
+
+# Verify this works:
+# % bazel coverage examples/coverage --combined_report=lcov
+# % cat $(bazel info output_path)/_coverage/_coverage_report.dat
+# SF:examples/coverage/coverage.js
+# FN:1,module.exports.test
+# FNDA:1,module.exports.test
+# ...
 js_test(
     name = "coverage",
     data = [
-        "coverage.js",
+        ":lib",
         "//:node_modules/@types/node",
     ],
     entry_point = "test.js",
