@@ -4,6 +4,7 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as child_process from 'node:child_process'
 import * as crypto from 'node:crypto'
+import * as readline from 'node:readline'
 
 // Globals
 const RUNFILES_ROOT = path.join(
@@ -452,10 +453,11 @@ async function main(args, sandbox) {
         })
 
         // Process stdin data in order using a promise chain.
-        let syncing = Promise.resolve()
-        process.stdin.on('data', async (chunk) => {
-            return (syncing = syncing.then(() => processChunk(chunk)))
-        })
+        let syncing = Promise.resolve();
+        const rl = readline.createInterface({ input: process.stdin });
+        rl.on('line', (line) => {
+            syncing = syncing.then(() => processChunk(line));
+        });
 
         async function processChunk(chunk) {
             try {
