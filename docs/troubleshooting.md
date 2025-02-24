@@ -162,15 +162,11 @@ This can lead to builds performing slower due to IO throttling, or even failing 
 
 If you are experiencing slower than expected builds, you can try disabling or reducing parallelism for the tools you are using.
 
-#### Jest
-
-See [rules_jest](https://github.com/aspect-build/rules_jest) specific [troubleshooting](https://docs.aspect.build/rulesets/aspect_rules_jest/docs/troubleshooting#performance).
-
 ### Unnecessary npm package content
 
 Npm packages sometimes include unnecessary files such as tests, test data etc. Large files or a large number of files can effect performance and are sometimes worth explicitly excluding content.
 
-In these cases you can add such packages and the respective files/folders you want to exclude to your npm_translate_lock rule in the exclude_package_contents attribute like so:
+In these cases you can add such packages and the respective files/folders you want to exclude to your npm_translate_lock rule in the `exclude_package_contents` attribute like so:
 
 
 ```starlark
@@ -182,6 +178,10 @@ npm.npm_translate_lock(
 )
 ```
 
-This example will remove the README file, regardless of its extension and its position inside any version of the library chalk.
+This example will remove the README file.
 
 You can use this to remove whatever you find to be not needed for your project.
+
+#### Jest
+
+See [rules_jest](https://github.com/aspect-build/rules_jest) specific [troubleshooting](https://docs.aspect.build/rulesets/aspect_rules_jest/docs/troubleshooting#performance).
