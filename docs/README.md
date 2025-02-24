@@ -115,9 +115,9 @@ Make sure to place this file at the root of the repository.
 
 ```yaml
 packages:
-  - 'deeply_nested_project/**'
-  - 'users/**'
-  - 'experimental/**'
+  - 'apps/**'
+  - 'packages/**'
+  - 'tools/*'
 ```
 
 ### Link the node_modules
