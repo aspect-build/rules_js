@@ -109,7 +109,7 @@ $ bazel fetch @npm//...
 
 ### Using pnpm workspaces
 
-Here's an example `pnpm-workspace.yaml` file which will find all projects listed under `deeply_nested_project`, `users`, and `experimental`, based on the existence of a `package.json` file.
+Here's an example `pnpm-workspace.yaml` file which will find all projects under `apps` or `packages` at any depth, and anything directly under `tools`, based on the existence of a `package.json` file.
 
 Make sure to place this file at the root of the repository.
 
