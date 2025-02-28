@@ -29,7 +29,6 @@ load(
     _git_reset = "reset",
 )
 load("//npm/private:tar.bzl", "detect_system_tar")
-load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -761,9 +760,9 @@ def _npm_import_links_rule_impl(rctx):
 
     maybe_exclude_package_contents = ""
     if rctx.attr.exclude_package_contents == attributes_dummy_list:
-        maybe_exclude_package_contents = "\nexclude_package_contents = " + starlark_codegen_utils.to_list_attr(exclude_package_contents_default) + ","
-    else:
-        maybe_exclude_package_contents = "\nexclude_package_contents = " + starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents) + ","
+        maybe_exclude_package_contents = ""
+    elif rctx.attr.exclude_package_contents != None:
+        maybe_exclude_package_contents = "\n        exclude_package_contents = " + starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents) + ","
 
     npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
