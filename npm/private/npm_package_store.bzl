@@ -4,6 +4,7 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -21,6 +22,8 @@ Npm may also support a symlinked node_modules structure called
 "Isolated mode" in the future:
 https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 """
+
+default_dummy_list = ["dummy_value_internal"]
 
 _ATTRS = {
     "src": attr.label(
@@ -112,6 +115,7 @@ _ATTRS = {
 
         The exclude patterns are relative to the package store directory.
         """,
+        default = default_dummy_list,
     ),
     "package": attr.string(
         doc = """The package name to link to.
@@ -231,7 +235,21 @@ def _npm_package_store_impl(ctx):
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
                 is_macos = ctx.target_platform_has_constraint(ctx.attr._macos_constraint[platform_common.ConstraintValueInfo])
-                tar_exclude_package_contents = (["--exclude"] + ctx.attr.exclude_package_contents) if ctx.attr.exclude_package_contents else []
+
+                excluded_contents_after_default = []
+                if ctx.attr.exclude_package_contents == default_dummy_list:
+                    excluded_contents_after_default = exclude_package_contents_default
+                else:
+                    excluded_contents_after_default = ctx.attr.exclude_package_contents
+
+                tar_exclude_package_contents = []
+                if excluded_contents_after_default:
+                    for pattern in excluded_contents_after_default:
+                        if pattern == "":
+                            continue
+                        tar_exclude_package_contents.append("--exclude")
+                        tar_exclude_package_contents.append(pattern)
+
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
                     inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
