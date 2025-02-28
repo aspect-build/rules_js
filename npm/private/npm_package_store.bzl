@@ -23,6 +23,8 @@ Npm may also support a symlinked node_modules structure called
 https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 """
 
+default_dummy_list = ["dummy_value_internal"]
+
 _ATTRS = {
     "src": attr.label(
         doc = """A npm_package target or or any other target that provides a NpmPackageInfo.
@@ -113,7 +115,7 @@ _ATTRS = {
 
         The exclude patterns are relative to the package store directory.
         """,
-        default = exclude_package_contents_default,
+        default = default_dummy_list,
     ),
     "package": attr.string(
         doc = """The package name to link to.
@@ -231,9 +233,18 @@ def _npm_package_store_impl(ctx):
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+
+                excluded_contents_after_default = []
+                if ctx.attr.exclude_package_contents == default_dummy_list:
+                    excluded_contents_after_default = exclude_package_contents_default
+                else:
+                    excluded_contents_after_default = ctx.attr.exclude_package_contents
+
                 tar_exclude_package_contents = []
-                if ctx.attr.exclude_package_contents:
-                    for pattern in ctx.attr.exclude_package_contents:
+                if excluded_contents_after_default:
+                    for pattern in excluded_contents_after_default:
+                        if pattern == "":
+                            continue
                         tar_exclude_package_contents.append("--exclude")
                         tar_exclude_package_contents.append(pattern)
 
