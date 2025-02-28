@@ -21,4 +21,10 @@ if ls "$TARGET_DIR"/README* >/dev/null 2>&1; then
     exit 1
 fi
 
+# Check if any LICENSE file exists
+if ls "$TARGET_DIR"/LICENSE* >/dev/null 2>&1; then
+    echo "Error: LICENSE file found in $TARGET_DIR, exclusion did not work."
+    exit 1
+fi
+
 echo "All tests passed"
