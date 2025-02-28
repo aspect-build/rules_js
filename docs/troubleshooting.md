@@ -178,7 +178,7 @@ npm.npm_translate_lock(
 )
 ```
 
-This example will remove the README file.
+This example will remove the test folder.
 
 You can use this to remove whatever you find to be not needed for your project.
 
