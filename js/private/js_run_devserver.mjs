@@ -219,9 +219,14 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
                     )} (${friendlyFileSize(lstat.size)})`
                 )
             }
-            if (exists) {
+            // unlink file if it exists, unless `writePerm` is true or we are not on Linux
+            // on macOS, and possibly other operating systems, you get errors if you copy
+            // over a file without the necessary permissions
+            let unlinkIsNecessary = writePerm || process.platform !== "linux";
+            if (exists && unlinkIsNecessary) {
                 await fs.promises.unlink(dst)
-            } else {
+            }
+            if (!exists) {
                 // Intentionally synchronous; see comment on mkdirpSync
                 mkdirpSync(path.dirname(dst))
             }
