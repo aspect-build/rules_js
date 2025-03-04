@@ -137,6 +137,9 @@ jobs:
                     - bazel-version:
                           major: 6
                       bzlmod: 0
+                    # Don't run workspace tests unit tests.
+                    - bzlmod: 0
+                      folder: .
                     # Don't run workspace smoke test under bzlmod
                     - bzlmod: 1
                       folder: e2e/workspace
