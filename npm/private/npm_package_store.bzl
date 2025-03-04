@@ -154,7 +154,6 @@ If set, takes precendance over the package version in the NpmPackageInfo src.
     "verbose": attr.bool(
         doc = """If true, prints out verbose logs to stdout""",
     ),
-    "_macos_constraint": attr.label(default = "@platforms//os:macos"),
 }
 
 def _npm_package_store_impl(ctx):
@@ -230,7 +229,6 @@ def _npm_package_store_impl(ctx):
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
-                is_macos = ctx.target_platform_has_constraint(ctx.attr._macos_constraint[platform_common.ConstraintValueInfo])
                 tar_exclude_package_contents = (["--exclude"] + ctx.attr.exclude_package_contents) if ctx.attr.exclude_package_contents else []
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
@@ -250,17 +248,10 @@ def _npm_package_store_impl(ctx):
                     ],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
-                    # Workaround https://github.com/bazelbuild/bazel-central-registry/issues/2256
+
                     # Always override the locale to give better hermeticity.
-                    # See https://github.com/bazelbuild/rules_java/blob/767e4410850453a10ccf89aa1cededf9de05c72e/toolchains/utf8_environment.bzl
-                    # and https://github.com/libarchive/libarchive/blob/65196fdd1a385f22114f245a9002ee8dc899f2c4/tar/bsdtar.c#L192
-                    env = {
-                        "LC_ALL":
-                        # # macOS doesn't have the C.UTF-8 locale, but en_US.UTF-8 is available and works the same way.
-                        "en_US.UTF-8" if is_macos else
-                        # The default UTF-8 locale on all recent Linux distributions. It is also available in Cygwin and MSYS2.
-                        "C.UTF-8",
-                    },
+                    # See https://github.com/aspect-build/rules_js/issues/2039
+                    env = getattr(bsdtar.tarinfo, "default_env", {}),
                 )
             else:
                 copy_directory_bin_action(
