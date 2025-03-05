@@ -29,10 +29,9 @@ load(
     _git_reset = "reset",
 )
 load("//npm/private:tar.bzl", "detect_system_tar")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
-
-attributes_dummy_list = ["dummy_value_attribute"]
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
@@ -759,7 +758,7 @@ def _npm_import_links_rule_impl(rctx):
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
     maybe_exclude_package_contents = ""
-    if rctx.attr.exclude_package_contents == attributes_dummy_list:
+    if rctx.attr.exclude_package_contents == exclude_package_contents_default:
         maybe_exclude_package_contents = ""
     elif rctx.attr.exclude_package_contents != None:
         maybe_exclude_package_contents = "\n        exclude_package_contents = " + starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents) + ","
@@ -829,7 +828,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
-    "exclude_package_contents": attr.string_list(default = attributes_dummy_list),
+    "exclude_package_contents": attr.string_list(default = exclude_package_contents_default),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
@@ -837,7 +836,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
-    "exclude_package_contents": attr.string_list(default = attributes_dummy_list),
+    "exclude_package_contents": attr.string_list(default = exclude_package_contents_default),
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
@@ -921,7 +920,7 @@ def npm_import(
         npm_auth_password = "",
         bins = {},
         dev = False,
-        exclude_package_contents = attributes_dummy_list,
+        exclude_package_contents = exclude_package_contents_default,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1177,7 +1176,7 @@ def npm_import(
             ```
             exclude_package_contents = ["**/tests/**"]
             ```
-            The default value is dummy so that you can use [] to override the default list of common excludes.
+            The default value is a list of common excludes. You can use [] to override the default.
 
         **kwargs: Internal use only
     """
