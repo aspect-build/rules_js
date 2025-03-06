@@ -64,9 +64,10 @@ def _gather_unique_values_from_matching_names(additive, keyed_lists, *names):
                 else:
                     fail("expected value to be list or string")
             elif type(v) == "list":
-                result = v
+                for item in v:
+                    result[item] = []
             elif type(v) == "string":
-                result = [v]
+                result[v] = []
             else:
                 fail("expected value to be list or string")
 
