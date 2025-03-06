@@ -1,6 +1,6 @@
 {
     "private": true,
     "dependencies": {
-        "@aspect-test/test-private-npm-package": "git+ssh://git@github.com:aspect-build/test-private-npm-package#a09b6c1084c15c0dcd230a7017aefee66e6bb9db"
+        "@aspect-test/test-private-npm-package": "git+ssh://git@github.com:aspect-test/test-private-npm-package#a09b6c1084c15c0dcd230a7017aefee66e6bb9db"
     }
 }
