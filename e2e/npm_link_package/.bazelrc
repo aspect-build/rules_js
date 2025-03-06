@@ -6,6 +6,10 @@ import %workspace%/../../.aspect/bazelrc/debug.bazelrc
 import %workspace%/../../.aspect/bazelrc/javascript.bazelrc
 import %workspace%/../../.aspect/bazelrc/performance.bazelrc
 
+# Test additional flags further restriction the sandbox
+# See: https://bazel.build/reference/command-line-reference#flag--experimental_use_hermetic_linux_sandbox
+common --experimental_use_hermetic_linux_sandbox
+
 ### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
 
 # Load any settings & overrides specific to the current user from `.aspect/bazelrc/user.bazelrc`.
