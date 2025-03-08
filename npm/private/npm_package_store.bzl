@@ -394,6 +394,12 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         for npm_package_store_info in npm_package_store_infos:
             transitive_files_depsets.append(npm_package_store_info.files)
 
+    for jsinfo in js_infos:
+        for source in jsinfo.sources.to_list():
+            if source.basename == "package.json":
+                files.append(source)
+                break
+
     npm_sources = depset(files, transitive = [jsinfo.npm_sources for jsinfo in js_infos])
     transitive_files_depset = depset(files, transitive = transitive_files_depsets)
     files_depset = depset(files)
