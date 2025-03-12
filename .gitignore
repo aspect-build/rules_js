@@ -5,6 +5,7 @@ node_modules/
 
 .idea/
 .ijwb/
+.bazelbsp/
 .vscode
 .DS_Store
 
@@ -16,5 +17,3 @@ node_modules/
 # [MODULE.bazel.lock file "reads through" already-locked package manager](https://github.com/bazelbuild/bazel/issues/20272)
 # [moduleFileHash in MODULE.bazel.lock causes frequent Git merge conflicts](https://github.com/bazelbuild/bazel/issues/20369)
 MODULE.bazel.lock
-
-.bazelbsp
