@@ -24,4 +24,11 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
+npm.npm_import(
+    name = "npm__uvu__0.5.6",
+    package = "uvu",
+    version = "0.5.6",
+)
+use_repo(npm, "npm__uvu__0.5.6")
+use_repo(npm, "npm__uvu__0.5.6__links")
 use_repo(npm, "npm")
