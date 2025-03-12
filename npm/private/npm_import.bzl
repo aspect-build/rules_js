@@ -943,6 +943,19 @@ def npm_import(
     )
     ```
 
+    In `MODULE.bazel` the same would look like so:
+
+    ```starlark
+    npm.npm_import(
+        name = "npm__at_types_node__15.12.2",
+        package = "@types/node",
+        version = "15.12.2",
+        integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",v
+    )
+    use_repo(npm, "npm__at_types_node__15.12.2")
+    use_repo(npm, "npm__at_types_node__15.12.2__links")
+    ```
+
     > This is similar to Bazel rules in other ecosystems named "_import" like
     > `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
     > `go_repository` is also a model for this rule.
