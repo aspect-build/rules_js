@@ -1,9 +1,9 @@
+load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm__uvu__0.5.6__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 load("@rules_js-repo_name//js:defs.bzl", "js_test")
 load("@rules_js-repo_name//npm:defs.bzl", "npm_link_package", "npm_package")
-load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
-load("@npm__uvu__0.5.6__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 
 npm_link_all_packages(
     name = "node_modules",
