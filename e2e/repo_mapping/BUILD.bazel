@@ -12,8 +12,6 @@ npm_link_all_packages(
     ],
 )
 
-
-
 js_test(
     name = "test",
     data = [":node_modules"],
