@@ -5,7 +5,6 @@ packages:
     - 'examples/npm_package/packages/*'
     - 'js/private/coverage/bundle'
     - 'js/private/worker/src'
-    - 'js/private/image'
     - 'js/private/test/*'
     - 'npm/private/test'
     - 'npm/private/test/*'
