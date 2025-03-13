@@ -77,6 +77,7 @@ assert_js_image_layer_listings(
 js_binary(
     name = "bin2",
     data = [
+        "empty empty.ㄴㅅ",
         "ㅑ재ㅕㅣㅇ.ㄴㅅ",
         ":node_modules",
     ],

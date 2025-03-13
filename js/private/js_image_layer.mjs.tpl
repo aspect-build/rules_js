@@ -163,7 +163,7 @@ function add_parents(
 function vis(str) {
     let result = "";
     for (const char of Buffer.from(str)) {
-      if (char < 32 || char > 126) { // Non-printable
+      if (char < 33 || char > 126) { // Non-printable
         result += "\\" + char.toString(8).padStart(3, "0");
       } else {
         result += String.fromCharCode(char);
