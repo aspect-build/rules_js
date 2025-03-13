@@ -360,7 +360,7 @@ def _run_splitter(ctx, files, entries_json, layer_groups, launcher, repo_mapping
     nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     ctx.actions.run(
         inputs = inputs,
-        arguments = [splitter.path],
+        arguments = [splitter.path, "--prof"],
         outputs = splitter_outputs,
         executable = nodeinfo.node,
         progress_message = "Computing Layer Groups %{label}",
