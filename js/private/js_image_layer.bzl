@@ -495,7 +495,7 @@ def _js_image_layer_impl(ctx):
 
         ctx.actions.run(
             inputs = depset(
-                ([repo_mapping] if repo_mapping else []) + [entries_json, launcher, mtree],
+                ([repo_mapping] if repo_mapping else []) + [entries_json, launcher, mtree, unused_inputs],
                 transitive = [runfiles_plus_files],
             ),
             arguments = [args],
