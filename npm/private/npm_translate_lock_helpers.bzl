@@ -48,6 +48,36 @@ Check the public_hoist_packages attribute for duplicates.
                 fail(msg)
 
 ################################################################################
+def _gather_unique_values_from_matching_names(additive, keyed_lists, *names):
+    keys = []
+    result = {}
+    for name in names:
+        if name and (name in keyed_lists or "*" in keyed_lists):
+            keys.append(name)
+            v = keyed_lists[name] if name in keyed_lists else keyed_lists["*"]
+            if additive:
+                if type(v) == "list":
+                    for item in v:
+                        result[item] = []
+                elif type(v) == "string":
+                    result[v] = []
+                else:
+                    fail("expected value to be list or string")
+            elif type(v) == "list":
+                for item in v:
+                    result[item] = []
+            elif type(v) == "string":
+                result[v] = []
+            else:
+                fail("expected value to be list or string")
+
+    # in case the key has not been met even once, we return None, instead of empty list as empty list is a valid value
+    if not keys:
+        return (None, keys)
+
+    return (result.keys(), keys)
+
+################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
     keys = []
     result = []
@@ -361,7 +391,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
         # gather exclude patterns
-        exclude_package_contents, _ = _gather_values_from_matching_names(True, attr.exclude_package_contents, name, friendly_name, unfriendly_name)
+        exclude_package_contents, _ = _gather_unique_values_from_matching_names(True, attr.exclude_package_contents, name, friendly_name, unfriendly_name)
 
         # gather replace packages
         replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
