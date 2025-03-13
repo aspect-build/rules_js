@@ -73,9 +73,9 @@ def _gather_unique_values_from_matching_names(additive, keyed_lists, *names):
 
     # in case the key has not been met even once, we return None, instead of empty list as empty list is a valid value
     if not keys:
-        return (None, keys)
+        return None
 
-    return (result.keys(), keys)
+    return result.keys()
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
@@ -391,7 +391,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
         # gather exclude patterns
-        exclude_package_contents, _ = _gather_unique_values_from_matching_names(True, attr.exclude_package_contents, name, friendly_name, unfriendly_name)
+        exclude_package_contents = _gather_unique_values_from_matching_names(True, attr.exclude_package_contents, name, friendly_name, unfriendly_name)
 
         # gather replace packages
         replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
