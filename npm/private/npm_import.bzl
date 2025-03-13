@@ -1182,7 +1182,6 @@ def npm_import(
             ```
             exclude_package_contents = ["**/tests/**"]
             ```
-            The default value is a list of common excludes. You can use [] to override the default.
 
         **kwargs: Internal use only
     """
