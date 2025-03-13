@@ -29,6 +29,7 @@ load(
     _git_reset = "reset",
 )
 load("//npm/private:tar.bzl", "detect_system_tar")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -72,9 +73,8 @@ def npm_imported_package_store(name):
         name = "{{}}/ref".format(store_target_name),
         package = "{package}",
         version = "{version}",
-        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
-        tags = ["manual"],
+        tags = ["manual"],{maybe_exclude_package_contents}
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -83,10 +83,9 @@ def npm_imported_package_store(name):
         src = "{{}}/pkg_lc".format(store_target_name) if {has_lifecycle_build_target} else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
-        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = ref_deps,
-        tags = ["manual"],
+        tags = ["manual"],{maybe_exclude_package_contents}
     )
 
     # package store target with transitive closure of all npm package dependencies
@@ -95,11 +94,10 @@ def npm_imported_package_store(name):
         src = None if {transitive_closure_pattern} else "{npm_package_target}",
         package = "{package}",
         version = "{version}",
-        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = deps,
         visibility = ["//visibility:public"],
-        tags = ["manual"],
+        tags = ["manual"],{maybe_exclude_package_contents}
     )
 
     # filegroup target that provides a single file which is
@@ -121,10 +119,9 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         name = "{{}}/pkg_pre_lc_lite".format(store_target_name),
         package = "{package}",
         version = "{version}",
-        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = ref_deps,
-        tags = ["manual"],
+        tags = ["manual"],{maybe_exclude_package_contents}
     )
 
     # terminal pre-lifecycle target for use in lifecycle build target below
@@ -132,10 +129,9 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         name = "{{}}/pkg_pre_lc".format(store_target_name),
         package = "{package}",
         version = "{version}",
-        exclude_package_contents = {exclude_package_contents},
         dev = {dev},
         deps = lc_deps,
-        tags = ["manual"],
+        tags = ["manual"],{maybe_exclude_package_contents}
     )
 
     # lifecycle build action
@@ -754,6 +750,12 @@ def _npm_import_links_rule_impl(rctx):
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
+    maybe_exclude_package_contents = ""
+    if rctx.attr.exclude_package_contents == exclude_package_contents_default:
+        maybe_exclude_package_contents = ""
+    elif rctx.attr.exclude_package_contents != None:
+        maybe_exclude_package_contents = "\n        exclude_package_contents = " + starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents) + ","
+
     npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 1, quote_key = False),
         link_default = "None" if rctx.attr.link_packages else "True",
@@ -779,7 +781,7 @@ def _npm_import_links_rule_impl(rctx):
         maybe_bins = maybe_bins,
         dev = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
-        exclude_package_contents = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents),
+        maybe_exclude_package_contents = maybe_exclude_package_contents,
     )
 
     npm_link_package_bzl = [
@@ -819,7 +821,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "transitive_closure": attr.string_list_dict(),
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
-    "exclude_package_contents": attr.string_list(),
+    "exclude_package_contents": attr.string_list(default = exclude_package_contents_default),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
@@ -827,7 +829,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
-    "exclude_package_contents": attr.string(),
+    "exclude_package_contents": attr.string_list(default = exclude_package_contents_default),
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
@@ -911,7 +913,7 @@ def npm_import(
         npm_auth_password = "",
         bins = {},
         dev = False,
-        exclude_package_contents = [],
+        exclude_package_contents = exclude_package_contents_default,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1180,6 +1182,7 @@ def npm_import(
             ```
             exclude_package_contents = ["**/tests/**"]
             ```
+            The default value is a list of common excludes. You can use [] to override the default.
 
         **kwargs: Internal use only
     """
@@ -1217,6 +1220,7 @@ def npm_import(
         ),
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
+        exclude_package_contents = exclude_package_contents,
         system_tar = system_tar,
     )
 
