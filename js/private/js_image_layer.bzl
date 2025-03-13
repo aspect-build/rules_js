@@ -290,7 +290,7 @@ def _write_laucher(ctx, real_binary):
     )
     return launcher
 
-def _run_splitter(ctx, files, entries_json, layer_groups, launcher, repo_mapping = None):
+def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups, launcher, repo_mapping = None):
     ownersplit = ctx.attr.owner.split(":")
     if len(ownersplit) != 2 or not ownersplit[0].isdigit() or not ownersplit[1].isdigit():
         fail("owner attribute should be in `0:0` `int:int` format.")
@@ -346,6 +346,8 @@ def _run_splitter(ctx, files, entries_json, layer_groups, launcher, repo_mapping
         substitutions = {
             "{{UID}}": ownersplit[0],
             "{{GID}}": ownersplit[1],
+            "{{RUNFILES_DIR}}": runfiles_dir,
+            "{{REPO_NAME}}": ctx.workspace_name,
             "{{ENTRIES}}": entries_json.path,
             "{{VARIABLES}}": VARIABLES,
             "{{PICK_STATEMENTS}}": PICK_STATEMENTS,
@@ -360,7 +362,7 @@ def _run_splitter(ctx, files, entries_json, layer_groups, launcher, repo_mapping
     nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     ctx.actions.run(
         inputs = inputs,
-        arguments = [splitter.path, "--prof"],
+        arguments = ["--prof", splitter.path],
         outputs = splitter_outputs,
         executable = nodeinfo.node,
         progress_message = "Computing Layer Groups %{label}",
@@ -409,16 +411,33 @@ def _js_image_layer_impl(ctx):
     # be careful about what you access outside of the function closure. accessing objects
     # such as ctx within this function will make it significantly slower.
     def map_entry(f, _):
-        return "%s:%s" % (
-            json.encode(runfiles_dir + "/" + _to_rlocation_path(f, workspace_name)),
-            json.encode({
-                "dest": f.path,
-                "root": f.root.path,
-                "is_external": f.owner.repo_name != "",
-                "is_source": f.is_source,
-                "is_directory": f.is_directory,
-            }),
-        )
+        return [
+            "%s:%s" % (
+                json.encode(runfiles_dir + "/" + _to_rlocation_path(f, workspace_name)),
+                json.encode({
+                    "dest": f.path,
+                    "root": f.root.path,
+                    "is_external": f.owner.repo_name != "",
+                    "is_source": f.is_source,
+                    "is_directory": f.is_directory,
+                    "repo_name": f.owner.repo_name,
+                }),
+            ),
+            # To avoid O(N ^ N) complexity when searching for entries by their destination
+            # the map also has to have entries by their path on bazel-out
+            "%s:%s" % (
+                json.encode(f.path),
+                json.encode({
+                    "skip": True,
+                    "dest": runfiles_dir + "/" + _to_rlocation_path(f, workspace_name),
+                    "root": f.root.path,
+                    "is_external": f.owner.repo_name != "",
+                    "is_source": f.is_source,
+                    "is_directory": f.is_directory,
+                    "repo_name": f.owner.repo_name,
+                }),
+            ),
+        ]
 
     entries = ctx.actions.args()
     entries.set_param_file_format("multiline")
@@ -452,7 +471,7 @@ def _js_image_layer_impl(ctx):
     # Ordering of these matter.
     layer_groups = dict(**ctx.attr.layer_groups)
     layer_groups |= _DEFAULT_LAYER_GROUPS
-    layer_groups_gen = _run_splitter(ctx, runfiles_plus_files, entries_json, layer_groups, launcher, repo_mapping)
+    layer_groups_gen = _run_splitter(ctx, runfiles_dir, runfiles_plus_files, entries_json, layer_groups, launcher, repo_mapping)
 
     tarinfo = ctx.toolchains[tar_lib.toolchain_type].tarinfo
 
@@ -484,6 +503,8 @@ def _js_image_layer_impl(ctx):
             unused_inputs_list = unused_inputs,
             env = tarinfo.default_env,
             outputs = [output],
+            mnemonic = "JsImageLayer",
+            progress_message = "JsImageLayer " + typ + " %{label}",
             toolchain = "@aspect_bazel_lib//lib:tar_toolchain_type",
         )
 

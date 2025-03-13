@@ -15,7 +15,8 @@ const MODE_FOR_SYMLINK = "0775"
  *	 is_external: boolean
  *	 dest: string
  *	 root?: string
- *	 remove_non_hermetic_lines?: boolean
+ *	 skip?: boolean
+ *   repo_name?: string
  * }} Entry
  * @typedef {{ [path: string]: Entry }} Entries
  * @typedef {Map<string, {match: RegExp, unused_inputs: string, mtree: string }>} LayerGroup
@@ -24,36 +25,17 @@ const MODE_FOR_SYMLINK = "0775"
 /**
  * @param {Entry} entries 
  * @param {string} value 
- * @returns {string}
+ * @returns {string | undefined}
  */
 function findKeyByValue(entries, value) {
-    for (const [key, { dest: val }] of Object.entries(entries)) {
-        // Check for exact match
-        if (val == value) {
-            return key
-        }
-        // Check matching parent directory (https://stackoverflow.com/a/45242825).
-        // For example, if `value` is a parent directory of `val`:
-        //
-        //   value = bazel-out/darwin_arm64-fastbuild-ST-1072e68bc32d/bin/pkg/b
-        //   val = bazel-out/darwin_arm64-fastbuild-ST-1072e68bc32d/bin/pkg/b/index.js
-        //
-        // then relative is `index.js` and `/index.js` is stripped from `key`:
-        //
-        //   key = /app/src/bin.runfiles/_main/pkg/b/index.js
-        //
-        // which returns `/app/src/bin.runfiles/_main/pkg/b`
-        const relative = path.relative(value, val)
-        if (
-            relative &&
-            !relative.startsWith('..') &&
-            !path.isAbsolute(relative) &&
-            key.length > relative.length + 1
-        ) {
-            return key.substring(0, key.length - relative.length - 1)
-        }
+    const found = entries[value];
+    if (!found) {
+        return undefined
+    } else if (!found.skip) {
+        // matched against the real entry. 
+        return undefined
     }
-    return undefined
+    return found.dest
 }
 
 async function readlinkSafe(p) {
@@ -222,8 +204,10 @@ function _mtree_line(
 
 
 async function split() {	
-    const uid = "{{UID}}"
-    const gid = "{{GID}}"
+    const UID = "{{UID}}"
+    const GID = "{{GID}}"
+    const RUNFILES_DIR = "{{RUNFILES_DIR}}"
+    const REPO_NAME = "{{REPO_NAME}}"
 
     // TODO: use computed_substitutions when we only support >= Bazel 7
     const entries = JSON.parse((await readFile("{{ENTRIES}}")).toString())
@@ -237,8 +221,13 @@ async function split() {
             is_source,
             is_external,
             root,
+            skip,
+            repo_name
         } = entries[key]
 
+        if (skip) {
+            continue
+        }
 
      	/** @type Set<string> */
         let mtree = null
@@ -253,12 +242,12 @@ async function split() {
                 const new_key = path.join(key, sub_key)
                 const new_dest = path.join(dest, sub_key)
 
-				add_parents(mtree, new_key, uid, gid)
+				add_parents(mtree, new_key, UID, GID)
 				mtree.add(_mtree_line(
 					new_key,
 					"file",
-					uid,
-					gid,
+					UID,
+					GID,
 					MTIME,
 					MODE_FOR_FILE,
 					new_dest
@@ -268,15 +257,15 @@ async function split() {
         }
 
         // create parents of current path.
-        add_parents(mtree, key, uid, gid)
+        add_parents(mtree, key, UID, GID)
 
         // A source file from workspace, not an output of a target.
         if (is_source) {
 			mtree.add(_mtree_line(
 				key,
 				"file",
-				uid,
-				gid,
+				UID,
+				GID,
 				MTIME,
 				MODE_FOR_FILE,
 				dest
@@ -301,14 +290,25 @@ async function split() {
         if (realp && !is_external) {
             const output_path = realp.slice(realp.indexOf(root))
             // Look in all entries for symlinks since they may be in other layers
-            const linkname = findKeyByValue(entries, output_path)
+            let linkname = findKeyByValue(entries, output_path)
+
+
+            // First party dependencies are linked against a folder in output tree or source tree
+            // which means that we won't have an exact match for it in the entries. We could continue
+            // doing what we have done https://github.com/aspect-build/rules_js/commit/f83467ba91deb88d43fd4ac07991b382bb14945f
+            // but that is expensive and does not scale.
+            if (linkname == undefined && !repo_name) {
+                linkname = RUNFILES_DIR + "/" + REPO_NAME + realp.slice(realp.indexOf(root) + root.length)
+            }
+            
             if (linkname == undefined) {
                 throw new Error(
                     `Couldn't map symbolic link ${output_path} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
                         `dest: ${dest}\n` +
                         `realpath: ${realp}\n` +
-                        `outputpath: ${output_path}\n` +
+                        `output_path: ${output_path}\n` +
                         `root: ${root}\n` +
+                        `repo_name: ${repo_name}\n` +  
                         `runfiles: ${key}\n\n`
                 )
             }
@@ -316,8 +316,8 @@ async function split() {
 			mtree.add(_mtree_line(
 				key,
 				"link",
-				uid,
-				gid,
+				UID,
+				GID,
 				MTIME,
 				// interestingly, bazel 5 and 6 sets different mode bits on symlinks.
 				// well use `0o755` to allow owner&group to `rwx` and others `rx`
@@ -330,8 +330,8 @@ async function split() {
             mtree.add(_mtree_line(
 				key,
 				"file",
-				uid,
-				gid,
+				UID,
+				GID,
 				MTIME,
                 // Due to filesystems setting different bits depending on the os we have to opt-in
                 // to use a stable mode for files.
