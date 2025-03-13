@@ -73,10 +73,19 @@ assert_js_image_layer_listings(
 )
 
 # Case 3: Layer groups
-# bazel run :custom_layer_groups_test_update_all
+# bazel run //js/private/test/image:custom_layer_groups_test_update_all
+js_binary(
+    name = "bin2",
+    data = [
+        "ㅑ재ㅕㅣㅇ.ㄴㅅ",
+        ":node_modules",
+    ],
+    entry_point = "main.js",
+)
+
 make_js_image_layer(
     name = "custom_layer_groups",
-    binary = ":bin",
+    binary = ":bin2",
     layer_groups = {
         "just_the_fs_patch": ".*js\\/private\\/node-patches\\/fs\\.cjs",
     },

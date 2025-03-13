@@ -206,7 +206,7 @@ function _mtree_line(
 	  "type=" + type,
 	];
 	if (content) {
-	  spec.push("content=" + content);
+	  spec.push("content=" + vis(content));
 	}
 	if (type == "link") {
         link = normalize(link)
