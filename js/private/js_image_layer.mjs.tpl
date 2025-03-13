@@ -159,6 +159,19 @@ function add_parents(
     }
 }
 
+
+function vis(str) {
+    let result = "";
+    for (const char of Buffer.from(str)) {
+      if (char < 32 || char > 126) { // Non-printable
+        result += "\\" + char.toString(8).padStart(3, "0");
+      } else {
+        result += String.fromCharCode(char);
+      }
+    }
+    return result;
+}
+
 function normalize(dest) {
     if (!dest.startsWith(".")) {
         if (!dest.startsWith("/")) {
@@ -166,7 +179,8 @@ function normalize(dest) {
         }
         dest = "." + dest;
     }
-    return dest
+
+    return vis(dest)
 }
 
 function _mtree_line(
