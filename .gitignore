@@ -5,6 +5,7 @@ node_modules/
 
 .idea/
 .ijwb/
+.bazelbsp/
 .vscode
 .DS_Store
 

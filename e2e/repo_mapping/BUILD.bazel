@@ -1,9 +1,16 @@
+load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm__uvu__0.5.6__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 load("@rules_js-repo_name//js:defs.bzl", "js_test")
-load("@rules_js-repo_name//npm:defs.bzl", "npm_package")
+load("@rules_js-repo_name//npm:defs.bzl", "npm_link_package", "npm_package")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages(
+    name = "node_modules",
+    imported_links = [
+        npm_link_types_node,
+    ],
+)
 
 js_test(
     name = "test",
@@ -21,5 +28,26 @@ build_test(
     targets = [
         ":node_modules",
         ":npm-pkg",
+    ],
+)
+
+npm_link_package(
+    name = "node_modules/@e2e/lib",
+    src = "//lib:lib_pkg",
+    package = "@e2e/lib",
+)
+
+output_files(
+    name = "e2e/lib-package_store_entry",
+    paths = [
+        "node_modules/.aspect_rules_js/@e2e+lib@0.0.0/node_modules/@e2e/lib",
+    ],
+    target = ":node_modules/@e2e/lib",
+)
+
+build_test(
+    name = "package_store_targets_test",
+    targets = [
+        ":e2e/lib-package_store_entry",
     ],
 )

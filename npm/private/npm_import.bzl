@@ -455,9 +455,16 @@ def _download_and_extract_archive(rctx, package_json_only):
         msg = "Failed to create package directory. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
         fail(msg)
 
+    exclude_pattern_args = []
+    if rctx.attr.exclude_package_contents:
+        for pattern in rctx.attr.exclude_package_contents:
+            if pattern == "":
+                continue
+            exclude_pattern_args.append("--exclude")
+            exclude_pattern_args.append(pattern)
+
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    exclude_pattern_args = ["--exclude", rctx.attr.exclude_package_contents] if rctx.attr.exclude_package_contents else []
     tar_args = ["tar", "-xf", _TARBALL_FILENAME] + ["--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"] + exclude_pattern_args
 
     system_tar = detect_system_tar(rctx) if rctx.attr.system_tar == "auto" else rctx.attr.system_tar
@@ -932,6 +939,19 @@ def npm_import(
         version = "15.12.2",
         integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
     )
+    ```
+
+    In `MODULE.bazel` the same would look like so:
+
+    ```starlark
+    npm.npm_import(
+        name = "npm__at_types_node__15.12.2",
+        package = "@types/node",
+        version = "15.12.2",
+        integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",v
+    )
+    use_repo(npm, "npm__at_types_node__15.12.2")
+    use_repo(npm, "npm__at_types_node__15.12.2__links")
     ```
 
     > This is similar to Bazel rules in other ecosystems named "_import" like
