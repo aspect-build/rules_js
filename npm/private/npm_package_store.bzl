@@ -4,7 +4,6 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
-load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -113,7 +112,7 @@ _ATTRS = {
 
         The exclude patterns are relative to the package store directory.
         """,
-        default = exclude_package_contents_default,
+        default = [],
     ),
     "package": attr.string(
         doc = """The package name to link to.
