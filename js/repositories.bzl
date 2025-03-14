@@ -16,9 +16,9 @@ def rules_js_dependencies():
 
     http_archive(
         name = "rules_nodejs",
-        sha256 = "83d2bb029c2a9a06a474c8748d1221a92a7ca02222dcf49a0b567825c4e3f1ce",
-        strip_prefix = "rules_nodejs-6.3.0",
-        url = "https://github.com/bazel-contrib/rules_nodejs/releases/download/v6.3.0/rules_nodejs-v6.3.0.tar.gz",
+        sha256 = "b361863788b15d9d0cebf6803c22e8d1afa689a0eefef96dec46bcce30527090",
+        strip_prefix = "rules_nodejs-6.3.4",
+        url = "https://github.com/bazel-contrib/rules_nodejs/releases/download/v6.3.4/rules_nodejs-v6.3.4.tar.gz",
     )
 
     http_archive(
