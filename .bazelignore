@@ -18,7 +18,6 @@ examples/runfiles/node_modules
 examples/stack_traces/node_modules
 examples/webpack_cli/node_modules/
 js/private/coverage/bundle/node_modules
-js/private/image/node_modules
 js/private/test/image/node_modules
 js/private/test/js_run_devserver/node_modules
 js/private/worker/src/node_modules
