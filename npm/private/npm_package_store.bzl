@@ -112,6 +112,7 @@ _ATTRS = {
 
         The exclude patterns are relative to the package store directory.
         """,
+        default = [],
     ),
     "package": attr.string(
         doc = """The package name to link to.
