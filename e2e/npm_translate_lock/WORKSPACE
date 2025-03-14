@@ -16,13 +16,13 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 npm_translate_lock(
     name = "npm",
     data = ["//:package.json"],
+    exclude_package_contents = {
+        "is-odd@3.0.1": ["**/README*"],
+    },
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
-    exclude_package_contents = {
-        "is-odd@3.0.1": ["**/README*"],
-    },
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
