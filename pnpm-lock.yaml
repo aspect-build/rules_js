@@ -9,7 +9,7 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 4368ccb508aca4e83892ade0753603ce
+packageExtensionsChecksum: e978e3e510efb71c3833e1915611f5d9
 
 patchedDependencies:
   meaning-of-life@1.0.0:
@@ -270,7 +270,7 @@ importers:
         version: 15.3.0(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.2)(tslib@2.8.1)(typescript@4.9.5)
       '@types/archiver':
         specifier: 5.3.4
         version: 5.3.4
@@ -284,8 +284,8 @@ importers:
         specifier: 2.79.2
         version: 2.79.2
       tslib:
-        specifier: 2.7.0
-        version: 2.7.0
+        specifier: 2.8.1
+        version: 2.8.1
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -331,7 +331,7 @@ importers:
         version: 0.4.4(rollup@2.79.2)
       '@rollup/plugin-typescript':
         specifier: 10.0.1
-        version: 10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5)
+        version: 10.0.1(rollup@2.79.2)(tslib@2.8.1)(typescript@4.9.5)
       '@types/google-protobuf':
         specifier: 3.15.12
         version: 3.15.12
@@ -345,8 +345,8 @@ importers:
         specifier: 2.79.2
         version: 2.79.2
       tslib:
-        specifier: 2.7.0
-        version: 2.7.0
+        specifier: 2.8.1
+        version: 2.8.1
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -1586,7 +1586,7 @@ packages:
       terser: 5.34.1
     dev: true
 
-  /@rollup/plugin-typescript@10.0.1(rollup@2.79.2)(tslib@2.7.0)(typescript@4.9.5):
+  /@rollup/plugin-typescript@10.0.1(rollup@2.79.2)(tslib@2.8.1)(typescript@4.9.5):
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1602,7 +1602,7 @@ packages:
       '@rollup/pluginutils': 5.0.2(rollup@2.79.2)
       resolve: 1.22.1
       rollup: 2.79.2
-      tslib: 2.7.0
+      tslib: 2.8.1
       typescript: 4.9.5
     dev: true
 
@@ -1737,6 +1737,14 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
+
+  /@types/yauzl@2.10.0:
+    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
+    requiresBuild: true
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
+    dev: true
+    optional: true
 
   /@vanilla-extract/babel-plugin-debug-ids@1.0.1:
     resolution: {integrity: sha512-ynyKqsJiMzM1/yiIJ6QdqpWKlK4IMJJWREpPtaemZrE1xG1B4E/Nfa6YazuDWjDkCJC1tRIpEGnVs+pMIjUxyw==}
@@ -3367,7 +3375,7 @@ packages:
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
-      '@types/yauzl': registry.npmjs.org/@types/yauzl@2.10.0
+      '@types/yauzl': 2.10.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6818,8 +6826,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /tslib@2.7.0:
-    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
+  /tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
     dev: true
 
   /tunnel-agent@0.6.0:
@@ -7430,9 +7438,6 @@ packages:
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.10
       google-protobuf: 3.21.4
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
     dev: true
     bundledDependencies:
       - '@mapbox/node-pre-gyp'
@@ -7457,7 +7462,7 @@ packages:
       rfc4648: 1.5.2
       stream-buffers: 3.0.2
       tar: 7.4.3
-      tslib: 2.7.0
+      tslib: 2.8.1
       typescript: 4.9.5
       ws: 8.18.0(bufferutil@4.0.8)
     optionalDependencies:
@@ -7614,13 +7619,3 @@ packages:
     dependencies:
       '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
-
-  registry.npmjs.org/@types/yauzl@2.10.0:
-    resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.0.tgz}
-    name: '@types/yauzl'
-    version: 2.10.0
-    requiresBuild: true
-    dependencies:
-      '@types/node': registry.npmjs.org/@types/node@18.19.54
-    dev: true
-    optional: true
