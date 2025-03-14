@@ -1,6 +1,7 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 platform(
     name = "linux_amd64",
@@ -23,6 +24,17 @@ filegroup(
     data = ["@com_google_googleapis//google/cloud/speech/v1p1beta1:speech_proto"],
 )
 
+S = range(0, 350000)
+A = ["I"] * 10
+[
+    write_file(
+        name = "copy_%s" % i,
+        content = A + [str(i)],
+        out = "copy_%s.txt" % i
+    )
+    for i in S
+]
+
 js_binary(
     name = "bin",
     args = ["foo"],
@@ -38,6 +50,9 @@ js_binary(
         "@repo//:dir",
         "@repo//:source_txt",
         "@repo//:sources",
+    ] + [
+        "copy_%s" % i
+        for i in S
     ],
     entry_point = "main.js",
 )
