@@ -333,7 +333,7 @@ if [ "${JS_BINARY__CHDIR:-}" ]; then
 fi
 
 # Gather node options
-JS_BINARY__NODE_OPTIONS=(--preserve-symlinks)
+JS_BINARY__NODE_OPTIONS=()
 {{node_options}}
 
 ARGS=()
