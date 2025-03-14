@@ -20,6 +20,9 @@ npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
+    exclude_package_contents = {
+        "is-odd@3.0.1": ["**/README*"],
+    },
 )
 
 load("@npm//:repositories.bzl", "npm_repositories")
