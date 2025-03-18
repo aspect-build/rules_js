@@ -142,20 +142,25 @@ function add_parents(
     }
 }
 
-
+/**
+ * @param {string} str 
+ * @returns {string}
+ */
 function vis(str) {
     let result = "";
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i)
-        if (char < 33 || char > 126) { // Non-printable
-            result += "\\" + char.toString(8).padStart(3, "0");
-        } else {
-            result += str[i];
-        }
+    // There is no way to iterate over byte-by-byte UTF-8 characters in JS
+    // so we have to use Buffer to get the bytes.
+    // Rust has this https://doc.rust-lang.org/std/string/struct.String.html#method.as_bytes
+    // and the equivalent in nodejs is Buffer.
+    for (const char of Buffer.from(str)) {
+      if (char < 33 || char > 126) { // Non-printable
+        result += "\\" + char.toString(8).padStart(3, "0");
+      } else {
+        result += String.fromCharCode(char);
+      }
     }
     return result;
 }
-
 
 function _mtree_dir_line(dir) {
     const dest = vis(dir)

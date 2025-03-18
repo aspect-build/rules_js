@@ -566,7 +566,7 @@ js_image_layer_lib = struct(
             default = False,
         ),
         "preserve_symlinks": attr.string(
-            doc = """Preserve symlinks matching the pattern.
+            doc = """Preserve symlinks for entries matching the pattern.
 By default symlinks within the `node_modules` is preserved.
 """,
             default = ".*\\/node_modules\\/.*",
@@ -578,7 +578,7 @@ The expected format for each entry is "<key>": "<value>", where <key> MUST be a 
 JavaScript identifier (alphanumeric characters),  and <value> MAY be either an empty string (signifying a universal match)
 or a valid regular expression.
  
-For better performance, it is recommended to split the large parts of a js_binary to have a separate layer.
+For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
 
 The matching order for layer groups is as follows:
 
