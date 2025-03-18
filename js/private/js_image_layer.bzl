@@ -290,7 +290,7 @@ def _write_laucher(ctx, real_binary):
     )
     return launcher
 
-def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups, launcher, repo_mapping = None):
+def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
     ownersplit = ctx.attr.owner.split(":")
     if len(ownersplit) != 2 or not ownersplit[0].isdigit() or not ownersplit[1].isdigit():
         fail("owner attribute should be in `0:0` `int:int` format.")
@@ -328,15 +328,18 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups, launcher
             IF_STMT,
             name,
             "\n".join([
-                '    %sunusedinputs.write(dest + "\\n");' % oname
+                "    %sunusedinputs.write(destBuf);" % oname
                 for oname in layer_groups.keys()
                 if oname != name
             ]),
         )
 
-        WRITE_STATEMENTS += """writeFile("%s", Array.from(%smtree).sort().concat([""]).join("\\n")),\n""" % (mtree.path, name)
+        WRITE_STATEMENTS += """writeFile("%s", Array.from(%smtree).sort().concat(["\\n"]).join("\\n")),\n""" % (mtree.path, name)
 
         expected_layer_groups.append((name, mtree, unused_inputs))
+
+    unused_inputs = ctx.actions.declare_file("{}_splitter_unused_inputs.txt".format(ctx.label.name))
+    splitter_outputs.append(unused_inputs)
 
     splitter = ctx.actions.declare_file("{}_js_image_layer_splitter.mjs".format(ctx.label.name))
     ctx.actions.expand_template(
@@ -349,20 +352,23 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups, launcher
             "{{RUNFILES_DIR}}": runfiles_dir,
             "{{REPO_NAME}}": ctx.workspace_name,
             "{{ENTRIES}}": entries_json.path,
-            "{{VARIABLES}}": VARIABLES,
-            "{{PICK_STATEMENTS}}": PICK_STATEMENTS,
-            "{{WRITE_STATEMENTS}}": WRITE_STATEMENTS,
+            "{{PRESERVE_SYMLINKS}}": ctx.attr.preserve_symlinks,
+            "{{UNUSED_INPUTS}}": unused_inputs.path,
+            "/*{{VARIABLES}}*/": VARIABLES,
+            "/*{{PICK_STATEMENTS}}*/": PICK_STATEMENTS,
+            "/*{{WRITE_STATEMENTS}}*/": WRITE_STATEMENTS,
         },
     )
 
     inputs = depset(
-        ([repo_mapping] if repo_mapping else []) + [entries_json, launcher, splitter],
+        [entries_json, splitter],
         transitive = [files],
     )
     nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     ctx.actions.run(
         inputs = inputs,
-        arguments = ["--prof", splitter.path],
+        arguments = [splitter.path],
+        unused_inputs_list = unused_inputs,
         outputs = splitter_outputs,
         executable = nodeinfo.node,
         progress_message = "Computing Layer Groups %{label}",
@@ -384,6 +390,8 @@ def _to_rlocation_path(file, workspace):
 def _repo_mapping_manifest(files_to_run):
     return getattr(files_to_run, "repo_mapping_manifest", None)
 
+_ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"is_directory":%s,"repo_name":"%s"},\n%s:"%s"'
+
 def _js_image_layer_impl(ctx):
     if ctx.attr.generate_empty_layers:
         # buildifier: disable=print
@@ -394,7 +402,7 @@ def _js_image_layer_impl(ctx):
     binary_default_info = ctx.attr.binary[0][DefaultInfo]
     binary_label = ctx.attr.binary[0].label
 
-    binary_path = paths.join(ctx.attr.root, binary_label.package, binary_label.name)
+    binary_path = "." + paths.join(ctx.attr.root, binary_label.package, binary_label.name)
     runfiles_dir = binary_path + ".runfiles"
 
     launcher = _write_laucher(ctx, binary_default_info.files_to_run.executable)
@@ -411,33 +419,21 @@ def _js_image_layer_impl(ctx):
     # be careful about what you access outside of the function closure. accessing objects
     # such as ctx within this function will make it significantly slower.
     def map_entry(f, _):
-        return [
-            "%s:%s" % (
-                json.encode(runfiles_dir + "/" + _to_rlocation_path(f, workspace_name)),
-                json.encode({
-                    "dest": f.path,
-                    "root": f.root.path,
-                    "is_external": f.owner.repo_name != "",
-                    "is_source": f.is_source,
-                    "is_directory": f.is_directory,
-                    "repo_name": f.owner.repo_name,
-                }),
-            ),
+        runfiles_dest = runfiles_dir + "/" + _to_rlocation_path(f, workspace_name)
+        path = json.encode(f.path)
+        return _ENTRY % (
+            runfiles_dest,
+            path,
+            f.root.path,
+            "true" if f.owner.repo_name != "" else "false",
+            "true" if f.is_source else "false",
+            "true" if f.is_directory else "false",
+            f.owner.repo_name,
             # To avoid O(N ^ N) complexity when searching for entries by their destination
-            # the map also has to have entries by their path on bazel-out
-            "%s:%s" % (
-                json.encode(f.path),
-                json.encode({
-                    "skip": True,
-                    "dest": runfiles_dir + "/" + _to_rlocation_path(f, workspace_name),
-                    "root": f.root.path,
-                    "is_external": f.owner.repo_name != "",
-                    "is_source": f.is_source,
-                    "is_directory": f.is_directory,
-                    "repo_name": f.owner.repo_name,
-                }),
-            ),
-        ]
+            # the map also has to have entries by their path on bazel-out,
+            path,
+            runfiles_dest,
+        )
 
     entries = ctx.actions.args()
     entries.set_param_file_format("multiline")
@@ -470,8 +466,13 @@ def _js_image_layer_impl(ctx):
 
     # Ordering of these matter.
     layer_groups = dict(**ctx.attr.layer_groups)
-    layer_groups |= _DEFAULT_LAYER_GROUPS
-    layer_groups_gen = _run_splitter(ctx, runfiles_dir, runfiles_plus_files, entries_json, layer_groups, launcher, repo_mapping)
+    for key, value in _DEFAULT_LAYER_GROUPS.items():
+        if key not in layer_groups:
+            layer_groups[key] = value
+        else:
+            fail("User-defined layer group `%s` conflicts with a default layer group. Please rename it." % key)
+
+    layer_groups_gen = _run_splitter(ctx, runfiles_dir, runfiles_plus_files, entries_json, layer_groups)
 
     tarinfo = ctx.toolchains[tar_lib.toolchain_type].tarinfo
 
@@ -535,7 +536,7 @@ js_image_layer_lib = struct(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
         "_splitter": attr.label(
-            default = "//js/private:js_image_layer.mjs.tpl",
+            default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
         ),
         "binary": attr.label(
@@ -563,6 +564,12 @@ js_image_layer_lib = struct(
             # TODO(3.0): remove this attribute.
             doc = """DEPRECATED. An empty layer is always generated if the layer group have no matching files.""",
             default = False,
+        ),
+        "preserve_symlinks": attr.string(
+            doc = """Preserve symlinks matching the pattern.
+By default symlinks within the `node_modules` is preserved.
+""",
+            default = ".*\\/node_modules\\/.*",
         ),
         "layer_groups": attr.string_dict(
             doc = """Layer groups to create.

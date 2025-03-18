@@ -1,12 +1,6 @@
 import { readdir, readFile, readlink, writeFile } from 'node:fs/promises'
-import { createWriteStream, link } from "node:fs"
+import { createWriteStream } from "node:fs"
 import * as path from 'node:path'
-
-const MTIME = "0"
-const MODE_FOR_DIR = "0755"
-const MODE_FOR_FILE = "0555"
-const MODE_FOR_SYMLINK = "0775"
-
 
 /**
  * @typedef {{
@@ -31,11 +25,11 @@ function findKeyByValue(entries, value) {
     const found = entries[value];
     if (!found) {
         return undefined
-    } else if (!found.skip) {
+    } else if (typeof found != "string") {
         // matched against the real entry. 
         return undefined
     }
-    return found.dest
+    return found
 }
 
 async function readlinkSafe(p) {
@@ -136,85 +130,60 @@ async function* walk(dir, accumulate = '') {
 function add_parents(
 	mtree,
     dest,
-    uid, 
-	gid,
 ) {
     const segments = path.dirname(dest).split('/')
     let prev = ''
     for (const part of segments) {
-        if (!part) {
+        if (!part || part == '.') {
             continue
         }
         prev = path.join(prev, part)
-		mtree.add(_mtree_line(
-			prev,
-			"dir",
-			uid,
-			gid,
-			MTIME,
-			// this is an intermediate directory and bazel does not allow specifying
-        	// the file mode for intermediate directories so we use a static mode.
-			MODE_FOR_DIR,
-		))
+        mtree.add(_mtree_dir_line(prev))
     }
 }
 
 
 function vis(str) {
     let result = "";
-    for (const char of Buffer.from(str)) {
-      if (char < 33 || char > 126) { // Non-printable
-        result += "\\" + char.toString(8).padStart(3, "0");
-      } else {
-        result += String.fromCharCode(char);
-      }
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i)
+        if (char < 33 || char > 126) { // Non-printable
+            result += "\\" + char.toString(8).padStart(3, "0");
+        } else {
+            result += str[i];
+        }
     }
     return result;
 }
 
-function normalize(dest) {
-    if (!dest.startsWith(".")) {
-        if (!dest.startsWith("/")) {
-            dest = "/" + dest;
-        }
-        dest = "." + dest;
-    }
 
-    return vis(dest)
+function _mtree_dir_line(dir) {
+    const dest = vis(dir)
+    // Due to filesystems setting different bits depending on the os we have to opt-in
+    // to use a stable mode for files.
+    // In the future, we might want to hand off fine-grained control of these to users
+    // see: https://chmodcommand.com/chmod-0755/
+    return `./${dest} uid={{UID}} gid={{GID}} time=0 mode=0755 type=dir`;
 }
 
-function _mtree_line(
-	dest,
-	type,
-	uid,
-	gid,
-	time,
-	mode,
-	content = null,
-	link = null,
-  ) {
-	// mtree expects paths to start with ./ so normalize paths that starts with
-	// `/` or relative path (without / and ./)
-	dest = normalize(dest)
-  
-	const spec = [
-	  dest,
-	  "uid=" + uid,
-	  "gid=" + gid,
-	  "time=" + time,
-	  "mode=" + mode,
-	  "type=" + type,
-	];
-	if (content) {
-	  spec.push("content=" + vis(content));
-	}
-	if (type == "link") {
-        link = normalize(link)
-		const link_parent = path.dirname(dest)
-		spec.push("link=" + path.relative(link_parent, link));
-	}
-	return spec.join(" ");
-  }
+function _mtree_link_line(key, linkname) {
+    const link_parent = path.dirname(key)
+    linkname = path.relative(link_parent, linkname)
+
+    // interestingly, bazel 5 and 6 sets different mode bits on symlinks.
+    // well use `0o755` to allow owner&group to `rwx` and others `rx`
+    // see: https://chmodcommand.com/chmod-775/
+    return `${vis(key)} uid={{UID}} gid={{GID}} time=0 mode=0775 type=link link=${vis(linkname)}`;
+}
+
+function _mtree_file_line(key, content) {
+    const dest = vis(key)
+    // Due to filesystems setting different bits depending on the os we have to opt-in
+    // to use a stable mode for files.
+    // In the future, we might want to hand off fine-grained control of these to users
+    // see: https://chmodcommand.com/chmod-0555/
+    return `${dest} uid={{UID}} gid={{GID}} time=0 mode=0555 type=file content=${vis(content)}`;
+}
 
 
 async function split() {	
@@ -226,64 +195,60 @@ async function split() {
     // TODO: use computed_substitutions when we only support >= Bazel 7
     const entries = JSON.parse((await readFile("{{ENTRIES}}")).toString())
 
-    {{VARIABLES}}
+    /*{{VARIABLES}}*/
 
-    for (const key of Object.keys(entries).sort()) {
+    const resolveTasks = [];
+    const splitterUnusedInputs = createWriteStream("{{UNUSED_INPUTS}}");
+
+    for (const key in entries) {
+        if (typeof entries[key] == "string") {
+            continue
+        }
         const {
             dest,
             is_directory,
             is_source,
             is_external,
             root,
-            skip,
             repo_name
         } = entries[key]
-
-        if (skip) {
-            continue
-        }
 
      	/** @type Set<string> */
         let mtree = null
         
+        const destBuf = Buffer.from(dest + "\n")
 
-        {{PICK_STATEMENTS}}
-  
+        /*{{PICK_STATEMENTS}}*/
+        
 
         // its a treeartifact. expand it and add individual entries.
         if (is_directory) {
             for await (const sub_key of walk(dest)) {
-                const new_key = path.join(key, sub_key)
-                const new_dest = path.join(dest, sub_key)
+                const new_key = key + "/" + sub_key;
+                const new_dest = dest + "/" + sub_key;
 
-				add_parents(mtree, new_key, UID, GID)
-				mtree.add(_mtree_line(
+				add_parents(mtree, new_key)
+				mtree.add(_mtree_file_line(
 					new_key,
-					"file",
-					UID,
-					GID,
-					MTIME,
-					MODE_FOR_FILE,
 					new_dest
 				))
             }
+            // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
+            splitterUnusedInputs.write(destBuf)
             continue
         }
 
         // create parents of current path.
-        add_parents(mtree, key, UID, GID)
+        add_parents(mtree, key)
 
         // A source file from workspace, not an output of a target.
         if (is_source) {
-			mtree.add(_mtree_line(
+			mtree.add(_mtree_file_line(
 				key,
-				"file",
-				UID,
-				GID,
-				MTIME,
-				MODE_FOR_FILE,
 				dest
 			))
+            // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
+            splitterUnusedInputs.write(destBuf)
             continue
         }
 
@@ -296,72 +261,74 @@ async function split() {
                     entries[key]
                 )}. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose`
             )
+        }   
+
+        // If its external or if it does not match the `preserve_symlinks` regex
+        // we don't support preserving symlinks.
+        if (is_external || !/{{PRESERVE_SYMLINKS}}/.test(key)) {
+            // Just add the file as a regular file.
+            mtree.add(_mtree_file_line(
+                key,
+                dest
+            ))
+            // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
+            splitterUnusedInputs.write(destBuf)
+            continue
         }
 
-        const realp = await resolveSymlink(dest)
-        // it's important that we don't treat any symlink pointing out of execroot since
-        // bazel symlinks external files into sandbox to make them available to us.
-        if (realp && !is_external) {
-            const output_path = realp.slice(realp.indexOf(root))
-            // Look in all entries for symlinks since they may be in other layers
-            let linkname = findKeyByValue(entries, output_path)
+        const resolveTask = resolveSymlink(dest).then((realp) => {
+            // it's important that we don't treat any symlink pointing out of execroot since
+            // bazel symlinks external files into sandbox to make them available to us.
+            if (realp) {
+                const output_path = realp.slice(realp.indexOf(root))
+                // Look in all entries for symlinks since they may be in other layers
+                let linkname = findKeyByValue(entries, output_path)
 
 
-            // First party dependencies are linked against a folder in output tree or source tree
-            // which means that we won't have an exact match for it in the entries. We could continue
-            // doing what we have done https://github.com/aspect-build/rules_js/commit/f83467ba91deb88d43fd4ac07991b382bb14945f
-            // but that is expensive and does not scale.
-            if (linkname == undefined && !repo_name) {
-                linkname = RUNFILES_DIR + "/" + REPO_NAME + realp.slice(realp.indexOf(root) + root.length)
+                // First party dependencies are linked against a folder in output tree or source tree
+                // which means that we won't have an exact match for it in the entries. We could continue
+                // doing what we have done https://github.com/aspect-build/rules_js/commit/f83467ba91deb88d43fd4ac07991b382bb14945f
+                // but that is expensive and does not scale.
+                if (linkname == undefined && !repo_name) {
+                    linkname = RUNFILES_DIR + "/" + REPO_NAME + realp.slice(realp.indexOf(root) + root.length)
+                }
+
+                if (linkname == undefined) {
+                    throw new Error(
+                        `Couldn't map symbolic link ${output_path} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
+                            `dest: ${dest}\n` +
+                            `realpath: ${realp}\n` +
+                            `output_path: ${output_path}\n` +
+                            `root: ${root}\n` +
+                            `repo_name: ${repo_name}\n` +  
+                            `runfiles: ${key}\n\n`
+                    )
+                }
+                // add the symlink to the mtree
+                mtree.add(_mtree_link_line(
+                    key,
+                    linkname
+                ))
+            } else {
+                // If we can't resolve the symlink, we just add the file as a regular file.
+                mtree.add(_mtree_file_line(
+                    key,
+                    dest
+                ))
+                // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
+                splitterUnusedInputs.write(destBuf)
             }
-            
-            if (linkname == undefined) {
-                throw new Error(
-                    `Couldn't map symbolic link ${output_path} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
-                        `dest: ${dest}\n` +
-                        `realpath: ${realp}\n` +
-                        `output_path: ${output_path}\n` +
-                        `root: ${root}\n` +
-                        `repo_name: ${repo_name}\n` +  
-                        `runfiles: ${key}\n\n`
-                )
-            }
-            
-			mtree.add(_mtree_line(
-				key,
-				"link",
-				UID,
-				GID,
-				MTIME,
-				// interestingly, bazel 5 and 6 sets different mode bits on symlinks.
-				// well use `0o755` to allow owner&group to `rwx` and others `rx`
-				// see: https://chmodcommand.com/chmod-775/
-				MODE_FOR_SYMLINK,
-				null,
-				linkname
-			))
-        } else {
-            mtree.add(_mtree_line(
-				key,
-				"file",
-				UID,
-				GID,
-				MTIME,
-                // Due to filesystems setting different bits depending on the os we have to opt-in
-                // to use a stable mode for files.
-                // In the future, we might want to hand off fine-grained control of these to users
-                // see: https://chmodcommand.com/chmod-0555/
-				MODE_FOR_FILE,
-				dest
-			))
-        }
+        })
+        resolveTasks.push(resolveTask)
     }
 
+    await Promise.all(resolveTasks);
+
     await Promise.all([
-       {{WRITE_STATEMENTS}}
+      /*{{WRITE_STATEMENTS}}*/
     ])
 
     
 }
 
-split()
+await split()
