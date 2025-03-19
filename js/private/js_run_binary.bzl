@@ -401,7 +401,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     _run_binary(
         name = name,
         tool = tool,
-        env = dicts.add(fixed_env, env),
+        env = fixed_env | env,
         srcs = srcs + extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
