@@ -97,6 +97,7 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
+        ":exclude_package_contents_default.bzl",
         ":npm_package_info",
         ":npm_package_store_info",
         ":utils",
@@ -113,6 +114,7 @@ bzl_library(
         "//npm:__subpackages__",
     ],
     deps = [
+        ":exclude_package_contents_default.bzl",
         ":starlark_codegen_utils",
         ":tar",
         ":utils",
