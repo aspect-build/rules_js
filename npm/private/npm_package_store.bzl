@@ -4,10 +4,10 @@ load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
-load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
