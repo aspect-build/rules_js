@@ -2,7 +2,7 @@ schemaVersion: 2.0.0
 
 commandTests:
     - name: 'smoke'
-      command: 'bash'
+      command: '/usr/bin/bash'
       args: ['/app/src/bin']
       expectedOutput:
           [
@@ -22,7 +22,8 @@ commandTests:
               ' SOURCE DIRECTORY CHECK    true',
           ]
     - name: 'smoke2'
-      command: '/app/src/bin'
+      command: '/usr/bin/bash'
+      args: ['/app/src/bin']
       expectedOutput:
           [
               'OS',
