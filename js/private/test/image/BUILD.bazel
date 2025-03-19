@@ -78,7 +78,7 @@ js_binary(
     name = "bin2",
     data = [
         "empty empty.ㄴㅅ",
-        "ㅑ재ㅕㅣㅇ.ㄴㅅ",
+        "ㅑㅕㅣㅇ.ㄴㅅ",
         ":node_modules",
     ],
     entry_point = "main.js",
