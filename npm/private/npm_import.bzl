@@ -29,9 +29,9 @@ load(
     _git_reset = "reset",
 )
 load("//npm/private:tar.bzl", "detect_system_tar")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
-load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
