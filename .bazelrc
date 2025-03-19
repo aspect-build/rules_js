@@ -23,6 +23,12 @@ build --workspace_status_command="echo BUILD_SCM_VERSION 1.2.3"
 # https://bazelbuild.slack.com/archives/C014RARENH0/p1691158021917459?thread_ts=1691156601.420349&cid=C014RARENH0
 common --check_direct_dependencies=off
 
+
+# Ignore this test as it breaks the runfiles tree generation in coverage mode. 
+# Also see: .aspect/bazelrc/performance.bazelrc where runfiles trees are eagerly 
+# generated due to `coverage --build_runfile_links`
+coverage --deleted_packages=js/private/test/image/non_ascii
+
 # Load any settings & overrides specific to the current user from `.aspect/bazelrc/user.bazelrc`.
 # This file should appear in `.gitignore` so that settings are not shared with team members. This
 # should be last statement in this config so the user configuration is able to overwrite flags from

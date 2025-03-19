@@ -18,6 +18,7 @@ platform(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
+    visibility = ["//js/private/test/image:__subpackages__"],
 )
 
 # All these golden files can be updated with
@@ -70,32 +71,4 @@ make_js_image_layer(
 assert_js_image_layer_listings(
     name = "custom_owner_test",
     js_image_layer = ":custom_owner",
-)
-
-# Case 3: Layer groups
-# bazel run //js/private/test/image:custom_layer_groups_test_update_all
-js_binary(
-    name = "bin2",
-    data = [
-        "empty empty.ㄴㅅ",
-        "ㅑㅕㅣㅇ.ㄴㅅ",
-        ":node_modules",
-    ],
-    entry_point = "main.js",
-)
-
-make_js_image_layer(
-    name = "custom_layer_groups",
-    binary = ":bin2",
-    layer_groups = {
-        "just_the_fs_patch": ".*js\\/private\\/node-patches\\/fs\\.cjs",
-    },
-    platform = ":linux_amd64",
-    root = "/app",
-)
-
-assert_js_image_layer_listings(
-    name = "custom_layer_groups_test",
-    additional_layers = ["just_the_fs_patch"],
-    js_image_layer = ":custom_layer_groups",
 )

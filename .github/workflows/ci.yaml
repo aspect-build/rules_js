@@ -317,7 +317,6 @@ jobs:
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --enable_bzlmod=${{ matrix.bzlmod }} \
                     --instrument_test_targets \
-                    --deleted_packages=js/private/test/image \
                     //...
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}

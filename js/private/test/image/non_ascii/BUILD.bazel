@@ -1,0 +1,29 @@
+load("//js:defs.bzl", "js_binary")
+load("//js/private/test/image:asserts.bzl", "assert_js_image_layer_listings", "make_js_image_layer")
+
+# Case 3: Layer groups
+# bazel run //js/private/test/image/non_ascii:custom_layer_groups_test_update_all
+js_binary(
+    name = "bin2",
+    data = [
+        "empty empty.ㄴㅅ",
+        "ㅑㅕㅣㅇ.ㄴㅅ",
+    ],
+    entry_point = "main.js",
+)
+
+make_js_image_layer(
+    name = "custom_layer_groups",
+    binary = ":bin2",
+    layer_groups = {
+        "just_the_fs_patch": ".*js\\/private\\/node-patches\\/fs\\.cjs",
+    },
+    platform = "//js/private/test/image:linux_amd64",
+    root = "/app",
+)
+
+assert_js_image_layer_listings(
+    name = "custom_layer_groups_test",
+    additional_layers = ["just_the_fs_patch"],
+    js_image_layer = ":custom_layer_groups",
+)
