@@ -34,9 +34,9 @@ load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
-load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
