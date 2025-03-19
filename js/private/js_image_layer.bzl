@@ -17,7 +17,7 @@ load("@aspect_bazel_lib//lib:tar.bzl", "tar_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DEFAULT_LAYER_GROUPS = {
-    "node": ".*\\/js\\/private\\/node-patches.*|.*\\/bin\\/nodejs\\/.*",
+    "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
     "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
     "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
     "node_modules": "\\/node_modules\\/",
@@ -262,6 +262,30 @@ container_image(
     }),
 )
 ```
+
+
+## Performance 
+
+For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
+
+The matching order for layer groups is as follows:
+
+1. `layer_groups` are checked in order first
+2. If no match is found for `layer_groups`, the `default layer groups` are checked.
+3. Any remaining files are placed into the app layer.
+
+The default layer groups are as follows and always created.
+
+```
+{
+    "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
+    "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
+    "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
+    "node_modules": "\\/node_modules\\/",
+    "app": "", # empty means just match anything.
+}
+```
+
 """
 
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
@@ -581,29 +605,8 @@ By default symlinks within the `node_modules` is preserved.
             doc = """Layer groups to create.
 These are utilized to categorize files into distinct layers, determined by their respective paths. 
 The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and 
-JavaScript identifier (alphanumeric characters),  and <value> MAY be either an empty string (signifying a universal match)
-or a valid regular expression.
- 
-For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
-
-The matching order for layer groups is as follows:
-
-1. `layer_groups` are checked in order first
-2. If no match is found for `layer_groups`, the `default layer groups` are checked.
-3. Any remaining files are placed into the app layer.
-
-The default layer groups are as follows and always created.
-
-```
-{
-    "node": ".*\\/js\\/private\\/node-patches.*|.*\\/bin\\/nodejs\\/.*",
-    "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
-    "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
-    "node_modules": "\\/node_modules\\/",
-    "app": "", # empty means just match anything. 
-}
-```
-""",
+JavaScript identifier (alphanumeric characters), and <value> MAY be either an empty string (signifying a universal match)
+or a valid regular expression.""",
         ),
     },
 )
