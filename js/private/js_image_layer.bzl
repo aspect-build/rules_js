@@ -465,12 +465,18 @@ def _js_image_layer_impl(ctx):
     ctx.actions.write(entries_json, content = entries)
 
     # Ordering of these matter.
-    layer_groups = dict(**ctx.attr.layer_groups)
+    layer_groups = dict()
+    for key in ctx.attr.layer_groups:
+        # Only add if the key is not in the default layer groups since we already handled the collision below.
+        if key not in _DEFAULT_LAYER_GROUPS:
+            layer_groups[key] = ctx.attr.layer_groups[key]
+
     for key, value in _DEFAULT_LAYER_GROUPS.items():
-        if key not in layer_groups:
-            layer_groups[key] = value
+        # if the key is provided by the user, use it, otherwise use the default.
+        if key in ctx.attr.layer_groups:
+            layer_groups[key] = ctx.attr.layer_groups[key]
         else:
-            fail("User-defined layer group `%s` conflicts with a default layer group. Please rename it." % key)
+            layer_groups[key] = value
 
     layer_groups_gen = _run_splitter(ctx, runfiles_dir, runfiles_plus_files, entries_json, layer_groups)
 
