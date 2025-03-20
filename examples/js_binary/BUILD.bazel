@@ -194,7 +194,7 @@ js_run_binary(
         "//conditions:default": {
             "NODE_ENV": "production"
         }
-    )
+    ),
     tool = ":bin4",
 )
 
