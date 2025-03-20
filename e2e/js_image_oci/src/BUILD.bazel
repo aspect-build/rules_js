@@ -54,6 +54,7 @@ js_image_layer(
         "@platforms//cpu:x86_64": ":linux_amd64",
     }),
     root = "/app",
+    tags = ["no-remote-exec"],
     visibility = ["//visibility:__pkg__"],
 )
 
@@ -63,7 +64,7 @@ oci_image(
     base = "@debian",
     # This is `/[js_image_layer 'root']/[package name of js_image_layer 'binary' target]/[name of js_image_layer 'binary' target]`
     cmd = ["/app/src/bin"],
-    entrypoint = ["bash"],
+    entrypoint = ["/usr/bin/bash"],
     tars = [
         ":layers",
     ],

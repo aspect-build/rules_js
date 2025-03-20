@@ -18,6 +18,7 @@ platform(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
+    visibility = ["//js/private/test/image:__subpackages__"],
 )
 
 # All these golden files can be updated with
@@ -44,6 +45,7 @@ assert_checksum(
 )
 
 # Case 1: Defaults
+# bazel run :default_test_update_all
 make_js_image_layer(
     name = "default",
     binary = ":bin",
@@ -57,6 +59,7 @@ assert_js_image_layer_listings(
 )
 
 # Case 2: Change owner
+# bazel run :custom_owner_test_update_all
 make_js_image_layer(
     name = "custom_owner",
     binary = ":bin",

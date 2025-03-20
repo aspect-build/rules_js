@@ -2,9 +2,7 @@
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("//js:defs.bzl", "js_binary")
 
 exports_files(
     glob(["*.bzl"]),
@@ -17,6 +15,7 @@ exports_files([
     "node_wrapper.sh",
     "npm_wrapper.bat",
     "npm_wrapper.sh",
+    "js_image_layer.mjs",
 ])
 
 bzl_library(
@@ -130,8 +129,7 @@ bzl_library(
         "//js:__subpackages__",
     ],
     deps = [
-        "@aspect_bazel_lib//lib:paths",
-        "@aspect_bazel_lib//lib:utils",
+        "@aspect_bazel_lib//lib:tar",
         "@bazel_skylib//lib:paths",
     ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
@@ -139,18 +137,5 @@ bzl_library(
 copy_to_bin(
     name = "js_devserver_entrypoint",
     srcs = ["js_run_devserver.mjs"],
-    visibility = ["//visibility:public"],
-)
-
-write_source_files(
-    name = "js_image_layer_checked",
-    files = {
-        "js_image_layer.mjs": "//js/private/image:image.mjs",
-    },
-)
-
-js_binary(
-    name = "js_image_layer_builder",
-    entry_point = "js_image_layer.mjs",
     visibility = ["//visibility:public"],
 )

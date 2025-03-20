@@ -13,8 +13,16 @@ js_image_layer(
 ```
 """
 
-load("@aspect_bazel_lib//lib:paths.bzl", "to_rlocation_path")
+load("@aspect_bazel_lib//lib:tar.bzl", "tar_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+
+_DEFAULT_LAYER_GROUPS = {
+    "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
+    "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
+    "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
+    "node_modules": "\\/node_modules\\/",
+    "app": "",  # empty means just match anything.
+}
 
 _DOC = """Create container image layers from js_binary targets.
 
@@ -254,210 +262,297 @@ container_image(
     }),
 )
 ```
+
+
+## Performance 
+
+For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
+
+The matching order for layer groups is as follows:
+
+1. `layer_groups` are checked in order first
+2. If no match is found for `layer_groups`, the `default layer groups` are checked.
+3. Any remaining files are placed into the app layer.
+
+The default layer groups are as follows and always created.
+
+```
+{
+    "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
+    "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
+    "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
+    "node_modules": "\\/node_modules\\/",
+    "app": "", # empty means just match anything.
+}
+```
+
 """
 
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
 # See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
 # for why this is needed.
-_LAUNCHER_TMPL = """\
+_LAUNCHER_PREABMLE = """\
 #!/usr/bin/env bash
-export BAZEL_BINDIR=.
-source {real_binary_path}
+
+export BAZEL_BINDIR="."
+
+# patched by js_image_layer for hermeticity
 """
 
-def _write_laucher(ctx, real_binary_path):
+def _write_laucher(ctx, real_binary):
     "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
     launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
-    ctx.actions.write(
+
+    ctx.actions.expand_template(
+        template = real_binary,
         output = launcher,
-        content = _LAUNCHER_TMPL.format(real_binary_path = real_binary_path),
+        substitutions = {
+            "#!/usr/bin/env bash": _LAUNCHER_PREABMLE,
+            'export JS_BINARY__BINDIR="%s"' % real_binary.root.path: 'export JS_BINARY__BINDIR="$(pwd)"',
+            'export JS_BINARY__BINDIR="%s"' % ctx.bin_dir.path: 'export JS_BINARY__BINDIR="$(pwd)"',
+            'export JS_BINARY__TARGET_CPU="%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'export JS_BINARY__TARGET_CPU="$(uname -m)"',
+        },
         is_executable = True,
     )
     return launcher
 
-def _runfile_path(ctx, file, runfiles_dir):
-    return paths.join(runfiles_dir, to_rlocation_path(ctx, file))
-
-def _build_layer(ctx, type, all_entries_json, entries, inputs):
-    if not entries and not ctx.attr.generate_empty_layers:
-        return None
-
-    entries_json = ctx.actions.declare_file("{}_{}_entries.json".format(ctx.label.name, type))
-    ctx.actions.write(entries_json, content = json.encode(entries))
-
-    extension = "tar.gz" if ctx.attr.compression == "gzip" else "tar"
-    output = ctx.actions.declare_file("{name}_{type}.{extension}".format(name = ctx.label.name, type = type, extension = extension))
-
-    args = ctx.actions.args()
-    args.add(all_entries_json)
-    args.add(entries_json)
-    args.add(output)
-    args.add(ctx.attr.compression)
-    args.add(ctx.attr.owner)
-
-    ctx.actions.run(
-        inputs = inputs + [all_entries_json, entries_json],
-        outputs = [output],
-        arguments = [args],
-        executable = ctx.executable._builder,
-        progress_message = "JsImageLayer %{label}",
-        mnemonic = "JsImageLayer",
-        env = {
-            "BAZEL_BINDIR": ".",
-        },
-    )
-
-    return output
-
-def _select_layer(layers, destination, file):
-    is_node = file.owner.repo_name != "" and "/bin/nodejs/" in destination
-    is_js_patches = "/js/private/node-patches" in destination
-    if is_node or is_js_patches:
-        return layers.node
-    is_package_store = "/.aspect_rules_js/" in destination
-    if is_package_store:
-        is_1p_dep = "@0.0.0/node_modules/" in destination
-        if is_1p_dep:
-            return layers.package_store_1p
-        else:
-            return layers.package_store_3p
-    is_node_modules = "/node_modules/" in destination
-    if is_node_modules:
-        return layers.node_modules
-    return layers.app
-
-def _repo_mapping_manifest(files_to_run):
-    return getattr(files_to_run, "repo_mapping_manifest", None)
-
-def _js_image_layer_impl(ctx):
-    if len(ctx.attr.binary) != 1:
-        fail("binary attribute has more than one transition")
-
+def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
     ownersplit = ctx.attr.owner.split(":")
     if len(ownersplit) != 2 or not ownersplit[0].isdigit() or not ownersplit[1].isdigit():
         fail("owner attribute should be in `0:0` `int:int` format.")
 
+    VARIABLES = ""
+    PICK_STATEMENTS = ""
+    WRITE_STATEMENTS = ""
+
+    splitter_outputs = []
+    expected_layer_groups = []
+
+    for name, match in layer_groups.items():
+        mtree = ctx.actions.declare_file("{}_{}.mtree".format(ctx.label.name, name))
+        unused_inputs = ctx.actions.declare_file("{}_{}_unused_inputs.txt".format(ctx.label.name, name))
+        splitter_outputs.extend([mtree, unused_inputs])
+        VARIABLES += """
+    const {name}mtree = new Set(["#mtree"]);
+    const {name}unusedinputs = createWriteStream("{}");
+""".format(unused_inputs.path, name = name)
+
+        STMT = "else if" if PICK_STATEMENTS != "" else "if"
+
+        IF_STMT = "%s (/%s/.test(key))" % (STMT, match)
+
+        # Empty match means, match anything, same as .* but faster.
+        if match == "":
+            IF_STMT = "%s (true)" % (STMT)
+
+        PICK_STATEMENTS += """
+%s {
+    mtree = %smtree;
+%s
+}
+        """ % (
+            IF_STMT,
+            name,
+            "\n".join([
+                "    %sunusedinputs.write(destBuf);" % oname
+                for oname in layer_groups.keys()
+                if oname != name
+            ]),
+        )
+
+        WRITE_STATEMENTS += """writeFile("%s", Array.from(%smtree).sort().concat(["\\n"]).join("\\n")),\n""" % (mtree.path, name)
+
+        expected_layer_groups.append((name, mtree, unused_inputs))
+
+    unused_inputs = ctx.actions.declare_file("{}_splitter_unused_inputs.txt".format(ctx.label.name))
+    splitter_outputs.append(unused_inputs)
+
+    splitter = ctx.actions.declare_file("{}_js_image_layer_splitter.mjs".format(ctx.label.name))
+    ctx.actions.expand_template(
+        template = ctx.file._splitter,
+        output = splitter,
+        is_executable = True,
+        substitutions = {
+            "{{UID}}": ownersplit[0],
+            "{{GID}}": ownersplit[1],
+            "{{RUNFILES_DIR}}": runfiles_dir,
+            "{{REPO_NAME}}": ctx.workspace_name,
+            "{{ENTRIES}}": entries_json.path,
+            "{{PRESERVE_SYMLINKS}}": ctx.attr.preserve_symlinks,
+            "{{UNUSED_INPUTS}}": unused_inputs.path,
+            "/*{{VARIABLES}}*/": VARIABLES,
+            "/*{{PICK_STATEMENTS}}*/": PICK_STATEMENTS,
+            "/*{{WRITE_STATEMENTS}}*/": WRITE_STATEMENTS,
+        },
+    )
+
+    inputs = depset(
+        [entries_json, splitter],
+        transitive = [files],
+    )
+    nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
+    ctx.actions.run(
+        inputs = inputs,
+        arguments = [splitter.path],
+        unused_inputs_list = unused_inputs,
+        outputs = splitter_outputs,
+        executable = nodeinfo.node,
+        progress_message = "Computing Layer Groups %{label}",
+        mnemonic = "JsImageLayerGroups",
+        toolchain = "@rules_nodejs//nodejs:toolchain_type",
+    )
+
+    return expected_layer_groups
+
+# This function exactly same as the one from "@aspect_bazel_lib//lib:paths.bzl"
+# except that it takes workspace_name directly instead of the ctx object.
+# Reason is the performance of Args.add_all closures where we use this function.
+# https://bazel.build/rules/lib/builtins/Args#add_all `allow_closure` explains this.
+def _to_rlocation_path(file, workspace):
+    if file.short_path.startswith("../"):
+        return file.short_path[3:]
+    return workspace + "/" + file.short_path
+
+def _repo_mapping_manifest(files_to_run):
+    return getattr(files_to_run, "repo_mapping_manifest", None)
+
+_ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"is_directory":%s,"repo_name":"%s"},\n%s:"%s"'
+
+def _js_image_layer_impl(ctx):
+    if ctx.attr.generate_empty_layers:
+        # buildifier: disable=print
+        print("The `generate_empty_layers` attribute is deprecated and will be removed in the next major release. Its behavior is now implicitly `True`")
+    if len(ctx.attr.binary) != 1:
+        fail("binary attribute has more than one transition")
+
     binary_default_info = ctx.attr.binary[0][DefaultInfo]
     binary_label = ctx.attr.binary[0].label
 
-    binary_path = paths.join(ctx.attr.root, binary_label.package, binary_label.name)
+    binary_path = "." + paths.join(ctx.attr.root, binary_label.package, binary_label.name)
     runfiles_dir = binary_path + ".runfiles"
 
-    real_binary_path = _runfile_path(ctx, binary_default_info.files_to_run.executable, runfiles_dir)
-    launcher = _write_laucher(ctx, real_binary_path)
+    launcher = _write_laucher(ctx, binary_default_info.files_to_run.executable)
 
     repo_mapping = _repo_mapping_manifest(binary_default_info.files_to_run)
 
-    all_files = depset(
-        [repo_mapping] if repo_mapping else [],
+    runfiles_plus_files = depset(
         transitive = [binary_default_info.files, binary_default_info.default_runfiles.files],
     )
-    all_entries = {}
 
-    layers = struct(
-        node = struct(
-            entries = {},
-            inputs = [],
-        ),
-        package_store_3p = struct(
-            entries = {},
-            inputs = [],
-        ),
-        package_store_1p = struct(
-            entries = {},
-            inputs = [],
-        ),
-        node_modules = struct(
-            entries = {},
-            inputs = [],
-        ),
-        app = struct(
-            entries = {binary_path: {"dest": launcher.path, "root": launcher.root.path}},
-            inputs = [launcher],
-        ),
+    # copy workspace name here just in case to prevent ctx  to be transferred to execution phase.
+    workspace_name = str(ctx.workspace_name)
+
+    # be careful about what you access outside of the function closure. accessing objects
+    # such as ctx within this function will make it significantly slower.
+    def map_entry(f, _):
+        runfiles_dest = runfiles_dir + "/" + _to_rlocation_path(f, workspace_name)
+        path = json.encode(f.path)
+        return _ENTRY % (
+            runfiles_dest,
+            path,
+            f.root.path,
+            "true" if f.owner.repo_name != "" else "false",
+            "true" if f.is_source else "false",
+            "true" if f.is_directory else "false",
+            f.owner.repo_name,
+            # To avoid O(N ^ N) complexity when searching for entries by their destination
+            # the map also has to have entries by their path on bazel-out,
+            path,
+            runfiles_dest,
+        )
+
+    entries = ctx.actions.args()
+    entries.set_param_file_format("multiline")
+
+    entries.add("{")
+    entries.add_joined(
+        [binary_path, {"dest": launcher.path, "root": launcher.root.path}],
+        join_with = ":",
+        map_each = json.encode,
     )
+    entries.add_all(
+        runfiles_plus_files,
+        expand_directories = False,
+        map_each = map_entry,
+        allow_closure = True,
+        before_each = ",",
+    )
+    entries.add(",")
 
-    for file in all_files.to_list():
-        destination = _runfile_path(ctx, file, runfiles_dir)
-        entry = {
-            "dest": file.path,
-            "root": file.root.path,
-            "is_external": file.owner.repo_name != "",
-            "is_source": file.is_source,
-            "is_directory": file.is_directory,
-        }
-        if destination == real_binary_path:
-            entry["remove_non_hermetic_lines"] = True
-
-        all_entries[destination] = entry
-
-        layer = _select_layer(layers, destination, file)
-        layer.entries[destination] = entry
-        layer.inputs.append(file)
+    # shell launcher generated by js_binary contains non-reproducible information swap it out with the sanitized one.
+    binary_path_under_runfiles = runfiles_dir + "/" + _to_rlocation_path(binary_default_info.files_to_run.executable, workspace_name)
+    entries.add_joined(
+        [binary_path_under_runfiles, {"dest": launcher.path, "root": launcher.root.path}],
+        join_with = ":",
+        map_each = json.encode,
+    )
 
     if repo_mapping:
-        destination = paths.join(runfiles_dir, "_repo_mapping")
-        entry = {
-            "dest": repo_mapping.path,
-            "root": repo_mapping.root.path,
-        }
-        all_entries[destination] = entry
-        layers.app.entries[destination] = entry
+        entries.add(",")
+        entries.add_joined(
+            [runfiles_dir + "/" + "_repo_mapping", {"dest": repo_mapping.path, "root": repo_mapping.root.path}],
+            join_with = ":",
+            map_each = json.encode,
+        )
+    entries.add("}")
 
-    all_entries_json = ctx.actions.declare_file("{}_all_entries.json".format(ctx.label.name))
-    ctx.actions.write(all_entries_json, content = json.encode(all_entries))
+    entries_json = ctx.actions.declare_file("{}_entries.json".format(ctx.label.name))
+    ctx.actions.write(entries_json, content = entries)
 
-    node = _build_layer(
-        ctx,
-        type = "node",
-        all_entries_json = all_entries_json,
-        entries = layers.node.entries,
-        inputs = layers.node.inputs,
-    )
-    package_store_3p = _build_layer(
-        ctx,
-        type = "package_store_3p",
-        all_entries_json = all_entries_json,
-        entries = layers.package_store_3p.entries,
-        inputs = layers.package_store_3p.inputs,
-    )
-    package_store_1p = _build_layer(
-        ctx,
-        type = "package_store_1p",
-        all_entries_json = all_entries_json,
-        entries = layers.package_store_1p.entries,
-        inputs = layers.package_store_1p.inputs,
-    )
-    node_modules = _build_layer(
-        ctx,
-        type = "node_modules",
-        all_entries_json = all_entries_json,
-        entries = layers.node_modules.entries,
-        inputs = layers.node_modules.inputs,
-    )
-    app = _build_layer(
-        ctx,
-        type = "app",
-        all_entries_json = all_entries_json,
-        entries = layers.app.entries,
-        inputs = layers.app.inputs,
-    )
+    # Ordering of these matter.
+    layer_groups = dict()
+    for key in ctx.attr.layer_groups:
+        # Only add if the key is not in the default layer groups since we already handled the collision below.
+        if key not in _DEFAULT_LAYER_GROUPS:
+            layer_groups[key] = ctx.attr.layer_groups[key]
+
+    for key, value in _DEFAULT_LAYER_GROUPS.items():
+        # if the key is provided by the user, use it, otherwise use the default.
+        if key in ctx.attr.layer_groups:
+            layer_groups[key] = ctx.attr.layer_groups[key]
+        else:
+            layer_groups[key] = value
+
+    layer_groups_gen = _run_splitter(ctx, runfiles_dir, runfiles_plus_files, entries_json, layer_groups)
+
+    tarinfo = ctx.toolchains[tar_lib.toolchain_type].tarinfo
+
+    outputs = []
+    output_groups = dict()
+    compress = "" if ctx.attr.compression == "none" else ctx.attr.compression
+    for typ, mtree, unused_inputs in layer_groups_gen:
+        ext = tar_lib.common.compression_to_extension[compress] if compress else ""
+        output = ctx.actions.declare_file("%s_%s%s" % (ctx.label.name, typ, ext))
+
+        # add the layer group to outputgroupinfo and defaultinfo
+        outputs.append(output)
+        output_groups[typ] = depset([output])
+
+        args = ctx.actions.args()
+        args.add("--create")
+        args.add("--file")
+        args.add(output)
+        tar_lib.common.add_compression_args(compress, args)
+        args.add(mtree, format = "@%s")
+
+        ctx.actions.run(
+            inputs = depset(
+                ([repo_mapping] if repo_mapping else []) + [entries_json, launcher, mtree, unused_inputs],
+                transitive = [runfiles_plus_files],
+            ),
+            arguments = [args],
+            executable = tarinfo.binary,
+            unused_inputs_list = unused_inputs,
+            env = tarinfo.default_env,
+            outputs = [output],
+            mnemonic = "JsImageLayer",
+            progress_message = "JsImageLayer " + typ + " %{label}",
+            toolchain = "@aspect_bazel_lib//lib:tar_toolchain_type",
+        )
 
     return [
-        DefaultInfo(files = depset([i for i in [
-            node,
-            package_store_3p,
-            package_store_1p,
-            node_modules,
-            app,
-        ] if i])),
-        OutputGroupInfo(
-            node = depset([node]) if node else depset(),
-            package_store_3p = depset([package_store_3p]) if package_store_3p else depset(),
-            package_store_1p = depset([package_store_1p]) if package_store_1p else depset(),
-            node_modules = depset([node_modules]) if node_modules else depset(),
-            app = depset([app]) if app else depset(),
-        ),
+        DefaultInfo(files = depset(outputs)),
+        OutputGroupInfo(**output_groups),
     ]
 
 def _js_image_layer_transition_impl(settings, attr):
@@ -481,10 +576,9 @@ js_image_layer_lib = struct(
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
-        "_builder": attr.label(
-            default = "//js/private:js_image_layer_builder",
-            executable = True,
-            cfg = "exec",
+        "_splitter": attr.label(
+            default = "//js/private:js_image_layer.mjs",
+            allow_single_file = True,
         ),
         "binary": attr.label(
             mandatory = True,
@@ -500,18 +594,30 @@ js_image_layer_lib = struct(
             default = "0:0",
         ),
         "compression": attr.string(
-            doc = "Compression algorithm. Can be one of `gzip`, `none`.",
-            values = ["gzip", "none"],
+            doc = "Compression algorithm. See https://github.com/bazel-contrib/bazel-lib/blob/bdc6ade0ba1ebe88d822bcdf4d4aaa2ce7e2cd37/lib/private/tar.bzl#L29-L39",
+            values = tar_lib.common.accepted_compression_types + ["none"],
             default = "gzip",
         ),
         "platform": attr.label(
             doc = "Platform to transition.",
         ),
         "generate_empty_layers": attr.bool(
-            doc = """Generate layers even if they are empty.
-
-Helpful when using js_image_layer with rules_docker.
-See https://github.com/aspect-build/rules_js/pull/1714 for more info""",
+            # TODO(3.0): remove this attribute.
+            doc = """DEPRECATED. An empty layer is always generated if the layer group have no matching files.""",
+            default = False,
+        ),
+        "preserve_symlinks": attr.string(
+            doc = """Preserve symlinks for entries matching the pattern.
+By default symlinks within the `node_modules` is preserved.
+""",
+            default = ".*\\/node_modules\\/.*",
+        ),
+        "layer_groups": attr.string_dict(
+            doc = """Layer groups to create.
+These are utilized to categorize files into distinct layers, determined by their respective paths. 
+The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and 
+JavaScript identifier (alphanumeric characters), and <value> MAY be either an empty string (signifying a universal match)
+or a valid regular expression.""",
         ),
     },
 )
@@ -520,4 +626,8 @@ js_image_layer = rule(
     implementation = js_image_layer_lib.implementation,
     attrs = js_image_layer_lib.attrs,
     doc = _DOC,
+    toolchains = [
+        tar_lib.toolchain_type,
+        "@rules_nodejs//nodejs:toolchain_type",
+    ],
 )
