@@ -13,7 +13,6 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
 load(":js_library.bzl", _js_library = "js_library")
@@ -401,7 +400,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     _run_binary(
         name = name,
         tool = tool,
-        env = dicts.add(fixed_env, env),
+        env = fixed_env | env,
         srcs = srcs + extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
