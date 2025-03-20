@@ -176,25 +176,13 @@ js_run_binary(
         "@mycorp/pkg-a",
     ],
     chdir = package_name(),
-    out_dirs = ["out4-dist"],
-    tool = ":bin4",
-)
-
-js_run_binary(
-    name = "run5-a",
-    args = [
-        "out4-dist/out4-a",
-        "@mycorp/pkg-a",
-    ],
-    chdir = package_name(),
-    # This specifically tests that a select can be merged
-    # with a dictionary. This will fail if dict.add is used
-    env = {} | select({
+    # This specifically tests that a `select` can be used when setting `env`.
+    env = select({
         "//conditions:default": {
             "NODE_ENV": "production",
         },
     }),
-    out_dirs = ["out5-dist"],
+    out_dirs = ["out4-dist"],
     tool = ":bin4",
 )
 
@@ -218,6 +206,12 @@ js_run_binary(
         "@mycorp/pkg-b",
     ],
     chdir = package_name(),
+    # This specifically tests that a `select` and `|` operator can be used when setting `env`.
+    env = {} | select({
+        "//conditions:default": {
+            "NODE_ENV": "production",
+        },
+    }),
     tool = ":bin4",
 )
 
