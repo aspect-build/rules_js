@@ -187,14 +187,14 @@ js_run_binary(
         "@mycorp/pkg-a",
     ],
     chdir = package_name(),
-    out_dirs = ["out5-dist"],
     # This specifically tests that a select can be merged
     # with a dictionary. This will fail if dict.add is used
-    env = {} | select(
+    env = {} | select({
         "//conditions:default": {
-            "NODE_ENV": "production"
-        }
-    ),
+            "NODE_ENV": "production",
+        },
+    }),
+    out_dirs = ["out5-dist"],
     tool = ":bin4",
 )
 
