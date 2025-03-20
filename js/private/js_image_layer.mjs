@@ -1,5 +1,5 @@
 import { readdir, readFile, readlink, writeFile } from 'node:fs/promises'
-import { createWriteStream } from "node:fs"
+import { createWriteStream } from 'node:fs'
 import * as path from 'node:path'
 
 /**
@@ -17,16 +17,16 @@ import * as path from 'node:path'
  */
 
 /**
- * @param {Entry} entries 
- * @param {string} value 
+ * @param {Entry} entries
+ * @param {string} value
  * @returns {string | undefined}
  */
 function findKeyByValue(entries, value) {
-    const found = entries[value];
+    const found = entries[value]
     if (!found) {
         return undefined
-    } else if (typeof found != "string") {
-        // matched against the real entry. 
+    } else if (typeof found != 'string') {
+        // matched against the real entry.
         return undefined
     }
     return found
@@ -49,7 +49,7 @@ async function readlinkSafe(p) {
     }
 }
 
-const EXECROOT = process.cwd();
+const EXECROOT = process.cwd()
 
 // Resolve symlinks while staying inside the sandbox.
 async function resolveSymlink(p) {
@@ -69,7 +69,7 @@ async function resolveSymlink(p) {
         // If there is more than one hop while staying inside sandbox
         // that means the symlink has multiple indirection within sandbox
         // but we want to hop only once, for example first party deps.
-        //  -> js/private/test/image/node_modules/@mycorp/pkg-d 
+        //  -> js/private/test/image/node_modules/@mycorp/pkg-d
         //      -> ../../../../../../node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp/pkg-d    <- WE WANT TO STOP RIGHT HERE.
         //          -> ../../../../../../examples/npm_package/packages/pkg_d
         if (nextHop != prevHop && hopped) {
@@ -77,7 +77,7 @@ async function resolveSymlink(p) {
         }
 
         // if the next hop is leads to a different path
-        // that indicates a symlink 
+        // that indicates a symlink
         if (nextHop != prevHop && !hopped) {
             prevHop = nextHop
             hopped = true
@@ -127,10 +127,7 @@ async function* walk(dir, accumulate = '') {
     }
 }
 
-function add_parents(
-	mtree,
-    dest,
-) {
+function add_parents(mtree, dest) {
     const segments = path.dirname(dest).split('/')
     let prev = ''
     for (const part of segments) {
@@ -143,23 +140,24 @@ function add_parents(
 }
 
 /**
- * @param {string} str 
+ * @param {string} str
  * @returns {string}
  */
 function vis(str) {
-    let result = "";
+    let result = ''
     // There is no way to iterate over byte-by-byte UTF-8 characters in JS
     // so we have to use Buffer to get the bytes.
     // Rust has this https://doc.rust-lang.org/std/string/struct.String.html#method.as_bytes
     // and the equivalent in nodejs is Buffer.
     for (const char of Buffer.from(str)) {
-      if (char < 33 || char > 126) { // Non-printable
-        result += "\\" + char.toString(8).padStart(3, "0");
-      } else {
-        result += String.fromCharCode(char);
-      }
+        if (char < 33 || char > 126) {
+            // Non-printable
+            result += '\\' + char.toString(8).padStart(3, '0')
+        } else {
+            result += String.fromCharCode(char)
+        }
     }
-    return result;
+    return result
 }
 
 function _mtree_dir_line(dir) {
@@ -168,7 +166,7 @@ function _mtree_dir_line(dir) {
     // to use a stable mode for files.
     // In the future, we might want to hand off fine-grained control of these to users
     // see: https://chmodcommand.com/chmod-0755/
-    return `./${dest} uid={{UID}} gid={{GID}} time=0 mode=0755 type=dir`;
+    return `./${dest} uid={{UID}} gid={{GID}} time=0 mode=0755 type=dir`
 }
 
 function _mtree_link_line(key, linkname) {
@@ -178,7 +176,9 @@ function _mtree_link_line(key, linkname) {
     // interestingly, bazel 5 and 6 sets different mode bits on symlinks.
     // well use `0o755` to allow owner&group to `rwx` and others `rx`
     // see: https://chmodcommand.com/chmod-775/
-    return `${vis(key)} uid={{UID}} gid={{GID}} time=0 mode=0775 type=link link=${vis(linkname)}`;
+    return `${vis(
+        key
+    )} uid={{UID}} gid={{GID}} time=0 mode=0775 type=link link=${vis(linkname)}`
 }
 
 function _mtree_file_line(key, content) {
@@ -187,56 +187,47 @@ function _mtree_file_line(key, content) {
     // to use a stable mode for files.
     // In the future, we might want to hand off fine-grained control of these to users
     // see: https://chmodcommand.com/chmod-0555/
-    return `${dest} uid={{UID}} gid={{GID}} time=0 mode=0555 type=file content=${vis(content)}`;
+    return `${dest} uid={{UID}} gid={{GID}} time=0 mode=0555 type=file content=${vis(
+        content
+    )}`
 }
 
-
-async function split() {	
-    const UID = "{{UID}}"
-    const GID = "{{GID}}"
-    const RUNFILES_DIR = "{{RUNFILES_DIR}}"
-    const REPO_NAME = "{{REPO_NAME}}"
+async function split() {
+    const UID = '{{UID}}'
+    const GID = '{{GID}}'
+    const RUNFILES_DIR = '{{RUNFILES_DIR}}'
+    const REPO_NAME = '{{REPO_NAME}}'
 
     // TODO: use computed_substitutions when we only support >= Bazel 7
-    const entries = JSON.parse((await readFile("{{ENTRIES}}")).toString())
+    const entries = JSON.parse((await readFile('{{ENTRIES}}')).toString())
 
     /*{{VARIABLES}}*/
 
-    const resolveTasks = [];
-    const splitterUnusedInputs = createWriteStream("{{UNUSED_INPUTS}}");
+    const resolveTasks = []
+    const splitterUnusedInputs = createWriteStream('{{UNUSED_INPUTS}}')
 
     for (const key in entries) {
-        if (typeof entries[key] == "string") {
+        if (typeof entries[key] == 'string') {
             continue
         }
-        const {
-            dest,
-            is_directory,
-            is_source,
-            is_external,
-            root,
-            repo_name
-        } = entries[key]
+        const { dest, is_directory, is_source, is_external, root, repo_name } =
+            entries[key]
 
-     	/** @type Set<string> */
+        /** @type Set<string> */
         let mtree = null
-        
-        const destBuf = Buffer.from(dest + "\n")
+
+        const destBuf = Buffer.from(dest + '\n')
 
         /*{{PICK_STATEMENTS}}*/
-        
 
         // its a treeartifact. expand it and add individual entries.
         if (is_directory) {
             for await (const sub_key of walk(dest)) {
-                const new_key = key + "/" + sub_key;
-                const new_dest = dest + "/" + sub_key;
+                const new_key = key + '/' + sub_key
+                const new_dest = dest + '/' + sub_key
 
-				add_parents(mtree, new_key)
-				mtree.add(_mtree_file_line(
-					new_key,
-					new_dest
-				))
+                add_parents(mtree, new_key)
+                mtree.add(_mtree_file_line(new_key, new_dest))
             }
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
             splitterUnusedInputs.write(destBuf)
@@ -248,10 +239,7 @@ async function split() {
 
         // A source file from workspace, not an output of a target.
         if (is_source) {
-			mtree.add(_mtree_file_line(
-				key,
-				dest
-			))
+            mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
             splitterUnusedInputs.write(destBuf)
             continue
@@ -266,16 +254,13 @@ async function split() {
                     entries[key]
                 )}. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose`
             )
-        }   
+        }
 
         // If its external or if it does not match the `preserve_symlinks` regex
         // we don't support preserving symlinks.
         if (is_external || !/{{PRESERVE_SYMLINKS}}/.test(key)) {
             // Just add the file as a regular file.
-            mtree.add(_mtree_file_line(
-                key,
-                dest
-            ))
+            mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
             splitterUnusedInputs.write(destBuf)
             continue
@@ -289,13 +274,16 @@ async function split() {
                 // Look in all entries for symlinks since they may be in other layers
                 let linkname = findKeyByValue(entries, output_path)
 
-
                 // First party dependencies are linked against a folder in output tree or source tree
                 // which means that we won't have an exact match for it in the entries. We could continue
                 // doing what we have done https://github.com/aspect-build/rules_js/commit/f83467ba91deb88d43fd4ac07991b382bb14945f
                 // but that is expensive and does not scale.
                 if (linkname == undefined && !repo_name) {
-                    linkname = RUNFILES_DIR + "/" + REPO_NAME + realp.slice(realp.indexOf(root) + root.length)
+                    linkname =
+                        RUNFILES_DIR +
+                        '/' +
+                        REPO_NAME +
+                        realp.slice(realp.indexOf(root) + root.length)
                 }
 
                 if (linkname == undefined) {
@@ -305,21 +293,15 @@ async function split() {
                             `realpath: ${realp}\n` +
                             `output_path: ${output_path}\n` +
                             `root: ${root}\n` +
-                            `repo_name: ${repo_name}\n` +  
+                            `repo_name: ${repo_name}\n` +
                             `runfiles: ${key}\n\n`
                     )
                 }
                 // add the symlink to the mtree
-                mtree.add(_mtree_link_line(
-                    key,
-                    linkname
-                ))
+                mtree.add(_mtree_link_line(key, linkname))
             } else {
                 // If we can't resolve the symlink, we just add the file as a regular file.
-                mtree.add(_mtree_file_line(
-                    key,
-                    dest
-                ))
+                mtree.add(_mtree_file_line(key, dest))
                 // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
                 splitterUnusedInputs.write(destBuf)
             }
@@ -327,13 +309,11 @@ async function split() {
         resolveTasks.push(resolveTask)
     }
 
-    await Promise.all(resolveTasks);
+    await Promise.all(resolveTasks)
 
     await Promise.all([
-      /*{{WRITE_STATEMENTS}}*/
+        /*{{WRITE_STATEMENTS}}*/
     ])
-
-    
 }
 
 await split()
