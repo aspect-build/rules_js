@@ -303,15 +303,17 @@ def _write_laucher(ctx, real_binary):
     "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
     launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
 
+    substitutions = {
+        "#!/usr/bin/env bash": _LAUNCHER_PREABMLE,
+        'export JS_BINARY__BINDIR="%s"' % real_binary.root.path: 'export JS_BINARY__BINDIR="$(pwd)"',
+        'export JS_BINARY__TARGET_CPU="%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'export JS_BINARY__TARGET_CPU="$(uname -m)"',
+    }
+    substitutions['export JS_BINARY__BINDIR="%s"' % ctx.bin_dir.path] = 'export JS_BINARY__BINDIR="$(pwd)"'
+
     ctx.actions.expand_template(
         template = real_binary,
         output = launcher,
-        substitutions = {
-            "#!/usr/bin/env bash": _LAUNCHER_PREABMLE,
-            'export JS_BINARY__BINDIR="%s"' % real_binary.root.path: 'export JS_BINARY__BINDIR="$(pwd)"',
-            'export JS_BINARY__BINDIR="%s"' % ctx.bin_dir.path: 'export JS_BINARY__BINDIR="$(pwd)"',
-            'export JS_BINARY__TARGET_CPU="%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'export JS_BINARY__TARGET_CPU="$(uname -m)"',
-        },
+        substitutions = substitutions,
         is_executable = True,
     )
     return launcher
