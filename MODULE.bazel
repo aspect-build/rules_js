@@ -16,6 +16,7 @@ bazel_dep(name = "platforms", version = "0.0.5")
 bazel_dep(name = "rules_nodejs", version = "6.3.0")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+use_repo(node, "nodejs_toolchains")
 use_repo(node, "nodejs_darwin_amd64")
 use_repo(node, "nodejs_darwin_arm64")
 use_repo(node, "nodejs_linux_amd64")
@@ -63,7 +64,6 @@ node_dev = use_extension(
     "node",
     dev_dependency = True,
 )
-use_repo(node_dev, "nodejs_toolchains")
 use_repo(node_dev, "node20_linux_amd64")
 use_repo(node_dev, "node20_darwin_arm64")
 use_repo(node_dev, "node20_darwin_amd64")
