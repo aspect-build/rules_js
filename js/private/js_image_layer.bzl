@@ -18,8 +18,8 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DEFAULT_LAYER_GROUPS = {
     "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
+    "package_store_3p": "\\/\\.aspect_rules_js\\/(?!.*@0\\.0\\.0).*\\/node_modules",
     "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
-    "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
     "node_modules": "\\/node_modules\\/",
     "app": "",  # empty means just match anything.
 }
