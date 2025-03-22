@@ -330,6 +330,8 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
     splitter_outputs = []
     expected_layer_groups = []
 
+    has_fallback = False
+
     for name, match in layer_groups.items():
         mtree = ctx.actions.declare_file("{}_{}.mtree".format(ctx.label.name, name))
         unused_inputs = ctx.actions.declare_file("{}_{}_unused_inputs.txt".format(ctx.label.name, name))
@@ -345,6 +347,7 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
 
         # Empty match means, match anything, same as .* but faster.
         if match == "":
+            has_fallback = True
             IF_STMT = "%s (true)" % (STMT)
 
         PICK_STATEMENTS += """
@@ -365,6 +368,19 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
         WRITE_STATEMENTS += """writeFile("%s", Array.from(%smtree).sort().concat(["\\n"]).join("\\n")),\n""" % (mtree.path, name)
 
         expected_layer_groups.append((name, mtree, unused_inputs))
+
+    if not has_fallback:
+        # Final else {} to discard a file if it doesn't match any of the layer groups.
+        PICK_STATEMENTS += """
+else {
+%s
+    continue
+}""" % (
+            "\n".join([
+                "    %sunusedinputs.write(destBuf);" % oname
+                for oname in layer_groups.keys()
+            ])
+        )
 
     unused_inputs = ctx.actions.declare_file("{}_splitter_unused_inputs.txt".format(ctx.label.name))
     splitter_outputs.append(unused_inputs)

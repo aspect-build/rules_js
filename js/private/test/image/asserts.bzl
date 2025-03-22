@@ -69,7 +69,7 @@ def make_js_image_layer(name, layer_groups = {}, **kwargs):
         **kwargs
     )
 
-    for layer in layers + layer_groups.keys():
+    for layer in layers + [k for k in layer_groups.keys() if k not in layers]:
         native.filegroup(
             name = name + "_" + layer,
             srcs = [name],
