@@ -1,6 +1,5 @@
 "Make shorter assertions"
 
-load("@aspect_bazel_lib//lib:utils.bzl", "is_bzlmod_enabled")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
@@ -42,7 +41,7 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
         assert_tar_listing(
             name = "assert_{}_{}".format(name, layer),
             actual = "{}_{}".format(js_image_layer, layer),
-            expected = "{}_{}{}.listing".format(name, layer, (".bzlmod" if is_bzlmod_enabled() else ".nobzlmod")),
+            expected = "{}_{}.listing".format(name, layer),
         )
 
     write_source_files(
@@ -100,6 +99,6 @@ echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
         name = name + "_test",
         testonly = True,
         in_file = name,
-        out_file = name + ("." if is_bzlmod_enabled() else ".no") + "bzlmod.expected",
+        out_file = name + ".expected",
         tags = ["skip-on-bazel6"],
     )
