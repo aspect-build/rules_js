@@ -29,8 +29,8 @@ def assert_tar_listing(name, actual, expected):
 
 layers = [
     "node",
-    "package_store_1p",
     "package_store_3p",
+    "package_store_1p",
     "node_modules",
     "app",
 ]
