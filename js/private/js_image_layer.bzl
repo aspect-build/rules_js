@@ -17,10 +17,10 @@ load("@aspect_bazel_lib//lib:tar.bzl", "tar_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 _DEFAULT_LAYER_GROUPS = {
-    "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
-    "package_store_3p": "\\/\\.aspect_rules_js\\/(?!.*@0\\.0\\.0).*\\/node_modules",
-    "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
-    "node_modules": "\\/node_modules\\/",
+    "node": "/js/private/node-patches/|/bin/nodejs/",
+    "package_store_3p": "/\\.aspect_rules_js/(?!.*@0\\.0\\.0).*/node_modules",
+    "package_store_1p": "\\.aspect_rules_js/.*@0\\.0\\.0/node_modules",
+    "node_modules": "/node_modules/",
     "app": "",  # empty means just match anything.
 }
 
@@ -278,10 +278,10 @@ The default layer groups are as follows and always created.
 
 ```
 {
-    "node": "\\/js\\/private\\/node-patches\\/|\\/bin\\/nodejs\\/",
-    "package_store_1p": "\\.aspect_rules_js\\/.*@0\\.0\\.0\\/node_modules",
-    "package_store_3p": "\\.aspect_rules_js\\/.*\\/node_modules",
-    "node_modules": "\\/node_modules\\/",
+    "node": "/js/private/node-patches/|/bin/nodejs/",
+    "package_store_1p": "\\.aspect_rules_js/.*@0\\.0\\.0/node_modules",
+    "package_store_3p": "\\.aspect_rules_js/.*/node_modules",
+    "node_modules": "/node_modules/",
     "app": "", # empty means just match anything.
 }
 ```
@@ -335,13 +335,14 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
         unused_inputs = ctx.actions.declare_file("{}_{}_unused_inputs.txt".format(ctx.label.name, name))
         splitter_outputs.extend([mtree, unused_inputs])
         VARIABLES += """
+    const {name}_re = new RegExp({});
     const {name}mtree = new Set(["#mtree"]);
-    const {name}unusedinputs = createWriteStream("{}");
-""".format(unused_inputs.path, name = name)
+    const {name}unusedinputs = createWriteStream({});
+""".format(json.encode(match), json.encode(unused_inputs.path), name = name)
 
         STMT = "else if" if PICK_STATEMENTS != "" else "if"
 
-        IF_STMT = "%s (/%s/.test(key))" % (STMT, match)
+        IF_STMT = "%s (%s_re.test(key))" % (STMT, name)
 
         # Empty match means, match anything, same as .* but faster.
         if match == "":
@@ -380,7 +381,7 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
             "{{RUNFILES_DIR}}": runfiles_dir,
             "{{REPO_NAME}}": ctx.workspace_name,
             "{{ENTRIES}}": entries_json.path,
-            "{{PRESERVE_SYMLINKS}}": ctx.attr.preserve_symlinks,
+            "'{{PRESERVE_SYMLINKS}}'": json.encode(ctx.attr.preserve_symlinks),
             "{{UNUSED_INPUTS}}": unused_inputs.path,
             "/*{{VARIABLES}}*/": VARIABLES,
             "/*{{PICK_STATEMENTS}}*/": PICK_STATEMENTS,
@@ -616,7 +617,7 @@ js_image_layer_lib = struct(
             doc = """Preserve symlinks for entries matching the pattern.
 By default symlinks within the `node_modules` is preserved.
 """,
-            default = ".*\\/node_modules\\/.*",
+            default = ".*/node_modules/.*",
         ),
         "layer_groups": attr.string_dict(
             doc = """Layer groups to create.

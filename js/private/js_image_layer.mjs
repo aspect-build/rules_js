@@ -201,6 +201,8 @@ async function split() {
     // TODO: use computed_substitutions when we only support >= Bazel 7
     const entries = JSON.parse((await readFile('{{ENTRIES}}')).toString())
 
+    const preserveSymlniksRe = new RegExp('{{PRESERVE_SYMLINKS}}')
+
     /*{{VARIABLES}}*/
 
     const resolveTasks = []
@@ -258,7 +260,7 @@ async function split() {
 
         // If its external or if it does not match the `preserve_symlinks` regex
         // we don't support preserving symlinks.
-        if (is_external || !/{{PRESERVE_SYMLINKS}}/.test(key)) {
+        if (is_external || !preserveSymlniksRe.test(key)) {
             // Just add the file as a regular file.
             mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
