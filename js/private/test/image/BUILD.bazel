@@ -72,3 +72,23 @@ assert_js_image_layer_listings(
     name = "custom_owner_test",
     js_image_layer = ":custom_owner",
 )
+
+# Case 3: Change owner
+# bazel run :custom_owner_test_update_all
+make_js_image_layer(
+    name = "regex_edge_cases",
+    binary = ":bin",
+    layer_groups = {
+        # Odd characters to insert into js string/regex/backtick expressions
+        "odd_characters": "spaces quotes ' \" ` slashes / \\ | symbols \\{",
+    },
+    platform = ":linux_amd64",
+    preserve_symlinks = "node_modules|/foobar/\"'",
+    root = "/app",
+)
+
+assert_js_image_layer_listings(
+    name = "regex_edge_cases_test",
+    additional_layers = ["odd_characters"],
+    js_image_layer = ":regex_edge_cases",
+)
