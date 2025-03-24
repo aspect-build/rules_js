@@ -1,4 +1,8 @@
-"A default files exclude list for common packages."
+"""A default files exclude list for common packages.
+
+Based on Yarn autoclean; see
+https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16
+"""
 
 exclude_package_contents_default = [
     # test directories
