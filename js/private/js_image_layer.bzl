@@ -367,6 +367,18 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
 
         expected_layer_groups.append((name, mtree, unused_inputs))
 
+    # Final else {} to discard a file if it doesn't match any of the layer groups.
+    PICK_STATEMENTS += """
+else {
+%s
+    continue
+}""" % (
+        "\n".join([
+            "    %sunusedinputs.write(destBuf);" % oname
+            for oname in layer_groups.keys()
+        ])
+    )
+
     unused_inputs = ctx.actions.declare_file("{}_splitter_unused_inputs.txt".format(ctx.label.name))
     splitter_outputs.append(unused_inputs)
 

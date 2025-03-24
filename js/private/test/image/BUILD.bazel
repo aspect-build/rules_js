@@ -92,3 +92,18 @@ assert_js_image_layer_listings(
     additional_layers = ["odd_characters"],
     js_image_layer = ":regex_edge_cases",
 )
+
+# Case 4: overwrite layer so some files have no matches
+# bazel run :custom_owner_test_update_all
+make_js_image_layer(
+    name = "custom_layers_nomatch",
+    binary = ":bin",
+    layer_groups = {"app": "no app for you"},
+    platform = ":linux_amd64",
+    root = "/app",
+)
+
+assert_js_image_layer_listings(
+    name = "custom_layers_nomatch_test",
+    js_image_layer = ":custom_layers_nomatch",
+)
