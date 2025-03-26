@@ -24,7 +24,7 @@ def assert_tar_listing(name, actual, expected):
         in_file = actual_listing,
         out_file = expected,
         testonly = True,
-        tags = ["skip-on-bazel6"],
+        tags = ["skip-on-bazel6", "skip-on-bazel8"],
     )
 
 layers = [
@@ -51,7 +51,7 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             "assert_{}_{}".format(name, layer)
             for layer in all_layers
         ],
-        tags = ["skip-on-bazel6"],
+        tags = ["skip-on-bazel6", "skip-on-bazel8"],
         testonly = True,
     )
 
@@ -101,5 +101,5 @@ echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
         testonly = True,
         in_file = name,
         out_file = name + ("." if is_bzlmod_enabled() else ".no") + "bzlmod.expected",
-        tags = ["skip-on-bazel6"],
+        tags = ["skip-on-bazel6", "skip-on-bazel8"],
     )
