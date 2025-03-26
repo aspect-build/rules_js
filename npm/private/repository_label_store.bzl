@@ -60,7 +60,7 @@ def _add_root(priv, repo_root, key, path):
     root_path = priv["root"]["path"]
 
     # we have no idea what package this path is in so just assume the root package which works for repository rules
-    label = Label("@{}//:{}".format(root_workspace, path))
+    label = Label("@@{}//:{}".format(root_workspace, path))
     priv["labels"][key] = label
     priv["paths"][key] = paths.join(root_path, path)
     priv["repository_paths"][key] = paths.join(repo_root, path)
