@@ -31,6 +31,8 @@ def _npm_extension_impl(module_ctx):
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
+                if hasattr(module_ctx, "watch"):
+                    module_ctx.watch(attr.pnpm_lock)
                 _npm_lock_imports_bzlmod(module_ctx, attr)
 
         for i in mod.tags.npm_import:
