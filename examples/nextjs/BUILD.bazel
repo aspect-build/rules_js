@@ -1,0 +1,84 @@
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_build", "nextjs_standalone_server")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//examples/nextjs:next/package_json.bzl", next_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+# The nextjs binary target to used by nextjs:defs.bzl
+next_bin.next_binary(
+    name = "next_js_binary",
+
+    # Nextjs requires a modern node toolchain
+    node_toolchain = select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
+    }),
+    visibility = ["//visibility:public"],
+)
+
+js_library(
+    name = "lib",
+    srcs = glob([
+        "src/**",
+        "public/**",
+    ]),
+    deps = [
+        ":node_modules/next",
+        ":node_modules/react",
+        ":node_modules/react-dom",
+    ],
+)
+
+js_library(
+    name = "nextjs-css",
+    srcs = [
+        "postcss.config.mjs",
+    ],
+    deps = [
+        ":node_modules/@tailwindcss/postcss",
+        ":node_modules/tailwindcss",
+    ],
+)
+
+# The standard nextjs build/start/dev workflow
+# nextjs(
+#     name = "app",
+#     srcs = [
+#         "jsconfig.json",
+#         ":nextjs-css",
+#         ":lib",
+#     ],
+#     config = "next.config.mjs",
+#     next_js_binary = ":next_js_binary",
+#     node_toolchain = select({
+#         "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
+#         "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
+#         "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
+#     }),
+# )
+
+# A standalone nextjs build
+nextjs_standalone_build(
+    name = "standalone",
+    srcs = [
+        "jsconfig.json",
+        ":lib",
+        ":nextjs-css",
+    ],
+    config = "next.standalone.mjs",
+    next_js_binary = ":next_js_binary",
+    silent_on_success = False,
+)
+
+# A standalone server
+nextjs_standalone_server(
+    name = "server",
+    app = ":standalone",
+    node_toolchain = select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
+    }),
+)

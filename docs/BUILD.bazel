@@ -107,6 +107,15 @@ stardoc_with_diff_test(
     ],
 )
 
+stardoc_with_diff_test(
+    name = "nextjs",
+    bzl_library_target = "//contrib/nextjs:defs",
+    tags = [
+        "skip-on-bazel6",
+        "skip-on-rbe",
+    ],
+)
+
 update_docs(
     name = "update",
     tags = [
