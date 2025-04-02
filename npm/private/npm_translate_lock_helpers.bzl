@@ -49,25 +49,25 @@ Check the public_hoist_packages attribute for duplicates.
 
 ################################################################################
 def _gather_package_content_excludes(keyed_lists, *names):
-    keys = []
-    result = {}
+    found = False
+    excludes = []
     for name in names:
-        if name and (name in keyed_lists or "*" in keyed_lists):
-            keys.append(name)
-            v = keyed_lists[name] if name in keyed_lists else keyed_lists["*"]
+        if name in keyed_lists:
+            found = True
+            v = keyed_lists[name]
             if type(v) == "list":
-                for item in v:
-                    result[item] = []
+                for e in v:
+                    excludes.append(e)
             elif type(v) == "string":
-                result[v] = []
+                excludes.append(v)
             else:
                 fail("expected value to be list or string")
 
     # in case the key has not been met even once, we return None, instead of empty list as empty list is a valid value
-    if not keys:
-        return None
+    if not found and "*" in keyed_lists:
+        excludes = keyed_lists["*"] if type(keyed_lists["*"]) == "list" else [keyed_lists["*"]]
 
-    return result.keys()
+    return None if len(excludes) == 0 else excludes
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
