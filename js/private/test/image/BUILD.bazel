@@ -36,7 +36,7 @@ make_js_image_layer(
     # more: https://stackoverflow.com/questions/26516369/zlib-gzip-produces-different-results-for-same-input-on-different-oses
     compression = "none",
     platform = ":linux_amd64",
-    root = "/app",
+    # root = unset to use default
 )
 
 assert_checksum(
@@ -50,7 +50,7 @@ make_js_image_layer(
     name = "default",
     binary = ":bin",
     platform = ":linux_amd64",
-    root = "/app",
+    root = "",  # blank
 )
 
 assert_js_image_layer_listings(
@@ -65,7 +65,7 @@ make_js_image_layer(
     binary = ":bin",
     owner = "100:0",
     platform = ":linux_amd64",
-    root = "/app",
+    root = "/",  # root /
 )
 
 assert_js_image_layer_listings(
@@ -84,7 +84,7 @@ make_js_image_layer(
     },
     platform = ":linux_amd64",
     preserve_symlinks = "node_modules|/foobar/\"'",
-    root = "/app",
+    root = "./app",  # with './' prefix
 )
 
 assert_js_image_layer_listings(
@@ -100,7 +100,7 @@ make_js_image_layer(
     binary = ":bin",
     layer_groups = {"app": "no app for you"},
     platform = ":linux_amd64",
-    root = "/app",
+    root = "/app",  # with /' prefix
 )
 
 assert_js_image_layer_listings(

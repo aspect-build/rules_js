@@ -443,7 +443,7 @@ def _js_image_layer_impl(ctx):
     binary_default_info = ctx.attr.binary[0][DefaultInfo]
     binary_label = ctx.attr.binary[0].label
 
-    binary_path = "." + paths.join(ctx.attr.root, binary_label.package, binary_label.name)
+    binary_path = "./" + paths.join(ctx.attr.root.lstrip("./").lstrip("/"), binary_label.package, binary_label.name)
     runfiles_dir = binary_path + ".runfiles"
 
     launcher = _write_laucher(ctx, binary_default_info.files_to_run.executable)
