@@ -113,6 +113,9 @@ jobs:
         runs-on: ${{ matrix.os }}-latest
         needs:
             - matrix-prep
+        defaults:
+            run:
+                working-directory: ${{ matrix.folder }}
         strategy:
             fail-fast: false
             matrix:
@@ -194,6 +197,12 @@ jobs:
                           major: 7
                           version: 7.4.0
                       bzlmod: 1
+                      folder: docs
+                      os: ubuntu
+                    - bazel-version:
+                          major: 7
+                          version: 7.4.0
+                      bzlmod: 1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
@@ -252,7 +261,6 @@ jobs:
                       bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
 
             - name: Configure Bazel version
-              working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
                   # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
@@ -268,12 +276,10 @@ jobs:
             # TODO: remove this block once we have Aspect CLI Windows releases
             - name: Don't use Aspect CLI on Windows
               if: matrix.os == 'windows'
-              working-directory: ${{ matrix.folder }}
               shell: bash
               run: rm -f .bazeliskrc
 
             - name: bazel test //...
-              working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
                   bazel \
@@ -293,7 +299,6 @@ jobs:
 
             - name: Check that unused npm packages were not fetched
               if: matrix.os != 'windows'
-              working-directory: ${{ matrix.folder }}
               shell: bash
               run: ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
 
@@ -315,7 +320,6 @@ jobs:
               # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               # Don't run coverage on Windows. It is currently broken.
               if: matrix.os != 'windows'
-              working-directory: ${{ matrix.folder }}
               shell: bash
               run: |
                   bazel \
@@ -337,7 +341,6 @@ jobs:
             - name: ./test.sh
               # Run if there is a test.sh file in the folder.
               if: matrix.os != 'windows' && hashFiles(format('{0}//test.sh', matrix.folder)) != ''
-              working-directory: ${{ matrix.folder }}
               shell: bash
               # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod={1,0}. All test.sh
               # scripts that run bazel directly should make use of this variable.
