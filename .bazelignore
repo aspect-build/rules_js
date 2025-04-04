@@ -1,4 +1,8 @@
+# Nested modules
+docs/
 e2e/
+
+# TODO(bazel 8): move to REPO.bazel
 examples/js_binary/node_modules/
 examples/js_lib_pkg/a/node_modules
 examples/js_lib_pkg/b/node_modules
