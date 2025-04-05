@@ -389,8 +389,7 @@ bzl_library(
     name = "{name}_bzl_library",
     srcs = ["{src}"],
     deps = [
-        "@aspect_bazel_lib//lib:directory_path",
-        "@aspect_rules_js//js:defs",
+        "@aspect_rules_js//npm/private:npm_import",
     ],
     visibility = ["//visibility:public"],
 )"""
