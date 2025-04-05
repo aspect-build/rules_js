@@ -17,7 +17,9 @@ See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API 
 for a given lockfile.
 """
 
+load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
+load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
@@ -252,29 +254,29 @@ def npm_link_imported_package(
     return (link_targets, scoped_targets)
 """
 
-_BIN_MACRO_TMPL = """
-def _{bin_name}_internal(name, link_root_name, **kwargs):
-    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
+def bin_internal(name, link_workspace, root_package, package_store_root, link_root_name, package_store_name, bin_path, bin_mnemonic, **kwargs):
+    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
-        path = "{bin_path}",
+        directory = target + "/dir",
+        path = bin_path,
         tags = ["manual"],
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = ["@{link_workspace}//{root_package}:{{}}".format(store_target_name)],
+        data = [target],
         include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )
     _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
-        mnemonic = kwargs.pop("mnemonic", "{bin_mnemonic}"),
+        mnemonic = kwargs.pop("mnemonic", bin_mnemonic),
         **kwargs
     )
 
+_BIN_MACRO_TMPL = """
 def _{bin_name}_test_internal(name, link_root_name, **kwargs):
     store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
     _directory_path(
@@ -303,6 +305,26 @@ def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
         entry_point = ":%s__entry_point" % name,
         data = kwargs.pop("data", []) + ["@{link_workspace}//{root_package}:{{}}".format(store_target_name)],
         **kwargs
+    )
+
+def _{bin_name}_internal(name, link_root_name, **kwargs):
+    _link_workspace = "{link_workspace}"
+    _root_package = "{root_package}"
+    _package_store_root = "{package_store_root}"
+    _package_store_name = "{package_store_name}"
+    _bin_path = "{bin_path}"
+    _bin_mnemonic = "{bin_mnemonic}"
+
+    bin_internal(
+        name,
+        link_workspace = _link_workspace,
+        root_package = _root_package,
+        package_store_root = _package_store_root,
+        link_root_name = link_root_name,
+        package_store_name = _package_store_name,
+        bin_path = _bin_path,
+        bin_mnemonic = _bin_mnemonic,
+        **kwargs,
     )
 
 def {bin_name}(name, **kwargs):
@@ -525,6 +547,7 @@ def _npm_import_rule_impl(rctx):
                 generated_by_prefix,
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
                 """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
+                """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_internal")""",
             ]
             for name in bins:
                 bin_name = _sanitize_bin_name(name)
