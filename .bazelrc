@@ -8,6 +8,8 @@ import %workspace%/.aspect/bazelrc/performance.bazelrc
 
 ### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
 
+common --repo_env=CACHE_BUSTER="04/05/2025"
+
 # We have some empty globs in rules_js
 common --noincompatible_disallow_empty_glob
 
