@@ -4,89 +4,54 @@
 load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
+load("@aspect_rules_js//npm/private:npm_import.bzl",
+    _npm_imported_package_store = "npm_imported_package_store_internal",
+    _npm_link_imported_package = "npm_link_imported_package_internal",
+    _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
+
+PACKAGE = "@aspect-test/c"
+VERSION = "2.0.0"
+_ROOT_PACKAGE = ""
+_PACKAGE_STORE_NAME = "@aspect-test+c@2.0.0"
 
 # Generated npm_package_store targets for npm package @aspect-test/c@2.0.0
 # buildifier: disable=function-docstring
 def npm_imported_package_store(link_root_name):
-    bazel_package = native.package_name()
-    root_package = ""
-    is_root = bazel_package == root_package
-    if not is_root:
-        msg = "No store links in bazel package '%s' for npm package npm package @aspect-test/c@2.0.0. This is neither the root package nor a link package of this package." % bazel_package
-        fail(msg)
-
-    deps = {
-        ":.aspect_rules_js/{}/@aspect-test+c@2.0.0/pkg".format(link_root_name): "@aspect-test/c",
-    }
-    ref_deps = {}
-
-    store_target_name = ".aspect_rules_js/{}/@aspect-test+c@2.0.0".format(link_root_name)
-
-    # reference target used to avoid circular deps
-    _npm_package_store(
-        name = "{}/ref".format(store_target_name),
-        package = "@aspect-test/c",
-        version = "2.0.0",
+    _npm_imported_package_store(
+        link_root_name = link_root_name,
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
+        deps = {
+            ":.aspect_rules_js/{link_root_name}/@aspect-test+c@2.0.0/pkg": "@aspect-test/c",
+        },
+        ref_deps = {},
+        lc_deps = {
+            ":.aspect_rules_js/{link_root_name}/@aspect-test+c@2.0.0/pkg_pre_lc_lite": "@aspect-test/c",
+        },
         dev = False,
-        tags = ["manual"],
-    )
-
-    # post-lifecycle target with reference deps for use in terminal target with transitive closure
-    _npm_package_store(
-        name = "{}/pkg".format(store_target_name),
-        src = "{}/pkg_lc".format(store_target_name) if False else "@@aspect_rules_js~~npm~npm__at_aspect-test_c__2.0.0//:pkg",
-        package = "@aspect-test/c",
-        version = "2.0.0",
-        dev = False,
-        deps = ref_deps,
-        tags = ["manual"],
-    )
-
-    # package store target with transitive closure of all npm package dependencies
-    _npm_package_store(
-        name = store_target_name,
-        src = None if True else "@@aspect_rules_js~~npm~npm__at_aspect-test_c__2.0.0//:pkg",
-        package = "@aspect-test/c",
-        version = "2.0.0",
-        dev = False,
-        deps = deps,
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-
-    # filegroup target that provides a single file which is
-    # package directory for use in $(execpath) and $(rootpath)
-    native.filegroup(
-        name = "{}/dir".format(store_target_name),
-        srcs = [":{}".format(store_target_name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
+        has_lifecycle_build_target = False,
+        transitive_closure_pattern = True,
+        npm_package_target = "@@aspect_rules_js~~npm~npm__at_aspect-test_c__2.0.0//:pkg",
+        package_store_name = _PACKAGE_STORE_NAME,
+        lifecycle_hooks_env = {},
+        lifecycle_hooks_execution_requirements = {},
+        use_default_shell_env = False,
+        exclude_package_contents = [],
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package @aspect-test/c@2.0.0
 # buildifier: disable=function-docstring
 def npm_link_imported_package_store(name, link_root_name, link_alias):
-    store_target_name = ".aspect_rules_js/{}/@aspect-test+c@2.0.0".format(link_root_name)
-
-    # terminal package store target to link
-    _npm_link_package_store(
-        name = name,
-        package = link_alias,
-        src = "//:{}".format(store_target_name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-
-    # filegroup target that provides a single file which is
-    # package directory for use in $(execpath) and $(rootpath)
-    native.filegroup(
-        name = "{}/dir".format(name),
-        srcs = [":{}".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
+    return _npm_link_imported_package_store(
+        name,
+        link_root_name,
+        link_alias,
+        root_package = _ROOT_PACKAGE,
+        link_visibility = ["//visibility:public"],
+        bins = {},
+        package_store_name = _PACKAGE_STORE_NAME,
+        public_visibility = True,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package @aspect-test/c@2.0.0
@@ -95,43 +60,17 @@ def npm_link_imported_package(
         name = "node_modules",
         link = None,
         fail_if_no_link = True):
-    bazel_package = native.package_name()
-    root_package = ""
-    link_packages = {
-        "": ["@aspect-test/c"],
-    }
-
-    if link_packages and link != None:
-        fail("link attribute cannot be specified when link_packages are set")
-
-    is_link = (link == True) or (link == None and bazel_package in link_packages)
-    is_root = bazel_package == root_package
-
-    if fail_if_no_link and not is_root and not link:
-        msg = "Nothing to link in bazel package '%s' for npm package npm package @aspect-test/c@2.0.0. This is neither the root package nor a link package of this package." % bazel_package
-        fail(msg)
-
-    link_targets = []
-    scoped_targets = {}
-
-    if is_link:
-        link_aliases = []
-        if bazel_package in link_packages:
-            link_aliases = link_packages[bazel_package]
-        if not link_aliases:
-            link_aliases = ["@aspect-test/c"]
-        for link_alias in link_aliases:
-            link_target_name = "{}/{}".format(name, link_alias)
-            npm_link_imported_package_store(name = link_target_name, link_root_name = name, link_alias = link_alias)
-            if True:
-                link_targets.append(":{}".format(link_target_name))
-                link_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
-                if link_scope:
-                    if link_scope not in scoped_targets:
-                        scoped_targets[link_scope] = []
-                    scoped_targets[link_scope].append(link_target_name)
-
-    if is_root:
-        npm_imported_package_store(name)
-
-    return (link_targets, scoped_targets)
+    return _npm_link_imported_package(
+        name,
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
+        link = link,
+        link_packages = {
+            "": [PACKAGE],
+        },
+        public_visibility = True,
+        npm_link_imported_package_store_macro = npm_link_imported_package_store,
+        npm_imported_package_store_macro = npm_imported_package_store,
+        fail_if_no_link = fail_if_no_link,
+    )
