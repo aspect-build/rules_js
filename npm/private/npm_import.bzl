@@ -308,13 +308,6 @@ def bin_binary_internal(name, link_workspace, root_package, package_store_root, 
 
 _BIN_MACRO_TMPL = """
 def _{bin_name}_internal(name, link_root_name, **kwargs):
-    _link_workspace = "{link_workspace}"
-    _root_package = "{root_package}"
-    _package_store_root = "{package_store_root}"
-    _package_store_name = "{package_store_name}"
-    _bin_path = "{bin_path}"
-    _bin_mnemonic = "{bin_mnemonic}"
-
     bin_internal(
         name,
         link_workspace = _link_workspace,
@@ -322,18 +315,12 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
         package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
-        bin_path = _bin_path,
-        bin_mnemonic = _bin_mnemonic,
+        bin_path = "{bin_path}",
+        bin_mnemonic = "{bin_mnemonic}",
         **kwargs,
     )
 
 def _{bin_name}_test_internal(name, link_root_name, **kwargs):
-    _link_workspace = "{link_workspace}"
-    _root_package = "{root_package}"
-    _package_store_root = "{package_store_root}"
-    _package_store_name = "{package_store_name}"
-    _bin_path = "{bin_path}"
-
     bin_test_internal(
         name,
         link_workspace = _link_workspace,
@@ -341,18 +328,12 @@ def _{bin_name}_test_internal(name, link_root_name, **kwargs):
         package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
-        bin_path = _bin_path,
+        bin_path = "{bin_path}",
         **kwargs,
     )
 
 
 def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
-    _link_workspace = "{link_workspace}"
-    _root_package = "{root_package}"
-    _package_store_root = "{package_store_root}"
-    _package_store_name = "{package_store_name}"
-    _bin_path = "{bin_path}"
-
     bin_binary_internal(
         name,
         link_workspace = _link_workspace,
@@ -360,7 +341,7 @@ def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
         package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
-        bin_path = _bin_path,
+        bin_path = "{bin_path}",
         **kwargs,
     )
 
@@ -585,6 +566,11 @@ def _npm_import_rule_impl(rctx):
                 """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
                 """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
+                "",
+                '_link_workspace = "%s"' % rctx.attr.link_workspace,
+                '_root_package = "%s"' % rctx.attr.root_package,
+                '_package_store_root = "%s"' % utils.package_store_root,
+                '_package_store_name = "%s"' % package_store_name,
             ]
             for name in bins:
                 bin_name = _sanitize_bin_name(name)
@@ -593,12 +579,6 @@ def _npm_import_rule_impl(rctx):
                         bin_name = bin_name,
                         bin_mnemonic = _mnemonic_for_bin(bin_name),
                         bin_path = bins[name],
-                        link_workspace = rctx.attr.link_workspace,
-                        package = rctx.attr.package,
-                        root_package = rctx.attr.root_package,
-                        version = rctx.attr.version,
-                        package_store_name = package_store_name,
-                        package_store_root = utils.package_store_root,
                     ),
                 )
 
