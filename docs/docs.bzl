@@ -10,7 +10,7 @@ def stardoc_with_diff_test(name, **kwargs):
         Wrapper around stardoc_with_diff_test that only runs the test if Bazel 7 or greater is being used.
     """
     if is_bazel_7_or_greater():
-        _stardoc_with_diff_test(name, **kwargs)
+        _stardoc_with_diff_test(name, renderer = "//tools:stardoc_renderer", **kwargs)
     else:
         # buildifier: disable=print
         print("WARNING: Skipping stardoc_with_diff_test for %s because it requires Bazel 7 or greater" % name)
