@@ -563,8 +563,6 @@ def _npm_import_rule_impl(rctx):
         for link_package in rctx.attr.link_packages.keys():
             bin_bzl = [
                 generated_by_prefix,
-                """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
-                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
                 "",
                 '_link_workspace = "%s"' % rctx.attr.link_workspace,
