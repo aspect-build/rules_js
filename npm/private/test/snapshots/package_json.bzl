@@ -2,22 +2,7 @@
 
 load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
-load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_internal", "bin_test_internal")
-
-def _rollup_binary_internal(name, link_root_name, **kwargs):
-    store_target_name = ".aspect_rules_js/{}/rollup@2.70.2".format(link_root_name)
-    _directory_path(
-        name = "%s__entry_point" % name,
-        directory = "@@//:{}/dir".format(store_target_name),
-        path = "dist/bin/rollup",
-        tags = ["manual"],
-    )
-    _js_binary(
-        name = name,
-        entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@@//:{}".format(store_target_name)],
-        **kwargs
-    )
+load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")
 
 def _rollup_internal(name, link_root_name, **kwargs):
     _link_workspace = "@"
@@ -47,6 +32,25 @@ def _rollup_test_internal(name, link_root_name, **kwargs):
     _bin_path = "dist/bin/rollup"
 
     bin_test_internal(
+        name,
+        link_workspace = _link_workspace,
+        root_package = _root_package,
+        package_store_root = _package_store_root,
+        link_root_name = link_root_name,
+        package_store_name = _package_store_name,
+        bin_path = _bin_path,
+        **kwargs,
+    )
+
+
+def _rollup_binary_internal(name, link_root_name, **kwargs):
+    _link_workspace = "@"
+    _root_package = ""
+    _package_store_root = ".aspect_rules_js"
+    _package_store_name = "rollup@2.70.2"
+    _bin_path = "dist/bin/rollup"
+
+    bin_binary_internal(
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
