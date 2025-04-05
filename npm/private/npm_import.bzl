@@ -254,8 +254,8 @@ def npm_link_imported_package(
     return (link_targets, scoped_targets)
 """
 
-def bin_internal(name, link_workspace, root_package, package_store_root, link_root_name, package_store_name, bin_path, bin_mnemonic, **kwargs):
-    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, package_store_root, link_root_name, package_store_name)
+def bin_internal(name, link_workspace, root_package, link_root_name, package_store_name, bin_path, bin_mnemonic, **kwargs):
+    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, utils.package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -276,8 +276,8 @@ def bin_internal(name, link_workspace, root_package, package_store_root, link_ro
         **kwargs
     )
 
-def bin_test_internal(name, link_workspace, root_package, package_store_root, link_root_name, package_store_name, bin_path, **kwargs):
-    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, package_store_root, link_root_name, package_store_name)
+def bin_test_internal(name, link_workspace, root_package, link_root_name, package_store_name, bin_path, **kwargs):
+    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, utils.package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -291,8 +291,8 @@ def bin_test_internal(name, link_workspace, root_package, package_store_root, li
         **kwargs
     )
 
-def bin_binary_internal(name, link_workspace, root_package, package_store_root, link_root_name, package_store_name, bin_path, **kwargs):
-    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, package_store_root, link_root_name, package_store_name)
+def bin_binary_internal(name, link_workspace, root_package, link_root_name, package_store_name, bin_path, **kwargs):
+    target = "@%s//%s:%s/%s/%s" % (link_workspace, root_package, utils.package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -312,7 +312,6 @@ def _{bin_name}_internal(name, link_root_name, **kwargs):
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
-        package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
@@ -325,7 +324,6 @@ def _{bin_name}_test_internal(name, link_root_name, **kwargs):
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
-        package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
@@ -338,7 +336,6 @@ def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
-        package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
@@ -567,7 +564,6 @@ def _npm_import_rule_impl(rctx):
                 "",
                 '_link_workspace = "%s"' % rctx.attr.link_workspace,
                 '_root_package = "%s"' % rctx.attr.root_package,
-                '_package_store_root = "%s"' % utils.package_store_root,
                 '_package_store_name = "%s"' % package_store_name,
             ]
             for name in bins:

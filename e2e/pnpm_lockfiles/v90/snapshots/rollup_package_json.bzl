@@ -4,7 +4,6 @@ load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin
 
 _link_workspace = "@"
 _root_package = "<LOCKVERSION>"
-_package_store_root = ".aspect_rules_js"
 _package_store_name = "rollup@2.14.0"
 
 def _rollup_internal(name, link_root_name, **kwargs):
@@ -12,7 +11,6 @@ def _rollup_internal(name, link_root_name, **kwargs):
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
-        package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "./dist/bin/rollup",
@@ -25,7 +23,6 @@ def _rollup_test_internal(name, link_root_name, **kwargs):
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
-        package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "./dist/bin/rollup",
@@ -38,7 +35,6 @@ def _rollup_binary_internal(name, link_root_name, **kwargs):
         name,
         link_workspace = _link_workspace,
         root_package = _root_package,
-        package_store_root = _package_store_root,
         link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "./dist/bin/rollup",
