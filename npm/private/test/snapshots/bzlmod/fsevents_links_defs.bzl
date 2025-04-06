@@ -9,15 +9,18 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package",
     _npm_link_imported_package_store = "npm_link_imported_package_store")
 
+PACKAGE = "fsevents"
+VERSION = "2.3.2"
+ROOT_PACKAGE = ""
 
 # Generated npm_package_store targets for npm package fsevents@2.3.2
 # buildifier: disable=function-docstring
 def npm_imported_package_store(name):
     _npm_imported_package_store(
         name = name,
-        package = "fsevents",
-        version = "2.3.2",
-        root_package = "",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = ROOT_PACKAGE,
         deps = {
             ":.aspect_rules_js/{link_root_name}/fsevents@2.3.2/pkg": "fsevents",
         },
@@ -43,9 +46,9 @@ def npm_imported_package_store(name):
 def npm_link_imported_package_store(name):
     return _npm_link_imported_package_store(
         name,
-        package = "fsevents",
-        version = "2.3.2",
-        root_package = "",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = ROOT_PACKAGE,
         link_packages = {},
         link_visibility = ["//visibility:public"],
         bins = {},
@@ -62,9 +65,9 @@ def npm_link_imported_package(
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
-        package = "fsevents",
-        version = "2.3.2",
-        root_package = "",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = ROOT_PACKAGE,
         link = link,
         link_packages = {},
         public_visibility = True,

@@ -9,15 +9,18 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package",
     _npm_link_imported_package_store = "npm_link_imported_package_store")
 
+PACKAGE = "segfault-handler"
+VERSION = "1.3.0"
+_ROOT_PACKAGE = ""
 
 # Generated npm_package_store targets for npm package segfault-handler@1.3.0
 # buildifier: disable=function-docstring
 def npm_imported_package_store(name):
     _npm_imported_package_store(
         name = name,
-        package = "segfault-handler",
-        version = "1.3.0",
-        root_package = "",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
         deps = {
             ":.aspect_rules_js/{link_root_name}/@gar+promisify@1.1.3/pkg": "@gar/promisify",
             ":.aspect_rules_js/{link_root_name}/@npmcli+fs@2.1.2/pkg": "@npmcli/fs",
@@ -245,9 +248,9 @@ def npm_imported_package_store(name):
 def npm_link_imported_package_store(name):
     return _npm_link_imported_package_store(
         name,
-        package = "segfault-handler",
-        version = "1.3.0",
-        root_package = "",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
         link_packages = {
             "": ["segfault-handler"],
         },
@@ -266,9 +269,9 @@ def npm_link_imported_package(
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
-        package = "segfault-handler",
-        version = "1.3.0",
-        root_package = "",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {
             "": ["segfault-handler"],

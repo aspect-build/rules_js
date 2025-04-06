@@ -48,15 +48,19 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package_store = "npm_link_imported_package_store")
 """
 
-_LINK_JS_PACKAGE_TMPL = """
+_LINK_JS_PACKAGE_TMPL = """\
+PACKAGE = "{package}"
+VERSION = "{version}"
+_ROOT_PACKAGE = "{root_package}"
+
 # Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_imported_package_store(name):
     _npm_imported_package_store(
         name = name,
-        package = "{package}",
-        version = "{version}",
-        root_package = "{root_package}",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
         deps = {deps},
         ref_deps = {ref_deps},
         lc_deps = {lc_deps},
@@ -294,9 +298,9 @@ _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 def npm_link_imported_package_store(name):
     return _npm_link_imported_package_store(
         name,
-        package = "{package}",
-        version = "{version}",
-        root_package = "{root_package}",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
         link_packages = {link_packages},
         link_visibility = {link_visibility},
         bins = {bins},
@@ -369,9 +373,9 @@ def npm_link_imported_package(
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
-        package = "{package}",
-        version = "{version}",
-        root_package = "{root_package}",
+        package = PACKAGE,
+        version = VERSION,
+        root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {link_packages},
         public_visibility = {public_visibility},
