@@ -9,6 +9,7 @@ DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
 DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
+DEFAULT_LINKED_VERSION = "0.0.0"
 
 def _sorted_map(m):
     result = dict()
@@ -50,7 +51,7 @@ def _package_store_name(pnpm_name, pnpm_version):
 
     if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
         name = pnpm_name
-        version = "0.0.0"
+        version = DEFAULT_LINKED_VERSION
     elif pnpm_version.startswith("npm:"):
         name, version = pnpm_version[4:].rsplit("@", 1)
     else:
