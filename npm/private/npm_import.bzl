@@ -52,6 +52,7 @@ _LINK_JS_PACKAGE_TMPL = """\
 PACKAGE = "{package}"
 VERSION = "{version}"
 _ROOT_PACKAGE = "{root_package}"
+_PACKAGE_STORE_NAME = "{package_store_name}"
 
 # Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
@@ -68,7 +69,7 @@ def npm_imported_package_store(name):
         has_lifecycle_build_target = {has_lifecycle_build_target},
         transitive_closure_pattern = {transitive_closure_pattern},
         npm_package_target = "{npm_package_target}",
-        package_store_name = "{package_store_name}",
+        package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {lifecycle_hooks_env},
         lifecycle_hooks_execution_requirements = {lifecycle_hooks_execution_requirements},
         use_default_shell_env = {use_default_shell_env},
@@ -305,7 +306,7 @@ def npm_link_imported_package_store(name):
         link_visibility = {link_visibility},
         bins = {bins},
         link = {link_default},
-        package_store_name = "{package_store_name}",
+        package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = {public_visibility},
     )
 """

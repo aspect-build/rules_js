@@ -12,6 +12,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "unused"
 VERSION = "0.2.2"
 _ROOT_PACKAGE = ""
+_PACKAGE_STORE_NAME = "unused@0.2.2"
 
 # Generated npm_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
@@ -43,7 +44,7 @@ def npm_imported_package_store(name):
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__unused__0.2.2//:pkg",
-        package_store_name = "unused@0.2.2",
+        package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},
         lifecycle_hooks_execution_requirements = {},
         use_default_shell_env = False,
@@ -64,7 +65,7 @@ def npm_link_imported_package_store(name):
         link_visibility = ["//visibility:private"],
         bins = {},
         link = None,
-        package_store_name = "unused@0.2.2",
+        package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = False,
     )
 

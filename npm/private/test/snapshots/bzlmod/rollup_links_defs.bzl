@@ -12,6 +12,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "rollup"
 VERSION = "2.70.2"
 _ROOT_PACKAGE = ""
+_PACKAGE_STORE_NAME = "rollup@2.70.2"
 
 # Generated npm_package_store targets for npm package rollup@2.70.2
 # buildifier: disable=function-docstring
@@ -36,7 +37,7 @@ def npm_imported_package_store(name):
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__rollup__2.70.2//:pkg",
-        package_store_name = "rollup@2.70.2",
+        package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},
         lifecycle_hooks_execution_requirements = {},
         use_default_shell_env = False,
@@ -57,7 +58,7 @@ def npm_link_imported_package_store(name):
         link_visibility = ["//visibility:public"],
         bins = {},
         link = None,
-        package_store_name = "rollup@2.70.2",
+        package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = True,
     )
 

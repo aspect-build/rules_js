@@ -12,6 +12,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "fsevents"
 VERSION = "2.3.2"
 _ROOT_PACKAGE = ""
+_PACKAGE_STORE_NAME = "fsevents@2.3.2"
 
 # Generated npm_package_store targets for npm package fsevents@2.3.2
 # buildifier: disable=function-docstring
@@ -32,7 +33,7 @@ def npm_imported_package_store(name):
         has_lifecycle_build_target = True,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__fsevents__2.3.2//:pkg",
-        package_store_name = "fsevents@2.3.2",
+        package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},
         lifecycle_hooks_execution_requirements = {
             "no-sandbox": "1",
@@ -54,7 +55,7 @@ def npm_link_imported_package_store(name):
         link_visibility = ["//visibility:public"],
         bins = {},
         link = True,
-        package_store_name = "fsevents@2.3.2",
+        package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = True,
     )
 

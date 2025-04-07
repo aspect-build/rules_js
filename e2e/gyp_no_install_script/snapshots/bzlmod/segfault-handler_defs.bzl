@@ -12,6 +12,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "segfault-handler"
 VERSION = "1.3.0"
 _ROOT_PACKAGE = ""
+_PACKAGE_STORE_NAME = "segfault-handler@1.3.0"
 
 # Generated npm_package_store targets for npm package segfault-handler@1.3.0
 # buildifier: disable=function-docstring
@@ -234,7 +235,7 @@ def npm_imported_package_store(name):
         has_lifecycle_build_target = True,
         transitive_closure_pattern = True,
         npm_package_target = "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
-        package_store_name = "segfault-handler@1.3.0",
+        package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},
         lifecycle_hooks_execution_requirements = {
             "no-sandbox": "1",
@@ -257,7 +258,7 @@ def npm_link_imported_package_store(name):
         link_visibility = ["//visibility:public"],
         bins = {},
         link = None,
-        package_store_name = "segfault-handler@1.3.0",
+        package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = True,
     )
 
