@@ -52,7 +52,7 @@ def npm_link_imported_package_store(name):
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         link_packages = {
-            "<LOCKVERSION>": ["rollup"],
+            "<LOCKVERSION>": [PACKAGE],
         },
         link_visibility = ["//visibility:public"],
         bins = {},
@@ -74,7 +74,7 @@ def npm_link_imported_package(
         root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {
-            "<LOCKVERSION>": ["rollup"],
+            "<LOCKVERSION>": [PACKAGE],
         },
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,

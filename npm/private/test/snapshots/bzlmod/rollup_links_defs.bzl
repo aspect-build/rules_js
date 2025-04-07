@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 
 PACKAGE = "rollup"
 VERSION = "2.70.2"
-ROOT_PACKAGE = ""
+_ROOT_PACKAGE = ""
 
 # Generated npm_package_store targets for npm package rollup@2.70.2
 # buildifier: disable=function-docstring
@@ -20,7 +20,7 @@ def npm_imported_package_store(name):
         name = name,
         package = PACKAGE,
         version = VERSION,
-        root_package = ROOT_PACKAGE,
+        root_package = _ROOT_PACKAGE,
         deps = {
             ":.aspect_rules_js/{link_root_name}/fsevents@2.3.2/pkg": "fsevents",
             ":.aspect_rules_js/{link_root_name}/rollup@2.70.2/pkg": "rollup",
@@ -50,9 +50,9 @@ def npm_link_imported_package_store(name):
         name,
         package = PACKAGE,
         version = VERSION,
-        root_package = ROOT_PACKAGE,
+        root_package = _ROOT_PACKAGE,
         link_packages = {
-            "examples/npm_deps": ["rollup"],
+            "examples/npm_deps": [PACKAGE],
         },
         link_visibility = ["//visibility:public"],
         bins = {},
@@ -71,10 +71,10 @@ def npm_link_imported_package(
         name,
         package = PACKAGE,
         version = VERSION,
-        root_package = ROOT_PACKAGE,
+        root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {
-            "examples/npm_deps": ["rollup"],
+            "examples/npm_deps": [PACKAGE],
         },
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,

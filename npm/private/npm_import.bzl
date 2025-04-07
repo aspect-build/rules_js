@@ -857,9 +857,19 @@ def _npm_import_links_rule_impl(rctx):
             npm_import_sources_repo_name,
         )
 
-    link_packages = {}
+    link_packages = "{\n"
+    indent = " " * 12
     for package, link_aliases in rctx.attr.link_packages.items():
-        link_packages[package] = link_aliases or [rctx.attr.package]
+        if link_aliases and link_aliases != [rctx.attr.package]:
+            link_packages += indent + '"{package}": {link_aliases},\n'.format(
+                package = package,
+                link_aliases = repr(link_aliases),
+            )
+        else:
+            link_packages += indent + '"{package}": [PACKAGE],\n'.format(
+                package = package,
+            )
+    link_packages += " " * 8 + "}"
 
     # collapse link aliases lists into comma separated strings
     for dep in deps.keys():
@@ -896,7 +906,7 @@ def _npm_import_links_rule_impl(rctx):
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
-        link_packages = starlark_codegen_utils.to_dict_attr(link_packages, 2, quote_value = False),
+        link_packages = link_packages,
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,

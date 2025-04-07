@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 
 PACKAGE = "unused"
 VERSION = "0.2.2"
-ROOT_PACKAGE = ""
+_ROOT_PACKAGE = ""
 
 # Generated npm_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
@@ -20,7 +20,7 @@ def npm_imported_package_store(name):
         name = name,
         package = PACKAGE,
         version = VERSION,
-        root_package = ROOT_PACKAGE,
+        root_package = _ROOT_PACKAGE,
         deps = {
             ":.aspect_rules_js/{link_root_name}/esprima@1.0.0/pkg": "esprima",
             ":.aspect_rules_js/{link_root_name}/minimist@0.0.10/pkg": "minimist",
@@ -57,9 +57,9 @@ def npm_link_imported_package_store(name):
         name,
         package = PACKAGE,
         version = VERSION,
-        root_package = ROOT_PACKAGE,
+        root_package = _ROOT_PACKAGE,
         link_packages = {
-            "npm/private/test": ["unused"],
+            "npm/private/test": [PACKAGE],
         },
         link_visibility = ["//visibility:private"],
         bins = {},
@@ -78,10 +78,10 @@ def npm_link_imported_package(
         name,
         package = PACKAGE,
         version = VERSION,
-        root_package = ROOT_PACKAGE,
+        root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {
-            "npm/private/test": ["unused"],
+            "npm/private/test": [PACKAGE],
         },
         public_visibility = False,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,
