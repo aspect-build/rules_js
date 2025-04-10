@@ -39,13 +39,12 @@ load(":utils.bzl", "utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
-
-# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_import.bzl",
+load(
+    "@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_imported_package_store = "npm_imported_package_store",
     _npm_link_imported_package = "npm_link_imported_package",
-    _npm_link_imported_package_store = "npm_link_imported_package_store")
+    _npm_link_imported_package_store = "npm_link_imported_package_store",
+)
 """
 
 _LINK_JS_PACKAGE_TMPL = """\
@@ -77,6 +76,7 @@ def npm_imported_package_store(name):
     )
 """
 
+# buildifier: disable=function-docstring
 def npm_imported_package_store(
         name,
         package,
@@ -238,13 +238,12 @@ def npm_imported_package_store(
             tags = ["manual"],
         )
 
+# buildifier: disable=function-docstring
 def npm_link_imported_package_store(
         name,
         package,
-        version,
         root_package,
         link_packages,
-        link,
         link_visibility,
         bins,
         package_store_name,
@@ -300,17 +299,16 @@ def npm_link_imported_package_store(name):
     return _npm_link_imported_package_store(
         name,
         package = PACKAGE,
-        version = VERSION,
         root_package = _ROOT_PACKAGE,
         link_packages = {link_packages},
         link_visibility = {link_visibility},
         bins = {bins},
-        link = {link_default},
         package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = {public_visibility},
     )
 """
 
+# buildifier: disable=function-docstring
 def npm_link_imported_package(
         name,
         package,
