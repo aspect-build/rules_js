@@ -1,6 +1,7 @@
 "npm_package_store rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
+load("@package_metadata//:defs.bzl", "PackageMetadataInfo")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
@@ -162,12 +163,14 @@ def _npm_package_store_impl(ctx):
         if NpmPackageInfo in ctx.attr.src:
             package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
             version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
+
         elif JsInfo in ctx.attr.src:
             if not ctx.attr.package:
                 msg = "Expected package to be specified in '{}' when src '{}' provides a JsInfo".format(ctx.label, ctx.attr.src[JsInfo].target)
                 fail(msg)
             package = ctx.attr.package
             version = ctx.attr.version if ctx.attr.version else "0.0.0"
+
         else:
             msg = "Expected src of '{}' to provide either NpmPackageInfo or JsInfo".format(ctx.label)
             fail(msg)
@@ -425,6 +428,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             files = files_depset,
             transitive_files = transitive_files_depset,
             dev = ctx.attr.dev,
+        ),
+        PackageMetadataInfo(
+            metadata = getattr(ctx.attr.src[NpmPackageInfo], "license", "") if ctx.attr.src else None,
         ),
     ]
 

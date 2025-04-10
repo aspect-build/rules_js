@@ -178,6 +178,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
         name = "{{}}/pkg_lc".format(store_target_name),
         src = ":{{}}/lc".format(store_target_name),
         package = "{package}",
+        metadata = "",
         version = "{version}",
         tags = ["manual"],
     )
@@ -344,6 +345,7 @@ _npm_package_internal(
     name = "pkg",
     src = ":{package_src}",
     package = "{package}",
+    metadata = "",
     version = "{version}",
     visibility = ["//visibility:public"],
 )
@@ -532,6 +534,7 @@ def _npm_import_rule_impl(rctx):
     }
 
     rctx_files["BUILD.bazel"].append(_JS_PACKAGE_TMPL.format(
+        metadata = None,
         package_src = package_src,
         package = rctx.attr.package,
         version = rctx.attr.version,
@@ -781,6 +784,7 @@ def _npm_import_links_rule_impl(rctx):
         ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 1, quote_key = False),
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
+        metadata = None,
         version = rctx.attr.version,
         package_store_name = package_store_name,
         package_store_root = utils.package_store_root,

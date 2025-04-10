@@ -16,6 +16,7 @@ _ATTRS = {
         doc = """The package version.""",
         mandatory = True,
     ),
+    "metadata": attr.string(doc = "TODO"),
 }
 
 def _npm_package_internal_impl(ctx):
@@ -34,6 +35,7 @@ def _npm_package_internal_impl(ctx):
             version = ctx.attr.version,
             src = dst,
             npm_package_store_infos = depset(),
+            metadata = ctx.attr.metadata,
         ),
     ]
 
