@@ -24,7 +24,7 @@ https://github.com/npm/rfcs/blob/main/accepted/0042-isolated-mode.md.
 
 _ATTRS = {
     "src": attr.label(
-        doc = """A npm_package target or or any other target that provides a NpmPackageInfo.
+        doc = """A target providing a `NpmPackageInfo` or `JsInfo` containing the package sources.
         """,
         mandatory = True,
     ),
@@ -117,15 +117,15 @@ _ATTRS = {
     "package": attr.string(
         doc = """The package name to link to.
 
-If unset, the package name in the NpmPackageInfo src must be set.
-If set, takes precendance over the package name in the NpmPackageInfo src.
+If unset, the package name in the `NpmPackageInfo` src must be set.
+If set, takes precendance over the package name in the `NpmPackageInfo` src.
 """,
     ),
     "version": attr.string(
         doc = """The package version being linked.
 
-If unset, the package version in the NpmPackageInfo src must be set.
-If set, takes precendance over the package version in the NpmPackageInfo src.
+If unset, the package version in the `NpmPackageInfo` src must be set.
+If set, takes precendance over the package version in the `NpmPackageInfo` src.
 """,
     ),
     "dev": attr.bool(

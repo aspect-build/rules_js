@@ -5,7 +5,7 @@ load(":npm_package_store.bzl", _npm_package_store_lib = "npm_package_store_lib")
 
 _INTERNAL_ATTRS_STORE = dicts.add(_npm_package_store_lib.attrs, {
     "src": attr.label(
-        doc = """A npm_package target or or any other target that provides a NpmPackageInfo.
+        doc = """A target providing a `NpmPackageInfo` or `JsInfo` containing the package sources.
 
         Can be left unspecified to allow for npm_link_package "reference" targets. `npm_link_package`
         targets without a `src` are used internally by `npm_import` to create "reference"
@@ -18,13 +18,13 @@ _INTERNAL_ATTRS_STORE = dicts.add(_npm_package_store_lib.attrs, {
     "package": attr.string(
         doc = """The package name to link to.
         
-        Takes precedence over the package name in the NpmPackageInfo src.""",
+        Takes precedence over the package name in the `NpmPackageInfo` src.""",
         mandatory = True,
     ),
     "version": attr.string(
         doc = """The package version to link to.
         
-        Takes precedence over the package version in the NpmPackageInfo src.""",
+        Takes precedence over the package version in the `NpmPackageInfo` src.""",
         mandatory = True,
     ),
 })
