@@ -13,6 +13,7 @@
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         "jquery-git-ssh-e61fccb": "git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d",
+        "lodash": "file:../vendored/lodash-4.17.21.tgz",
         "rollup": "2.14.0",
         "rollup3": "npm:rollup@3.29.4",
         "rollup-plugin-with-peers": "npm:@rollup/plugin-typescript@8.2.1",
