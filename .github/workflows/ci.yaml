@@ -157,6 +157,11 @@ jobs:
                     # TODO: un-exclude the following bzlmod tests once they work
                     - bzlmod: 1
                       folder: e2e/js_image_docker
+                    # TODO: js_image_oci with bazel 7.6.1 and non-bzlmod fails
+                    - bazel-version:
+                          major: 7
+                      bzlmod: 0
+                      folder: e2e/js_image_oci
                     - bzlmod: 1
                       folder: e2e/npm_link_package-esm
                     - bzlmod: 1
