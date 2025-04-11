@@ -7,13 +7,12 @@ rollup_bin.rollup(
     name = "bundle",
     srcs = [
         "index.ts",
-        "rollup.config.js",
+        "rollup.config.mjs",
         "size.ts",
         "worker_protocol.ts",
         ":node_modules/@rollup/plugin-commonjs",
         ":node_modules/@rollup/plugin-json",
         ":node_modules/@rollup/plugin-node-resolve",
-        ":node_modules/@rollup/plugin-terser",
         ":node_modules/@rollup/plugin-typescript",
         ":node_modules/@types/google-protobuf",
         ":node_modules/@types/node",
@@ -27,7 +26,7 @@ rollup_bin.rollup(
     args = [
         "index.ts",
         "--config",
-        "rollup.config.js",
+        "rollup.config.mjs",
         "--format",
         "cjs",
         "--file",

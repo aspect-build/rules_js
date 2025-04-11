@@ -8,7 +8,7 @@ rollup_bin.rollup(
     srcs = [
         "c8.js",
         "package.json",
-        "rollup.config.js",
+        "rollup.config.mjs",
         ":node_modules/@rollup/plugin-commonjs",
         ":node_modules/@rollup/plugin-json",
         ":node_modules/@rollup/plugin-node-resolve",
@@ -20,7 +20,7 @@ rollup_bin.rollup(
     args = [
         "c8.js",
         "--config",
-        "rollup.config.js",
+        "rollup.config.mjs",
         "--format",
         "cjs",
         "--file",
