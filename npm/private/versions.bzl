@@ -1,6 +1,6 @@
 """Mirror of npm registry metadata for the pnpm package.
 
-AUTO-GENERATED; do not edit.
+AUTO-GENERATED; do not edit
 """
 
 PNPM_VERSIONS = {
@@ -867,4 +867,7 @@ PNPM_VERSIONS = {
     "10.6.3": "sha512-u0XjTVCpp26FipWDcwG/tr1tNa6ixdUglPpJekZ8Q/XEQBA84lEengovicPWBxuqwzWPxorG+3XizrPSc2Bl5g==",
     "10.6.4": "sha512-2j1xW/0iqaEF5ugIjPx4JmmTMt7WDEI7FOxhOhhfFgIgZwL/D+TEOMsVyXkIHOTLAlaONksVF0UDpjx6jipfbA==",
     "10.6.5": "sha512-zfko/KIIMs1Z7FOCZJK33CXcUk1DcLa0rb9lgD0y76psHIgUfArk6NV5psnuxxV1e1DU+jXuoXnYaOraTtBDrw==",
+    "10.7.0": "sha512-a4Za1LYqHZhCth1nSjk5A7hx2SRJVPZSuIQsK1U8chdrJ49kxGPlLUD/+KujhcI1yMns9cx95P14uLttSWM6tg==",
+    "10.7.1": "sha512-LZLIa3ko3IKE9TSU+0IB+YPaZfD7Tw1Auq+lz2KPox2uPllo8SRm8X336XMQ4w80OmSLrqG5s1BoXa+v/99YCA==",
+    "10.8.0": "sha512-DoJxTRtbQ8dGEBk8sgc0iXwdAN6J0OGEIK68WXf6E9eAqcsFc0Yk6B69gcyHbNRkeUhQZBxIuVRDJrViLKKZcQ==",
 }
