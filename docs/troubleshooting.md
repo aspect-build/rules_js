@@ -151,6 +151,14 @@ See [examples/stack_traces](../examples/stack_traces) for a working example.
 
 For general bazel performance tips see the [Aspect bazelrc guide](https://docs.aspect.build/guides/bazelrc/#performance-options).
 
+### Linking first-party packages
+
+When linking first-party packages it is recommended to use `js_library` or another `JsInfo`-providing rule to represent the package instead of the `npm_package` rule (which provides `NpmPackageInfo`).
+
+The use of `NpmPackageInfo` requires building the full package content in order to output a single directory artifact representing the package.
+
+Using `JsInfo` allows rules_js to passthru the provider without collecting the package content until another action requests it. For example `JsInfo.types`, normally outputted by a slow `.d.ts` producing tool such as `tsc`, is most likely unnecessary when only executing or bundling JavaScript files from `JsInfo.sources`. If `JsInfo.types` is produced by different actions then `JsInfo.sources` then those actions may not be required at all.
+
 ### Parallelism (build, test)
 
 A lot of tooling in the JS ecosystem uses parallelism to speed up builds. This is great, but as Bazel also parallels builds this can lead to a lot of contention for resources.
