@@ -51,3 +51,6 @@ require('@isaacs/cliui')
 
 // `alias-only-sizzle` aliases a package not declared elsewhere
 require('alias-only-sizzle/package.json')
+
+// lodash file: reference
+require('lodash')

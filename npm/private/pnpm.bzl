@@ -101,6 +101,16 @@ def _convert_v5_v6_file_package(package_path, package_snapshot):
 
     return name, version, friendly_version
 
+def _convert_v9_file_package_version(version, package_snapshot):
+    if _is_vendored_tarfile(package_snapshot):
+        if "version" in package_snapshot:
+            version = package_snapshot["version"]
+        friendly_version = version
+    else:
+        friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
+
+    return version, friendly_version
+
 def _strip_v5_peer_dep_or_patched_version(version):
     "Remove peer dependency or patched syntax from version string"
 
@@ -514,8 +524,14 @@ def _convert_v9_packages(packages, snapshots):
         # Extract the version including peerDeps+patch from the key
         version = package_key[package_key.index("@", 1) + 1:]
 
-        # package_data can have the resolved "version" for things like https:// deps
-        friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
+        if version.startswith("file:"):
+            version, friendly_version = _convert_v9_file_package_version(version, package_data)
+
+            # Update the `package_key` to always equal name@version since `version` may have changed
+            package_key = _to_package_key(name, version)
+        else:
+            # package_data can have the resolved "version" for things like https:// deps
+            friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
         package_info = _new_package_info(
             id = None,  # pnpm v9+ no longer requires an id field
