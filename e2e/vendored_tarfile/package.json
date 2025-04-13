@@ -1,4 +1,7 @@
 {
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "lodash": "file:lodash-4.17.21.tgz"
     }
