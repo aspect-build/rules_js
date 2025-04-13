@@ -26,6 +26,7 @@
         "is-odd-v2": "npm:is-odd@2.0.0",
         "is-odd-v3": "npm:is-odd@3.0.0",
         "uvu": "0.5.6",
+        "lodash": "file:../vendored/lodash-4.17.21.tgz",
         "scoped/bad": "link:../projects/b",
         "@scoped/a": "workspace:*",
         "@scoped/b": "link:../projects/b",

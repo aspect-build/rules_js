@@ -19,6 +19,7 @@ expected_importers = {
     ".": {
         "dependencies": {
             "@aspect-test/a": "5.0.0",
+            "lodash": "file:lodash-4.17.21.tgz",
         },
         "dev_dependencies": {},
         "optional_dependencies": {},
@@ -44,6 +45,22 @@ expected_packages = {
             "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         },
     },
+    "lodash@4.17.21": {
+        "id": None,
+        "name": "lodash",
+        "dependencies": {},
+        "optional_dependencies": {},
+        "dev_only": False,
+        "has_bin": False,
+        "optional": False,
+        "requires_build": False,
+        "version": "4.17.21",
+        "friendly_version": "4.17.21",
+        "resolution": {
+            "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
+            "tarball": "file:lodash-4.17.21.tgz",
+        },
+    },
 }
 
 def _parse_lockfile_v5_test_impl(ctx):
@@ -53,10 +70,12 @@ def _parse_lockfile_v5_test_impl(ctx):
 {
   "lockfileVersion": 5.4,
   "specifiers": {
-    "@aspect-test/a": "5.0.0"
+    "@aspect-test/a": "5.0.0",
+    "lodash": "file:lodash-4.17.21.tgz"
   },
   "dependencies": {
-    "@aspect-test/a": "5.0.0"
+    "@aspect-test/a": "5.0.0",
+    "lodash": "file:lodash-4.17.21.tgz"
   },
   "packages": {
     "/@aspect-test/a/5.0.0": {
@@ -69,6 +88,15 @@ def _parse_lockfile_v5_test_impl(ctx):
         "@aspect-test/c": "1.0.0",
         "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0"
       },
+      "dev": false
+    },
+    "file:lodash-4.17.21.tgz": {
+      "resolution": {
+        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
+        "tarball": "file:lodash-4.17.21.tgz"
+      },
+      "name": "lodash",
+      "version": "4.17.21",
       "dev": false
     }
   }
@@ -97,6 +125,10 @@ def _parse_lockfile_v6_test_impl(ctx):
     "@aspect-test/a": {
       "specifier": "5.0.0",
       "version": "5.0.0"
+    },
+    "lodash": {
+      "specifier": "file:lodash-4.17.21.tgz",
+      "version": "file:lodash-4.17.21.tgz"
     }
   },
   "packages": {
@@ -110,6 +142,15 @@ def _parse_lockfile_v6_test_impl(ctx):
         "@aspect-test/c": "1.0.0",
         "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
       },
+      "dev": false
+    },
+    "file:lodash-4.17.21.tgz": {
+      "resolution": {
+        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
+        "tarball": "file:lodash-4.17.21.tgz"
+      },
+      "name": "lodash",
+      "version": "4.17.21",
       "dev": false
     }
   }
@@ -144,6 +185,10 @@ def _parse_lockfile_v9_test_impl(ctx):
         "@aspect-test/a": {
           "specifier": "5.0.0",
           "version": "5.0.0"
+        },
+        "lodash": {
+          "specifier": "file:lodash-4.17.21.tgz",
+          "version": "file:lodash-4.17.21.tgz"
         }
       }
     }
@@ -154,6 +199,13 @@ def _parse_lockfile_v9_test_impl(ctx):
         "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
       },
       "hasBin": true
+    },
+    "lodash@file:lodash-4.17.21.tgz": {
+      "resolution": {
+        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
+        "tarball": "file:lodash-4.17.21.tgz"
+      },
+      "version": "4.17.21"
     }
   },
   "snapshots": {
@@ -163,16 +215,20 @@ def _parse_lockfile_v9_test_impl(ctx):
         "@aspect-test/c": "1.0.0",
         "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
       }
-    }
+    },
+    "lodash@file:lodash-4.17.21.tgz": { }
   }
 }
 """)
 
-    # NOTE: unknown properties in >=v9
+    # NOTE: unknown properties in >=v9, convert to <v9 defaults for test assertions
     v9_expected_packages = dict(expected_packages)
     v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
     v9_expected_packages["@aspect-test/a@5.0.0"]["dev_only"] = None
     v9_expected_packages["@aspect-test/a@5.0.0"]["requires_build"] = None
+    v9_expected_packages["lodash@4.17.21"] = dict(v9_expected_packages["lodash@4.17.21"])
+    v9_expected_packages["lodash@4.17.21"]["dev_only"] = None
+    v9_expected_packages["lodash@4.17.21"]["requires_build"] = None
 
     expected = (
         expected_importers,

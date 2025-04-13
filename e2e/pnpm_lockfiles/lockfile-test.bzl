@@ -81,6 +81,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/is-odd-v1",
             ":node_modules/is-odd-v2",
             ":node_modules/is-odd-v3",
+            ":node_modules/lodash",
             ":node_modules/@isaacs/cliui",
         ],
         entry_point = "aliases-test.js",
@@ -124,6 +125,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
             ":node_modules/scoped/bad",
+            ":node_modules/lodash",
 
             # Packages involving overrides
             ":node_modules/is-odd",
@@ -178,6 +180,8 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+c@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
+            ":.aspect_rules_js/node_modules/lodash@4.17.21",
+            ":.aspect_rules_js/node_modules/lodash@4.17.21/dir",
 
             # Patched dependencies
             ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_o3deharooos255qt5xdujc3cuq",
