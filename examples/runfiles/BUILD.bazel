@@ -12,12 +12,6 @@ js_test(
     ],
     entry_point = "test.js",
     tags = ["skip-on-bazel8"],
-    # @bazel/runfiles seems broken with non-bzlmod + bazel7
-    # https://github.com/bazel-contrib/rules_nodejs/issues/3797
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
 )
 
 # Path of file must start similar to `test_fixture.md` in order to regression-test a

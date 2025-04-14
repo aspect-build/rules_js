@@ -59,23 +59,9 @@ assert_contains(
 )
 
 assert_contains(
-    name = "BAZEL_WORKSPACE_wksp_test",
-    actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_WORKSPACE aspect_rules_js",
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-)
-
-assert_contains(
-    name = "BAZEL_WORKSPACE_bzlmod_test",
+    name = "BAZEL_WORKSPACE_test",
     actual = ":stderr",
     expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_WORKSPACE _main",
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
 )
 
 assert_contains(
@@ -109,23 +95,9 @@ assert_contains(
 )
 
 assert_contains(
-    name = "JS_BINARY__WORKSPACE_wksp_test",
-    actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__WORKSPACE aspect_rules_js",
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-)
-
-assert_contains(
-    name = "JS_BINARY__WORKSPACE_bzlmod_test",
+    name = "JS_BINARY__WORKSPACE_test",
     actual = ":stderr",
     expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__WORKSPACE _main",
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
 )
 
 # js_binary with interesting args: https://github.com/aspect-build/rules_js/issues/1045
