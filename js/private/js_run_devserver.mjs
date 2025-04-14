@@ -65,19 +65,41 @@ export function is1pPackageStoreDep(p) {
     return p.match(unscoped1p) || p.match(scoped1p)
 }
 
+// Utility function to retry an async operation with backoff
+async function withRetry(operation, description, maxRetries = 3, initialDelay = 100) {
+    let retries = maxRetries
+    let delay = initialDelay
+    while (retries > 0) {
+        try {
+            return await operation()
+        } catch (e) {
+            if (e.code === 'ENOENT' && retries > 1) {
+                retries--
+                console.error(`Retrying ${description} in ${delay}ms (${retries} attempts remaining)`)
+                await new Promise(resolve => setTimeout(resolve, delay))
+                delay += initialDelay
+                continue
+            }
+            console.error(`Failed ${description} after all retries: ${e.message}`)
+            throw e
+        }
+    }
+}
+
 // Hashes a file using a read stream. Based on https://github.com/kodie/md5-file.
 async function generateChecksum(p) {
-    return new Promise((resolve, reject) => {
-        const output = crypto.createHash('md5')
-        const input = fs.createReadStream(p)
-        input.on('error', (err) => {
-            reject(err)
-        })
-        output.once('readable', () => {
-            resolve(output.read().toString('hex'))
-        })
-        input.pipe(output)
-    })
+    return withRetry(
+        () => new Promise((resolve, reject) => {
+            const output = crypto.createHash('md5')
+            const input = fs.createReadStream(p)
+            input.on('error', reject)
+            output.once('readable', () => {
+                resolve(output.read().toString('hex'))
+            })
+            input.pipe(output)
+        }),
+        `generateChecksum for ${p}`
+    )
 }
 
 // Converts a size in bytes to a human readable friendly number such as "24 KiB"
@@ -117,7 +139,10 @@ function partitionArray(array, callback) {
 // pointing to the source symlink.
 async function syncRecursive(src, dst, sandbox, writePerm) {
     try {
-        const lstat = await fs.promises.lstat(src)
+        const lstat = await withRetry(
+            () => fs.promises.lstat(src),
+            `lstat for ${src}`
+        )
         const last = syncedTime.get(src)
         if (!lstat.isDirectory() && last && lstat.mtimeMs == last) {
             // this file is already up-to-date
@@ -226,7 +251,11 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
                 mkdirpSync(path.dirname(dst))
             }
 
-            await fs.promises.copyFile(src, dst)
+            await withRetry(
+                () => fs.promises.copyFile(src, dst),
+                `copyFile from ${src} to ${dst}`
+            )
+
             if (writePerm) {
                 const s = await fs.promises.stat(dst)
                 const mode = s.mode | fs.constants.S_IWUSR
@@ -243,6 +272,7 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
         }
     } catch (e) {
         console.error(e)
+        console.trace()
         process.exit(1)
     }
 }
