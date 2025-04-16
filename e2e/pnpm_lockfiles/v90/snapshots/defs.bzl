@@ -313,13 +313,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+c@0.0.0",
+            package_store_name = "@scoped+c@file++..+projects+c",
             src = "//projects/c:pkg",
             package = "@scoped/c",
-            version = "0.0.0",
+            version = "file:../projects/c",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@link++..+a".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@link++..+projects+b".format(name): "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -329,7 +329,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/c".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@file++..+projects+c".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -352,10 +352,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "is-number@0.0.0",
+            package_store_name = "is-number@file++..+vendored+is-number",
             src = "//vendored/is-number:pkg",
             package = "is-number",
-            version = "0.0.0",
+            version = "file:../vendored/is-number",
             deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -364,10 +364,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+a@0.0.0",
+            package_store_name = "@scoped+a@link++..+projects+a",
             src = "//projects/a:pkg",
             package = "@scoped/a",
-            version = "0.0.0",
+            version = "link:../projects/a",
             deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -377,7 +377,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/a".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@link++..+projects+a".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -400,12 +400,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+b@0.0.0",
+            package_store_name = "@scoped+b@link++..+projects+b",
             src = "//projects/b:pkg",
             package = "@scoped/b",
-            version = "0.0.0",
+            version = "link:../projects/b",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@link++..+projects+a".format(name): "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -415,7 +415,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/b".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@link++..+projects+b".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -438,13 +438,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+d@0.0.0",
+            package_store_name = "@scoped+d@link++..+projects+d",
             src = "//projects/d:pkg",
             package = "@scoped/d",
-            version = "0.0.0",
+            version = "link:../projects/d",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@link++..+projects+a".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@link++..+projects+b".format(name): "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -454,7 +454,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/d".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@link++..+projects+d".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -477,10 +477,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "alias-project-a@0.0.0",
+            package_store_name = "alias-project-a@link++..+projects+a",
             src = "//projects/a:pkg",
             package = "alias-project-a",
-            version = "0.0.0",
+            version = "link:../projects/a",
             deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -490,7 +490,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/alias-project-a".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@link++..+projects+a".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -509,12 +509,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "scoped+bad@0.0.0",
+            package_store_name = "scoped+bad@link++..+projects+b",
             src = "//projects/b:pkg",
             package = "scoped/bad",
-            version = "0.0.0",
+            version = "link:../projects/b",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@link++..+projects+a".format(name): "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -524,7 +524,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/scoped/bad".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@link++..+projects+b".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -543,10 +543,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "test-c200-d200@0.0.0",
+            package_store_name = "test-c200-d200@link++..+projects+peers-combo-2",
             src = "//projects/peers-combo-2:pkg",
             package = "test-c200-d200",
-            version = "0.0.0",
+            version = "link:../projects/peers-combo-2",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+c@2.0.0".format(name): "@aspect-test/c",
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.0".format(name): "@aspect-test/d",
@@ -559,7 +559,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/test-c200-d200".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@link++..+projects+peers-combo-2".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -578,10 +578,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "test-c201-d200@0.0.0",
+            package_store_name = "test-c201-d200@link++..+projects+peers-combo-1",
             src = "//projects/peers-combo-1:pkg",
             package = "test-c201-d200",
-            version = "0.0.0",
+            version = "link:../projects/peers-combo-1",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+c@2.0.1".format(name): "@aspect-test/c",
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.1".format(name): "@aspect-test/d",
@@ -594,7 +594,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/test-c201-d200".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@link++..+projects+peers-combo-1".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -613,10 +613,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "a-types@0.0.0",
+            package_store_name = "a-types@link++..+projects+a-types",
             src = "//projects/a-types:pkg",
             package = "a-types",
-            version = "0.0.0",
+            version = "link:../projects/a-types",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@16.18.11".format(name): "@types/node",
             },
@@ -628,7 +628,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/a-types".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@link++..+projects+a-types".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )

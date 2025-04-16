@@ -6,6 +6,10 @@ drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@link++examples+npm_package+packages+pkg_d/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@link++examples+npm_package+packages+pkg_d/node_modules/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@link++examples+npm_package+packages+pkg_d/node_modules/@mycorp/
+lrwxrwxr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@link++examples+npm_package+packages+pkg_d/node_modules/@mycorp/pkg-d -> ../../../../../examples/npm_package/packages/pkg_d
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/

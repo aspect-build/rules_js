@@ -163,11 +163,11 @@ def _npm_package_store_impl(ctx):
             package = ctx.attr.package if ctx.attr.package else ctx.attr.src[NpmPackageInfo].package
             version = ctx.attr.version if ctx.attr.version else ctx.attr.src[NpmPackageInfo].version
         elif JsInfo in ctx.attr.src:
-            if not ctx.attr.package:
-                msg = "Expected package to be specified in '{}' when src '{}' provides a JsInfo".format(ctx.label, ctx.attr.src[JsInfo].target)
+            if not ctx.attr.package or not ctx.attr.version:
+                msg = "Expected package+version to be specified in '{}' when src '{}' provides a JsInfo".format(ctx.label, ctx.attr.src[JsInfo].target)
                 fail(msg)
             package = ctx.attr.package
-            version = ctx.attr.version if ctx.attr.version else "0.0.0"
+            version = ctx.attr.version
         else:
             msg = "Expected src of '{}' to provide either NpmPackageInfo or JsInfo".format(ctx.label)
             fail(msg)

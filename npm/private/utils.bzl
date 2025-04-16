@@ -50,20 +50,21 @@ def _package_store_name(pnpm_name, pnpm_version):
 
     if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
         name = pnpm_name
-        version = "0.0.0"
+        version = pnpm_version
     elif pnpm_version.startswith("npm:"):
         name, version = pnpm_version[4:].rsplit("@", 1)
     else:
         name = pnpm_name
         version = pnpm_version
 
+    escaped_name = name.replace("/", "+")
+    escaped_version = version.replace("://", "/").replace(":", "//").replace("/", "+")
+
     if version.startswith("@"):
         # Special case where the package name should _not_ be included in the package store name.
         # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return version.replace("/", "+")
+        return escaped_version
     else:
-        escaped_name = name.replace("/", "+")
-        escaped_version = version.replace("://", "/").replace("/", "+")
         return "%s@%s" % (escaped_name, escaped_version)
 
 def _make_symlink(ctx, symlink_path, target_path):
