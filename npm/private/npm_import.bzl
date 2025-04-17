@@ -50,17 +50,13 @@ load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_inte
 _LINK_JS_PACKAGE_TMPL = """
 # Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_imported_package_store(name):
+def npm_imported_package_store(link_root_name):
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
     if not is_root:
         msg = "No store links in bazel package '%s' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package." % bazel_package
         fail(msg)
-    if not name.endswith("/{package}"):
-        msg = "name must end with one of '/{package}' when linking the store in package '{package}'; recommended value is 'node_modules/{package}'"
-        fail(msg)
-    link_root_name = name[:-len("/{package}")]
 
     deps = {deps}
     ref_deps = {ref_deps}
@@ -271,7 +267,7 @@ def npm_link_imported_package(
                     scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
-        npm_imported_package_store("{{}}/{package}".format(name))
+        npm_imported_package_store(name)
 
     return (link_targets, scoped_targets)
 """

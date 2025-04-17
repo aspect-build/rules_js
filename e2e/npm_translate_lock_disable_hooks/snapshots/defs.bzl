@@ -28,7 +28,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets[_scope].extend(_targets)
 
     if is_root:
-        store_0(name = "{}/@aspect-test/c".format(name))
+        store_0(name)
     if link:
         if bazel_package == "":
             link_0(name = "{}/@aspect-test/c".format(name))
