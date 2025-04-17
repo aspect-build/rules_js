@@ -9,29 +9,31 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package_internal",
     _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
 
+KEY = "/rollup/2.14.0"
 PACKAGE = "rollup"
 VERSION = "2.14.0"
 _ROOT_PACKAGE = "<LOCKVERSION>"
-_PACKAGE_STORE_NAME = "rollup@2.14.0"
+_PACKAGE_STORE_NAME = "rollup+2.14.0"
 
 # Generated npm_package_store targets for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
 def npm_imported_package_store(link_root_name):
     _npm_imported_package_store(
         link_root_name = link_root_name,
+        key = KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
-            ":.aspect_rules_js/{link_root_name}/rollup@2.14.0/pkg": "rollup",
+            ":.aspect_rules_js/{link_root_name}/fsevents+2.3.3/pkg": "fsevents",
+            ":.aspect_rules_js/{link_root_name}/rollup+2.14.0/pkg": "rollup",
         },
         ref_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/ref": "fsevents",
+            ":.aspect_rules_js/{link_root_name}/fsevents+2.3.3/ref": "fsevents",
         },
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
-            ":.aspect_rules_js/{link_root_name}/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
+            ":.aspect_rules_js/{link_root_name}/fsevents+2.3.3/pkg": "fsevents",
+            ":.aspect_rules_js/{link_root_name}/rollup+2.14.0/pkg_pre_lc_lite": "rollup",
         },
         dev = False,
         has_lifecycle_build_target = False,

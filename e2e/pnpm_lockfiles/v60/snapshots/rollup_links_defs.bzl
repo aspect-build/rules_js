@@ -9,6 +9,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package_internal",
     _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
 
+KEY = "/rollup@2.14.0"
 PACKAGE = "rollup"
 VERSION = "2.14.0"
 _ROOT_PACKAGE = "<LOCKVERSION>"
@@ -19,6 +20,7 @@ _PACKAGE_STORE_NAME = "rollup@2.14.0"
 def npm_imported_package_store(link_root_name):
     _npm_imported_package_store(
         link_root_name = link_root_name,
+        key = KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,

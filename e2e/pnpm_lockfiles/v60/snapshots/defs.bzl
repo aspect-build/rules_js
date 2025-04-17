@@ -9,50 +9,50 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_b__5.0.2__links/
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.0__links//:defs.bzl", link_6 = "npm_link_imported_package_store", store_6 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.1__links//:defs.bzl", link_7 = "npm_link_imported_package_store", store_7 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.2__links//:defs.bzl", store_8 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.0__links//:defs.bzl", link_9 = "npm_link_imported_package_store", store_9 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.1__links//:defs.bzl", link_10 = "npm_link_imported_package_store", store_10 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links//:defs.bzl", store_11 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d_2.0.0_aspect-test_c_2.0.0__links//:defs.bzl", link_9 = "npm_link_imported_package_store", store_9 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d_2.0.0_aspect-test_c_2.0.1__links//:defs.bzl", link_10 = "npm_link_imported_package_store", store_10 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d_2.0.0_aspect-test_c_2.0.2__links//:defs.bzl", store_11 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_e__1.0.0__links//:defs.bzl", link_12 = "npm_link_imported_package_store", store_12 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_h__1.0.0__links//:defs.bzl", link_13 = "npm_link_imported_package_store", store_13 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_isaacs_cliui__8.0.2__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_1813138439__links//:defs.bzl", link_16 = "npm_link_imported_package_store", store_16 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_pluginutils__3.1.0_rollup_3.29.4__links//:defs.bzl", store_17 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_18 = "npm_link_imported_package_store", store_18 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_estree__0.0.39__links//:defs.bzl", store_19 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_20 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_21 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_22 = "npm_link_imported_package_store", store_22 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_sizzle__2.3.9__links//:defs.bzl", link_23 = "npm_link_imported_package_store", store_23 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-convert__2.0.1__links//:defs.bzl", store_24 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-name__1.1.4__links//:defs.bzl", store_25 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__debug__github.com_ngokevin_debug_9742c5f383a6f8046241920156236ade8ec30d53__links//:defs.bzl", link_26 = "npm_link_imported_package_store", store_26 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__dequal__2.0.3__links//:defs.bzl", store_27 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__diff__at_github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz__links//:defs.bzl", store_28 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__eastasianwidth__0.2.0__links//:defs.bzl", store_29 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__8.0.0__links//:defs.bzl", store_30 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__9.2.2__links//:defs.bzl", store_31 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__estree-walker__1.0.1__links//:defs.bzl", store_32 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_33 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__function-bind__1.1.2__links//:defs.bzl", store_34 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hasown__2.0.2__links//:defs.bzl", store_35 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hello__at_gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello__links//:defs.bzl", link_36 = "npm_link_imported_package_store", store_36 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_37 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_38 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_39 = "npm_link_imported_package_store", store_39 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_40 = "npm_link_imported_package_store", store_40 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_41 = "npm_link_imported_package_store", store_41 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_42 = "npm_link_imported_package_store", store_42 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_43 = "npm_link_imported_package_store", store_43 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__github.com_jquery_jquery_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_44 = "npm_link_imported_package_store", store_44 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__github.com_jquery_jquery_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_45 = "npm_link_imported_package_store", store_45 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_46 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_47 = "npm_link_imported_package_store", store_47 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_48 = "npm_link_imported_package_store", store_48 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_49 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_50 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_51 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_52 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_github.com_aspect-build_test-packages_releases_download_0.0.0_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz__links//:defs.bzl", store_15 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello__links//:defs.bzl", link_16 = "npm_link_imported_package_store", store_16 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_isaacs_cliui__8.0.2__links//:defs.bzl", link_17 = "npm_link_imported_package_store", store_17 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_plugin-typescript_8.2.1_rollup_3.29.4_tslib_2.6.3_typescript_5.5.2__links//:defs.bzl", link_18 = "npm_link_imported_package_store", store_18 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_pluginutils_3.1.0_rollup_3.29.4__links//:defs.bzl", store_19 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-convert__2.0.1__links//:defs.bzl", store_20 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-name__1.1.4__links//:defs.bzl", store_21 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__dequal__2.0.3__links//:defs.bzl", store_22 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__eastasianwidth__0.2.0__links//:defs.bzl", store_23 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__8.0.0__links//:defs.bzl", store_24 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__9.2.2__links//:defs.bzl", store_25 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__estree-walker__1.0.1__links//:defs.bzl", store_26 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_27 = "npm_link_imported_package_store", store_27 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_28 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__function-bind__1.1.2__links//:defs.bzl", store_29 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__github.com_jquery_jquery_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_30 = "npm_link_imported_package_store", store_30 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__github.com_jquery_jquery_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_31 = "npm_link_imported_package_store", store_31 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__github.com_ngokevin_debug_9742c5f383a6f8046241920156236ade8ec30d53__links//:defs.bzl", link_32 = "npm_link_imported_package_store", store_32 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hasown__2.0.2__links//:defs.bzl", store_33 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_34 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_35 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_36 = "npm_link_imported_package_store", store_36 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_37 = "npm_link_imported_package_store", store_37 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_38 = "npm_link_imported_package_store", store_38 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_39 = "npm_link_imported_package_store", store_39 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_40 = "npm_link_imported_package_store", store_40 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_41 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life_1.0.0_patch_hash_o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_42 = "npm_link_imported_package_store", store_42 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_43 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_44 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_45 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_46 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__registry.npmjs.org_types_archiver_5.3.1__links//:defs.bzl", link_47 = "npm_link_imported_package_store", store_47 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__registry.npmjs.org_types_estree_0.0.39__links//:defs.bzl", store_48 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__registry.npmjs.org_types_glob_8.1.0__links//:defs.bzl", store_49 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__registry.npmjs.org_types_minimatch_5.1.2__links//:defs.bzl", store_50 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__registry.npmjs.org_types_node_16.18.11__links//:defs.bzl", link_51 = "npm_link_imported_package_store", store_51 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__registry.npmjs.org_types_sizzle_2.3.9__links//:defs.bzl", link_52 = "npm_link_imported_package_store", store_52 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__resolve__1.22.10__links//:defs.bzl", store_53 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_54 = "npm_link_imported_package_store", store_54 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_55 = "npm_link_imported_package_store", store_55 = "npm_imported_package_store")
@@ -77,7 +77,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
+_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "projects/peers-local-combo-1", "projects/peers-local-combo-2", "vendored/is-number"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -223,54 +223,54 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@aspect-test"].append(link_targets[-1])
             link_14("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
             link_targets.append(":{}/jsonify".format(name))
-            link_15("{}/@isaacs/cliui".format(name), link_root_name = name, link_alias = "@isaacs/cliui")
+            link_16("{}/hello".format(name), link_root_name = name, link_alias = "hello")
+            link_targets.append(":{}/hello".format(name))
+            link_17("{}/@isaacs/cliui".format(name), link_root_name = name, link_alias = "@isaacs/cliui")
             link_targets.append(":{}/@isaacs/cliui".format(name))
             if "@isaacs" not in scope_targets:
                 scope_targets["@isaacs"] = [link_targets[-1]]
             else:
                 scope_targets["@isaacs"].append(link_targets[-1])
-            link_16("{}/rollup-plugin-with-peers".format(name), link_root_name = name, link_alias = "rollup-plugin-with-peers")
+            link_18("{}/rollup-plugin-with-peers".format(name), link_root_name = name, link_alias = "rollup-plugin-with-peers")
             link_targets.append(":{}/rollup-plugin-with-peers".format(name))
-            link_18("{}/@types/archiver".format(name), link_root_name = name, link_alias = "@types/archiver")
+            link_27("{}/lodash".format(name), link_root_name = name, link_alias = "lodash")
+            link_targets.append(":{}/lodash".format(name))
+            link_30("{}/jquery-git-ssh-399b201".format(name), link_root_name = name, link_alias = "jquery-git-ssh-399b201")
+            link_targets.append(":{}/jquery-git-ssh-399b201".format(name))
+            link_31("{}/jquery-git-ssh-e61fccb".format(name), link_root_name = name, link_alias = "jquery-git-ssh-e61fccb")
+            link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
+            link_32("{}/debug".format(name), link_root_name = name, link_alias = "debug")
+            link_targets.append(":{}/debug".format(name))
+            link_36("{}/is-odd-v0".format(name), link_root_name = name, link_alias = "is-odd-v0")
+            link_targets.append(":{}/is-odd-v0".format(name))
+            link_37("{}/is-odd-v1".format(name), link_root_name = name, link_alias = "is-odd-v1")
+            link_targets.append(":{}/is-odd-v1".format(name))
+            link_38("{}/is-odd-v2".format(name), link_root_name = name, link_alias = "is-odd-v2")
+            link_targets.append(":{}/is-odd-v2".format(name))
+            link_39("{}/is-odd-v3".format(name), link_root_name = name, link_alias = "is-odd-v3")
+            link_targets.append(":{}/is-odd-v3".format(name))
+            link_40("{}/is-odd".format(name), link_root_name = name, link_alias = "is-odd")
+            link_targets.append(":{}/is-odd".format(name))
+            link_40("{}/is-odd-alias".format(name), link_root_name = name, link_alias = "is-odd-alias")
+            link_targets.append(":{}/is-odd-alias".format(name))
+            link_42("{}/meaning-of-life".format(name), link_root_name = name, link_alias = "meaning-of-life")
+            link_targets.append(":{}/meaning-of-life".format(name))
+            link_47("{}/@types/archiver".format(name), link_root_name = name, link_alias = "@types/archiver")
             link_targets.append(":{}/@types/archiver".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
-            link_22("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
+            link_51("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
-            link_22("{}/alias-types-node".format(name), link_root_name = name, link_alias = "alias-types-node")
+            link_51("{}/alias-types-node".format(name), link_root_name = name, link_alias = "alias-types-node")
             link_targets.append(":{}/alias-types-node".format(name))
-            link_23("{}/alias-only-sizzle".format(name), link_root_name = name, link_alias = "alias-only-sizzle")
+            link_52("{}/alias-only-sizzle".format(name), link_root_name = name, link_alias = "alias-only-sizzle")
             link_targets.append(":{}/alias-only-sizzle".format(name))
-            link_26("{}/debug".format(name), link_root_name = name, link_alias = "debug")
-            link_targets.append(":{}/debug".format(name))
-            link_36("{}/hello".format(name), link_root_name = name, link_alias = "hello")
-            link_targets.append(":{}/hello".format(name))
-            link_39("{}/is-odd-v0".format(name), link_root_name = name, link_alias = "is-odd-v0")
-            link_targets.append(":{}/is-odd-v0".format(name))
-            link_40("{}/is-odd-v1".format(name), link_root_name = name, link_alias = "is-odd-v1")
-            link_targets.append(":{}/is-odd-v1".format(name))
-            link_41("{}/is-odd-v2".format(name), link_root_name = name, link_alias = "is-odd-v2")
-            link_targets.append(":{}/is-odd-v2".format(name))
-            link_42("{}/is-odd-v3".format(name), link_root_name = name, link_alias = "is-odd-v3")
-            link_targets.append(":{}/is-odd-v3".format(name))
-            link_43("{}/is-odd".format(name), link_root_name = name, link_alias = "is-odd")
-            link_targets.append(":{}/is-odd".format(name))
-            link_43("{}/is-odd-alias".format(name), link_root_name = name, link_alias = "is-odd-alias")
-            link_targets.append(":{}/is-odd-alias".format(name))
-            link_44("{}/jquery-git-ssh-399b201".format(name), link_root_name = name, link_alias = "jquery-git-ssh-399b201")
-            link_targets.append(":{}/jquery-git-ssh-399b201".format(name))
-            link_45("{}/jquery-git-ssh-e61fccb".format(name), link_root_name = name, link_alias = "jquery-git-ssh-e61fccb")
-            link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
-            link_47("{}/lodash".format(name), link_root_name = name, link_alias = "lodash")
-            link_targets.append(":{}/lodash".format(name))
-            link_48("{}/meaning-of-life".format(name), link_root_name = name, link_alias = "meaning-of-life")
-            link_targets.append(":{}/meaning-of-life".format(name))
             link_54("{}/rollup".format(name), link_root_name = name, link_alias = "rollup")
             link_targets.append(":{}/rollup".format(name))
             link_55("{}/rollup3".format(name), link_root_name = name, link_alias = "rollup3")
@@ -310,17 +310,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         elif bazel_package == "projects/peer-types":
             link_14("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
             link_targets.append(":{}/jsonify".format(name))
-            link_36("{}/hello".format(name), link_root_name = name, link_alias = "hello")
+            link_16("{}/hello".format(name), link_root_name = name, link_alias = "hello")
             link_targets.append(":{}/hello".format(name))
         elif bazel_package == "projects/a-types":
-            link_22("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
+            link_51("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "projects/b":
-            link_22("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
+            link_51("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
@@ -330,13 +330,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+c@0.0.0",
+            package_store_name = "file_..+projects+c_@scoped+b@projects+b@0.0.0",
+            key = "file:../projects/c(@scoped/b@projects+b)",
             src = "//projects/c:pkg",
             package = "@scoped/c",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name): "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -346,7 +347,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/c".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/file_..+projects+c_@scoped+b@projects+b@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -369,10 +370,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "is-number@0.0.0",
+            package_store_name = "file_..+vendored+is-number@0.0.0",
+            key = "file:../vendored/is-number",
             src = "//vendored/is-number:pkg",
             package = "is-number",
-            version = "0.0.0",
+            version = "0.0.1",
             deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -381,7 +383,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+a@0.0.0",
+            package_store_name = "link_..+projects+a@0.0.0",
+            key = "link:../projects/a",
             src = "//projects/a:pkg",
             package = "@scoped/a",
             version = "0.0.0",
@@ -394,7 +397,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/a".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -414,25 +417,47 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         else:
             scope_targets["@scoped"].append(link_targets[-1])
 
+    if bazel_package in ["<LOCKVERSION>"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/alias-project-a".format(name),
+            package = "alias-project-a",
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/alias-project-a/dir".format(name),
+            srcs = [":{}/alias-project-a".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/alias-project-a".format(name))
+
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+b@0.0.0",
+            package_store_name = "link_..+projects+b@0.0.0",
+            key = "link:../projects/b",
             src = "//projects/b:pkg",
             package = "@scoped/b",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a@0.0.0".format(name): "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
 
-    if bazel_package in ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types"]:
+    if bazel_package in ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types", "projects/peers-local-combo-1", "projects/peers-local-combo-2"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/b".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -452,26 +477,48 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         else:
             scope_targets["@scoped"].append(link_targets[-1])
 
+    if bazel_package in ["<LOCKVERSION>"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/scoped/bad".format(name),
+            package = "scoped/bad",
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/scoped/bad/dir".format(name),
+            srcs = [":{}/scoped/bad".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/scoped/bad".format(name))
+
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+d@0.0.0",
+            package_store_name = "link_..+projects+d@0.0.0",
+            key = "link:../projects/d",
             src = "//projects/d:pkg",
             package = "@scoped/d",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name): "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
 
-    if bazel_package in ["<LOCKVERSION>"]:
+    if bazel_package in ["<LOCKVERSION>", "projects/peers-local-combo-2"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/d".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+d@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -494,79 +541,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "alias-project-a@0.0.0",
-            src = "//projects/a:pkg",
-            package = "alias-project-a",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/alias-project-a".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/alias-project-a/dir".format(name),
-            srcs = [":{}/alias-project-a".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/alias-project-a".format(name))
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "scoped+bad@0.0.0",
-            src = "//projects/b:pkg",
-            package = "scoped/bad",
-            version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/scoped/bad".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/scoped/bad/dir".format(name),
-            srcs = [":{}/scoped/bad".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/scoped/bad".format(name))
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "test-c200-d200@0.0.0",
+            package_store_name = "link_..+projects+peers-combo-2@0.0.0",
+            key = "link:../projects/peers-combo-2",
             src = "//projects/peers-combo-2:pkg",
             package = "test-c200-d200",
             version = "0.0.0",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+c@2.0.0".format(name): "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.0".format(name): "@aspect-test/d",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0".format(name): "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -576,7 +558,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/test-c200-d200".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+peers-combo-2@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -595,13 +577,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "test-c201-d200@0.0.0",
+            package_store_name = "link_..+projects+peers-combo-1@0.0.0",
+            key = "link:../projects/peers-combo-1",
             src = "//projects/peers-combo-1:pkg",
             package = "test-c201-d200",
             version = "0.0.0",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+c@2.0.1".format(name): "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.1".format(name): "@aspect-test/d",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_@aspect-test+c@2.0.1".format(name): "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -611,7 +594,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/test-c201-d200".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+peers-combo-1@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -630,7 +613,80 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "test-peer-types@0.0.0",
+            package_store_name = "link_..+projects+peers-local-combo-1@0.0.0",
+            key = "link:../projects/peers-local-combo-1",
+            src = "//projects/peers-local-combo-1:pkg",
+            package = "test-local-combo-1",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+c@0.0.0".format(name): "@scoped/c",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/test-local-combo-1".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+peers-local-combo-1@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/test-local-combo-1/dir".format(name),
+            srcs = [":{}/test-local-combo-1".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/test-local-combo-1".format(name))
+
+    if is_root:
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "link_..+projects+peers-local-combo-2@0.0.0",
+            key = "link:../projects/peers-local-combo-2",
+            src = "//projects/peers-local-combo-2:pkg",
+            package = "test-local-combo-2",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+d@0.0.0".format(name): "@scoped/d",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/test-local-combo-2".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+peers-local-combo-2@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/test-local-combo-2/dir".format(name),
+            srcs = [":{}/test-local-combo-2".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/test-local-combo-2".format(name))
+
+    if is_root:
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "link_..+projects+peer-types@0.0.0",
+            key = "link:../projects/peer-types",
             src = "//projects/peer-types:pkg",
             package = "test-peer-types",
             version = "0.0.0",
@@ -643,7 +699,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/test-peer-types".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-peer-types@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+peer-types@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -662,12 +718,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "a-types@0.0.0",
+            package_store_name = "link_..+projects+a-types@0.0.0",
+            key = "link:../projects/a-types",
             src = "//projects/a-types:pkg",
             package = "a-types",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@16.18.11".format(name): "@types/node",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/registry.npmjs.org+@types+node@16.18.11".format(name): "@types/node",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -677,7 +734,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/a-types".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a-types@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -692,6 +749,46 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             tags = ["manual"],
         )
         link_targets.append(":{}/a-types".format(name))
+
+    if is_root:
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "link_..+projects+c@0.0.0",
+            key = "link:../projects/c",
+            src = "//projects/c:pkg",
+            package = "@scoped/c",
+            version = "0.0.0",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+b@0.0.0".format(name): "@scoped/b",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["projects/peers-local-combo-1"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@scoped/c".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/link_..+projects+c@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@scoped/c/dir".format(name),
+            srcs = [":{}/@scoped/c".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/@scoped/c".format(name))
+        if "@scoped" not in scope_targets:
+            scope_targets["@scoped"] = [link_targets[-1]]
+        else:
+            scope_targets["@scoped"].append(link_targets[-1])
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -728,24 +825,24 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append(":{}/@aspect-test/e".format(name))
             link_targets.append(":{}/@aspect-test/h-is-only-optional".format(name))
             link_targets.append(":{}/jsonify".format(name))
+            link_targets.append(":{}/hello".format(name))
             link_targets.append(":{}/@isaacs/cliui".format(name))
             link_targets.append(":{}/rollup-plugin-with-peers".format(name))
-            link_targets.append(":{}/@types/archiver".format(name))
-            link_targets.append(":{}/@types/node".format(name))
-            link_targets.append(":{}/alias-types-node".format(name))
-            link_targets.append(":{}/alias-only-sizzle".format(name))
+            link_targets.append(":{}/lodash".format(name))
+            link_targets.append(":{}/jquery-git-ssh-399b201".format(name))
+            link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
             link_targets.append(":{}/debug".format(name))
-            link_targets.append(":{}/hello".format(name))
             link_targets.append(":{}/is-odd-v0".format(name))
             link_targets.append(":{}/is-odd-v1".format(name))
             link_targets.append(":{}/is-odd-v2".format(name))
             link_targets.append(":{}/is-odd-v3".format(name))
             link_targets.append(":{}/is-odd".format(name))
             link_targets.append(":{}/is-odd-alias".format(name))
-            link_targets.append(":{}/jquery-git-ssh-399b201".format(name))
-            link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
-            link_targets.append(":{}/lodash".format(name))
             link_targets.append(":{}/meaning-of-life".format(name))
+            link_targets.append(":{}/@types/archiver".format(name))
+            link_targets.append(":{}/@types/node".format(name))
+            link_targets.append(":{}/alias-types-node".format(name))
+            link_targets.append(":{}/alias-only-sizzle".format(name))
             link_targets.append(":{}/rollup".format(name))
             link_targets.append(":{}/rollup3".format(name))
             link_targets.append(":{}/tslib".format(name))
@@ -771,17 +868,17 @@ def npm_link_targets(name = "node_modules", package = None):
     if bazel_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d", "projects/peer-types"]:
         link_targets.append(":{}/@scoped/a".format(name))
 
-    if bazel_package in ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types"]:
-        link_targets.append(":{}/@scoped/b".format(name))
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        link_targets.append(":{}/@scoped/d".format(name))
-
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/alias-project-a".format(name))
 
+    if bazel_package in ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types", "projects/peers-local-combo-1", "projects/peers-local-combo-2"]:
+        link_targets.append(":{}/@scoped/b".format(name))
+
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/scoped/bad".format(name))
+
+    if bazel_package in ["<LOCKVERSION>", "projects/peers-local-combo-2"]:
+        link_targets.append(":{}/@scoped/d".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/test-c200-d200".format(name))
@@ -790,8 +887,17 @@ def npm_link_targets(name = "node_modules", package = None):
         link_targets.append(":{}/test-c201-d200".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
+        link_targets.append(":{}/test-local-combo-1".format(name))
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        link_targets.append(":{}/test-local-combo-2".format(name))
+
+    if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/test-peer-types".format(name))
 
     if bazel_package in ["projects/b"]:
         link_targets.append(":{}/a-types".format(name))
+
+    if bazel_package in ["projects/peers-local-combo-1"]:
+        link_targets.append(":{}/@scoped/c".format(name))
     return link_targets
