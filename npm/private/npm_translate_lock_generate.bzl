@@ -122,11 +122,11 @@ sh_binary(
     }
 
     # Look for first-party file: links in packages
-    for package_info in packages.values():
+    for package_key, package_info in packages.items():
         name = package_info.get("name")
         version = package_info.get("version")
         deps = package_info.get("dependencies")
-        if version.startswith("file:"):
+        if package_key.startswith("file:"):
             if version in packages and packages[version]["id"] and packages[version]["id"].startswith("file:"):
                 dep_path = helpers.link_package(root_package, packages[version]["id"][len("file:"):])
             else:
@@ -170,17 +170,16 @@ sh_binary(
                     fail(msg)
                 fp_links[dep_key]["link_packages"][link_package] = True
             elif dep_version.startswith("link:"):
-                dep_version = dep_version[len("link:"):]
-                dep_importer = paths.normalize("{}/{}".format(import_path, dep_version) if import_path else dep_version)
-                dep_path = helpers.link_package(root_package, import_path, dep_version)
+                dep_link = dep_version[len("link:"):]
+                dep_path = helpers.link_package(root_package, dep_link)
                 dep_key = "{}+{}".format(dep_package, dep_path)
                 if fp_links.get(dep_key, False):
                     fp_links[dep_key]["link_packages"][link_package] = True
                 else:
                     transitive_deps = {}
                     raw_deps = {}
-                    if importers.get(dep_importer, False):
-                        raw_deps = importers.get(dep_importer).get("deps")
+                    if importers.get(dep_link, False):
+                        raw_deps = importers.get(dep_link).get("deps")
                     for raw_package, raw_version in raw_deps.items():
                         package_store_name = utils.package_store_name(raw_package, raw_version)
                         dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(

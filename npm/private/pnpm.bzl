@@ -1,5 +1,6 @@
 "Pnpm lockfile parsing and conversion to rules_js format."
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
 load(":utils.bzl", "DEFAULT_REGISTRY_DOMAIN_SLASH", "utils")
 
@@ -134,7 +135,7 @@ def _strip_v5_default_registry_to_version(name, version):
     # Strip the default registry/name@ from the version string
     return version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH + name + "/")
 
-def _convert_v5_importer_dependency_map(specifiers, deps):
+def _convert_v5_importer_dependency_map(import_path, specifiers, deps):
     result = {}
     for name, version in deps.items():
         specifier = specifiers.get(name)
@@ -145,6 +146,10 @@ def _convert_v5_importer_dependency_map(specifiers, deps):
             alias, version = _strip_v5_v6_default_registry(version).lstrip("/").rsplit("/", 1)
             version = _convert_pnpm_v5_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
+        elif version.startswith("link:"):
+            version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
+        elif version.startswith("file:"):
+            version = _convert_pnpm_v5_version_peer_dep(version)
         else:
             # Transition [registry/]name/version[_patch][_peer_data] to a rules_js version format
             version = _convert_pnpm_v5_version_peer_dep(_strip_v5_default_registry_to_version(name, version))
@@ -158,9 +163,9 @@ def _convert_v5_importers(importers):
         specifiers = importer.get("specifiers", {})
 
         result[import_path] = _new_import_info(
-            dependencies = _convert_v5_importer_dependency_map(specifiers, importer.get("dependencies", {})),
-            dev_dependencies = _convert_v5_importer_dependency_map(specifiers, importer.get("devDependencies", {})),
-            optional_dependencies = _convert_v5_importer_dependency_map(specifiers, importer.get("optionalDependencies", {})),
+            dependencies = _convert_v5_importer_dependency_map(import_path, specifiers, importer.get("dependencies", {})),
+            dev_dependencies = _convert_v5_importer_dependency_map(import_path, specifiers, importer.get("devDependencies", {})),
+            optional_dependencies = _convert_v5_importer_dependency_map(import_path, specifiers, importer.get("optionalDependencies", {})),
         )
     return result
 
@@ -293,7 +298,7 @@ def _strip_v6_default_registry_to_version(name, version):
     # Strip the default registry/name@ from the version string
     return version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH + name + "@")
 
-def _convert_pnpm_v6_importer_dependency_map(deps):
+def _convert_pnpm_v6_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
         specifier = attributes.get("specifier")
@@ -305,6 +310,10 @@ def _convert_pnpm_v6_importer_dependency_map(deps):
             alias, version = _split_name_at_version(_strip_v5_v6_default_registry(version).lstrip("/"))
             version = _convert_pnpm_v6_v9_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
+        elif version.startswith("link:"):
+            version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
+        elif version.startswith("file:"):
+            version = _convert_pnpm_v6_v9_version_peer_dep(version)
         else:
             # Transition [registry/]name@version[(peer)(data)] to a rules_js version format
             version = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, version))
@@ -339,9 +348,9 @@ def _convert_v6_importers(importers):
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
-            dependencies = _convert_pnpm_v6_importer_dependency_map(importer.get("dependencies", {})),
-            dev_dependencies = _convert_pnpm_v6_importer_dependency_map(importer.get("devDependencies", {})),
-            optional_dependencies = _convert_pnpm_v6_importer_dependency_map(importer.get("optionalDependencies", {})),
+            dependencies = _convert_pnpm_v6_importer_dependency_map(import_path, importer.get("dependencies", {})),
+            dev_dependencies = _convert_pnpm_v6_importer_dependency_map(import_path, importer.get("devDependencies", {})),
+            optional_dependencies = _convert_pnpm_v6_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
         )
     return result
 
@@ -443,7 +452,7 @@ def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
         result[name] = _convert_pnpm_v9_package_dependency_version(snapshots, name, version)
     return result
 
-def _convert_pnpm_v9_importer_dependency_map(deps):
+def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
         specifier = attributes.get("specifier")
@@ -455,6 +464,10 @@ def _convert_pnpm_v9_importer_dependency_map(deps):
         if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
             # Keep the npm: specifier for aliased dependencies
             version = "npm:{}".format(version)
+        elif version.startswith("link:"):
+            version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
+        elif version.startswith("file:"):
+            version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
         result[name] = version
     return result
@@ -466,9 +479,9 @@ def _convert_v9_importers(importers):
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
-            dependencies = _convert_pnpm_v9_importer_dependency_map(importer.get("dependencies", {})),
-            dev_dependencies = _convert_pnpm_v9_importer_dependency_map(importer.get("devDependencies", {})),
-            optional_dependencies = _convert_pnpm_v9_importer_dependency_map(importer.get("optionalDependencies", {})),
+            dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("dependencies", {})),
+            dev_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("devDependencies", {})),
+            optional_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
         )
     return result
 
