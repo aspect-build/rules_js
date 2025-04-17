@@ -182,25 +182,7 @@ _LINK_JS_PACKAGE_LIFECYCLE_TMPL = """\
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name):
-    bazel_package = native.package_name()
-    link_packages = {link_packages}
-    if bazel_package in link_packages:
-        link_aliases = link_packages[bazel_package]
-    else:
-        link_aliases = ["{package}"]
-
-    link_alias = None
-    for _link_alias in link_aliases:
-        if name.endswith("/{{}}".format(_link_alias)):
-            # longest match wins
-            if not link_alias or len(_link_alias) > len(link_alias):
-                link_alias = _link_alias
-    if not link_alias:
-        msg = "name must end with one of '/{{{{ {{link_aliases_comma_separated}} }}}}' when called from package '{package}'; recommended value(s) are 'node_modules/{{{{ {{link_aliases_comma_separated}} }}}}'".format(link_aliases_comma_separated = ", ".join(link_aliases))
-        fail(msg)
-
-    link_root_name = name[:-len("/{{}}".format(link_alias))]
+def npm_link_imported_package_store(name, link_root_name, link_alias):
     store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
 
     # terminal package store target to link
@@ -257,7 +239,7 @@ def npm_link_imported_package(
             link_aliases = ["{package}"]
         for link_alias in link_aliases:
             link_target_name = "{{}}/{{}}".format(name, link_alias)
-            npm_link_imported_package_store(name = link_target_name)
+            npm_link_imported_package_store(name = link_target_name, link_root_name = name, link_alias = link_alias)
             if {public_visibility}:
                 link_targets.append(":{{}}".format(link_target_name))
                 link_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None

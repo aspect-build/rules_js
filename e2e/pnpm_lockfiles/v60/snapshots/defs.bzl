@@ -159,119 +159,119 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_61(name)
     if link:
         if bazel_package == "<LOCKVERSION>":
-            link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
+            link_4("{}/@aspect-test-a-bad-scope".format(name), link_root_name = name, link_alias = "@aspect-test-a-bad-scope")
             link_targets.append(":{}/@aspect-test-a-bad-scope".format(name))
             if "@aspect-test-a-bad-scop" not in scope_targets:
                 scope_targets["@aspect-test-a-bad-scop"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test-a-bad-scop"].append(link_targets[-1])
-            link_4(name = "{}/@aspect-test-custom-scope/a".format(name))
+            link_4("{}/@aspect-test-custom-scope/a".format(name), link_root_name = name, link_alias = "@aspect-test-custom-scope/a")
             link_targets.append(":{}/@aspect-test-custom-scope/a".format(name))
             if "@aspect-test-custom-scope" not in scope_targets:
                 scope_targets["@aspect-test-custom-scope"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test-custom-scope"].append(link_targets[-1])
-            link_4(name = "{}/@aspect-test/a".format(name))
+            link_4("{}/@aspect-test/a".format(name), link_root_name = name, link_alias = "@aspect-test/a")
             link_targets.append(":{}/@aspect-test/a".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_4(name = "{}/@aspect-test/a2".format(name))
+            link_4("{}/@aspect-test/a2".format(name), link_root_name = name, link_alias = "@aspect-test/a2")
             link_targets.append(":{}/@aspect-test/a2".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_4(name = "{}/aspect-test-a-no-scope".format(name))
+            link_4("{}/aspect-test-a-no-scope".format(name), link_root_name = name, link_alias = "aspect-test-a-no-scope")
             link_targets.append(":{}/aspect-test-a-no-scope".format(name))
-            link_4(name = "{}/aspect-test-a/no-at".format(name))
+            link_4("{}/aspect-test-a/no-at".format(name), link_root_name = name, link_alias = "aspect-test-a/no-at")
             link_targets.append(":{}/aspect-test-a/no-at".format(name))
-            link_5(name = "{}/@aspect-test/b".format(name))
+            link_5("{}/@aspect-test/b".format(name), link_root_name = name, link_alias = "@aspect-test/b")
             link_targets.append(":{}/@aspect-test/b".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_6(name = "{}/@aspect-test/c".format(name))
+            link_6("{}/@aspect-test/c".format(name), link_root_name = name, link_alias = "@aspect-test/c")
             link_targets.append(":{}/@aspect-test/c".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_9(name = "{}/@aspect-test/e".format(name))
+            link_9("{}/@aspect-test/e".format(name), link_root_name = name, link_alias = "@aspect-test/e")
             link_targets.append(":{}/@aspect-test/e".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_10(name = "{}/jsonify".format(name))
+            link_10("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
             link_targets.append(":{}/jsonify".format(name))
-            link_11(name = "{}/@isaacs/cliui".format(name))
+            link_11("{}/@isaacs/cliui".format(name), link_root_name = name, link_alias = "@isaacs/cliui")
             link_targets.append(":{}/@isaacs/cliui".format(name))
             if "@isaacs" not in scope_targets:
                 scope_targets["@isaacs"] = [link_targets[-1]]
             else:
                 scope_targets["@isaacs"].append(link_targets[-1])
-            link_12(name = "{}/rollup-plugin-with-peers".format(name))
+            link_12("{}/rollup-plugin-with-peers".format(name), link_root_name = name, link_alias = "rollup-plugin-with-peers")
             link_targets.append(":{}/rollup-plugin-with-peers".format(name))
-            link_14(name = "{}/@types/archiver".format(name))
+            link_14("{}/@types/archiver".format(name), link_root_name = name, link_alias = "@types/archiver")
             link_targets.append(":{}/@types/archiver".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
-            link_18(name = "{}/@types/node".format(name))
+            link_18("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
-            link_18(name = "{}/alias-types-node".format(name))
+            link_18("{}/alias-types-node".format(name), link_root_name = name, link_alias = "alias-types-node")
             link_targets.append(":{}/alias-types-node".format(name))
-            link_19(name = "{}/alias-only-sizzle".format(name))
+            link_19("{}/alias-only-sizzle".format(name), link_root_name = name, link_alias = "alias-only-sizzle")
             link_targets.append(":{}/alias-only-sizzle".format(name))
-            link_22(name = "{}/debug".format(name))
+            link_22("{}/debug".format(name), link_root_name = name, link_alias = "debug")
             link_targets.append(":{}/debug".format(name))
-            link_32(name = "{}/hello".format(name))
+            link_32("{}/hello".format(name), link_root_name = name, link_alias = "hello")
             link_targets.append(":{}/hello".format(name))
-            link_35(name = "{}/is-odd-v0".format(name))
+            link_35("{}/is-odd-v0".format(name), link_root_name = name, link_alias = "is-odd-v0")
             link_targets.append(":{}/is-odd-v0".format(name))
-            link_36(name = "{}/is-odd-v1".format(name))
+            link_36("{}/is-odd-v1".format(name), link_root_name = name, link_alias = "is-odd-v1")
             link_targets.append(":{}/is-odd-v1".format(name))
-            link_37(name = "{}/is-odd-v2".format(name))
+            link_37("{}/is-odd-v2".format(name), link_root_name = name, link_alias = "is-odd-v2")
             link_targets.append(":{}/is-odd-v2".format(name))
-            link_38(name = "{}/is-odd-v3".format(name))
+            link_38("{}/is-odd-v3".format(name), link_root_name = name, link_alias = "is-odd-v3")
             link_targets.append(":{}/is-odd-v3".format(name))
-            link_39(name = "{}/is-odd".format(name))
+            link_39("{}/is-odd".format(name), link_root_name = name, link_alias = "is-odd")
             link_targets.append(":{}/is-odd".format(name))
-            link_39(name = "{}/is-odd-alias".format(name))
+            link_39("{}/is-odd-alias".format(name), link_root_name = name, link_alias = "is-odd-alias")
             link_targets.append(":{}/is-odd-alias".format(name))
-            link_40(name = "{}/jquery-git-ssh-e61fccb".format(name))
+            link_40("{}/jquery-git-ssh-e61fccb".format(name), link_root_name = name, link_alias = "jquery-git-ssh-e61fccb")
             link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
-            link_42(name = "{}/lodash".format(name))
+            link_42("{}/lodash".format(name), link_root_name = name, link_alias = "lodash")
             link_targets.append(":{}/lodash".format(name))
-            link_43(name = "{}/meaning-of-life".format(name))
+            link_43("{}/meaning-of-life".format(name), link_root_name = name, link_alias = "meaning-of-life")
             link_targets.append(":{}/meaning-of-life".format(name))
-            link_49(name = "{}/rollup".format(name))
+            link_49("{}/rollup".format(name), link_root_name = name, link_alias = "rollup")
             link_targets.append(":{}/rollup".format(name))
-            link_50(name = "{}/rollup3".format(name))
+            link_50("{}/rollup3".format(name), link_root_name = name, link_alias = "rollup3")
             link_targets.append(":{}/rollup3".format(name))
-            link_57(name = "{}/tslib".format(name))
+            link_57("{}/tslib".format(name), link_root_name = name, link_alias = "tslib")
             link_targets.append(":{}/tslib".format(name))
-            link_58(name = "{}/typescript".format(name))
+            link_58("{}/typescript".format(name), link_root_name = name, link_alias = "typescript")
             link_targets.append(":{}/typescript".format(name))
-            link_59(name = "{}/uvu".format(name))
+            link_59("{}/uvu".format(name), link_root_name = name, link_alias = "uvu")
             link_targets.append(":{}/uvu".format(name))
         elif bazel_package == "projects/a-types":
-            link_18(name = "{}/@types/node".format(name))
+            link_18("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "projects/b":
-            link_18(name = "{}/@types/node".format(name))
+            link_18("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]

@@ -31,7 +31,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_0(name)
     if link:
         if bazel_package == "":
-            link_0(name = "{}/chalk".format(name))
+            link_0("{}/chalk".format(name), link_root_name = name, link_alias = "chalk")
             link_targets.append(":{}/chalk".format(name))
 
     for scope, scoped_targets in scope_targets.items():
