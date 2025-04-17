@@ -146,7 +146,7 @@ load("@@_main~npm~npm__at_esbuild_win32-x64__0.21.5__links//:defs.bzl", store_14
 load("@@_main~npm~npm__at_esbuild_win32-x64__0.24.0__links//:defs.bzl", store_143 = "npm_imported_package_store")
 load("@@_main~npm~npm__at_fastify_send__3.3.0__links//:defs.bzl", link_144 = "npm_link_imported_package_store", store_144 = "npm_imported_package_store")
 load("@@_main~npm~npm__at_figma_nodegit__0.28.0-figma.3__links//:defs.bzl", link_145 = "npm_link_imported_package_store", store_145 = "npm_imported_package_store")
-load("@@_main~npm~npm__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_146 = "npm_imported_package_store")
+load("@@_main~npm~npm__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_146 = "npm_imported_package_store")
 load("@@_main~npm~npm__at_gar_promisify__1.1.3__links//:defs.bzl", store_147 = "npm_imported_package_store")
 load("@@_main~npm~npm__at_gregmagolan_test-a__0.0.1__links//:defs.bzl", store_148 = "npm_imported_package_store")
 load("@@_main~npm~npm__at_gregmagolan_test-b__0.0.2__links//:defs.bzl", link_149 = "npm_link_imported_package_store", store_149 = "npm_imported_package_store")
@@ -735,7 +735,7 @@ load("@@_main~npm~npm__loader-utils__2.0.4__links//:defs.bzl", store_731 = "npm_
 load("@@_main~npm~npm__locate-path__5.0.0__links//:defs.bzl", store_732 = "npm_imported_package_store")
 load("@@_main~npm~npm__locate-path__6.0.0__links//:defs.bzl", store_733 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash.merge__4.6.2__links//:defs.bzl", store_734 = "npm_imported_package_store")
-load("@@_main~npm~npm__lodash__4.0.0__links//:defs.bzl", store_735 = "npm_imported_package_store")
+load("@@_main~npm~npm__lodash__4.0.0__links//:defs.bzl", link_735 = "npm_link_imported_package_store", store_735 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash__4.17.21__links//:defs.bzl", link_736 = "npm_link_imported_package_store", store_736 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash__file_npm_private_test_vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_737 = "npm_link_imported_package_store", store_737 = "npm_imported_package_store")
 load("@@_main~npm~npm__log-symbols__4.1.0__links//:defs.bzl", store_738 = "npm_imported_package_store")
@@ -1181,7 +1181,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/image": ["@mycorp/pkg-a", "@mycorp/pkg-d", "acorn"],
     "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
     "js/private/worker/src": ["abortcontroller-polyfill", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
-    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash-4.17.21", "lodash", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
+    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "lodash-4.17.21", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "npm/private/test/npm_package": ["chalk", "chalk-alt"],
 }
 
@@ -2341,7 +2341,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_1133()
         store_1134()
         _npm_local_package_store(
-            package_store_name = "is-odd@file+npm+private+test+vendored+is-odd",
+            package_store_name = "is-odd@file_npm+private+test+vendored+is-odd",
+            key = "is-odd@file:npm/private/test/vendored/is-odd",
             src = "//npm/private/test/vendored/is-odd:pkg",
             package = "is-odd",
             version = "file:npm/private/test/vendored/is-odd",
@@ -2352,19 +2353,21 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "semver-max@file+npm+private+test+vendored+semver-max",
+            package_store_name = "semver-max@file_npm+private+test+vendored+semver-max",
+            key = "semver-max@file:npm/private/test/vendored/semver-max",
             src = "//npm/private/test/vendored/semver-max:pkg",
             package = "semver-max",
             version = "file:npm/private/test/vendored/semver-max",
             deps = {
-                "//:.aspect_rules_js/node_modules/is-odd@file+npm+private+test+vendored+is-odd": "is-odd",
+                "//:.aspect_rules_js/node_modules/is-odd@file_npm+private+test+vendored+is-odd": "is-odd",
                 "//:.aspect_rules_js/node_modules/semver@5.7.2": "semver",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@mycorp+pkg-a@0.0.0",
+            package_store_name = "link_examples+npm_package+packages+pkg_a@0.0.0",
+            key = "link:examples/npm_package/packages/pkg_a",
             src = "//examples/npm_package/packages/pkg_a:pkg",
             package = "@mycorp/pkg-a",
             version = "0.0.0",
@@ -2376,7 +2379,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "js_lib_pkg_a@0.0.0",
+            package_store_name = "link_examples+js_lib_pkg+a@0.0.0",
+            key = "link:examples/js_lib_pkg/a",
             src = "//examples/js_lib_pkg/a:pkg",
             package = "js_lib_pkg_a",
             version = "0.0.0",
@@ -2385,7 +2389,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@lib+test@0.0.0",
+            package_store_name = "link_examples+linked_pkg@0.0.0",
+            key = "link:examples/linked_pkg",
             src = "//examples/linked_pkg:pkg",
             package = "@lib/test",
             version = "0.0.0",
@@ -2396,7 +2401,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@lib+test2@0.0.0",
+            package_store_name = "link_examples+linked_lib@0.0.0",
+            key = "link:examples/linked_lib",
             src = "//examples/linked_lib:pkg",
             package = "@lib/test2",
             version = "0.0.0",
@@ -2407,7 +2413,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@mycorp+pkg-d@0.0.0",
+            package_store_name = "link_examples+npm_package+packages+pkg_d@0.0.0",
+            key = "link:examples/npm_package/packages/pkg_d",
             src = "//examples/npm_package/packages/pkg_d:pkg",
             package = "@mycorp/pkg-d",
             version = "0.0.0",
@@ -2419,18 +2426,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@mycorp+pkg-e@0.0.0",
+            package_store_name = "link_examples+npm_package+packages+pkg_e@0.0.0",
+            key = "link:examples/npm_package/packages/pkg_e",
             src = "//examples/npm_package/packages/pkg_e:pkg",
             package = "@mycorp/pkg-e",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@mycorp+pkg-d@0.0.0": "@mycorp/pkg-d",
+                "//:.aspect_rules_js/node_modules/link_examples+npm_package+packages+pkg_d@0.0.0": "@mycorp/pkg-d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "test-npm_package@0.0.0",
+            package_store_name = "link_npm+private+test+npm_package@0.0.0",
+            key = "link:npm/private/test/npm_package",
             src = "//npm/private/test/npm_package:pkg",
             package = "test-npm_package",
             version = "0.0.0",
@@ -2650,8 +2659,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_609("node_modules/hot-shots", True, "hot-shots")
             link_633("node_modules/inline-fixtures", True, "inline-fixtures")
             link_693("node_modules/json-stable-stringify", True, "json-stable-stringify")
+            link_735("node_modules/lodash", True, "lodash")
             link_736("node_modules/lodash-4.17.21", True, "lodash-4.17.21")
-            link_737("node_modules/lodash", True, "lodash")
             link_737("node_modules/lodash-4.17.21-tar", True, "lodash-4.17.21-tar")
             link_825("node_modules/node-gyp", True, "node-gyp")
             link_889("node_modules/plotly.js", True, "plotly.js")
@@ -2679,8 +2688,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
@@ -3004,8 +3013,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
@@ -3120,7 +3129,7 @@ def _fp_link_2(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@mycorp/pkg-a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-a@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_examples+npm_package+packages+pkg_a@0.0.0",
         link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
@@ -3130,7 +3139,7 @@ def _fp_link_3(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/js_lib_pkg_a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_examples+js_lib_pkg+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test" package
@@ -3139,7 +3148,7 @@ def _fp_link_4(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/test" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+test@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_examples+linked_pkg@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test2" package
@@ -3148,7 +3157,7 @@ def _fp_link_5(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/test2" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+test2@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_examples+linked_lib@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-d" package
@@ -3157,7 +3166,7 @@ def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@mycorp/pkg-d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-d@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_examples+npm_package+packages+pkg_d@0.0.0",
         link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
@@ -3167,7 +3176,7 @@ def _fp_link_7(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@mycorp/pkg-e" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-e@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_examples+npm_package+packages+pkg_e@0.0.0",
         link_visibility = ["//examples:__subpackages__"],
     )
 
@@ -3177,5 +3186,5 @@ def _fp_link_8(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-npm_package" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/test-npm_package@0.0.0",
+        src = "//:.aspect_rules_js/node_modules/link_npm+private+test+npm_package@0.0.0",
     )

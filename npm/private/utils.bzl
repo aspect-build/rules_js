@@ -14,57 +14,88 @@ def _sorted_map(m):
     # TODO(zbarsky): maybe faster as `dict(sorted(m.items()))`?
     return {k: m[k] for k in sorted(m.keys())}
 
-def _sanitize_rule_name(string):
+def _package_target_name(s):
+    # Target names may contain only A-Z, a-z, 0-9, '-', '_', '.', '+', '@' and probably more.
+    # Package target names handle '/' and other characters unique to better represent npm packages.
+
+    # TODO(3.0): simplify and stop trying to be backwards compatible with 2.x?
+
+    version_index = s.find("@", 1)
+    peers_index = s.find("(", version_index)
+
+    r = ""
+    for i, c in enumerate(s.elems()):
+        if c == "/" and (peers_index == -1 or i <= peers_index):
+            # use "+" for package name or version / (such as @scoped/pkg or file:path separators)
+            if r and r[-1] != "+":
+                r += "+"
+        elif c == "@" and i > version_index:
+            if r and r[-1] != "_":
+                # use "_" for version @ in peers
+                r += "_"
+            if s[i - 1] == "(":
+                # use "at" for scope @ in peers
+                r += "at_"
+        elif not c.isalnum() and c != "-" and c != "_" and c != "." and c != "+" and c != "@":
+            r += "_"
+        else:
+            r += c
+
+    r = r.rstrip("_-.")
+
+    # Add an indication for local packages
+    if s.startswith("link:") or s.startswith("file:"):
+        r += "@0.0.0"
+
+    return r
+
+def _package_repo_name(prefix, s):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
-    result = ""
-    for c in string.elems():
-        if c == "@" and (not result or result[-1] == "_"):
-            result += "at"
-        if not c.isalnum() and c != "-" and c != "_" and c != ".":
-            c = "_"
-        result += c
-    return result.strip("_-")
+    # Package repo names handle '/' and other characters unique to better represent npm packages.
 
-def _bazel_name(name, version = None):
-    "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
-    escaped_name = _sanitize_rule_name(name)
-    if not version:
-        return escaped_name
+    # TODO(3.0): simplify and stop trying to be backwards compatible with 2.x?
 
-    # Separate name + version with extra _
-    return "%s__%s" % (escaped_name, _sanitize_rule_name(version))
+    version_index = s.find("@", 1)
+    peers_index = s.find("(", version_index)
 
-def _package_key(name, version):
-    "Make a name/version pnpm-style name for a package name and version"
-    return "%s@%s" % (name, version)
+    peer_suffix = ""
+    if peers_index != -1:
+        peer_dep = s[peers_index:]
+        s = s[:peers_index]
+
+        # TODO(3.0): "patch_hash=" removal desinged to align hashes with pnpm <v9
+        peer_dep = peer_dep.replace("(patch_hash=", "(")
+
+        if len(peer_dep) > 32:
+            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
+            # peer deps so we must hash here to prevent extremely long file paths that lead to
+            # "File name too long) build failures.
+            peer_suffix = "_" + utils.hash(peer_dep).lstrip("-")
+        else:
+            peer_suffix = peer_dep.replace("(@", "(at_").replace(")(", "_").replace("@", "_").replace("/", "_").replace("(", "_").replace(")", "_")
+
+    r = prefix + "__"
+    for i, c in enumerate(s.elems()):
+        if i == version_index:
+            # Separate package name and version with double underscore
+            r += "__"
+        elif c == "@" and (i == 0 or s[i - 1] == "("):
+            # Replace scope and peer/patch separator with 'at_'
+            if r and r[-1] != "_":
+                r += "_"
+            r += "at_"
+        elif not c.isalnum() and c != "-" and c != "_" and c != ".":
+            r += "_"
+        else:
+            r += c
+
+    r += peer_suffix
+
+    return r.rstrip("_-.")
 
 def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
-
-def _escape_target_name(name):
-    return name.replace("://", "/").replace("/", "+").replace(":", "+")
-
-def _package_store_name(pnpm_name, pnpm_version):
-    "Make a package store name for a given package and version"
-
-    if pnpm_version.startswith("link:"):
-        # Distinguish local links a 0.0.0 version. This is unlike pnpm which symlinks
-        # local links into the source tree instead of storing them in the package store.
-        name = pnpm_name
-        version = "0.0.0"
-    elif pnpm_version.startswith("npm:"):
-        name, version = pnpm_version[4:].rsplit("@", 1)
-    else:
-        name = pnpm_name
-        version = pnpm_version
-
-    if version.startswith("@"):
-        # Special case where the package name should _not_ be included in the package store name.
-        # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return _escape_target_name(version)
-    else:
-        return "%s@%s" % (_escape_target_name(name), _escape_target_name(version))
 
 def _make_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
@@ -241,11 +272,10 @@ def _is_tarball_extension(ext):
     return ext in tarball_extensions
 
 utils = struct(
-    bazel_name = _bazel_name,
+    package_repo_name = _package_repo_name,
+    package_store_name = _package_target_name,
     sorted_map = _sorted_map,
-    package_key = _package_key,
     friendly_name = _friendly_name,
-    package_store_name = _package_store_name,
     make_symlink = _make_symlink,
     # Symlinked node_modules structure package store path under node_modules
     package_store_root = ".aspect_rules_js",

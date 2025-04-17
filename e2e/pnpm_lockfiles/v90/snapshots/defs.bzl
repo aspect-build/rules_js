@@ -14,7 +14,7 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspe
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links//:defs.bzl", store_11 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_e__1.0.0__links//:defs.bzl", link_12 = "npm_link_imported_package_store", store_12 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_h__1.0.0__links//:defs.bzl", link_13 = "npm_link_imported_package_store", store_13 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_isaacs_cliui__8.0.2__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_626159424__links//:defs.bzl", link_16 = "npm_link_imported_package_store", store_16 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_pluginutils__3.1.0_rollup_2.14.0__links//:defs.bzl", store_17 = "npm_imported_package_store")
@@ -47,7 +47,7 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_44 = "npm_link_imported_package_store", store_44 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_45 = "npm_link_imported_package_store", store_45 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_46 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", store_47 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", link_47 = "npm_link_imported_package_store", store_47 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_48 = "npm_link_imported_package_store", store_48 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_49 = "npm_link_imported_package_store", store_49 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_50 = "npm_link_imported_package_store", store_50 = "npm_imported_package_store")
@@ -172,19 +172,21 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_69()
         store_70()
         _npm_local_package_store(
-            package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
+            package_store_name = "@scoped+c@file_..+projects+c_at_scoped_b_projects+b",
+            key = "@scoped/c@file:../projects/c(@scoped/b@projects+b)",
             src = "//projects/c:pkg",
             package = "@scoped/c",
-            version = "file:../projects/c_at_scoped_b_projects+b",
+            version = "file:../projects/c",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+b@0.0.0": "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "is-number@file+..+vendored+is-number",
+            package_store_name = "is-number@file_..+vendored+is-number",
+            key = "is-number@file:../vendored/is-number",
             src = "//vendored/is-number:pkg",
             package = "is-number",
             version = "file:../vendored/is-number",
@@ -193,7 +195,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@scoped+a@0.0.0",
+            package_store_name = "link_..+projects+a@0.0.0",
+            key = "link:../projects/a",
             src = "//projects/a:pkg",
             package = "@scoped/a",
             version = "0.0.0",
@@ -202,44 +205,48 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@scoped+b@0.0.0",
+            package_store_name = "link_..+projects+b@0.0.0",
+            key = "link:../projects/b",
             src = "//projects/b:pkg",
             package = "@scoped/b",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+a@0.0.0": "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "@scoped+d@0.0.0",
+            package_store_name = "link_..+projects+d@0.0.0",
+            key = "link:../projects/d",
             src = "//projects/d:pkg",
             package = "@scoped/d",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+b@0.0.0": "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "alternate-versions@0.0.0",
+            package_store_name = "link_..+projects+alts@0.0.0",
+            key = "link:../projects/alts",
             src = "//projects/alts:pkg",
             package = "alternate-versions",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.0.1": "lodash",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.17.20": "lodash-4.17.20",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.17.21": "lodash-4.17.21",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash-4.17.21-file@lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash-4.17.21-file",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@file_..+vendored+lodash-4.17.21.tgz": "lodash-4.17.21-file",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "test-c200-d200@0.0.0",
+            package_store_name = "link_..+projects+peers-combo-2@0.0.0",
+            key = "link:../projects/peers-combo-2",
             src = "//projects/peers-combo-2:pkg",
             package = "test-c200-d200",
             version = "0.0.0",
@@ -251,7 +258,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "test-c201-d200@0.0.0",
+            package_store_name = "link_..+projects+peers-combo-1@0.0.0",
+            key = "link:../projects/peers-combo-1",
             src = "//projects/peers-combo-1:pkg",
             package = "test-c201-d200",
             version = "0.0.0",
@@ -263,7 +271,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "test-peer-types@0.0.0",
+            package_store_name = "link_..+projects+peer-types@0.0.0",
+            key = "link:../projects/peer-types",
             src = "//projects/peer-types:pkg",
             package = "test-peer-types",
             version = "0.0.0",
@@ -272,7 +281,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "a-types@0.0.0",
+            package_store_name = "link_..+projects+a-types@0.0.0",
+            key = "link:../projects/a-types",
             src = "//projects/a-types:pkg",
             package = "a-types",
             version = "0.0.0",
@@ -467,14 +477,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@scoped": [":node_modules/@scoped/a"],
             }
         elif bazel_package == "projects/alts":
+            link_47("node_modules/lodash", False, "lodash")
             link_48("node_modules/lodash-4.17.20", False, "lodash-4.17.20")
             link_49("node_modules/lodash-4.17.21", False, "lodash-4.17.21")
-            link_50("node_modules/lodash", False, "lodash")
             link_50("node_modules/lodash-4.17.21-file", False, "lodash-4.17.21-file")
             link_targets = [
+                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.20",
                 ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.21-file",
             ]
         elif bazel_package == "projects/c":
@@ -632,9 +642,9 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     elif bazel_package == "projects/alts":
         if prod:
             link_targets.extend([
+                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.20",
                 ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.21-file",
             ])
     elif bazel_package == "projects/c":
@@ -660,7 +670,7 @@ def _fp_link_0(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file_..+projects+c_at_scoped_b_projects+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package
@@ -669,7 +679,7 @@ def _fp_link_2(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/b" package
@@ -678,7 +688,7 @@ def _fp_link_3(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+b@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/d" package
@@ -687,7 +697,7 @@ def _fp_link_4(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+d@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+d@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "alternate-versions" package
@@ -696,7 +706,7 @@ def _fp_link_5(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/alternate-versions" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/alternate-versions@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+alts@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-c200-d200" package
@@ -705,7 +715,7 @@ def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-c200-d200" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+peers-combo-2@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-c201-d200" package
@@ -714,7 +724,7 @@ def _fp_link_7(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-c201-d200" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+peers-combo-1@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-peer-types" package
@@ -723,7 +733,7 @@ def _fp_link_8(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-peer-types" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-peer-types@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+peer-types@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "a-types" package
@@ -732,5 +742,5 @@ def _fp_link_9(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/a-types" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/a-types@0.0.0",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/link_..+projects+a-types@0.0.0",
     )

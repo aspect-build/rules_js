@@ -9,6 +9,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package_internal",
     _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
 
+KEY = "fsevents@2.3.3"
 PACKAGE = "fsevents"
 VERSION = "2.3.3"
 _ROOT_PACKAGE = ""
@@ -18,6 +19,7 @@ _PACKAGE_STORE_NAME = "fsevents@2.3.3"
 # buildifier: disable=function-docstring
 def npm_imported_package_store():
     _npm_imported_package_store(
+        key = KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,

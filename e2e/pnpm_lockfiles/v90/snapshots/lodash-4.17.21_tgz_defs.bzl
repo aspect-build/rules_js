@@ -9,24 +9,26 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package_internal",
     _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
 
+KEY = "lodash@file:../vendored/lodash-4.17.21.tgz"
 PACKAGE = "lodash"
 VERSION = "file:../vendored/lodash-4.17.21.tgz"
 _ROOT_PACKAGE = "<LOCKVERSION>"
-_PACKAGE_STORE_NAME = "lodash@file+..+vendored+lodash-4.17.21.tgz"
+_PACKAGE_STORE_NAME = "lodash@file_..+vendored+lodash-4.17.21.tgz"
 
 # Generated npm_package_store targets for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
 def npm_imported_package_store():
     _npm_imported_package_store(
+        key = KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg": "lodash",
+            ":.aspect_rules_js/node_modules/lodash@file_..+vendored+lodash-4.17.21.tgz/pkg": "lodash",
         },
         ref_deps = {},
         lc_deps = {
-            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg_pre_lc_lite": "lodash",
+            ":.aspect_rules_js/node_modules/lodash@file_..+vendored+lodash-4.17.21.tgz/pkg_pre_lc_lite": "lodash",
         },
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
@@ -69,7 +71,7 @@ def npm_link_imported_package(
         link = link,
         link_packages = {
             "<LOCKVERSION>": [PACKAGE],
-            "projects/alts": ["lodash", "lodash-4.17.21-file"],
+            "projects/alts": ["lodash-4.17.21-file"],
         },
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,

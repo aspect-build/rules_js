@@ -168,9 +168,10 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
 def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
     state = npm_translate_lock_state.new(attr.name, module_ctx, attr)
 
-    importers, packages = translate_to_transitive_closure(
+    importers, packages, snapshots = translate_to_transitive_closure(
         state.importers(),
         state.packages(),
+        state.snapshots(),
         attr.prod,
         attr.dev,
         attr.no_optional,
@@ -208,6 +209,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
+        snapshots = snapshots,
         replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
@@ -225,7 +227,8 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
     for i in imports:
         npm_import(
-            name = i.name,
+            name = i.repo_name,
+            key = i.snapshot_key,
             bins = i.bins,
             commit = i.commit,
             custom_postinstall = i.custom_postinstall,
@@ -317,6 +320,9 @@ def _npm_import_attrs():
     attrs["lifecycle_hooks_execution_requirements"] = attr.string_list(default = ["no-sandbox"])
     attrs["patch_args"] = attr.string_list(default = ["-p0"])
     attrs["package_visibility"] = attr.string_list(default = ["//visibility:public"])
+
+    # Args specified by the extension and not public to the tag API
+    attrs.pop("key")
 
     return attrs
 
