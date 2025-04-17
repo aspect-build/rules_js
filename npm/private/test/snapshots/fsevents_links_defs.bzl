@@ -12,17 +12,13 @@ load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_inte
 
 # Generated npm_package_store targets for npm package fsevents@2.3.2
 # buildifier: disable=function-docstring
-def npm_imported_package_store(name):
+def npm_imported_package_store(link_root_name):
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
     if not is_root:
         msg = "No store links in bazel package '%s' for npm package npm package fsevents@2.3.2. This is neither the root package nor a link package of this package." % bazel_package
         fail(msg)
-    if not name.endswith("/fsevents"):
-        msg = "name must end with one of '/fsevents' when linking the store in package 'fsevents'; recommended value is 'node_modules/fsevents'"
-        fail(msg)
-    link_root_name = name[:-len("/fsevents")]
 
     deps = {
         ":.aspect_rules_js/{}/fsevents@2.3.2/pkg".format(link_root_name): "fsevents",
@@ -233,6 +229,6 @@ def npm_link_imported_package(
                     scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
-        npm_imported_package_store("{}/fsevents".format(name))
+        npm_imported_package_store(name)
 
     return (link_targets, scoped_targets)

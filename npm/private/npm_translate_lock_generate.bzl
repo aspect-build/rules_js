@@ -267,10 +267,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 ),
             )
 
-        stores_bzl.append("""        store_{i}(name = "{{}}/{pkg}".format(name))""".format(
-            i = i,
-            pkg = _import.package,
-        ))
+        stores_bzl.append("""        store_{i}(name)""".format(i = i))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
