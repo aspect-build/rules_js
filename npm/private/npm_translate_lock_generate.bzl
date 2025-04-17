@@ -285,14 +285,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             # for each alias of this package
             for link_alias in link_aliases:
                 # link the alias to the underlying package
-                links_bzl[link_package].append("""            link_{i}(name = "{{}}/{pkg}".format(name))""".format(
+                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), link_root_name = name, link_alias = "{alias}")""".format(
                     i = i,
-                    pkg = link_alias,
+                    alias = link_alias,
                 ))
 
                 # expose the alias if public
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_targets = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = link_alias)
+                    add_to_link_targets = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
