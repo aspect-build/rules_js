@@ -15,241 +15,16 @@ def _parse_empty_lock_test_impl(ctx):
 
     return unittest.end(env)
 
-expected_importers = {
-    ".": {
-        "dependencies": {
-            "@aspect-test/a": "5.0.0",
-            "lodash": "file:lodash-4.17.21.tgz",
-        },
-        "dev_dependencies": {},
-        "optional_dependencies": {},
-    },
-}
-expected_packages = {
-    "@aspect-test/a@5.0.0": {
-        "name": "@aspect-test/a",
-        "dependencies": {
-            "@aspect-test/b": "5.0.0",
-            "@aspect-test/c": "1.0.0",
-            "@aspect-test/d": "2.0.0_at_aspect-test_c_1.0.0",
-        },
-        "optional_dependencies": {},
-        "dev_only": False,
-        "has_bin": True,
-        "optional": False,
-        "requires_build": False,
-        "version": "5.0.0",
-        "friendly_version": "5.0.0",
-        "resolution": {
-            "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
-        },
-    },
-    "lodash@4.17.21": {
-        "name": "lodash",
-        "dependencies": {},
-        "optional_dependencies": {},
-        "dev_only": False,
-        "has_bin": False,
-        "optional": False,
-        "requires_build": False,
-        "version": "4.17.21",
-        "friendly_version": "4.17.21",
-        "resolution": {
-            "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
-            "tarball": "file:lodash-4.17.21.tgz",
-        },
-    },
-}
-
-def _parse_lockfile_v5_test_impl(ctx):
-    env = unittest.begin(ctx)
-
-    parsed_json = pnpm.parse_pnpm_lock_json("""\
-{
-  "lockfileVersion": 5.4,
-  "specifiers": {
-    "@aspect-test/a": "5.0.0",
-    "lodash": "file:lodash-4.17.21.tgz"
-  },
-  "dependencies": {
-    "@aspect-test/a": "5.0.0",
-    "lodash": "file:lodash-4.17.21.tgz"
-  },
-  "packages": {
-    "/@aspect-test/a/5.0.0": {
-      "resolution": {
-        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
-      },
-      "hasBin": true,
-      "dependencies": {
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "1.0.0",
-        "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0"
-      },
-      "dev": false
-    },
-    "file:lodash-4.17.21.tgz": {
-      "resolution": {
-        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
-        "tarball": "file:lodash-4.17.21.tgz"
-      },
-      "name": "lodash",
-      "version": "4.17.21",
-      "dev": false
-    }
-  }
-}
-""")
-
-    expected = (
-        expected_importers,
-        expected_packages,
-        {},
-        5.4,
-        None,
-    )
-
-    asserts.equals(env, expected, parsed_json)
-
-    return unittest.end(env)
-
-def _parse_lockfile_v6_test_impl(ctx):
-    env = unittest.begin(ctx)
-
-    parsed_json = pnpm.parse_pnpm_lock_json("""\
-{
-  "lockfileVersion": "6.0",
-  "dependencies": {
-    "@aspect-test/a": {
-      "specifier": "5.0.0",
-      "version": "5.0.0"
-    },
-    "lodash": {
-      "specifier": "file:lodash-4.17.21.tgz",
-      "version": "file:lodash-4.17.21.tgz"
-    }
-  },
-  "packages": {
-    "/@aspect-test/a@5.0.0": {
-      "resolution": {
-        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
-      },
-      "hasBin": true,
-      "dependencies": {
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "1.0.0",
-        "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
-      },
-      "dev": false
-    },
-    "file:lodash-4.17.21.tgz": {
-      "resolution": {
-        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
-        "tarball": "file:lodash-4.17.21.tgz"
-      },
-      "name": "lodash",
-      "version": "4.17.21",
-      "dev": false
-    }
-  }
-}
-""")
-
-    expected = (
-        expected_importers,
-        expected_packages,
-        {},
-        6.0,
-        None,
-    )
-
-    asserts.equals(env, expected, parsed_json)
-
-    return unittest.end(env)
-
-def _parse_lockfile_v9_test_impl(ctx):
-    env = unittest.begin(ctx)
-
-    parsed_json = pnpm.parse_pnpm_lock_json("""\
-{
-  "lockfileVersion": "9.0",
-  "settings": {
-    "autoInstallPeers": true,
-    "excludeLinksFromLockfile": false
-  },
-  "importers": {
-    ".": {
-      "dependencies": {
-        "@aspect-test/a": {
-          "specifier": "5.0.0",
-          "version": "5.0.0"
-        },
-        "lodash": {
-          "specifier": "file:lodash-4.17.21.tgz",
-          "version": "file:lodash-4.17.21.tgz"
-        }
-      }
-    }
-  },
-  "packages": {
-    "@aspect-test/a@5.0.0": {
-      "resolution": {
-        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
-      },
-      "hasBin": true
-    },
-    "lodash@file:lodash-4.17.21.tgz": {
-      "resolution": {
-        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
-        "tarball": "file:lodash-4.17.21.tgz"
-      },
-      "version": "4.17.21"
-    }
-  },
-  "snapshots": {
-    "@aspect-test/a@5.0.0": {
-      "dependencies": {
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "1.0.0",
-        "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
-      }
-    },
-    "lodash@file:lodash-4.17.21.tgz": { }
-  }
-}
-""")
-
-    # NOTE: unknown properties in >=v9, convert to <v9 defaults for test assertions
-    v9_expected_packages = dict(expected_packages)
-    v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
-    v9_expected_packages["@aspect-test/a@5.0.0"]["dev_only"] = None
-    v9_expected_packages["@aspect-test/a@5.0.0"]["requires_build"] = None
-    v9_expected_packages["lodash@4.17.21"] = dict(v9_expected_packages["lodash@4.17.21"])
-    v9_expected_packages["lodash@4.17.21"]["dev_only"] = None
-    v9_expected_packages["lodash@4.17.21"]["requires_build"] = None
-
-    expected = (
-        expected_importers,
-        v9_expected_packages,
-        {},
-        9.0,
-        None,
-    )
-
-    asserts.equals(env, expected, parsed_json)
-
-    return unittest.end(env)
-
 # buildifier: disable=function-docstring
 def _test_strip_peer_dep_or_patched_version(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
         "21.1.0",
-        pnpm_test.strip_v5_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
+        pnpm_test.v5_strip_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
     )
-    asserts.equals(env, "1.0.0", pnpm_test.strip_v5_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
-    asserts.equals(env, "21.1.0", pnpm_test.strip_v5_peer_dep_or_patched_version("21.1.0"))
+    asserts.equals(env, "1.0.0", pnpm_test.v5_strip_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
+    asserts.equals(env, "21.1.0", pnpm_test.v5_strip_peer_dep_or_patched_version("21.1.0"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -272,20 +47,44 @@ def _test_version_supported(ctx):
 
     return unittest.end(env)
 
+def _test_v5_package_key_to_name_version(ctx):
+    env = unittest.begin(ctx)
+
+    n, v = pnpm_test.v5_package_key_to_name_version("/@aspect-test/a/5.0.0")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    n, v = pnpm_test.v5_package_key_to_name_version("/@aspect-test/a/5.0.0_@aspect-test/c@1.0.0")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    return unittest.end(env)
+
+def _test_v6_package_key_to_name_version(ctx):
+    env = unittest.begin(ctx)
+
+    n, v = pnpm_test.v6_package_key_to_name_version("/@aspect-test/a@5.0.0")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    n, v = pnpm_test.v6_package_key_to_name_version("/@aspect-test/a@5.0.0(@aspect-test/c@1.0.0)")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    return unittest.end(env)
+
 a_test = unittest.make(_parse_empty_lock_test_impl, attrs = {})
-b_test = unittest.make(_parse_lockfile_v5_test_impl, attrs = {})
-c_test = unittest.make(_parse_lockfile_v6_test_impl, attrs = {})
-d_test = unittest.make(_parse_lockfile_v9_test_impl, attrs = {})
 e_test = unittest.make(_test_version_supported, attrs = {})
 f_test = unittest.make(_test_strip_peer_dep_or_patched_version, attrs = {})
+g_test = unittest.make(_test_v5_package_key_to_name_version, attrs = {})
+h_test = unittest.make(_test_v6_package_key_to_name_version, attrs = {})
 
 TESTS = [
     a_test,
-    b_test,
-    c_test,
-    d_test,
     e_test,
     f_test,
+    g_test,
+    h_test,
 ]
 
 def parse_pnpm_lock_tests(name):

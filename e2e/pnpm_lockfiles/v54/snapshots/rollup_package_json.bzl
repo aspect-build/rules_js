@@ -3,7 +3,7 @@
 load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")
 
 _link_workspace_and_package = "@@//<LOCKVERSION>"
-_package_store_name = "rollup@2.14.0"
+_package_store_name = "rollup+2.14.0"
 
 def _rollup_internal(name, link_root_name, **kwargs):
     bin_internal(

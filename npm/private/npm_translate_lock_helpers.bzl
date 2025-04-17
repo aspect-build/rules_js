@@ -258,7 +258,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
+def _get_npm_imports(importers, packages, snapshots, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -274,36 +274,32 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
             "link_package": _link_package(root_package, import_path),
         }
         linked_packages = {}
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
+        for dep_package, dep_package_key in dependencies.items():
+            if dep_package_key.startswith("link:"):
                 continue
-            if dep_version.startswith("npm:"):
-                # special case for alias dependencies such as npm:alias-to@version
-                maybe_package = dep_version[4:]
-            elif dep_version not in packages:
-                maybe_package = utils.package_key(dep_package, dep_version)
+            if dep_package_key not in linked_packages:
+                linked_packages[dep_package_key] = [dep_package]
             else:
-                maybe_package = dep_version
-            if maybe_package not in linked_packages:
-                linked_packages[maybe_package] = [dep_package]
-            else:
-                linked_packages[maybe_package].append(dep_package)
+                linked_packages[dep_package_key].append(dep_package)
         links["packages"] = linked_packages
         importer_links[import_path] = links
 
     patches_used = []
     result = {}
-    for package_key, package_info in packages.items():
+    for snapshot_key, snapshot_info in snapshots.items():
+        package_key = snapshot_info["package"]
+        package_info = packages.get(package_key)
+
         name = package_info.get("name")
         version = package_info.get("version")
-        friendly_version = package_info.get("friendly_version")
-        deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optional_dependencies")
         dev_only = package_info.get("dev_only")
         optional = package_info.get("optional")
         requires_build = package_info.get("requires_build")
-        transitive_closure = package_info.get("transitive_closure")
         resolution = package_info.get("resolution")
+
+        deps = snapshot_info.get("dependencies")
+        optional_deps = snapshot_info.get("optional_dependencies")
+        transitive_closure = snapshot_info.get("transitive_closure")
 
         resolution_type = resolution.get("type", None)
         if resolution_type == "directory":
@@ -339,17 +335,13 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
         if not attr.no_optional:
             deps = dicts.add(optional_deps, deps)
 
-        friendly_name = utils.friendly_name(name, friendly_version)
-        unfriendly_name = utils.friendly_name(name, version)
-        if unfriendly_name == friendly_name:
-            # there is no unfriendly name for this package
-            unfriendly_name = None
+        friendly_name = utils.friendly_name(name, version)
 
         # gather patches & patch args
         patches = []
         patch_args = []
 
-        translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
+        translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name)
 
         pnpm_patch = patched_dependencies.get(friendly_name, patched_dependencies.get(name, None))
         pnpm_patched = pnpm_patch != None
@@ -371,7 +363,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             patch_args = ["-p1"]
         elif len(translate_patches) > 0:
             patches = translate_patches
-            patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
+            patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name)
             patches_used.extend(patches_keys)
 
         # Resolve string patch labels relative to the root respository rather than relative to rules_js.
@@ -383,23 +375,23 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
         # gather exclude patterns
-        exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name, unfriendly_name)
+        exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name)
 
         # gather replace packages
-        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
+        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name)
         if len(replace_packages) > 1:
             msg = "Multiple package replacements found for package {}".format(name)
             fail(msg)
         replace_package = replace_packages[0] if replace_packages else None
 
         # gather custom postinstalls
-        custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
+        custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
-        repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
+        repo_name = utils.package_repo_name(attr.name, snapshot_key, name, version)
 
         # gather package visibility
-        package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
+        package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name)
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
@@ -407,12 +399,12 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         link_packages = {}
         for import_path, links in importer_links.items():
             linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key, [])
+            link_names = linked_packages.get(snapshot_key, [])
             if link_names:
                 link_packages[links["link_package"]] = link_names
 
         # check if this package should be hoisted via public_hoist_packages
-        public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
+        public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name)
         for public_hoist_package in public_hoist_packages:
             if public_hoist_package not in link_packages:
                 link_packages[public_hoist_package] = [name]
@@ -421,10 +413,10 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build)
         if run_lifecycle_hooks:
-            lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
-            lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
-            lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_execution_requirements, "*", name, friendly_name, unfriendly_name)
-            lifecycle_hooks_use_default_shell_env, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_use_default_shell_env, "*", name, friendly_name, unfriendly_name)
+            lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name)
+            lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name)
+            lifecycle_hooks_execution_requirements, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_execution_requirements, "*", name, friendly_name)
+            lifecycle_hooks_use_default_shell_env, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks_use_default_shell_env, "*", name, friendly_name)
         else:
             lifecycle_hooks = False
             lifecycle_hooks_env = []
@@ -432,7 +424,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             lifecycle_hooks_use_default_shell_env = False
 
         bins = {}
-        matching_bins, _ = _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name, unfriendly_name)
+        matching_bins, _ = _gather_values_from_matching_names(False, attr.bins, "*", name, friendly_name)
         for bin in matching_bins:
             key_value = bin.split("=", 1)
             if len(key_value) == 2:
@@ -471,7 +463,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             deps = deps,
             integrity = integrity,
             link_packages = link_packages,
-            name = repo_name,
+            repo_name = repo_name,
+            package_key = snapshot_key,
             package = name,
             package_visibility = package_visibility,
             patch_tool = attr.patch_tool,
