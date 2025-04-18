@@ -636,14 +636,14 @@ def _npm_import_links_rule_impl(rctx):
     deps = {}
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        package_store_name = utils.package_store_name(dep_name, dep_version)
+        dep_package_store_name = utils.package_store_name(dep_name, dep_version)
         if dep_version.startswith("link:") or dep_version.startswith("file:"):
             dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
         else:
             dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/ref".format(link_root_name)"""
         dep_store_target = dep_store_target.format(
             root_package = rctx.attr.root_package,
-            package_store_name = package_store_name,
+            package_store_name = dep_package_store_name,
             package_store_root = utils.package_store_root,
         )
         if not dep_store_target in ref_deps:
@@ -669,16 +669,16 @@ def _npm_import_links_rule_impl(rctx):
                         # of the lifecycle action
                         lc_dep_store_target = """":{package_store_root}/{{}}/{package_store_name}/pkg_pre_lc_lite".format(link_root_name)"""
 
-                package_store_name = utils.package_store_name(dep_name, dep_version)
+                dep_package_store_name = utils.package_store_name(dep_name, dep_version)
 
                 dep_store_target = dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    package_store_name = package_store_name,
+                    package_store_name = dep_package_store_name,
                     package_store_root = utils.package_store_root,
                 )
                 lc_dep_store_target = lc_dep_store_target.format(
                     root_package = rctx.attr.root_package,
-                    package_store_name = package_store_name,
+                    package_store_name = dep_package_store_name,
                     package_store_root = utils.package_store_root,
                 )
 
@@ -751,8 +751,6 @@ def _npm_import_links_rule_impl(rctx):
 
     maybe_bins = ("""
         bins = %s,""" % starlark_codegen_utils.to_dict_attr(rctx.attr.bins, 3)) if len(rctx.attr.bins) > 0 else ""
-
-    package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
