@@ -203,8 +203,6 @@ def npm_link_imported_package_store(name, link_root_name, link_alias):
         visibility = {link_visibility},
         tags = ["manual"],
     )
-
-    return [":{{}}".format(name)] if {public_visibility} else []
 """
 
 _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
