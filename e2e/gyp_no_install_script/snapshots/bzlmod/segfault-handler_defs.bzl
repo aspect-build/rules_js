@@ -370,8 +370,6 @@ def npm_link_imported_package_store(name, link_root_name, link_alias):
         tags = ["manual"],
     )
 
-    return [":{}".format(name)] if True else []
-
 # Generated npm_package_store and npm_link_package_store targets for npm package segfault-handler@1.3.0
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
