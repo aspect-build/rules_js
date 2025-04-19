@@ -124,6 +124,8 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
+            ":node_modules/test-c200-d200",
+            ":node_modules/test-c201-d200",
             ":node_modules/scoped/bad",
             ":node_modules/lodash",
 
@@ -180,6 +182,8 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+c@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
+            ":.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
+            ":.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
             ":.aspect_rules_js/node_modules/lodash@4.17.21",
             ":.aspect_rules_js/node_modules/lodash@4.17.21/dir",
 

@@ -51,6 +51,8 @@ importers:
       rollup-plugin-with-peers: npm:@rollup/plugin-typescript@8.2.1
       rollup3: npm:rollup@3.29.4
       scoped/bad: link:../projects/b
+      test-c200-d200: workspace:*
+      test-c201-d200: workspace:*
       tslib: ^2.6.3
       typescript: 5.5.2
       uvu: 0.5.6
@@ -82,6 +84,8 @@ importers:
       rollup-plugin-with-peers: /@rollup/plugin-typescript/8.2.1_3vgsug3mjv7wvue74swjdxifxy
       rollup3: /rollup/3.29.4
       scoped/bad: link:../projects/b
+      test-c200-d200: link:../projects/peers-combo-2
+      test-c201-d200: link:../projects/peers-combo-1
       tslib: 2.8.1
       typescript: 5.5.2
       uvu: 0.5.6
@@ -126,6 +130,22 @@ importers:
     dependencies:
       '@scoped/a': link:../a
 
+  ../projects/peers-combo-1:
+    specifiers:
+      '@aspect-test/c': 2.0.1
+      '@aspect-test/d': 2.0.0
+    dependencies:
+      '@aspect-test/c': 2.0.1
+      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.1
+
+  ../projects/peers-combo-2:
+    specifiers:
+      '@aspect-test/c': 2.0.0
+      '@aspect-test/d': 2.0.0
+    dependencies:
+      '@aspect-test/c': 2.0.0
+      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
+
   ../vendored/is-number:
     specifiers: {}
 
@@ -152,12 +172,35 @@ packages:
     hasBin: true
     requiresBuild: true
     dev: false
-    optional: true
+
+  /@aspect-test/c/2.0.1:
+    resolution: {integrity: sha512-pyetgkZm4yfHYJYFaIi0rXM2VeR9qGw+gukEkrUO7LXuDIfkuvQd5TDduwIYIVvXGRjHKKjCa2BaA153nZfFyQ==}
+    hasBin: true
+    requiresBuild: true
+    dev: false
 
   /@aspect-test/c/2.0.2:
     resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
     requiresBuild: true
+
+  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.0:
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+    dependencies:
+      '@aspect-test/c': 2.0.0
+    dev: false
+
+  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.1:
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+    dependencies:
+      '@aspect-test/c': 2.0.1
+    dev: false
 
   /@aspect-test/d/2.0.0_@aspect-test+c@2.0.2:
     resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
