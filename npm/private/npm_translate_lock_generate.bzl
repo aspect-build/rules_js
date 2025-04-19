@@ -164,10 +164,6 @@ sh_binary(
         link_package = helpers.link_package(root_package, import_path)
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("file:"):
-                if dep_version in packages and packages[dep_version]["id"]:
-                    dep_path = helpers.link_package(root_package, packages[dep_version]["id"][len("file:"):])
-                else:
-                    dep_path = helpers.link_package(root_package, dep_version[len("file:"):])
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
                     msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
