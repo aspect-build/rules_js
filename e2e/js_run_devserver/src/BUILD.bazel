@@ -121,6 +121,7 @@ js_run_devserver(
         ":web_files",
     ],
     log_level = "debug",
+    grant_sandbox_write_permissions = True,
 )
 
 # Now the js_binary variant
@@ -141,6 +142,7 @@ js_run_devserver(
     ],
     log_level = "debug",
     tool = ":simple_bin",
+    grant_sandbox_write_permissions = True,
 )
 
 # Intentionally a js_library and not a js_binary to test that transitive npm are
