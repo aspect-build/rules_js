@@ -12,17 +12,13 @@ load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_inte
 
 # Generated npm_package_store targets for npm package segfault-handler@1.3.0
 # buildifier: disable=function-docstring
-def npm_imported_package_store(name):
+def npm_imported_package_store(link_root_name):
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
     if not is_root:
         msg = "No store links in bazel package '%s' for npm package npm package segfault-handler@1.3.0. This is neither the root package nor a link package of this package." % bazel_package
         fail(msg)
-    if not name.endswith("/segfault-handler"):
-        msg = "name must end with one of '/segfault-handler' when linking the store in package 'segfault-handler'; recommended value is 'node_modules/segfault-handler'"
-        fail(msg)
-    link_root_name = name[:-len("/segfault-handler")]
 
     deps = {
         ":.aspect_rules_js/{}/@gar+promisify@1.1.3/pkg".format(link_root_name): "@gar/promisify",
@@ -352,27 +348,7 @@ def npm_imported_package_store(name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package segfault-handler@1.3.0
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name):
-    bazel_package = native.package_name()
-    link_packages = {
-        "": ["segfault-handler"],
-    }
-    if bazel_package in link_packages:
-        link_aliases = link_packages[bazel_package]
-    else:
-        link_aliases = ["segfault-handler"]
-
-    link_alias = None
-    for _link_alias in link_aliases:
-        if name.endswith("/{}".format(_link_alias)):
-            # longest match wins
-            if not link_alias or len(_link_alias) > len(link_alias):
-                link_alias = _link_alias
-    if not link_alias:
-        msg = "name must end with one of '/{{ {link_aliases_comma_separated} }}' when called from package 'segfault-handler'; recommended value(s) are 'node_modules/{{ {link_aliases_comma_separated} }}'".format(link_aliases_comma_separated = ", ".join(link_aliases))
-        fail(msg)
-
-    link_root_name = name[:-len("/{}".format(link_alias))]
+def npm_link_imported_package_store(name, link_root_name, link_alias):
     store_target_name = ".aspect_rules_js/{}/segfault-handler@1.3.0".format(link_root_name)
 
     # terminal package store target to link
@@ -393,8 +369,6 @@ def npm_link_imported_package_store(name):
         visibility = ["//visibility:public"],
         tags = ["manual"],
     )
-
-    return [":{}".format(name)] if True else []
 
 # Generated npm_package_store and npm_link_package_store targets for npm package segfault-handler@1.3.0
 # buildifier: disable=function-docstring
@@ -429,7 +403,7 @@ def npm_link_imported_package(
             link_aliases = ["segfault-handler"]
         for link_alias in link_aliases:
             link_target_name = "{}/{}".format(name, link_alias)
-            npm_link_imported_package_store(name = link_target_name)
+            npm_link_imported_package_store(name = link_target_name, link_root_name = name, link_alias = link_alias)
             if True:
                 link_targets.append(":{}".format(link_target_name))
                 link_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
@@ -439,6 +413,6 @@ def npm_link_imported_package(
                     scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
-        npm_imported_package_store("{}/segfault-handler".format(name))
+        npm_imported_package_store(name)
 
     return (link_targets, scoped_targets)
