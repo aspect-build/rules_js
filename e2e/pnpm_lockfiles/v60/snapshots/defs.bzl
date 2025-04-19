@@ -164,7 +164,47 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_63(name = "{}/wrap-ansi".format(name))
         store_64(name = "{}/wrap-ansi".format(name))
     if link:
-        if bazel_package == "<LOCKVERSION>":
+        if bazel_package == "projects/a-types":
+            link_21(name = "{}/@types/node".format(name))
+            link_targets.append(":{}/@types/node".format(name))
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
+        elif bazel_package == "projects/b":
+            link_21(name = "{}/@types/node".format(name))
+            link_targets.append(":{}/@types/node".format(name))
+            if "@types" not in scope_targets:
+                scope_targets["@types"] = [link_targets[-1]]
+            else:
+                scope_targets["@types"].append(link_targets[-1])
+        elif bazel_package == "projects/peers-combo-1":
+            link_7(name = "{}/@aspect-test/c".format(name))
+            link_targets.append(":{}/@aspect-test/c".format(name))
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
+            link_10(name = "{}/@aspect-test/d".format(name))
+            link_targets.append(":{}/@aspect-test/d".format(name))
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
+        elif bazel_package == "projects/peers-combo-2":
+            link_6(name = "{}/@aspect-test/c".format(name))
+            link_targets.append(":{}/@aspect-test/c".format(name))
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
+            link_9(name = "{}/@aspect-test/d".format(name))
+            link_targets.append(":{}/@aspect-test/d".format(name))
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
+        elif bazel_package == "<LOCKVERSION>":
             link_4(name = "{}/@aspect-test-a-bad-scope".format(name))
             link_targets.append(":{}/@aspect-test-a-bad-scope".format(name))
             if "@aspect-test-a-bad-scop" not in scope_targets:
@@ -269,46 +309,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(":{}/typescript".format(name))
             link_62(name = "{}/uvu".format(name))
             link_targets.append(":{}/uvu".format(name))
-        elif bazel_package == "projects/peers-combo-2":
-            link_6(name = "{}/@aspect-test/c".format(name))
-            link_targets.append(":{}/@aspect-test/c".format(name))
-            if "@aspect-test" not in scope_targets:
-                scope_targets["@aspect-test"] = [link_targets[-1]]
-            else:
-                scope_targets["@aspect-test"].append(link_targets[-1])
-            link_9(name = "{}/@aspect-test/d".format(name))
-            link_targets.append(":{}/@aspect-test/d".format(name))
-            if "@aspect-test" not in scope_targets:
-                scope_targets["@aspect-test"] = [link_targets[-1]]
-            else:
-                scope_targets["@aspect-test"].append(link_targets[-1])
-        elif bazel_package == "projects/peers-combo-1":
-            link_7(name = "{}/@aspect-test/c".format(name))
-            link_targets.append(":{}/@aspect-test/c".format(name))
-            if "@aspect-test" not in scope_targets:
-                scope_targets["@aspect-test"] = [link_targets[-1]]
-            else:
-                scope_targets["@aspect-test"].append(link_targets[-1])
-            link_10(name = "{}/@aspect-test/d".format(name))
-            link_targets.append(":{}/@aspect-test/d".format(name))
-            if "@aspect-test" not in scope_targets:
-                scope_targets["@aspect-test"] = [link_targets[-1]]
-            else:
-                scope_targets["@aspect-test"].append(link_targets[-1])
-        elif bazel_package == "projects/a-types":
-            link_21(name = "{}/@types/node".format(name))
-            link_targets.append(":{}/@types/node".format(name))
-            if "@types" not in scope_targets:
-                scope_targets["@types"] = [link_targets[-1]]
-            else:
-                scope_targets["@types"].append(link_targets[-1])
-        elif bazel_package == "projects/b":
-            link_21(name = "{}/@types/node".format(name))
-            link_targets.append(":{}/@types/node".format(name))
-            if "@types" not in scope_targets:
-                scope_targets["@types"] = [link_targets[-1]]
-            else:
-                scope_targets["@types"].append(link_targets[-1])
 
     if is_root:
         _npm_package_store(
@@ -624,7 +624,17 @@ def npm_link_targets(name = "node_modules", package = None):
     link_targets = []
 
     if link:
-        if bazel_package == "<LOCKVERSION>":
+        if bazel_package == "projects/a-types":
+            link_targets.append(":{}/@types/node".format(name))
+        elif bazel_package == "projects/b":
+            link_targets.append(":{}/@types/node".format(name))
+        elif bazel_package == "projects/peers-combo-1":
+            link_targets.append(":{}/@aspect-test/c".format(name))
+            link_targets.append(":{}/@aspect-test/d".format(name))
+        elif bazel_package == "projects/peers-combo-2":
+            link_targets.append(":{}/@aspect-test/c".format(name))
+            link_targets.append(":{}/@aspect-test/d".format(name))
+        elif bazel_package == "<LOCKVERSION>":
             link_targets.append(":{}/@aspect-test-a-bad-scope".format(name))
             link_targets.append(":{}/@aspect-test-custom-scope/a".format(name))
             link_targets.append(":{}/@aspect-test/a".format(name))
@@ -657,16 +667,6 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append(":{}/tslib".format(name))
             link_targets.append(":{}/typescript".format(name))
             link_targets.append(":{}/uvu".format(name))
-        elif bazel_package == "projects/peers-combo-2":
-            link_targets.append(":{}/@aspect-test/c".format(name))
-            link_targets.append(":{}/@aspect-test/d".format(name))
-        elif bazel_package == "projects/peers-combo-1":
-            link_targets.append(":{}/@aspect-test/c".format(name))
-            link_targets.append(":{}/@aspect-test/d".format(name))
-        elif bazel_package == "projects/a-types":
-            link_targets.append(":{}/@types/node".format(name))
-        elif bazel_package == "projects/b":
-            link_targets.append(":{}/@types/node".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/@scoped/c".format(name))
