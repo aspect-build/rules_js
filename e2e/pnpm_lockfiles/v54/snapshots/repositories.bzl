@@ -132,6 +132,7 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["@aspect-test/c"],
+            "projects/peers-combo-2": ["@aspect-test/c"],
         },
         package = "@aspect-test/c",
         version = "2.0.0",
@@ -141,6 +142,26 @@ def npm_repositories():
         integrity = "sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==",
         transitive_closure = {
             "@aspect-test/c": ["2.0.0"],
+        },
+        lifecycle_hooks = ["preinstall", "install", "postinstall"],
+        lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_aspect-test_c__2.0.1",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "projects/peers-combo-1": ["@aspect-test/c"],
+        },
+        package = "@aspect-test/c",
+        version = "2.0.1",
+        url = "https://registry.npmjs.org/@aspect-test/c/-/c-2.0.1.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-pyetgkZm4yfHYJYFaIi0rXM2VeR9qGw+gukEkrUO7LXuDIfkuvQd5TDduwIYIVvXGRjHKKjCa2BaA153nZfFyQ==",
+        transitive_closure = {
+            "@aspect-test/c": ["2.0.1"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -162,6 +183,50 @@ def npm_repositories():
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "projects/peers-combo-2": ["@aspect-test/d"],
+        },
+        package = "@aspect-test/d",
+        version = "2.0.0_at_aspect-test_c_2.0.0",
+        url = "https://registry.npmjs.org/@aspect-test/d/-/d-2.0.0.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
+        deps = {
+            "@aspect-test/c": "2.0.0",
+        },
+        transitive_closure = {
+            "@aspect-test/c": ["2.0.0"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.1",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "projects/peers-combo-1": ["@aspect-test/d"],
+        },
+        package = "@aspect-test/d",
+        version = "2.0.0_at_aspect-test_c_2.0.1",
+        url = "https://registry.npmjs.org/@aspect-test/d/-/d-2.0.0.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==",
+        deps = {
+            "@aspect-test/c": "2.0.1",
+        },
+        transitive_closure = {
+            "@aspect-test/c": ["2.0.1"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.1"],
+        },
     )
 
     npm_import(

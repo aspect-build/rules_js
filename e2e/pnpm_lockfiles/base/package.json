@@ -31,7 +31,9 @@
         "@scoped/a": "workspace:*",
         "@scoped/b": "link:../projects/b",
         "@scoped/c": "file:../projects/c",
-        "@scoped/d": "../projects/d"
+        "@scoped/d": "../projects/d",
+        "test-c200-d200": "workspace:*",
+        "test-c201-d200": "workspace:*"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",
