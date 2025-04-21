@@ -1,6 +1,7 @@
 # NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
 
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
@@ -28,4 +29,13 @@ js_test(
     ],
     entry_point = "main.js",
     log_level = "info",
+)
+
+build_test(
+    name = "aliases",
+    targets = [
+        ":node_modules/@lib/b",
+        ":node_modules/@lib/b_alias",
+        "//root:.aspect_rules_js/node_modules/@lib+b_alias@0.0.0",
+    ],
 )
