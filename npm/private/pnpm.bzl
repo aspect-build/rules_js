@@ -109,6 +109,11 @@ def _convert_v9_file_package_version(version, package_snapshot):
     else:
         friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
 
+    peer_index = friendly_version.find("(")
+    if peer_index != -1:
+        # Remove the peer dependency data from the version string
+        friendly_version = friendly_version[:peer_index]
+
     return version, friendly_version
 
 def _strip_v5_peer_dep_or_patched_version(version):
@@ -519,22 +524,35 @@ def _convert_v9_packages(packages, snapshots):
         # the raw name + version are the key, not including peerDeps+patch
         version_index = static_key.index("@", 1)
         name = static_key[:version_index]
-        package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
 
         # Extract the version including peerDeps+patch from the key
         version = package_key[package_key.index("@", 1) + 1:]
 
+        package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
+
+        # pnpm v9+ no longer contains an id field
+        # but we will use it to support some edge cases
+        id = None
+
         if version.startswith("file:"):
+            # Keep the file: path as the 'id' for later use when linking to the path
+            peer_index = version.find("(")
+            if peer_index != -1:
+                id = version[:peer_index]
+
             version, friendly_version = _convert_v9_file_package_version(version, package_data)
+            version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
             # Update the `package_key` to always equal name@version since `version` may have changed
             package_key = _to_package_key(name, version)
         else:
+            version = _convert_pnpm_v6_v9_version_peer_dep(version)
+
             # package_data can have the resolved "version" for things like https:// deps
             friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
         package_info = _new_package_info(
-            id = None,  # pnpm v9+ no longer requires an id field
+            id = id,
             name = name,
             version = version,
             friendly_version = friendly_version,

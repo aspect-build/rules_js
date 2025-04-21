@@ -310,6 +310,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             version = "0.0.0",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],

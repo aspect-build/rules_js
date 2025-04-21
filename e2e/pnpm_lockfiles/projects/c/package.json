@@ -3,5 +3,8 @@
     "private": true,
     "dependencies": {
         "@scoped/a": "link:../a"
+    },
+    "peerDependencies": {
+        "@scoped/b": "workspace:*"
     }
 }

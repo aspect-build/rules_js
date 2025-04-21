@@ -45,7 +45,7 @@ importers:
         version: link:../projects/b
       '@scoped/c':
         specifier: file:../projects/c
-        version: file:../projects/c
+        version: file:../projects/c(@scoped/b@projects+b)
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
@@ -165,12 +165,18 @@ importers:
       '@scoped/a':
         specifier: link:../a
         version: link:../a
+      '@scoped/b':
+        specifier: workspace:*
+        version: link:../b
 
   ../projects/d:
     dependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
+      '@scoped/b':
+        specifier: link:../b
+        version: link:../b
 
   ../projects/peers-combo-1:
     dependencies:
@@ -248,6 +254,8 @@ packages:
 
   '@scoped/c@file:../projects/c':
     resolution: {directory: ../projects/c, type: directory}
+    peerDependencies:
+      '@scoped/b': workspace:*
 
   '@types/archiver@5.3.1':
     resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
@@ -516,9 +524,10 @@ snapshots:
       picomatch: 2.3.1
       rollup: 2.14.0
 
-  '@scoped/c@file:../projects/c':
+  '@scoped/c@file:../projects/c(@scoped/b@projects+b)':
     dependencies:
       '@scoped/a': link:../a
+      '@scoped/b': link:../projects/b
 
   '@types/archiver@5.3.1':
     dependencies:

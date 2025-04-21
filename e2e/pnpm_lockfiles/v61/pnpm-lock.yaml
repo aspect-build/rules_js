@@ -48,7 +48,7 @@ importers:
         version: link:../projects/b
       '@scoped/c':
         specifier: file:../projects/c
-        version: file:../projects/c
+        version: file:../projects/c(@scoped/b@projects+b)
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
@@ -168,12 +168,18 @@ importers:
       '@scoped/a':
         specifier: link:../a
         version: link:../a
+      '@scoped/b':
+        specifier: workspace:*
+        version: link:../b
 
   ../projects/d:
     dependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
+      '@scoped/b':
+        specifier: link:../b
+        version: link:../b
 
   ../projects/peers-combo-1:
     dependencies:
@@ -575,11 +581,15 @@ packages:
     version: 1.0.0
     dev: false
 
-  file:../projects/c:
+  file:../projects/c(@scoped/b@projects+b):
     resolution: {directory: ../projects/c, type: directory}
+    id: file:../projects/c
     name: '@scoped/c'
+    peerDependencies:
+      '@scoped/b': workspace:*
     dependencies:
       '@scoped/a': link:../a
+      '@scoped/b': link:../projects/b
     dev: false
 
   file:../vendored/is-number:
