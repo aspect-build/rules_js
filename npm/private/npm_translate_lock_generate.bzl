@@ -127,7 +127,7 @@ sh_binary(
         version = package_info.get("version")
         deps = package_info.get("dependencies")
         if version.startswith("file:"):
-            if version in packages and packages[version]["id"]:
+            if version in packages and packages[version]["id"] and packages[version]["id"].startswith("file:"):
                 dep_path = helpers.link_package(root_package, packages[version]["id"][len("file:"):])
             else:
                 dep_path = helpers.link_package(root_package, version[len("file:"):])
@@ -166,7 +166,7 @@ sh_binary(
             if dep_version.startswith("file:"):
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
-                    msg = "Expected to file: referenced package {} in first-party links".format(dep_key)
+                    msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
                     fail(msg)
                 fp_links[dep_key]["link_packages"][link_package] = True
             elif dep_version.startswith("link:"):

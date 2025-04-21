@@ -64,7 +64,7 @@ importers:
       '@isaacs/cliui': 8.0.2
       '@scoped/a': link:../projects/a
       '@scoped/b': link:../projects/b
-      '@scoped/c': file:../projects/c
+      '@scoped/c': file:../projects/c_@scoped+b@projects+b
       '@scoped/d': link:../projects/d
       aspect-test-a-no-scope: /@aspect-test/a/5.0.2
       aspect-test-a/no-at: /@aspect-test/a/5.0.2
@@ -524,11 +524,15 @@ packages:
     version: 1.0.0
     dev: false
 
-  file:../projects/c:
+  file:../projects/c_@scoped+b@projects+b:
     resolution: {directory: ../projects/c, type: directory}
+    id: file:../projects/c
     name: '@scoped/c'
+    peerDependencies:
+      '@scoped/b': workspace:*
     dependencies:
       '@scoped/a': link:../a
+      '@scoped/b': link:../projects/b
     dev: false
 
   file:../vendored/is-number:
