@@ -11,6 +11,9 @@ importers:
       '@aspect-test/a':
         specifier: 5.0.2
         version: 5.0.2
+      lodash:
+        specifier: file:vendored/lodash-4.17.19.tgz
+        version: file:vendored/lodash-4.17.19.tgz
       typescript:
         specifier: 4.9.5
         version: 4.9.5
@@ -194,4 +197,10 @@ packages:
       '@lib/b': workspace:*
     dependencies:
       '@lib/b': link:lib/b
+    dev: false
+
+  file:vendored/lodash-4.17.19.tgz:
+    resolution: {integrity: sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==, tarball: file:vendored/lodash-4.17.19.tgz}
+    name: lodash
+    version: 4.17.19
     dev: false

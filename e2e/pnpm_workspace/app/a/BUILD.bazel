@@ -13,6 +13,7 @@ js_binary(
         ":node_modules/@aspect-test",
         ":node_modules/@lib",
         "//:node_modules/@aspect-test",
+        "//:node_modules/lodash",
     ],
     entry_point = "main.js",
 )
@@ -23,6 +24,7 @@ js_test(
     data = [
         ":node_modules",
         "//:node_modules/@aspect-test",
+        "//:node_modules/lodash",
     ],
     entry_point = "main.js",
     log_level = "info",

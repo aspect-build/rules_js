@@ -29,6 +29,7 @@ npm_translate_lock(
         "//app/a:package.json",
         "//app/b:package.json",
         "//app/c:package.json",
+        "//app/d:package.json",
         "//lib/a:package.json",
         "//lib/b:package.json",
         "//lib/c:package.json",
