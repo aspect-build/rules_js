@@ -263,33 +263,31 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
 
-    # make a lookup table of package to link name for each importer
-    importer_links = {}
+    # make a lookup table of packages to all importers depending on them
+    package_importers = {}
     for import_path, importer in importers.items():
         dependencies = importer.get("all_deps")
         if type(dependencies) != "dict":
             msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
             fail(msg)
-        links = {
-            "link_package": _link_package(root_package, import_path),
-        }
-        linked_packages = {}
         for dep_package, dep_version in dependencies.items():
             if dep_version.startswith("link:"):
                 continue
+
             if dep_version.startswith("npm:"):
                 # special case for alias dependencies such as npm:alias-to@version
-                maybe_package = dep_version[4:]
+                package_key = dep_version[4:]
             elif dep_version not in packages:
-                maybe_package = utils.package_key(dep_package, dep_version)
+                package_key = utils.package_key(dep_package, dep_version)
             else:
-                maybe_package = dep_version
-            if maybe_package not in linked_packages:
-                linked_packages[maybe_package] = [dep_package]
-            else:
-                linked_packages[maybe_package].append(dep_package)
-        links["packages"] = linked_packages
-        importer_links[import_path] = links
+                package_key = dep_version
+
+            import_path = "" if import_path == "." else import_path
+            if package_key not in package_importers:
+                package_importers[package_key] = {}
+            if import_path not in package_importers[package_key]:
+                package_importers[package_key][import_path] = []
+            package_importers[package_key][import_path].append(dep_package)
 
     patches_used = []
     result = {}
@@ -404,12 +402,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             package_visibility = ["//visibility:public"]
 
         # gather all of the importers (workspace packages) that this npm package should be linked at which names
-        link_packages = {}
-        for import_path, links in importer_links.items():
-            linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key, [])
-            if link_names:
-                link_packages[links["link_package"]] = link_names
+        link_packages = package_importers[package_key] if package_key in package_importers else {}
 
         # check if this package should be hoisted via public_hoist_packages
         public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
