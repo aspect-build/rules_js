@@ -462,6 +462,37 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     if is_root:
         _npm_package_store(
+            name = ".aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
+            src = "//projects/a:pkg",
+            package = "alias-project-a",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/alias-project-a".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/alias-project-a/dir".format(name),
+            srcs = [":{}/alias-project-a".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/alias-project-a".format(name))
+
+    if is_root:
+        _npm_package_store(
             name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
             src = "//projects/b:pkg",
             package = "scoped/bad",
@@ -671,6 +702,9 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/@scoped/d".format(name))
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        link_targets.append(":{}/alias-project-a".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/scoped/bad".format(name))

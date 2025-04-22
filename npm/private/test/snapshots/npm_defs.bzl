@@ -2656,6 +2656,37 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     if is_root:
         _npm_package_store(
+            name = ".aspect_rules_js/{}/js_lib_pkg_a-alias@0.0.0".format(name),
+            src = "//examples/js_lib_pkg/a:pkg",
+            package = "js_lib_pkg_a-alias",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["examples/js_lib_pkg/b"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/js_lib_pkg_a-alias".format(name),
+            src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/js_lib_pkg_a-alias/dir".format(name),
+            srcs = [":{}/js_lib_pkg_a-alias".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
+
+    if is_root:
+        _npm_package_store(
             name = ".aspect_rules_js/{}/@lib+test@0.0.0".format(name),
             src = "//examples/linked_pkg:pkg",
             package = "@lib/test",
@@ -2984,6 +3015,9 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if bazel_package in ["examples/js_lib_pkg/b"]:
         link_targets.append(":{}/js_lib_pkg_a".format(name))
+
+    if bazel_package in ["examples/js_lib_pkg/b"]:
+        link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
 
     if bazel_package in ["examples/linked_consumer"]:
         link_targets.append(":{}/@lib/test".format(name))
