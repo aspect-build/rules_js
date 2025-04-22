@@ -32,6 +32,7 @@ importers:
       '@types/archiver': 5.3.1
       '@types/node': 16.18.11
       alias-only-sizzle: npm:@types/sizzle@~2.3.9
+      alias-project-a: link:../projects/a
       alias-types-node: npm:@types/node@~16.18.11
       aspect-test-a-no-scope: npm:@aspect-test/a
       aspect-test-a/no-at: npm:@aspect-test/a
@@ -66,6 +67,7 @@ importers:
       '@scoped/b': link:../projects/b
       '@scoped/c': file:../projects/c_@scoped+b@projects+b
       '@scoped/d': link:../projects/d
+      alias-project-a: link:../projects/a
       aspect-test-a-no-scope: /@aspect-test/a/5.0.2
       aspect-test-a/no-at: /@aspect-test/a/5.0.2
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53

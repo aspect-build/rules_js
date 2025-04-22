@@ -48,6 +48,9 @@ importers:
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
+      alias-project-a:
+        specifier: link:../projects/a
+        version: link:../projects/a
       aspect-test-a-no-scope:
         specifier: npm:@aspect-test/a
         version: /@aspect-test/a@5.0.2

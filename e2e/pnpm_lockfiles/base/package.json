@@ -32,6 +32,7 @@
         "@scoped/b": "link:../projects/b",
         "@scoped/c": "file:../projects/c",
         "@scoped/d": "../projects/d",
+        "alias-project-a": "link:../projects/a",
         "test-c200-d200": "workspace:*",
         "test-c201-d200": "workspace:*"
     },

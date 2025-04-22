@@ -72,8 +72,10 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/aspect-test-a/no-at",
             ":node_modules/@aspect-test-a-bad-scope",
             ":node_modules/@aspect-test-custom-scope/a",
+            ":node_modules/@scoped/a",
             ":node_modules/@types/node",
             ":node_modules/alias-only-sizzle",
+            ":node_modules/alias-project-a",
             ":node_modules/alias-types-node",
             ":node_modules/is-odd",
             ":node_modules/is-odd-alias",
@@ -150,6 +152,9 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@aspect-test-a-bad-scope",
             ":node_modules/@aspect-test-custom-scope",  # target for the scope
             ":node_modules/@aspect-test-custom-scope/a",
+
+            # alias via link:
+            ":node_modules/alias-project-a",
 
             # npm: alias to alternate versions
             ":node_modules/is-odd-v0",

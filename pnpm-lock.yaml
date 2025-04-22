@@ -53,6 +53,9 @@ importers:
       js_lib_pkg_a:
         specifier: workspace:*
         version: link:../a
+      js_lib_pkg_a-alias:
+        specifier: link:../a
+        version: link:../a
     devDependencies:
       '@types/node':
         specifier: 18.19.54
