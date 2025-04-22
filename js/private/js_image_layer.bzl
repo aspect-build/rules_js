@@ -407,12 +407,17 @@ else {
     )
 
     nodeinfo = ctx.attr._current_node[platform_common.ToolchainInfo].nodeinfo
+    if hasattr(nodeinfo, "node"):
+        node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
+    else:
+        # TODO(3.0): drop support for deprecated toolchain attributes
+        node_path = nodeinfo.target_tool_path
     ctx.actions.run(
         inputs = inputs,
         arguments = [splitter.path],
         unused_inputs_list = unused_inputs,
         outputs = splitter_outputs,
-        executable = nodeinfo.node,
+        executable = node_path,
         progress_message = "Computing Layer Groups %{label}",
         mnemonic = "JsImageLayerGroups",
     )
@@ -595,10 +600,6 @@ js_image_layer_lib = struct(
             default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
         ),
-        "_current_node": attr.label(
-            default = "@nodejs_toolchains//:resolved_toolchain",
-            cfg = "exec",
-        ),
         "binary": attr.label(
             mandatory = True,
             cfg = _js_image_layer_transition,
@@ -647,5 +648,6 @@ js_image_layer = rule(
     doc = _DOC,
     toolchains = [
         tar_lib.toolchain_type,
+        "@rules_nodejs//nodejs:toolchain_type",
     ],
 )
