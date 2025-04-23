@@ -27,7 +27,6 @@ expected_importers = {
 }
 expected_packages = {
     "@aspect-test/a@5.0.0": {
-        "id": None,
         "name": "@aspect-test/a",
         "dependencies": {
             "@aspect-test/b": "5.0.0",
@@ -46,7 +45,6 @@ expected_packages = {
         },
     },
     "lodash@4.17.21": {
-        "id": None,
         "name": "lodash",
         "dependencies": {},
         "optional_dependencies": {},

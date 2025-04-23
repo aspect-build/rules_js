@@ -35,14 +35,6 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 # have data normalized across lockfiles.
 #
 # Args:
-#   id: a "universal identifier of the package" only present when the id is not the same as the key
-#       Normally present when the package is an odd version (such as file: or link: package) while
-#       also having peer dependencies in the key.
-#
-#       Removed in lockfile v9+ where snapshots/packages are separate.
-#
-#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathid
-#
 #   name:
 #   version:
 #   dependencies:
@@ -65,9 +57,8 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathrequiresbuild
 #
 #   resolution: the lockfile resolution field
-def _new_package_info(id, name, dependencies, optional_dependencies, dev_only, has_bin, optional, requires_build, version, friendly_version, resolution):
+def _new_package_info(name, dependencies, optional_dependencies, dev_only, has_bin, optional, requires_build, version, friendly_version, resolution):
     return {
-        "id": id,
         "name": name,
         "dependencies": dependencies,
         "optional_dependencies": optional_dependencies,
@@ -241,7 +232,6 @@ def _convert_v5_packages(packages):
         package_key = _to_package_key(name, version)
 
         package_info = _new_package_info(
-            id = package_snapshot.get("id", None),
             name = name,
             version = version,
             friendly_version = friendly_version,
@@ -412,7 +402,6 @@ def _convert_v6_packages(packages):
         package_key = _to_package_key(name, version)
 
         package_info = _new_package_info(
-            id = package_snapshot.get("id", None),
             name = name,
             version = version,
             friendly_version = friendly_version,
@@ -543,16 +532,7 @@ def _convert_v9_packages(packages, snapshots):
 
         package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
 
-        # pnpm v9+ no longer contains an id field
-        # but we will use it to support some edge cases
-        id = None
-
         if version.startswith("file:"):
-            # Keep the file: path as the 'id' for later use when linking to the path
-            peer_index = version.find("(")
-            if peer_index != -1:
-                id = version[:peer_index]
-
             version, friendly_version = _convert_v9_file_package_version(version, package_data)
             version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
@@ -565,7 +545,6 @@ def _convert_v9_packages(packages, snapshots):
             friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
         package_info = _new_package_info(
-            id = id,
             name = name,
             version = version,
             friendly_version = friendly_version,
