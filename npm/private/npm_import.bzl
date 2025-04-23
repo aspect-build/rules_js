@@ -17,7 +17,9 @@ See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API 
 for a given lockfile.
 """
 
+load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
+load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
@@ -252,57 +254,89 @@ def npm_link_imported_package(
     return (link_targets, scoped_targets)
 """
 
-_BIN_MACRO_TMPL = """
-def _{bin_name}_internal(name, link_root_name, **kwargs):
-    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
+def bin_internal(name, link_workspace_and_package, link_root_name, package_store_name, bin_path, bin_mnemonic, **kwargs):
+    target = "%s:%s/%s/%s" % (link_workspace_and_package, utils.package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
-        path = "{bin_path}",
+        directory = target + "/dir",
+        path = bin_path,
         tags = ["manual"],
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = ["@{link_workspace}//{root_package}:{{}}".format(store_target_name)],
+        data = [target],
         include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )
     _js_run_binary(
         name = name,
         tool = ":%s__js_binary" % name,
-        mnemonic = kwargs.pop("mnemonic", "{bin_mnemonic}"),
+        mnemonic = kwargs.pop("mnemonic", bin_mnemonic),
         **kwargs
     )
 
-def _{bin_name}_test_internal(name, link_root_name, **kwargs):
-    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
+def bin_test_internal(name, link_workspace_and_package, link_root_name, package_store_name, bin_path, **kwargs):
+    target = "%s:%s/%s/%s" % (link_workspace_and_package, utils.package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
-        path = "{bin_path}",
+        directory = target + "/dir",
+        path = bin_path,
         tags = ["manual"],
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{root_package}:{{}}".format(store_target_name)],
+        data = kwargs.pop("data", []) + [target],
         **kwargs
     )
 
-def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
-    store_target_name = "{package_store_root}/{{}}/{package_store_name}".format(link_root_name)
+def bin_binary_internal(name, link_workspace_and_package, link_root_name, package_store_name, bin_path, **kwargs):
+    target = "%s:%s/%s/%s" % (link_workspace_and_package, utils.package_store_root, link_root_name, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = "@{link_workspace}//{root_package}:{{}}/dir".format(store_target_name),
-        path = "{bin_path}",
+        directory = target + "/dir",
+        path = bin_path,
         tags = ["manual"],
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + ["@{link_workspace}//{root_package}:{{}}".format(store_target_name)],
+        data = kwargs.pop("data", []) + [target],
         **kwargs
+    )
+
+_BIN_MACRO_TMPL = """
+def _{bin_name}_internal(name, link_root_name, **kwargs):
+    bin_internal(
+        name,
+        link_workspace_and_package = _link_workspace_and_package,
+        link_root_name = link_root_name,
+        package_store_name = _package_store_name,
+        bin_path = "{bin_path}",
+        bin_mnemonic = "{bin_mnemonic}",
+        **kwargs,
+    )
+
+def _{bin_name}_test_internal(name, link_root_name, **kwargs):
+    bin_test_internal(
+        name,
+        link_workspace_and_package = _link_workspace_and_package,
+        link_root_name = link_root_name,
+        package_store_name = _package_store_name,
+        bin_path = "{bin_path}",
+        **kwargs,
+    )
+
+
+def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
+    bin_binary_internal(
+        name,
+        link_workspace_and_package = _link_workspace_and_package,
+        link_root_name = link_root_name,
+        package_store_name = _package_store_name,
+        bin_path = "{bin_path}",
+        **kwargs,
     )
 
 def {bin_name}(name, **kwargs):
@@ -331,8 +365,7 @@ bzl_library(
     name = "{name}_bzl_library",
     srcs = ["{src}"],
     deps = [
-        "@aspect_bazel_lib//lib:directory_path",
-        "@aspect_rules_js//js:defs",
+        "@aspect_rules_js//npm/private:npm_import",
     ],
     visibility = ["//visibility:public"],
 )"""
@@ -523,8 +556,10 @@ def _npm_import_rule_impl(rctx):
         for link_package in rctx.attr.link_packages.keys():
             bin_bzl = [
                 generated_by_prefix,
-                """load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")""",
-                """load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")""",
+                """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
+                "",
+                '_link_workspace_and_package = "@%s//%s"' % (rctx.attr.link_workspace, rctx.attr.root_package),
+                '_package_store_name = "%s"' % package_store_name,
             ]
             for name in bins:
                 bin_name = _sanitize_bin_name(name)
@@ -533,12 +568,6 @@ def _npm_import_rule_impl(rctx):
                         bin_name = bin_name,
                         bin_mnemonic = _mnemonic_for_bin(bin_name),
                         bin_path = bins[name],
-                        link_workspace = rctx.attr.link_workspace,
-                        package = rctx.attr.package,
-                        root_package = rctx.attr.root_package,
-                        version = rctx.attr.version,
-                        package_store_name = package_store_name,
-                        package_store_root = utils.package_store_root,
                     ),
                 )
 
