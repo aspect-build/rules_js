@@ -600,6 +600,10 @@ js_image_layer_lib = struct(
             default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
         ),
+        "_current_node": attr.label(
+            default = "@nodejs_toolchains//:resolved_toolchain",
+            cfg = "exec",
+        ),
         "binary": attr.label(
             mandatory = True,
             cfg = _js_image_layer_transition,
