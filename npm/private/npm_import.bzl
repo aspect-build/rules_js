@@ -667,12 +667,7 @@ def _npm_import_links_rule_impl(rctx):
                 deps[dep_store_target].append(dep_name)
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
-            if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
-            else:
-                dep_store_target = """":{package_store_root}/{{}}/{package_store_name}".format(link_root_name)"""
-            dep_store_target = dep_store_target.format(
-                root_package = rctx.attr.root_package,
+            dep_store_target = """":{package_store_root}/{{}}/{package_store_name}".format(link_root_name)""".format(
                 package_store_name = utils.package_store_name(dep_name, dep_version),
                 package_store_root = utils.package_store_root,
             )
