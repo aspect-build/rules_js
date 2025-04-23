@@ -122,15 +122,13 @@ sh_binary(
     }
 
     # Look for first-party file: links in packages
-    for package_key, package_info in packages.items():
+    for package_info in packages.values():
         name = package_info.get("name")
         version = package_info.get("version")
         deps = package_info.get("dependencies")
-        if package_key.startswith("file:"):
-            if version in packages and packages[version]["id"] and packages[version]["id"].startswith("file:"):
-                dep_path = helpers.link_package(root_package, packages[version]["id"][len("file:"):])
-            else:
-                dep_path = helpers.link_package(root_package, version[len("file:"):])
+        resolution = package_info.get("resolution")
+        if resolution.get("type", None) == "directory":
+            dep_path = helpers.link_package(root_package, resolution.get("directory"))
             dep_key = "{}+{}".format(name, version)
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
