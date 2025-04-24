@@ -1102,7 +1102,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
@@ -2564,8 +2564,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(":{}/source-map-support".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/is-odd@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "is-odd@0.0.0",
             src = "//npm/private/test/vendored/is-odd:pkg",
             package = "is-odd",
             version = "0.0.0",
@@ -2577,8 +2578,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/semver-max@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "semver-max@0.0.0",
             src = "//npm/private/test/vendored/semver-max:pkg",
             package = "semver-max",
             version = "0.0.0",
@@ -2591,8 +2593,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-a@0.0.0",
             src = "//examples/npm_package/packages/pkg_a:pkg",
             package = "@mycorp/pkg-a",
             version = "0.0.0",
@@ -2624,8 +2627,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "js_lib_pkg_a@0.0.0",
             src = "//examples/js_lib_pkg/a:pkg",
             package = "js_lib_pkg_a",
             version = "0.0.0",
@@ -2655,8 +2659,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/js_lib_pkg_a".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/js_lib_pkg_a-alias@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "js_lib_pkg_a-alias@0.0.0",
             src = "//examples/js_lib_pkg/a:pkg",
             package = "js_lib_pkg_a-alias",
             version = "0.0.0",
@@ -2686,8 +2691,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+test@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+test@0.0.0",
             src = "//examples/linked_pkg:pkg",
             package = "@lib/test",
             version = "0.0.0",
@@ -2723,8 +2729,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+test2@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+test2@0.0.0",
             src = "//examples/linked_lib:pkg",
             package = "@lib/test2",
             version = "0.0.0",
@@ -2760,8 +2767,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-d@0.0.0",
             src = "//examples/npm_package/packages/pkg_d:pkg",
             package = "@mycorp/pkg-d",
             version = "0.0.0",
@@ -2798,8 +2806,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-e@0.0.0",
             src = "//examples/npm_package/packages/pkg_e:pkg",
             package = "@mycorp/pkg-e",
             version = "0.0.0",
@@ -2835,8 +2844,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "test-npm_package@0.0.0",
             src = "//npm/private/test/npm_package:pkg",
             package = "test-npm_package",
             version = "0.0.0",

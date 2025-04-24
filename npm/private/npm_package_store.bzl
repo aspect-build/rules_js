@@ -458,3 +458,32 @@ npm_package_store = rule(
     provides = npm_package_store_lib.provides,
     toolchains = npm_package_store_lib.toolchains,
 )
+
+# Invoked by generated package store targets for local packages
+# buildifier: disable=function-docstring
+# buildifier: disable=unnamed-macro
+def npm_local_package_store_internal(link_root_name, package_store_name, package, version, src, deps, visibility, tags):
+    store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
+
+    npm_package_store(
+        name = store_target_name,
+        src = src,
+        package = package,
+        version = version,
+        deps = deps,
+        visibility = visibility,
+        tags = tags,
+    )
+
+    # Create aliases for the standard /ref and /pkg targets so local packages can be
+    # references in the same way as remote packages.
+    native.alias(
+        name = "{}/ref".format(store_target_name),
+        actual = store_target_name,
+        visibility = visibility,
+    )
+    native.alias(
+        name = "{}/pkg".format(store_target_name),
+        actual = store_target_name,
+        visibility = visibility,
+    )

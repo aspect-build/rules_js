@@ -73,7 +73,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
 
@@ -311,8 +311,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@types"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@scoped+c@0.0.0",
             src = "//projects/c:pkg",
             package = "@scoped/c",
             version = "0.0.0",
@@ -349,8 +350,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/is-number@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "is-number@0.0.0",
             src = "//vendored/is-number:pkg",
             package = "is-number",
             version = "0.0.0",
@@ -360,8 +362,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         )
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@scoped+a@0.0.0",
             src = "//projects/a:pkg",
             package = "@scoped/a",
             version = "0.0.0",
@@ -395,8 +398,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@scoped+b@0.0.0",
             src = "//projects/b:pkg",
             package = "@scoped/b",
             version = "0.0.0",
@@ -432,8 +436,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@scoped+d@0.0.0",
             src = "//projects/d:pkg",
             package = "@scoped/d",
             version = "0.0.0",
@@ -470,8 +475,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "alias-project-a@0.0.0",
             src = "//projects/a:pkg",
             package = "alias-project-a",
             version = "0.0.0",
@@ -501,8 +507,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/alias-project-a".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "scoped+bad@0.0.0",
             src = "//projects/b:pkg",
             package = "scoped/bad",
             version = "0.0.0",
@@ -534,8 +541,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/scoped/bad".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "test-c200-d200@0.0.0",
             src = "//projects/peers-combo-2:pkg",
             package = "test-c200-d200",
             version = "0.0.0",
@@ -568,8 +576,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/test-c200-d200".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "test-c201-d200@0.0.0",
             src = "//projects/peers-combo-1:pkg",
             package = "test-c201-d200",
             version = "0.0.0",
@@ -602,8 +611,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/test-c201-d200".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/a-types@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "a-types@0.0.0",
             src = "//projects/a-types:pkg",
             package = "a-types",
             version = "0.0.0",
