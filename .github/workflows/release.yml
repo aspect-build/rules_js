@@ -1,41 +1,25 @@
 # Cut a release whenever a new tag is pushed to the repo.
-# You should use an annotated tag, like `git tag -a v1.2.3`
-# and put the release notes into the commit message for the tag.
 name: Release
 
 on:
     push:
         tags:
             - 'v*.*.*'
-
+permissions:
+    id-token: write
+    attestations: write
+    contents: write
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Mount bazel caches
-              uses: actions/cache@v4
-              with:
-                  # Cache the --dist_cache and --repository_cache directories (see ci.bazelrc)
-                  # and the default bazel output (https://bazel.build/remote/output-directories#layout)
-                  # and bazelisk cache.
-                  path: |
-                      ~/.cache/bazel-disk-cache
-                      ~/.cache/bazel-repository-cache
-                      ~/.cache/bazel
-                      ~/.cache/bazelisk
-                  key: bazel-cache-release-${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}
-                  restore-keys: bazel-cache-release-
-            - name: bazel test //...
-              run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test //...
-            - name: Prepare release
-              run: .github/workflows/release_prep.sh ${{ env.GITHUB_REF_NAME }} > release_notes.txt
-            - name: Release
-              uses: softprops/action-gh-release@v2
-              with:
-                  # Use GH feature to populate the changelog automatically
-                  generate_release_notes: true
-                  body_path: release_notes.txt
-                  files: rules_js-*.tar.gz
-                  fail_on_unmatched_files: true
+    release:
+        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.2.2
+        with:
+            release_files: rules_js-*.tar.gz
+            prerelease: false
+            tag_name: ${{ github.ref_name }}
+    publish:
+        needs: release
+        uses: ./.github/workflows/publish.yaml
+        with:
+            tag_name: ${{ github.ref_name }}
+        secrets:
+            publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
