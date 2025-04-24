@@ -408,16 +408,16 @@ else {
 
     nodeinfo = ctx.attr._current_node[platform_common.ToolchainInfo].nodeinfo
     if hasattr(nodeinfo, "node"):
-        node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
+        node_exec = nodeinfo.node
     else:
         # TODO(3.0): drop support for deprecated toolchain attributes
-        node_path = nodeinfo.target_tool_path
+        node_exec = nodeinfo.target_tool_path
     ctx.actions.run(
         inputs = inputs,
         arguments = [splitter.path],
         unused_inputs_list = unused_inputs,
         outputs = splitter_outputs,
-        executable = node_path,
+        executable = node_exec,
         progress_message = "Computing Layer Groups %{label}",
         mnemonic = "JsImageLayerGroups",
     )
