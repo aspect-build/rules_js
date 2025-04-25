@@ -31,8 +31,9 @@ bin_factory = _bin_factory
 _FP_STORE_TMPL = \
     """
     if is_root:
-        _npm_package_store(
-            name = "{package_store_root}/{{}}/{package_store_name}".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "{package_store_name}",
             src = "{npm_package_target}",
             package = "{package}",
             version = "0.0.0",
@@ -437,7 +438,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")""")
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")""")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")""")
 
     rctx_files[rctx.attr.defs_bzl_filename] = [
         "\n".join(defs_bzl_header),

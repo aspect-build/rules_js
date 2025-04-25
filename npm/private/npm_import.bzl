@@ -748,14 +748,8 @@ def _npm_import_links_rule_impl(rctx):
     deps = {}
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        dep_package_store_name = utils.package_store_name(dep_name, dep_version)
-        if dep_version.startswith("link:") or dep_version.startswith("file:"):
-            dep_store_target = '"//{root_package}:{package_store_root}/{{link_root_name}}/{package_store_name}"'
-        else:
-            dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/ref"'
-        dep_store_target = dep_store_target.format(
-            root_package = rctx.attr.root_package,
-            package_store_name = dep_package_store_name,
+        dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/ref"'.format(
+            package_store_name = utils.package_store_name(dep_name, dep_version),
             package_store_root = utils.package_store_root,
         )
         if not dep_store_target in ref_deps:
@@ -769,17 +763,13 @@ def _npm_import_links_rule_impl(rctx):
         # party npm deps; it is not used for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
-                if dep_version.startswith("link:") or dep_version.startswith("file:"):
-                    dep_store_target = '"//{root_package}:{package_store_root}/{{link_root_name}}/{package_store_name}"'
-                    lc_dep_store_target = dep_store_target
-                else:
-                    dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg"'
-                    lc_dep_store_target = dep_store_target
-                    if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
-                        # special case for lifecycle transitive closure deps; do not depend on
-                        # the __pkg of this package as that will be the output directory
-                        # of the lifecycle action
-                        lc_dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg_pre_lc_lite"'
+                dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg"'
+                lc_dep_store_target = dep_store_target
+                if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
+                    # special case for lifecycle transitive closure deps; do not depend on
+                    # the __pkg of this package as that will be the output directory
+                    # of the lifecycle action
+                    lc_dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg_pre_lc_lite"'
 
                 dep_package_store_name = utils.package_store_name(dep_name, dep_version)
 

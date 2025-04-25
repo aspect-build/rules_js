@@ -20,7 +20,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d"]
 
@@ -155,8 +155,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@aspect-test"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+c@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+c@0.0.0",
             src = "//lib/c:pkg",
             package = "@lib/c",
             version = "0.0.0",
@@ -192,8 +193,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/vendored-a@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "vendored-a@0.0.0",
             src = "//vendored/a:pkg",
             package = "vendored-a",
             version = "0.0.0",
@@ -225,8 +227,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/vendored-a".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/vendored-b@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "vendored-b@0.0.0",
             src = "//vendored/b:pkg",
             package = "vendored-b",
             version = "0.0.0",
@@ -258,8 +261,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         link_targets.append(":{}/vendored-b".format(name))
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+a@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+a@0.0.0",
             src = "//lib/a:pkg",
             package = "@lib/a",
             version = "0.0.0",
@@ -298,8 +302,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+b@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+b@0.0.0",
             src = "//lib/b:pkg",
             package = "@lib/b",
             version = "0.0.0",
@@ -336,8 +341,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+b_alias@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+b_alias@0.0.0",
             src = "//lib/b:pkg",
             package = "@lib/b_alias",
             version = "0.0.0",
@@ -374,8 +380,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
-        _npm_package_store(
-            name = ".aspect_rules_js/{}/@lib+d@0.0.0".format(name),
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+d@0.0.0",
             src = "//lib/d:pkg",
             package = "@lib/d",
             version = "0.0.0",
