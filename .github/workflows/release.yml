@@ -22,4 +22,4 @@ jobs:
         with:
             tag_name: ${{ github.ref_name }}
         secrets:
-            publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
+            BCR_PUBLISH_TOKEN: ${{ secrets.BCR_PUBLISH_TOKEN }}
