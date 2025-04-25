@@ -1,7 +1,7 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_library")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # An example of a library that is use directly and not via a npm_package.
 # This library could be used by build steps of packages as a "dev dependency"
