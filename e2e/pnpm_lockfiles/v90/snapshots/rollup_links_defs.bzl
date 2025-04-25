@@ -16,22 +16,21 @@ _PACKAGE_STORE_NAME = "rollup@2.14.0"
 
 # Generated npm_package_store targets for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
-def npm_imported_package_store(link_root_name):
+def npm_imported_package_store():
     _npm_imported_package_store(
-        link_root_name = link_root_name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
-            ":.aspect_rules_js/{link_root_name}/rollup@2.14.0/pkg": "rollup",
+            ":.aspect_rules_js/fsevents@2.3.3/pkg": "fsevents",
+            ":.aspect_rules_js/rollup@2.14.0/pkg": "rollup",
         },
         ref_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/ref": "fsevents",
+            ":.aspect_rules_js/fsevents@2.3.3/ref": "fsevents",
         },
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
-            ":.aspect_rules_js/{link_root_name}/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
+            ":.aspect_rules_js/fsevents@2.3.3/pkg": "fsevents",
+            ":.aspect_rules_js/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
         },
         dev = False,
         has_lifecycle_build_target = False,
@@ -46,26 +45,19 @@ def npm_imported_package_store(link_root_name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, link_root_name, link_alias):
-    return _npm_link_imported_package_store(
+def npm_link_imported_package_store(name):
+    _npm_link_imported_package_store(
         name,
-        link_root_name,
-        link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = ["//visibility:public"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = True,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
-def npm_link_imported_package(
-        name = "node_modules",
-        link = None,
-        fail_if_no_link = True):
+def npm_link_imported_package(link = None, fail_if_no_link = True):
     return _npm_link_imported_package(
-        name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
