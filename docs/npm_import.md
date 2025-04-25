@@ -79,7 +79,7 @@ package's `BUILD.bazel` file:
 ```
 load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 
-npm_link_types_node(name = "node_modules")
+npm_link_types_node()
 ```
 
 This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
@@ -95,7 +95,7 @@ When using `npm_translate_lock`, you can link all the npm dependencies in the lo
 ```
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 ```
 
 This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
@@ -111,7 +111,6 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
 
 npm_link_all_packages(
-    name = "node_modules",
     imported_links = [
         npm_link_types_node,
     ]

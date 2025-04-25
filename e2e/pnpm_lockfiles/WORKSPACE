@@ -59,7 +59,7 @@ npm_repositories_v90()
 
 [
     npm_translate_lock(
-        name = lockfile.replace(".yaml", ""),
+        name = lockfile,
         pnpm_lock = "//cases/%s:pnpm-lock.yaml" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )

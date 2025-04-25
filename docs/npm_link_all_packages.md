@@ -16,7 +16,7 @@ load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 ## npm_link_all_packages
 
 <pre>
-npm_link_all_packages(<a href="#npm_link_all_packages-name">name</a>, <a href="#npm_link_all_packages-imported_links">imported_links</a>)
+npm_link_all_packages(<a href="#npm_link_all_packages-imported_links">imported_links</a>)
 </pre>
 
 Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
@@ -27,7 +27,6 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
     load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
 
     npm_link_all_packages(
-        name = "node_modules",
         imported_links = [
             npm_link_meaning_of_life,
         ],
@@ -39,7 +38,6 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_all_packages-name"></a>name |  name of catch all target to generate for all packages linked   |  `"node_modules"` |
 | <a id="npm_link_all_packages-imported_links"></a>imported_links |  optional list link functions from manually imported packages that were fetched with npm_import rules.   |  `[]` |
 
 
@@ -48,7 +46,7 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
 ## npm_link_targets
 
 <pre>
-npm_link_targets(<a href="#npm_link_targets-name">name</a>, <a href="#npm_link_targets-package">package</a>)
+npm_link_targets(<a href="#npm_link_targets-package">package</a>)
 </pre>
 
 Generated list of target names that are linked by npm_link_all_packages()
@@ -58,7 +56,6 @@ Generated list of target names that are linked by npm_link_all_packages()
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="npm_link_targets-name"></a>name |  name of catch all target to generate for all packages linked   |  `"node_modules"` |
 | <a id="npm_link_targets-package"></a>package |  Bazel package to generate targets names for.<br><br>Set to an empty string "" to specify the root package.<br><br>If unspecified, the current package (`native.package_name()`) is used.   |  `None` |
 
 **RETURNS**

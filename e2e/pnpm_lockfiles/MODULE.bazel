@@ -93,7 +93,7 @@ npm = use_extension(
 
 [
     npm.npm_translate_lock(
-        name = lockfile.replace(".yaml", ""),
+        name = lockfile,
         pnpm_lock = "//cases/%s:pnpm-lock.yaml" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )
@@ -103,7 +103,7 @@ npm = use_extension(
 [
     use_repo(
         npm,
-        lockfile.replace(".yaml", ""),
+        lockfile,
     )
     for lockfile in PNPM_LOCK_TEST_CASES
 ]

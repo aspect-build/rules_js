@@ -48,19 +48,19 @@ _ATTRS = {
         For example,
 
         ```
-        //:.aspect_rules_js/node_modules/cliui/7.0.4
+        //:.aspect_rules_js/cliui/7.0.4
         ```
 
         The version may include peer dep(s),
 
         ```
-        //:.aspect_rules_js/node_modules/debug/4.3.4_supports-color@8.1.1
+        //:.aspect_rules_js/debug/4.3.4_supports-color@8.1.1
         ```
 
         It could be also be a url based version,
 
         ```
-        //:.aspect_rules_js/node_modules/debug/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
+        //:.aspect_rules_js/debug/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
         ```
 
         Package store link targets names for 3rd party package that come directly from an
@@ -72,7 +72,7 @@ _ATTRS = {
         For example,
 
         ```
-        //:.aspect_rules_js/node_modules/cliui/7.0.4
+        //:.aspect_rules_js/cliui/7.0.4
         ```
 
         Package store link targets names for 1st party packages automatically linked by `npm_link_all_packages`
@@ -82,7 +82,7 @@ _ATTRS = {
         For example,
 
         ```
-        //:.aspect_rules_js/node_modules/@mycorp/mypkg/0.0.0
+        //:.aspect_rules_js/@mycorp/mypkg/0.0.0
         ```
 
         Package store link targets names for 1st party packages manually linked with `npm_link_package`
@@ -91,7 +91,7 @@ _ATTRS = {
         For example,
 
         ```
-        //:.aspect_rules_js/node_modules/@mycorp/mypkg
+        //:.aspect_rules_js/@mycorp/mypkg
         ```
 
         > In typical usage, a node.js program sometimes requires modules which were
@@ -462,8 +462,8 @@ npm_package_store = rule(
 # Invoked by generated package store targets for local packages
 # buildifier: disable=function-docstring
 # buildifier: disable=unnamed-macro
-def npm_local_package_store_internal(link_root_name, package_store_name, package, version, src, deps, visibility, tags):
-    store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
+def npm_local_package_store_internal(package_store_name, package, version, src, deps, visibility, tags):
+    store_target_name = "%s/%s" % (utils.package_store_root, package_store_name)
 
     npm_package_store(
         name = store_target_name,

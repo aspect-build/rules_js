@@ -32,7 +32,6 @@ _FP_STORE_TMPL = \
     """
     if is_root:
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "{package_store_name}",
             src = "{npm_package_target}",
             package = "{package}",
@@ -47,8 +46,8 @@ _FP_DIRECT_TMPL = \
     if bazel_package in {link_packages}:
         # terminal target for direct dependencies
         _npm_link_package_store(
-            name = "{{}}/{pkg}".format(name),
-            src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
+            name = "node_modules/{pkg}",
+            src = "//{root_package}:{package_store_root}/{package_store_name}",
             visibility = {link_visibility},
             tags = ["manual"],
         )
@@ -56,8 +55,8 @@ _FP_DIRECT_TMPL = \
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
         native.filegroup(
-            name = "{{}}/{pkg}/dir".format(name),
-            srcs = [":{{}}/{pkg}".format(name)],
+            name = "node_modules/{pkg}/dir",
+            srcs = [":node_modules/{pkg}"],
             output_group = "{package_directory_output_group}",
             visibility = {link_visibility},
             tags = ["manual"],
@@ -66,7 +65,7 @@ _FP_DIRECT_TMPL = \
 _FP_DIRECT_TARGET_TMPL = \
     """
     if bazel_package in {link_packages}:
-        link_targets.append(":{{}}/{pkg}".format(name))"""
+        link_targets.append(":node_modules/{pkg}")"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -134,7 +133,7 @@ sh_binary(
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
                 package_store_name = utils.package_store_name(raw_package, raw_version)
-                dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
+                dep_store_target = '"//{root_package}:{package_store_root}/{package_store_name}"'.format(
                     root_package = root_package,
                     package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
@@ -181,7 +180,7 @@ sh_binary(
                         raw_deps = importers.get(dep_link).get("deps")
                     for raw_package, raw_version in raw_deps.items():
                         package_store_name = utils.package_store_name(raw_package, raw_version)
-                        dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
+                        dep_store_target = '"//{root_package}:{package_store_root}/{package_store_name}"'.format(
                             root_package = root_package,
                             package_store_name = package_store_name,
                             package_store_root = utils.package_store_root,
@@ -206,7 +205,7 @@ sh_binary(
     npm_link_targets_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(package = None):
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -217,7 +216,7 @@ def npm_link_targets(name = "node_modules", package = None):
     npm_link_all_packages_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(imported_links = []):
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
@@ -229,7 +228,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     scope_targets = {{}}
 
     for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name)
+        new_link_targets, new_scope_targets = link_fn()
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
             if _scope not in scope_targets:
@@ -265,7 +264,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 ),
             )
 
-        stores_bzl.append("""        store_{i}(name)""".format(i = i))
+        stores_bzl.append("""        store_{i}()""".format(i = i))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
@@ -283,14 +282,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             # for each alias of this package
             for link_alias in link_aliases:
                 # link the alias to the underlying package
-                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), link_root_name = name, link_alias = "{alias}")""".format(
+                links_bzl[link_package].append("""            link_{i}("{alias}")""".format(
                     i = i,
                     alias = link_alias,
                 ))
 
                 # expose the alias if public
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_targets = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
+                    add_to_link_targets = """            link_targets.append(":node_modules/{alias}")""".format(alias = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
@@ -404,7 +403,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             ))
 
             if "//visibility:public" in package_visibility:
-                add_to_link_targets = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+                add_to_link_targets = """        link_targets.append(":node_modules/{pkg}")""".format(pkg = fp_package)
                 npm_link_all_packages_bzl.append(add_to_link_targets)
                 package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                 if package_scope:
@@ -414,14 +413,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     npm_link_all_packages_bzl.append("""
     for scope, scoped_targets in scope_targets.items():
         _js_library(
-            name = "{}/{}".format(name, scope),
+            name = "node_modules/{}".format(scope),
             srcs = scoped_targets,
             tags = ["manual"],
             visibility = ["//visibility:public"],
         )
 
     _js_library(
-        name = name,
+        name = "node_modules",
         srcs = link_targets,
         tags = ["manual"],
         visibility = ["//visibility:public"],

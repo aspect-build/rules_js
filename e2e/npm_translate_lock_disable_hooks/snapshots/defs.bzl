@@ -8,7 +8,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 _LINK_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(imported_links = []):
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -20,7 +20,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     scope_targets = {}
 
     for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name)
+        new_link_targets, new_scope_targets = link_fn()
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
             if _scope not in scope_targets:
@@ -28,11 +28,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             scope_targets[_scope].extend(_targets)
 
     if is_root:
-        store_0(name)
+        store_0()
     if link:
         if bazel_package == "":
-            link_0("{}/@aspect-test/c".format(name), link_root_name = name, link_alias = "@aspect-test/c")
-            link_targets.append(":{}/@aspect-test/c".format(name))
+            link_0("@aspect-test/c")
+            link_targets.append(":node_modules/@aspect-test/c")
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
@@ -40,21 +40,21 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
-            name = "{}/{}".format(name, scope),
+            name = "node_modules/{}".format(scope),
             srcs = scoped_targets,
             tags = ["manual"],
             visibility = ["//visibility:public"],
         )
 
     _js_library(
-        name = name,
+        name = "node_modules",
         srcs = link_targets,
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
 
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(package = None):
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -62,5 +62,5 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "":
-            link_targets.append(":{}/@aspect-test/c".format(name))
+            link_targets.append(":node_modules/@aspect-test/c")
     return link_targets

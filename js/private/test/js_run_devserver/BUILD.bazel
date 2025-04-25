@@ -3,7 +3,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/test/js_run_devserver:jasmine/package_json.bzl", jasmine_bin = "bin")
 load(":js_run_devserver_test.bzl", "js_run_devserver_test")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # Checks node_modules symlinks that they refer to exec root (instead of runfiles)
 # in order to make sure bundlers see exactly one node_modules tree. Checks:
