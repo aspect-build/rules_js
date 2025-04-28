@@ -12,7 +12,6 @@ not_windows = select({
 })
 
 npm_link_all_packages(
-    name = "node_modules",
     imported_links = [
         npm_link_meaning_of_life,
     ],
