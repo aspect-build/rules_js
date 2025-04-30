@@ -74,7 +74,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
+_LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -604,6 +604,38 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
+            package_store_name = "test-peer-types@0.0.0",
+            src = "//projects/peer-types:pkg",
+            package = "test-peer-types",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/test-peer-types".format(name),
+            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-peer-types@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/test-peer-types/dir".format(name),
+            srcs = [":{}/test-peer-types".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/test-peer-types".format(name))
+
+    if is_root:
+        _npm_local_package_store(
+            link_root_name = name,
             package_store_name = "a-types@0.0.0",
             src = "//projects/a-types:pkg",
             package = "a-types",
@@ -724,6 +756,9 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if bazel_package in ["<LOCKVERSION>"]:
         link_targets.append(":{}/test-c201-d200".format(name))
+
+    if bazel_package in ["<LOCKVERSION>"]:
+        link_targets.append(":{}/test-peer-types".format(name))
 
     if bazel_package in ["projects/b"]:
         link_targets.append(":{}/a-types".format(name))

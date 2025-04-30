@@ -115,6 +115,9 @@ importers:
       test-c201-d200:
         specifier: workspace:*
         version: link:../projects/peers-combo-1
+      test-peer-types:
+        specifier: ../projects/peer-types
+        version: link:../projects/peer-types
       tslib:
         specifier: ^2.6.3
         version: 2.6.3
@@ -183,6 +186,24 @@ importers:
       '@scoped/b':
         specifier: link:../b
         version: link:../b
+
+  ../projects/peer-types:
+    dependencies:
+      '@scoped/a':
+        specifier: workspace:*
+        version: link:../a
+      '@scoped/b':
+        specifier: link:../b
+        version: link:../b
+      '@scoped/c':
+        specifier: file:../c
+        version: file:../projects/c(@scoped/b@projects+b)
+      hello:
+        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
+        version: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
+      jsonify:
+        specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
+        version: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
 
   ../projects/peers-combo-1:
     dependencies:
