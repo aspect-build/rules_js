@@ -1,5 +1,10 @@
 node_modules/
-cases/node_modules
+cases/versionless-patch-v9/node_modules
+cases/docusaurus-direct-peer-v9/node_modules
+cases/isaacs-cliui-v90/node_modules
+cases/override-with-alias-url-v9/node_modules
+cases/docusaurus-direct-peer-v6/node_modules
+cases/tarball-no-url-v54/node_modules
 projects/a/node_modules
 projects/a-types/node_modules
 projects/b/node_modules

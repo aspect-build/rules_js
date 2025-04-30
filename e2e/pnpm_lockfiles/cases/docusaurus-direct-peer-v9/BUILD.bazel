@@ -1,0 +1,14 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@docusaurus-direct-peer-v9//:defs.bzl", docusaurus_direct_with_peers_v9_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+docusaurus_direct_with_peers_v9_link_all()
+
+build_test(
+    name = "docusaurus_direct_with_peers",
+    targets = [
+        ":node_modules",
+        ":node_modules/@docusaurus/module-type-aliases",
+    ],
+)

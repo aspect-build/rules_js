@@ -14,12 +14,12 @@ PNPM_LOCK_VERSIONS = [
 
 # Lockfiles with unique test cases
 PNPM_LOCK_TEST_CASES = [
-    "tarball-no-url-v54.yaml",
-    "override-with-alias-url-v9.yaml",
-    "isaacs-cliui-v90.yaml",
-    "docusaurus-direct-peer-v6.yaml",
-    "docusaurus-direct-peer-v9.yaml",
-    "versionless-patch-v9.yaml",
+    "tarball-no-url-v54",
+    "override-with-alias-url-v9",
+    "isaacs-cliui-v90",
+    "docusaurus-direct-peer-v6",
+    "docusaurus-direct-peer-v9",
+    "versionless-patch-v9",
 ]
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
@@ -94,7 +94,7 @@ npm = use_extension(
 [
     npm.npm_translate_lock(
         name = lockfile.replace(".yaml", ""),
-        pnpm_lock = "//cases:%s" % lockfile,
+        pnpm_lock = "//cases/%s:pnpm-lock.yaml" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )
     for lockfile in PNPM_LOCK_TEST_CASES

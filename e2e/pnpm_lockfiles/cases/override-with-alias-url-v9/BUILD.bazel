@@ -1,0 +1,14 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@override-with-alias-url-v9//:defs.bzl", override_with_alias_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+override_with_alias_link_all()
+
+build_test(
+    name = "override-with-alias-url-v9",
+    targets = [
+        ":node_modules",
+        "node_modules/lodash.pick",
+    ],
+)
