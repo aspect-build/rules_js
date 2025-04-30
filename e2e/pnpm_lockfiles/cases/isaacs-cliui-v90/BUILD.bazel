@@ -1,0 +1,14 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@isaacs-cliui-v90//:defs.bzl", isaacs_cliui_v90_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+isaacs_cliui_v90_link_all()
+
+build_test(
+    name = "isaacs_cliui",
+    targets = [
+        ":node_modules",
+        ":node_modules/@isaacs/cliui",
+    ],
+)

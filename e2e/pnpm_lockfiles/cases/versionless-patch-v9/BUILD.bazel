@@ -1,0 +1,23 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@versionless-patch-v9//:defs.bzl", versionless_patch_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+versionless_patch_link_all()
+
+build_test(
+    name = "versionless_patch_targets",
+    targets = [
+        ":node_modules",
+        ":node_modules/@aspect-test/e",
+    ],
+)
+
+js_test(
+    name = "versionless_patch_test",
+    data = [
+        ":node_modules/@aspect-test/e",
+    ],
+    entry_point = "versionless-patch.spec.js",
+)
