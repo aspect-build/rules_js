@@ -114,6 +114,7 @@ _ATTRS = {
         """,
         default = [],
     ),
+    "key": attr.string(mandatory = True),
     "package": attr.string(
         doc = """The package name to link to.
 
@@ -183,8 +184,10 @@ def _npm_package_store_impl(ctx):
         fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+    if not ctx.attr.key:
+        fail("No package key specified to link to. Package key must specified explicitly via 'key' attribute")
 
-    package_store_name = utils.package_store_name(package, version)
+    package_store_name = utils.package_store_name(ctx.attr.key)
     package_store_directory = None
 
     # files required to create the package store entry
@@ -342,7 +345,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
             # create a map of deps that have package store directories
             if dep_info.package_store_directory:
-                deps_map[utils.package_store_name(dep_info.package, dep_info.version)] = dep
+                deps_map[utils.package_store_name(dep_info.key)] = dep
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
@@ -352,14 +355,14 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
         for dep in ctx.attr.deps:
             dep_info = dep[NpmPackageStoreInfo]
-            dep_package_store_name = utils.package_store_name(dep_info.package, dep_info.version)
+            dep_package_store_name = utils.package_store_name(dep_info.key)
 
             if package_store_name == dep_package_store_name:
                 # provide the node_modules directory for this package if found in the transitive_closure
                 package_store_directory = dep_info.package_store_directory
 
             for dep_ref_dep, dep_ref_dep_aliases in dep_info.ref_deps.items():
-                dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
+                dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].key)
                 if not dep_ref_dep_package_store_name in deps_map:
                     # This can happen in lifecycle npm package targets. We have no choice but to
                     # ignore reference back to self in dyadic circular deps in this case since a
@@ -417,6 +420,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             transitive_types = types_depset,
         ),
         NpmPackageStoreInfo(
+            key = ctx.attr.key,
             root_package = ctx.label.package,
             package = package,
             version = version,
@@ -462,12 +466,13 @@ npm_package_store = rule(
 # Invoked by generated package store targets for local packages
 # buildifier: disable=function-docstring
 # buildifier: disable=unnamed-macro
-def npm_local_package_store_internal(link_root_name, package_store_name, package, version, src, deps, visibility, tags):
+def npm_local_package_store_internal(link_root_name, package_store_name, key, package, version, src, deps, visibility, tags):
     store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
 
     npm_package_store(
         name = store_target_name,
         src = src,
+        key = key,
         package = package,
         version = version,
         deps = deps,

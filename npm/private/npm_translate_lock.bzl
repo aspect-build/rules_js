@@ -124,9 +124,10 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
-    importers, packages = translate_to_transitive_closure(
+    importers, packages, snapshots = translate_to_transitive_closure(
         state.importers(),
         state.packages(),
+        state.snapshots(),
         rctx.attr.prod,
         rctx.attr.dev,
         rctx.attr.no_optional,
@@ -139,6 +140,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.label_store.label("pnpm_lock"),
         importers,
         packages,
+        snapshots,
         state.patched_dependencies(),
         state.only_built_dependencies(),
         state.root_package(),

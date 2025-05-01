@@ -75,6 +75,7 @@ def npm_link_package(
         # link the package store when linking at the root
         npm_package_store(
             name = store_target_name,
+            key = name,
             src = src,
             deps = deps,
             visibility = ["//visibility:public"],
