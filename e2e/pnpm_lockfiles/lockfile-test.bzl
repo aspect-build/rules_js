@@ -135,6 +135,8 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/test-c200-d200",
             ":node_modules/test-c201-d200",
             ":node_modules/test-peer-types",
+            ":node_modules/test-local-combo-1",
+            ":node_modules/test-local-combo-2",
             ":node_modules/scoped/bad",
             ":node_modules/lodash",
 
