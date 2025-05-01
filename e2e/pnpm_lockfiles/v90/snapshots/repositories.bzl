@@ -273,6 +273,7 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["jsonify"],
+            "projects/peer-types": ["jsonify"],
         },
         package = "@foo/jsonify",
         version = "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
@@ -712,6 +713,7 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["hello"],
+            "projects/peer-types": ["hello"],
         },
         package = "hello",
         version = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",

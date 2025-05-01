@@ -60,7 +60,7 @@ def _package_store_name(pnpm_name, pnpm_version):
     if version.startswith("@"):
         # Special case where the package name should _not_ be included in the package store name.
         # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return version.replace("/", "+")
+        return version.replace("://", "/").replace("/", "+")
     else:
         escaped_name = name.replace("/", "+")
         escaped_version = version.replace("://", "/").replace("/", "+")

@@ -10,6 +10,7 @@ projects/a-types/node_modules
 projects/b/node_modules
 projects/c/node_modules
 projects/d/node_modules
+projects/peer-types/node_modules
 projects/peers-combo-1/node_modules
 projects/peers-combo-2/node_modules
 v54/node_modules/

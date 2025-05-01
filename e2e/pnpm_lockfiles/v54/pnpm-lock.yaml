@@ -54,6 +54,7 @@ importers:
       scoped/bad: link:../projects/b
       test-c200-d200: workspace:*
       test-c201-d200: workspace:*
+      test-peer-types: ../projects/peer-types
       tslib: ^2.6.3
       typescript: 5.5.2
       uvu: 0.5.6
@@ -88,6 +89,7 @@ importers:
       scoped/bad: link:../projects/b
       test-c200-d200: link:../projects/peers-combo-2
       test-c201-d200: link:../projects/peers-combo-1
+      test-peer-types: link:../projects/peer-types
       tslib: 2.8.1
       typescript: 5.5.2
       uvu: 0.5.6
@@ -131,6 +133,9 @@ importers:
       '@scoped/a': workspace:*
     dependencies:
       '@scoped/a': link:../a
+
+  ../projects/peer-types:
+    specifiers: {}
 
   ../projects/peers-combo-1:
     specifiers:

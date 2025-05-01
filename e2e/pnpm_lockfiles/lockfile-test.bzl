@@ -128,6 +128,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@scoped/d",
             ":node_modules/test-c200-d200",
             ":node_modules/test-c201-d200",
+            ":node_modules/test-peer-types",
             ":node_modules/scoped/bad",
             ":node_modules/lodash",
 
