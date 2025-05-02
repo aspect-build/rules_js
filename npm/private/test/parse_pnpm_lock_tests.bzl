@@ -28,11 +28,7 @@ expected_importers = {
 expected_packages = {
     "@aspect-test/a@5.0.0": {
         "name": "@aspect-test/a",
-        "dependencies": {
-            "@aspect-test/b": "5.0.0",
-            "@aspect-test/c": "1.0.0",
-            "@aspect-test/d": "2.0.0_at_aspect-test_c_1.0.0",
-        },
+        "dependencies": {},
         "optional_dependencies": {},
         "dev_only": False,
         "has_bin": True,
@@ -81,11 +77,7 @@ def _parse_lockfile_v5_test_impl(ctx):
         "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
       },
       "hasBin": true,
-      "dependencies": {
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "1.0.0",
-        "@aspect-test/d": "2.0.0_@aspect-test+c@1.0.0"
-      },
+      "dependencies": {},
       "dev": false
     },
     "file:lodash-4.17.21.tgz": {
@@ -135,11 +127,7 @@ def _parse_lockfile_v6_test_impl(ctx):
         "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
       },
       "hasBin": true,
-      "dependencies": {
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "1.0.0",
-        "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
-      },
+      "dependencies": {},
       "dev": false
     },
     "file:lodash-4.17.21.tgz": {
@@ -208,11 +196,7 @@ def _parse_lockfile_v9_test_impl(ctx):
   },
   "snapshots": {
     "@aspect-test/a@5.0.0": {
-      "dependencies": {
-        "@aspect-test/b": "5.0.0",
-        "@aspect-test/c": "1.0.0",
-        "@aspect-test/d": "2.0.0(@aspect-test/c@1.0.0)"
-      }
+      "dependencies": {}
     },
     "lodash@file:lodash-4.17.21.tgz": { }
   }
