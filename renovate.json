@@ -11,6 +11,12 @@
         "group:monorepos",
         "workarounds:all"
     ],
+    "packageRules": [
+        {
+          "matchFiles": ["MODULE.bazel"],
+          "enabled": false
+        }
+    ],
 
     "labels": ["deps"],
 
