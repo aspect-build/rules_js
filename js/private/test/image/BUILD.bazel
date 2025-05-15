@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_binary")
 load(":asserts.bzl", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
@@ -106,4 +107,18 @@ make_js_image_layer(
 assert_js_image_layer_listings(
     name = "custom_layers_nomatch_test",
     js_image_layer = ":custom_layers_nomatch",
+)
+
+# Case 5: transition the edge instead of just the binary
+# bazel run :custom_owner_test_update_all
+make_js_image_layer(
+    name = "js_image_layer_untransitioned",
+    binary = ":bin",
+)
+
+platform_transition_filegroup(
+    name = "transition_js_image_layer",
+    testonly = True,
+    srcs = [":js_image_layer_untransitioned"],
+    target_platform = ":linux_amd64",
 )

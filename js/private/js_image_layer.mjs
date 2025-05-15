@@ -5,7 +5,7 @@ import * as path from 'node:path'
 /**
  * @typedef {{
  *	 is_source: boolean
- *	 is_directory: boolean
+ *: boolean
  *	 is_external: boolean
  *	 dest: string
  *	 root?: string
@@ -89,44 +89,6 @@ async function resolveSymlink(p) {
     }
 }
 
-async function* walk(dir, accumulate = '') {
-    const dirents = await readdir(dir, { withFileTypes: true })
-    for (const dirent of dirents) {
-        let isDirectory = dirent.isDirectory()
-
-        if (
-            dirent.isSymbolicLink() &&
-            !dirent.isDirectory() &&
-            !dirent.isFile()
-        ) {
-            // On OSX we sometimes encounter this bug: https://github.com/nodejs/node/issues/30646
-            // The entry is apparently a symlink, but it's ambiguous whether it's a symlink to a
-            // file or to a directory, and lstat doesn't tell us either. Determine the type by
-            // attempting to read it as a directory.
-
-            try {
-                await readdir(path.join(dir, dirent.name))
-                isDirectory = true
-            } catch (error) {
-                if (error.code === 'ENOTDIR') {
-                    isDirectory = false
-                } else {
-                    throw error
-                }
-            }
-        }
-
-        if (isDirectory) {
-            yield* walk(
-                path.join(dir, dirent.name),
-                path.join(accumulate, dirent.name)
-            )
-        } else {
-            yield path.join(accumulate, dirent.name)
-        }
-    }
-}
-
 function add_parents(mtree, dest) {
     const segments = path.dirname(dest).split('/')
     let prev = ''
@@ -193,8 +155,6 @@ function _mtree_file_line(key, content) {
 }
 
 async function split() {
-    const UID = '{{UID}}'
-    const GID = '{{GID}}'
     const RUNFILES_DIR = '{{RUNFILES_DIR}}'
     const REPO_NAME = '{{REPO_NAME}}'
 
@@ -212,8 +172,7 @@ async function split() {
         if (typeof entries[key] == 'string') {
             continue
         }
-        const { dest, is_directory, is_source, is_external, root, repo_name } =
-            entries[key]
+        const { dest, is_source, is_external, root, repo_name } = entries[key]
 
         /** @type Set<string> */
         let mtree = null
@@ -221,20 +180,6 @@ async function split() {
         const destBuf = Buffer.from(dest + '\n')
 
         /*{{PICK_STATEMENTS}}*/
-
-        // its a treeartifact. expand it and add individual entries.
-        if (is_directory) {
-            for await (const sub_key of walk(dest)) {
-                const new_key = key + '/' + sub_key
-                const new_dest = dest + '/' + sub_key
-
-                add_parents(mtree, new_key)
-                mtree.add(_mtree_file_line(new_key, new_dest))
-            }
-            // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
-            splitterUnusedInputs.write(destBuf)
-            continue
-        }
 
         // create parents of current path.
         add_parents(mtree, key)

@@ -26,7 +26,7 @@ _DEFAULT_LAYER_GROUPS = {
 
 _DOC = """Create container image layers from js_binary targets.
 
-By design, js_image_layer doesn't have any preference over which rule assembles the container image. 
+By design, js_image_layer doesn't have any preference over which rule assembles the container image.
 This means the downstream rule (`oci_image` from [rules_oci](https://github.com/bazel-contrib/rules_oci)
 or `container_image` from [rules_docker](https://github.com/bazelbuild/rules_docker)) must
 set a proper `workdir` and `cmd` to for the container work.
@@ -264,7 +264,7 @@ container_image(
 ```
 
 
-## Performance 
+## Performance
 
 For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
 
@@ -436,7 +436,7 @@ def _to_rlocation_path(file, workspace):
 def _repo_mapping_manifest(files_to_run):
     return getattr(files_to_run, "repo_mapping_manifest", None)
 
-_ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"is_directory":%s,"repo_name":"%s"},\n%s:"%s"'
+_ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"repo_name":"%s"},\n%s:"%s"'
 
 def _js_image_layer_impl(ctx):
     if ctx.attr.generate_empty_layers:
@@ -464,22 +464,47 @@ def _js_image_layer_impl(ctx):
 
     # be careful about what you access outside of the function closure. accessing objects
     # such as ctx within this function will make it significantly slower.
-    def map_entry(f, _):
+    def map_entry(f, expander):
         runfiles_dest = runfiles_dir + "/" + _to_rlocation_path(f, workspace_name)
         path = json.encode(f.path)
-        return _ENTRY % (
-            runfiles_dest,
-            path,
-            f.root.path,
-            "true" if f.owner.repo_name != "" else "false",
-            "true" if f.is_source else "false",
-            "true" if f.is_directory else "false",
-            f.owner.repo_name,
-            # To avoid O(N ^ N) complexity when searching for entries by their destination
-            # the map also has to have entries by their path on bazel-out,
-            path,
-            runfiles_dest,
-        )
+        if not f.is_directory:
+            return _ENTRY % (
+                runfiles_dest,
+                path,
+                f.root.path,
+                "true" if f.owner.repo_name != "" else "false",
+                "true" if f.is_source else "false",
+                f.owner.repo_name,
+                # To avoid O(N ^ N) complexity when searching for entries by their destination
+                # the map also has to have entries by their path on bazel-out,
+                path,
+                runfiles_dest,
+            )
+        else:
+            # Directory expansion needs to happen during execution phase to
+            # correctly track the contents of the treeartifact.
+            tree = expander.expand(f)
+            contents = ""
+            for f in tree:
+                # only add command after first iteration.
+                if contents:
+                    contents += ","
+
+                runfiles_dest = runfiles_dest + f.tree_relative_path
+                path = path + f.tree_relative_path
+                contents += _ENTRY % (
+                    runfiles_dest,
+                    path,
+                    f.root.path,
+                    "true" if f.owner.repo_name != "" else "false",
+                    "true" if f.is_source else "false",
+                    f.owner.repo_name,
+                    # To avoid O(N ^ N) complexity when searching for entries by their destination
+                    # the map also has to have entries by their path on bazel-out,
+                    path,
+                    runfiles_dest,
+                )
+            return contents
 
     entries = ctx.actions.args()
     entries.set_param_file_format("multiline")
@@ -492,7 +517,7 @@ def _js_image_layer_impl(ctx):
     )
     entries.add_all(
         runfiles_plus_files,
-        expand_directories = False,
+        expand_directories = True,
         map_each = map_entry,
         allow_closure = True,
         before_each = ",",
@@ -638,8 +663,8 @@ By default symlinks within the `node_modules` is preserved.
         ),
         "layer_groups": attr.string_dict(
             doc = """Layer groups to create.
-These are utilized to categorize files into distinct layers, determined by their respective paths. 
-The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and 
+These are utilized to categorize files into distinct layers, determined by their respective paths.
+The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and
 JavaScript identifier (alphanumeric characters), and <value> MAY be either an empty string (signifying a universal match)
 or a valid regular expression.""",
         ),
