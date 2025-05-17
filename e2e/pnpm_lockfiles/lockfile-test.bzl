@@ -104,6 +104,9 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@types/node",
 
             # Direct 'optionalDependencies'
+            ":node_modules/@aspect-test/h-is-only-optional",
+
+            # Direct optional + dev
             ":node_modules/@aspect-test/c",
 
             # rollup has a 'optionalDependency' (fsevents)
