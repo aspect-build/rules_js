@@ -129,6 +129,114 @@ export function friendlyFileSize(bytes) {
     )
 }
 
+async function syncSymlink(src, dst, sandbox, exists) {
+    const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
+    let symlinkMeta = ''
+    if (isNodeModulePath(src)) {
+        let linkPath = await fs.promises.readlink(src)
+        if (path.isAbsolute(linkPath)) {
+            linkPath = path.relative(src, linkPath)
+        }
+        // Special case for 1p node_modules symlinks
+        const maybe1pSync = path.normalize(
+            path.join(sandbox, srcWorkspacePath, linkPath)
+        )
+        if (fs.existsSync(maybe1pSync)) {
+            src = maybe1pSync
+            symlinkMeta = '1p'
+        }
+        if (!symlinkMeta) {
+            // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
+            // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
+            const maybeBinSrc = path.join(
+                process.env.JS_BINARY__EXECROOT,
+                process.env.JS_BINARY__BINDIR,
+                srcWorkspacePath
+            )
+            if (fs.existsSync(maybeBinSrc)) {
+                src = maybeBinSrc
+                symlinkMeta = 'bazel-out'
+            }
+        }
+    }
+    if (process.env.JS_BINARY__LOG_DEBUG) {
+        console.error(
+            `Syncing symlink ${srcWorkspacePath}${
+                symlinkMeta ? ` (${symlinkMeta})` : ''
+            }`
+        )
+    }
+    if (exists) {
+        await fs.promises.unlink(dst)
+    } else {
+        // Intentionally synchronous; see comment on mkdirpSync
+        mkdirpSync(path.dirname(dst))
+    }
+    await fs.promises.symlink(src, dst)
+    return 1
+}
+
+async function syncDirectory(src, dst, sandbox, exists, writePerm) {
+    if (process.env.JS_BINARY__LOG_DEBUG) {
+        console.error(
+            `Syncing directory ${src.slice(RUNFILES_ROOT.length + 1)}...`
+        )
+    }
+    const contents = await fs.promises.readdir(src)
+    if (!exists) {
+        // Intentionally synchronous; see comment on mkdirpSync
+        mkdirpSync(dst)
+    }
+    return (
+        await Promise.all(
+            contents.map(
+                async (entry) =>
+                    await syncRecursive(
+                        path.join(src, entry),
+                        path.join(dst, entry),
+                        sandbox,
+                        writePerm
+                    )
+            )
+        )
+    ).reduce((s, t) => s + t, 0)
+}
+
+async function syncFile(src, dst, exists, lstat, writePerm) {
+    if (process.env.JS_BINARY__LOG_DEBUG) {
+        console.error(
+            `Syncing file ${src.slice(
+                RUNFILES_ROOT.length + 1
+            )} (${friendlyFileSize(lstat.size)})`
+        )
+    }
+    if (exists) {
+        await fs.promises.unlink(dst)
+    } else {
+        // Intentionally synchronous; see comment on mkdirpSync
+        mkdirpSync(path.dirname(dst))
+    }
+
+    await withRetry(
+        () => fs.promises.copyFile(src, dst),
+        `copyFile from ${src} to ${dst}`
+    )
+
+    if (writePerm) {
+        const s = await fs.promises.stat(dst)
+        const mode = s.mode | fs.constants.S_IWUSR
+        if (process.env.JS_BINARY__LOG_DEBUG) {
+            console.error(
+                `Adding write permissions to file ${src.slice(
+                    RUNFILES_ROOT.length + 1
+                )}: ${(mode & parseInt('777', 8)).toString(8)}`
+            )
+        }
+        await fs.promises.chmod(dst, mode)
+    }
+    return 1
+}
+
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
@@ -154,69 +262,9 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
         const exists = syncedTime.has(src) || fs.existsSync(dst)
         syncedTime.set(src, lstat.mtimeMs)
         if (lstat.isSymbolicLink()) {
-            const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
-            let symlinkMeta = ''
-            if (isNodeModulePath(src)) {
-                let linkPath = await fs.promises.readlink(src)
-                if (path.isAbsolute(linkPath)) {
-                    linkPath = path.relative(src, linkPath)
-                }
-                // Special case for 1p node_modules symlinks
-                const maybe1pSync = path.normalize(
-                    path.join(sandbox, srcWorkspacePath, linkPath)
-                )
-                if (fs.existsSync(maybe1pSync)) {
-                    src = maybe1pSync
-                    symlinkMeta = '1p'
-                }
-                if (!symlinkMeta) {
-                    // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
-                    // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
-                    const maybeBinSrc = path.join(
-                        process.env.JS_BINARY__EXECROOT,
-                        process.env.JS_BINARY__BINDIR,
-                        srcWorkspacePath
-                    )
-                    if (fs.existsSync(maybeBinSrc)) {
-                        src = maybeBinSrc
-                        symlinkMeta = 'bazel-out'
-                    }
-                }
-            }
-            if (process.env.JS_BINARY__LOG_DEBUG) {
-                console.error(
-                    `Syncing symlink ${srcWorkspacePath}${
-                        symlinkMeta ? ` (${symlinkMeta})` : ''
-                    }`
-                )
-            }
-            if (exists) {
-                await fs.promises.unlink(dst)
-            } else {
-                // Intentionally synchronous; see comment on mkdirpSync
-                mkdirpSync(path.dirname(dst))
-            }
-            await fs.promises.symlink(src, dst)
-            return 1
+            return syncSymlink(src, dst, sandbox, exists)
         } else if (lstat.isDirectory()) {
-            const contents = await fs.promises.readdir(src)
-            if (!exists) {
-                // Intentionally synchronous; see comment on mkdirpSync
-                mkdirpSync(dst)
-            }
-            return (
-                await Promise.all(
-                    contents.map(
-                        async (entry) =>
-                            await syncRecursive(
-                                path.join(src, entry),
-                                path.join(dst, entry),
-                                sandbox,
-                                writePerm
-                            )
-                    )
-                )
-            ).reduce((s, t) => s + t, 0)
+            return syncDirectory(src, dst, sandbox, exists, writePerm)
         } else {
             const lastChecksum = syncedChecksum.get(src)
             const checksum = await generateChecksum(src)
@@ -233,38 +281,7 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
             }
             syncedChecksum.set(src, checksum)
 
-            if (process.env.JS_BINARY__LOG_DEBUG) {
-                console.error(
-                    `Syncing file ${src.slice(
-                        RUNFILES_ROOT.length + 1
-                    )} (${friendlyFileSize(lstat.size)})`
-                )
-            }
-            if (exists) {
-                await fs.promises.unlink(dst)
-            } else {
-                // Intentionally synchronous; see comment on mkdirpSync
-                mkdirpSync(path.dirname(dst))
-            }
-
-            await withRetry(
-                () => fs.promises.copyFile(src, dst),
-                `copyFile from ${src} to ${dst}`
-            )
-
-            if (writePerm) {
-                const s = await fs.promises.stat(dst)
-                const mode = s.mode | fs.constants.S_IWUSR
-                if (process.env.JS_BINARY__LOG_DEBUG) {
-                    console.error(
-                        `Adding write permissions to file ${src.slice(
-                            RUNFILES_ROOT.length + 1
-                        )}: ${(mode & parseInt('777', 8)).toString(8)}`
-                    )
-                }
-                await fs.promises.chmod(dst, mode)
-            }
-            return 1
+            return syncFile(src, dst, exists, lstat, writePerm)
         }
     } catch (e) {
         console.error(e)
@@ -332,7 +349,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 }
 
 // Sync list of files to the sandbox
-async function syncFiles(files, sandbox, writePerm) {
+async function syncFiles(files, sandbox, writePerm, doSync) {
     console.error(`+ Syncing ${files.length} files & folders...`)
     const startTime = perf_hooks.performance.now()
 
@@ -368,7 +385,7 @@ async function syncFiles(files, sandbox, writePerm) {
             otherFiles.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, sandbox, writePerm)
+                return await doSync(src, dst, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -386,7 +403,7 @@ async function syncFiles(files, sandbox, writePerm) {
             packageStore1pDeps.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, sandbox, writePerm)
+                return await doSync(src, dst, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -403,7 +420,7 @@ async function syncFiles(files, sandbox, writePerm) {
             otherNodeModulesFiles.map(async (file) => {
                 const src = path.join(RUNFILES_ROOT, file)
                 const dst = path.join(sandbox, file)
-                return await syncRecursive(src, dst, sandbox, writePerm)
+                return await doSync(src, dst, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -425,47 +442,84 @@ async function main(args, sandbox) {
 
     const config = JSON.parse(await fs.promises.readFile(configPath))
 
+    const cwd = process.env.JS_BINARY__CHDIR
+        ? path.join(sandbox, process.env.JS_BINARY__CHDIR)
+        : sandbox
+
+    const tool = config.tool
+        ? path.join(RUNFILES_ROOT, config.tool)
+        : config.command
+
+    const toolArgs = args.slice(1)
+
+    console.error(`Running '${tool} ${toolArgs.join(' ')}' in ${cwd}\n\n`)
+
+    const env = {
+        ...process.env,
+        BAZEL_BINDIR: '.', // no load bearing but it may be depended on by users
+        JS_BINARY__CHDIR: '',
+        JS_BINARY__NO_CD_BINDIR: '1',
+    }
+
+    if (config.use_execroot_entry_point) {
+        // Configure a potential js_binary tool to use the execroot entry_point.
+        // js_run_devserver is a special case where we need to set the BAZEL_BINDIR
+        // to determine the execroot entry point but since the tool is running
+        // in a custom sandbox we don't want to cd into the BAZEL_BINDIR in the launcher
+        // (JS_BINARY__NO_CD_BINDIR is set above)
+        env['JS_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
+        env['BAZEL_BINDIR'] = config.bazel_bindir
+        if (config.allow_execroot_entry_point_with_no_copy_data_to_bin) {
+            env[
+                'JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN'
+            ] = '1'
+        }
+    }
+
+    let exitCode
+    if (process.env.ABAZEL_WATCH_SOCKET_FILE) {
+        exitCode = await runWatchProtocol(
+            config,
+            configPath,
+            sandbox,
+            cwd,
+            tool,
+            toolArgs,
+            env
+        )
+    } else {
+        exitCode = await runIBazelProtocol(
+            config,
+            configPath,
+            sandbox,
+            cwd,
+            tool,
+            toolArgs,
+            env
+        )
+    }
+
+    console.error(`child tool process exited with code ${exitCode}`)
+    process.exit(exitCode)
+}
+
+async function runIBazelProtocol(
+    config,
+    configPath,
+    sandbox,
+    cwd,
+    tool,
+    toolArgs,
+    env
+) {
     await syncFiles(
         config.data_files,
         sandbox,
-        config.grant_sandbox_write_permissions
+        config.grant_sandbox_write_permissions,
+        syncRecursive
     )
 
     return new Promise((resolve) => {
-        const cwd = process.env.JS_BINARY__CHDIR
-            ? path.join(sandbox, process.env.JS_BINARY__CHDIR)
-            : sandbox
-
-        const tool = config.tool
-            ? path.join(RUNFILES_ROOT, config.tool)
-            : config.command
-
-        const toolArgs = args.slice(1)
-
-        console.error(`Running '${tool} ${toolArgs.join(' ')}' in ${cwd}\n\n`)
-
-        const env = {
-            ...process.env,
-            BAZEL_BINDIR: '.', // no load bearing but it may be depended on by users
-            JS_BINARY__CHDIR: '',
-            JS_BINARY__NO_CD_BINDIR: '1',
-        }
-
-        if (config.use_execroot_entry_point) {
-            // Configure a potential js_binary tool to use the execroot entry_point.
-            // js_run_devserver is a special case where we need to set the BAZEL_BINDIR
-            // to determine the execroot entry point but since the tool is running
-            // in a custom sandbox we don't want to cd into the BAZEL_BINDIR in the launcher
-            // (JS_BINARY__NO_CD_BINDIR is set above)
-            env['JS_BINARY__USE_EXECROOT_ENTRY_POINT'] = '1'
-            env['BAZEL_BINDIR'] = config.bazel_bindir
-            if (config.allow_execroot_entry_point_with_no_copy_data_to_bin) {
-                env[
-                    'JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN'
-                ] = '1'
-            }
-        }
-
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
             env: env,
@@ -481,11 +535,7 @@ async function main(args, sandbox) {
             stdio: ['pipe', 'inherit', 'inherit'],
         })
 
-        proc.on('close', (code) => {
-            console.error(`child tool process exited with code ${code}`)
-            resolve()
-            process.exit(code)
-        })
+        proc.on('close', resolve)
 
         // Process stdin data in order using a promise chain.
         let syncing = Promise.resolve()
@@ -520,7 +570,8 @@ async function main(args, sandbox) {
                         syncFiles(
                             updatedDataFiles,
                             sandbox,
-                            config.grant_sandbox_write_permissions
+                            config.grant_sandbox_write_permissions,
+                            syncRecursive
                         ),
                     ])
 
@@ -548,6 +599,130 @@ async function main(args, sandbox) {
             }
         }
     })
+}
+
+async function runWatchProtocol(
+    config,
+    configPath,
+    sandbox,
+    cwd,
+    tool,
+    toolArgs,
+    env
+) {
+    // Configure the watch protocol
+    const w = new AspectWatchProtocol(process.env.ABAZEL_WATCH_SOCKET_FILE)
+    w.onError((err) =>
+        console.error(
+            `js_run_devserver[WATCH]: error received from aspect watch server: `,
+            err
+        )
+    )
+    w.onCycle(watchProtocolCycle.bind(null, config, configPath, sandbox))
+
+    // Connect to the watch protocol server and begin listening for cycles
+    await w.connect()
+
+    console.error(
+        `js_run_devserver[WATCH]: Connected to aspect watch server at ${w.socketFile}`
+    )
+
+    await w.awaitFirstCycle()
+
+    console.error(`js_run_devserver[WATCH]: Initialized sandbox ${sandbox}`)
+
+    // Start the child process async *after* establishing the connection
+    const procPromise = new Promise((resolve) => {
+        const proc = child_process.spawn(tool, toolArgs, {
+            cwd,
+            env,
+            stdio: 'inherit',
+        })
+        proc.on('close', resolve)
+    })
+
+    // Run until either the child process exits or the watch protocol connection is closed.
+    await Promise.any([procPromise, w.cycle()])
+
+    // Close the watch protocol connection, return the process exit code
+    try {
+        await w.disconnect()
+    } catch (_) {
+        // Ignore errors on disconnect, the connection may have already been closed
+        // by the child process or the watch protocol server.
+    }
+    return await procPromise
+}
+
+async function watchProtocolCycle(config, configPath, sandbox, cycle) {
+    const oldFiles = config.data_files
+
+    // Re-parse the config file to get the latest list of data files to copy
+    const newFiles = JSON.parse(
+        await fs.promises.readFile(configPath)
+    ).data_files
+
+    // Only sync files changed in the current cycle.
+    const filesToSync = newFiles.filter((f) =>
+        cycle.sources.hasOwnProperty(`${process.env.JS_BINARY__WORKSPACE}/${f}`)
+    )
+
+    await Promise.all([
+        // Remove files that were previously synced but are no longer in the updated list of files to sync
+        deleteFiles(oldFiles, newFiles, sandbox),
+
+        // Sync changed files
+        syncFiles(
+            filesToSync,
+            sandbox,
+            config.grant_sandbox_write_permissions,
+            cycleSyncRecurse.bind(null, cycle)
+        ),
+    ])
+
+    // The latest state of copied data files
+    config.data_files = newFiles
+}
+
+async function cycleSyncRecurse(cycle, src, dst, sandbox, writePerm) {
+    // Assume it exists if it has been synced before.
+    const exists = syncedTime.has(src)
+
+    // Assume it was updated 'now()' since we know it changed
+    // TODO: potentially fetch mtime from cycle.sources[src].mtime?
+    syncedTime.set(src, Date.now())
+
+    const srcRunfilesPath = src.startsWith(process.env.JS_BINARY__RUNFILES)
+        ? src.slice(process.env.JS_BINARY__RUNFILES.length + 1)
+        : src
+
+    // The cycleSyncRecurse function should only be called for files directly from the CYCLE event.
+    if (!(srcRunfilesPath in cycle.sources)) {
+        throw new Error(`File ${srcRunfilesPath} is not in the cycle sources`)
+    }
+
+    if (cycle.sources[srcRunfilesPath].is_symlink) {
+        return syncSymlink(src, dst, sandbox, exists)
+    }
+
+    let isDirectory = false
+    let lstat = null
+    if (isNodeModulePath(src)) {
+        // A node_modules path which is not a symlink is always a directory
+        isDirectory = true
+    } else {
+        // Otherwise a fs.lstat is needed to determine if it is a directory
+        // TODO: move to protocol capability that expands directories
+        lstat = await fs.promises.lstat(src)
+
+        isDirectory = lstat.isDirectory()
+    }
+
+    if (isDirectory) {
+        return syncDirectory(src, dst, sandbox, exists, writePerm)
+    } else {
+        return syncFile(src, dst, exists, lstat, writePerm)
+    }
 }
 
 ;(async () => {
@@ -597,4 +772,132 @@ function onProcessEnd(callback) {
     process.on('SIGINT', callback)
 
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
+}
+
+// AspectWatchProtocol ------------------------------------------------------------
+// TODO: generalize more to be usable by other tools, not just js_run_devserver, move to own file.
+import * as net from 'node:net'
+
+class AspectWatchProtocol {
+    constructor(socketFile) {
+        this.socketFile = socketFile
+        this.connection = new net.Socket({})
+
+        // Propagate connection errors to a configurable callback
+        this._error = console.error
+        this.connection.on('error', (err) => {
+            this._error(err)
+        })
+    }
+
+    async connect() {
+        await new Promise((resolve, reject) => {
+            // Initial connection + success vs failure
+            this.connection.once('error', reject)
+            this.connection.once('connect', resolve)
+            this.connection.connect({ path: this.socketFile })
+        })
+
+        await this._receive('NEGOTIATE')
+        // TODO: throw if unsupported version
+        await this._send('NEGOTIATE_RESPONSE', { version: 0 })
+
+        return this
+    }
+
+    async disconnect() {
+        if (this.connection.writable) {
+            await this._send('EXIT')
+            await new Promise((resolve) => this.connection.end(resolve))
+        }
+
+        return this
+    }
+
+    onError(callback) {
+        this._error = callback
+    }
+
+    onCycle(callback) {
+        this._cycle = callback
+    }
+
+    async awaitFirstCycle() {
+        await this.cycle(true)
+    }
+
+    async cycle(once) {
+        do {
+            // Only receive a cycle messages, forever up until the connection is closed.
+            // Connection errors will propagate.
+            const cycleMsg = await this._receive('CYCLE')
+
+            // Invoke the cycle callback while recording+logging errors
+            let cycleError = null
+            try {
+                await this._cycle(cycleMsg)
+            } catch (e) {
+                this._error((cycleError = e))
+            }
+
+            // Respond with COMPLETE or FAILED for this cycle.
+            // Connection errors will propagate.
+            if (cycleError) {
+                await this._send('CYCLE_FAILED', {
+                    cycle_id: cycleMsg.cycle_id,
+                    description: cycleError.message,
+                })
+            } else {
+                await this._send('CYCLE_COMPLETED', {
+                    cycle_id: cycleMsg.cycle_id,
+                })
+            }
+        } while (!once && this.connection.readable && this.connection.writable)
+    }
+
+    async _receive(type = null) {
+        return new Promise((resolve, reject) => {
+            let line = ''
+            const dataReceived = (data) => {
+                line += data.toString()
+                if (!line.endsWith('\n')) {
+                    return
+                }
+
+                this.connection.off('data', dataReceived)
+
+                try {
+                    const msg = JSON.parse(line.trim())
+                    if (type && msg.kind !== type) {
+                        reject(
+                            new Error(
+                                `Expected message kind ${type}, got ${msg.kind}`
+                            )
+                        )
+                    } else {
+                        resolve(msg)
+                    }
+                } catch (e) {
+                    reject(e)
+                }
+            }
+
+            this.connection.on('data', dataReceived)
+        })
+    }
+
+    async _send(type, data = {}) {
+        return new Promise((resolve, reject) => {
+            this.connection.write(
+                JSON.stringify({ kind: type, ...data }) + '\n',
+                function (err) {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve()
+                    }
+                }
+            )
+        })
+    }
 }
