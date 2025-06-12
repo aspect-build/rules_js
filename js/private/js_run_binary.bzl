@@ -43,6 +43,7 @@ def js_run_binary(
         execution_requirements = None,
         stamp = 0,
         patch_node_fs = True,
+        patch_node_esm_loader = False,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         use_default_shell_env = None,
         **kwargs):
@@ -224,6 +225,8 @@ def js_run_binary(
             When disabled, node programs can leave the execroot, runfiles and sandbox by following symlinks
             which can lead to non-hermetic behavior.
 
+        patch_node_esm_loader: additionally patch the Node.js ESM loader
+
         allow_execroot_entry_point_with_no_copy_data_to_bin: Turn off validation that the `js_binary` tool
             has `copy_data_to_bin` set to True when `use_execroot_entry_point` is set to True.
 
@@ -337,6 +340,11 @@ WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' in
     # Disable node patches if requested
     if patch_node_fs:
         fixed_env["JS_BINARY__PATCH_NODE_FS"] = "1"
+
+        if patch_node_esm_loader:
+            fixed_env["JS_BINARY__PATCH_NODE_ESM_LOADER"] = "1"
+        else:
+            fixed_env["JS_BINARY__PATCH_NODE_ESM_LOADER"] = "0"
     else:
         # Set explicitly to "0" so disable overrides any enable in the js_binary
         fixed_env["JS_BINARY__PATCH_NODE_FS"] = "0"

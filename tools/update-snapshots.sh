@@ -107,6 +107,7 @@ run_target "$REPO_ROOT" "//js/private/test/image:default_test_update_all" "js/pr
 run_target "$REPO_ROOT" "//js/private/test/image:custom_owner_test_update_all" "js/private/test/image custom_owner" "--enable_bzlmod=true"
 run_target "$REPO_ROOT" "//js/private/test/image:regex_edge_cases_test_update_all" "js/private/test/image regex_edge_cases" "--enable_bzlmod=true"
 run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_update_all" "js/private/test/image custom_layers_nomatch" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test/image/non_ascii:assert_custom_layer_groups_test_app" "js/private/test/image default" "--enable_bzlmod=true"
 
 ##############################################################################
 # GENERATED SOURCES

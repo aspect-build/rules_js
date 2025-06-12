@@ -18,5 +18,5 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/
 -r-xr-xr-x  0 0      0       xxxxx Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/bin
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/
--r-xr-xr-x  0 0      0         133 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/node
+-r-xr-xr-x  0 0      0         303 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/node
 -r-xr-xr-x  0 0      0          20 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/main.js
