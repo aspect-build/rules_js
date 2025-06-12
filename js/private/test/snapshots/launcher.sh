@@ -12,6 +12,7 @@
 
 set -o pipefail -o errexit -o nounset
 
+export JS_BINARY__PATCH_NODE_ESM_LOADER="0"
 export JS_BINARY__BINDIR="bazel-out/k8-fastbuild/bin"
 export JS_BINARY__COMPILATION_MODE="fastbuild"
 export JS_BINARY__TARGET_CPU="k8"

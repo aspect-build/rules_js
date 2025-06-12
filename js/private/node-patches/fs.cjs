@@ -39,6 +39,7 @@ var __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _ar
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.patcher = patcher;
 exports.isSubPath = isSubPath;
+exports.resolvePathLike = resolvePathLike;
 exports.escapeFunction = escapeFunction;
 const path = require("path");
 const util = require("util");
@@ -65,7 +66,7 @@ const PATCHED_FS_METHODS = [
  * Function that patches the `fs` module to not escape the given roots.
  * @returns a function to undo the patches.
  */
-function patcher(roots) {
+function patcher(roots, useInternalLstatPatch = false) {
     if (fs._unpatched) {
         throw new Error('FS is already patched.');
     }
@@ -99,6 +100,15 @@ function patcher(roots) {
     const origRealpathSyncNative = fs.realpathSync
         .native;
     const { canEscape, isEscape } = escapeFunction(roots);
+    // =========================================================================
+    // fsInternal.lstat (to patch ESM resolve's `realpathSync`!)
+    // =========================================================================
+    let unpatchEsm;
+    if (useInternalLstatPatch) {
+        const lstatEsmPatcher = new (require('./fs_stat.cjs').FsInternalStatPatcher)({ canEscape, isEscape }, guardedReadLink, guardedReadLinkSync, unguardedRealPath, unguardedRealPathSync);
+        lstatEsmPatcher.patch();
+        unpatchEsm = lstatEsmPatcher.revert.bind(lstatEsmPatcher);
+    }
     // =========================================================================
     // fs.lstat
     // =========================================================================
@@ -388,7 +398,9 @@ function patcher(roots) {
     let unpatchPromises;
     if (promisePropertyDescriptor) {
         const promises = {};
-        promises.lstat = util.promisify(fs.lstat);
+        if (!useInternalLstatPatch) {
+            promises.lstat = util.promisify(fs.lstat);
+        }
         // NOTE: node core uses the newer realpath function fs.promises.native instead of fs.realPath
         promises.realpath = util.promisify(fs.realpath.native);
         promises.readlink = util.promisify(fs.readlink);
@@ -764,6 +776,9 @@ function patcher(roots) {
         delete fs._unpatched;
         if (unpatchPromises) {
             unpatchPromises();
+        }
+        if (unpatchEsm) {
+            unpatchEsm();
         }
         // Re-sync the esm modules to revert to the unpatched module.
         esmModule.syncBuiltinESMExports();
