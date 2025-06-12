@@ -53,9 +53,24 @@ const PATCHED_FS_METHODS: ReadonlyArray<keyof typeof FsType> = [
 
 /**
  * Function that patches the `fs` module to not escape the given roots.
+ *
+ * NOTE: internally Node may call back to `fs.*` methods for example
+ *      realpath: https://github.com/nodejs/node/blob/v24.12.0/lib/fs.js#L2927
+ *                https://github.com/nodejs/node/blob/v24.12.0/lib/fs.js#L2951-L2957
+ *
+ *      writeFile: https://github.com/nodejs/node/blob/v24.12.0/lib/fs.js#L2372
+ *
+ *      ... many other places.
+ *
+ * However in other scenarios such as ESM module resolution it uses internal invocations
+ * that can not be patched via `fs.*` methods.
+ *
  * @returns a function to undo the patches.
  */
-export function patcher(roots: string[]): () => void {
+export function patcher(
+    roots: string[],
+    useInternalLstatPatch: boolean = false
+): () => void {
     if (fs._unpatched) {
         throw new Error('FS is already patched.')
     }
@@ -105,6 +120,25 @@ export function patcher(roots: string[]): () => void {
         .native as typeof FsType.realpathSync.native
 
     const { canEscape, isEscape } = escapeFunction(roots)
+
+    // =========================================================================
+    // fsInternal.lstat (to patch ESM resolve's `realpathSync`!)
+    // =========================================================================
+    let unpatchEsm: Function | undefined
+    if (useInternalLstatPatch) {
+        const lstatEsmPatcher =
+            new (require('./fs_stat.cjs').FsInternalStatPatcher)(
+                { canEscape, isEscape },
+                guardedReadLink,
+                guardedReadLinkSync,
+                unguardedRealPath,
+                unguardedRealPathSync
+            )
+
+        lstatEsmPatcher.patch()
+
+        unpatchEsm = lstatEsmPatcher.revert.bind(lstatEsmPatcher)
+    }
 
     // =========================================================================
     // fs.lstat
@@ -919,6 +953,10 @@ export function patcher(roots: string[]): () => void {
             unpatchPromises()
         }
 
+        if (unpatchEsm) {
+            unpatchEsm()
+        }
+
         // Re-sync the esm modules to revert to the unpatched module.
         esmModule.syncBuiltinESMExports()
     }
@@ -943,7 +981,7 @@ function stringifyPathLike(p: PathLike): string {
     }
 }
 
-function resolvePathLike(p: PathLike): string {
+export function resolvePathLike(p: PathLike): string {
     return path.resolve(stringifyPathLike(p))
 }
 

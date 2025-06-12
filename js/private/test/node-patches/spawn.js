@@ -16,7 +16,12 @@ async function it(_, fn) {
 describe('child_process node path', async () => {
     function assertNodePath({ stdout, stderr, code, error }) {
         // Process errors
-        if (stderr?.toString().trim()) {
+        if (
+            stderr
+                ?.toString()
+                .replace(/.*internal\/test\/binding.*\.\n.*/, '')
+                .trim()
+        ) {
             throw new Error(`Received stderr: ${stderr.toString()}`)
         } else if (code) {
             throw new Error(`Exit code: ${code}`)
@@ -128,7 +133,12 @@ describe('child_process node path', async () => {
 describe('child_process patch depth', async () => {
     function assertPatchDepth({ stdout, stderr, code, error }) {
         // Process errors
-        if (stderr?.toString().trim()) {
+        if (
+            stderr
+                ?.toString()
+                .replace(/.*internal\/test\/binding.*\.\n.*/, '')
+                .trim()
+        ) {
             throw new Error(`Received stderr: ${stderr.toString()}`)
         } else if (code) {
             throw new Error(`Exit code: ${code}`)
