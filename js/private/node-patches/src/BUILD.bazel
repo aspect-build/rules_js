@@ -4,18 +4,24 @@ typescript_bin.tsc(
     name = "compile",
     srcs = [
         "fs.cts",
+        "fs_stat.cts",
+        "fs_stat_types.d.cts",
         "tsconfig.json",
         "//:node_modules/@types/node",
     ],
     outs = [
         "fs.cjs",
+        "fs_stat.cjs",
     ],
     args = [
         "-p",
         "tsconfig.json",
     ],
     chdir = package_name(),
-    visibility = ["//js/private/test/node-patches:__pkg__"],
+    visibility = [
+        "//js/private/node-patches:__pkg__",
+        "//js/private/test/node-patches:__pkg__",
+    ],
 )
 
 genrule(

@@ -2,4 +2,13 @@
 
 set -o pipefail -o errexit -o nounset
 
-exec "$JS_BINARY__NODE_BINARY" --require "$JS_BINARY__NODE_PATCHES" "$@"
+if [[ "${JS_BINARY__PATCH_NODE_ESM_LOADER:-}" == "1" ]]; then
+    # --expose-internals is needed for FS esm patches.
+    # TODO: --disable-warning for stop warnings from that
+
+    exec "$JS_BINARY__NODE_BINARY" \
+        --expose-internals \
+        --require "$JS_BINARY__NODE_PATCHES" "$@"
+else
+    exec "$JS_BINARY__NODE_BINARY" --require "$JS_BINARY__NODE_PATCHES" "$@"
+fi
