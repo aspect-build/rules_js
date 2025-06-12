@@ -42,10 +42,11 @@ exports.isSubPath = isSubPath;
 exports.escapeFunction = escapeFunction;
 const path = require("path");
 const util = require("util");
+const fs_stat_cjs_1 = require("./fs_stat.cjs");
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('node:fs');
+const fs = require('node:fs');
 const url = require('node:url');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
@@ -65,8 +66,6 @@ function patcher(fs = _fs, roots) {
         }
         return;
     }
-    const origLstat = fs.lstat.bind(fs);
-    const origLstatSync = fs.lstatSync.bind(fs);
     const origReaddir = fs.readdir.bind(fs);
     const origReaddirSync = fs.readdirSync.bind(fs);
     const origReadlink = fs.readlink.bind(fs);
@@ -141,22 +140,21 @@ function patcher(fs = _fs, roots) {
             return stats;
         }
         try {
-            args[0] = unguardedRealPathSync(args[0]);
-            // there are no hops so lets report the stats of the real file;
-            // we can't use origRealPathSync here since that function calls lstat internally
-            // which can result in an infinite loop
-            return origLstatSync(...args);
+            lstatPatcher.originalSyncRequested = true;
+            return fs.lstatSync.apply(fs, args);
         }
-        catch (err) {
-            if (err.code === 'ENOENT') {
-                // broken link so there is nothing more to do
-                return stats;
-            }
-            throw err;
+        finally {
+            lstatPatcher.originalSyncRequested = false;
         }
     };
     // =========================================================================
-    // fs.realpath
+    // fsInternal.lstat (to patch ESM resolve's `realpathSync`!) and
+    //      fs.lstat implementations.
+    //      fs.realpath implementations.
+    // =========================================================================
+    lstatPatcher.patch();
+    // =========================================================================
+    // fs.realpath.native
     // =========================================================================
     fs.realpath = function realpath(...args) {
         // preserve error when calling function without required callback
@@ -195,14 +193,6 @@ function patcher(fs = _fs, roots) {
             }
         };
         origRealpathNative(...args);
-    };
-    fs.realpathSync = function realpathSync(...args) {
-        const str = origRealpathSync(...args);
-        const escapedRoot = isEscape(args[0], str);
-        if (escapedRoot) {
-            return guardedRealPathSync(args[0], escapedRoot);
-        }
-        return str;
     };
     fs.realpathSync.native = function native_realpathSync(...args) {
         const str = origRealpathSyncNative(...args);
@@ -368,7 +358,6 @@ function patcher(fs = _fs, roots) {
     const promisePropertyDescriptor = Object.getOwnPropertyDescriptor(fs, 'promises');
     if (promisePropertyDescriptor) {
         const promises = {};
-        promises.lstat = util.promisify(fs.lstat);
         // NOTE: node core uses the newer realpath function fs.promises.native instead of fs.realPath
         promises.realpath = util.promisify(fs.realpath.native);
         promises.readlink = util.promisify(fs.readlink);
@@ -740,6 +729,7 @@ function stringifyPathLike(p) {
 function resolvePathLike(p) {
     return path.resolve(stringifyPathLike(p));
 }
+exports.resolvePathLike = resolvePathLike;
 function normalizePathLike(p) {
     const s = stringifyPathLike(p);
     // TODO: are URLs always absolute?

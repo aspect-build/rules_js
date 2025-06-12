@@ -29,6 +29,11 @@ TOOLCHAINS_VERSIONS = [
         "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
         "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
     }),
+    select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@node22_linux_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:darwin": "@node22_darwin_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:windows": "@node22_windows_amd64//:node_toolchain",
+    }),
 ]
 
 # We need to copy the entry points to the bin so that the tests below don't follow the execroot
@@ -51,6 +56,7 @@ TOOLCHAINS_VERSIONS = [
             "//js/private/node-patches/src:compile",
         ],
         entry_point = "copy_entry_{}".format(t),
+        node_options = ["--expose-internals"],
         patch_node_fs = False,
         # Without node patches on for these tests, the program is going to escape the sandbox if it
         # is on since the fs patches are not on for the tests as they are the code under test

@@ -45,35 +45,34 @@ describe('testing readlink', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir)])
+                const revertPatches = patcher([path.join(fixturesDir)])
                 const linkPath = path.join(fixturesDir, 'a', 'link')
 
                 assert.deepStrictEqual(
-                    patchedFs.readlinkSync(linkPath),
+                    fs.readlinkSync(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'SYNC: should read the symlink because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.readlinkSync(new URL(`file://${linkPath}`)),
+                    fs.readlinkSync(new URL(`file://${linkPath}`)),
                     path.join(fixturesDir, 'b', 'file'),
                     'SYNC: should read the symlink because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.readlink)(linkPath),
+                    await util.promisify(fs.readlink)(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'CB: should read the symlink because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.readlink(linkPath),
+                    await fs.promises.readlink(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'Promise: should read the symlink because its within root'
                 )
+
+                revertPatches();
             }
         )
     })
@@ -92,23 +91,21 @@ describe('testing readlink', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
                 const linkPath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
                     'link'
                 )
+                console.error('go', linkPath)
 
                 assert.throws(() => {
-                    patchedFs.readlinkSync(linkPath)
+                    fs.readlinkSync(linkPath)
                 }, "should throw because it's not a link")
 
                 let thrown
                 try {
-                    await util.promisify(patchedFs.readlink)(linkPath)
+                    await util.promisify(fs.readlink)(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
@@ -117,12 +114,14 @@ describe('testing readlink', async () => {
 
                 thrown = undefined
                 try {
-                    await patchedFs.promises.readlink(linkPath)
+                    await fs.promises.readlink(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
                     if (!thrown) assert.fail('must throw einval error')
                 }
+
+                revertPatches();
             }
         )
     })
@@ -152,36 +151,35 @@ describe('testing readlink', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const revertPatches = patcher([path.join(fixturesDir, 'sandbox')])
                 const linkPath = path.join(fixturesDir, 'sandbox', 'link')
                 const filePath = path.join(fixturesDir, 'sandbox', 'file')
 
                 assert.deepStrictEqual(
-                    patchedFs.readlinkSync(linkPath),
+                    fs.readlinkSync(linkPath),
                     filePath,
                     'SYNC: should read the symlink in the sandbox'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.readlinkSync(new URL(`file://${linkPath}`)),
+                    fs.readlinkSync(new URL(`file://${linkPath}`)),
                     filePath,
                     'SYNC: should read the symlink in the sandbox'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.readlink)(linkPath),
+                    await util.promisify(fs.readlink)(linkPath),
                     filePath,
                     'CB: should read the symlink in the sandbox'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.readlink(linkPath),
+                    await fs.promises.readlink(linkPath),
                     filePath,
                     'Promise: should read the symlink in the sandbox'
                 )
+
+                revertPatches();
             }
         )
     })
@@ -207,20 +205,22 @@ describe('testing readlink', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const revertPatches = patcher([path.join(fixturesDir, 'sandbox')])
                 const linkPath = path.join(fixturesDir, 'sandbox', 'link')
                 const filePath = path.join(fixturesDir, 'sandbox', 'file')
 
+                                console.error('go', linkPath)
+
+
                 assert.throws(() => {
-                    patchedFs.readlinkSync(linkPath)
+                    fs.readlinkSync(linkPath)
                 }, "should throw because it's not a resolvable link")
+
+                console.error('-------')
 
                 let thrown
                 try {
-                    await util.promisify(patchedFs.readlink)(linkPath)
+                    await util.promisify(fs.readlink)(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
@@ -229,12 +229,14 @@ describe('testing readlink', async () => {
 
                 thrown = undefined
                 try {
-                    await patchedFs.promises.readlink(linkPath)
+                    await fs.promises.readlink(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
                     if (!thrown) assert.fail('must throw einval error')
                 }
+
+                revertPatches();
             }
         )
     })
