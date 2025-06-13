@@ -4,7 +4,11 @@ These are needed for local dev, and users must install them as well.
 See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
 """
 
-load("//js/private:maybe.bzl", http_archive = "maybe_http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_archive = "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
+def http_archive(**kwargs):
+    maybe(_http_archive, **kwargs)
 
 # buildifier: disable=function-docstring
 def rules_js_dependencies():
