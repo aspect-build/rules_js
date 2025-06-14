@@ -145,6 +145,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/hello",
             ":node_modules/jsonify",
             ":node_modules/jquery-git-ssh-e61fccb",
+            ":node_modules/jquery-git-ssh-399b201",
 
             # npm: alias
             ":node_modules/@aspect-test/a2",

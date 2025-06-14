@@ -45,6 +45,9 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
+def _escape_target_name(name):
+    return name.replace("://", "/").replace("/", "+").replace(":", "+")
+
 def _package_store_name(pnpm_name, pnpm_version):
     "Make a package store name for a given package and version"
 
@@ -60,11 +63,9 @@ def _package_store_name(pnpm_name, pnpm_version):
     if version.startswith("@"):
         # Special case where the package name should _not_ be included in the package store name.
         # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return version.replace("://", "/").replace("/", "+")
+        return _escape_target_name(version)
     else:
-        escaped_name = name.replace("/", "+")
-        escaped_version = version.replace("://", "/").replace("/", "+")
-        return "%s@%s" % (escaped_name, escaped_version)
+        return "%s@%s" % (_escape_target_name(name), _escape_target_name(version))
 
 def _make_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)

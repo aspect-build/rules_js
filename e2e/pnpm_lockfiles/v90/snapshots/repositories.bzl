@@ -891,6 +891,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["jquery-git-ssh-399b201"],
+        },
+        package = "jquery",
+        version = "https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967",
+        url = "https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        transitive_closure = {
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
