@@ -66,7 +66,12 @@ export function is1pPackageStoreDep(p) {
 }
 
 // Utility function to retry an async operation with backoff
-async function withRetry(operation, description, maxRetries = 3, initialDelay = 100) {
+async function withRetry(
+    operation,
+    description,
+    maxRetries = 3,
+    initialDelay = 100
+) {
     let retries = maxRetries
     let delay = initialDelay
     while (retries > 0) {
@@ -75,12 +80,16 @@ async function withRetry(operation, description, maxRetries = 3, initialDelay = 
         } catch (e) {
             if (e.code === 'ENOENT' && retries > 1) {
                 retries--
-                console.error(`Retrying ${description} in ${delay}ms (${retries} attempts remaining)`)
-                await new Promise(resolve => setTimeout(resolve, delay))
+                console.error(
+                    `Retrying ${description} in ${delay}ms (${retries} attempts remaining)`
+                )
+                await new Promise((resolve) => setTimeout(resolve, delay))
                 delay += initialDelay
                 continue
             }
-            console.error(`Failed ${description} after all retries: ${e.message}`)
+            console.error(
+                `Failed ${description} after all retries: ${e.message}`
+            )
             throw e
         }
     }
@@ -89,15 +98,16 @@ async function withRetry(operation, description, maxRetries = 3, initialDelay = 
 // Hashes a file using a read stream. Based on https://github.com/kodie/md5-file.
 async function generateChecksum(p) {
     return withRetry(
-        () => new Promise((resolve, reject) => {
-            const output = crypto.createHash('md5')
-            const input = fs.createReadStream(p)
-            input.on('error', reject)
-            output.once('readable', () => {
-                resolve(output.read().toString('hex'))
-            })
-            input.pipe(output)
-        }),
+        () =>
+            new Promise((resolve, reject) => {
+                const output = crypto.createHash('md5')
+                const input = fs.createReadStream(p)
+                input.on('error', reject)
+                output.once('readable', () => {
+                    resolve(output.read().toString('hex'))
+                })
+                input.pipe(output)
+            }),
         `generateChecksum for ${p}`
     )
 }
@@ -483,11 +493,11 @@ async function main(args, sandbox) {
         })
 
         // Process stdin data in order using a promise chain.
-        let syncing = Promise.resolve();
-        const rl = readline.createInterface({ input: process.stdin });
+        let syncing = Promise.resolve()
+        const rl = readline.createInterface({ input: process.stdin })
         rl.on('line', (line) => {
-            syncing = syncing.then(() => processChunk(line));
-        });
+            syncing = syncing.then(() => processChunk(line))
+        })
 
         async function processChunk(chunk) {
             try {
