@@ -45,6 +45,7 @@ importers:
       is-odd-v1: npm:is-odd@1.0.0
       is-odd-v2: npm:is-odd@2.0.0
       is-odd-v3: npm:is-odd@3.0.0
+      jquery-git-ssh-399b201: git+ssh://git@github.com:jquery/jquery#399b201bb3143a3952894cf3489b4848fc003967
       jquery-git-ssh-e61fccb: git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d
       jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
       lodash: file:../vendored/lodash-4.17.21.tgz
@@ -80,6 +81,7 @@ importers:
       is-odd-v1: /is-odd/1.0.0
       is-odd-v2: /is-odd/2.0.0
       is-odd-v3: /is-odd/3.0.0
+      jquery-git-ssh-399b201: github.com/jquery/jquery/399b201bb3143a3952894cf3489b4848fc003967
       jquery-git-ssh-e61fccb: github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d
       jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
       lodash: file:../vendored/lodash-4.17.21.tgz
@@ -560,6 +562,12 @@ packages:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:../vendored/lodash-4.17.21.tgz}
     name: lodash
     version: 4.17.21
+    dev: false
+
+  github.com/jquery/jquery/399b201bb3143a3952894cf3489b4848fc003967:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967}
+    name: jquery
+    version: 3.7.1-pre
     dev: false
 
   github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d:
