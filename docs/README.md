@@ -39,7 +39,7 @@ Other recommendations:
 
 rules_js depends on rules_nodejs version 6.1.0 or greater.
 
-Installation is included in the `WORKSPACE` snippet you pasted from the Installation instructions above.
+Installation is included in the `MODULE` or `WORKSPACE` snippet you pasted from the Installation instructions above.
 
 **API docs:**
 
@@ -69,24 +69,8 @@ using the identical version of pnpm that Bazel is configured with:
 $ bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only
 ```
 
-During migration from npm or yarn you can still use a `package-lock.json` or `yarn.lock` as the source of truth by
-setting the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`. When the `pnpm-lock.yaml` is out of date
-rules_js will run `pnpm import` to generate the `pnpm-lock.yaml` file.
-See the notes about these attributes in the [migration guide](https://docs.aspect.build/guides/rules_js_migration).
-
 Next, you'll typically use `npm_translate_lock` to translate the lock file to Starlark, which Bazel extensions understand.
-The `WORKSPACE` snippet you pasted above already contains this code.
-
-After `npm_translate_lock`, you have two choices:
-
-1.  `load` from the generated `repositories.bzl` file in `WORKSPACE`, like the `WORKSPACE` snippet does.
-    This will cause every Bazel execution to evaluate the `npm_translate_lock`, making it "eager".
-    The execution is fast and only invalidated when the `pnpm-lock.yaml` file changes, so we recommend
-    this approach.
-1.  Check the generated `repositories.bzl` file into your version control, and `load` it from there.
-    This fixes the "eager" execution, however it means you need some way to ensure the file stays
-    up-to-date as the `pnpm-lock.yaml` file changes. This approach can be useful for bazel rules which
-    want to hide their transitive dependencies from users. See https://github.com/bazelbuild/rules_python/issues/608 for a similar discussion about rules_python `pip_parse` which is similar.
+The `MODULE` or `WORKSPACE` snippet you pasted above already contains this code.
 
 Technically, we run a port of pnpm rather than pnpm itself. Here are some design details:
 
@@ -107,6 +91,13 @@ Assuming your `npm_translate_lock` was named `npm`, you can run:
 $ bazel fetch @npm//...
 ```
 
+#### Migration from npm or yarn
+
+During migration from npm or yarn you can still use a `package-lock.json` or `yarn.lock` as the source of truth by
+setting the `npm_package_lock`/`yarn_lock` attributes of `npm_translate_lock`. When the `pnpm-lock.yaml` is out of date
+rules_js will run `pnpm import` to generate the `pnpm-lock.yaml` file.
+See the notes about these attributes in the [migration guide](https://docs.aspect.build/guides/rules_js_migration).
+
 ### Using pnpm workspaces
 
 Here's an example `pnpm-workspace.yaml` file which will find all projects under `apps` or `packages` at any depth, and anything directly under `tools`, based on the existence of a `package.json` file.
@@ -115,9 +106,9 @@ Make sure to place this file at the root of the repository.
 
 ```yaml
 packages:
-  - 'apps/**'
-  - 'packages/**'
-  - 'tools/*'
+    - 'apps/**'
+    - 'packages/**'
+    - 'tools/*'
 ```
 
 ### Link the node_modules
