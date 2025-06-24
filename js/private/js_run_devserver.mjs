@@ -565,15 +565,14 @@ async function main(args, sandbox) {
     onProcessEnd(() => sandbox && removeSandbox(sandbox) && (sandbox = null))
 
     try {
-        sandbox = path.join(
-            await fs.promises.mkdtemp(
-                path.join(os.tmpdir(), 'js_run_devserver-')
-            ),
-            process.env.JS_BINARY__WORKSPACE
+        sandbox = await fs.promises.mkdtemp(
+            path.join(os.tmpdir(), 'js_run_devserver-')
         )
+        const sandboxMain = path.join(sandbox, process.env.JS_BINARY__WORKSPACE)
+
         // Intentionally synchronous; see comment on mkdirpSync
-        mkdirpSync(path.join(sandbox, process.env.JS_BINARY__CHDIR || ''))
-        await main(process.argv.slice(2), sandbox)
+        mkdirpSync(path.join(sandboxMain, process.env.JS_BINARY__CHDIR || ''))
+        await main(process.argv.slice(2), sandboxMain)
     } catch (e) {
         console.error(e)
         process.exit(1)
