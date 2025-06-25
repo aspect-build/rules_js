@@ -486,7 +486,7 @@ function patcher(fs = _fs, roots) {
         }
     }
     function nextHop(loc, cb) {
-        let nested = [];
+        let nested = '';
         let maybe = loc;
         let escapedHop = false;
         readHopLink(maybe, function readNextHop(link) {
@@ -494,7 +494,7 @@ function patcher(fs = _fs, roots) {
                 return cb(undefined);
             }
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, ...nested.reverse());
+                link = path.join(link, nested);
                 if (!isEscape(loc, link)) {
                     return cb(link);
                 }
@@ -510,7 +510,7 @@ function patcher(fs = _fs, roots) {
                 // not a link
                 return cb(escapedHop);
             }
-            nested.push(path.basename(maybe));
+            nested = path.join(path.basename(maybe), nested);
             maybe = dirname;
             readHopLink(maybe, readNextHop);
         });
@@ -578,7 +578,7 @@ function patcher(fs = _fs, roots) {
         });
     }
     function nextHopSync(loc) {
-        let nested = [];
+        let nested = '';
         let maybe = loc;
         let escapedHop = false;
         for (;;) {
@@ -587,7 +587,7 @@ function patcher(fs = _fs, roots) {
                 return undefined;
             }
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, ...nested.reverse());
+                link = path.join(link, nested);
                 if (!isEscape(loc, link)) {
                     return link;
                 }
@@ -603,7 +603,7 @@ function patcher(fs = _fs, roots) {
                 // not a link
                 return escapedHop;
             }
-            nested.push(path.basename(maybe));
+            nested = path.join(path.basename(maybe), nested);
             maybe = dirname;
         }
     }
