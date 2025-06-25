@@ -12,60 +12,61 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.2__links/
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.0__links//:defs.bzl", link_9 = "npm_link_imported_package_store", store_9 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.1__links//:defs.bzl", link_10 = "npm_link_imported_package_store", store_10 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links//:defs.bzl", store_11 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_h__1.0.0__links//:defs.bzl", link_12 = "npm_link_imported_package_store", store_12 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_13 = "npm_link_imported_package_store", store_13 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_isaacs_cliui__8.0.2__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_3vgsug3mjv7wvue74swjdxifxy__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_pluginutils__3.1.0_rollup_2.14.0__links//:defs.bzl", store_16 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_17 = "npm_link_imported_package_store", store_17 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_estree__0.0.39__links//:defs.bzl", store_18 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_19 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_20 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_21 = "npm_link_imported_package_store", store_21 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_sizzle__2.3.9__links//:defs.bzl", link_22 = "npm_link_imported_package_store", store_22 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-convert__2.0.1__links//:defs.bzl", store_23 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-name__1.1.4__links//:defs.bzl", store_24 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__debug__github.com_ngokevin_debug_9742c5f383a6f8046241920156236ade8ec30d53__links//:defs.bzl", link_25 = "npm_link_imported_package_store", store_25 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__dequal__2.0.3__links//:defs.bzl", store_26 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__diff__at_github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz__links//:defs.bzl", store_27 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__eastasianwidth__0.2.0__links//:defs.bzl", store_28 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__8.0.0__links//:defs.bzl", store_29 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__9.2.2__links//:defs.bzl", store_30 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__estree-walker__1.0.1__links//:defs.bzl", store_31 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_32 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__function-bind__1.1.2__links//:defs.bzl", store_33 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hasown__2.0.2__links//:defs.bzl", store_34 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hello__at_gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello__links//:defs.bzl", link_35 = "npm_link_imported_package_store", store_35 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_36 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_37 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_38 = "npm_link_imported_package_store", store_38 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_39 = "npm_link_imported_package_store", store_39 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_40 = "npm_link_imported_package_store", store_40 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_41 = "npm_link_imported_package_store", store_41 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_42 = "npm_link_imported_package_store", store_42 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__github.com_jquery_jquery_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_43 = "npm_link_imported_package_store", store_43 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__github.com_jquery_jquery_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_44 = "npm_link_imported_package_store", store_44 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_45 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_46 = "npm_link_imported_package_store", store_46 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_47 = "npm_link_imported_package_store", store_47 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_48 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_49 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_50 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_51 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__resolve__1.22.10__links//:defs.bzl", store_52 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_53 = "npm_link_imported_package_store", store_53 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_54 = "npm_link_imported_package_store", store_54 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_55 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__4.2.3__links//:defs.bzl", store_56 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__5.1.2__links//:defs.bzl", store_57 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__6.0.1__links//:defs.bzl", store_58 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__7.1.0__links//:defs.bzl", store_59 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_60 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_61 = "npm_link_imported_package_store", store_61 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_62 = "npm_link_imported_package_store", store_62 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_63 = "npm_link_imported_package_store", store_63 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_64 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_65 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_e__1.0.0__links//:defs.bzl", link_12 = "npm_link_imported_package_store", store_12 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_h__1.0.0__links//:defs.bzl", link_13 = "npm_link_imported_package_store", store_13 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store", store_14 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_isaacs_cliui__8.0.2__links//:defs.bzl", link_15 = "npm_link_imported_package_store", store_15 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_626159424__links//:defs.bzl", link_16 = "npm_link_imported_package_store", store_16 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_rollup_pluginutils__3.1.0_rollup_2.14.0__links//:defs.bzl", store_17 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_18 = "npm_link_imported_package_store", store_18 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_estree__0.0.39__links//:defs.bzl", store_19 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_20 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_21 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_22 = "npm_link_imported_package_store", store_22 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_sizzle__2.3.9__links//:defs.bzl", link_23 = "npm_link_imported_package_store", store_23 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-convert__2.0.1__links//:defs.bzl", store_24 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-name__1.1.4__links//:defs.bzl", store_25 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__debug__https___codeload.github.com_ngokevin_debug_tar.gz_9742c5f383a6f8046241920156236ade8ec30d53__links//:defs.bzl", link_26 = "npm_link_imported_package_store", store_26 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__dequal__2.0.3__links//:defs.bzl", store_27 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__diff__https___github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz__links//:defs.bzl", store_28 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__eastasianwidth__0.2.0__links//:defs.bzl", store_29 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__8.0.0__links//:defs.bzl", store_30 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__emoji-regex__9.2.2__links//:defs.bzl", store_31 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__estree-walker__1.0.1__links//:defs.bzl", store_32 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_33 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__function-bind__1.1.2__links//:defs.bzl", store_34 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hasown__2.0.2__links//:defs.bzl", store_35 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hello__https___gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello__links//:defs.bzl", link_36 = "npm_link_imported_package_store", store_36 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_37 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_38 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_39 = "npm_link_imported_package_store", store_39 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_40 = "npm_link_imported_package_store", store_40 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_41 = "npm_link_imported_package_store", store_41 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_42 = "npm_link_imported_package_store", store_42 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_43 = "npm_link_imported_package_store", store_43 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_44 = "npm_link_imported_package_store", store_44 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_45 = "npm_link_imported_package_store", store_45 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_46 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_47 = "npm_link_imported_package_store", store_47 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life__1.0.0_1541309197__links//:defs.bzl", link_48 = "npm_link_imported_package_store", store_48 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_49 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_50 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_51 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_52 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__resolve__1.22.10__links//:defs.bzl", store_53 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_54 = "npm_link_imported_package_store", store_54 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_55 = "npm_link_imported_package_store", store_55 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_56 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__4.2.3__links//:defs.bzl", store_57 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__5.1.2__links//:defs.bzl", store_58 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__6.0.1__links//:defs.bzl", store_59 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__7.1.0__links//:defs.bzl", store_60 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_61 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_62 = "npm_link_imported_package_store", store_62 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_63 = "npm_link_imported_package_store", store_63 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_64 = "npm_link_imported_package_store", store_64 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_65 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_66 = "npm_imported_package_store")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
@@ -165,6 +166,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_63(name)
         store_64(name)
         store_65(name)
+        store_66(name)
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_4("{}/@aspect-test-a-bad-scope".format(name), link_root_name = name, link_alias = "@aspect-test-a-bad-scope")
@@ -207,71 +209,77 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_12("{}/@aspect-test/h-is-only-optional".format(name), link_root_name = name, link_alias = "@aspect-test/h-is-only-optional")
+            link_12("{}/@aspect-test/e".format(name), link_root_name = name, link_alias = "@aspect-test/e")
+            link_targets.append(":{}/@aspect-test/e".format(name))
+            if "@aspect-test" not in scope_targets:
+                scope_targets["@aspect-test"] = [link_targets[-1]]
+            else:
+                scope_targets["@aspect-test"].append(link_targets[-1])
+            link_13("{}/@aspect-test/h-is-only-optional".format(name), link_root_name = name, link_alias = "@aspect-test/h-is-only-optional")
             link_targets.append(":{}/@aspect-test/h-is-only-optional".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-            link_13("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
+            link_14("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
             link_targets.append(":{}/jsonify".format(name))
-            link_14("{}/@isaacs/cliui".format(name), link_root_name = name, link_alias = "@isaacs/cliui")
+            link_15("{}/@isaacs/cliui".format(name), link_root_name = name, link_alias = "@isaacs/cliui")
             link_targets.append(":{}/@isaacs/cliui".format(name))
             if "@isaacs" not in scope_targets:
                 scope_targets["@isaacs"] = [link_targets[-1]]
             else:
                 scope_targets["@isaacs"].append(link_targets[-1])
-            link_15("{}/rollup-plugin-with-peers".format(name), link_root_name = name, link_alias = "rollup-plugin-with-peers")
+            link_16("{}/rollup-plugin-with-peers".format(name), link_root_name = name, link_alias = "rollup-plugin-with-peers")
             link_targets.append(":{}/rollup-plugin-with-peers".format(name))
-            link_17("{}/@types/archiver".format(name), link_root_name = name, link_alias = "@types/archiver")
+            link_18("{}/@types/archiver".format(name), link_root_name = name, link_alias = "@types/archiver")
             link_targets.append(":{}/@types/archiver".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
-            link_21("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
+            link_22("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
-            link_21("{}/alias-types-node".format(name), link_root_name = name, link_alias = "alias-types-node")
+            link_22("{}/alias-types-node".format(name), link_root_name = name, link_alias = "alias-types-node")
             link_targets.append(":{}/alias-types-node".format(name))
-            link_22("{}/alias-only-sizzle".format(name), link_root_name = name, link_alias = "alias-only-sizzle")
+            link_23("{}/alias-only-sizzle".format(name), link_root_name = name, link_alias = "alias-only-sizzle")
             link_targets.append(":{}/alias-only-sizzle".format(name))
-            link_25("{}/debug".format(name), link_root_name = name, link_alias = "debug")
+            link_26("{}/debug".format(name), link_root_name = name, link_alias = "debug")
             link_targets.append(":{}/debug".format(name))
-            link_35("{}/hello".format(name), link_root_name = name, link_alias = "hello")
+            link_36("{}/hello".format(name), link_root_name = name, link_alias = "hello")
             link_targets.append(":{}/hello".format(name))
-            link_38("{}/is-odd-v0".format(name), link_root_name = name, link_alias = "is-odd-v0")
+            link_39("{}/is-odd-v0".format(name), link_root_name = name, link_alias = "is-odd-v0")
             link_targets.append(":{}/is-odd-v0".format(name))
-            link_39("{}/is-odd-v1".format(name), link_root_name = name, link_alias = "is-odd-v1")
+            link_40("{}/is-odd-v1".format(name), link_root_name = name, link_alias = "is-odd-v1")
             link_targets.append(":{}/is-odd-v1".format(name))
-            link_40("{}/is-odd-v2".format(name), link_root_name = name, link_alias = "is-odd-v2")
+            link_41("{}/is-odd-v2".format(name), link_root_name = name, link_alias = "is-odd-v2")
             link_targets.append(":{}/is-odd-v2".format(name))
-            link_41("{}/is-odd-v3".format(name), link_root_name = name, link_alias = "is-odd-v3")
+            link_42("{}/is-odd-v3".format(name), link_root_name = name, link_alias = "is-odd-v3")
             link_targets.append(":{}/is-odd-v3".format(name))
-            link_42("{}/is-odd".format(name), link_root_name = name, link_alias = "is-odd")
+            link_43("{}/is-odd".format(name), link_root_name = name, link_alias = "is-odd")
             link_targets.append(":{}/is-odd".format(name))
-            link_42("{}/is-odd-alias".format(name), link_root_name = name, link_alias = "is-odd-alias")
+            link_43("{}/is-odd-alias".format(name), link_root_name = name, link_alias = "is-odd-alias")
             link_targets.append(":{}/is-odd-alias".format(name))
-            link_43("{}/jquery-git-ssh-399b201".format(name), link_root_name = name, link_alias = "jquery-git-ssh-399b201")
+            link_44("{}/jquery-git-ssh-399b201".format(name), link_root_name = name, link_alias = "jquery-git-ssh-399b201")
             link_targets.append(":{}/jquery-git-ssh-399b201".format(name))
-            link_44("{}/jquery-git-ssh-e61fccb".format(name), link_root_name = name, link_alias = "jquery-git-ssh-e61fccb")
+            link_45("{}/jquery-git-ssh-e61fccb".format(name), link_root_name = name, link_alias = "jquery-git-ssh-e61fccb")
             link_targets.append(":{}/jquery-git-ssh-e61fccb".format(name))
-            link_46("{}/lodash".format(name), link_root_name = name, link_alias = "lodash")
+            link_47("{}/lodash".format(name), link_root_name = name, link_alias = "lodash")
             link_targets.append(":{}/lodash".format(name))
-            link_47("{}/meaning-of-life".format(name), link_root_name = name, link_alias = "meaning-of-life")
+            link_48("{}/meaning-of-life".format(name), link_root_name = name, link_alias = "meaning-of-life")
             link_targets.append(":{}/meaning-of-life".format(name))
-            link_53("{}/rollup".format(name), link_root_name = name, link_alias = "rollup")
+            link_54("{}/rollup".format(name), link_root_name = name, link_alias = "rollup")
             link_targets.append(":{}/rollup".format(name))
-            link_54("{}/rollup3".format(name), link_root_name = name, link_alias = "rollup3")
+            link_55("{}/rollup3".format(name), link_root_name = name, link_alias = "rollup3")
             link_targets.append(":{}/rollup3".format(name))
-            link_61("{}/tslib".format(name), link_root_name = name, link_alias = "tslib")
+            link_62("{}/tslib".format(name), link_root_name = name, link_alias = "tslib")
             link_targets.append(":{}/tslib".format(name))
-            link_62("{}/typescript".format(name), link_root_name = name, link_alias = "typescript")
+            link_63("{}/typescript".format(name), link_root_name = name, link_alias = "typescript")
             link_targets.append(":{}/typescript".format(name))
-            link_63("{}/uvu".format(name), link_root_name = name, link_alias = "uvu")
+            link_64("{}/uvu".format(name), link_root_name = name, link_alias = "uvu")
             link_targets.append(":{}/uvu".format(name))
         elif bazel_package == "projects/peers-combo-2":
             link_6("{}/@aspect-test/c".format(name), link_root_name = name, link_alias = "@aspect-test/c")
@@ -300,19 +308,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
         elif bazel_package == "projects/peer-types":
-            link_13("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
+            link_14("{}/jsonify".format(name), link_root_name = name, link_alias = "jsonify")
             link_targets.append(":{}/jsonify".format(name))
-            link_35("{}/hello".format(name), link_root_name = name, link_alias = "hello")
+            link_36("{}/hello".format(name), link_root_name = name, link_alias = "hello")
             link_targets.append(":{}/hello".format(name))
         elif bazel_package == "projects/a-types":
-            link_21("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
+            link_22("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
         elif bazel_package == "projects/b":
-            link_21("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
+            link_22("{}/@types/node".format(name), link_root_name = name, link_alias = "@types/node")
             link_targets.append(":{}/@types/node".format(name))
             if "@types" not in scope_targets:
                 scope_targets["@types"] = [link_targets[-1]]
@@ -420,7 +428,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             tags = ["manual"],
         )
 
-    if bazel_package in ["<LOCKVERSION>", "projects/peer-types"]:
+    if bazel_package in ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@scoped/b".format(name),
@@ -453,6 +461,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             version = "0.0.0",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -716,6 +725,7 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append(":{}/aspect-test-a/no-at".format(name))
             link_targets.append(":{}/@aspect-test/b".format(name))
             link_targets.append(":{}/@aspect-test/c".format(name))
+            link_targets.append(":{}/@aspect-test/e".format(name))
             link_targets.append(":{}/@aspect-test/h-is-only-optional".format(name))
             link_targets.append(":{}/jsonify".format(name))
             link_targets.append(":{}/@isaacs/cliui".format(name))
@@ -761,7 +771,7 @@ def npm_link_targets(name = "node_modules", package = None):
     if bazel_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d", "projects/peer-types"]:
         link_targets.append(":{}/@scoped/a".format(name))
 
-    if bazel_package in ["<LOCKVERSION>", "projects/peer-types"]:
+    if bazel_package in ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types"]:
         link_targets.append(":{}/@scoped/b".format(name))
 
     if bazel_package in ["<LOCKVERSION>"]:

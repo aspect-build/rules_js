@@ -190,11 +190,11 @@ importers:
         specifier: workspace:*
         version: link:../a
       '@scoped/b':
-        specifier: link:../b
+        specifier: workspace:*
         version: link:../b
 
   ../projects/peer-types:
-    dependencies:
+    devDependencies:
       '@scoped/a':
         specifier: workspace:*
         version: link:../a
@@ -602,7 +602,6 @@ packages:
     resolution: {tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
     name: '@foo/jsonify'
     version: 0.0.0
-    dev: false
 
   '@github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz':
     resolution: {tarball: https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz}
@@ -615,7 +614,6 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
     name: hello
     version: 1.0.0
-    dev: false
 
   file:../projects/c(@scoped/b@projects+b):
     resolution: {directory: ../projects/c, type: directory}
@@ -626,7 +624,6 @@ packages:
     dependencies:
       '@scoped/a': link:../a
       '@scoped/b': link:../projects/b
-    dev: false
 
   file:../vendored/is-number:
     resolution: {directory: ../vendored/is-number, type: directory}

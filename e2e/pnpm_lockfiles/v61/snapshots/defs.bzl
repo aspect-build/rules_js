@@ -634,13 +634,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             src = "//projects/peer-types:pkg",
             package = "test-peer-types",
             version = "0.0.0",
-            deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name): "@scoped/c",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@gitpkg.vercel.app+EqualMa+gitpkg-hello+packages+hello".format(name): "hello",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@github.com+aspect-build+test-packages+releases+download+0.0.0+@foo-jsonify-0.0.0.tgz".format(name): "jsonify",
-            },
+            deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )

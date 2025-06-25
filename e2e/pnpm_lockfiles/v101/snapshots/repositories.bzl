@@ -250,6 +250,24 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__at_aspect-test_e__1.0.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["@aspect-test/e"],
+        },
+        package = "@aspect-test/e",
+        version = "1.0.0",
+        url = "https://registry.npmjs.org/@aspect-test/e/-/e-1.0.0.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==",
+        transitive_closure = {
+            "@aspect-test/e": ["1.0.0"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__at_aspect-test_h__1.0.0",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
@@ -268,7 +286,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz",
+        name = "lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
@@ -276,12 +294,12 @@ def npm_repositories():
             "projects/peer-types": ["jsonify"],
         },
         package = "@foo/jsonify",
-        version = "@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
+        version = "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         url = "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "@foo/jsonify": ["@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"],
+            "@foo/jsonify": ["https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"],
         },
     )
 
@@ -322,14 +340,14 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_3vgsug3mjv7wvue74swjdxifxy",
+        name = "lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_626159424",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["rollup-plugin-with-peers"],
         },
         package = "@rollup/plugin-typescript",
-        version = "8.2.1_3vgsug3mjv7wvue74swjdxifxy",
+        version = "8.2.1_626159424",
         url = "https://registry.npmjs.org/@rollup/plugin-typescript/-/plugin-typescript-8.2.1.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
@@ -342,7 +360,7 @@ def npm_repositories():
             "typescript": "5.5.2",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": ["8.2.1_3vgsug3mjv7wvue74swjdxifxy"],
+            "@rollup/plugin-typescript": ["8.2.1_626159424"],
             "@rollup/pluginutils": ["3.1.0_rollup_2.14.0"],
             "@types/estree": ["0.0.39"],
             "estree-walker": ["1.0.1"],
@@ -396,10 +414,9 @@ def npm_repositories():
         },
         package = "@types/archiver",
         version = "5.3.1",
-        url = "https://registry.yarnpkg.com/@types/archiver/-/archiver-5.3.1.tgz",
+        url = "https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==",
         deps = {
             "@types/glob": "8.1.0",
@@ -419,7 +436,7 @@ def npm_repositories():
         link_packages = {},
         package = "@types/estree",
         version = "0.0.39",
-        url = "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz",
+        url = "https://registry.npmjs.org/@types/estree/-/estree-0.0.39.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==",
@@ -435,10 +452,9 @@ def npm_repositories():
         link_packages = {},
         package = "@types/glob",
         version = "8.1.0",
-        url = "https://registry.yarnpkg.com/@types/glob/-/glob-8.1.0.tgz",
+        url = "https://registry.npmjs.org/@types/glob/-/glob-8.1.0.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==",
         deps = {
             "@types/minimatch": "5.1.2",
@@ -458,10 +474,9 @@ def npm_repositories():
         link_packages = {},
         package = "@types/minimatch",
         version = "5.1.2",
-        url = "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz",
+        url = "https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==",
         transitive_closure = {
             "@types/minimatch": ["5.1.2"],
@@ -479,7 +494,7 @@ def npm_repositories():
         },
         package = "@types/node",
         version = "16.18.11",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-16.18.11.tgz",
+        url = "https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==",
@@ -497,10 +512,9 @@ def npm_repositories():
         },
         package = "@types/sizzle",
         version = "2.3.9",
-        url = "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.9.tgz",
+        url = "https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.9.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        dev = True,
         integrity = "sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==",
         transitive_closure = {
             "@types/sizzle": ["2.3.9"],
@@ -544,14 +558,14 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__debug__github.com_ngokevin_debug_9742c5f383a6f8046241920156236ade8ec30d53",
+        name = "lock-<LOCKVERSION>__debug__https___codeload.github.com_ngokevin_debug_tar.gz_9742c5f383a6f8046241920156236ade8ec30d53",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["debug"],
         },
         package = "debug",
-        version = "github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53",
+        version = "https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53",
         url = "https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
@@ -559,7 +573,7 @@ def npm_repositories():
             "ms": "0.7.3",
         },
         transitive_closure = {
-            "debug": ["github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53"],
+            "debug": ["https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53"],
             "ms": ["0.7.3"],
         },
     )
@@ -581,17 +595,17 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__diff__at_github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz",
+        name = "lock-<LOCKVERSION>__diff__https___github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "diff",
-        version = "@github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
+        version = "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
         url = "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "diff": ["@github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"],
+            "diff": ["https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"],
         },
     )
 
@@ -712,7 +726,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__hello__at_gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello",
+        name = "lock-<LOCKVERSION>__hello__https___gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
@@ -720,12 +734,12 @@ def npm_repositories():
             "projects/peer-types": ["hello"],
         },
         package = "hello",
-        version = "@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
+        version = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         url = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "hello": ["@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello"],
+            "hello": ["https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello"],
         },
     )
 
@@ -877,36 +891,36 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__jquery__github.com_jquery_jquery_399b201bb3143a3952894cf3489b4848fc003967",
+        name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["jquery-git-ssh-399b201"],
         },
         package = "jquery",
-        version = "github.com/jquery/jquery/399b201bb3143a3952894cf3489b4848fc003967",
+        version = "https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967",
         url = "https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "jquery": ["github.com/jquery/jquery/399b201bb3143a3952894cf3489b4848fc003967"],
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"],
         },
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__jquery__github.com_jquery_jquery_e61fccb9d736235b4b011f89cba6866bc0b8997d",
+        name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["jquery-git-ssh-e61fccb"],
         },
         package = "jquery",
-        version = "github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d",
+        version = "https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d",
         url = "https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "jquery": ["github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d"],
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d"],
         },
     )
 
@@ -945,20 +959,20 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq",
+        name = "lock-<LOCKVERSION>__meaning-of-life__1.0.0_1541309197",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["meaning-of-life"],
         },
         package = "meaning-of-life",
-        version = "1.0.0_o3deharooos255qt5xdujc3cuq",
+        version = "1.0.0_1541309197",
         url = "https://registry.npmjs.org/meaning-of-life/-/meaning-of-life-1.0.0.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==",
         transitive_closure = {
-            "meaning-of-life": ["1.0.0_o3deharooos255qt5xdujc3cuq"],
+            "meaning-of-life": ["1.0.0_1541309197"],
         },
         patches = ["@//<LOCKVERSION>:patches/meaning-of-life@1.0.0-pnpm.patch"],
         patch_args = ["-p1"],
@@ -1275,13 +1289,13 @@ def npm_repositories():
         integrity = "sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==",
         deps = {
             "dequal": "2.0.3",
-            "diff": "@github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
+            "diff": "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
             "kleur": "4.1.5",
             "sade": "1.8.1",
         },
         transitive_closure = {
             "dequal": ["2.0.3"],
-            "diff": ["@github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"],
+            "diff": ["https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"],
             "kleur": ["4.1.5"],
             "mri": ["1.2.0"],
             "sade": ["1.8.1"],
