@@ -46,7 +46,7 @@ const _fs = require('node:fs');
 const url = require('node:url');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
-const patcher = (fs = _fs, roots) => {
+function patcher(fs = _fs, roots) {
     fs = fs || _fs;
     // Make the original version of the library available for when access to the
     // unguarded file system is necessary, such as the esbuild plugin that
@@ -85,7 +85,7 @@ const patcher = (fs = _fs, roots) => {
         }
         const cb = once(args[args.length - 1]);
         // override the callback
-        args[args.length - 1] = (err, stats) => {
+        args[args.length - 1] = function lstatCb(err, stats) {
             if (err)
                 return cb(err);
             if (!stats.isSymbolicLink()) {
@@ -97,7 +97,8 @@ const patcher = (fs = _fs, roots) => {
                 // the file can not escaped the sandbox so there is nothing more to do
                 return cb(null, stats);
             }
-            return guardedReadLink(args[0], (str) => {
+            return guardedReadLink(args[0], guardedReadLinkCb);
+            function guardedReadLinkCb(str) {
                 if (str != args[0]) {
                     // there are one or more hops within the guards so there is nothing more to do
                     return cb(null, stats);
@@ -105,7 +106,8 @@ const patcher = (fs = _fs, roots) => {
                 // there are no hops so lets report the stats of the real file;
                 // we can't use origRealPath here since that function calls lstat internally
                 // which can result in an infinite loop
-                return unguardedRealPath(args[0], (err, str) => {
+                return unguardedRealPath(args[0], unguardedRealPathCb);
+                function unguardedRealPathCb(err, str) {
                     if (err) {
                         if (err.code === 'ENOENT') {
                             // broken link so there is nothing more to do
@@ -113,9 +115,9 @@ const patcher = (fs = _fs, roots) => {
                         }
                         return cb(err);
                     }
-                    return origLstat(str, (err, str) => cb(err, str));
-                });
-            });
+                    return origLstat(str, cb);
+                }
+            }
         };
         origLstat(...args);
     };
@@ -159,12 +161,12 @@ const patcher = (fs = _fs, roots) => {
             return origRealpath(...args);
         }
         const cb = once(args[args.length - 1]);
-        args[args.length - 1] = (err, str) => {
+        args[args.length - 1] = function realpathCb(err, str) {
             if (err)
                 return cb(err);
             const escapedRoot = isEscape(args[0], str);
             if (escapedRoot) {
-                return guardedRealPath(args[0], (err, str) => cb(err, str), escapedRoot);
+                return guardedRealPath(args[0], cb, escapedRoot);
             }
             else {
                 return cb(null, str);
@@ -178,12 +180,12 @@ const patcher = (fs = _fs, roots) => {
             return origRealpathNative(...args);
         }
         const cb = once(args[args.length - 1]);
-        args[args.length - 1] = (err, str) => {
+        args[args.length - 1] = function nativeCb(err, str) {
             if (err)
                 return cb(err);
             const escapedRoot = isEscape(args[0], str);
             if (escapedRoot) {
-                return guardedRealPath(args[0], (err, str) => cb(err, str), escapedRoot);
+                return guardedRealPath(args[0], cb, escapedRoot);
             }
             else {
                 return cb(null, str);
@@ -216,14 +218,15 @@ const patcher = (fs = _fs, roots) => {
             return origReadlink(...args);
         }
         const cb = once(args[args.length - 1]);
-        args[args.length - 1] = (err, str) => {
+        args[args.length - 1] = function readlinkCb(err, str) {
             if (err)
                 return cb(err);
             const resolved = resolvePathLike(args[0]);
             str = path.resolve(path.dirname(resolved), str);
             const escapedRoot = isEscape(resolved, str);
             if (escapedRoot) {
-                return nextHop(str, (next) => {
+                return nextHop(str, readlinkNextHopCb);
+                function readlinkNextHopCb(next) {
                     if (!next) {
                         if (next == undefined) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
@@ -242,12 +245,13 @@ const patcher = (fs = _fs, roots) => {
                     // The escape from the root is not mappable back into the root; we must make
                     // this look like a real file so we call readlink on the realpath which we
                     // expect to return an error
-                    return origRealpath(resolved, (err, str) => {
+                    return origRealpath(resolved, readlinkRealpathCb);
+                    function readlinkRealpathCb(err, str) {
                         if (err)
                             return cb(err);
-                        return origReadlink(str, (err, str) => cb(err, str));
-                    });
-                });
+                        return origReadlink(str, cb);
+                    }
+                }
             }
             else {
                 return cb(null, str);
@@ -290,7 +294,7 @@ const patcher = (fs = _fs, roots) => {
         }
         const cb = once(args[args.length - 1]);
         const p = resolvePathLike(args[0]);
-        args[args.length - 1] = (err, result) => {
+        args[args.length - 1] = function readdirCb(err, result) {
             if (err)
                 return cb(err);
             // user requested withFileTypes
@@ -328,7 +332,7 @@ const patcher = (fs = _fs, roots) => {
             // we call it so we don't have to throw a mock
             if (typeof args[args.length - 1] === 'function') {
                 const cb = once(args[args.length - 1]);
-                args[args.length - 1] = async (err, dir) => {
+                args[args.length - 1] = async function opendirCb(err, dir) {
                     try {
                         cb(null, await handleDir(dir));
                     }
@@ -418,10 +422,10 @@ const patcher = (fs = _fs, roots) => {
                 }
             });
         };
-        dir.read = async (...args) => {
+        dir.read = async function handleDirRead(...args) {
             if (typeof args[args.length - 1] === 'function') {
                 const cb = args[args.length - 1];
-                args[args.length - 1] = async (err, entry) => {
+                args[args.length - 1] = async function handleDirReadCb(err, entry) {
                     cb(err, entry ? await handleDirent(p, entry) : null);
                 };
                 origRead(...args);
@@ -435,28 +439,29 @@ const patcher = (fs = _fs, roots) => {
             }
         };
         const origReadSync = dir.readSync.bind(dir);
-        dir.readSync = () => {
+        dir.readSync = function handleDirReadSync() {
             return handleDirentSync(p, origReadSync()); // intentionally sync for simplicity
         };
         return dir;
     }
     function handleDirent(p, v) {
-        return new Promise((resolve, reject) => {
+        return new Promise(function handleDirentExecutor(resolve, reject) {
             if (!v.isSymbolicLink()) {
                 return resolve(v);
             }
             const f = path.resolve(p, v.name);
-            return guardedReadLink(f, (str) => {
+            return guardedReadLink(f, handleDirentReadLinkCb);
+            function handleDirentReadLinkCb(str) {
                 if (f != str) {
                     return resolve(v);
                 }
                 // There are no hops so we should hide the fact that the file is a symlink
                 v.isSymbolicLink = () => false;
-                origRealpath(f, (err, str) => {
+                origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
                         throw err;
                     }
-                    fs.stat(str, (err, stat) => {
+                    fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
                             throw err;
                         }
@@ -464,7 +469,7 @@ const patcher = (fs = _fs, roots) => {
                         resolve(v);
                     });
                 });
-            });
+            }
         });
     }
     function handleDirentSync(p, v) {
@@ -548,7 +553,7 @@ const patcher = (fs = _fs, roots) => {
         if (hopLinkCache[p]) {
             return cb(hopLinkCache[p]);
         }
-        origReadlink(p, (err, link) => {
+        origReadlink(p, function readHopLinkCb(err, link) {
             if (err) {
                 let result;
                 if (err.code === 'ENOENT') {
@@ -604,7 +609,8 @@ const patcher = (fs = _fs, roots) => {
     }
     function guardedReadLink(start, cb) {
         let loc = start;
-        return nextHop(loc, (next) => {
+        return nextHop(loc, guardedReadLinkHopCb);
+        function guardedReadLinkHopCb(next) {
             if (!next) {
                 // we're no longer hopping but we haven't escaped;
                 // something funky happened in the filesystem
@@ -615,7 +621,7 @@ const patcher = (fs = _fs, roots) => {
                 return cb(loc);
             }
             return cb(next);
-        });
+        }
     }
     function guardedReadLinkSync(start) {
         let loc = start;
@@ -633,8 +639,8 @@ const patcher = (fs = _fs, roots) => {
     }
     function unguardedRealPath(start, cb) {
         start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpath)
-        const oneHop = (loc, cb) => {
-            nextHop(loc, (next) => {
+        function oneHop(loc, cb) {
+            nextHop(loc, function oneHopeNextCb(next) {
                 if (next == undefined) {
                     // file does not exist (broken link)
                     return cb(enoent('realpath', start));
@@ -645,16 +651,16 @@ const patcher = (fs = _fs, roots) => {
                 }
                 oneHop(next, cb);
             });
-        };
+        }
         oneHop(start, cb);
     }
     function guardedRealPath(start, cb, escapedRoot = undefined) {
         start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpath)
-        const oneHop = (loc, cb) => {
-            nextHop(loc, (next) => {
+        function oneHop(loc, cb) {
+            nextHop(loc, function guardedRealPathHopCb(next) {
                 if (!next) {
                     // we're no longer hopping but we haven't escaped
-                    return fs.exists(loc, (e) => {
+                    return fs.exists(loc, function guardedRealPathExistsCb(e) {
                         if (e) {
                             // we hit a real file within the guard and can go no further
                             return cb(null, loc);
@@ -673,7 +679,7 @@ const patcher = (fs = _fs, roots) => {
                 }
                 oneHop(next, cb);
             });
-        };
+        }
         oneHop(start, cb);
     }
     function unguardedRealPathSync(start) {
@@ -713,7 +719,7 @@ const patcher = (fs = _fs, roots) => {
             }
         }
     }
-};
+}
 exports.patcher = patcher;
 // =========================================================================
 // generic helper functions
@@ -782,7 +788,7 @@ function escapeFunction(_roots) {
 exports.escapeFunction = escapeFunction;
 function once(fn) {
     let called = false;
-    return (...args) => {
+    return function callOnce(...args) {
         if (called)
             return;
         called = true;
