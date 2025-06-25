@@ -545,7 +545,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
     }
 
     function nextHop(loc: string, cb: (next: string | false) => void): void {
-        let nested: string[] = []
+        let nested = ''
         let maybe = loc
         let escapedHop: string | false = false
 
@@ -555,7 +555,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             }
 
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, ...nested.reverse())
+                link = path.join(link, nested)
 
                 if (!isEscape(loc, link)) {
                     return cb(link)
@@ -575,7 +575,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 // not a link
                 return cb(escapedHop)
             }
-            nested.push(path.basename(maybe))
+            nested = path.join(path.basename(maybe), nested)
             maybe = dirname
             readHopLink(maybe, readNextHop)
         })
@@ -650,7 +650,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
     }
 
     function nextHopSync(loc: string): string | false {
-        let nested: string[] = []
+        let nested = ''
         let maybe = loc
         let escapedHop: string | false = false
 
@@ -662,7 +662,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             }
 
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, ...nested.reverse())
+                link = path.join(link, nested)
 
                 if (!isEscape(loc, link)) {
                     return link
@@ -683,7 +683,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 return escapedHop
             }
 
-            nested.push(path.basename(maybe))
+            nested = path.join(path.basename(maybe), nested)
             maybe = dirname
         }
     }
