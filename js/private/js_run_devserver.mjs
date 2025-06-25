@@ -129,20 +129,6 @@ export function friendlyFileSize(bytes) {
     )
 }
 
-// https://stackoverflow.com/a/42299191
-function partitionArray(array, callback) {
-    return array.reduce(
-        function (result, element, i) {
-            callback(element, i, array)
-                ? result[0].push(element)
-                : result[1].push(element)
-
-            return result
-        },
-        [[], []]
-    )
-}
-
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
@@ -350,15 +336,24 @@ async function syncFiles(files, sandbox, writePerm) {
     console.error(`+ Syncing ${files.length} files & folders...`)
     const startTime = perf_hooks.performance.now()
 
-    const [nodeModulesFiles, otherFiles] = partitionArray(
-        files,
-        isNodeModulePath
-    )
-
-    const [packageStore1pDeps, otherNodeModulesFiles] = partitionArray(
-        nodeModulesFiles,
-        is1pPackageStoreDep
-    )
+    // Partition files into node_modules and non-node_modules files
+    const packageStore1pDeps = []
+    const otherNodeModulesFiles = []
+    const otherFiles = []
+    for (const file of files) {
+        if (isNodeModulePath(file)) {
+            // Node module file
+            if (is1pPackageStoreDep(file)) {
+                // 1p package store dep
+                packageStore1pDeps.push(file)
+            } else {
+                // Other node_modules file
+                otherNodeModulesFiles.push(file)
+            }
+        } else {
+            otherFiles.push(file)
+        }
+    }
 
     // Sync non-node_modules files first since syncing 1p js_library linked node_modules symlinks
     // requires the files they point to be in place.
