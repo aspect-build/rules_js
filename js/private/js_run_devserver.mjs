@@ -62,7 +62,7 @@ export function is1pPackageStoreDep(p) {
     // scoped1p: https://regex101.com/r/bWS7Hl/1
     const scoped1p =
         /^.+\/\.aspect_rules_js\/@([^@+\/]+)\+([^@+\/]+)@0\.0\.0\/node_modules\/@\1\/\2$/
-    return p.match(unscoped1p) || p.match(scoped1p)
+    return unscoped1p.test(p) || scoped1p.test(p)
 }
 
 // Utility function to retry an async operation with backoff
