@@ -36,7 +36,7 @@ const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
 
 type HopResults = string | typeof HOP_NON_LINK | typeof HOP_NOT_FOUND
 
-export const patcher = (fs: any = _fs, roots: string[]) => {
+export function patcher(fs: any = _fs, roots: string[]) {
     fs = fs || _fs
     // Make the original version of the library available for when access to the
     // unguarded file system is necessary, such as the esbuild plugin that
@@ -90,7 +90,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         const cb = once(args[args.length - 1] as any)
 
         // override the callback
-        args[args.length - 1] = (err: Error, stats: Stats) => {
+        args[args.length - 1] = function lstatCb(err: Error, stats: Stats) {
             if (err) return cb(err)
 
             if (!stats.isSymbolicLink()) {
@@ -105,7 +105,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 return cb(null, stats)
             }
 
-            return guardedReadLink(args[0], (str: string) => {
+            return guardedReadLink(args[0], guardedReadLinkCb)
+
+            function guardedReadLinkCb(str: string) {
                 if (str != args[0]) {
                     // there are one or more hops within the guards so there is nothing more to do
                     return cb(null, stats)
@@ -114,7 +116,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 // there are no hops so lets report the stats of the real file;
                 // we can't use origRealPath here since that function calls lstat internally
                 // which can result in an infinite loop
-                return unguardedRealPath(args[0], (err: Error, str: string) => {
+                return unguardedRealPath(args[0], unguardedRealPathCb)
+
+                function unguardedRealPathCb(err: Error, str: string) {
                     if (err) {
                         if ((err as any).code === 'ENOENT') {
                             // broken link so there is nothing more to do
@@ -122,9 +126,9 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                         }
                         return cb(err)
                     }
-                    return origLstat(str, (err, str) => cb(err, str))
-                })
-            })
+                    return origLstat(str, cb)
+                }
+            }
         }
 
         origLstat(...args)
@@ -181,15 +185,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
         const cb = once(args[args.length - 1] as any)
 
-        args[args.length - 1] = (err: Error, str: string) => {
+        args[args.length - 1] = function realpathCb(err: Error, str: string) {
             if (err) return cb(err)
             const escapedRoot: string | false = isEscape(args[0], str)
             if (escapedRoot) {
-                return guardedRealPath(
-                    args[0],
-                    (err, str) => cb(err, str),
-                    escapedRoot
-                )
+                return guardedRealPath(args[0], cb, escapedRoot)
             } else {
                 return cb(null, str)
             }
@@ -208,15 +208,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
         const cb = once(args[args.length - 1] as any)
 
-        args[args.length - 1] = (err: Error, str: string) => {
+        args[args.length - 1] = function nativeCb(err: Error, str: string) {
             if (err) return cb(err)
             const escapedRoot: string | false = isEscape(args[0], str)
             if (escapedRoot) {
-                return guardedRealPath(
-                    args[0],
-                    (err, str) => cb(err, str),
-                    escapedRoot
-                )
+                return guardedRealPath(args[0], cb, escapedRoot)
             } else {
                 return cb(null, str)
             }
@@ -259,13 +255,15 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
         const cb = once(args[args.length - 1] as any)
 
-        args[args.length - 1] = (err: Error, str: string) => {
+        args[args.length - 1] = function readlinkCb(err: Error, str: string) {
             if (err) return cb(err)
             const resolved = resolvePathLike(args[0])
             str = path.resolve(path.dirname(resolved), str)
             const escapedRoot: string | false = isEscape(resolved, str)
             if (escapedRoot) {
-                return nextHop(str, (next: string | false) => {
+                return nextHop(str, readlinkNextHopCb)
+
+                function readlinkNextHopCb(next: string | false) {
                     if (!next) {
                         if (next == undefined) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
@@ -281,18 +279,23 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                     )
                     if (
                         next != resolved &&
-                        !isEscape(resolved, next, [escapedRoot])
+                        !isEscape(resolved, next, [escapedRoot as string])
                     ) {
                         return cb(null, next)
                     }
                     // The escape from the root is not mappable back into the root; we must make
                     // this look like a real file so we call readlink on the realpath which we
                     // expect to return an error
-                    return origRealpath(resolved, (err, str) => {
+                    return origRealpath(resolved, readlinkRealpathCb)
+
+                    function readlinkRealpathCb(
+                        err: NodeJS.ErrnoException,
+                        str: string
+                    ) {
                         if (err) return cb(err)
-                        return origReadlink(str, (err, str) => cb(err, str))
-                    })
-                })
+                        return origReadlink(str, cb)
+                    }
+                }
             } else {
                 return cb(null, str)
             }
@@ -349,7 +352,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         const cb = once(args[args.length - 1] as any)
         const p = resolvePathLike(args[0])
 
-        args[args.length - 1] = (err: Error, result: Dirent[]) => {
+        args[args.length - 1] = function readdirCb(
+            err: Error,
+            result: Dirent[]
+        ) {
             if (err) return cb(err)
             // user requested withFileTypes
             if (result[0] && result[0].isSymbolicLink) {
@@ -391,7 +397,10 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             // we call it so we don't have to throw a mock
             if (typeof args[args.length - 1] === 'function') {
                 const cb = once(args[args.length - 1] as any)
-                args[args.length - 1] = async (err: Error, dir: Dir) => {
+                args[args.length - 1] = async function opendirCb(
+                    err: Error,
+                    dir: Dir
+                ) {
                     try {
                         cb(null, await handleDir(dir))
                     } catch (err) {
@@ -466,10 +475,13 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 yield entry
             }
         }
-        ;(dir.read as any) = async (...args: any[]) => {
+        ;(dir.read as any) = async function handleDirRead(...args: any[]) {
             if (typeof args[args.length - 1] === 'function') {
                 const cb = args[args.length - 1]
-                args[args.length - 1] = async (err: Error, entry: Dirent) => {
+                args[args.length - 1] = async function handleDirReadCb(
+                    err: Error,
+                    entry: Dirent
+                ) {
                     cb(err, entry ? await handleDirent(p, entry) : null)
                 }
                 origRead(...args)
@@ -482,7 +494,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             }
         }
         const origReadSync: any = dir.readSync.bind(dir)
-        ;(dir.readSync as any) = () => {
+        ;(dir.readSync as any) = function handleDirReadSync() {
             return handleDirentSync(p, origReadSync()) // intentionally sync for simplicity
         }
 
@@ -490,22 +502,23 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
     }
 
     function handleDirent(p: string, v: Dirent): Promise<Dirent> {
-        return new Promise((resolve, reject) => {
+        return new Promise(function handleDirentExecutor(resolve, reject) {
             if (!v.isSymbolicLink()) {
                 return resolve(v)
             }
             const f = path.resolve(p, v.name)
-            return guardedReadLink(f, (str: string) => {
+            return guardedReadLink(f, handleDirentReadLinkCb)
+            function handleDirentReadLinkCb(str: string) {
                 if (f != str) {
                     return resolve(v)
                 }
                 // There are no hops so we should hide the fact that the file is a symlink
                 v.isSymbolicLink = () => false
-                origRealpath(f, (err, str) => {
+                origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
                         throw err
                     }
-                    fs.stat(str, (err, stat) => {
+                    fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
                             throw err
                         }
@@ -513,7 +526,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                         resolve(v)
                     })
                 })
-            })
+            }
         })
     }
 
@@ -607,7 +620,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
             return cb(hopLinkCache[p])
         }
 
-        origReadlink(p, (err: Error, link: string) => {
+        origReadlink(p, function readHopLinkCb(err: Error, link: string) {
             if (err) {
                 let result: HopResults
 
@@ -677,7 +690,8 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
 
     function guardedReadLink(start: string, cb: (str: string) => void): void {
         let loc = start
-        return nextHop(loc, (next: string | false) => {
+        return nextHop(loc, guardedReadLinkHopCb)
+        function guardedReadLinkHopCb(next: string | false) {
             if (!next) {
                 // we're no longer hopping but we haven't escaped;
                 // something funky happened in the filesystem
@@ -688,7 +702,7 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
                 return cb(loc)
             }
             return cb(next)
-        })
+        }
     }
 
     function guardedReadLinkSync(start: string): string {
@@ -711,8 +725,8 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         cb: (err: Error, str?: string) => void
     ): void {
         start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpath)
-        const oneHop = (loc, cb) => {
-            nextHop(loc, (next) => {
+        function oneHop(loc, cb) {
+            nextHop(loc, function oneHopeNextCb(next) {
                 if (next == undefined) {
                     // file does not exist (broken link)
                     return cb(enoent('realpath', start))
@@ -732,14 +746,11 @@ export const patcher = (fs: any = _fs, roots: string[]) => {
         escapedRoot: string = undefined
     ): void {
         start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpath)
-        const oneHop = (
-            loc: string,
-            cb: (err: Error, str?: string) => void
-        ) => {
-            nextHop(loc, (next) => {
+        function oneHop(loc: string, cb: (err: Error, str?: string) => void) {
+            nextHop(loc, function guardedRealPathHopCb(next) {
                 if (!next) {
                     // we're no longer hopping but we haven't escaped
-                    return fs.exists(loc, (e) => {
+                    return fs.exists(loc, function guardedRealPathExistsCb(e) {
                         if (e) {
                             // we hit a real file within the guard and can go no further
                             return cb(null, loc)
@@ -894,7 +905,7 @@ export function escapeFunction(_roots: string[]) {
 function once<T>(fn: (...args: unknown[]) => T) {
     let called = false
 
-    return (...args: unknown[]) => {
+    return function callOnce(...args: unknown[]) {
         if (called) return
         called = true
 
