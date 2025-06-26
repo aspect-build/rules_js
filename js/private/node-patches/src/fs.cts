@@ -555,7 +555,9 @@ export function patcher(fs: any = _fs, roots: string[]) {
             }
 
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, nested)
+                if (nested) {
+                    link = link + path.sep + nested
+                }
 
                 if (!isEscape(loc, link)) {
                     return cb(link)
@@ -575,7 +577,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 // not a link
                 return cb(escapedHop)
             }
-            nested = path.join(path.basename(maybe), nested)
+            nested = path.basename(maybe) + (nested ? path.sep + nested : '')
             maybe = dirname
             readHopLink(maybe, readNextHop)
         })
@@ -662,7 +664,9 @@ export function patcher(fs: any = _fs, roots: string[]) {
             }
 
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, nested)
+                if (nested) {
+                    link = link + path.sep + nested
+                }
 
                 if (!isEscape(loc, link)) {
                     return link
@@ -683,7 +687,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 return escapedHop
             }
 
-            nested = path.join(path.basename(maybe), nested)
+            nested = path.basename(maybe) + (nested ? path.sep + nested : '')
             maybe = dirname
         }
     }

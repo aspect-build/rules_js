@@ -494,7 +494,9 @@ function patcher(fs = _fs, roots) {
                 return cb(undefined);
             }
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, nested);
+                if (nested) {
+                    link = link + path.sep + nested;
+                }
                 if (!isEscape(loc, link)) {
                     return cb(link);
                 }
@@ -510,7 +512,7 @@ function patcher(fs = _fs, roots) {
                 // not a link
                 return cb(escapedHop);
             }
-            nested = path.join(path.basename(maybe), nested);
+            nested = path.basename(maybe) + (nested ? path.sep + nested : '');
             maybe = dirname;
             readHopLink(maybe, readNextHop);
         });
@@ -587,7 +589,9 @@ function patcher(fs = _fs, roots) {
                 return undefined;
             }
             if (link !== HOP_NON_LINK) {
-                link = path.join(link, nested);
+                if (nested) {
+                    link = link + path.sep + nested;
+                }
                 if (!isEscape(loc, link)) {
                     return link;
                 }
@@ -603,7 +607,7 @@ function patcher(fs = _fs, roots) {
                 // not a link
                 return escapedHop;
             }
-            nested = path.join(path.basename(maybe), nested);
+            nested = path.basename(maybe) + (nested ? path.sep + nested : '');
             maybe = dirname;
         }
     }
