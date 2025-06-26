@@ -21,14 +21,31 @@ _attrs = dicts.add(js_binary_lib.attrs, {
     "command": attr.string(),
 })
 
+def _file_to_entry_json(f):
+    if "/.aspect_rules_js/" in f.short_path:
+        # Special handling for package store deps; we only include 1st party deps since copying
+        # all 3rd party node_modules over is expensive for typical graphs
+        path_segments = f.path.split("/")
+        package_name_segment = path_segments.index(".aspect_rules_js") + 1
+
+        # TODO: @0.0.0 is by default the version of all 1p linked packages, however, it can be overridden by users
+        # if they are manually linking a 1p package and not using workspace. A more robust solution would be to
+        # split handling of 1p and 3p package in the JsInfo provider itself. Other optimizations in the rule set
+        # could also be made if that was the case.
+        if len(path_segments) <= package_name_segment or "@0.0.0" not in path_segments[package_name_segment]:
+            return None
+
+    return json.encode(f.short_path)
+
 def _js_run_devserver_impl(ctx):
     config_file = ctx.actions.declare_file("{}_config.json".format(ctx.label.name))
+    entries_json_file = ctx.actions.declare_file("{}_entries.json".format(ctx.label.name))
 
     launcher = js_binary_lib.create_launcher(
         ctx,
         log_prefix_rule_set = "aspect_rules_js",
         log_prefix_rule = "js_run_devserver",
-        fixed_args = [config_file.short_path],
+        fixed_args = [config_file.short_path, entries_json_file.short_path],
     )
 
     use_tool = ctx.attr.tool_target_cfg or ctx.attr.tool_exec_cfg
@@ -51,30 +68,20 @@ def _js_run_devserver_impl(ctx):
 
     default_data_runfiles = [target[DefaultInfo].default_runfiles.files for target in ctx.attr.data]
 
-    # The .to_list() calls here are intentional and cannot be avoided; they should be small sets of
-    # files as they only include direct npm links (node_modules/foo) and the package store tree
-    # artifacts those symlinks point to (node_modules/.aspect_rules_js/foo@1.2.3/node_modules/foo)
-    data_files = []
-    for f in depset(transitive = transitive_runfiles + [dep.files for dep in ctx.attr.data] + default_data_runfiles).to_list():
-        if "/.aspect_rules_js/" in f.path:
-            # Special handling for package store deps; we only include 1st party deps since copying
-            # all 3rd party node_modules over is expensive for typical graphs
-            path_segments = f.path.split("/")
-            package_name_segment = path_segments.index(".aspect_rules_js") + 1
+    # Build the list of data files to copy to the custom sandbox using ctx.actions.args()
+    entries = ctx.actions.args()
+    entries.set_param_file_format("multiline")
+    entries.add("[")
+    entries.add_joined(
+        depset(transitive = transitive_runfiles + [dep.files for dep in ctx.attr.data] + default_data_runfiles),
+        expand_directories = False,
+        map_each = _file_to_entry_json,
+        join_with = ",",
+    )
+    entries.add("]")
+    ctx.actions.write(entries_json_file, content = entries)
 
-            # TODO: @0.0.0 is by default the version of all 1p linked packages, however, it can be overridden by users
-            # if they are manually linking a 1p package and not using workspace. A more robust solution would be to
-            # split handling of 1p and 3p package in the JsInfo provider itself. Other optimizations in the rule set
-            # could also be made if that was the case.
-            if len(path_segments) > package_name_segment and "@0.0.0" in path_segments[package_name_segment]:
-                # include this first party linked dependency
-                data_files.append(f)
-        else:
-            data_files.append(f)
-
-    config = {
-        "data_files": [f.short_path for f in data_files],
-    }
+    config = {}
 
     runfiles_merge_targets = ctx.attr.data[:]
 
@@ -97,7 +104,7 @@ def _js_run_devserver_impl(ctx):
     ctx.actions.write(config_file, json.encode(config))
 
     runfiles = ctx.runfiles(
-        files = ctx.files.data + [config_file],
+        files = ctx.files.data + [config_file, entries_json_file],
         transitive_files = depset(transitive = transitive_runfiles),
     ).merge(launcher.runfiles).merge_all([
         target[DefaultInfo].default_runfiles
