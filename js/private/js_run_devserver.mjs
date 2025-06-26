@@ -249,14 +249,11 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
 
             if (process.env.JS_BINARY__LOG_DEBUG) {
                 console.error(
-                    `Syncing file ${src.slice(
-                        RUNFILES_ROOT.length + 1
-                    )} (${friendlyFileSize(lstat.size)})`
+                    `Syncing file ${src} (${friendlyFileSize(lstat.size)}) to ${dst}`
                 )
+                console.error(`Dst exists: ${exists}`)
             }
-            if (exists) {
-                await fs.promises.unlink(dst)
-            } else {
+            if (!exists) {
                 // Intentionally synchronous; see comment on mkdirpSync
                 mkdirpSync(path.dirname(dst))
             }
