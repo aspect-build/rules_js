@@ -439,6 +439,7 @@ async function main(args, sandbox) {
     )
 
     const configPath = path.join(RUNFILES_ROOT, args[0])
+    const entriesPath = path.join(RUNFILES_ROOT, args[1])
 
     const config = JSON.parse(await fs.promises.readFile(configPath))
 
@@ -450,7 +451,7 @@ async function main(args, sandbox) {
         ? path.join(RUNFILES_ROOT, config.tool)
         : config.command
 
-    const toolArgs = args.slice(1)
+    const toolArgs = args.slice(2)
 
     console.error(`Running '${tool} ${toolArgs.join(' ')}' in ${cwd}\n\n`)
 
@@ -480,7 +481,7 @@ async function main(args, sandbox) {
     if (process.env.ABAZEL_WATCH_SOCKET_FILE) {
         exitCode = await runWatchProtocol(
             config,
-            configPath,
+            entriesPath,
             sandbox,
             cwd,
             tool,
@@ -490,7 +491,7 @@ async function main(args, sandbox) {
     } else {
         exitCode = await runIBazelProtocol(
             config,
-            configPath,
+            entriesPath,
             sandbox,
             cwd,
             tool,
@@ -505,7 +506,7 @@ async function main(args, sandbox) {
 
 async function runIBazelProtocol(
     config,
-    configPath,
+    entriesPath,
     sandbox,
     cwd,
     tool,
@@ -513,7 +514,7 @@ async function runIBazelProtocol(
     env
 ) {
     await syncFiles(
-        config.data_files,
+        await fs.promises.readFile(entriesPath).then(JSON.parse),
         sandbox,
         config.grant_sandbox_write_permissions,
         syncRecursive
@@ -552,12 +553,12 @@ async function runIBazelProtocol(
                         console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
                     }
 
-                    const oldFiles = config.data_files
+                    const oldFiles = config.previous_files || []
 
                     // Re-parse the config file to get the latest list of data files to copy
-                    const updatedDataFiles = JSON.parse(
-                        await fs.promises.readFile(configPath)
-                    ).data_files
+                    const updatedDataFiles = await fs.promises
+                        .readFile(entriesPath)
+                        .then(JSON.parse)
 
                     // Await promises to catch any exceptions, and wait for the
                     // sync to be complete before writing to stdin of the child
@@ -576,7 +577,7 @@ async function runIBazelProtocol(
                     ])
 
                     // The latest state of copied data files
-                    config.data_files = updatedDataFiles
+                    config.previous_files = updatedDataFiles
                 } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
                     if (process.env.JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_STARTED')
@@ -603,7 +604,7 @@ async function runIBazelProtocol(
 
 async function runWatchProtocol(
     config,
-    configPath,
+    entriesPath,
     sandbox,
     cwd,
     tool,
@@ -618,7 +619,7 @@ async function runWatchProtocol(
             err
         )
     )
-    w.onCycle(watchProtocolCycle.bind(null, config, configPath, sandbox))
+    w.onCycle(watchProtocolCycle.bind(null, config, entriesPath, sandbox))
 
     // Connect to the watch protocol server and begin listening for cycles
     await w.connect()
@@ -654,13 +655,11 @@ async function runWatchProtocol(
     return await procPromise
 }
 
-async function watchProtocolCycle(config, configPath, sandbox, cycle) {
-    const oldFiles = config.data_files
+async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
+    const oldFiles = config.previous_entries || []
 
     // Re-parse the config file to get the latest list of data files to copy
-    const newFiles = JSON.parse(
-        await fs.promises.readFile(configPath)
-    ).data_files
+    const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse)
 
     // Only sync files changed in the current cycle.
     const filesToSync = newFiles.filter((f) =>
@@ -681,7 +680,7 @@ async function watchProtocolCycle(config, configPath, sandbox, cycle) {
     ])
 
     // The latest state of copied data files
-    config.data_files = newFiles
+    config.previous_entries = newFiles
 }
 
 async function cycleSyncRecurse(cycle, src, dst, sandbox, writePerm) {
