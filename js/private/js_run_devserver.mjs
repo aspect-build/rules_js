@@ -6,11 +6,18 @@ import * as child_process from 'node:child_process'
 import * as crypto from 'node:crypto'
 import * as readline from 'node:readline'
 
+// Environment constants
+const {
+    JS_BINARY__EXECROOT,
+    JS_BINARY__BINDIR,
+    JS_BINARY__WORKSPACE,
+    JS_BINARY__RUNFILES,
+    JS_BINARY__LOG_DEBUG,
+} = process.env
+
+const RUNFILES_ROOT = path.join(JS_BINARY__RUNFILES, JS_BINARY__WORKSPACE)
+
 // Globals
-const RUNFILES_ROOT = path.join(
-    process.env.JS_BINARY__RUNFILES,
-    process.env.JS_BINARY__WORKSPACE
-)
 const syncedTime = new Map()
 const syncedChecksum = new Map()
 const mkdirs = new Set()
@@ -146,8 +153,8 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
             // Special case for node_modules symlinks where we should _not_ symlink to the runfiles but rather
             // the bin copy of the symlink to avoid finding npm packages in multiple node_modules trees
             const maybeBinSrc = path.join(
-                process.env.JS_BINARY__EXECROOT,
-                process.env.JS_BINARY__BINDIR,
+                JS_BINARY__EXECROOT,
+                JS_BINARY__BINDIR,
                 file
             )
             if (fs.existsSync(maybeBinSrc)) {
@@ -156,7 +163,7 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
             }
         }
     }
-    if (process.env.JS_BINARY__LOG_DEBUG) {
+    if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `Syncing symlink ${file}${symlinkMeta ? ` (${symlinkMeta})` : ''}`
         )
@@ -172,7 +179,7 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
 }
 
 async function syncDirectory(file, src, sandbox, writePerm) {
-    if (process.env.JS_BINARY__LOG_DEBUG) {
+    if (JS_BINARY__LOG_DEBUG) {
         console.error(`Syncing directory ${file}...`)
     }
     const contents = await fs.promises.readdir(src)
@@ -192,7 +199,7 @@ async function syncDirectory(file, src, sandbox, writePerm) {
 }
 
 async function syncFile(file, src, dst, exists, lstat, writePerm) {
-    if (process.env.JS_BINARY__LOG_DEBUG) {
+    if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `Syncing file ${file}${
                 lstat ? ' (' + friendlyFileSize(lstat.size) + ')' : ''
@@ -214,7 +221,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
     if (writePerm) {
         const s = await fs.promises.stat(dst)
         const mode = s.mode | fs.constants.S_IWUSR
-        if (process.env.JS_BINARY__LOG_DEBUG) {
+        if (JS_BINARY__LOG_DEBUG) {
             console.error(
                 `Adding write permissions to file ${file}: ${(
                     mode & parseInt('777', 8)
@@ -242,7 +249,7 @@ async function syncRecursive(file, _, sandbox, writePerm) {
         const last = syncedTime.get(file)
         if (!lstat.isDirectory() && last && lstat.mtimeMs == last) {
             // this file is already up-to-date
-            if (process.env.JS_BINARY__LOG_DEBUG) {
+            if (JS_BINARY__LOG_DEBUG) {
                 console.error(
                     `Skipping file ${file} since its timestamp has not changed`
                 )
@@ -260,7 +267,7 @@ async function syncRecursive(file, _, sandbox, writePerm) {
             const checksum = await generateChecksum(src)
             if (lastChecksum && checksum == lastChecksum) {
                 // the file contents have not changed since the last sync
-                if (process.env.JS_BINARY__LOG_DEBUG) {
+                if (JS_BINARY__LOG_DEBUG) {
                     console.error(
                         `Skipping file ${file} since contents have not changed`
                     )
@@ -366,7 +373,7 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
 
     // Sync non-node_modules files first since syncing 1p js_library linked node_modules symlinks
     // requires the files they point to be in place.
-    if (otherFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+    if (JS_BINARY__LOG_DEBUG && otherFiles.length > 0) {
         console.error(
             `+ Syncing ${otherFiles.length} non-node_modules files & folders...`
         )
@@ -382,7 +389,7 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
 
     // Sync first-party package store files before other node_modules files since correctly syncing
     // direct 1p node_modules symlinks depends on checking if the package store synced files exist.
-    if (packageStore1pDeps.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+    if (JS_BINARY__LOG_DEBUG && packageStore1pDeps.length > 0) {
         console.error(
             `+ Syncing ${packageStore1pDeps.length} first party package store dep(s)`
         )
@@ -397,7 +404,7 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     ).reduce((s, t) => s + t, 0)
 
     // Finally sync all remaining node_modules files
-    if (otherNodeModulesFiles.length > 0 && process.env.JS_BINARY__LOG_DEBUG) {
+    if (JS_BINARY__LOG_DEBUG && otherNodeModulesFiles.length > 0) {
         console.error(
             `+ Syncing ${otherNodeModulesFiles.length} other node_modules files`
         )
@@ -535,7 +542,7 @@ async function runIBazelProtocol(
             try {
                 const chunkString = chunk.toString()
                 if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
-                    if (process.env.JS_BINARY__LOG_DEBUG) {
+                    if (JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
                     }
 
@@ -565,7 +572,7 @@ async function runIBazelProtocol(
                     // The latest state of copied data files
                     config.previous_files = updatedDataFiles
                 } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
-                    if (process.env.JS_BINARY__LOG_DEBUG) {
+                    if (JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_STARTED')
                     }
                 }
@@ -649,7 +656,7 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
 
     // Only sync files changed in the current cycle.
     const filesToSync = newFiles.filter(([f]) =>
-        cycle.sources.hasOwnProperty(`${process.env.JS_BINARY__WORKSPACE}/${f}`)
+        cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
     )
 
     await Promise.all([
@@ -680,7 +687,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     // TODO: potentially fetch mtime from cycle.sources[src].mtime?
     syncedTime.set(file, Date.now())
 
-    const srcRunfilesPath = path.join(process.env.JS_BINARY__WORKSPACE, file)
+    const srcRunfilesPath = path.join(JS_BINARY__WORKSPACE, file)
 
     // The cycleSyncRecurse function should only be called for files directly from the CYCLE event.
     if (!(srcRunfilesPath in cycle.sources)) {
@@ -711,7 +718,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
         sandbox = await fs.promises.mkdtemp(
             path.join(os.tmpdir(), 'js_run_devserver-')
         )
-        const sandboxMain = path.join(sandbox, process.env.JS_BINARY__WORKSPACE)
+        const sandboxMain = path.join(sandbox, JS_BINARY__WORKSPACE)
 
         // Intentionally synchronous; see comment on mkdirpSync
         mkdirpSync(path.join(sandboxMain, process.env.JS_BINARY__CHDIR || ''))
