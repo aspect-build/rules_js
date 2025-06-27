@@ -138,9 +138,7 @@ async function syncSymlink(src, dst, sandbox, exists) {
             linkPath = path.relative(src, linkPath)
         }
         // Special case for 1p node_modules symlinks
-        const maybe1pSync = path.normalize(
-            path.join(sandbox, srcWorkspacePath, linkPath)
-        )
+        const maybe1pSync = path.join(sandbox, srcWorkspacePath, linkPath)
         if (fs.existsSync(maybe1pSync)) {
             src = maybe1pSync
             symlinkMeta = '1p'
