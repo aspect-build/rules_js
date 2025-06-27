@@ -129,16 +129,15 @@ export function friendlyFileSize(bytes) {
     )
 }
 
-async function syncSymlink(src, dst, sandbox, exists) {
-    const srcWorkspacePath = src.slice(RUNFILES_ROOT.length + 1)
+async function syncSymlink(file, src, dst, sandbox, exists) {
     let symlinkMeta = ''
-    if (isNodeModulePath(src)) {
+    if (isNodeModulePath(file)) {
         let linkPath = await fs.promises.readlink(src)
         if (path.isAbsolute(linkPath)) {
             linkPath = path.relative(src, linkPath)
         }
         // Special case for 1p node_modules symlinks
-        const maybe1pSync = path.join(sandbox, srcWorkspacePath, linkPath)
+        const maybe1pSync = path.join(sandbox, file, linkPath)
         if (fs.existsSync(maybe1pSync)) {
             src = maybe1pSync
             symlinkMeta = '1p'
@@ -149,7 +148,7 @@ async function syncSymlink(src, dst, sandbox, exists) {
             const maybeBinSrc = path.join(
                 process.env.JS_BINARY__EXECROOT,
                 process.env.JS_BINARY__BINDIR,
-                srcWorkspacePath
+                file
             )
             if (fs.existsSync(maybeBinSrc)) {
                 src = maybeBinSrc
@@ -159,9 +158,7 @@ async function syncSymlink(src, dst, sandbox, exists) {
     }
     if (process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
-            `Syncing symlink ${srcWorkspacePath}${
-                symlinkMeta ? ` (${symlinkMeta})` : ''
-            }`
+            `Syncing symlink ${file}${symlinkMeta ? ` (${symlinkMeta})` : ''}`
         )
     }
     if (exists) {
@@ -194,10 +191,10 @@ async function syncDirectory(file, src, sandbox, writePerm) {
     ).reduce((s, t) => s + t, 0)
 }
 
-async function syncFile(src, dst, exists, lstat, writePerm) {
+async function syncFile(file, src, dst, exists, lstat, writePerm) {
     if (process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
-            `Syncing file ${src.slice(RUNFILES_ROOT.length + 1)}${
+            `Syncing file ${file}${
                 lstat ? ' (' + friendlyFileSize(lstat.size) + ')' : ''
             })`
         )
@@ -219,9 +216,9 @@ async function syncFile(src, dst, exists, lstat, writePerm) {
         const mode = s.mode | fs.constants.S_IWUSR
         if (process.env.JS_BINARY__LOG_DEBUG) {
             console.error(
-                `Adding write permissions to file ${src.slice(
-                    RUNFILES_ROOT.length + 1
-                )}: ${(mode & parseInt('777', 8)).toString(8)}`
+                `Adding write permissions to file ${file}: ${(
+                    mode & parseInt('777', 8)
+                ).toString(8)}`
             )
         }
         await fs.promises.chmod(dst, mode)
@@ -242,41 +239,37 @@ async function syncRecursive(file, _, sandbox, writePerm) {
             () => fs.promises.lstat(src),
             `lstat for ${src}`
         )
-        const last = syncedTime.get(src)
+        const last = syncedTime.get(file)
         if (!lstat.isDirectory() && last && lstat.mtimeMs == last) {
             // this file is already up-to-date
             if (process.env.JS_BINARY__LOG_DEBUG) {
                 console.error(
-                    `Skipping file ${src.slice(
-                        RUNFILES_ROOT.length + 1
-                    )} since its timestamp has not changed`
+                    `Skipping file ${file} since its timestamp has not changed`
                 )
             }
             return 0
         }
-        const exists = syncedTime.has(src) || fs.existsSync(dst)
-        syncedTime.set(src, lstat.mtimeMs)
+        const exists = syncedTime.has(file) || fs.existsSync(dst)
+        syncedTime.set(file, lstat.mtimeMs)
         if (lstat.isSymbolicLink()) {
-            return syncSymlink(src, dst, sandbox, exists)
+            return syncSymlink(file, src, dst, sandbox, exists)
         } else if (lstat.isDirectory()) {
             return syncDirectory(file, src, sandbox, writePerm)
         } else {
-            const lastChecksum = syncedChecksum.get(src)
+            const lastChecksum = syncedChecksum.get(file)
             const checksum = await generateChecksum(src)
             if (lastChecksum && checksum == lastChecksum) {
                 // the file contents have not changed since the last sync
                 if (process.env.JS_BINARY__LOG_DEBUG) {
                     console.error(
-                        `Skipping file ${src.slice(
-                            RUNFILES_ROOT.length + 1
-                        )} since contents have not changed`
+                        `Skipping file ${file} since contents have not changed`
                     )
                 }
                 return 0
             }
-            syncedChecksum.set(src, checksum)
+            syncedChecksum.set(file, checksum)
 
-            return syncFile(src, dst, exists, lstat, writePerm)
+            return syncFile(file, src, dst, exists, lstat, writePerm)
         }
     } catch (e) {
         console.error(e)
@@ -305,14 +298,14 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 
         // clear any matching files or files rooted at this folder from the
         // syncedTime and syncedChecksum maps
-        const srcPath = path.join(RUNFILES_ROOT, f)
+        const fSlash = f + '/'
         for (const k of syncedTime.keys()) {
-            if (k == srcPath || k.startsWith(srcPath + '/')) {
+            if (k == f || k.startsWith(fSlash)) {
                 syncedTime.delete(k)
             }
         }
         for (const k of syncedChecksum.keys()) {
-            if (k == srcPath || k.startsWith(srcPath + '/')) {
+            if (k == f || k.startsWith(fSlash)) {
                 syncedChecksum.delete(k)
             }
         }
@@ -681,15 +674,13 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     const dst = path.join(sandbox, file)
 
     // Assume it exists if it has been synced before.
-    const exists = syncedTime.has(src)
+    const exists = syncedTime.has(file)
 
     // Assume it was updated 'now()' since we know it changed
     // TODO: potentially fetch mtime from cycle.sources[src].mtime?
-    syncedTime.set(src, Date.now())
+    syncedTime.set(file, Date.now())
 
-    const srcRunfilesPath = src.startsWith(process.env.JS_BINARY__RUNFILES)
-        ? src.slice(process.env.JS_BINARY__RUNFILES.length + 1)
-        : src
+    const srcRunfilesPath = path.join(process.env.JS_BINARY__WORKSPACE, file)
 
     // The cycleSyncRecurse function should only be called for files directly from the CYCLE event.
     if (!(srcRunfilesPath in cycle.sources)) {
@@ -697,13 +688,13 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     }
 
     if (cycle.sources[srcRunfilesPath].is_symlink) {
-        return syncSymlink(src, dst, sandbox, exists)
+        return syncSymlink(file, src, dst, sandbox, exists)
     }
 
     if (isDirectory) {
         return syncDirectory(file, src, sandbox, writePerm)
     } else {
-        return syncFile(src, dst, exists, null, writePerm)
+        return syncFile(file, src, dst, exists, null, writePerm)
     }
 }
 
