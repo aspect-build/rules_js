@@ -188,7 +188,7 @@ async function syncDirectory(file, src, sandbox, writePerm) {
             contents.map(
                 async (entry) =>
                     await syncRecursive(
-                        path.join(file, entry),
+                        file + path.sep + entry,
                         undefined,
                         sandbox,
                         writePerm
@@ -238,8 +238,8 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
 async function syncRecursive(file, _, sandbox, writePerm) {
-    const src = path.join(RUNFILES_ROOT, file)
-    const dst = path.join(sandbox, file)
+    const src = RUNFILES_ROOT + path.sep + file
+    const dst = sandbox + path.sep + file
 
     try {
         const lstat = await withRetry(
@@ -677,8 +677,8 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
 }
 
 async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
-    const src = path.join(RUNFILES_ROOT, file)
-    const dst = path.join(sandbox, file)
+    const src = RUNFILES_ROOT + path.sep + file
+    const dst = sandbox + path.sep + file
 
     // Assume it exists if it has been synced before.
     const exists = syncedTime.has(file)
@@ -687,7 +687,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     // TODO: potentially fetch mtime from cycle.sources[src].mtime?
     syncedTime.set(file, Date.now())
 
-    const srcRunfilesPath = path.join(JS_BINARY__WORKSPACE, file)
+    const srcRunfilesPath = JS_BINARY__WORKSPACE + path.sep + file
 
     // The cycleSyncRecurse function should only be called for files directly from the CYCLE event.
     if (!(srcRunfilesPath in cycle.sources)) {
