@@ -176,17 +176,13 @@ async function syncSymlink(src, dst, sandbox, exists) {
     return 1
 }
 
-async function syncDirectory(src, dst, sandbox, exists, writePerm) {
+async function syncDirectory(src, dst, sandbox, writePerm) {
     if (process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
             `Syncing directory ${src.slice(RUNFILES_ROOT.length + 1)}...`
         )
     }
     const contents = await fs.promises.readdir(src)
-    if (!exists) {
-        // Intentionally synchronous; see comment on mkdirpSync
-        mkdirpSync(dst)
-    }
     return (
         await Promise.all(
             contents.map(
@@ -264,7 +260,7 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
         if (lstat.isSymbolicLink()) {
             return syncSymlink(src, dst, sandbox, exists)
         } else if (lstat.isDirectory()) {
-            return syncDirectory(src, dst, sandbox, exists, writePerm)
+            return syncDirectory(src, dst, sandbox, writePerm)
         } else {
             const lastChecksum = syncedChecksum.get(src)
             const checksum = await generateChecksum(src)
@@ -718,7 +714,7 @@ async function cycleSyncRecurse(cycle, src, dst, sandbox, writePerm) {
     }
 
     if (isDirectory) {
-        return syncDirectory(src, dst, sandbox, exists, writePerm)
+        return syncDirectory(src, dst, sandbox, writePerm)
     } else {
         return syncFile(src, dst, exists, lstat, writePerm)
     }
