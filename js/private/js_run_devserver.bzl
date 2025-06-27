@@ -35,7 +35,7 @@ def _file_to_entry_json(f):
         if len(path_segments) <= package_name_segment or "@0.0.0" not in path_segments[package_name_segment]:
             return None
 
-    return json.encode(f.short_path)
+    return json.encode([f.short_path, 1 if f.is_directory else 0])
 
 def _js_run_devserver_impl(ctx):
     config_file = ctx.actions.declare_file("{}_config.json".format(ctx.label.name))

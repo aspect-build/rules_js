@@ -176,11 +176,9 @@ async function syncSymlink(src, dst, sandbox, exists) {
     return 1
 }
 
-async function syncDirectory(src, dst, sandbox, writePerm) {
+async function syncDirectory(file, src, sandbox, writePerm) {
     if (process.env.JS_BINARY__LOG_DEBUG) {
-        console.error(
-            `Syncing directory ${src.slice(RUNFILES_ROOT.length + 1)}...`
-        )
+        console.error(`Syncing directory ${file}...`)
     }
     const contents = await fs.promises.readdir(src)
     return (
@@ -188,8 +186,8 @@ async function syncDirectory(src, dst, sandbox, writePerm) {
             contents.map(
                 async (entry) =>
                     await syncRecursive(
-                        path.join(src, entry),
-                        path.join(dst, entry),
+                        path.join(file, entry),
+                        undefined,
                         sandbox,
                         writePerm
                     )
@@ -201,9 +199,9 @@ async function syncDirectory(src, dst, sandbox, writePerm) {
 async function syncFile(src, dst, exists, lstat, writePerm) {
     if (process.env.JS_BINARY__LOG_DEBUG) {
         console.error(
-            `Syncing file ${src.slice(
-                RUNFILES_ROOT.length + 1
-            )} (${friendlyFileSize(lstat.size)})`
+            `Syncing file ${src.slice(RUNFILES_ROOT.length + 1)}${
+                lstat ? ' (' + friendlyFileSize(lstat.size) + ')' : ''
+            })`
         )
     }
     if (exists) {
@@ -237,7 +235,10 @@ async function syncFile(src, dst, exists, lstat, writePerm) {
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
-async function syncRecursive(src, dst, sandbox, writePerm) {
+async function syncRecursive(file, _, sandbox, writePerm) {
+    const src = path.join(RUNFILES_ROOT, file)
+    const dst = path.join(sandbox, file)
+
     try {
         const lstat = await withRetry(
             () => fs.promises.lstat(src),
@@ -260,7 +261,7 @@ async function syncRecursive(src, dst, sandbox, writePerm) {
         if (lstat.isSymbolicLink()) {
             return syncSymlink(src, dst, sandbox, exists)
         } else if (lstat.isDirectory()) {
-            return syncDirectory(src, dst, sandbox, writePerm)
+            return syncDirectory(file, src, sandbox, writePerm)
         } else {
             const lastChecksum = syncedChecksum.get(src)
             const checksum = await generateChecksum(src)
@@ -293,8 +294,11 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const deletions = []
 
     // Remove files that were previously synced but are no longer in the updated list of files to sync
-    const updatedFilesSet = new Set(updatedFiles)
-    for (const f of previousFiles) {
+    const updatedFilesSet = new Set()
+    for (const [f] of updatedFiles) {
+        updatedFilesSet.add(f)
+    }
+    for (const [f] of previousFiles) {
         if (updatedFilesSet.has(f)) {
             continue
         }
@@ -353,18 +357,19 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     const packageStore1pDeps = []
     const otherNodeModulesFiles = []
     const otherFiles = []
-    for (const file of files) {
+    for (const fileInfo of files) {
+        const file = fileInfo[0]
         if (isNodeModulePath(file)) {
             // Node module file
             if (is1pPackageStoreDep(file)) {
                 // 1p package store dep
-                packageStore1pDeps.push(file)
+                packageStore1pDeps.push(fileInfo)
             } else {
                 // Other node_modules file
-                otherNodeModulesFiles.push(file)
+                otherNodeModulesFiles.push(fileInfo)
             }
         } else {
-            otherFiles.push(file)
+            otherFiles.push(fileInfo)
         }
     }
 
@@ -378,10 +383,8 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
 
     let totalSynced = (
         await Promise.all(
-            otherFiles.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
-                const dst = path.join(sandbox, file)
-                return await doSync(src, dst, sandbox, writePerm)
+            otherFiles.map(async ([file, isDirectory]) => {
+                return await doSync(file, isDirectory, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -396,10 +399,8 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
 
     totalSynced += (
         await Promise.all(
-            packageStore1pDeps.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
-                const dst = path.join(sandbox, file)
-                return await doSync(src, dst, sandbox, writePerm)
+            packageStore1pDeps.map(async ([file, isDirectory]) => {
+                return await doSync(file, isDirectory, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -413,10 +414,8 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
 
     totalSynced += (
         await Promise.all(
-            otherNodeModulesFiles.map(async (file) => {
-                const src = path.join(RUNFILES_ROOT, file)
-                const dst = path.join(sandbox, file)
-                return await doSync(src, dst, sandbox, writePerm)
+            otherNodeModulesFiles.map(async ([file, isDirectory]) => {
+                return await doSync(file, isDirectory, sandbox, writePerm)
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -658,7 +657,7 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse)
 
     // Only sync files changed in the current cycle.
-    const filesToSync = newFiles.filter((f) =>
+    const filesToSync = newFiles.filter(([f]) =>
         cycle.sources.hasOwnProperty(`${process.env.JS_BINARY__WORKSPACE}/${f}`)
     )
 
@@ -679,7 +678,10 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     config.previous_entries = newFiles
 }
 
-async function cycleSyncRecurse(cycle, src, dst, sandbox, writePerm) {
+async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
+    const src = path.join(RUNFILES_ROOT, file)
+    const dst = path.join(sandbox, file)
+
     // Assume it exists if it has been synced before.
     const exists = syncedTime.has(src)
 
@@ -700,23 +702,10 @@ async function cycleSyncRecurse(cycle, src, dst, sandbox, writePerm) {
         return syncSymlink(src, dst, sandbox, exists)
     }
 
-    let isDirectory = false
-    let lstat = null
-    if (isNodeModulePath(src)) {
-        // A node_modules path which is not a symlink is always a directory
-        isDirectory = true
-    } else {
-        // Otherwise a fs.lstat is needed to determine if it is a directory
-        // TODO: move to protocol capability that expands directories
-        lstat = await fs.promises.lstat(src)
-
-        isDirectory = lstat.isDirectory()
-    }
-
     if (isDirectory) {
-        return syncDirectory(src, dst, sandbox, writePerm)
+        return syncDirectory(file, src, sandbox, writePerm)
     } else {
-        return syncFile(src, dst, exists, lstat, writePerm)
+        return syncFile(src, dst, exists, null, writePerm)
     }
 }
 
