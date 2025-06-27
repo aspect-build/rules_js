@@ -688,13 +688,14 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     syncedTime.set(file, Date.now())
 
     const srcRunfilesPath = JS_BINARY__WORKSPACE + path.sep + file
+    const srcRunfilesInfo = cycle.sources[srcRunfilesPath]
 
     // The cycleSyncRecurse function should only be called for files directly from the CYCLE event.
-    if (!(srcRunfilesPath in cycle.sources)) {
+    if (!srcRunfilesInfo) {
         throw new Error(`File ${srcRunfilesPath} is not in the cycle sources`)
     }
 
-    if (cycle.sources[srcRunfilesPath].is_symlink) {
+    if (srcRunfilesInfo.is_symlink) {
         return syncSymlink(file, src, dst, sandbox, exists)
     }
 
