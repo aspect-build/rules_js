@@ -11,7 +11,6 @@ load("//npm:defs.bzl", "npm_link_package")
 # manual /WORKSPACE npm_import rules to bazel-bin/node_modules as well as the package store
 # bazel-bin/node_modules/.aspect_rules_js since /pnpm-lock.yaml is the root of the pnpm workspace
 npm_link_all_packages(
-    name = "node_modules",
     imported_links = [
         npm_link_acorn,
         npm_link_pnpm,
@@ -27,7 +26,6 @@ build_test(
 
 # buildifier: disable=duplicated-name
 NODE_MODULES = npm_link_targets(
-    name = "node_modules",
     package = package_name(),
 ) + [
     "//:node_modules/acorn",
