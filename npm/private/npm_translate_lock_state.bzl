@@ -483,6 +483,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 def _load_lockfile(priv, rctx, _, label_store):
     importers = {}
     packages = {}
+    snapshots = {}
     patched_dependencies = {}
     lock_version = None
     lock_parse_err = None
@@ -496,11 +497,12 @@ def _load_lockfile(priv, rctx, _, label_store):
     if result.return_code:
         lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        importers, packages, patched_dependencies, lock_version, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        importers, packages, snapshots, patched_dependencies, lock_version, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
 
     priv["lock_version"] = lock_version
     priv["importers"] = importers
     priv["packages"] = packages
+    priv["snapshots"] = snapshots
     priv["patched_dependencies"] = patched_dependencies
 
     if lock_parse_err != None:
@@ -539,6 +541,9 @@ def _importers(priv):
 
 def _packages(priv):
     return priv["packages"]
+
+def _snapshots(priv):
+    return priv["snapshots"]
 
 def _patched_dependencies(priv):
     return priv["patched_dependencies"]
@@ -581,6 +586,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         "npm_auth": {},
         "npm_registries": {},
         "packages": {},
+        "snapshots": {},
         "root_package": None,
         "root_package_json": {},
         "patched_dependencies": {},
@@ -597,6 +603,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         lockfile_version = lambda: _lockfile_version(priv),
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
+        snapshots = lambda: _snapshots(priv),
         patched_dependencies = lambda: _patched_dependencies(priv),
         only_built_dependencies = lambda: _only_built_dependencies(priv),
         npm_registries = lambda: _npm_registries(priv),

@@ -36,7 +36,9 @@
         "alias-project-a": "link:../projects/a",
         "test-peer-types": "../projects/peer-types",
         "test-c200-d200": "workspace:*",
-        "test-c201-d200": "workspace:*"
+        "test-c201-d200": "workspace:*",
+        "test-local-combo-1": "workspace:*",
+        "test-local-combo-2": "workspace:*"
     },
     "devDependencies": {
         "@aspect-test/b": "5.0.2",
