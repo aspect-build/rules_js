@@ -278,10 +278,11 @@ def js_run_devserver(
             "//conditions:default": False,
         }),
         entry_point = Label("@aspect_rules_js//js/private:js_devserver_entrypoint"),
-        # This rule speaks the ibazel protocol
+        # This rule speaks the ibazel protocol, supports live reload, supports incremental-build-protocol
         tags = kwargs.pop("tags", []) + [
             "ibazel_live_reload",
             "ibazel_notify_changes",
+            "supports_incremental_build_protocol",
         ],
         tool_exec_cfg = tool,
         tool_target_cfg = tool,
