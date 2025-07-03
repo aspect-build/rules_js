@@ -34,6 +34,7 @@ load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load(":platform_utils.bzl", "get_normalized_platform", "is_package_compatible_with_platform")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -611,7 +612,111 @@ def _download_and_extract_archive(rctx, package_json_only):
             msg = "Failed to set directory listing permissions. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(chmod_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
+def _is_package_compatible_with_current_platform(rctx, package_os, package_cpu):
+    """Check if a package is compatible with the current execution platform.
+    
+    Args:
+        rctx: repository context
+        package_os: OS constraint from package metadata (string, list, or None)
+        package_cpu: CPU constraint from package metadata (string, list, or None)
+    
+    Returns:
+        bool: True if compatible or no constraints, False if incompatible
+    """
+    # Get normalized current platform info
+    current_os, current_cpu = get_normalized_platform(rctx.os.name, rctx.os.arch)
+    
+    return is_package_compatible_with_platform(package_os, package_cpu, current_os, current_cpu)
+
+def _create_incompatible_package_fake(rctx, package_os, package_cpu):
+    """Create a fake package repository for incompatible packages.
+    
+    This creates only minimal files to reduce system load while maintaining Bazel compatibility.
+    This prevents downloads while providing clear indication of incompatibility.
+    """
+    # Get normalized platform info for consistent reporting
+    current_os, current_cpu = get_normalized_platform(rctx.os.name, rctx.os.arch)
+    
+    # Normalize constraint display for clarity
+    def format_constraint(constraint):
+        if not constraint:
+            return None
+        return constraint if type(constraint) == "list" else [constraint]
+    
+    required_os = format_constraint(package_os)
+    required_cpu = format_constraint(package_cpu)
+    
+    # Generate human-readable constraint description
+    constraints = []
+    if required_os:
+        constraints.append("os={}".format(",".join(required_os)))
+    if required_cpu:
+        constraints.append("cpu={}".format(",".join(required_cpu)))
+    
+    constraint_desc = " and ".join(constraints) if constraints else "specific platform constraints"
+    
+    # Create a structured package.json with clear compatibility information
+    package_json_content = {
+        "name": rctx.attr.package,
+        "version": rctx.attr.version,
+        "description": "Platform-incompatible package placeholder created by rules_js",
+        "_rules_js": {
+            "incompatible": True,
+            "reason": "platform_mismatch",
+            "required": {
+                "os": required_os,
+                "cpu": required_cpu,
+            },
+            "current": {
+                "os": current_os,
+                "cpu": current_cpu,
+            },
+            "message": "This package requires {} but current platform is {}/{}".format(
+                constraint_desc,
+                current_os,
+                current_cpu
+            ),
+        },
+        # Keep legacy marker for backward compatibility with existing tools/tests
+        "_incompatible": "Platform mismatch: requires {} but current platform is {}/{}".format(
+            constraint_desc,
+            current_os,
+            current_cpu
+        ),
+    }
+    rctx.file("package.json", json.encode_indent(package_json_content, indent = "  "))
+    
+    # Create a minimal BUILD.bazel file with required pkg target
+    # Use npm_package_internal to provide proper providers but keep it minimal
+    generated_by_prefix = _make_generated_by_prefix(rctx.attr.package, rctx.attr.version)
+    build_content = """{generated_by_prefix}load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")
+
+# Minimal fake package for platform-incompatible dependency
+_npm_package_internal(
+    name = "pkg",
+    src = ".",
+    package = "{package}",
+    version = "{version}",
+    visibility = ["//visibility:public"],
+)
+""".format(
+        generated_by_prefix = generated_by_prefix,
+        package = rctx.attr.package,
+        version = rctx.attr.version
+    )
+    rctx.file("BUILD.bazel", build_content)
+
 def _npm_import_rule_impl(rctx):
+    # Check platform compatibility early to avoid unnecessary downloads
+    package_os = rctx.attr.os if rctx.attr.os else None
+    package_cpu = rctx.attr.cpu if rctx.attr.cpu else None
+    
+    if not _is_package_compatible_with_current_platform(rctx, package_os, package_cpu):
+        # Package is incompatible - create fake target (no download but buildable)
+        _create_incompatible_package_fake(rctx, package_os, package_cpu)
+        return
+    # else package is compatible - proceed with normal download
+    
     has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
     has_patches = not (not rctx.attr.patches)
 
@@ -920,6 +1025,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
     "commit": attr.string(),
+    "cpu": attr.string_list(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
@@ -932,6 +1038,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "npm_auth_basic": attr.string(),
     "npm_auth_password": attr.string(),
     "npm_auth_username": attr.string(),
+    "os": attr.string_list(),
     "patch_tool": attr.label(),
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
@@ -1008,6 +1115,8 @@ def npm_import(
         bins = {},
         dev = False,
         exclude_package_contents = [],
+        os = None,
+        cpu = None,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1277,6 +1386,8 @@ def npm_import(
             exclude_package_contents = ["**/tests/**"]
             ```
 
+
+
         **kwargs: Internal use only
     """
 
@@ -1286,6 +1397,15 @@ def npm_import(
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
+
+    # Normalize os and cpu to lists for the rule
+    os_list = []
+    if os != None:
+        os_list = os if type(os) == "list" else [os]
+    
+    cpu_list = []
+    if cpu != None:
+        cpu_list = cpu if type(cpu) == "list" else [cpu]
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
@@ -1315,6 +1435,8 @@ def npm_import(
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
         system_tar = system_tar,
+        os = os_list,
+        cpu = cpu_list,
     )
 
     has_custom_postinstall = not (not custom_postinstall)

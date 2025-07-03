@@ -57,7 +57,7 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathrequiresbuild
 #
 #   resolution: the lockfile resolution field
-def _new_package_info(name, dependencies, optional_dependencies, dev_only, has_bin, optional, requires_build, version, friendly_version, resolution):
+def _new_package_info(name, dependencies, optional_dependencies, dev_only, has_bin, optional, requires_build, version, friendly_version, resolution, cpu = None, os = None):
     return {
         "name": name,
         "dependencies": dependencies,
@@ -69,6 +69,8 @@ def _new_package_info(name, dependencies, optional_dependencies, dev_only, has_b
         "version": version,
         "friendly_version": friendly_version,
         "resolution": resolution,
+        "cpu": cpu,
+        "os": os,
     }
 
 ######################### Lockfile v5.4 #########################
@@ -242,6 +244,8 @@ def _convert_v5_packages(packages):
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
             resolution = package_snapshot.get("resolution"),
+            cpu = package_snapshot.get("cpu", None),
+            os = package_snapshot.get("os", None),
         )
 
         if package_key in result:
@@ -412,6 +416,8 @@ def _convert_v6_packages(packages):
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
             resolution = package_snapshot.get("resolution"),
+            cpu = package_snapshot.get("cpu", None),
+            os = package_snapshot.get("os", None),
         )
 
         if package_key in result:
@@ -555,6 +561,8 @@ def _convert_v9_packages(packages, snapshots):
             optional = package_snapshot.get("optional", False),
             requires_build = None,  # Unknown from lockfile in v9
             resolution = package_data.get("resolution"),
+            cpu = package_data.get("cpu", None),
+            os = package_data.get("os", None),
         )
 
         if package_key in result:

@@ -1,0 +1,10 @@
+{
+  "name": "npm-translate-lock-platform-test",
+  "version": "1.0.0",
+  "dependencies": {
+    "esbuild": "0.16.17"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  }
+} 

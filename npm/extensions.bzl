@@ -14,12 +14,15 @@ load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers 
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
+load("//npm/private:platform_utils.bzl", "create_platform_cache", "get_normalized_platform_cached")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:tar.bzl", "detect_system_tar")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
+
+
 
 def _npm_extension_impl(module_ctx):
     if not bazel_lib_utils.is_bazel_6_or_greater():
@@ -145,6 +148,10 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
     )
+    # Create platform cache and detect current platform for compatibility checks
+    platform_cache = create_platform_cache()
+    current_os, current_cpu = get_normalized_platform_cached(module_ctx.os.name, module_ctx.os.arch, platform_cache)
+
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
@@ -160,15 +167,23 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         default_registry = state.default_registry(),
         npm_auth = npm_auth,
         exclude_package_contents_config = exclude_package_contents_config,
+        current_os = current_os,
+        current_cpu = current_cpu,
+        platform_cache = platform_cache,
     )
 
     system_tar = detect_system_tar(module_ctx)
 
     for i in imports:
+        # Pass full platform constraints (including lists) to npm_import
+        package_cpu = getattr(i, "cpu", None)
+        package_os = getattr(i, "os", None)
+
         npm_import(
             name = i.name,
             bins = i.bins,
             commit = i.commit,
+            cpu = package_cpu,
             custom_postinstall = i.custom_postinstall,
             deps = i.deps,
             dev = i.dev,
@@ -185,6 +200,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             npm_auth_basic = i.npm_auth_basic,
             npm_auth_password = i.npm_auth_password,
             npm_auth_username = i.npm_auth_username,
+            os = package_os,
             package = i.package,
             package_visibility = i.package_visibility,
             patch_tool = i.patch_tool,
@@ -204,6 +220,7 @@ def _npm_import_bzlmod(i):
         name = i.name,
         bins = i.bins,
         commit = i.commit,
+        cpu = getattr(i, "cpu", None),
         custom_postinstall = i.custom_postinstall,
         deps = i.deps,
         dev = i.dev,
@@ -219,6 +236,7 @@ def _npm_import_bzlmod(i):
         npm_auth_basic = i.npm_auth_basic,
         npm_auth_username = i.npm_auth_username,
         npm_auth_password = i.npm_auth_password,
+        os = getattr(i, "os", None),
         package = i.package,
         package_visibility = i.package_visibility,
         patch_tool = i.patch_tool,

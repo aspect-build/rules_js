@@ -4,7 +4,46 @@ load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load(":platform_utils.bzl", "is_package_compatible_with_platform", "is_package_compatible_with_platform_cached")
 load(":utils.bzl", "utils")
+
+def _is_package_compatible_with_current_platform(package_os, package_cpu, current_os = None, current_cpu = None):
+    """Check if a package is compatible with the current build platform.
+
+    Args:
+        package_os: OS constraint from package metadata (string, list, or None)
+        package_cpu: CPU constraint from package metadata (string, list, or None)
+        current_os: Current OS name (normalized to Node.js conventions)
+        current_cpu: Current CPU architecture (normalized to Node.js conventions)
+
+    Returns:
+        bool: True if compatible or no constraints, False if incompatible
+
+    Raises:
+        fail: If constraint formats are invalid
+    """
+    # If we don't have current platform info, be conservative
+    if current_os == None or current_cpu == None:
+        # Basic validation of constraint types (detailed validation happens in platform_utils)
+        if package_os != None and type(package_os) not in ["string", "list"]:
+            fail("Invalid package_os constraint: must be string, list, or None, got {} of type {}".format(
+                package_os, type(package_os)
+            ))
+        if package_cpu != None and type(package_cpu) not in ["string", "list"]:
+            fail("Invalid package_cpu constraint: must be string, list, or None, got {} of type {}".format(
+                package_cpu, type(package_cpu)
+            ))
+
+        # Allow packages with no constraints, reject packages with constraints
+        return not package_os and not package_cpu
+
+    # Validate current platform parameters
+    if current_os and type(current_os) != "string":
+        fail("Invalid current_os: must be string or None, got {} of type {}".format(current_os, type(current_os)))
+    if current_cpu and type(current_cpu) != "string":
+        fail("Invalid current_cpu: must be string or None, got {} of type {}".format(current_cpu, type(current_cpu)))
+
+    return is_package_compatible_with_platform(package_os, package_cpu, current_os, current_cpu)
 
 ################################################################################
 def _check_for_conflicting_public_links(npm_imports, public_hoist_packages):
@@ -253,7 +292,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
+def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None, current_os = None, current_cpu = None, platform_cache = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -419,7 +458,19 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build)
+        # Check platform compatibility to determine if we should run lifecycle hooks
+        package_os = package_info.get("os", None)
+        package_cpu = package_info.get("cpu", None)
+
+        # Use cached compatibility check if cache is available
+        if platform_cache != None:
+            is_platform_compatible = is_package_compatible_with_platform_cached(
+                package_os, package_cpu, current_os, current_cpu, platform_cache
+            )
+        else:
+            is_platform_compatible = _is_package_compatible_with_current_platform(package_os, package_cpu, current_os, current_cpu)
+
+        run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build) and is_platform_compatible
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
             lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
@@ -495,6 +546,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             package_info = package_info,
             dev = dev_only,
             replace_package = replace_package,
+            cpu = package_info.get("cpu", None),
+            os = package_info.get("os", None),
+            optional = optional,
         )
 
         if repo_name in result:
