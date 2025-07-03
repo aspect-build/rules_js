@@ -473,11 +473,6 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         else:
             is_platform_compatible = _is_package_compatible_with_current_platform(package_os, package_cpu, current_os, current_cpu)
 
-        # Skip platform-incompatible packages entirely - don't create npm_import rules for them
-        if not is_platform_compatible:
-            skipped_packages.append("{}@{}".format(name, version))
-            continue
-
         run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build) and is_platform_compatible
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)

@@ -612,9 +612,8 @@ def _download_and_extract_archive(rctx, package_json_only):
             msg = "Failed to set directory listing permissions. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(chmod_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
-
 def _npm_import_rule_impl(rctx):
-    
+
     has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
     has_patches = not (not rctx.attr.patches)
 
@@ -1300,7 +1299,7 @@ def npm_import(
     os_list = []
     if os != None:
         os_list = os if type(os) == "list" else [os]
-    
+
     cpu_list = []
     if cpu != None:
         cpu_list = cpu if type(cpu) == "list" else [cpu]
