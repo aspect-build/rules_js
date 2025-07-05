@@ -95,9 +95,11 @@ def lockfile_test(npm_link_all_packages, name = None):
             # The full node_modules target
             ":node_modules",
 
-            # Direct 'dependencies'
+            # Direct 'dependencies', some with peers etc
             ":node_modules/@aspect-test",  # target for the scope
             ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/b",
+            ":node_modules/@aspect-test/c",
 
             # Direct 'devDependencies'
             ":node_modules/@aspect-test/b",
@@ -114,11 +116,6 @@ def lockfile_test(npm_link_all_packages, name = None):
 
             # npm: alias to a package that has many peers
             ":node_modules/rollup-plugin-with-peers",
-            # underlying repo for the many-peers package
-            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (
-                lock_repo,
-                "3vgsug3mjv7wvue74swjdxifxy" if lock_version == "v54" else "626159424" if (lock_version == "v90" or lock_version == "v101") else "1813138439" if (lock_version == "v61" or lock_version == "v60") else "unknown",
-            ),
 
             # uuv 'hasBin'
             ":node_modules/uvu",
@@ -135,13 +132,26 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/test-c200-d200",
             ":node_modules/test-c201-d200",
             ":node_modules/test-peer-types",
+            ":node_modules/test-local-combo-1",
+            ":node_modules/test-local-combo-2",
             ":node_modules/scoped/bad",
             ":node_modules/lodash",
 
+            # link:, workspace:, file:, ./rel/path virtual store targets
+            ":.aspect_rules_js/node_modules/link_..+projects+a-types@0.0.0",
+            ":.aspect_rules_js/node_modules/link_..+projects+a@0.0.0",
+            ":.aspect_rules_js/node_modules/link_..+projects+b@0.0.0",
+            ":.aspect_rules_js/node_modules/link_..+projects+d@0.0.0",
+            ":.aspect_rules_js/node_modules/link_..+projects+peers-combo-1@0.0.0",
+            ":.aspect_rules_js/node_modules/link_..+projects+peers-combo-2@0.0.0",
+            ":.aspect_rules_js/node_modules/lodash@file_..+vendored+lodash-4.17.21.tgz" if lock_version == "v90" else ":.aspect_rules_js/node_modules/file_..+vendored+lodash-4.17.21.tgz@0.0.0",
+
             # Packages involving overrides
             ":node_modules/is-odd",
-            ":.aspect_rules_js/node_modules/is-odd@3.0.1",
-            ":.aspect_rules_js/node_modules/is-number@0.0.0",
+            _vs(lock_version, ":.aspect_rules_js/node_modules/is-odd@3.0.1"),
+
+            # >=v9 includes the `name@` in the snapshot name
+            ":.aspect_rules_js/node_modules/is-number@file_..+vendored+is-number" if lock_version == "v90" else ":.aspect_rules_js/node_modules/file_..+vendored+is-number@0.0.0",
 
             # Odd git/http versions
             ":node_modules/debug",
@@ -169,47 +179,32 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/is-odd-v1",
             ":node_modules/is-odd-v2",
             ":node_modules/is-odd-v3",
-            ":.aspect_rules_js/node_modules/is-odd@0.1.0",
-            ":.aspect_rules_js/node_modules/is-odd@1.0.0",
-            ":.aspect_rules_js/node_modules/is-odd@2.0.0",
-            ":.aspect_rules_js/node_modules/is-odd@3.0.0",
+            _vs(lock_version, ":.aspect_rules_js/node_modules/is-odd@0.1.0"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/is-odd@1.0.0"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/is-odd@2.0.0"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/is-odd@3.0.0"),
 
             # npm: alias to package not listed elsewhere
             ":node_modules/alias-only-sizzle",
-            ":.aspect_rules_js/node_modules/@types+sizzle@2.3.9",
-            "@%s__at_types_sizzle__2.3.9//:pkg" % lock_repo,
+            # ":.aspect_rules_js/node_modules/@types+sizzle@2.3.9",
 
             # Targets within the virtual store...
             # Direct dep targets
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2",
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/dir",
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/pkg",
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/ref",
+            _vs(lock_version, ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/dir"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/pkg"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/ref"),
 
             # Direct deps with lifecycles
-            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/lc",
-            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
-
-            # link:, workspace:, file:, ./rel/path
-            ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+c@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
-            ":.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
-            ":.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
-            ":.aspect_rules_js/node_modules/lodash@4.17.21",
-            ":.aspect_rules_js/node_modules/lodash@4.17.21/dir",
+            _vs(lock_version, ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/lc"),
+            _vs(lock_version, ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc"),
 
             # Patched dependencies
-            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
-            "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
+            ":node_modules/meaning-of-life",
 
             # Direct deps from custom registry
-            ":.aspect_rules_js/node_modules/@types+node@16.18.11",
-
-            # Direct deps with peers
-            ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",
-            "@%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2//:pkg" % lock_repo,
+            # <v9 includes the registry URL
+            ":.aspect_rules_js/node_modules/@types+node@16.18.11" if lock_version == "v90" else _vs(lock_version, ":.aspect_rules_js/node_modules/registry.npmjs.org+@types+node@16.18.11"),
         ],
     )
 
@@ -282,3 +277,14 @@ def lockfile_test(npm_link_all_packages, name = None):
         # Target names may be different on bazel versions
         tags = ["skip-on-bazel6"],
     )
+
+# Util to convert virtual-store targets across pnpm version
+def _vs(v, target):
+    if v != "v54":
+        return target
+
+    vi = target.rindex("@")
+    if vi != -1:
+        return target[:vi] + "+" + target[vi + 1:]
+    else:
+        return target
