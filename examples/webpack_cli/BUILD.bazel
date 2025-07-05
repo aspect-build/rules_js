@@ -2,9 +2,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//examples/webpack_cli:webpack-cli/package_json.bzl", "bin")
 
-npm_link_all_packages(
-    name = "node_modules",
-)
+npm_link_all_packages()
 
 js_library(
     name = "lib",

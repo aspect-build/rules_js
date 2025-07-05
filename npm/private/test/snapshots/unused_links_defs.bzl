@@ -16,29 +16,28 @@ _PACKAGE_STORE_NAME = "unused@0.2.2"
 
 # Generated npm_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
-def npm_imported_package_store(link_root_name):
+def npm_imported_package_store():
     _npm_imported_package_store(
-        link_root_name = link_root_name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/esprima@1.0.0/pkg": "esprima",
-            ":.aspect_rules_js/{link_root_name}/minimist@0.0.10/pkg": "minimist",
-            ":.aspect_rules_js/{link_root_name}/optimist@0.6.0/pkg": "optimist",
-            ":.aspect_rules_js/{link_root_name}/unused@0.2.2/pkg": "unused",
-            ":.aspect_rules_js/{link_root_name}/wordwrap@0.0.3/pkg": "wordwrap",
+            ":.aspect_rules_js/esprima@1.0.0/pkg": "esprima",
+            ":.aspect_rules_js/minimist@0.0.10/pkg": "minimist",
+            ":.aspect_rules_js/optimist@0.6.0/pkg": "optimist",
+            ":.aspect_rules_js/unused@0.2.2/pkg": "unused",
+            ":.aspect_rules_js/wordwrap@0.0.3/pkg": "wordwrap",
         },
         ref_deps = {
-            ":.aspect_rules_js/{link_root_name}/esprima@1.0.0/ref": "esprima",
-            ":.aspect_rules_js/{link_root_name}/optimist@0.6.0/ref": "optimist",
+            ":.aspect_rules_js/esprima@1.0.0/ref": "esprima",
+            ":.aspect_rules_js/optimist@0.6.0/ref": "optimist",
         },
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/esprima@1.0.0/pkg": "esprima",
-            ":.aspect_rules_js/{link_root_name}/minimist@0.0.10/pkg": "minimist",
-            ":.aspect_rules_js/{link_root_name}/optimist@0.6.0/pkg": "optimist",
-            ":.aspect_rules_js/{link_root_name}/unused@0.2.2/pkg_pre_lc_lite": "unused",
-            ":.aspect_rules_js/{link_root_name}/wordwrap@0.0.3/pkg": "wordwrap",
+            ":.aspect_rules_js/esprima@1.0.0/pkg": "esprima",
+            ":.aspect_rules_js/minimist@0.0.10/pkg": "minimist",
+            ":.aspect_rules_js/optimist@0.6.0/pkg": "optimist",
+            ":.aspect_rules_js/unused@0.2.2/pkg_pre_lc_lite": "unused",
+            ":.aspect_rules_js/wordwrap@0.0.3/pkg": "wordwrap",
         },
         dev = True,
         has_lifecycle_build_target = False,
@@ -53,26 +52,19 @@ def npm_imported_package_store(link_root_name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, link_root_name, link_alias):
-    return _npm_link_imported_package_store(
+def npm_link_imported_package_store(name):
+    _npm_link_imported_package_store(
         name,
-        link_root_name,
-        link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = ["//visibility:private"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = False,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
-def npm_link_imported_package(
-        name = "node_modules",
-        link = None,
-        fail_if_no_link = True):
+def npm_link_imported_package(link = None, fail_if_no_link = True):
     return _npm_link_imported_package(
-        name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
