@@ -26,9 +26,8 @@ echo "Platform: $PLATFORM $ARCH"
 echo "Bazel platform: ${BAZEL_PLATFORM}_${BAZEL_ARCH}"
 
 # Build first to ensure bazel-out directory exists
-echo ""
-echo "Building node_modules to generate bazel-out structure..."
-bazel build //:node_modules >/dev/null
+echo "Building node_modules..."
+bazel build //:node_modules >/dev/null 2>&1
 
 # Find the bazel-out directory structure
 BAZEL_OUT_DIR=""
@@ -40,7 +39,7 @@ for potential_dir in "bazel-out/${BAZEL_PLATFORM}_${BAZEL_ARCH}-fastbuild" "baze
 done
 
 if [[ -z "$BAZEL_OUT_DIR" ]]; then
-    echo "❌ Could not find bazel-out directory for platform ${BAZEL_PLATFORM}_${BAZEL_ARCH}"
+    echo "ERROR: Could not find bazel-out directory for platform ${BAZEL_PLATFORM}_${BAZEL_ARCH}"
     echo "Available bazel-out directories:"
     ls -la bazel-out/ 2>/dev/null || echo "No bazel-out directory found"
     exit 1
@@ -48,131 +47,165 @@ fi
 
 echo "Found bazel-out directory: $BAZEL_OUT_DIR"
 
-# Function to check if a package has a fake package.json
-check_package_is_fake() {
+# Function to check if a package repository directory exists
+check_package_repository_exists() {
     local package_name="$1"
-    local expected_fake="$2"  # "true" or "false"
+    local should_exist="$2"  # "true" or "false"
     
-    echo "Checking $package_name (should be $([ "$expected_fake" = "true" ] && echo "fake" || echo "real"))..."
+    # Check if repository directory exists in bazel-out
+    local repo_path="$BAZEL_OUT_DIR/bin/external/npm__esbuild_${package_name}__0.16.17"
+    local package_store_path="$BAZEL_OUT_DIR/bin/node_modules/.aspect_rules_js/@esbuild+${package_name}@0.16.17"
     
-    # Build the expected path
-    local package_path="$BAZEL_OUT_DIR/bin/node_modules/.aspect_rules_js/@esbuild+${package_name}@0.16.17/node_modules/@esbuild/${package_name}/package.json"
+    local repo_exists="false"
+    local package_exists="false"
     
-    if [[ ! -f "$package_path" ]]; then
-        echo "  ❌ Package file not found: $package_path"
-        return 1
+    if [[ -d "$repo_path" ]]; then
+        repo_exists="true"
     fi
     
-    echo "  📁 Found: $package_path"
-    
-    # Check if package.json contains _incompatible marker (indicates fake package)
-    local is_fake="false"
-    if grep -q "_incompatible" "$package_path" 2>/dev/null; then
-        is_fake="true"
-        echo "  🚫 Contains _incompatible marker (fake package)"
-        
-        # Show the fake package content for verification
-        echo "  📄 Fake package.json content:"
-        cat "$package_path" | sed 's/^/    /'
-    else
-        echo "  ✅ No _incompatible marker (real package)"
-        
-        # Show basic info about real package
-        if command -v jq >/dev/null 2>&1; then
-            local name=$(jq -r '.name // "unknown"' "$package_path" 2>/dev/null)
-            local version=$(jq -r '.version // "unknown"' "$package_path" 2>/dev/null)
-            echo "  📦 Real package: $name@$version"
-        fi
+    if [[ -d "$package_store_path" ]]; then
+        package_exists="true"
     fi
     
     # Verify expectations
-    if [[ "$expected_fake" = "$is_fake" ]]; then
-        echo "  ✅ Package type matches expectation"
-        return 0
+    if [[ "$should_exist" = "true" ]]; then
+        if [[ "$repo_exists" = "true" || "$package_exists" = "true" ]]; then
+            echo "  PASS: $package_name (compatible platform)"
+            return 0
+        else
+            echo "  FAIL: $package_name missing but should exist (compatible platform)"
+            return 1
+        fi
     else
-        echo "  ❌ Package type mismatch: expected $([ "$expected_fake" = "true" ] && echo "fake" || echo "real"), got $([ "$is_fake" = "true" ] && echo "fake" || echo "real")"
+        if [[ "$repo_exists" = "false" && "$package_exists" = "false" ]]; then
+            echo "  PASS: $package_name correctly filtered (incompatible platform)"
+            return 0
+        else
+            echo "  FAIL: $package_name exists but should be filtered (incompatible platform)"
+            return 1
+        fi
+    fi
+}
+
+# Function to check generated repositories.bzl file
+check_repositories_bzl() {
+    # Look for the generated repositories file
+    local repos_file=""
+    for potential_file in "bazel-bin/external/npm/repositories.bzl" "bazel-out/*/bin/external/npm/repositories.bzl"; do
+        if [[ -f "$potential_file" ]]; then
+            repos_file="$potential_file"
+            break
+        fi
+    done
+    
+    if [[ -z "$repos_file" ]]; then
+        echo "WARNING: Could not find repositories.bzl file"
+        return 0
+    fi
+    
+    # Count npm_import rules for platform-specific packages
+    local incompatible_count=0
+    
+    # Define incompatible packages for current platform
+    local incompatible_packages=()
+    if [[ "$BAZEL_PLATFORM" = "darwin" && "$BAZEL_ARCH" = "arm64" ]]; then
+        incompatible_packages=("linux-x64" "win32-x64" "linux-arm64")
+    elif [[ "$BAZEL_PLATFORM" = "linux" && "$BAZEL_ARCH" = "amd64" ]]; then
+        incompatible_packages=("darwin-arm64" "win32-x64" "darwin-x64")
+    else
+        # Generic check - just look for common incompatible ones
+        incompatible_packages=("win32-x64")
+    fi
+    
+    for package in "${incompatible_packages[@]}"; do
+        if grep -q "npm__esbuild_${package}__" "$repos_file"; then
+            echo "FAIL: Found npm_import rule for incompatible package: $package"
+            incompatible_count=$((incompatible_count + 1))
+        fi
+    done
+    
+    if [[ "$incompatible_count" -gt 0 ]]; then
+        echo "FAIL: Found $incompatible_count npm_import rules for incompatible packages"
         return 1
+    else
+        echo "PASS: No npm_import rules found for incompatible packages"
+        return 0
     fi
 }
 
 # Main test logic based on current platform
-echo ""
 echo "Running platform-specific validation..."
 
 success=true
 
 if [[ "$BAZEL_PLATFORM" = "darwin" && "$BAZEL_ARCH" = "arm64" ]]; then
-    echo "🖥️  Testing on Darwin ARM64..."
-    
-    # linux-x64 should be fake (incompatible)
-    if ! check_package_is_fake "linux-x64" "true"; then
+    # linux-x64 should NOT exist (incompatible)
+    if ! check_package_repository_exists "linux-x64" "false"; then
         success=false
     fi
     
-    # darwin-arm64 should be real (compatible) - but might be fake if optional
-    echo ""
-    if ! check_package_is_fake "darwin-arm64" "false"; then
-        echo "  ℹ️  darwin-arm64 is fake - this might be OK if it's optional and not needed"
-        # Don't fail the test for this case
+    # win32-x64 should NOT exist (incompatible)
+    if ! check_package_repository_exists "win32-x64" "false"; then
+        success=false
+    fi
+    
+    # darwin-arm64 should exist (compatible) if not optional
+    if ! check_package_repository_exists "darwin-arm64" "true"; then
+        echo "  INFO: darwin-arm64 doesn't exist - this is OK if it's optional and not needed"
+        # Don't fail the test for this case since it's optional
     fi
     
 elif [[ "$BAZEL_PLATFORM" = "linux" && "$BAZEL_ARCH" = "amd64" ]]; then
-    echo "🖥️  Testing on Linux x64..."
-    
-    # darwin-arm64 should be fake (incompatible)
-    if ! check_package_is_fake "darwin-arm64" "true"; then
+    # darwin-arm64 should NOT exist (incompatible)
+    if ! check_package_repository_exists "darwin-arm64" "false"; then
         success=false
     fi
     
-    # linux-x64 should be real (compatible)
-    echo ""
-    if ! check_package_is_fake "linux-x64" "false"; then
-        echo "  ℹ️  linux-x64 is fake - this might be OK if it's optional and not needed"
-        # Don't fail the test for this case
+    # win32-x64 should NOT exist (incompatible)
+    if ! check_package_repository_exists "win32-x64" "false"; then
+        success=false
+    fi
+    
+    # linux-x64 should exist (compatible) if not optional
+    if ! check_package_repository_exists "linux-x64" "true"; then
+        echo "  INFO: linux-x64 doesn't exist - this is OK if it's optional and not needed"
+        # Don't fail the test for this case since it's optional
     fi
     
 else
-    echo "🖥️  Testing on $BAZEL_PLATFORM $BAZEL_ARCH..."
-    echo "ℹ️  Platform-specific validation not implemented for this platform"
-    echo "ℹ️  Will check that at least one platform-specific package exists and some are fake"
+    echo "Testing generic platform filtering..."
     
-    # Generic test - just check that we have some fake packages
-    fake_count=0
-    total_count=0
+    # Generic test - just check that some packages don't exist
+    skipped_count=0
+    total_checked=0
     
-    for package in "linux-x64" "darwin-arm64"; do
-        package_path="$BAZEL_OUT_DIR/bin/node_modules/.aspect_rules_js/@esbuild+${package}@0.16.17/node_modules/@esbuild/${package}/package.json"
-        if [[ -f "$package_path" ]]; then
-            total_count=$((total_count + 1))
-            if grep -q "_incompatible" "$package_path" 2>/dev/null; then
-                fake_count=$((fake_count + 1))
-                echo "  🚫 Found fake package: $package"
-            else
-                echo "  ✅ Found real package: $package"
-            fi
+    for package in "win32-x64" "win32-ia32" "sunos-x64"; do
+        total_checked=$((total_checked + 1))
+        if ! check_package_repository_exists "$package" "false"; then
+            # Package exists when it shouldn't
+            echo "  WARNING: Package $package exists but should be filtered"
+        else
+            skipped_count=$((skipped_count + 1))
         fi
     done
     
-    echo "  📊 Summary: $fake_count fake packages out of $total_count total"
-    
-    if [[ "$fake_count" -gt 0 ]]; then
-        echo "  🎉 Platform filtering is working (found fake packages)"
-    else
-        echo "  ⚠️  No fake packages found - platform filtering might not be working"
+    if [[ "$skipped_count" -eq 0 ]]; then
+        echo "  FAIL: No packages filtered - platform filtering might not be working"
         success=false
     fi
 fi
 
+# Check the generated repositories.bzl file
+if ! check_repositories_bzl; then
+    success=false
+fi
+
 # Final result
 echo ""
-echo "=== Test Summary ==="
 if [[ "$success" = "true" ]]; then
-    echo "🎉 Platform filtering test passed!"
-    echo "✅ Incompatible packages have fake package.json files"
-    echo "✅ Platform-specific handling is working correctly"
+    echo "PASS: Platform filtering test passed"
     exit 0
 else
-    echo "❌ Platform filtering test failed!"
-    echo "💡 Check that incompatible packages are being replaced with fake packages"
+    echo "FAIL: Platform filtering test failed"
     exit 1
 fi 
