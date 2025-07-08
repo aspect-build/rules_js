@@ -74,6 +74,7 @@ def _npm_translate_lock_bzlmod(attr):
         verify_node_modules_ignored = attr.verify_node_modules_ignored,
         verify_patches = attr.verify_patches,
         yarn_lock = attr.yarn_lock,
+        exclude_package_contents = attr.exclude_package_contents,
         bzlmod = True,
     )
 
