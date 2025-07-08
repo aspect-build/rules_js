@@ -297,6 +297,9 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
 
+    # Track packages skipped due to platform incompatibility
+    skipped_packages = []
+
     # make a lookup table of package to link name for each importer
     importer_links = {}
     for import_path, importer in importers.items():
@@ -470,6 +473,11 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         else:
             is_platform_compatible = _is_package_compatible_with_current_platform(package_os, package_cpu, current_os, current_cpu)
 
+        # Skip platform-incompatible packages entirely - don't create npm_import rules for them
+        if not is_platform_compatible:
+            skipped_packages.append("{}@{}".format(name, version))
+            continue
+
         run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build) and is_platform_compatible
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
@@ -556,6 +564,98 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             fail(msg)
 
         result[repo_name] = result_pkg
+
+    # Clean up dependencies that reference skipped packages
+    skipped_package_names = {}
+    for pkg in skipped_packages:
+        # Handle scoped packages like @esbuild/android-arm64@0.16.17
+        if pkg.startswith("@"):
+            # For scoped packages, split on @ and take the first two parts
+            parts = pkg.split("@")
+            if len(parts) >= 3:
+                package_name = "@{}".format(parts[1])
+            else:
+                package_name = pkg.split("@")[0]  # fallback
+        else:
+            package_name = pkg.split("@")[0]
+        skipped_package_names[package_name] = True
+    if skipped_package_names:
+        updated_result = {}
+        for repo_name, pkg_struct in result.items():
+            # Clean up both regular dependencies and optional dependencies
+            cleaned_deps = {}
+            for dep_name, dep_version in pkg_struct.deps.items():
+                if dep_name not in skipped_package_names:
+                    cleaned_deps[dep_name] = dep_version
+
+            # Also clean up dependencies from the original package_info to avoid transitive closure issues
+            original_package_info = pkg_struct.package_info
+            cleaned_package_deps = {}
+            cleaned_package_optional_deps = {}
+
+            for dep_name, dep_version in original_package_info.get("dependencies", {}).items():
+                if dep_name not in skipped_package_names:
+                    cleaned_package_deps[dep_name] = dep_version
+
+            for dep_name, dep_version in original_package_info.get("optional_dependencies", {}).items():
+                if dep_name not in skipped_package_names:
+                    cleaned_package_optional_deps[dep_name] = dep_version
+
+            # Clean up transitive closure references
+            cleaned_transitive_closure = {}
+            original_transitive_closure = original_package_info.get("transitive_closure", {})
+            if original_transitive_closure:
+                for dep_name, dep_versions in original_transitive_closure.items():
+                    if dep_name not in skipped_package_names:
+                        cleaned_transitive_closure[dep_name] = dep_versions
+
+            # Create cleaned package_info
+            cleaned_package_info = {}
+            for key, value in original_package_info.items():
+                if key == "dependencies":
+                    cleaned_package_info[key] = cleaned_package_deps
+                elif key == "optional_dependencies":
+                    cleaned_package_info[key] = cleaned_package_optional_deps
+                elif key == "transitive_closure":
+                    cleaned_package_info[key] = cleaned_transitive_closure
+                else:
+                    cleaned_package_info[key] = value
+
+            # Recreate struct with cleaned dependencies
+            updated_result[repo_name] = struct(
+                custom_postinstall = pkg_struct.custom_postinstall,
+                deps = cleaned_deps,
+                integrity = pkg_struct.integrity,
+                link_packages = pkg_struct.link_packages,
+                name = pkg_struct.name,
+                package = pkg_struct.package,
+                package_visibility = pkg_struct.package_visibility,
+                patch_tool = pkg_struct.patch_tool,
+                patch_args = pkg_struct.patch_args,
+                patches = pkg_struct.patches,
+                exclude_package_contents = pkg_struct.exclude_package_contents,
+                root_package = pkg_struct.root_package,
+                lifecycle_hooks = pkg_struct.lifecycle_hooks,
+                lifecycle_hooks_env = pkg_struct.lifecycle_hooks_env,
+                lifecycle_hooks_execution_requirements = pkg_struct.lifecycle_hooks_execution_requirements,
+                lifecycle_hooks_use_default_shell_env = pkg_struct.lifecycle_hooks_use_default_shell_env,
+                npm_auth = pkg_struct.npm_auth,
+                npm_auth_basic = pkg_struct.npm_auth_basic,
+                npm_auth_username = pkg_struct.npm_auth_username,
+                npm_auth_password = pkg_struct.npm_auth_password,
+                transitive_closure = cleaned_transitive_closure,
+                url = pkg_struct.url,
+                commit = pkg_struct.commit,
+                version = pkg_struct.version,
+                bins = pkg_struct.bins,
+                package_info = cleaned_package_info,
+                dev = pkg_struct.dev,
+                replace_package = pkg_struct.replace_package,
+                cpu = pkg_struct.cpu,
+                os = pkg_struct.os,
+                optional = pkg_struct.optional,
+            )
+        result = updated_result
 
     result = utils.sorted_map(result).values()
 
