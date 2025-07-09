@@ -844,15 +844,20 @@ INFO: {} file has changed""".format(pnpm_lock_relative_path))
 
 ################################################################################
 def _fail_if_frozen_pnpm_lock(rctx, state):
+    repo_reference_symbol = "@"
+    if rctx.attr.bzlmod:
+        repo_reference_symbol = "@@"
+
     if RULES_JS_FROZEN_PNPM_LOCK_ENV in rctx.os.environ.keys() and rctx.os.environ[RULES_JS_FROZEN_PNPM_LOCK_ENV]:
         fail("""
 
 ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To update run,
 
-           bazel run @{rctx_name}//:sync
+           bazel run {repo_reference_symbol}{rctx_name}//:sync
 
 """.format(
             action_cache = state.label_store.relative_path("action_cache"),
             pnpm_lock = state.label_store.relative_path("pnpm_lock"),
+            repo_reference_symbol = repo_reference_symbol,
             rctx_name = rctx.name,
         ))
