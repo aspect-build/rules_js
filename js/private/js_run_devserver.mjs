@@ -36,11 +36,12 @@ function mkdirpSync(p) {
     if (mkdirs.has(p)) {
         return
     }
-    if (!fs.existsSync(p)) {
-        mkdirpSync(path.dirname(p))
-        fs.mkdirSync(p)
-    }
-    mkdirs.add(p)
+
+    fs.mkdirSync(p, { recursive: true })
+
+    do {
+        mkdirs.add(p)
+    } while (!mkdirs.has((p = path.dirname(p))))
 }
 
 // Determines if a file path refers to a node module.
