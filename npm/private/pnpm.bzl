@@ -589,12 +589,12 @@ def _parse_lockfile(parsed, err):
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
     if err != None or parsed == None or parsed == {}:
-        return {}, {}, {}, err
+        return {}, {}, {}, None, err
 
     if not types.is_dict(parsed):
-        return {}, {}, {}, "lockfile should be a starlark dict"
+        return {}, {}, {}, None, "lockfile should be a starlark dict"
     if not parsed.get("lockfileVersion", False):
-        return {}, {}, {}, "expected lockfileVersion key in lockfile"
+        return {}, {}, {}, None, "expected lockfileVersion key in lockfile"
 
     # Lockfile version may be a float such as 5.4 or a string such as '6.0'
     lockfile_version = str(parsed["lockfileVersion"])
