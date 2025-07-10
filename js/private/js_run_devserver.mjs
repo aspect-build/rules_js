@@ -734,6 +734,8 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
 function removeSandbox(sandbox) {
     try {
         if (sandbox) {
+            console.error(`Deleting js_run_devserver sandbox at ${sandbox}...`)
+
             // Must be synchronous when invoked from process exit handler
             fs.rmSync(sandbox, { force: true, recursive: true })
         }
