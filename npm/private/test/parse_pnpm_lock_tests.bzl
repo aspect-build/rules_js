@@ -8,7 +8,7 @@ def _parse_empty_lock_test_impl(ctx):
 
     parsed_json_a = pnpm.parse_pnpm_lock_json("")
     parsed_json_b = pnpm.parse_pnpm_lock_json("{}")
-    expected = ({}, {}, {}, None)
+    expected = ({}, {}, {}, None, None)
 
     asserts.equals(env, expected, parsed_json_a)
     asserts.equals(env, expected, parsed_json_b)
