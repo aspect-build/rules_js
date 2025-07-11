@@ -130,11 +130,85 @@ def test_verify_gather_package_content_returns_none_when_no_matches(ctx):
     asserts.equals(env, expected, actual)
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
+def test_verify_gather_package_content_works_with_yarn_autoclean_preset(ctx):
+    env = unittest.begin(ctx)
+    actual = helpers_testonly.gather_package_content_excludes(
+        {
+            "packageA": "yarn-autoclean",
+        },
+        "packageA",
+    )
+
+    # Should expand to the actual default patterns, not just the string
+    asserts.true(env, len(actual) > 1)
+    asserts.true(env, "**/__tests__/**" in actual)
+    asserts.true(env, "**/test/**" in actual)
+    asserts.true(env, "*.md" in actual)
+    return unittest.end(env)
+
+# buildifier: disable=function-docstring
+def test_verify_gather_package_content_works_with_yarn_autoclean_in_star_pattern(ctx):
+    env = unittest.begin(ctx)
+    actual = helpers_testonly.gather_package_content_excludes(
+        {
+            "*": "yarn-autoclean",
+        },
+        "packageA",
+    )
+
+    # Should expand to the actual default patterns, not just the string
+    asserts.true(env, len(actual) > 1)
+    asserts.true(env, "**/__tests__/**" in actual)
+    asserts.true(env, "**/test/**" in actual)
+    asserts.true(env, "*.md" in actual)
+    return unittest.end(env)
+
+# buildifier: disable=function-docstring
+def test_verify_gather_package_content_works_with_yarn_autoclean_in_list(ctx):
+    env = unittest.begin(ctx)
+    actual = helpers_testonly.gather_package_content_excludes(
+        {
+            "packageA": ["yarn-autoclean", "**/extra/**"],
+        },
+        "packageA",
+    )
+
+    # Should expand yarn-autoclean to the actual default patterns AND include the extra pattern
+    # Default patterns (32) + extra pattern (1) = 33 total
+    asserts.true(env, len(actual) == 33)
+    asserts.true(env, "**/__tests__/**" in actual)
+    asserts.true(env, "**/test/**" in actual)
+    asserts.true(env, "*.md" in actual)
+    asserts.true(env, "**/extra/**" in actual)
+    return unittest.end(env)
+
+# buildifier: disable=function-docstring
+def test_verify_gather_package_content_works_with_yarn_autoclean_in_star_list(ctx):
+    env = unittest.begin(ctx)
+    actual = helpers_testonly.gather_package_content_excludes(
+        {
+            "*": ["yarn-autoclean"],
+        },
+        "packageA",
+    )
+
+    # Should expand to the actual default patterns, not just the string
+    asserts.true(env, len(actual) > 1)
+    asserts.true(env, "**/__tests__/**" in actual)
+    asserts.true(env, "**/test/**" in actual)
+    asserts.true(env, "*.md" in actual)
+    return unittest.end(env)
+
 t2_test = unittest.make(test_verify_gather_package_content_works_with_simple_name)
 t3_test = unittest.make(test_verify_gather_package_content_works_with_star_pattern)
 t4_test = unittest.make(test_verify_gather_package_content_works_with_simple_name_and_single_pattern)
 t5_test = unittest.make(test_verify_gather_package_content_works_with_star_pattern_and_only_one_exclude_pattern)
 t6_test = unittest.make(test_verify_gather_package_content_returns_none_when_no_matches)
+t7_test = unittest.make(test_verify_gather_package_content_works_with_yarn_autoclean_preset)
+t8_test = unittest.make(test_verify_gather_package_content_works_with_yarn_autoclean_in_star_pattern)
+t9_test = unittest.make(test_verify_gather_package_content_works_with_yarn_autoclean_in_list)
+t10_test = unittest.make(test_verify_gather_package_content_works_with_yarn_autoclean_in_star_list)
 
 def translate_lock_helpers_tests(name):
-    unittest.suite(name, t0_test, t1_test, t2_test, t3_test, t4_test, t5_test, t6_test)
+    unittest.suite(name, t0_test, t1_test, t2_test, t3_test, t4_test, t5_test, t6_test, t7_test, t8_test, t9_test, t10_test)

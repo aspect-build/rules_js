@@ -4,6 +4,7 @@ load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":utils.bzl", "utils")
 
 ################################################################################
@@ -57,15 +58,38 @@ def _gather_package_content_excludes(keyed_lists, *names):
             v = keyed_lists[name]
             if type(v) == "list":
                 for e in v:
-                    excludes.append(e)
+                    if e == "yarn-autoclean":
+                        # Support string presets within lists
+                        excludes.extend(exclude_package_contents_default)
+                    else:
+                        excludes.append(e)
             elif type(v) == "string":
-                excludes.append(v)
+                # Support string presets
+                if v == "yarn-autoclean":
+                    excludes.extend(exclude_package_contents_default)
+                else:
+                    excludes.append(v)
             else:
                 fail("expected value to be list or string")
 
     # in case the key has not been met even once, we return None, instead of empty list as empty list is a valid value
     if not found and "*" in keyed_lists:
-        excludes = keyed_lists["*"] if type(keyed_lists["*"]) == "list" else [keyed_lists["*"]]
+        v = keyed_lists["*"]
+        if type(v) == "list":
+            for e in v:
+                if e == "yarn-autoclean":
+                    # Support string presets within lists
+                    excludes.extend(exclude_package_contents_default)
+                else:
+                    excludes.append(e)
+        elif type(v) == "string":
+            # Support string presets in "*" fallback
+            if v == "yarn-autoclean":
+                excludes = exclude_package_contents_default
+            else:
+                excludes = [v]
+        else:
+            fail("expected value to be list or string")
 
     return None if len(excludes) == 0 else excludes
 
