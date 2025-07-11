@@ -650,8 +650,6 @@ async function runWatchProtocol(
 }
 
 async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
-    const oldFiles = config.previous_entries || []
-
     // Re-parse the config file to get the latest list of data files to copy
     const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse)
 
@@ -660,11 +658,19 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
         cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
     )
 
-    await Promise.all([
-        // Remove files that were previously synced but are no longer in the updated list of files to sync
-        deleteFiles(oldFiles, newFiles, sandbox),
+    // The files marked for deletion in this cycle
+    const toDelete = []
+    for (const l in cycle.sources) {
+        if (cycle.sources[l] === null) {
+            toDelete.push([
+                l.slice(JS_BINARY__WORKSPACE.length + 1),
+                /*isDirectory=*/ false,
+            ])
+        }
+    }
 
-        // Sync changed files
+    await Promise.all([
+        deleteFiles(toDelete, [], sandbox),
         syncFiles(
             filesToSync,
             sandbox,
@@ -672,9 +678,6 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
             cycleSyncRecurse.bind(null, cycle)
         ),
     ])
-
-    // The latest state of copied data files
-    config.previous_entries = newFiles
 }
 
 async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
