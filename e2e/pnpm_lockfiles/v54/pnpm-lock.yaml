@@ -56,6 +56,8 @@ importers:
       scoped/bad: link:../projects/b
       test-c200-d200: workspace:*
       test-c201-d200: workspace:*
+      test-local-combo-1: workspace:*
+      test-local-combo-2: workspace:*
       test-peer-types: ../projects/peer-types
       tslib: ^2.6.3
       typescript: 5.5.2
@@ -92,6 +94,8 @@ importers:
       scoped/bad: link:../projects/b
       test-c200-d200: link:../projects/peers-combo-2
       test-c201-d200: link:../projects/peers-combo-1
+      test-local-combo-1: link:../projects/peers-local-combo-1
+      test-local-combo-2: link:../projects/peers-local-combo-2
       test-peer-types: link:../projects/peer-types
       tslib: 2.8.1
       typescript: 5.5.2
@@ -167,6 +171,22 @@ importers:
     dependencies:
       '@aspect-test/c': 2.0.0
       '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.0
+
+  ../projects/peers-local-combo-1:
+    specifiers:
+      '@scoped/b': workspace:*
+      '@scoped/c': workspace:*
+    dependencies:
+      '@scoped/b': link:../b
+      '@scoped/c': link:../c
+
+  ../projects/peers-local-combo-2:
+    specifiers:
+      '@scoped/b': workspace:*
+      '@scoped/d': workspace:*
+    dependencies:
+      '@scoped/b': link:../b
+      '@scoped/d': link:../d
 
   ../vendored/is-number:
     specifiers: {}

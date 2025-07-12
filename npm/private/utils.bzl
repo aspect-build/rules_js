@@ -17,55 +17,57 @@ def _sorted_map(m):
 
     return result
 
-def _sanitize_rule_name(string):
+def _sanitize_repo_name(s):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
+
+    r = ""
+    for c in s.elems():
+        if not c.isalnum() and c != "-" and c != "_" and c != ".":
+            if not r or r[-1] != "_":
+                r += "_"
+        else:
+            r += c
+    return r.strip("_-.")
+
+def _package_target_name(string):
+    # Target names may contain only A-Z, a-z, 0-9, '-', '_', '.', '+', '@' and probably more.
+    # Package target names handle '/' and other characters unique to better represent npm packages.
     result = ""
     for c in string.elems():
-        if c == "@" and (not result or result[-1] == "_"):
-            result += "at"
-        if not c.isalnum() and c != "-" and c != "_" and c != ".":
-            c = "_"
-        result += c
-    return result.strip("_-")
+        if c == "/":
+            if result and result[-1] != "+":
+                result += "+"
+        elif not c.isalnum() and c != "-" and c != "_" and c != "." and c != "+" and c != "@":
+            if not result or result[-1] != "_":
+                result += "_"
+        else:
+            result += c
+    result = result.strip("_-+.")
 
-def _bazel_name(name, version = None):
-    "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
-    escaped_name = _sanitize_rule_name(name)
-    if not version:
-        return escaped_name
+    # Add an indication for local packages
+    if string.startswith("link:") or string.startswith("file:"):
+        result += "@0.0.0"
 
-    # Separate name + version with extra _
-    return "%s__%s" % (escaped_name, _sanitize_rule_name(version))
+    return result
 
-def _package_key(name, version):
-    "Make a name/version pnpm-style name for a package name and version"
-    return "%s@%s" % (name, version)
+def _package_repo_name(prefix, snapshot_key, name = None, version = None):
+    snapshot_key = snapshot_key.strip("_-./")
+
+    # Try to align the repository name with rules_js <3.0 to avoid breaking changes.
+    # TODO(3.0): use snapshot_key from the lockfile without modifying, remove name|version params
+    if name and version and snapshot_key.startswith(name) and snapshot_key.endswith(version) and len(snapshot_key) == len(name) + len(version) + 1:
+        at = "at_" if snapshot_key.startswith("@") else ""
+        name = _sanitize_repo_name(name)
+        version = _sanitize_repo_name(version)
+        return "{}__{}{}__{}".format(prefix, at, name, version)
+
+    result = "at_" if snapshot_key.startswith("@") else ""
+    result = result + _sanitize_repo_name(snapshot_key)
+    return "{}__{}".format(prefix, result)
 
 def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
-
-def _escape_target_name(name):
-    return name.replace("://", "/").replace("/", "+").replace(":", "+")
-
-def _package_store_name(pnpm_name, pnpm_version):
-    "Make a package store name for a given package and version"
-
-    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
-        name = pnpm_name
-        version = "0.0.0"
-    elif pnpm_version.startswith("npm:"):
-        name, version = pnpm_version[4:].rsplit("@", 1)
-    else:
-        name = pnpm_name
-        version = pnpm_version
-
-    if version.startswith("@"):
-        # Special case where the package name should _not_ be included in the package store name.
-        # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return _escape_target_name(version)
-    else:
-        return "%s@%s" % (_escape_target_name(name), _escape_target_name(version))
 
 def _make_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
@@ -242,11 +244,10 @@ def _is_tarball_extension(ext):
     return ext in tarball_extensions
 
 utils = struct(
-    bazel_name = _bazel_name,
+    package_repo_name = _package_repo_name,
     sorted_map = _sorted_map,
-    package_key = _package_key,
     friendly_name = _friendly_name,
-    package_store_name = _package_store_name,
+    package_store_name = _package_target_name,
     make_symlink = _make_symlink,
     # Symlinked node_modules structure package store path under node_modules
     package_store_root = ".aspect_rules_js",

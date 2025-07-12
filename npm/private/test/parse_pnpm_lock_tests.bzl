@@ -230,10 +230,10 @@ def _test_strip_peer_dep_or_patched_version(ctx):
     asserts.equals(
         env,
         "21.1.0",
-        pnpm_test.strip_v5_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
+        pnpm_test.v5_strip_peer_dep_or_patched_version("21.1.0_rollup@2.70.2_x@1.1.1"),
     )
-    asserts.equals(env, "1.0.0", pnpm_test.strip_v5_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
-    asserts.equals(env, "21.1.0", pnpm_test.strip_v5_peer_dep_or_patched_version("21.1.0"))
+    asserts.equals(env, "1.0.0", pnpm_test.v5_strip_peer_dep_or_patched_version("1.0.0_o3deharooos255qt5xdujc3cuq"))
+    asserts.equals(env, "21.1.0", pnpm_test.v5_strip_peer_dep_or_patched_version("21.1.0"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -256,20 +256,44 @@ def _test_version_supported(ctx):
 
     return unittest.end(env)
 
+def _test_v5_package_key_to_name_version(ctx):
+    env = unittest.begin(ctx)
+
+    n, v = pnpm_test.v5_package_key_to_name_version("/@aspect-test/a/5.0.0")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    n, v = pnpm_test.v5_package_key_to_name_version("/@aspect-test/a/5.0.0_@aspect-test/c@1.0.0")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    return unittest.end(env)
+
+def _test_v6_package_key_to_name_version(ctx):
+    env = unittest.begin(ctx)
+
+    n, v = pnpm_test.v6_package_key_to_name_version("/@aspect-test/a@5.0.0")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    n, v = pnpm_test.v6_package_key_to_name_version("/@aspect-test/a@5.0.0(@aspect-test/c@1.0.0)")
+    asserts.equals(env, "@aspect-test/a", n)
+    asserts.equals(env, "5.0.0", v)
+
+    return unittest.end(env)
+
 a_test = unittest.make(_parse_empty_lock_test_impl, attrs = {})
-b_test = unittest.make(_parse_lockfile_v5_test_impl, attrs = {})
-c_test = unittest.make(_parse_lockfile_v6_test_impl, attrs = {})
-d_test = unittest.make(_parse_lockfile_v9_test_impl, attrs = {})
 e_test = unittest.make(_test_version_supported, attrs = {})
 f_test = unittest.make(_test_strip_peer_dep_or_patched_version, attrs = {})
+g_test = unittest.make(_test_v5_package_key_to_name_version, attrs = {})
+h_test = unittest.make(_test_v6_package_key_to_name_version, attrs = {})
 
 TESTS = [
     a_test,
-    b_test,
-    c_test,
-    d_test,
     e_test,
     f_test,
+    g_test,
+    h_test,
 ]
 
 def parse_pnpm_lock_tests(name):

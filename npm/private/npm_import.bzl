@@ -49,6 +49,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 """
 
 _LINK_JS_PACKAGE_TMPL = """\
+KEY = "{package_key}"
 PACKAGE = "{package}"
 VERSION = "{version}"
 _ROOT_PACKAGE = "{root_package}"
@@ -59,6 +60,7 @@ _PACKAGE_STORE_NAME = "{package_store_name}"
 def npm_imported_package_store(link_root_name):
     _npm_imported_package_store(
         link_root_name = link_root_name,
+        key = KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
@@ -82,6 +84,7 @@ def npm_imported_package_store(link_root_name):
 # buildifier: disable=unnamed-macro
 def npm_imported_package_store_internal(
         link_root_name,
+        key,
         package,
         version,
         root_package,
@@ -116,6 +119,7 @@ def npm_imported_package_store_internal(
     # reference target used to avoid circular deps
     _npm_package_store(
         name = "{}/ref".format(store_target_name),
+        key = key,
         package = package,
         version = version,
         dev = dev,
@@ -127,6 +131,7 @@ def npm_imported_package_store_internal(
     _npm_package_store(
         name = "{}/pkg".format(store_target_name),
         src = "{}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else npm_package_target,
+        key = key,
         package = package,
         version = version,
         dev = dev,
@@ -139,6 +144,7 @@ def npm_imported_package_store_internal(
     _npm_package_store(
         name = store_target_name,
         src = None if transitive_closure_pattern else npm_package_target,
+        key = key,
         package = package,
         version = version,
         dev = dev,
@@ -162,6 +168,7 @@ def npm_imported_package_store_internal(
         # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
         _npm_package_store(
             name = "{}/pkg_pre_lc_lite".format(store_target_name),
+            key = key,
             package = package,
             version = version,
             dev = dev,
@@ -173,6 +180,7 @@ def npm_imported_package_store_internal(
         # terminal pre-lifecycle target for use in lifecycle build target below
         _npm_package_store(
             name = "{}/pkg_pre_lc".format(store_target_name),
+            key = key,
             package = package,
             version = version,
             dev = dev,
@@ -657,7 +665,7 @@ def _npm_import_rule_impl(rctx):
         rctx_files["BUILD.bazel"].append("\n" + rctx.attr.extra_build_content)
 
     if bins:
-        package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
+        package_store_name = utils.package_store_name(rctx.attr.key)
         package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
 
         for link_package in rctx.attr.link_packages.keys():
@@ -749,7 +757,7 @@ def _npm_import_links_rule_impl(rctx):
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
         dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/ref"'.format(
-            package_store_name = utils.package_store_name(dep_name, dep_version),
+            package_store_name = utils.package_store_name(dep_version),
             package_store_root = utils.package_store_root,
         )
         if not dep_store_target in ref_deps:
@@ -761,17 +769,17 @@ def _npm_import_links_rule_impl(rctx):
         # transitive closure deps pattern is used for breaking circular deps;
         # this pattern is used to break circular dependencies between 3rd
         # party npm deps; it is not used for 1st party deps
-        for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
-            for dep_version in dep_versions:
+        for (dep_key, dep_names) in rctx.attr.transitive_closure.items():
+            for dep_name in dep_names:
                 dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg"'
                 lc_dep_store_target = dep_store_target
-                if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
+                if dep_key == rctx.attr.key:
                     # special case for lifecycle transitive closure deps; do not depend on
                     # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
                     lc_dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg_pre_lc_lite"'
 
-                dep_package_store_name = utils.package_store_name(dep_name, dep_version)
+                dep_package_store_name = utils.package_store_name(dep_key)
 
                 dep_store_target = dep_store_target.format(
                     root_package = rctx.attr.root_package,
@@ -794,7 +802,7 @@ def _npm_import_links_rule_impl(rctx):
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
             dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}"'.format(
-                package_store_name = utils.package_store_name(dep_name, dep_version),
+                package_store_name = utils.package_store_name(dep_version),
                 package_store_root = utils.package_store_root,
             )
 
@@ -806,7 +814,7 @@ def _npm_import_links_rule_impl(rctx):
                 deps[dep_store_target] = []
             deps[dep_store_target].append(dep_name)
 
-    package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
+    package_store_name = utils.package_store_name(rctx.attr.key)
 
     # strip _links post-fix to get the repository name of the npm sources
     npm_import_sources_repo_name = rctx.name[:-len(utils.links_repo_suffix)]
@@ -868,6 +876,7 @@ def _npm_import_links_rule_impl(rctx):
         link_packages = link_packages,
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
+        package_key = rctx.attr.key,
         package = rctx.attr.package,
         ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 2, quote_key = False),
         root_package = rctx.attr.root_package,
@@ -899,6 +908,7 @@ def _npm_import_links_rule_impl(rctx):
 
 _COMMON_ATTRS = {
     "link_packages": attr.string_list_dict(),
+    "key": attr.string(mandatory = True),
     "package": attr.string(mandatory = True),
     "root_package": attr.string(),
     "version": attr.string(mandatory = True),
@@ -1280,6 +1290,10 @@ def npm_import(
         **kwargs: Internal use only
     """
 
+    # A unique package store key.
+    # Often from the lockfile yaml key
+    key = kwargs.pop("key", name)
+
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
     system_tar = kwargs.pop("system_tar", "auto")
@@ -1291,6 +1305,7 @@ def npm_import(
     # package sources downloaded from the registry and extracted
     npm_import_rule(
         name = name,
+        key = key,
         package = package,
         version = version,
         root_package = root_package,
@@ -1324,6 +1339,7 @@ def npm_import(
     # code to link this npm package into one or more node_modules trees
     npm_import_links(
         name = "{}{}".format(name, utils.links_repo_suffix),
+        key = key,
         package = package,
         version = version,
         dev = dev,
