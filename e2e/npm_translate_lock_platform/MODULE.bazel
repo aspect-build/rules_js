@@ -1,0 +1,19 @@
+# Minimal module for platform fetch e2e test
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
+
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+
+use_repo(npm, "npm") 
