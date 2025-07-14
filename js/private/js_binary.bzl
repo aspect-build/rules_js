@@ -577,6 +577,12 @@ def _js_binary_impl(ctx):
     if ctx.attr.testonly and ctx.configuration.coverage_enabled:
         # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
         # See: https://github.com/bazelbuild/bazel/issues/4033
+        # This is optional because:
+        # - We do not want to require it for js_binary targets
+        #   (but we cannot distinguish js_binary from js_test here, see #2229).
+        # - It is not required anymore on bazel 8
+        #   (https://github.com/bazelbuild/bazel/issues/4033#issuecomment-2507162290)
+        # TODO: Remove once bazel<8 support is dropped.
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
         providers = [
@@ -649,6 +655,8 @@ See the Bazel [Test encyclopedia](https://bazel.build/reference/test-encyclopedi
 the contract between Bazel and a test runner.""",
     implementation = js_binary_lib.implementation,
     attrs = dict(js_binary_lib.attrs, **{
+        # TODO: Remove once bazel<8 support is dropped.
+        # See comment at usage site in the rule impl for more.
         "_lcov_merger": attr.label(
             executable = True,
             default = Label("//js/private/coverage:merger"),
