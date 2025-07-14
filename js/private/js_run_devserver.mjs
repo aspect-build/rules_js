@@ -841,17 +841,22 @@ class AspectWatchProtocol {
 
     async _receive(type = null) {
         return new Promise((resolve, reject) => {
-            let line = ''
-            const dataReceived = (data) => {
-                line += data.toString()
-                if (!line.endsWith('\n')) {
+            const dataBufs = []
+            const connection = this.connection
+
+            connection.on('data', function dataReceived(data) {
+                dataBufs.push(data)
+
+                if (data.at(data.byteLength - 1) !== '\n'.charCodeAt(0)) {
                     return
                 }
 
-                this.connection.off('data', dataReceived)
+                connection.off('data', dataReceived)
 
                 try {
-                    const msg = JSON.parse(line.trim())
+                    const msg = JSON.parse(
+                        Buffer.concat(dataBufs).toString().trim()
+                    )
                     if (type && msg.kind !== type) {
                         reject(
                             new Error(
@@ -864,9 +869,7 @@ class AspectWatchProtocol {
                 } catch (e) {
                     reject(e)
                 }
-            }
-
-            this.connection.on('data', dataReceived)
+            })
         })
     }
 
