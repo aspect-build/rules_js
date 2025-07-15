@@ -573,6 +573,12 @@ def _js_binary_impl(ctx):
     runfiles = launcher.runfiles
 
     providers = []
+    if hasattr(ctx.attr, "env_inherit"):
+        providers.append(
+            RunEnvironmentInfo(
+                inherited_environment = ctx.attr.env_inherit,
+            ),
+        )
 
     if ctx.attr.testonly and ctx.configuration.coverage_enabled:
         # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
@@ -655,6 +661,10 @@ See the Bazel [Test encyclopedia](https://bazel.build/reference/test-encyclopedi
 the contract between Bazel and a test runner.""",
     implementation = js_binary_lib.implementation,
     attrs = dict(js_binary_lib.attrs, **{
+        "env_inherit": attr.string_list(
+            default = [],
+            doc = "Specifies additional environment variables to inherit from the external environment when the test is executed by bazel test.",
+        ),
         # TODO: Remove once bazel<8 support is dropped.
         # See comment at usage site in the rule impl for more.
         "_lcov_merger": attr.label(
