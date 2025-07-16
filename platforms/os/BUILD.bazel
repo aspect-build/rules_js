@@ -15,3 +15,28 @@ alias(
     actual = "@platforms//os:windows",
     visibility = ["//visibility:public"],
 )
+
+# Custom constraint values for OSes not in @platforms
+constraint_value(
+    name = "netbsd",
+    constraint_setting = "@platforms//os:os",
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "sunos",
+    constraint_setting = "@platforms//os:os", 
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "freebsd",
+    constraint_setting = "@platforms//os:os",
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "android",
+    constraint_setting = "@platforms//os:os",
+    visibility = ["//visibility:public"],
+)

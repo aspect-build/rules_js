@@ -1,0 +1,135 @@
+# Config settings for combined OS+CPU platform constraints
+# Generated for npm package platform compatibility
+
+# Linux combinations
+config_setting(
+    name = "os_linux_cpu_x64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_linux_cpu_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_linux_cpu_arm",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_linux_cpu_ia32",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_32",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# macOS combinations
+config_setting(
+    name = "os_darwin_cpu_x64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_darwin_cpu_arm64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Windows combinations
+config_setting(
+    name = "os_win32_cpu_x64",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_win32_cpu_ia32",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_32",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_win32_cpu_arm64",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# FreeBSD combinations
+config_setting(
+    name = "os_freebsd_cpu_x64",
+    constraint_values = [
+        "@aspect_rules_js//platforms/os:freebsd",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_freebsd_cpu_arm64",
+    constraint_values = [
+        "@aspect_rules_js//platforms/os:freebsd",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Android combinations  
+config_setting(
+    name = "os_android_cpu_arm",
+    constraint_values = [
+        "@aspect_rules_js//platforms/os:android",
+        "@platforms//cpu:arm",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_android_cpu_arm64",
+    constraint_values = [
+        "@aspect_rules_js//platforms/os:android",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "os_android_cpu_x64",
+    constraint_values = [
+        "@aspect_rules_js//platforms/os:android",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Additional combinations can be added as needed 

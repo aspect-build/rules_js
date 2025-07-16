@@ -1,5 +1,6 @@
 # Minimal module for platform fetch e2e test
 bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+bazel_dep(name = "platforms", version = "0.0.5")
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../..",

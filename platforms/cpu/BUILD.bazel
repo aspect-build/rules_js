@@ -9,3 +9,34 @@ alias(
     actual = "@platforms//cpu:x86_64",
     visibility = ["//visibility:public"],
 )
+
+# Custom constraint values for CPU architectures not in @platforms
+constraint_value(
+    name = "s390x",
+    constraint_setting = "@platforms//cpu:cpu",
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "ppc64", 
+    constraint_setting = "@platforms//cpu:cpu",
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "mips64el",
+    constraint_setting = "@platforms//cpu:cpu",
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "riscv64",
+    constraint_setting = "@platforms//cpu:cpu",
+    visibility = ["//visibility:public"],
+)
+
+constraint_value(
+    name = "loong64",
+    constraint_setting = "@platforms//cpu:cpu",
+    visibility = ["//visibility:public"],
+)
