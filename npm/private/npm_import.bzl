@@ -34,6 +34,7 @@ load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load(":platform_utils.bzl", "get_normalized_platform", "is_package_compatible_with_platform")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -611,7 +612,9 @@ def _download_and_extract_archive(rctx, package_json_only):
             msg = "Failed to set directory listing permissions. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(chmod_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
+
 def _npm_import_rule_impl(rctx):
+    
     has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
     has_patches = not (not rctx.attr.patches)
 
@@ -920,6 +923,7 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
     "commit": attr.string(),
+    "cpu": attr.string_list(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
@@ -932,6 +936,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "npm_auth_basic": attr.string(),
     "npm_auth_password": attr.string(),
     "npm_auth_username": attr.string(),
+    "os": attr.string_list(),
     "patch_tool": attr.label(),
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
@@ -1008,6 +1013,8 @@ def npm_import(
         bins = {},
         dev = False,
         exclude_package_contents = [],
+        os = None,
+        cpu = None,
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1277,6 +1284,8 @@ def npm_import(
             exclude_package_contents = ["**/tests/**"]
             ```
 
+
+
         **kwargs: Internal use only
     """
 
@@ -1286,6 +1295,15 @@ def npm_import(
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
+
+    # Normalize os and cpu to lists for the rule
+    os_list = []
+    if os != None:
+        os_list = os if type(os) == "list" else [os]
+    
+    cpu_list = []
+    if cpu != None:
+        cpu_list = cpu if type(cpu) == "list" else [cpu]
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
@@ -1315,6 +1333,8 @@ def npm_import(
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
         system_tar = system_tar,
+        os = os_list,
+        cpu = cpu_list,
     )
 
     has_custom_postinstall = not (not custom_postinstall)
