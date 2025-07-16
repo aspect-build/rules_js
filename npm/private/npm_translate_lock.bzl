@@ -28,6 +28,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
 load(":npm_translate_lock_helpers.bzl", "helpers")
@@ -42,6 +43,41 @@ RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
 ################################################################################
 DEFAULT_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
+
+def _normalize_exclude_package_contents(exclude_package_contents):
+    """Normalize exclude_package_contents dictionary for string_list_dict format."""
+    if not exclude_package_contents:
+        return {}
+
+    result = {}
+    for package, value in exclude_package_contents.items():
+        if type(value) == "bool":
+            if value == True:
+                # True means use default exclusions
+                result[package] = exclude_package_contents_default
+            else:
+                # False means no exclusions
+                result[package] = []
+        elif type(value) == "string":
+            # Single string becomes a list
+            result[package] = [value]
+        elif type(value) == "list":
+            # Process list to handle any booleans inside
+            normalized_list = []
+            for item in value:
+                if type(item) == "bool":
+                    if item == True:
+                        # Boolean True in list means add default exclusions
+                        normalized_list.extend(exclude_package_contents_default)
+
+                    # Boolean False in list means skip this entry
+                else:
+                    normalized_list.append(item)
+            result[package] = normalized_list
+        else:
+            fail("exclude_package_contents values must be boolean, string, or list. Got: {}".format(type(value)))
+
+    return result
 
 _ATTRS = {
     "additional_file_contents": attr.string_list_dict(),
@@ -284,18 +320,27 @@ def npm_translate_lock(
 
             Read more: [patching](/docs/pnpm.md#patching)
 
-        exclude_package_contents: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
-            to a list of patterns to exclude from the package's generated node_modules link targets. Multiple matches are additive.
+        exclude_package_contents: Configuration for excluding package contents (WORKSPACE only).
+
+            For MODULE.bazel, use the `exclude_package_contents` tag class instead.
+
+            The configuration is a dictionary that maps package names (or package names with their version, e.g., "my-package" or "my-package@v1.2.3") to exclusion rules.
+
+            Values can be:
+            - `True`: Use default exclusions
+            - String: Single exclusion pattern
+            - List of strings: Multiple exclusion patterns
 
             Versions must match if used.
 
-            For example,
+            Example:
 
             ```
             exclude_package_contents = {
+                "*": True,  # Use defaults for all packages
                 "@foo/bar": ["**/test/**"],
-                "@foo/car@2.0.0": ["**/README*"],
-            },
+                "@foo/car@2.0.0": "**/README*",
+            }
             ```
         patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
 
@@ -591,7 +636,7 @@ def npm_translate_lock(
         npmrc = npmrc,
         use_home_npmrc = use_home_npmrc,
         patches = patches,
-        exclude_package_contents = exclude_package_contents,
+        exclude_package_contents = _normalize_exclude_package_contents(exclude_package_contents),
         patch_tool = patch_tool,
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,

@@ -168,6 +168,7 @@ bzl_library(
     name = "npm_translate_lock",
     srcs = ["npm_translate_lock.bzl"],
     deps = [
+        ":exclude_package_contents_default.bzl",
         ":list_sources",
         ":npm_translate_lock_generate",
         ":npm_translate_lock_helpers",

@@ -6,6 +6,7 @@ load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_features//:features.bzl", "bazel_features")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "npm_translate_lock_rule")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
@@ -24,16 +25,19 @@ def _npm_extension_impl(module_ctx):
         # ctx.actions.declare_symlink was added in Bazel 6
         fail("A minimum version of Bazel 6 required to use rules_js")
 
+    # Collect all exclude_package_contents tags and build exclusion dictionary
+    exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
+
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(attr)
+            _npm_translate_lock_bzlmod(attr, exclude_package_contents_config)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 if hasattr(module_ctx, "watch"):
                     module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr)
+                _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -44,7 +48,27 @@ def _npm_extension_impl(module_ctx):
         )
     return module_ctx.extension_metadata()
 
-def _npm_translate_lock_bzlmod(attr):
+def _build_exclude_package_contents_config(module_ctx):
+    """Build exclude_package_contents configuration from tags across all modules."""
+    exclusions = {}
+
+    for mod in module_ctx.modules:
+        for exclude_tag in mod.tags.exclude_package_contents:
+            # Process each package in the tag
+            for package in exclude_tag.packages:
+                if package not in exclusions:
+                    exclusions[package] = []
+
+                # Add default exclusions if requested
+                if exclude_tag.use_defaults:
+                    exclusions[package].extend(exclude_package_contents_default)
+
+                # Add custom patterns
+                exclusions[package].extend(exclude_tag.patterns)
+
+    return exclusions
+
+def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
     npm_translate_lock_rule(
         name = attr.name,
         bins = attr.bins,
@@ -74,10 +98,11 @@ def _npm_translate_lock_bzlmod(attr):
         verify_node_modules_ignored = attr.verify_node_modules_ignored,
         verify_patches = attr.verify_patches,
         yarn_lock = attr.yarn_lock,
+        exclude_package_contents = exclude_package_contents_config,
         bzlmod = True,
     )
 
-def _npm_lock_imports_bzlmod(module_ctx, attr):
+def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config):
     state = npm_translate_lock_state.new(attr.name, module_ctx, attr, True)
 
     importers, packages = translate_to_transitive_closure(
@@ -131,6 +156,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         registries = registries,
         default_registry = state.default_registry(),
         npm_auth = npm_auth,
+        exclude_package_contents_config = exclude_package_contents_config,
     )
 
     system_tar = detect_system_tar(module_ctx)
@@ -218,6 +244,7 @@ def _npm_translate_lock_attrs():
 
     # Args not supported or unnecessary in bzlmod
     attrs.pop("repositories_bzl_filename")
+    attrs.pop("exclude_package_contents")  # Use tag classes only for MODULE.bazel
 
     return attrs
 
@@ -237,11 +264,28 @@ def _npm_import_attrs():
 
     return attrs
 
+def _exclude_package_contents_attrs():
+    return {
+        "packages": attr.string_list(
+            doc = "List of package names to apply exclusions to. Supports wildcards like '*' for all packages.",
+            default = [],
+        ),
+        "patterns": attr.string_list(
+            doc = "List of glob patterns to exclude from the specified packages.",
+            default = [],
+        ),
+        "use_defaults": attr.bool(
+            doc = "Whether to use default exclusion patterns for the specified packages.",
+            default = False,
+        ),
+    }
+
 npm = module_extension(
     implementation = _npm_extension_impl,
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
+        "exclude_package_contents": tag_class(attrs = _exclude_package_contents_attrs()),
     },
 )
 
