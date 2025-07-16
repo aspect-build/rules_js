@@ -452,7 +452,7 @@ def npm_package(
             name = "{}.publish".format(name),
             entry_point = Label("@aspect_rules_js//npm/private:npm_publish_mjs"),
             fixed_args = [
-                "$(rootpath :{})".format(name),
+                "./$(rootpath :{})".format(name),
             ],
             data = [name],
             # required to make npm to be available in PATH
