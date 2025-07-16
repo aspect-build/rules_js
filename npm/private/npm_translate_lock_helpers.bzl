@@ -48,26 +48,38 @@ Check the public_hoist_packages attribute for duplicates.
                 fail(msg)
 
 ################################################################################
-def _gather_package_content_excludes(keyed_lists, *names):
+def _gather_package_content_excludes(config, *names):
+    # Handle empty or default configuration
+    if not config:
+        return None
+
+    if type(config) != "dict":
+        fail("exclude_package_contents must be a dictionary configuration")
+
     found = False
     excludes = []
-    for name in names:
-        if name in keyed_lists:
-            found = True
-            v = keyed_lists[name]
-            if type(v) == "list":
-                for e in v:
-                    excludes.append(e)
-            elif type(v) == "string":
-                excludes.append(v)
-            else:
-                fail("expected value to be list or string")
 
-    # in case the key has not been met even once, we return None, instead of empty list as empty list is a valid value
-    if not found and "*" in keyed_lists:
-        excludes = keyed_lists["*"] if type(keyed_lists["*"]) == "list" else [keyed_lists["*"]]
+    # Process explicit package name matches
+    for name in names:
+        if name in config:
+            found = True
+            value = config[name]
+            _process_exclude_value(value, excludes)
+
+    # Handle "*" fallback if no explicit matches found
+    if not found and "*" in config:
+        value = config["*"]
+        _process_exclude_value(value, excludes)
 
     return None if len(excludes) == 0 else excludes
+
+def _process_exclude_value(value, excludes):
+    """Process a single exclude configuration value and add to excludes list"""
+    if type(value) == "list":
+        # Value should already be normalized to a list of strings by the macro
+        excludes.extend(value)
+    else:
+        fail("exclude_package_contents values should be normalized to lists by the macro. Got: {}".format(type(value)))
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
@@ -258,7 +270,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth):
+def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -383,7 +395,15 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
         # gather exclude patterns
-        exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name, unfriendly_name)
+        if exclude_package_contents_config != None:
+            # MODULE.bazel mode: use only tag-based configuration
+            exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
+        elif attr.bzlmod:
+            # MODULE.bazel mode with no tags: no exclusions
+            exclude_package_contents = None
+        else:
+            # WORKSPACE mode: use attribute configuration
+            exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name, unfriendly_name)
 
         # gather replace packages
         replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)

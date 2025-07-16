@@ -541,7 +541,7 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
     maybe_replace_package = ("""
         replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
     maybe_exclude_package_contents = ("""
-        exclude_package_contents = %s,""" % _import.exclude_package_contents) if _import.exclude_package_contents != None else ""
+        exclude_package_contents = %s,""" % starlark_codegen_utils.to_list_attr(_import.exclude_package_contents)) if _import.exclude_package_contents != None else ""
 
     return _NPM_IMPORT_TMPL.format(
         link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),

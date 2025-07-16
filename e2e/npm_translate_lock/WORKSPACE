@@ -17,7 +17,7 @@ npm_translate_lock(
     name = "npm",
     data = ["//:package.json"],
     exclude_package_contents = {
-        "is-odd@3.0.1": ["**/README*"],
+        "is-odd@3.0.1": "**/README*",  # Single pattern as string
     },
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
