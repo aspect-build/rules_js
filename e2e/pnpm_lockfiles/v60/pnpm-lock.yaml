@@ -114,6 +114,12 @@ importers:
       test-c201-d200:
         specifier: workspace:*
         version: link:../projects/peers-combo-1
+      test-local-combo-1:
+        specifier: workspace:*
+        version: link:../projects/peers-local-combo-1
+      test-local-combo-2:
+        specifier: workspace:*
+        version: link:../projects/peers-local-combo-2
       test-peer-types:
         specifier: ../projects/peer-types
         version: link:../projects/peer-types
@@ -224,6 +230,24 @@ importers:
       '@aspect-test/d':
         specifier: 2.0.0
         version: 2.0.0(@aspect-test/c@2.0.0)
+
+  ../projects/peers-local-combo-1:
+    dependencies:
+      '@scoped/b':
+        specifier: workspace:*
+        version: link:../b
+      '@scoped/c':
+        specifier: workspace:*
+        version: link:../c
+
+  ../projects/peers-local-combo-2:
+    dependencies:
+      '@scoped/b':
+        specifier: workspace:*
+        version: link:../b
+      '@scoped/d':
+        specifier: workspace:*
+        version: link:../d
 
   ../vendored/is-number: {}
 

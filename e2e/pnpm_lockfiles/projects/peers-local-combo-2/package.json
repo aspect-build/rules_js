@@ -1,0 +1,8 @@
+{
+    "name": "test-local-combo-2",
+    "private": true,
+    "dependencies": {
+        "@scoped/b": "workspace:*",
+        "@scoped/d": "workspace:*"
+    }
+}
