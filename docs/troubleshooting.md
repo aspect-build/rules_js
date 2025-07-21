@@ -175,11 +175,11 @@ If you are experiencing slower than expected builds, you can try disabling or re
 Npm packages sometimes include unnecessary files such as tests, test data etc. Large files or a large number of files
 can effect performance and are sometimes worth explicitly excluding content.
 
-In these cases you can add such packages and the respective files/folders you want to exclude to your npm_translate_lock
-rule in the `exclude_package_contents` attribute like so:
+In these cases you can add such packages and the respective files/folders you want to exclude.
 
+**For WORKSPACE builds:**
 ```starlark
-npm.npm_translate_lock(
+npm_translate_lock(
     ...
     exclude_package_contents = {
         "resolve": ["**/test/*"],
@@ -187,7 +187,15 @@ npm.npm_translate_lock(
 )
 ```
 
-This example will remove the test folder.
+**For Bzlmod builds (MODULE.bazel):**
+```starlark
+npm.npm_exclude_package_contents(
+    package = "resolve",
+    patterns = ["**/test/*"],
+)
+```
+
+These examples will remove the test folder from the "resolve" package.
 
 You can use this to remove whatever you find to be not needed for your project.
 

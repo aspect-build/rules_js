@@ -58,24 +58,14 @@ def _normalize_exclude_package_contents(exclude_package_contents):
             else:
                 # False means no exclusions
                 result[package] = []
-        elif type(value) == "string":
-            # Single string becomes a list
-            result[package] = [value]
         elif type(value) == "list":
-            # Process list to handle any booleans inside
-            normalized_list = []
+            # Lists must contain only strings
             for item in value:
-                if type(item) == "bool":
-                    if item == True:
-                        # Boolean True in list means add default exclusions
-                        normalized_list.extend(exclude_package_contents_default)
-
-                    # Boolean False in list means skip this entry
-                else:
-                    normalized_list.append(item)
-            result[package] = normalized_list
+                if type(item) != "string":
+                    fail("exclude_package_contents list values must be strings. Got: {} in package '{}'".format(type(item), package))
+            result[package] = value
         else:
-            fail("exclude_package_contents values must be boolean, string, or list. Got: {}".format(type(value)))
+            fail("exclude_package_contents values must be boolean or string list. Got: {} for package '{}'".format(type(value), package))
 
     return result
 

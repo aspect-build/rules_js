@@ -53,18 +53,18 @@ def _build_exclude_package_contents_config(module_ctx):
     exclusions = {}
 
     for mod in module_ctx.modules:
-        for exclude_tag in mod.tags.exclude_package_contents:
-            # Process each package in the tag
-            for package in exclude_tag.packages:
-                if package not in exclusions:
-                    exclusions[package] = []
+        for exclude_tag in mod.tags.npm_exclude_package_contents:
+            # Process the package in the tag
+            package = exclude_tag.package
+            if package not in exclusions:
+                exclusions[package] = []
 
-                # Add default exclusions if requested
-                if exclude_tag.use_defaults:
-                    exclusions[package].extend(exclude_package_contents_default)
+            # Add default exclusions if requested
+            if exclude_tag.use_defaults:
+                exclusions[package].extend(exclude_package_contents_default)
 
-                # Add custom patterns
-                exclusions[package].extend(exclude_tag.patterns)
+            # Add custom patterns
+            exclusions[package].extend(exclude_tag.patterns)
 
     return exclusions
 
@@ -264,18 +264,18 @@ def _npm_import_attrs():
 
     return attrs
 
-def _exclude_package_contents_attrs():
+def _npm_exclude_package_contents_attrs():
     return {
-        "packages": attr.string_list(
-            doc = "List of package names to apply exclusions to. Supports wildcards like '*' for all packages.",
-            default = [],
+        "package": attr.string(
+            doc = "Package name to apply exclusions to. Supports wildcards like '*' for all packages.",
+            mandatory = True,
         ),
         "patterns": attr.string_list(
-            doc = "List of glob patterns to exclude from the specified packages.",
+            doc = "List of glob patterns to exclude from the specified package.",
             default = [],
         ),
         "use_defaults": attr.bool(
-            doc = "Whether to use default exclusion patterns for the specified packages.",
+            doc = "Whether to use default exclusion patterns for the specified package.",
             default = False,
         ),
     }
@@ -285,7 +285,7 @@ npm = module_extension(
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
-        "exclude_package_contents": tag_class(attrs = _exclude_package_contents_attrs()),
+        "npm_exclude_package_contents": tag_class(attrs = _npm_exclude_package_contents_attrs()),
     },
 )
 

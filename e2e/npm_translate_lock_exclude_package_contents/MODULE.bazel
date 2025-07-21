@@ -20,12 +20,12 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
-npm.exclude_package_contents(
-    packages = ["*"],
+npm.npm_exclude_package_contents(
+    package = "*",
     use_defaults = True,
 )
-npm.exclude_package_contents(
-    packages = ["is-odd@3.0.1"],
+npm.npm_exclude_package_contents(
+    package = "is-odd@3.0.1",
     patterns = [
         "**/README*",
         "**/LICENSE*",
