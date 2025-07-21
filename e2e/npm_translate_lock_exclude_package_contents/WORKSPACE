@@ -16,11 +16,11 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 npm_translate_lock(
     name = "npm",
     exclude_package_contents = {
+        "*": True,  # Use default exclusions for all packages
         "is-odd@3.0.1": [
             "**/README*",
-            "",
             "**/LICENSE*",
-        ],
+        ],  # Custom exclusions for specific package
     },
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",

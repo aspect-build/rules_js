@@ -16,15 +16,20 @@ npm = use_extension(
 npm.npm_translate_lock(
     name = "npm",
     data = ["//:package.json"],
-    exclude_package_contents = {
-        "is-odd@3.0.1": [
-            "**/README*",
-            "",
-            "**/LICENSE*",
-        ],
-    },
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
+)
+npm.npm_exclude_package_contents(
+    package = "*",
+    use_defaults = True,
+)
+npm.npm_exclude_package_contents(
+    package = "is-odd@3.0.1",
+    patterns = [
+        "**/README*",
+        "**/LICENSE*",
+    ],
+    use_defaults = True,
 )
 use_repo(npm, "npm")
