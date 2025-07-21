@@ -56,10 +56,10 @@ def _build_exclude_package_contents_config(module_ctx):
         for exclude_tag in mod.tags.npm_exclude_package_contents:
             # Process the package in the tag
             package = exclude_tag.package
-            if package not in exclusions:
-                exclusions[package] = []
-            else:
+            if package in exclusions:
                 fail("Duplicate exclude_package_contents tag for package: {}".format(package))
+
+            exclusions[package] = []
 
             # Add default exclusions if requested
             if exclude_tag.use_defaults:
