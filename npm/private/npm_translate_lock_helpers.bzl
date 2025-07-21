@@ -49,37 +49,20 @@ Check the public_hoist_packages attribute for duplicates.
 
 ################################################################################
 def _gather_package_content_excludes(config, *names):
-    # Handle empty or default configuration
-    if not config:
-        return None
-
-    if type(config) != "dict":
-        fail("exclude_package_contents must be a dictionary configuration")
-
     found = False
     excludes = []
 
-    # Process explicit package name matches
     for name in names:
         if name in config:
             found = True
             value = config[name]
-            _process_exclude_value(value, excludes)
+            excludes.extend(value)
 
-    # Handle "*" fallback if no explicit matches found
     if not found and "*" in config:
         value = config["*"]
-        _process_exclude_value(value, excludes)
+        excludes.extend(value)
 
     return None if len(excludes) == 0 else excludes
-
-def _process_exclude_value(value, excludes):
-    """Process a single exclude configuration value and add to excludes list"""
-    if type(value) == "list":
-        # Value should already be normalized to a list of strings by the macro
-        excludes.extend(value)
-    else:
-        fail("exclude_package_contents values should be normalized to lists by the macro. Got: {}".format(type(value)))
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
