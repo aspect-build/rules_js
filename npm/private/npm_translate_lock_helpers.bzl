@@ -379,11 +379,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # gather exclude patterns
         if exclude_package_contents_config != None:
-            # MODULE.bazel mode: use only tag-based configuration
+            # bzlmod mode: use provided configuration
             exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
-        elif attr.bzlmod:
-            # MODULE.bazel mode with no tags: no exclusions
-            exclude_package_contents = None
         else:
             # WORKSPACE mode: use attribute configuration
             exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name, unfriendly_name)
