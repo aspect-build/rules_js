@@ -318,7 +318,6 @@ def npm_translate_lock(
 
             Values can be:
             - `True`: Use default exclusions
-            - String: Single exclusion pattern
             - List of strings: Multiple exclusion patterns
 
             Versions must match if used.
@@ -329,7 +328,7 @@ def npm_translate_lock(
             exclude_package_contents = {
                 "*": True,  # Use defaults for all packages
                 "@foo/bar": ["**/test/**"],
-                "@foo/car@2.0.0": "**/README*",
+                "@foo/car@2.0.0": ["**/README*"],
             }
             ```
         patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.

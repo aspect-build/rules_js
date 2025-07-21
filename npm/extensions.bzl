@@ -58,6 +58,8 @@ def _build_exclude_package_contents_config(module_ctx):
             package = exclude_tag.package
             if package not in exclusions:
                 exclusions[package] = []
+            else:
+                fail("Duplicate exclude_package_contents tag for package: {}".format(package))
 
             # Add default exclusions if requested
             if exclude_tag.use_defaults:
@@ -275,7 +277,7 @@ def _npm_exclude_package_contents_attrs():
             default = [],
         ),
         "use_defaults": attr.bool(
-            doc = "Whether to use default exclusion patterns for the specified package.",
+            doc = "Whether to use default exclusion patterns for the specified package. Defaults are as to Yarn autoclean: https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16",
             default = False,
         ),
     }
