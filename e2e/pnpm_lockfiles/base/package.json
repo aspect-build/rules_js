@@ -64,7 +64,8 @@
             "is-number": "file:../vendored/is-number",
             "diff": "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
             "fsevents": "^2.3",
-            "typescript": "5.5.2"
+            "typescript": "5.5.2",
+            "@types/glob": "^8.1.0"
         }
     }
 }
