@@ -167,3 +167,7 @@ This third approach has trade-offs.
     and must ensure that sources are copied there first.
     This forces users to pass a `BAZEL_BINDIR` in the environment of every node action.
     https://github.com/bazelbuild/bazel/issues/15470 suggests a way to improve that, avoiding that imposition on users.
+
+# Telemetry & privacy policy
+
+This ruleset collects limited usage data via [`tools_telemetry`](https://github.com/aspect-build/tools_telemetry), which is reported to Aspect Build Inc and governed by our [privacy policy](https://www.aspect.build/privacy-policy).
