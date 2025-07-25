@@ -4,6 +4,7 @@ set -o errexit -o nounset -o pipefail
 
 # Don't include e2e or examples in the distribution artifact, to reduce size
 echo >.git/info/attributes "examples export-ignore"
+echo >>.git/info/attributes "js/private/test/image/non_ascii export-ignore"
 # But **do** include e2e/bzlmod since the BCR wants to run presubmit test
 # and it only sees our release artifact.
 # shellcheck disable=2010
