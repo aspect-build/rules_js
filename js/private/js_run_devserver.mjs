@@ -772,9 +772,6 @@ class AspectWatchProtocol {
 
         // Propagate connection errors to a configurable callback
         this._error = console.error
-        this.connection.on('error', (err) => {
-            this._error(err)
-        })
     }
 
     async connect() {
