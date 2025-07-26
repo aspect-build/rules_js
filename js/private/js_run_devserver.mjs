@@ -772,9 +772,6 @@ class AspectWatchProtocol {
 
         // Propagate connection errors to a configurable callback
         this._error = console.error
-        this.connection.on('error', (err) => {
-            this._error(err)
-        })
     }
 
     async connect() {
@@ -843,7 +840,7 @@ class AspectWatchProtocol {
     }
 
     async _receive(type = null) {
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             const dataBufs = []
             const connection = this.connection
 
@@ -877,17 +874,21 @@ class AspectWatchProtocol {
     }
 
     async _send(type, data = {}) {
-        return new Promise((resolve, reject) => {
-            this.connection.write(
-                JSON.stringify({ kind: type, ...data }) + '\n',
-                function (err) {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve()
+        return await new Promise((resolve, reject) => {
+            try {
+                this.connection.write(
+                    JSON.stringify({ kind: type, ...data }) + '\n',
+                    function (err) {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve()
+                        }
                     }
-                }
-            )
+                )
+            } catch (err) {
+                reject(err)
+            }
         })
     }
 }
