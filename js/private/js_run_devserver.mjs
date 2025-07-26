@@ -778,8 +778,13 @@ class AspectWatchProtocol {
         await new Promise((resolve, reject) => {
             // Initial connection + success vs failure
             this.connection.once('error', reject)
-            this.connection.once('connect', resolve)
-            this.connection.connect({ path: this.socketFile })
+            try {
+                this.connection.connect({ path: this.socketFile }, resolve)
+            } catch (err) {
+                reject(err)
+            } finally {
+                this.connection.off('error', reject)
+            }
         })
 
         await this._receive('NEGOTIATE')
@@ -844,14 +849,33 @@ class AspectWatchProtocol {
             const dataBufs = []
             const connection = this.connection
 
-            connection.on('data', function dataReceived(data) {
+            connection.once('error', onError)
+            connection.once('close', onError)
+            connection.on('data', dataReceived)
+
+            // Destructor removing all temporary event handlers.
+            function removeHandlers() {
+                connection.off('error', onError)
+                connection.off('close', onError)
+                connection.off('data', dataReceived)
+            }
+
+            // Error event handler
+            function onError(err) {
+                removeHandlers()
+                reject(err)
+            }
+
+            // Data event handler to receive data and determine when to resolve the promise.
+            function dataReceived(data) {
                 dataBufs.push(data)
 
                 if (data.at(data.byteLength - 1) !== '\n'.charCodeAt(0)) {
                     return
                 }
 
-                connection.off('data', dataReceived)
+                // Removal all temporary event handlers before resolving the promise
+                removeHandlers()
 
                 try {
                     const msg = JSON.parse(
@@ -869,7 +893,7 @@ class AspectWatchProtocol {
                 } catch (e) {
                     reject(e)
                 }
-            })
+            }
         })
     }
 
