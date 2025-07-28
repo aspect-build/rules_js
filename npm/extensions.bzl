@@ -254,7 +254,7 @@ def _npm_translate_lock_attrs():
     # Args not supported or unnecessary in bzlmod
     attrs.pop("repositories_bzl_filename")
     attrs.pop("exclude_package_contents")  # Use tag classes only for MODULE.bazel
-    
+
     # Replaced with tag in bzlmod
     attrs.pop("replace_packages")
 
