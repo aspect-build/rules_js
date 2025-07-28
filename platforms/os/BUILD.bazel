@@ -40,3 +40,9 @@ constraint_value(
     constraint_setting = "@platforms//os:os",
     visibility = ["//visibility:public"],
 )
+
+constraint_value(
+    name = "aix",
+    constraint_setting = "@platforms//os:os",
+    visibility = ["//visibility:public"],
+)

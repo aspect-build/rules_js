@@ -35,24 +35,24 @@ def get_normalized_platform(os_name, cpu_name):
         current_os = "win32"
     elif current_os == "linux":
         current_os = "linux"  # Already correct
-    elif current_os in ["freebsd", "openbsd", "netbsd", "sunos", "android"]:
+    elif current_os in ["freebsd", "openbsd", "netbsd", "sunos", "android", "aix"]:
         # These are already in correct format
         pass
     else:
         # Unknown OS - provide helpful error message
-        fail("Unknown OS '{}': supported values are Mac OS X, Linux, Windows, FreeBSD, OpenBSD, NetBSD, SunOS, Android".format(os_name))
+        fail("Unknown OS '{}': supported values are Mac OS X, Linux, Windows, FreeBSD, OpenBSD, NetBSD, SunOS, Android, AIX".format(os_name))
     
     # Normalize CPU architecture names to match Node.js conventions
     if current_cpu in ["amd64", "x86_64"]:
         current_cpu = "x64"
     elif current_cpu == "aarch64":
         current_cpu = "arm64"
-    elif current_cpu in ["x64", "arm64", "arm", "ia32", "s390x", "ppc64", "mips64el", "riscv64", "loong64"]:
+    elif current_cpu in ["x64", "arm64", "arm", "ia32", "s390x", "ppc64", "mips64el", "riscv64", "loong64", "wasm32"]:
         # These are already in correct format
         pass
     else:
         # Unknown CPU architecture - provide helpful error message
-        fail("Unknown CPU architecture '{}': supported values are amd64, x86_64, aarch64, arm64, arm, ia32, s390x, ppc64, mips64el, riscv64, loong64".format(cpu_name))
+        fail("Unknown CPU architecture '{}': supported values are amd64, x86_64, aarch64, arm64, arm, ia32, s390x, ppc64, mips64el, riscv64, loong64, wasm32".format(cpu_name))
     
     return current_os, current_cpu
 
@@ -244,7 +244,8 @@ def node_os_to_bazel_constraint(node_os):
         "freebsd": "@platforms//os:freebsd",
         "openbsd": "@platforms//os:openbsd",
         "android": "@platforms//os:android",
-        # NetBSD and SunOS don't have standard Bazel constraints, use custom ones
+        # AIX, NetBSD and SunOS don't have standard Bazel constraints, use custom ones
+        "aix": "@aspect_rules_js//platforms/os:aix",
         "netbsd": "@aspect_rules_js//platforms/os:netbsd",
         "sunos": "@aspect_rules_js//platforms/os:sunos",
     }
@@ -284,6 +285,7 @@ def node_cpu_to_bazel_constraint(node_cpu):
         "mips64el": "@aspect_rules_js//platforms/cpu:mips64el",
         "riscv64": "@aspect_rules_js//platforms/cpu:riscv64",
         "loong64": "@aspect_rules_js//platforms/cpu:loong64",
+        "wasm32": "@aspect_rules_js//platforms/cpu:wasm32",
     }
     
     constraint = cpu_map.get(node_cpu)
