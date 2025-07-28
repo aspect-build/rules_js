@@ -19,13 +19,16 @@ npm = use_extension(
     "npm",
     dev_dependency = True,
 )
+
+npm.replace_package(
+    package = "chalk@5.3.0",
+    replacement = "@chalk_501//:pkg",
+)
+
 npm.npm_translate_lock(
     name = "npm",
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
-    replace_packages = {
-        "chalk@5.3.0": "@chalk_501//:pkg",
-    },
     verify_node_modules_ignored = "//:.bazelignore",
 )
 

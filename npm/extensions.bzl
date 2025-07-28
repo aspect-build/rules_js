@@ -29,15 +29,21 @@ def _npm_extension_impl(module_ctx):
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
 
     for mod in module_ctx.modules:
+        replace_packages = {}
+        for attr in mod.tags.replace_package:
+            if attr.package in replace_packages:
+                fail("Each package can have only one replacement")
+            replace_packages[attr.package] = "@@{}//{}:{}".format(attr.replacement.repo_name, attr.replacement.package, attr.replacement.name)
+
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(attr, exclude_package_contents_config)
+            _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 if hasattr(module_ctx, "watch"):
                     module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config)
+                _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -70,7 +76,7 @@ def _build_exclude_package_contents_config(module_ctx):
 
     return exclusions
 
-def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
+def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages):
     npm_translate_lock_rule(
         name = attr.name,
         bins = attr.bins,
@@ -93,7 +99,7 @@ def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
         prod = attr.prod,
         public_hoist_packages = attr.public_hoist_packages,
         quiet = attr.quiet,
-        replace_packages = attr.replace_packages,
+        replace_packages = replace_packages,
         root_package = attr.root_package,
         update_pnpm_lock = attr.update_pnpm_lock,
         use_home_npmrc = attr.use_home_npmrc,
@@ -104,7 +110,7 @@ def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
         bzlmod = True,
     )
 
-def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config):
+def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
     state = npm_translate_lock_state.new(attr.name, module_ctx, attr, True)
 
     importers, packages = translate_to_transitive_closure(
@@ -147,6 +153,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
+        replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
         root_package = attr.pnpm_lock.package,
@@ -247,6 +254,9 @@ def _npm_translate_lock_attrs():
     # Args not supported or unnecessary in bzlmod
     attrs.pop("repositories_bzl_filename")
     attrs.pop("exclude_package_contents")  # Use tag classes only for MODULE.bazel
+    
+    # Replaced with tag in bzlmod
+    attrs.pop("replace_packages")
 
     return attrs
 
@@ -282,12 +292,18 @@ def _npm_exclude_package_contents_attrs():
         ),
     }
 
+_REPLACE_PACKAGE_ATTRS = {
+    "package": attr.string(),
+    "replacement": attr.label(),
+}
+
 npm = module_extension(
     implementation = _npm_extension_impl,
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
         "npm_exclude_package_contents": tag_class(attrs = _npm_exclude_package_contents_attrs()),
+        "replace_package": tag_class(attrs = _REPLACE_PACKAGE_ATTRS),
     },
 )
 
