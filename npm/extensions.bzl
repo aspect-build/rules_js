@@ -30,7 +30,7 @@ def _npm_extension_impl(module_ctx):
 
     for mod in module_ctx.modules:
         replace_packages = {}
-        for attr in mod.tags.replace_package:
+        for attr in mod.tags.npm_replace_package:
             if attr.package in replace_packages:
                 fail("Each package can have only one replacement")
             replace_packages[attr.package] = "@@{}//{}:{}".format(attr.replacement.repo_name, attr.replacement.package, attr.replacement.name)
@@ -77,6 +77,17 @@ def _build_exclude_package_contents_config(module_ctx):
     return exclusions
 
 def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages):
+    # TODO(3.0): remove this warning when replace_packages attribute is removed
+    if attr.replace_packages:
+        # buildifier: disable=print
+        print("WARNING: replace_packages attribute is deprecated in bzlmod. Use npm.npm_replace_package() tag instead. This attribute will be removed in rules_js 3.0.")
+        
+        # Merge replace_packages attribute with replace_package tags
+        for package, replacement in attr.replace_packages.items():
+            if package in replace_packages:
+                fail("Package replacement conflict: {} specified in both replace_packages attribute and replace_package tag".format(package))
+            replace_packages[package] = replacement
+    
     npm_translate_lock_rule(
         name = attr.name,
         bins = attr.bins,
@@ -255,9 +266,8 @@ def _npm_translate_lock_attrs():
     attrs.pop("repositories_bzl_filename")
     attrs.pop("exclude_package_contents")  # Use tag classes only for MODULE.bazel
 
-    # Replaced with tag in bzlmod
-    attrs.pop("replace_packages")
-
+    # TODO(3.0): remove replace_packages attribute in favor of npm_replace_package tag
+    # attrs.pop("replace_packages")
     return attrs
 
 def _npm_import_attrs():
@@ -293,8 +303,14 @@ def _npm_exclude_package_contents_attrs():
     }
 
 _REPLACE_PACKAGE_ATTRS = {
-    "package": attr.string(),
-    "replacement": attr.label(),
+    "package": attr.string(
+        doc = "The package name and version to replace (e.g., 'chalk@5.3.0')",
+        mandatory = True,
+    ),
+    "replacement": attr.label(
+        doc = "The target to use as replacement for this package",
+        mandatory = True,
+    ),
 }
 
 npm = module_extension(
@@ -303,7 +319,23 @@ npm = module_extension(
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
         "npm_exclude_package_contents": tag_class(attrs = _npm_exclude_package_contents_attrs()),
-        "replace_package": tag_class(attrs = _REPLACE_PACKAGE_ATTRS),
+        "npm_replace_package": tag_class(
+            attrs = _REPLACE_PACKAGE_ATTRS,
+            doc = """Replace a package with a custom target.
+
+This allows you to replace packages declared in package.json with custom implementations.
+Multiple npm_replace_package tags can be used to replace different packages.
+
+Example:
+```starlark
+npm.npm_replace_package(
+    package = "chalk@5.3.0",
+    replacement = "@chalk_501//:pkg",
+)
+```
+
+This is the bzlmod equivalent of the replace_packages attribute in WORKSPACE mode.""",
+        ),
     },
 )
 

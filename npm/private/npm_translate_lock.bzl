@@ -446,6 +446,17 @@ def npm_translate_lock(
 
         replace_packages: A dict of package names to targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
 
+            **Note for bzlmod users:** Use the `npm_replace_package` tag class instead:
+
+                        ```starlark
+                        npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+                        npm.npm_replace_package(
+                            package = "chalk@5.3.0",
+                            replacement = "@chalk_501//:pkg",
+                        )
+                        npm.npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")
+                        ```
+
             Targets must produce `JsInfo` or `NpmPackageInfo` providers such as `js_library` or `npm_package` targets.
 
             The injected package targets may optionally contribute transitive npm package dependencies on top
