@@ -28,6 +28,7 @@ use_repo(node, "nodejs_linux_arm64")
 use_repo(node, "nodejs_linux_ppc64le")
 use_repo(node, "nodejs_linux_s390x")
 use_repo(node, "nodejs_windows_amd64")
+use_repo(node, "nodejs_windows_arm64")
 
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
@@ -47,6 +48,7 @@ use_repo(bazel_lib_toolchains, "yq_linux_arm64")
 use_repo(bazel_lib_toolchains, "yq_linux_ppc64le")
 use_repo(bazel_lib_toolchains, "yq_linux_s390x")
 use_repo(bazel_lib_toolchains, "yq_windows_amd64")
+use_repo(bazel_lib_toolchains, "yq_windows_arm64")
 use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 ####### Dev dependencies ########
@@ -75,6 +77,7 @@ use_repo(node_dev, "node20_linux_arm64")
 use_repo(node_dev, "node20_linux_s390x")
 use_repo(node_dev, "node20_linux_ppc64le")
 use_repo(node_dev, "node20_windows_amd64")
+use_repo(node_dev, "node20_windows_arm64")
 use_repo(node_dev, "node18_linux_amd64")
 use_repo(node_dev, "node18_darwin_arm64")
 use_repo(node_dev, "node18_darwin_amd64")
