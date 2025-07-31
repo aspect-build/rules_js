@@ -419,6 +419,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
+        package_os = package_info.get("os", None)
+        package_cpu = package_info.get("cpu", None)
+        
         run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build)
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
@@ -466,6 +469,24 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
+        # Build dependency platform constraints for this package
+        # Include both regular dependencies and optional dependencies
+        all_deps = dicts.add(deps, optional_deps) if not attr.no_optional else deps
+        deps_constraints = {}
+        for dep_name in all_deps.keys():
+            dep_package_key = utils.package_key(dep_name, all_deps[dep_name])
+            dep_package_info = packages.get(dep_package_key)
+            if dep_package_info:
+                dep_os = dep_package_info.get("os", None)
+                dep_cpu = dep_package_info.get("cpu", None)
+                if dep_os or dep_cpu:
+                    # This dependency has platform constraints - collect them
+                    deps_constraints[dep_name] = {
+                        "os": dep_os if dep_os else [],
+                        "cpu": dep_cpu if dep_cpu else []
+                    }
+
+
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
             deps = deps,
@@ -495,6 +516,12 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             package_info = package_info,
             dev = dev_only,
             replace_package = replace_package,
+            cpu = package_info.get("cpu", None),
+            os = package_info.get("os", None),
+            optional = optional,
+            # Platform constraints for dependencies
+            deps_os_constraints = {k: v.get("os", []) for k, v in deps_constraints.items()},
+            deps_cpu_constraints = {k: v.get("cpu", []) for k, v in deps_constraints.items()},
         )
 
         if repo_name in result:

@@ -18,7 +18,7 @@ _NPM_IMPORT_TMPL = \
         version = "{version}",
         url = "{url}",
         system_tar = "{system_tar}",
-        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_package_contents}
+        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_package_contents}{maybe_os}{maybe_cpu}{maybe_deps_os_constraints}{maybe_deps_cpu_constraints}{maybe_optional}
     )
 """
 
@@ -543,11 +543,29 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
     maybe_exclude_package_contents = ("""
         exclude_package_contents = %s,""" % starlark_codegen_utils.to_list_attr(_import.exclude_package_contents)) if _import.exclude_package_contents != None else ""
 
+    package_os = getattr(_import, "os", None)
+    package_cpu = getattr(_import, "cpu", None)
+
+    maybe_os = ("""
+        os = %s,""" % repr(package_os)) if package_os else ""
+    maybe_cpu = ("""
+        cpu = %s,""" % repr(package_cpu)) if package_cpu else ""
+
+    # Generate dependency platform constraints
+    deps_os_constraints = getattr(_import, "deps_os_constraints", {})
+    deps_cpu_constraints = getattr(_import, "deps_cpu_constraints", {})
+
+    maybe_deps_os_constraints = ("""
+        deps_os_constraints = %s,""" % starlark_codegen_utils.to_dict_list_attr(deps_os_constraints, 2)) if deps_os_constraints else ""
+    maybe_deps_cpu_constraints = ("""
+        deps_cpu_constraints = %s,""" % starlark_codegen_utils.to_dict_list_attr(deps_cpu_constraints, 2)) if deps_cpu_constraints else ""
+
     return _NPM_IMPORT_TMPL.format(
         link_packages = starlark_codegen_utils.to_dict_attr(_import.link_packages, 2, quote_value = False),
         link_workspace = link_workspace,
         maybe_bins = maybe_bins,
         maybe_commit = maybe_commit,
+        maybe_cpu = maybe_cpu,
         maybe_custom_postinstall = maybe_custom_postinstall,
         maybe_deps = maybe_deps,
         maybe_dev = maybe_dev,
@@ -561,6 +579,7 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         maybe_npm_auth_basic = maybe_npm_auth_basic,
         maybe_npm_auth_password = maybe_npm_auth_password,
         maybe_npm_auth_username = maybe_npm_auth_username,
+        maybe_os = maybe_os,
         maybe_patch_tool = maybe_patch_tool,
         maybe_patch_args = maybe_patch_args,
         maybe_patches = maybe_patches,
@@ -574,4 +593,6 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         url = _import.url,
         version = _import.version,
         maybe_exclude_package_contents = maybe_exclude_package_contents,
+        maybe_deps_os_constraints = maybe_deps_os_constraints,
+        maybe_deps_cpu_constraints = maybe_deps_cpu_constraints,
     )

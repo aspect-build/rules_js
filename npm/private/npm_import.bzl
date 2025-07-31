@@ -34,6 +34,7 @@ load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load(":platform_utils.bzl", "build_platform_select_conditions", "build_select_dict_for_platform_compatibility", "get_normalized_platform", "is_package_compatible_with_platform")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -46,6 +47,9 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_imported_package_store = "npm_imported_package_store_internal",
     _npm_link_imported_package = "npm_link_imported_package_internal",
     _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:platform_utils.bzl", "build_select_dict_for_platform_compatibility")
 """
 
 _LINK_JS_PACKAGE_TMPL = """\
@@ -53,6 +57,8 @@ PACKAGE = "{package}"
 VERSION = "{version}"
 _ROOT_PACKAGE = "{root_package}"
 _PACKAGE_STORE_NAME = "{package_store_name}"
+_PACKAGE_OS = {package_os}
+_PACKAGE_CPU = {package_cpu}
 
 # Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
@@ -74,6 +80,8 @@ def npm_imported_package_store(link_root_name):
         lifecycle_hooks_execution_requirements = {lifecycle_hooks_execution_requirements},
         use_default_shell_env = {use_default_shell_env},
         exclude_package_contents = {exclude_package_contents},
+        package_os = _PACKAGE_OS,
+        package_cpu = _PACKAGE_CPU,
     )
 """
 
@@ -96,7 +104,9 @@ def npm_imported_package_store_internal(
         lifecycle_hooks_env,
         lifecycle_hooks_execution_requirements,
         use_default_shell_env,
-        exclude_package_contents):
+        exclude_package_contents,
+        package_os,
+        package_cpu):
     bazel_package = native.package_name()
     is_root = bazel_package == root_package
     if not is_root:
@@ -107,11 +117,35 @@ def npm_imported_package_store_internal(
         )
         fail(msg)
 
-    deps = {k.format(link_root_name = link_root_name): v for k, v in deps.items()}
-    ref_deps = {k.format(link_root_name = link_root_name): v for k, v in ref_deps.items()}
-    lc_deps = {k.format(link_root_name = link_root_name): v for k, v in lc_deps.items()}
+    # Apply link_root_name substitution to dependency dictionaries
+    def _substitute_link_root_name(deps_dict):
+        result = {}
+        for k, v in deps_dict.items():
+            new_key = k.format(link_root_name = link_root_name)
+            result[new_key] = v
+        return result
+
+    deps = _substitute_link_root_name(deps)
+    ref_deps = _substitute_link_root_name(ref_deps)
+    lc_deps = _substitute_link_root_name(lc_deps)
 
     store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
+
+    # Build platform-aware src values using select() for conditional behavior
+    # Compatible platforms get the real source, incompatible platforms get None
+    pkg_src_select = build_select_dict_for_platform_compatibility(
+        package_os,
+        package_cpu,
+        compatible_value = "{}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else npm_package_target,
+        incompatible_value = None,
+    )
+
+    main_src_select = build_select_dict_for_platform_compatibility(
+        package_os,
+        package_cpu,
+        compatible_value = npm_package_target,
+        incompatible_value = None,
+    ) if not transitive_closure_pattern else None
 
     # reference target used to avoid circular deps
     _npm_package_store(
@@ -126,7 +160,7 @@ def npm_imported_package_store_internal(
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
     _npm_package_store(
         name = "{}/pkg".format(store_target_name),
-        src = "{}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else npm_package_target,
+        src = pkg_src_select,
         package = package,
         version = version,
         dev = dev,
@@ -138,7 +172,7 @@ def npm_imported_package_store_internal(
     # package store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
-        src = None if transitive_closure_pattern else npm_package_target,
+        src = main_src_select,
         package = package,
         version = version,
         dev = dev,
@@ -742,15 +776,135 @@ def _mnemonic_for_bin(bin_name):
     bin_words = bin_name.split("_")
     return "".join([word.capitalize() for word in bin_words])
 
+def _extract_package_name_from_target(dep_target):
+    """Extract package name from a dependency target string.
+
+    Args:
+        dep_target: Target like ":.aspect_rules_js/{link_root_name}/@esbuild+android-arm@0.16.17/pkg"
+
+    Returns:
+        Package name like "@esbuild/android-arm"
+    """
+
+    # Remove quotes and leading colon
+    target = dep_target.strip('"').lstrip(":")
+
+    # Split by '/' and find the package identifier
+    parts = target.split("/")
+
+    # Look for the package store part that contains package info
+    for part in parts:
+        # Check for scoped package pattern like "@esbuild+android-arm@version"
+        if part.startswith("@") and "+" in part and "@" in part[1:]:
+            # Parse "@esbuild+android-arm@0.16.17" -> "@esbuild/android-arm"
+            # Split at the first @ to get scope
+            at_index = part.find("@", 1)  # Find @ after the first character
+            if at_index > 0:
+                scope_and_package = part[:at_index]  # "@esbuild+android-arm"
+                if "+" in scope_and_package:
+                    scope, package_name = scope_and_package.split("+", 1)
+                    return scope + "/" + package_name
+
+            # Check for regular package pattern like "package+name@version"
+        elif "+" in part and "@" in part and not part.startswith("@"):
+            # Parse "package+name@version" -> "package/name"
+            at_index = part.find("@")
+            if at_index > 0:
+                package_part = part[:at_index]  # "package+name"
+                if "+" in package_part:
+                    return package_part.replace("+", "/")
+
+    return None
+
+def _group_dependencies_by_platform(deps_dict, deps_os_constraints, deps_cpu_constraints):
+    """Group dependencies into platform-neutral and platform-specific buckets.
+
+    Args:
+        deps_dict: Dict mapping dependency targets to aliases
+        deps_os_constraints: Dict mapping package names to OS constraint lists
+        deps_cpu_constraints: Dict mapping package names to CPU constraint lists
+
+    Returns:
+        struct with:
+        - neutral_deps: dict of deps with no platform constraints
+        - platform_specific_deps: dict mapping platform conditions to dep dicts
+    """
+    neutral_deps = {}
+    platform_specific_deps = {}
+
+    # Cache for constraint lookups to improve performance
+    constraint_cache = {}
+
+    for dep_target, dep_aliases in deps_dict.items():
+        # Extract package name from dependency target
+        package_name = _extract_package_name_from_target(dep_target)
+
+        # Use cache for constraint lookups
+        cache_key = package_name
+        if cache_key in constraint_cache:
+            package_os, package_cpu = constraint_cache[cache_key]
+        else:
+            package_os = deps_os_constraints.get(package_name, [])
+            package_cpu = deps_cpu_constraints.get(package_name, [])
+            constraint_cache[cache_key] = (package_os, package_cpu)
+
+        if not package_os and not package_cpu:
+            # No platform constraints - always include
+            neutral_deps[dep_target] = dep_aliases
+        else:
+            # Has platform constraints - group by platform conditions
+            conditions = build_platform_select_conditions(package_os, package_cpu)
+            if conditions:
+                for condition in conditions:
+                    if condition not in platform_specific_deps:
+                        platform_specific_deps[condition] = {}
+                    platform_specific_deps[condition][dep_target] = dep_aliases
+            else:
+                # No valid conditions generated, treat as neutral
+                # buildifier: disable=print
+                print("WARNING: Invalid platform constraints for package '{}', treating as platform-neutral. OS: {}, CPU: {}".format(
+                    package_name,
+                    package_os,
+                    package_cpu,
+                ))
+                neutral_deps[dep_target] = dep_aliases
+
+    return struct(
+        neutral_deps = neutral_deps,
+        platform_specific_deps = platform_specific_deps,
+    )
+
+def _generate_deps_with_select(grouped_deps):
+    """Generate a Starlark expression for dependencies with select() statements.
+    
+    Args:
+        grouped_deps: struct with neutral_deps and platform_specific_deps
+        
+    Returns:
+        str: Starlark expression for dependencies that includes select() statements
+    """
+    # For now, merge all dependencies to ensure stable builds
+    # TODO: Implement proper select() generation for advanced platform filtering
+    all_deps = dict(grouped_deps.neutral_deps)
+    for condition, deps_dict in grouped_deps.platform_specific_deps.items():
+        all_deps.update(deps_dict)
+    
+    return starlark_codegen_utils.to_dict_attr(all_deps, 2, quote_value = True)
+
 def _npm_import_links_rule_impl(rctx):
+    # Get platform constraints from attributes
+    deps_os_constraints = getattr(rctx.attr, "deps_os_constraints", {})
+    deps_cpu_constraints = getattr(rctx.attr, "deps_cpu_constraints", {})
+
     ref_deps = {}
     lc_deps = {}
     deps = {}
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/ref"'.format(
+        dep_store_target = ":{package_store_root}/{link_root_name}/{package_store_name}/ref".format(
             package_store_name = utils.package_store_name(dep_name, dep_version),
             package_store_root = utils.package_store_root,
+            link_root_name = "{link_root_name}",
         )
         if not dep_store_target in ref_deps:
             ref_deps[dep_store_target] = []
@@ -763,26 +917,25 @@ def _npm_import_links_rule_impl(rctx):
         # party npm deps; it is not used for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
-                dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg"'
+                dep_store_target = ":{package_store_root}/{link_root_name}/{package_store_name}/pkg".format(
+                    package_store_name = utils.package_store_name(dep_name, dep_version),
+                    package_store_root = utils.package_store_root,
+                    link_root_name = "{link_root_name}",
+                )
                 lc_dep_store_target = dep_store_target
                 if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
                     # special case for lifecycle transitive closure deps; do not depend on
                     # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
-                    lc_dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg_pre_lc_lite"'
+                    lc_dep_store_target = ":{package_store_root}/{link_root_name}/{package_store_name}/pkg_pre_lc_lite".format(
+                        package_store_name = utils.package_store_name(dep_name, dep_version),
+                        package_store_root = utils.package_store_root,
+                        link_root_name = "{link_root_name}",
+                    )
 
                 dep_package_store_name = utils.package_store_name(dep_name, dep_version)
 
-                dep_store_target = dep_store_target.format(
-                    root_package = rctx.attr.root_package,
-                    package_store_name = dep_package_store_name,
-                    package_store_root = utils.package_store_root,
-                )
-                lc_dep_store_target = lc_dep_store_target.format(
-                    root_package = rctx.attr.root_package,
-                    package_store_name = dep_package_store_name,
-                    package_store_root = utils.package_store_root,
-                )
+                # dep_store_target and lc_dep_store_target already have link_root_name formatted
 
                 if lc_dep_store_target not in lc_deps:
                     lc_deps[lc_dep_store_target] = []
@@ -793,9 +946,10 @@ def _npm_import_links_rule_impl(rctx):
                 deps[dep_store_target].append(dep_name)
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
-            dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}"'.format(
+            dep_store_target = ":{package_store_root}/{link_root_name}/{package_store_name}".format(
                 package_store_name = utils.package_store_name(dep_name, dep_version),
                 package_store_root = utils.package_store_root,
+                link_root_name = "{link_root_name}",
             )
 
             if dep_store_target not in lc_deps:
@@ -840,6 +994,11 @@ def _npm_import_links_rule_impl(rctx):
     for dep in ref_deps.keys():
         ref_deps[dep] = ",".join(ref_deps[dep])
 
+    # Phase 2A: Re-enable dependency-level platform grouping
+    grouped_deps = _group_dependencies_by_platform(deps, deps_os_constraints, deps_cpu_constraints)
+    grouped_lc_deps = _group_dependencies_by_platform(lc_deps, deps_os_constraints, deps_cpu_constraints)
+    grouped_ref_deps = _group_dependencies_by_platform(ref_deps, deps_os_constraints, deps_cpu_constraints)
+
     lifecycle_hooks_env = {}
     for env in rctx.attr.lifecycle_hooks_env:
         key_value = env.split("=", 1)
@@ -857,11 +1016,16 @@ def _npm_import_links_rule_impl(rctx):
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
+    # Generate select statements for dependencies
+    deps_expr = _generate_deps_with_select(grouped_deps)
+    lc_deps_expr = _generate_deps_with_select(grouped_lc_deps)
+    ref_deps_expr = _generate_deps_with_select(grouped_ref_deps)
+
     npm_link_pkg_bzl_vars = dict(
-        deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
+        deps = deps_expr,
         link_default = "None" if rctx.attr.link_packages else "True",
         npm_package_target = npm_package_target,
-        lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 2, quote_key = False),
+        lc_deps = lc_deps_expr,
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
@@ -869,7 +1033,7 @@ def _npm_import_links_rule_impl(rctx):
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,
-        ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 2, quote_key = False),
+        ref_deps = ref_deps_expr,
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
@@ -878,6 +1042,8 @@ def _npm_import_links_rule_impl(rctx):
         dev = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
         exclude_package_contents = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents),
+        package_os = repr(rctx.attr.os) if rctx.attr.os else "None",
+        package_cpu = repr(rctx.attr.cpu) if rctx.attr.cpu else "None",
     )
 
     npm_link_package_bzl = [
@@ -907,6 +1073,8 @@ _COMMON_ATTRS = {
 _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
+    "deps_os_constraints": attr.string_list_dict(),  # NEW: Package -> OS constraints
+    "deps_cpu_constraints": attr.string_list_dict(),  # NEW: Package -> CPU constraints
     "dev": attr.bool(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
@@ -916,10 +1084,13 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
     "exclude_package_contents": attr.string_list(default = []),
+    "os": attr.string_list(),
+    "cpu": attr.string_list(),
 })
 
 _ATTRS = dicts.add(_COMMON_ATTRS, {
     "commit": attr.string(),
+    "cpu": attr.string_list(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
@@ -932,6 +1103,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "npm_auth_basic": attr.string(),
     "npm_auth_password": attr.string(),
     "npm_auth_username": attr.string(),
+    "os": attr.string_list(),
     "patch_tool": attr.label(),
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
@@ -1008,6 +1180,10 @@ def npm_import(
         bins = {},
         dev = False,
         exclude_package_contents = [],
+        os = None,
+        cpu = None,
+        deps_os_constraints = {},
+        deps_cpu_constraints = {},
         **kwargs):
     """Import a single npm package into Bazel.
 
@@ -1277,6 +1453,8 @@ def npm_import(
             exclude_package_contents = ["**/tests/**"]
             ```
 
+
+
         **kwargs: Internal use only
     """
 
@@ -1286,6 +1464,15 @@ def npm_import(
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
+
+    # Normalize os and cpu to lists for the rule
+    os_list = []
+    if os != None:
+        os_list = os if type(os) == "list" else [os]
+
+    cpu_list = []
+    if cpu != None:
+        cpu_list = cpu if type(cpu) == "list" else [cpu]
 
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
@@ -1315,6 +1502,8 @@ def npm_import(
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
         system_tar = system_tar,
+        os = os_list,
+        cpu = cpu_list,
     )
 
     has_custom_postinstall = not (not custom_postinstall)
@@ -1339,4 +1528,6 @@ def npm_import(
         package_visibility = package_visibility,
         replace_package = replace_package,
         exclude_package_contents = exclude_package_contents,
+        deps_os_constraints = deps_os_constraints,
+        deps_cpu_constraints = deps_cpu_constraints,
     )
