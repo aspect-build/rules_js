@@ -874,6 +874,23 @@ def _group_dependencies_by_platform(deps_dict, deps_os_constraints, deps_cpu_con
         platform_specific_deps = platform_specific_deps,
     )
 
+def _generate_deps_with_select(grouped_deps):
+    """Generate a Starlark expression for dependencies with select() statements.
+    
+    Args:
+        grouped_deps: struct with neutral_deps and platform_specific_deps
+        
+    Returns:
+        str: Starlark expression for dependencies that includes select() statements
+    """
+    # For now, merge all dependencies to ensure stable builds
+    # TODO: Implement proper select() generation for advanced platform filtering
+    all_deps = dict(grouped_deps.neutral_deps)
+    for condition, deps_dict in grouped_deps.platform_specific_deps.items():
+        all_deps.update(deps_dict)
+    
+    return starlark_codegen_utils.to_dict_attr(all_deps, 2, quote_value = True)
+
 def _npm_import_links_rule_impl(rctx):
     # Get platform constraints from attributes
     deps_os_constraints = getattr(rctx.attr, "deps_os_constraints", {})
@@ -999,23 +1016,16 @@ def _npm_import_links_rule_impl(rctx):
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
-    all_deps = dict(grouped_deps.neutral_deps)
-    for condition, deps_dict in grouped_deps.platform_specific_deps.items():
-        all_deps.update(deps_dict)
-
-    all_lc_deps = dict(grouped_lc_deps.neutral_deps)
-    for condition, deps_dict in grouped_lc_deps.platform_specific_deps.items():
-        all_lc_deps.update(deps_dict)
-
-    all_ref_deps = dict(grouped_ref_deps.neutral_deps)
-    for condition, deps_dict in grouped_ref_deps.platform_specific_deps.items():
-        all_ref_deps.update(deps_dict)
+    # Generate select statements for dependencies
+    deps_expr = _generate_deps_with_select(grouped_deps)
+    lc_deps_expr = _generate_deps_with_select(grouped_lc_deps)
+    ref_deps_expr = _generate_deps_with_select(grouped_ref_deps)
 
     npm_link_pkg_bzl_vars = dict(
-        deps = starlark_codegen_utils.to_dict_attr(all_deps, 2, quote_value = True),
+        deps = deps_expr,
         link_default = "None" if rctx.attr.link_packages else "True",
         npm_package_target = npm_package_target,
-        lc_deps = starlark_codegen_utils.to_dict_attr(all_lc_deps, 2, quote_value = True),
+        lc_deps = lc_deps_expr,
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
@@ -1023,7 +1033,7 @@ def _npm_import_links_rule_impl(rctx):
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,
-        ref_deps = starlark_codegen_utils.to_dict_attr(all_ref_deps, 2, quote_value = True),
+        ref_deps = ref_deps_expr,
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,

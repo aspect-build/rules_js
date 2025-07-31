@@ -1,3 +1,6 @@
+# All OS constraints are now using official Bazel platforms package
+# These aliases are kept for backward compatibility but point to official constraints
+
 alias(
     name = "osx",
     actual = "@platforms//os:osx",
@@ -16,33 +19,20 @@ alias(
     visibility = ["//visibility:public"],
 )
 
-# Custom constraint values for OSes not in @platforms
-constraint_value(
-    name = "netbsd",
-    constraint_setting = "@platforms//os:os",
-    visibility = ["//visibility:public"],
-)
-
-constraint_value(
-    name = "sunos",
-    constraint_setting = "@platforms//os:os", 
-    visibility = ["//visibility:public"],
-)
-
-constraint_value(
+alias(
     name = "freebsd",
-    constraint_setting = "@platforms//os:os",
+    actual = "@platforms//os:freebsd",
     visibility = ["//visibility:public"],
 )
 
-constraint_value(
+alias(
     name = "android",
-    constraint_setting = "@platforms//os:os",
+    actual = "@platforms//os:android",
     visibility = ["//visibility:public"],
 )
 
-constraint_value(
-    name = "aix",
-    constraint_setting = "@platforms//os:os",
+alias(
+    name = "netbsd",
+    actual = "@platforms//os:netbsd",
     visibility = ["//visibility:public"],
 )

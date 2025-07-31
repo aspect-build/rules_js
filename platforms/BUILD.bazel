@@ -15,7 +15,7 @@ config_setting(
     name = "os_linux_cpu_arm64",
     constraint_values = [
         "@platforms//os:linux",
-        "@platforms//cpu:arm64",
+        "@platforms//cpu:aarch64",
     ],
     visibility = ["//visibility:public"],
 )
@@ -42,7 +42,7 @@ config_setting(
 config_setting(
     name = "os_darwin_cpu_x64",
     constraint_values = [
-        "@platforms//os:macos",
+        "@platforms//os:osx",
         "@platforms//cpu:x86_64",
     ],
     visibility = ["//visibility:public"],
@@ -51,8 +51,8 @@ config_setting(
 config_setting(
     name = "os_darwin_cpu_arm64",
     constraint_values = [
-        "@platforms//os:macos",
-        "@platforms//cpu:arm64",
+        "@platforms//os:osx",
+        "@platforms//cpu:aarch64",
     ],
     visibility = ["//visibility:public"],
 )
@@ -80,7 +80,7 @@ config_setting(
     name = "os_win32_cpu_arm64",
     constraint_values = [
         "@platforms//os:windows",
-        "@platforms//cpu:arm64",
+        "@platforms//cpu:aarch64",
     ],
     visibility = ["//visibility:public"],
 )
@@ -89,7 +89,7 @@ config_setting(
 config_setting(
     name = "os_freebsd_cpu_x64",
     constraint_values = [
-        "@aspect_rules_js//platforms/os:freebsd",
+        "@platforms//os:freebsd",
         "@platforms//cpu:x86_64",
     ],
     visibility = ["//visibility:public"],
@@ -98,8 +98,8 @@ config_setting(
 config_setting(
     name = "os_freebsd_cpu_arm64",
     constraint_values = [
-        "@aspect_rules_js//platforms/os:freebsd",
-        "@platforms//cpu:arm64",
+        "@platforms//os:freebsd",
+        "@platforms//cpu:aarch64",
     ],
     visibility = ["//visibility:public"],
 )
@@ -108,7 +108,7 @@ config_setting(
 config_setting(
     name = "os_android_cpu_arm",
     constraint_values = [
-        "@aspect_rules_js//platforms/os:android",
+        "@platforms//os:android",
         "@platforms//cpu:arm",
     ],
     visibility = ["//visibility:public"],
@@ -117,8 +117,8 @@ config_setting(
 config_setting(
     name = "os_android_cpu_arm64",
     constraint_values = [
-        "@aspect_rules_js//platforms/os:android",
-        "@platforms//cpu:arm64",
+        "@platforms//os:android",
+        "@platforms//cpu:aarch64",
     ],
     visibility = ["//visibility:public"],
 )
@@ -126,7 +126,7 @@ config_setting(
 config_setting(
     name = "os_android_cpu_x64",
     constraint_values = [
-        "@aspect_rules_js//platforms/os:android",
+        "@platforms//os:android",
         "@platforms//cpu:x86_64",
     ],
     visibility = ["//visibility:public"],
