@@ -27,10 +27,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
             Set to an empty string "" to specify the root package.
 
             If unspecified, the current package (`native.package_name()`) is used.
-        
+
         prod: If True, only include production dependencies (dependencies from package.json).
             Cannot be used together with `dev`.
-        
+
         dev: If True, only include development dependencies (devDependencies from package.json).
             Cannot be used together with `prod`.
 

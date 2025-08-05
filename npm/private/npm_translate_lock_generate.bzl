@@ -63,7 +63,6 @@ _FP_DIRECT_TMPL = \
             tags = ["manual"],
         )"""
 
-
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
     name = "{name}_bzl_library",
@@ -474,7 +473,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
                     add_to_link_all = """        if {condition}:
             link_targets.append(":{{}}/{pkg}".format(name))""".format(
                         pkg = fp_package,
-                        condition = condition
+                        condition = condition,
                     )
                     npm_link_all_packages_bzl.append(add_to_link_all)
 
