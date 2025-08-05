@@ -81,13 +81,13 @@ def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_pa
     if attr.replace_packages:
         # buildifier: disable=print
         print("WARNING: replace_packages attribute is deprecated in bzlmod. Use npm.npm_replace_package() tag instead. This attribute will be removed in rules_js 3.0.")
-        
+
         # Merge replace_packages attribute with replace_package tags
         for package, replacement in attr.replace_packages.items():
             if package in replace_packages:
                 fail("Package replacement conflict: {} specified in both replace_packages attribute and replace_package tag".format(package))
             replace_packages[package] = replacement
-    
+
     npm_translate_lock_rule(
         name = attr.name,
         bins = attr.bins,

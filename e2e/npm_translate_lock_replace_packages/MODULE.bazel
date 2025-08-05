@@ -50,5 +50,4 @@ npm.npm_replace_package(
     package = "lodash@4.17.21",
     replacement = "@lodash_replacement_module//:lodash_replacement",
 )
-
 use_repo(npm, "npm")
