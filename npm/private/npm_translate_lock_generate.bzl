@@ -63,7 +63,6 @@ _FP_DIRECT_TMPL = \
             tags = ["manual"],
         )"""
 
-
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
     name = "{name}_bzl_library",
@@ -319,13 +318,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
                     links_bzl[link_package].append(add_to_link_all)
 
                     append_stmt_base = """link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
-                    
+
                     links_targets_bzl[link_package]["all"].append("            " + append_stmt_base)
-                    
+
                     importer_deps = importer_deps_map.get(link_package, {})
                     dep_info = importer_deps.get(link_alias, {})
                     is_dev = dep_info.get("dev", False)
-                    
+
                     if is_dev:
                         links_targets_bzl[link_package]["dev"].append("                " + append_stmt_base)
                     else:
@@ -399,26 +398,26 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
                 els = "" if first_link else "el",
                 pkg = link_package,
             ))
-            
+
             if lists["prod"] or lists["dev"]:
                 npm_link_targets_bzl.append("""            if prod:""")
                 if lists["prod"]:
                     npm_link_targets_bzl.extend(lists["prod"])
                 else:
                     npm_link_targets_bzl.append("""                pass""")
-                    
+
                 npm_link_targets_bzl.append("""            elif dev:""")
                 if lists["dev"]:
                     npm_link_targets_bzl.extend(lists["dev"])
                 else:
                     npm_link_targets_bzl.append("""                pass""")
-                    
+
                 npm_link_targets_bzl.append("""            else:""")
                 for item in lists["all"]:
                     npm_link_targets_bzl.append("    " + item)
             else:
                 npm_link_targets_bzl.extend(lists["all"])
-                
+
             first_link = False
 
     for fp_link in fp_links.values():
@@ -458,11 +457,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
                 for fp_link_package in fp_link_packages:
                     if fp_link_package not in links_targets_bzl:
                         links_targets_bzl[fp_link_package] = {"all": [], "prod": [], "dev": []}
-                    
+
                     append_stmt_base = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-                    
+
                     links_targets_bzl[fp_link_package]["all"].append("            " + append_stmt_base)
-                    
+
                     if link_type == "link_dev_packages":
                         links_targets_bzl[fp_link_package]["dev"].append("                " + append_stmt_base)
                     else:
@@ -474,10 +473,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
                     add_to_link_all = """        if {condition}:
             link_targets.append(":{{}}/{pkg}".format(name))""".format(
                         pkg = fp_package,
-                        condition = condition
+                        condition = condition,
                     )
                     npm_link_all_packages_bzl.append(add_to_link_all)
-                    
+
                     package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                     if package_scope:
                         npm_link_all_packages_bzl.append("""            if "{package_scope}" not in scope_targets:
