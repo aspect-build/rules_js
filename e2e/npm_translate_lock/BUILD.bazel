@@ -1,17 +1,67 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 
 npm_link_all_packages(name = "node_modules")
+
+npm_link_all_packages(
+    name = "node_modules_prod",
+    prod = True,
+)
+
+npm_link_all_packages(
+    name = "node_modules_dev",
+    dev = True,
+)
+
+PROD_TARGETS = npm_link_targets(prod = True)
+
+DEV_TARGETS = npm_link_targets(dev = True)
+
+ALL_TARGETS = npm_link_targets()
+
+js_library(
+    name = "prod_deps",
+    srcs = PROD_TARGETS,
+)
+
+js_library(
+    name = "dev_deps",
+    srcs = DEV_TARGETS,
+)
+
+js_library(
+    name = "all_deps",
+    srcs = ALL_TARGETS,
+)
+
+js_test(
+    name = "test_prod_filtering",
+    data = [":prod_deps"],
+    entry_point = "test_prod_filtering.js",
+)
+
+js_test(
+    name = "test_dev_filtering",
+    data = [":dev_deps"],
+    entry_point = "test_dev_filtering.js",
+)
 
 build_test(
     name = "test",
     targets = [
         ":node_modules",
+        ":node_modules_prod",
+        ":node_modules_dev",
+        ":prod_deps",
+        ":dev_deps",
+        ":all_deps",
+        ":test_prod_filtering",
+        ":test_dev_filtering",
     ],
 )
 
-# Strip the system-dependent 'system_tar' attribute from the generated repositories.bzl
 genrule(
     name = "npm_translate_lock_wksp-repositories",
     srcs = ["@npm//:repositories.bzl"],
