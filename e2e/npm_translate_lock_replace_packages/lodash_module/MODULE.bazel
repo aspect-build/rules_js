@@ -1,13 +1,11 @@
 module(
-    name = "lodash_replacement_module", 
+    name = "lodash_replacement_module",
     version = "0.0.0",
     compatibility_level = 1,
 )
 
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
-
 local_path_override(
     module_name = "aspect_rules_js",
     path = "../../..",
 )
-
