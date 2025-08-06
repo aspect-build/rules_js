@@ -264,7 +264,7 @@ def _npm_translate_lock_attrs():
 
     # Args not supported or unnecessary in bzlmod
     attrs.pop("repositories_bzl_filename")
-    attrs.pop("exclude_package_contents")  # Use tag classes only for MODULE.bazel
+    attrs.pop("exclude_package_contents")  # Use npm_exclude_package_contents tag instead
 
     # TODO(3.0): remove replace_packages attribute in favor of npm_replace_package tag
     # attrs.pop("replace_packages")
@@ -332,9 +332,7 @@ npm.npm_replace_package(
     package = "chalk@5.3.0",
     replacement = "@chalk_501//:pkg",
 )
-```
-
-This is the bzlmod equivalent of the replace_packages attribute in WORKSPACE mode.""",
+```""",
         ),
     },
 )

@@ -444,7 +444,7 @@ def npm_translate_lock(
 
             Read more: [lifecycles](/docs/pnpm.md#lifecycles)
 
-        replace_packages: A dict of package names to targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
+        replace_packages: [DEPRECATED - Use npm.npm_replace_package() tag in MODULE.bazel instead] A dict of package names to targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
 
             **Note for bzlmod users:** Use the `npm_replace_package` tag class instead:
 
