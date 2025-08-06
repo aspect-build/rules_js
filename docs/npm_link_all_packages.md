@@ -16,7 +16,7 @@ load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 ## npm_link_all_packages
 
 <pre>
-npm_link_all_packages(<a href="#npm_link_all_packages-name">name</a>, <a href="#npm_link_all_packages-imported_links">imported_links</a>, <a href="#npm_link_all_packages-prod">prod</a>, <a href="#npm_link_all_packages-dev">dev</a>)
+npm_link_all_packages(<a href="#npm_link_all_packages-name">name</a>, <a href="#npm_link_all_packages-imported_links">imported_links</a>)
 </pre>
 
 Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
@@ -41,8 +41,6 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
 | :------------- | :------------- | :------------- |
 | <a id="npm_link_all_packages-name"></a>name |  name of catch all target to generate for all packages linked   |  `"node_modules"` |
 | <a id="npm_link_all_packages-imported_links"></a>imported_links |  optional list link functions from manually imported packages that were fetched with npm_import rules.   |  `[]` |
-| <a id="npm_link_all_packages-prod"></a>prod |  If True, only include production dependencies (dependencies from package.json). Cannot be used together with `dev`.   |  `False` |
-| <a id="npm_link_all_packages-dev"></a>dev |  If True, only include development dependencies (devDependencies from package.json). Cannot be used together with `prod`.   |  `False` |
 
 
 <a id="npm_link_targets"></a>
