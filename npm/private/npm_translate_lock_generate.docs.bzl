@@ -40,7 +40,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
     pass
 
 # buildifier: disable=unused-variable
-def npm_link_all_packages(name = "node_modules", imported_links = [], prod = False, dev = False):
+def npm_link_all_packages(name = "node_modules", imported_links = []):
     """Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
 
     If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you can link these as well, for example,
@@ -58,9 +58,5 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
     Args:
         name: name of catch all target to generate for all packages linked
         imported_links: optional list link functions from manually imported packages that were fetched with npm_import rules.
-        prod: If True, only include production dependencies (dependencies from package.json).
-            Cannot be used together with `dev`.
-        dev: If True, only include development dependencies (devDependencies from package.json).
-            Cannot be used together with `prod`.
     """
     pass

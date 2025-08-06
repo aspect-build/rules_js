@@ -236,9 +236,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
     npm_link_all_packages_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = [], prod = False, dev = False):
-    if prod and dev:
-        fail("prod and dev attributes cannot both be set to true")
+def npm_link_all_packages(name = "node_modules", imported_links = []):
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
@@ -384,6 +382,26 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             npm_link_all_packages_bzl.extend(bzl)
             first_link = False
 
+    # Add first-party packages to npm_link_targets before generating the function
+    for fp_link in fp_links.values():
+        fp_package = fp_link.get("package")
+        for link_type in ["link_packages", "link_dev_packages"]:
+            fp_link_packages = fp_link.get(link_type, {}).keys()
+            if len(fp_link_packages) > 0:
+                # Add first-party package links to npm_link_targets for each package that uses it
+                for fp_link_package in fp_link_packages:
+                    if fp_link_package not in links_targets_bzl:
+                        links_targets_bzl[fp_link_package] = {"all": [], "prod": [], "dev": []}
+
+                    fp_append_stmt = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+
+                    links_targets_bzl[fp_link_package]["all"].append("            " + fp_append_stmt)
+
+                    if link_type == "link_dev_packages":
+                        links_targets_bzl[fp_link_package]["dev"].append("                " + fp_append_stmt)
+                    else:
+                        links_targets_bzl[fp_link_package]["prod"].append("                " + fp_append_stmt)
+
     if len(links_targets_bzl) > 0:
         npm_link_targets_bzl.append("""    if link:""")
         first_link = True
@@ -448,35 +466,47 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
                     package_store_root = utils.package_store_root,
                 ))
 
-                for fp_link_package in fp_link_packages:
-                    if fp_link_package not in links_targets_bzl:
-                        links_targets_bzl[fp_link_package] = {"all": [], "prod": [], "dev": []}
+                # Also add the first-party package to its own package context
+                fp_package_path = fp_link.get("path")
+                if fp_package_path and fp_package_path not in links_targets_bzl:
+                    links_targets_bzl[fp_package_path] = {"all": [], "prod": [], "dev": []}
 
-                    append_stmt_base = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+                if fp_package_path:
+                    append_stmt_self = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
 
-                    links_targets_bzl[fp_link_package]["all"].append("            " + append_stmt_base)
+                    links_targets_bzl[fp_package_path]["all"].append("            " + append_stmt_self)
 
                     if link_type == "link_dev_packages":
-                        links_targets_bzl[fp_link_package]["dev"].append("                " + append_stmt_base)
+                        links_targets_bzl[fp_package_path]["dev"].append("                " + append_stmt_self)
                     else:
-                        links_targets_bzl[fp_link_package]["prod"].append("                " + append_stmt_base)
+                        links_targets_bzl[fp_package_path]["prod"].append("                " + append_stmt_self)
 
                 if "//visibility:public" in package_visibility:
-                    is_dev_pkg = link_type == "link_dev_packages"
-                    condition = "not prod" if is_dev_pkg else "not dev"
-                    add_to_link_all = """        if {condition}:
-            link_targets.append(":{{}}/{pkg}".format(name))""".format(
+                    add_to_link_all = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(
                         pkg = fp_package,
-                        condition = condition,
                     )
                     npm_link_all_packages_bzl.append(add_to_link_all)
 
+                    # Also add this first-party package to npm_link_targets for packages that use it
+                    for fp_link_package in fp_link_packages:
+                        if fp_link_package not in links_targets_bzl:
+                            links_targets_bzl[fp_link_package] = {"all": [], "prod": [], "dev": []}
+
+                        fp_append_stmt = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+
+                        links_targets_bzl[fp_link_package]["all"].append("            " + fp_append_stmt)
+
+                        if link_type == "link_dev_packages":
+                            links_targets_bzl[fp_link_package]["dev"].append("                " + fp_append_stmt)
+                        else:
+                            links_targets_bzl[fp_link_package]["prod"].append("                " + fp_append_stmt)
+
                     package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                     if package_scope:
-                        npm_link_all_packages_bzl.append("""            if "{package_scope}" not in scope_targets:
-                scope_targets["{package_scope}"] = [link_targets[-1]]
-            else:
-                scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))
+                        npm_link_all_packages_bzl.append("""        if "{package_scope}" not in scope_targets:
+            scope_targets["{package_scope}"] = [link_targets[-1]]
+        else:
+            scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
