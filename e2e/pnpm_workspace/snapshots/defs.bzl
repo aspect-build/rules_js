@@ -436,7 +436,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     )
 
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
+    if prod and dev:
+        fail("prod and dev attributes cannot both be set to true")
+
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -444,50 +447,97 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "":
-            link_targets.append(":{}/@aspect-test/a".format(name))
-            link_targets.append(":{}/@aspect-test/b".format(name))
-            link_targets.append(":{}/@aspect-test/c".format(name))
-            link_targets.append(":{}/lodash".format(name))
-            link_targets.append(":{}/typescript".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/a".format(name))
+                link_targets.append(":{}/@aspect-test/c".format(name))
+                link_targets.append(":{}/lodash".format(name))
+                link_targets.append(":{}/typescript".format(name))
+            elif dev:
+                link_targets.append(":{}/@aspect-test/b".format(name))
+            else:
+                link_targets.append(":{}/@aspect-test/a".format(name))
+                link_targets.append(":{}/@aspect-test/b".format(name))
+                link_targets.append(":{}/@aspect-test/c".format(name))
+                link_targets.append(":{}/lodash".format(name))
+                link_targets.append(":{}/typescript".format(name))
         elif bazel_package == "app/a":
-            link_targets.append(":{}/@aspect-test/a".format(name))
-            link_targets.append(":{}/@aspect-test/g".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/a".format(name))
+                link_targets.append(":{}/@aspect-test/g".format(name))
+                link_targets.append(":{}/@lib/a".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/a".format(name))
+                link_targets.append(":{}/@aspect-test/g".format(name))
+                link_targets.append(":{}/@lib/a".format(name))
         elif bazel_package == "app/c":
-            link_targets.append(":{}/@aspect-test/a".format(name))
-            link_targets.append(":{}/@aspect-test/g".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/a".format(name))
+                link_targets.append(":{}/@aspect-test/g".format(name))
+                link_targets.append(":{}/@lib/c".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/a".format(name))
+                link_targets.append(":{}/@aspect-test/g".format(name))
+                link_targets.append(":{}/@lib/c".format(name))
         elif bazel_package == "lib/d":
-            link_targets.append(":{}/@aspect-test/d".format(name))
-            link_targets.append(":{}/alias-2".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/d".format(name))
+                link_targets.append(":{}/alias-2".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/d".format(name))
+                link_targets.append(":{}/alias-2".format(name))
         elif bazel_package == "lib/a":
-            link_targets.append(":{}/@aspect-test/e".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/e".format(name))
+                link_targets.append(":{}/vendored-a".format(name))
+                link_targets.append(":{}/vendored-b".format(name))
+                link_targets.append(":{}/@lib/b".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/e".format(name))
+                link_targets.append(":{}/vendored-a".format(name))
+                link_targets.append(":{}/vendored-b".format(name))
+                link_targets.append(":{}/@lib/b".format(name))
         elif bazel_package == "lib/b":
-            link_targets.append(":{}/@aspect-test/f".format(name))
-            link_targets.append(":{}/alias-1".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/f".format(name))
+                link_targets.append(":{}/alias-1".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/f".format(name))
+                link_targets.append(":{}/alias-1".format(name))
         elif bazel_package == "lib/c":
-            link_targets.append(":{}/@aspect-test/f".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/f".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/f".format(name))
         elif bazel_package == "app/d":
-            link_targets.append(":{}/@aspect-test/g".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/g".format(name))
+                link_targets.append(":{}/@lib/d".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/g".format(name))
+                link_targets.append(":{}/@lib/d".format(name))
         elif bazel_package == "app/b":
-            link_targets.append(":{}/@aspect-test/h".format(name))
-
-    if bazel_package in ["app/c"]:
-        link_targets.append(":{}/@lib/c".format(name))
-
-    if bazel_package in ["lib/a"]:
-        link_targets.append(":{}/vendored-a".format(name))
-
-    if bazel_package in ["lib/a"]:
-        link_targets.append(":{}/vendored-b".format(name))
-
-    if bazel_package in ["app/a"]:
-        link_targets.append(":{}/@lib/a".format(name))
-
-    if bazel_package in ["app/b", "lib/a"]:
-        link_targets.append(":{}/@lib/b".format(name))
-
-    if bazel_package in ["app/b"]:
-        link_targets.append(":{}/@lib/b_alias".format(name))
-
-    if bazel_package in ["app/d"]:
-        link_targets.append(":{}/@lib/d".format(name))
+            if prod:
+                link_targets.append(":{}/@aspect-test/h".format(name))
+                link_targets.append(":{}/@lib/b".format(name))
+                link_targets.append(":{}/@lib/b_alias".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@aspect-test/h".format(name))
+                link_targets.append(":{}/@lib/b".format(name))
+                link_targets.append(":{}/@lib/b_alias".format(name))
     return link_targets

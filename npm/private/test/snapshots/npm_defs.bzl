@@ -1128,9 +1128,7 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 _LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = [], prod = False, dev = False):
-    if prod and dev:
-        fail("prod and dev attributes cannot both be set to true")
+def npm_link_all_packages(name = "node_modules", imported_links = []):
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -2752,8 +2750,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not dev:
-            link_targets.append(":{}/js_lib_pkg_a".format(name))
+        link_targets.append(":{}/js_lib_pkg_a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2785,8 +2782,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not dev:
-            link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
+        link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2820,12 +2816,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not dev:
-            link_targets.append(":{}/@lib/test".format(name))
-            if "@lib" not in scope_targets:
-                scope_targets["@lib"] = [link_targets[-1]]
-            else:
-                scope_targets["@lib"].append(link_targets[-1])
+        link_targets.append(":{}/@lib/test".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2859,12 +2854,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not dev:
-            link_targets.append(":{}/@lib/test2".format(name))
-            if "@lib" not in scope_targets:
-                scope_targets["@lib"] = [link_targets[-1]]
-            else:
-                scope_targets["@lib"].append(link_targets[-1])
+        link_targets.append(":{}/@lib/test2".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2899,12 +2893,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not dev:
-            link_targets.append(":{}/@mycorp/pkg-d".format(name))
-            if "@mycorp" not in scope_targets:
-                scope_targets["@mycorp"] = [link_targets[-1]]
-            else:
-                scope_targets["@mycorp"].append(link_targets[-1])
+        link_targets.append(":{}/@mycorp/pkg-d".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if bazel_package in ["examples/npm_deps"]:
         # terminal target for direct dependencies
@@ -2924,12 +2917,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not prod:
-            link_targets.append(":{}/@mycorp/pkg-d".format(name))
-            if "@mycorp" not in scope_targets:
-                scope_targets["@mycorp"] = [link_targets[-1]]
-            else:
-                scope_targets["@mycorp"].append(link_targets[-1])
+        link_targets.append(":{}/@mycorp/pkg-d".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2963,12 +2955,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not prod:
-            link_targets.append(":{}/@mycorp/pkg-e".format(name))
-            if "@mycorp" not in scope_targets:
-                scope_targets["@mycorp"] = [link_targets[-1]]
-            else:
-                scope_targets["@mycorp"].append(link_targets[-1])
+        link_targets.append(":{}/@mycorp/pkg-e".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -3003,8 +2994,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Fal
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        if not prod:
-            link_targets.append(":{}/test-npm_package".format(name))
+        link_targets.append(":{}/test-npm_package".format(name))
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -3061,10 +3051,14 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
         elif bazel_package == "js/private/test/image":
             if prod:
                 link_targets.append(":{}/acorn".format(name))
+                link_targets.append(":{}/@mycorp/pkg-a".format(name))
+                link_targets.append(":{}/@mycorp/pkg-d".format(name))
             elif dev:
                 pass
             else:
                 link_targets.append(":{}/acorn".format(name))
+                link_targets.append(":{}/@mycorp/pkg-a".format(name))
+                link_targets.append(":{}/@mycorp/pkg-d".format(name))
         elif bazel_package == "examples/npm_deps":
             if prod:
                 link_targets.append(":{}/ms".format(name))
@@ -3081,6 +3075,9 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
                 link_targets.append(":{}/react".format(name))
                 link_targets.append(":{}/rollup".format(name))
                 link_targets.append(":{}/uvu".format(name))
+                link_targets.append(":{}/@mycorp/pkg-a".format(name))
+                link_targets.append(":{}/@mycorp/pkg-d".format(name))
+                link_targets.append(":{}/@mycorp/pkg-e".format(name))
             else:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/@aspect-test/a".format(name))
@@ -3095,6 +3092,9 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
                 link_targets.append(":{}/react".format(name))
                 link_targets.append(":{}/rollup".format(name))
                 link_targets.append(":{}/uvu".format(name))
+                link_targets.append(":{}/@mycorp/pkg-a".format(name))
+                link_targets.append(":{}/@mycorp/pkg-d".format(name))
+                link_targets.append(":{}/@mycorp/pkg-e".format(name))
         elif bazel_package == "examples/npm_package/packages/pkg_a":
             if prod:
                 link_targets.append(":{}/acorn".format(name))
@@ -3181,6 +3181,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
                 link_targets.append(":{}/syncpack".format(name))
                 link_targets.append(":{}/typescript".format(name))
                 link_targets.append(":{}/webpack-bundle-analyzer".format(name))
+                link_targets.append(":{}/test-npm_package".format(name))
             else:
                 link_targets.append(":{}/@fastify/send".format(name))
                 link_targets.append(":{}/@figma/nodegit".format(name))
@@ -3206,6 +3207,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
                 link_targets.append(":{}/syncpack".format(name))
                 link_targets.append(":{}/typescript".format(name))
                 link_targets.append(":{}/webpack-bundle-analyzer".format(name))
+                link_targets.append(":{}/test-npm_package".format(name))
         elif bazel_package == "js/private/coverage/bundle":
             if prod:
                 link_targets.append(":{}/c8".format(name))
@@ -3250,11 +3252,14 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
                 link_targets.append(":{}/@types/node".format(name))
         elif bazel_package == "examples/js_lib_pkg/b":
             if prod:
-                pass
+                link_targets.append(":{}/js_lib_pkg_a".format(name))
+                link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
             elif dev:
                 link_targets.append(":{}/@types/node".format(name))
             else:
                 link_targets.append(":{}/@types/node".format(name))
+                link_targets.append(":{}/js_lib_pkg_a".format(name))
+                link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
         elif bazel_package == "examples/webpack_cli":
             if prod:
                 link_targets.append(":{}/@vanilla-extract/css".format(name))
@@ -3307,4 +3312,27 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
                 link_targets.append(":{}/source-map-support".format(name))
             else:
                 link_targets.append(":{}/source-map-support".format(name))
+        elif bazel_package == "examples/js_binary":
+            if prod:
+                pass
+            elif dev:
+                link_targets.append(":{}/@mycorp/pkg-a".format(name))
+            else:
+                link_targets.append(":{}/@mycorp/pkg-a".format(name))
+        elif bazel_package == "examples/linked_consumer":
+            if prod:
+                link_targets.append(":{}/@lib/test".format(name))
+                link_targets.append(":{}/@lib/test2".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@lib/test".format(name))
+                link_targets.append(":{}/@lib/test2".format(name))
+        elif bazel_package == "examples/npm_package/packages/pkg_e":
+            if prod:
+                link_targets.append(":{}/@mycorp/pkg-d".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/@mycorp/pkg-d".format(name))
     return link_targets
