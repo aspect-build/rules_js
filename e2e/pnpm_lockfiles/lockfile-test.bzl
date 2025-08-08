@@ -23,6 +23,11 @@ BZLMOD_FILES = {
     "is-odd_resolved.json": "@REPO_NAME//VERSION:is-odd/resolved.json",
     "is-odd-v0_resolved.json": "@REPO_NAME//VERSION:is-odd-v0/resolved.json",
 
+    # Circular deps, lifecycle hooks
+    "aspect_test_a_links_defs.bzl": "@REPO_NAME__at_aspect-test_a__5.0.2__links//:defs.bzl",
+    "aspect_test_b_links_defs.bzl": "@REPO_NAME__at_aspect-test_b__5.0.2__links//:defs.bzl",
+    "aspect_test_c_links_defs.bzl": "@REPO_NAME__at_aspect-test_c__2.0.0__links//:defs.bzl",
+
     # hasBin, optional deps, deps and across versions
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
     "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",
