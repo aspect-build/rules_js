@@ -28,13 +28,16 @@ def _npm_extension_impl(module_ctx):
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
 
+    # Collect all package replacements across all modules
+    replace_packages = {}
     for mod in module_ctx.modules:
-        replace_packages = {}
         for attr in mod.tags.npm_replace_package:
             if attr.package in replace_packages:
-                fail("Each package can have only one replacement")
+                fail("Package '{}' already has a replacement defined in another module".format(attr.package))
             replace_packages[attr.package] = "@@{}//{}:{}".format(attr.replacement.repo_name, attr.replacement.package, attr.replacement.name)
 
+    # Process npm_translate_lock and npm_import tags
+    for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
             _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages)
 
