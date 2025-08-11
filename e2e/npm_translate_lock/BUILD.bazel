@@ -1,5 +1,5 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 
@@ -11,30 +11,15 @@ DEV_TARGETS = npm_link_targets(dev = True)
 
 ALL_TARGETS = npm_link_targets()
 
-js_library(
-    name = "prod_deps",
-    srcs = PROD_TARGETS,
-)
-
-js_library(
-    name = "dev_deps",
-    srcs = DEV_TARGETS,
-)
-
-js_library(
-    name = "all_deps",
-    srcs = ALL_TARGETS,
-)
-
 js_test(
     name = "test_prod_filtering",
-    data = [":prod_deps"],
+    data = PROD_TARGETS,
     entry_point = "test_prod_filtering.js",
 )
 
 js_test(
     name = "test_dev_filtering",
-    data = [":dev_deps"],
+    data = DEV_TARGETS,
     entry_point = "test_dev_filtering.js",
 )
 
@@ -42,9 +27,6 @@ build_test(
     name = "test",
     targets = [
         ":node_modules",
-        ":prod_deps",
-        ":dev_deps",
-        ":all_deps",
         ":test_prod_filtering",
         ":test_dev_filtering",
     ],
