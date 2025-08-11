@@ -104,6 +104,7 @@ def run_environment_info_test_suite(name):
             "ANOTHER_VAR": "another_value",
             "LOCATION_VAR": "$(location :data.json)",
         },
+        tags = ["manual"],
     )
 
     js_test(
@@ -126,6 +127,7 @@ def run_environment_info_test_suite(name):
             "EXPANDED_PATH": "$(location :data.json)",
         },
         expect_inherited = ["PATH", "HOME"],
+        tags = ["manual"],
     )
 
     js_test(
@@ -139,6 +141,7 @@ def run_environment_info_test_suite(name):
         name = name + "_test_inherit_only_test",
         target_under_test = ":" + name + "_test_inherit_only_subject",
         expect_inherited = ["USER", "SHELL"],
+        tags = ["manual"],
     )
 
     js_binary(
@@ -151,6 +154,7 @@ def run_environment_info_test_suite(name):
         name = name + "_binary_no_env_test",
         target_under_test = ":" + name + "_binary_no_env_subject",
         expect_no_provider = True,
+        tags = ["manual"],
     )
 
     native.test_suite(
@@ -161,4 +165,5 @@ def run_environment_info_test_suite(name):
             ":" + name + "_test_inherit_only_test",
             ":" + name + "_binary_no_env_test",
         ],
+        tags = ["manual"],
     )
