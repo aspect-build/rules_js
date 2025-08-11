@@ -50,7 +50,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     )
 
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
+    if prod and dev:
+        fail("prod and dev attributes cannot both be set to true")
+
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -58,5 +61,10 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "":
-            link_targets.append(":{}/chalk".format(name))
+            if prod:
+                link_targets.append(":{}/chalk".format(name))
+            elif dev:
+                pass
+            else:
+                link_targets.append(":{}/chalk".format(name))
     return link_targets
