@@ -3,6 +3,7 @@ load("@aspect_bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
+load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
 
 ####################################################################################################
 # Write a js_binary launcher to the source tree so it is shell checked on commit
@@ -41,6 +42,8 @@ write_source_files(
 )
 
 js_library_test_suite(name = "js_library_test")
+
+run_environment_info_test_suite(name = "run_environment_info_tests")
 
 # js_library(data) wrapper of the data
 js_library(
