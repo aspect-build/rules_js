@@ -9,8 +9,6 @@ PROD_TARGETS = npm_link_targets(prod = True)
 
 DEV_TARGETS = npm_link_targets(dev = True)
 
-ALL_TARGETS = npm_link_targets()
-
 js_test(
     name = "test_prod_filtering",
     data = PROD_TARGETS,
