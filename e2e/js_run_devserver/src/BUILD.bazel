@@ -1,7 +1,7 @@
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library", "js_run_devserver")
-load("@com_github_ash2k_bazel_tools//multirun:def.bzl", "command", "multirun")
 load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
+load("@rules_multirun//:defs.bzl", "command", "multirun")
 
 http_server_bin.http_server_binary(
     name = "http_server",

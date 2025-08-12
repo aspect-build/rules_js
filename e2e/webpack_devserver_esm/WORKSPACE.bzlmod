@@ -1,15 +1,2 @@
 # The presence of this file causes WORKSPACE to be ignored when bzlmod is enabled.
 # See https://docs.google.com/document/d/1JtXIVnXyFZ4bmbiBCr5gsTH4-opZAFf5DMMb-54kES0/edit#heading=h.y054fjub9max
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "com_github_ash2k_bazel_tools",
-    sha256 = "0ad31a16c9e48b01a1a11daf908227a6bf6106269187cccf7398625fea2ba45a",
-    strip_prefix = "bazel-tools-4e045b9b4e3e613970ab68941b556a356239d433",
-    url = "https://github.com/ash2k/bazel-tools/archive/4e045b9b4e3e613970ab68941b556a356239d433.tar.gz",
-)
-
-load("@com_github_ash2k_bazel_tools//multirun:deps.bzl", "multirun_dependencies")
-
-multirun_dependencies()
