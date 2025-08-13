@@ -3,9 +3,12 @@ load("@npm_utils//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
 
-exports_files([
-    "test.mjs",
-], visibility = ["//visibility:public"])
+exports_files(
+    [
+        "test.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 js_library(
     name = "lib",
@@ -18,8 +21,8 @@ js_library(
 
 js_library(
     name = "test_lib",
-    srcs = ["test.mjs"],
     testonly = True,
+    srcs = ["test.mjs"],
     visibility = ["//visibility:public"],
     deps = [":lib"],
 )
