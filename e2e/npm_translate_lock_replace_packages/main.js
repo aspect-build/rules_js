@@ -45,5 +45,3 @@ if (uniqueArray.length !== 3) {
     throw new Error(`Expected lodash.uniq to work, but got array length ${uniqueArray.length}`)
 }
 
-console.log(chalk.blue(`Hello world! Multiple package replacements work! 🎉`))
-console.log(chalk.green(`Chalk ${chalkActualDep} and Lodash ${lodashActualDep} both replaced successfully`))

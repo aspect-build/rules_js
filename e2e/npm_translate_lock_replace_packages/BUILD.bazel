@@ -15,6 +15,15 @@ js_test(
     entry_point = "main.js",
 )
 
+js_test(
+    name = "utils_test",
+    data = [
+        "@utils_replacement_module//:test_lib",
+    ],
+    entry_point = "@utils_replacement_module//:test.mjs",
+    no_copy_to_bin = ["@utils_replacement_module//:test.mjs"],
+)
+
 npm_package(
     name = "npm-pkg",
     srcs = [
