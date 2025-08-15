@@ -17,7 +17,7 @@ load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 # Instead, we define the interfaces in this file, while the implementations live in npm_translate_lock_generate.bzl.
 
 # buildifier: disable=unused-variable
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
     """Generated list of target names that are linked by npm_link_all_packages()
 
     Args:
@@ -27,6 +27,12 @@ def npm_link_targets(name = "node_modules", package = None):
             Set to an empty string "" to specify the root package.
 
             If unspecified, the current package (`native.package_name()`) is used.
+
+        prod: If True, only include production dependencies (dependencies from package.json).
+            Cannot be used together with `dev`.
+
+        dev: If True, only include development dependencies (devDependencies from package.json).
+            Cannot be used together with `prod`.
 
     Returns:
         A list of target names that are linked by npm_link_all_packages()
