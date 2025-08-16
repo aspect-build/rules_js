@@ -573,12 +573,23 @@ def _js_binary_impl(ctx):
     runfiles = launcher.runfiles
 
     providers = []
+
+    # Create RunEnvironmentInfo provider with both env and env_inherit (if available)
+    run_env_info_kwargs = {}
+
+    if ctx.attr.env:
+        action_context_env_expanded = {}
+        for key, value in ctx.attr.env.items():
+            action_context_env_expanded[key] = _expand_env_if_needed(ctx, value)
+        run_env_info_kwargs["environment"] = action_context_env_expanded
+
+    # Add inherited environment variables (for js_test)
     if hasattr(ctx.attr, "env_inherit"):
-        providers.append(
-            RunEnvironmentInfo(
-                inherited_environment = ctx.attr.env_inherit,
-            ),
-        )
+        run_env_info_kwargs["inherited_environment"] = ctx.attr.env_inherit
+
+    # Only create provider if we have something to provide
+    if run_env_info_kwargs:
+        providers.append(RunEnvironmentInfo(**run_env_info_kwargs))
 
     if ctx.attr.testonly and ctx.configuration.coverage_enabled:
         # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
