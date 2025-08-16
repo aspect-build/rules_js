@@ -19,7 +19,7 @@ js_image_layer(
 ## js_image_layer
 
 <pre>
-js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-generate_empty_layers">generate_empty_layers</a>, <a href="#js_image_layer-layer_groups">layer_groups</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-platform">platform</a>,
+js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-generate_empty_layers">generate_empty_layers</a>, <a href="#js_image_layer-layer_groups">layer_groups</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-directory_mode">directory_mode</a>, <a href="#js_image_layer-file_mode">file_mode</a>, <a href="#js_image_layer-platform">platform</a>,
                <a href="#js_image_layer-preserve_symlinks">preserve_symlinks</a>, <a href="#js_image_layer-root">root</a>)
 </pre>
 
@@ -296,6 +296,8 @@ The default layer groups are as follows and always created.
 | <a id="js_image_layer-generate_empty_layers"></a>generate_empty_layers |  DEPRECATED. An empty layer is always generated if the layer group have no matching files.   | Boolean | optional |  `False`  |
 | <a id="js_image_layer-layer_groups"></a>layer_groups |  Layer groups to create. These are utilized to categorize files into distinct layers, determined by their respective paths. The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and JavaScript identifier (alphanumeric characters), and <value> MAY be either an empty string (signifying a universal match) or a valid regular expression.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  `{}`  |
 | <a id="js_image_layer-owner"></a>owner |  Owner of the entries, in `GID:UID` format. By default `0:0` (root, root) is used.   | String | optional |  `"0:0"`  |
+| <a id="js_image_layer-directory_mode"></a>directory_mode |  Mode of the directories, in `octal` format. By default `0755` is used.   | String | optional |  `"0755"`  |
+| <a id="js_image_layer-file_mode"></a>file_mode |  Mode of the files, in `octal` format. By default `0555` is used.   | String | optional |  `"0555"`  |
 | <a id="js_image_layer-platform"></a>platform |  Platform to transition.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 | <a id="js_image_layer-preserve_symlinks"></a>preserve_symlinks |  Preserve symlinks for entries matching the pattern. By default symlinks within the `node_modules` is preserved.   | String | optional |  `".*/node_modules/.*"`  |
 | <a id="js_image_layer-root"></a>root |  Path where the files from js_binary will reside in. eg: /apps/app1 or /app   | String | optional |  `""`  |

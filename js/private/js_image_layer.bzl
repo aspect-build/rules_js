@@ -395,6 +395,8 @@ else {
             "{{ENTRIES}}": entries_json.path,
             "'{{PRESERVE_SYMLINKS}}'": json.encode(ctx.attr.preserve_symlinks),
             "{{UNUSED_INPUTS}}": unused_inputs.path,
+            "{{DIRECTORY_MODE}}": ctx.attr.directory_mode,
+            "{{FILE_MODE}}": ctx.attr.file_mode,
             "/*{{VARIABLES}}*/": VARIABLES,
             "/*{{PICK_STATEMENTS}}*/": PICK_STATEMENTS,
             "/*{{WRITE_STATEMENTS}}*/": WRITE_STATEMENTS,
@@ -641,6 +643,14 @@ js_image_layer_lib = struct(
         "owner": attr.string(
             doc = "Owner of the entries, in `GID:UID` format. By default `0:0` (root, root) is used.",
             default = "0:0",
+        ),
+        "directory_mode": attr.string(
+            doc = "Mode of the directories, in `octal` format. By default `0755` is used.",
+            default = "0755",
+        ),
+        "file_mode": attr.string(
+            doc = "Mode of the files, in `octal` format. By default `0555` is used.",
+            default = "0555",
         ),
         "compression": attr.string(
             doc = "Compression algorithm. See https://github.com/bazel-contrib/bazel-lib/blob/bdc6ade0ba1ebe88d822bcdf4d4aaa2ce7e2cd37/lib/private/tar.bzl#L29-L39",
