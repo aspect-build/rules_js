@@ -126,9 +126,7 @@ function _mtree_dir_line(dir) {
     const dest = vis(dir)
     // Due to filesystems setting different bits depending on the os we have to opt-in
     // to use a stable mode for files.
-    // In the future, we might want to hand off fine-grained control of these to users
-    // see: https://chmodcommand.com/chmod-0755/
-    return `./${dest} uid={{UID}} gid={{GID}} time=0 mode=0755 type=dir`
+    return `./${dest} uid={{UID}} gid={{GID}} time=0 mode={{DIRECTORY_MODE}} type=dir`
 }
 
 function _mtree_link_line(key, linkname) {
@@ -147,9 +145,7 @@ function _mtree_file_line(key, content) {
     const dest = vis(key)
     // Due to filesystems setting different bits depending on the os we have to opt-in
     // to use a stable mode for files.
-    // In the future, we might want to hand off fine-grained control of these to users
-    // see: https://chmodcommand.com/chmod-0555/
-    return `${dest} uid={{UID}} gid={{GID}} time=0 mode=0555 type=file content=${vis(
+    return `${dest} uid={{UID}} gid={{GID}} time=0 mode={{FILE_MODE}} type=file content=${vis(
         content
     )}`
 }
