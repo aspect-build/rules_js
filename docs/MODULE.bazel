@@ -1,4 +1,4 @@
-bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.0")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 bazel_dep(name = "stardoc", version = "0.6.2", repo_name = "io_bazel_stardoc")
 
