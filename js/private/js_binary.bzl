@@ -602,7 +602,7 @@ def _js_binary_impl(ctx):
         # TODO: Remove once bazel<8 support is dropped.
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
-        providers = [
+        providers.append(
             coverage_common.instrumented_files_info(
                 ctx,
                 source_attributes = ["data"],
@@ -620,7 +620,7 @@ def _js_binary_impl(ctx):
                     "tsx",
                 ],
             ),
-        ]
+        )
 
     return providers + [
         DefaultInfo(
