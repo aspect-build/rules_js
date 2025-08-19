@@ -47,6 +47,7 @@ use_repo(bazel_lib_toolchains, "yq_linux_arm64")
 use_repo(bazel_lib_toolchains, "yq_linux_ppc64le")
 use_repo(bazel_lib_toolchains, "yq_linux_s390x")
 use_repo(bazel_lib_toolchains, "yq_windows_amd64")
+use_repo(bazel_lib_toolchains, "yq_windows_arm64")
 use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 
 ####### Dev dependencies ########
