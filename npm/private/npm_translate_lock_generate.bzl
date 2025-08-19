@@ -222,9 +222,7 @@ sh_binary(
     npm_link_targets_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
-    if prod and dev:
-        fail("prod and dev attributes cannot both be set to true")
+def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
 
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
@@ -418,15 +416,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 else:
                     npm_link_targets_bzl.append("""                pass""")
 
-                npm_link_targets_bzl.append("""            elif dev:""")
+                npm_link_targets_bzl.append("""            if dev:""")
                 if lists["dev"]:
                     npm_link_targets_bzl.extend(lists["dev"])
                 else:
                     npm_link_targets_bzl.append("""                pass""")
-
-                npm_link_targets_bzl.append("""            else:""")
-                for item in lists["all"]:
-                    npm_link_targets_bzl.append("    " + item)
             else:
                 npm_link_targets_bzl.extend(lists["all"])
 
