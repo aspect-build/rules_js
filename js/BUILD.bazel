@@ -18,6 +18,7 @@ bzl_library(
         "//js/private:js_library",
         "//js/private:js_run_binary",
         "//js/private:js_run_devserver",
+        "@aspect_tools_telemetry_report//:defs.bzl",
     ],
 )
 
