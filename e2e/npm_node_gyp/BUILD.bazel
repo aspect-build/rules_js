@@ -1,0 +1,14 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+# Link all direct dependencies in /examples/node-gyp/package.json to
+# bazel-bin/examples/node-gyp/node_modules
+npm_link_all_packages(name = "node_modules")
+
+js_binary(
+    name = "node-gyp-determinism",
+    entry_point = "index.mjs",
+    data = [
+        "//:node_modules/unix-dgram",
+    ],
+)
