@@ -89,10 +89,15 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
     }
 }
 
+// Returns true if the package uses node-gyp.
+async function useNodeGyp(root) {
+    return await exists(path.join(root, 'binding.gyp'))
+}
+
 // Helper which is exported from @pnpm/lifecycle:
 // https://github.com/pnpm/pnpm/blob/bc18d33fe00d9ed43f1562d4cc6d37f49d9c2c38/exec/lifecycle/src/index.ts#L52
 async function checkBindingGyp(root, scripts) {
-    if (await exists(path.join(root, 'binding.gyp'))) {
+    if (await useNodeGyp(root)) {
         scripts['install'] = 'node-gyp rebuild'
     }
 }
@@ -120,6 +125,19 @@ async function runLifecycleHooks(opts, hooks) {
     for (const hook of hooks) {
         if (pkg.scripts[hook]) {
             await runLifecycleHook(hook, pkg, opts)
+        }
+    }
+}
+
+// Remove the indeterministic Makefile from the resulting directory.
+// Can be removed when https://github.com/nodejs/gyp-next/pull/293
+// has sufficiently propagated.
+async function cleanupNodeGypIndeterminism(root) {
+    if (await useNodeGyp(root)) {
+        try {
+            await fs.promises.rm(path.join(root,'build', 'Makefile'))
+        } catch (e) {
+            // Best effort, ignore errors.
         }
     }
 }
@@ -260,6 +278,8 @@ async function main(args) {
         // Run user specified custom postinstall hook
         await runLifecycleHook('custom_postinstall', rulesJsJson, opts)
     }
+
+    await cleanupNodeGypIndeterminism(opts.pkgRoot)
 }
 
 // Copy contents of a package dir to a destination dir (without copying the package dir itself)
