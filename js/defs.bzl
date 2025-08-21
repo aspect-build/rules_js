@@ -1,5 +1,6 @@
 """Rules for running JavaScript programs"""
 
+load("@aspect_tools_telemetry_report//:defs.bzl", "TELEMETRY")  # buildifier: disable=load
 load(
     "//js/private:js_binary.bzl",
     _js_binary = "js_binary",
