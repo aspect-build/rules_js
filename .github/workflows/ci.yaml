@@ -22,7 +22,7 @@ jobs:
     matrix-prep:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
             - id: bazel-version
               name: Prepare 'bazel-version' matrix axis
               run: |
@@ -236,7 +236,7 @@ jobs:
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under github.workspace, so your job can access it
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
             # which exercises fetching a git repository via ssh.
