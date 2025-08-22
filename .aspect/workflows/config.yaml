@@ -204,6 +204,9 @@ workspaces:
     # No test targets. Requires running test.sh.
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
+bazel:
+  flags:
+    - --config=ci
 tasks:
     - checkout:
           update_strategy: rebase
