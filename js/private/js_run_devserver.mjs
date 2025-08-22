@@ -796,8 +796,20 @@ class AspectWatchProtocol {
 
     async disconnect() {
         if (this.connection.writable) {
-            await this._send('EXIT')
+            try {
+                await this._send('EXIT')
+            } catch (e) {
+                if (JS_BINARY__LOG_DEBUG) {
+                    console.log(
+                        'AspectWatchProtocol[disconnect]: failed to send EXIT message:',
+                        e
+                    )
+                }
+            }
+
             await new Promise((resolve) => this.connection.end(resolve))
+
+            this.connection.destroy()
         }
 
         return this
