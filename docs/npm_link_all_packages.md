@@ -48,7 +48,7 @@ If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you c
 ## npm_link_targets
 
 <pre>
-npm_link_targets(<a href="#npm_link_targets-name">name</a>, <a href="#npm_link_targets-package">package</a>)
+npm_link_targets(<a href="#npm_link_targets-name">name</a>, <a href="#npm_link_targets-package">package</a>, <a href="#npm_link_targets-prod">prod</a>, <a href="#npm_link_targets-dev">dev</a>)
 </pre>
 
 Generated list of target names that are linked by npm_link_all_packages()
@@ -60,6 +60,8 @@ Generated list of target names that are linked by npm_link_all_packages()
 | :------------- | :------------- | :------------- |
 | <a id="npm_link_targets-name"></a>name |  name of catch all target to generate for all packages linked   |  `"node_modules"` |
 | <a id="npm_link_targets-package"></a>package |  Bazel package to generate targets names for.<br><br>Set to an empty string "" to specify the root package.<br><br>If unspecified, the current package (`native.package_name()`) is used.   |  `None` |
+| <a id="npm_link_targets-prod"></a>prod |  If True, only include production dependencies (dependencies from package.json). Cannot be used together with `dev`.   |  `False` |
+| <a id="npm_link_targets-dev"></a>dev |  If True, only include development dependencies (devDependencies from package.json). Cannot be used together with `prod`.   |  `False` |
 
 **RETURNS**
 
