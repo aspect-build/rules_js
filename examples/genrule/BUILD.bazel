@@ -43,8 +43,8 @@ genrule(
         # $@ is bazel shorthand for the path of the output file
         ">$@",
     ]),
-    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
-    tools = ["@nodejs_toolchains//:resolved_toolchain"],
+    toolchains = ["@rules_nodejs//nodejs:current_node_toolchain"],
+    tools = ["@rules_nodejs//nodejs:current_node_toolchain"],
 )
 
 diff_test(
@@ -74,8 +74,8 @@ genrule(
         $(NODE_PATH) \\
         ./$(execpath :require_acorn_js) \\
         $@""",
-    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
-    tools = ["@nodejs_toolchains//:resolved_toolchain"],
+    toolchains = ["@rules_nodejs//nodejs:current_node_toolchain"],
+    tools = ["@rules_nodejs//nodejs:current_node_toolchain"],
 )
 
 diff_test(
