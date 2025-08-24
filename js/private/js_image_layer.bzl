@@ -408,7 +408,7 @@ else {
         transitive = [files],
     )
 
-    nodeinfo = ctx.attr._current_node[platform_common.ToolchainInfo].nodeinfo
+    nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     node_exec = nodeinfo.node
     ctx.actions.run(
         inputs = inputs,
@@ -418,6 +418,7 @@ else {
         executable = node_exec,
         progress_message = "Computing Layer Groups %{label}",
         mnemonic = "JsImageLayerGroups",
+        toolchain = "@rules_nodejs//nodejs:toolchain_type",
     )
 
     return expected_layer_groups
@@ -622,10 +623,6 @@ js_image_layer_lib = struct(
         "_splitter": attr.label(
             default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
-        ),
-        "_current_node": attr.label(
-            default = "@nodejs_toolchains//:resolved_toolchain",
-            cfg = "exec",
         ),
         "binary": attr.label(
             mandatory = True,
