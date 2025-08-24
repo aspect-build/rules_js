@@ -34,4 +34,8 @@ sh_test(
         "no-remote-exec",
         "no-sandbox",
     ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )

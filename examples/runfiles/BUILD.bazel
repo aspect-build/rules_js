@@ -12,6 +12,10 @@ js_test(
     ],
     entry_point = "test.js",
     tags = ["skip-on-bazel8"],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 # Path of file must start similar to `test_fixture.md` in order to regression-test a
