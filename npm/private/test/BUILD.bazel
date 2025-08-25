@@ -5,6 +5,8 @@ load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":parse_pnpm_lock_tests.bzl", "parse_pnpm_lock_tests")
+load(":platform_utils_tests.bzl", "platform_utils_test_suite")
+load(":platform_performance_test.bzl", "platform_performance_test_suite")
 load(":pnpm_test.bzl", "pnpm_tests")
 load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_helpers_tests.bzl", "translate_lock_helpers_tests")
@@ -24,6 +26,10 @@ transitive_closure_tests(name = "test_transitive_closure")
 translate_lock_helpers_tests(name = "test_translate_lock")
 
 parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
+
+platform_utils_test_suite()
+
+platform_performance_test_suite()
 
 generated_pkg_json_test(name = "test_generated_pkg_json")
 
