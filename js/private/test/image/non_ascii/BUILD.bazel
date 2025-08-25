@@ -10,6 +10,10 @@ js_binary(
         "ㅑㅕㅣㅇ.ㄴㅅ",
     ],
     entry_point = "main.js",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 make_js_image_layer(
@@ -20,10 +24,15 @@ make_js_image_layer(
     },
     platform = "//js/private/test/image:linux_amd64",
     root = "/app",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 assert_js_image_layer_listings(
     name = "custom_layer_groups_test",
     additional_layers = ["just_the_fs_patch"],
     js_image_layer = ":custom_layer_groups",
+    exclude_windows = True,
 )

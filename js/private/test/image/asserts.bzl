@@ -3,19 +3,27 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
+NOT_WINDOWS = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 # buildifier: disable=function-docstring
-def assert_tar_listing(name, actual, expected):
+def assert_tar_listing(name, actual, expected, **kwargs):
     actual_listing = "_{}_listing".format(name)
     native.genrule(
         name = actual_listing,
-        srcs = [actual],
+        srcs = [
+            actual, 
+        ],
         testonly = True,
         outs = ["_{}.listing".format(name)],
         # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
-        # we need to exlude it from checksums
+        # we need to exclude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
-        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" >$@'.format(actual),
-        toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
+        cmd = "$(location :tar_listing) $(BSDTAR_BIN) $(location {}) > $@".format(actual),
+        tools = [":tar_listing"],
+        toolchains = ["@bsd_tar_toolchains//:resolved_toolchain", "@coreutils_toolchains//:resolved_toolchain"],
     )
 
     write_source_file(
@@ -24,6 +32,7 @@ def assert_tar_listing(name, actual, expected):
         out_file = expected,
         testonly = True,
         tags = ["skip-on-bazel6", "skip-on-bazel8"],
+        **kwargs,
     )
 
 layers = [
@@ -35,14 +44,22 @@ layers = [
 ]
 
 # buildifier: disable=function-docstring
-def assert_js_image_layer_listings(name, js_image_layer, additional_layers = []):
+def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [], exclude_windows=False):
     all_layers = layers + additional_layers
     for layer in all_layers:
         assert_tar_listing(
             name = "assert_{}_{}".format(name, layer),
             actual = "{}_{}".format(js_image_layer, layer),
             expected = "{}_{}.listing".format(name, layer),
+            target_compatible_with = NOT_WINDOWS,
         )
+        if not exclude_windows:
+            assert_tar_listing(
+                name = "assert_{}_{}_windows".format(name, layer),
+                actual = "{}_{}".format(js_image_layer, layer),
+                expected = "{}_{}_windows.listing".format(name, layer),
+                target_compatible_with = ["@platforms//os:windows"],
+            )
 
     write_source_files(
         name = name + "_update_all",
@@ -52,7 +69,19 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
         ],
         tags = ["skip-on-bazel6", "skip-on-bazel8"],
         testonly = True,
+        target_compatible_with = NOT_WINDOWS,        
     )
+    if not exclude_windows:
+        write_source_files(
+            name = name + "_update_all_windows",
+            additional_update_targets = [
+                "assert_{}_{}_windows".format(name, layer)
+                for layer in all_layers
+            ],
+            tags = ["skip-on-bazel6", "skip-on-bazel8"],
+            testonly = True,
+            target_compatible_with = ["@platforms//os:windows"],
+        )
 
 # buildifier: disable=function-docstring
 def make_js_image_layer(name, layer_groups = {}, **kwargs):
