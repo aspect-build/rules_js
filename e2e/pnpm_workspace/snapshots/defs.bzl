@@ -10,7 +10,7 @@ load("@@aspect_rules_js~~npm~npm__at_aspect-test_g__1.0.0__links//:defs.bzl", li
 load("@@aspect_rules_js~~npm~npm__at_aspect-test_h__1.0.0__links//:defs.bzl", link_7 = "npm_link_imported_package_store", store_7 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~npm__at_types_node__16.18.11__links//:defs.bzl", link_8 = "npm_link_imported_package_store", store_8 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~npm__at_types_sizzle__2.3.8__links//:defs.bzl", link_9 = "npm_link_imported_package_store", store_9 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~npm__lodash__4.17.19__links//:defs.bzl", link_10 = "npm_link_imported_package_store", store_10 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~npm__lodash__file_vendored_lodash-4.17.19.tgz__links//:defs.bzl", link_10 = "npm_link_imported_package_store", store_10 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~npm__typescript__4.9.5__links//:defs.bzl", link_11 = "npm_link_imported_package_store", store_11 = "npm_imported_package_store")
 
 # buildifier: disable=bzl-visibility

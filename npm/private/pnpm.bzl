@@ -4,11 +4,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
 load(":utils.bzl", "DEFAULT_REGISTRY_DOMAIN_SLASH", "utils")
 
-def _is_vendored_tarfile(package_snapshot):
-    if "resolution" in package_snapshot:
-        return "tarball" in package_snapshot["resolution"]
-    return False
-
 def _to_package_key(name, version):
     if not version[0].isdigit():
         return version
@@ -84,29 +79,9 @@ def _convert_v5_v6_file_package(package_path, package_snapshot):
 
     name = package_snapshot["name"]
     version = package_path
-    if _is_vendored_tarfile(package_snapshot):
-        if "version" in package_snapshot:
-            version = package_snapshot["version"]
-        friendly_version = version
-    else:
-        friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
+    friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
 
     return name, version, friendly_version
-
-def _convert_v9_file_package_version(version, package_snapshot):
-    if _is_vendored_tarfile(package_snapshot):
-        if "version" in package_snapshot:
-            version = package_snapshot["version"]
-        friendly_version = version
-    else:
-        friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
-
-    peer_index = friendly_version.find("(")
-    if peer_index != -1:
-        # Remove the peer dependency data from the version string
-        friendly_version = friendly_version[:peer_index]
-
-    return version, friendly_version
 
 def _strip_v5_peer_dep_or_patched_version(version):
     "Remove peer dependency or patched syntax from version string"
@@ -527,22 +502,13 @@ def _convert_v9_packages(packages, snapshots):
         version_index = static_key.index("@", 1)
         name = static_key[:version_index]
 
-        # Extract the version including peerDeps+patch from the key
-        version = package_key[package_key.index("@", 1) + 1:]
-
         package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
 
-        if version.startswith("file:"):
-            version, friendly_version = _convert_v9_file_package_version(version, package_data)
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
+        # Extract the version including peerDeps+patch from the key
+        version = _convert_pnpm_v6_v9_version_peer_dep(package_key[package_key.index("@", 1) + 1:])
 
-            # Update the `package_key` to always equal name@version since `version` may have changed
-            package_key = _to_package_key(name, version)
-        else:
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
-
-            # package_data can have the resolved "version" for things like https:// deps
-            friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
+        # package_data can have the resolved "version" for things like https:// deps
+        friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
         package_info = _new_package_info(
             name = name,

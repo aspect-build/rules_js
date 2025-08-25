@@ -7,6 +7,7 @@ cases/docusaurus-direct-peer-v6/node_modules
 cases/tarball-no-url-v54/node_modules
 projects/a/node_modules
 projects/a-types/node_modules
+projects/alts/node_modules
 projects/b/node_modules
 projects/c/node_modules
 projects/d/node_modules

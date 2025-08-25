@@ -40,7 +40,7 @@ expected_packages = {
             "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         },
     },
-    "lodash@4.17.21": {
+    "file:lodash-4.17.21.tgz": {
         "name": "lodash",
         "dependencies": {},
         "optional_dependencies": {},
@@ -48,7 +48,7 @@ expected_packages = {
         "has_bin": False,
         "optional": False,
         "requires_build": False,
-        "version": "4.17.21",
+        "version": "file:lodash-4.17.21.tgz",
         "friendly_version": "4.17.21",
         "resolution": {
             "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
@@ -208,9 +208,10 @@ def _parse_lockfile_v9_test_impl(ctx):
     v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
     v9_expected_packages["@aspect-test/a@5.0.0"]["dev_only"] = None
     v9_expected_packages["@aspect-test/a@5.0.0"]["requires_build"] = None
-    v9_expected_packages["lodash@4.17.21"] = dict(v9_expected_packages["lodash@4.17.21"])
-    v9_expected_packages["lodash@4.17.21"]["dev_only"] = None
-    v9_expected_packages["lodash@4.17.21"]["requires_build"] = None
+    v9_expected_packages["lodash@file:lodash-4.17.21.tgz"] = dict(v9_expected_packages["file:lodash-4.17.21.tgz"])
+    v9_expected_packages["lodash@file:lodash-4.17.21.tgz"]["dev_only"] = None
+    v9_expected_packages["lodash@file:lodash-4.17.21.tgz"]["requires_build"] = None
+    v9_expected_packages.pop("file:lodash-4.17.21.tgz")  # renamed with lodash@ in v9
 
     expected = (
         expected_importers,

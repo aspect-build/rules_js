@@ -22,18 +22,18 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__ansi-regex__6.1.0",
+        name = "lock-<LOCKVERSION>__ansi-regex__6.2.0",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "ansi-regex",
-        version = "6.1.0",
-        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.1.0.tgz",
+        version = "6.2.0",
+        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.2.0.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==",
+        integrity = "sha512-TKY5pyBkHyADOPYlRT9Lx6F544mPl0vS5Ew7BJ45hA08Q+t3GjbueLliBWN3sMICk6+y7HdyxSzC4bWS8baBdg==",
         transitive_closure = {
-            "ansi-regex": ["6.1.0"],
+            "ansi-regex": ["6.2.0"],
         },
     )
 
@@ -308,7 +308,7 @@ def npm_repositories():
         },
         transitive_closure = {
             "@isaacs/cliui": ["8.0.2"],
-            "ansi-regex": ["5.0.1", "6.1.0"],
+            "ansi-regex": ["5.0.1", "6.2.0"],
             "ansi-styles": ["4.3.0", "6.2.1"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
@@ -931,16 +931,35 @@ def npm_repositories():
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
-            "<LOCKVERSION>": ["lodash"],
+            "projects/alts": ["lodash-dupe"],
         },
         package = "lodash",
         version = "4.17.21",
-        url = "file:vendored/lodash-4.17.21.tgz",
+        url = "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         transitive_closure = {
             "lodash": ["4.17.21"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["lodash"],
+            "projects/alts": ["lodash", "lodash-file"],
+        },
+        package = "lodash",
+        version = "file:../vendored/lodash-4.17.21.tgz",
+        url = "file:vendored/lodash-4.17.21.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
+        transitive_closure = {
+            "lodash": ["file:../vendored/lodash-4.17.21.tgz"],
         },
     )
 
@@ -1160,7 +1179,7 @@ def npm_repositories():
             "strip-ansi": "7.1.0",
         },
         transitive_closure = {
-            "ansi-regex": ["6.1.0"],
+            "ansi-regex": ["6.2.0"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["9.2.2"],
             "string-width": ["5.1.2"],
@@ -1200,10 +1219,10 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
         deps = {
-            "ansi-regex": "6.1.0",
+            "ansi-regex": "6.2.0",
         },
         transitive_closure = {
-            "ansi-regex": ["6.1.0"],
+            "ansi-regex": ["6.2.0"],
             "strip-ansi": ["7.1.0"],
         },
     )
@@ -1335,7 +1354,7 @@ def npm_repositories():
             "strip-ansi": "7.1.0",
         },
         transitive_closure = {
-            "ansi-regex": ["6.1.0"],
+            "ansi-regex": ["6.2.0"],
             "ansi-styles": ["6.2.1"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["9.2.2"],
