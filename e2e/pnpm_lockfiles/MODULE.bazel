@@ -76,6 +76,13 @@ npm = use_extension(
         "lock-%s__at_types_sizzle__2.3.9" % version,
         "lock-%s__at_types_sizzle__2.3.9__links" % version,
 
+        # Deps with circles
+        "lock-%s__at_aspect-test_a__5.0.2__links" % version,
+        "lock-%s__at_aspect-test_b__5.0.2__links" % version,
+
+        # Dep with lifecycle hooks
+        "lock-%s__at_aspect-test_c__2.0.0__links" % version,
+
         # Dep with peers
         "lock-%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2" % version,
         "lock-%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links" % version,
