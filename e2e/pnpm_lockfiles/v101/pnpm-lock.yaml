@@ -160,6 +160,18 @@ importers:
         specifier: 16.18.11
         version: 16.18.11
 
+  ../projects/alts:
+    dependencies:
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+      lodash-dupe:
+        specifier: npm:lodash@4.17.21
+        version: lodash@4.17.21
+      lodash-file:
+        specifier: file:../../vendored/lodash-4.17.21.tgz
+        version: lodash@file:../vendored/lodash-4.17.21.tgz
+
   ../projects/b:
     dependencies:
       '@scoped/a':
@@ -314,8 +326,8 @@ packages:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
 
-  ansi-regex@6.1.0:
-    resolution: {integrity: sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==}
+  ansi-regex@6.2.0:
+    resolution: {integrity: sha512-TKY5pyBkHyADOPYlRT9Lx6F544mPl0vS5Ew7BJ45hA08Q+t3GjbueLliBWN3sMICk6+y7HdyxSzC4bWS8baBdg==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
@@ -421,6 +433,9 @@ packages:
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
+
+  lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
   lodash@file:../vendored/lodash-4.17.21.tgz:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==, tarball: file:../vendored/lodash-4.17.21.tgz}
@@ -590,7 +605,7 @@ snapshots:
 
   ansi-regex@5.0.1: {}
 
-  ansi-regex@6.1.0: {}
+  ansi-regex@6.2.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -665,6 +680,8 @@ snapshots:
 
   kleur@4.1.5: {}
 
+  lodash@4.17.21: {}
+
   lodash@file:../vendored/lodash-4.17.21.tgz: {}
 
   meaning-of-life@1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0): {}
@@ -713,7 +730,7 @@ snapshots:
 
   strip-ansi@7.1.0:
     dependencies:
-      ansi-regex: 6.1.0
+      ansi-regex: 6.2.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
