@@ -45,6 +45,10 @@ async function readlinkSafe(p) {
             // assume the file exists in another layer
             return p
         }
+        if (process.platform === 'win32' && e.code == 'UNKNOWN' && e.errno == -4094) {
+            // Windows returns 'UNKNOWN' when reading a link that is a file
+            return p
+        }
         throw e
     }
 }
@@ -96,7 +100,7 @@ function add_parents(mtree, dest) {
         if (!part || part == '.') {
             continue
         }
-        prev = path.join(prev, part)
+        prev = path.posix.join(prev, part)
         mtree.add(_mtree_dir_line(prev))
     }
 }
@@ -112,6 +116,13 @@ function vis(str) {
     // Rust has this https://doc.rust-lang.org/std/string/struct.String.html#method.as_bytes
     // and the equivalent in nodejs is Buffer.
     for (const char of Buffer.from(str)) {
+        if (char == '\\') {
+            throw new Error(
+                `unexpected entry format. ${JSON.stringify(
+                    str
+                )}. find the source of the errant backslash`
+            )
+        }
         if (char < 33 || char > 126) {
             // Non-printable
             result += '\\' + char.toString(8).padStart(3, '0')
@@ -130,8 +141,8 @@ function _mtree_dir_line(dir) {
 }
 
 function _mtree_link_line(key, linkname) {
-    const link_parent = path.dirname(key)
-    linkname = path.relative(link_parent, linkname)
+    const link_parent = path.posix.dirname(key)
+    linkname = path.posix.relative(link_parent, linkname)
 
     // interestingly, bazel 5 and 6 sets different mode bits on symlinks.
     // well use `0o755` to allow owner&group to `rwx` and others `rx`

@@ -22,6 +22,12 @@ platform(
     visibility = ["//js/private/test/image:__subpackages__"],
 )
 
+sh_binary(
+    name = "tar_listing",
+    srcs = ["tar_listing.sh"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
 # All these golden files can be updated with
 # bazel run //js/private/test/image:default_test_update_all --enable_bzlmod
 # bazel run //js/private/test/image:custom_owner_test_update_all --enable_bzlmod
@@ -38,10 +44,6 @@ make_js_image_layer(
     compression = "none",
     platform = ":linux_amd64",
     # root = unset to use default
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 assert_checksum(
@@ -56,10 +58,6 @@ make_js_image_layer(
     binary = ":bin",
     platform = ":linux_amd64",
     root = "",  # blank
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 assert_js_image_layer_listings(
@@ -75,10 +73,6 @@ make_js_image_layer(
     owner = "100:0",
     platform = ":linux_amd64",
     root = "/",  # root /
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 assert_js_image_layer_listings(
@@ -98,10 +92,6 @@ make_js_image_layer(
     platform = ":linux_amd64",
     preserve_symlinks = "node_modules|/foobar/\"'",
     root = "./app",  # with './' prefix
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 assert_js_image_layer_listings(
@@ -118,10 +108,6 @@ make_js_image_layer(
     layer_groups = {"app": "no app for you"},
     platform = ":linux_amd64",
     root = "/app",  # with /' prefix
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 assert_js_image_layer_listings(
@@ -134,19 +120,11 @@ assert_js_image_layer_listings(
 make_js_image_layer(
     name = "js_image_layer_untransitioned",
     binary = ":bin",
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 platform_transition_filegroup(
     name = "transition_js_image_layer",
     testonly = True,
     srcs = [":js_image_layer_untransitioned"],
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
     target_platform = ":linux_amd64",
 )
