@@ -30,16 +30,6 @@ rules_js is just a part Aspect's monorepo developer platform:
     -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
     -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
 
-## Bazel compatibility
-
-The ruleset is known to work with:
-
--   Bazel 7 using WORKSPACE and Bzlmod _(tested on CI)_
--   Bazel 6 using WORKSPACE and Bzlmod _(tested on CI)_
-
-> [!NOTE]
-> Remote Execution (RBE) requires at least Bazel [6.0](https://blog.bazel.build/2022/12/19/bazel-6.0.html).
-
 ## Known issues
 
 -   ESM imports escape the runfiles tree and the sandbox due to https://github.com/aspect-build/rules_js/issues/362
