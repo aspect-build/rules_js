@@ -53,11 +53,11 @@ async function readlinkSafe(p) {
     }
 }
 
-const EXECROOT = process.cwd()
+const EXECROOT = process.cwd().replace(/\\/g, '/')
 
 // Resolve symlinks while staying inside the sandbox.
 async function resolveSymlink(p) {
-    let prevHop = path.resolve(p)
+    let prevHop = path.posix.resolve(p)
     let hopped = false
     while (true) {
         // /output-base/sandbox/4/execroot/wksp/bazel-out
@@ -66,6 +66,7 @@ async function resolveSymlink(p) {
         // if the next hop leads to out of execroot, that means
         // we hopped too far, return the previous hop.
 
+        nextHop = nextHop.replace(/\\/g, '/')
         if (!nextHop.startsWith(EXECROOT)) {
             return hopped ? prevHop : undefined
         }
