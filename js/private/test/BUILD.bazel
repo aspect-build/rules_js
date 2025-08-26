@@ -72,21 +72,8 @@ if (parseInt(process.version.slice(1)) !== parseInt(process.argv[2])) {
 
 js_test(
     name = "main_default_toolchain",
-    args = ["16"],
+    args = ["18"],
     entry_point = "binary_version.js",
-)
-
-js_test(
-    name = "main_toolchain_16",
-    args = ["16"],
-    entry_point = "binary_version.js",
-    # using the select statement will download toolchains for all three platforms
-    # you can also just provide an individual toolchain if you don't want to download them all
-    node_toolchain = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node16_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node16_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node16_windows_amd64//:node_toolchain",
-    }),
 )
 
 js_test(
@@ -99,5 +86,18 @@ js_test(
         "@bazel_tools//src/conditions:linux_x86_64": "@node18_linux_amd64//:node_toolchain",
         "@bazel_tools//src/conditions:darwin": "@node18_darwin_amd64//:node_toolchain",
         "@bazel_tools//src/conditions:windows": "@node18_windows_amd64//:node_toolchain",
+    }),
+)
+
+js_test(
+    name = "main_toolchain_20",
+    args = ["20"],
+    entry_point = "binary_version.js",
+    # using the select statement will download toolchains for all three platforms
+    # you can also just provide an individual toolchain if you don't want to download them all
+    node_toolchain = select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
+        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
     }),
 )

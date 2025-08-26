@@ -21,8 +21,8 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_archiver__5.3.1__links
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_estree__0.0.39__links//:defs.bzl", store_18 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_19 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_20 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__16.18.11__links//:defs.bzl", link_21 = "npm_link_imported_package_store", store_21 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_sizzle__2.3.9__links//:defs.bzl", link_22 = "npm_link_imported_package_store", store_22 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_node__18.19.54__links//:defs.bzl", link_21 = "npm_link_imported_package_store", store_21 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_types_sizzle__2.3.10__links//:defs.bzl", link_22 = "npm_link_imported_package_store", store_22 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-convert__2.0.1__links//:defs.bzl", store_23 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__color-name__1.1.4__links//:defs.bzl", store_24 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__debug__github.com_ngokevin_debug_9742c5f383a6f8046241920156236ade8ec30d53__links//:defs.bzl", link_25 = "npm_link_imported_package_store", store_25 = "npm_imported_package_store")
@@ -64,9 +64,10 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__7.1.0__links//:defs
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_61 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_62 = "npm_link_imported_package_store", store_62 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_63 = "npm_link_imported_package_store", store_63 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_64 = "npm_link_imported_package_store", store_64 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_65 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_66 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__undici-types__5.26.5__links//:defs.bzl", store_64 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_65 = "npm_link_imported_package_store", store_65 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_66 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_67 = "npm_imported_package_store")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
@@ -167,6 +168,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         store_64(name)
         store_65(name)
         store_66(name)
+        store_67(name)
     if link:
         if bazel_package == "<LOCKVERSION>":
             link_4("{}/@aspect-test-a-bad-scope".format(name), link_root_name = name, link_alias = "@aspect-test-a-bad-scope")
@@ -273,7 +275,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_targets.append(":{}/tslib".format(name))
             link_63("{}/typescript".format(name), link_root_name = name, link_alias = "typescript")
             link_targets.append(":{}/typescript".format(name))
-            link_64("{}/uvu".format(name), link_root_name = name, link_alias = "uvu")
+            link_65("{}/uvu".format(name), link_root_name = name, link_alias = "uvu")
             link_targets.append(":{}/uvu".format(name))
         elif bazel_package == "projects/peers-combo-2":
             link_6("{}/@aspect-test/c".format(name), link_root_name = name, link_alias = "@aspect-test/c")
@@ -667,7 +669,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             package = "a-types",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@16.18.11".format(name): "@types/node",
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@18.19.54".format(name): "@types/node",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
