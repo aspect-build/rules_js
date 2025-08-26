@@ -17,6 +17,6 @@ BSDTAR_BIN=$1
 FILE_PATH=$2
 TZ="UTC"
 LC_ALL="en_US.UTF-8"
-echo ${BSDTAR_BIN} -tvf ${FILE_PATH} --exclude "**/_repo_mapping" \| sed 's|\t|/t|g' \| sed 's|\\\\|/|g' 1>&2
-${BSDTAR_BIN} -tvf ${FILE_PATH} --exclude "**/_repo_mapping" | sed 's|\t|/t|g' | sed 's|\\|/|g' | sed 's|Dec 31  1969|Jan  1  1970|g' | tr -d '\r' | sort -k 8
+# https://github.com/libarchive/libarchive/issues/2726
+${BSDTAR_BIN} -tvf ${FILE_PATH} --exclude "**/_repo_mapping" | sed 's|Dec 31  1969|Jan  1  1970|g' | tr -d '\r'
 
