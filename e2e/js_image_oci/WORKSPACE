@@ -14,7 +14,7 @@ rules_js_dependencies()
 
 load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
 
-rules_js_register_toolchains(node_version = "16.14.2")
+rules_js_register_toolchains(node_version = "18.14.2")
 
 load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 
