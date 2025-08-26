@@ -426,7 +426,8 @@ def npm_repositories():
             "@types/archiver": ["5.3.1"],
             "@types/glob": ["8.1.0"],
             "@types/minimatch": ["5.1.2"],
-            "@types/node": ["16.18.11"],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -460,12 +461,13 @@ def npm_repositories():
         integrity = "sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==",
         deps = {
             "@types/minimatch": "5.1.2",
-            "@types/node": "16.18.11",
+            "@types/node": "18.19.54",
         },
         transitive_closure = {
             "@types/glob": ["8.1.0"],
             "@types/minimatch": ["5.1.2"],
-            "@types/node": ["16.18.11"],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -487,7 +489,7 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__at_types_node__16.18.11",
+        name = "lock-<LOCKVERSION>__at_types_node__18.19.54",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
@@ -496,32 +498,36 @@ def npm_repositories():
             "projects/b": ["@types/node"],
         },
         package = "@types/node",
-        version = "16.18.11",
-        url = "https://registry.yarnpkg.com/@types/node/-/node-16.18.11.tgz",
+        version = "18.19.54",
+        url = "https://registry.yarnpkg.com/@types/node/-/node-18.19.54.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==",
+        integrity = "sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==",
+        deps = {
+            "undici-types": "5.26.5",
+        },
         transitive_closure = {
-            "@types/node": ["16.18.11"],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__at_types_sizzle__2.3.9",
+        name = "lock-<LOCKVERSION>__at_types_sizzle__2.3.10",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["alias-only-sizzle"],
         },
         package = "@types/sizzle",
-        version = "2.3.9",
-        url = "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.9.tgz",
+        version = "2.3.10",
+        url = "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.10.tgz",
         system_tar = "<TAR>",
         package_visibility = ["//visibility:public"],
         dev = True,
-        integrity = "sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==",
+        integrity = "sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==",
         transitive_closure = {
-            "@types/sizzle": ["2.3.9"],
+            "@types/sizzle": ["2.3.10"],
         },
     )
 
@@ -1294,6 +1300,22 @@ def npm_repositories():
         integrity = "sha512-NcRtPEOsPFFWjobJEtfihkLCZCXZt/os3zf8nTxjVH3RvTSxjrCamJpbExGvYOF+tFHc3pA65qpdwPbzjohhew==",
         transitive_closure = {
             "typescript": ["5.5.2"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__undici-types__5.26.5",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "undici-types",
+        version = "5.26.5",
+        url = "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz",
+        system_tar = "<TAR>",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==",
+        transitive_closure = {
+            "undici-types": ["5.26.5"],
         },
     )
 

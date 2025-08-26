@@ -32,10 +32,10 @@ importers:
       '@scoped/c': file:../projects/c
       '@scoped/d': ../projects/d
       '@types/archiver': 5.3.1
-      '@types/node': 16.18.11
-      alias-only-sizzle: npm:@types/sizzle@~2.3.9
+      '@types/node': 18.19.54
+      alias-only-sizzle: npm:@types/sizzle@~2.3.10
       alias-project-a: link:../projects/a
-      alias-types-node: npm:@types/node@~16.18.11
+      alias-types-node: npm:@types/node@~18.19.54
       aspect-test-a-no-scope: npm:@aspect-test/a
       aspect-test-a/no-at: npm:@aspect-test/a
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
@@ -103,18 +103,18 @@ importers:
     devDependencies:
       '@aspect-test/b': 5.0.2
       '@types/archiver': registry.npmjs.org/@types/archiver/5.3.1
-      '@types/node': registry.npmjs.org/@types/node/16.18.11
-      alias-only-sizzle: registry.npmjs.org/@types/sizzle/2.3.9
-      alias-types-node: registry.npmjs.org/@types/node/16.18.11
+      '@types/node': registry.npmjs.org/@types/node/18.19.54
+      alias-only-sizzle: registry.npmjs.org/@types/sizzle/2.3.10
+      alias-types-node: registry.npmjs.org/@types/node/18.19.54
 
   ../projects/a:
     specifiers: {}
 
   ../projects/a-types:
     specifiers:
-      '@types/node': 16.18.11
+      '@types/node': 18.19.54
     dependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.18.11
+      '@types/node': registry.npmjs.org/@types/node/18.19.54
 
   ../projects/alts:
     specifiers:
@@ -129,12 +129,12 @@ importers:
   ../projects/b:
     specifiers:
       '@scoped/a': workspace:*
-      '@types/node': 16.18.11
+      '@types/node': 18.19.54
       a-types: workspace:*
     dependencies:
       '@scoped/a': link:../a
     devDependencies:
-      '@types/node': registry.npmjs.org/@types/node/16.18.11
+      '@types/node': registry.npmjs.org/@types/node/18.19.54
       a-types: link:../a-types
 
   ../projects/c:
@@ -519,6 +519,9 @@ packages:
     hasBin: true
     dev: false
 
+  /undici-types/5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   /uvu/0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
@@ -632,7 +635,7 @@ packages:
     version: 8.1.0
     dependencies:
       '@types/minimatch': registry.npmjs.org/@types/minimatch/5.1.2
-      '@types/node': registry.npmjs.org/@types/node/16.18.11
+      '@types/node': registry.npmjs.org/@types/node/18.19.54
     dev: true
 
   registry.npmjs.org/@types/minimatch/5.1.2:
@@ -641,13 +644,15 @@ packages:
     version: 5.1.2
     dev: true
 
-  registry.npmjs.org/@types/node/16.18.11:
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  registry.npmjs.org/@types/node/18.19.54:
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
     name: '@types/node'
-    version: 16.18.11
+    version: 18.19.54
+    dependencies:
+      undici-types: 5.26.5
 
-  registry.npmjs.org/@types/sizzle/2.3.9:
-    resolution: {integrity: sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.9.tgz}
+  registry.npmjs.org/@types/sizzle/2.3.10:
+    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.10.tgz}
     name: '@types/sizzle'
-    version: 2.3.9
+    version: 2.3.10
     dev: true
