@@ -181,8 +181,8 @@ def lockfile_test(npm_link_all_packages, name = None):
 
             # npm: alias to package not listed elsewhere
             ":node_modules/alias-only-sizzle",
-            ":.aspect_rules_js/node_modules/@types+sizzle@2.3.9",
-            "@%s__at_types_sizzle__2.3.9//:pkg" % lock_repo,
+            ":.aspect_rules_js/node_modules/@types+sizzle@2.3.10",
+            "@%s__at_types_sizzle__2.3.10//:pkg" % lock_repo,
 
             # Targets within the virtual store...
             # Direct dep targets
@@ -210,7 +210,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
 
             # Direct deps from custom registry
-            ":.aspect_rules_js/node_modules/@types+node@16.18.11",
+            ":.aspect_rules_js/node_modules/@types+node@18.19.54",
 
             # Direct deps with peers
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",

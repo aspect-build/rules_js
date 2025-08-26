@@ -5,7 +5,7 @@
         "@scoped/a": "workspace:*"
     },
     "devDependencies": {
-        "@types/node": "16.18.11",
+        "@types/node": "18.19.54",
         "a-types": "workspace:*"
     }
 }

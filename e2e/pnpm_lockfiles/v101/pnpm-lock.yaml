@@ -136,14 +136,14 @@ importers:
         specifier: 5.3.1
         version: 5.3.1
       '@types/node':
-        specifier: 16.18.11
-        version: 16.18.11
+        specifier: 18.19.54
+        version: 18.19.54
       alias-only-sizzle:
-        specifier: npm:@types/sizzle@~2.3.9
-        version: '@types/sizzle@2.3.9'
+        specifier: npm:@types/sizzle@~2.3.10
+        version: '@types/sizzle@2.3.10'
       alias-types-node:
-        specifier: npm:@types/node@~16.18.11
-        version: '@types/node@16.18.11'
+        specifier: npm:@types/node@~18.19.54
+        version: '@types/node@18.19.54'
     optionalDependencies:
       '@aspect-test/c':
         specifier: 2.0.0
@@ -157,8 +157,8 @@ importers:
   ../projects/a-types:
     dependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: 16.18.11
+        specifier: 18.19.54
+        version: 18.19.54
 
   ../projects/alts:
     dependencies:
@@ -179,8 +179,8 @@ importers:
         version: link:../a
     devDependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: 16.18.11
+        specifier: 18.19.54
+        version: 18.19.54
       a-types:
         specifier: workspace:*
         version: link:../a-types
@@ -316,11 +316,11 @@ packages:
   '@types/minimatch@5.1.2':
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
 
-  '@types/node@16.18.11':
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  '@types/node@18.19.54':
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
 
-  '@types/sizzle@2.3.9':
-    resolution: {integrity: sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.9.tgz}
+  '@types/sizzle@2.3.10':
+    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.10.tgz}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -505,6 +505,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
@@ -595,13 +598,15 @@ snapshots:
   '@types/glob@8.1.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 16.18.11
+      '@types/node': 18.19.54
 
   '@types/minimatch@5.1.2': {}
 
-  '@types/node@16.18.11': {}
+  '@types/node@18.19.54':
+    dependencies:
+      undici-types: 5.26.5
 
-  '@types/sizzle@2.3.9': {}
+  '@types/sizzle@2.3.10': {}
 
   ansi-regex@5.0.1: {}
 
@@ -737,6 +742,8 @@ snapshots:
   tslib@2.8.1: {}
 
   typescript@5.5.2: {}
+
+  undici-types@5.26.5: {}
 
   uvu@0.5.6:
     dependencies:
