@@ -34,5 +34,4 @@ assert_js_image_layer_listings(
     name = "custom_layer_groups_test",
     additional_layers = ["just_the_fs_patch"],
     js_image_layer = ":custom_layer_groups",
-    exclude_windows = True,
 )
