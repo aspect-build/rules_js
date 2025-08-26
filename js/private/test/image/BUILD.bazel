@@ -22,6 +22,12 @@ platform(
     visibility = ["//js/private/test/image:__subpackages__"],
 )
 
+sh_binary(
+    name = "tar_listing",
+    srcs = ["tar_listing.sh"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
 # All these golden files can be updated with
 # bazel run //js/private/test/image:default_test_update_all --enable_bzlmod
 # bazel run //js/private/test/image:custom_owner_test_update_all --enable_bzlmod

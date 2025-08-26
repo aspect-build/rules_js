@@ -8,6 +8,7 @@ node_modules/
 .bazelbsp/
 .vscode
 .DS_Store
+.bazelrc.user
 
 # Bazel's MODULE lockfile isn't ready to check in yet as of Bazel 7.1.
 # Do allow for it to be created, however, since it gives a performance boost for local development.

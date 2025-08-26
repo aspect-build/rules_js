@@ -3,19 +3,27 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
+NOT_WINDOWS = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 # buildifier: disable=function-docstring
-def assert_tar_listing(name, actual, expected):
+def assert_tar_listing(name, actual, expected, **kwargs):
     actual_listing = "_{}_listing".format(name)
     native.genrule(
         name = actual_listing,
-        srcs = [actual],
+        srcs = [
+            actual, 
+        ],
         testonly = True,
         outs = ["_{}.listing".format(name)],
         # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
-        # we need to exlude it from checksums
+        # we need to exclude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
-        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" >$@'.format(actual),
-        toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
+        cmd = "$(location :tar_listing) $(BSDTAR_BIN) $(location {}) > $@".format(actual),
+        tools = [":tar_listing"],
+        toolchains = ["@bsd_tar_toolchains//:resolved_toolchain", "@coreutils_toolchains//:resolved_toolchain"],
     )
 
     write_source_file(
@@ -24,6 +32,7 @@ def assert_tar_listing(name, actual, expected):
         out_file = expected,
         testonly = True,
         tags = ["skip-on-bazel6", "skip-on-bazel8"],
+        **kwargs,
     )
 
 layers = [
@@ -43,7 +52,6 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             actual = "{}_{}".format(js_image_layer, layer),
             expected = "{}_{}.listing".format(name, layer),
         )
-
     write_source_files(
         name = name + "_update_all",
         additional_update_targets = [
@@ -51,7 +59,7 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             for layer in all_layers
         ],
         tags = ["skip-on-bazel6", "skip-on-bazel8"],
-        testonly = True,
+        testonly = True,       
     )
 
 # buildifier: disable=function-docstring
@@ -83,13 +91,15 @@ def assert_checksum(name, image_layer):
         srcs = ["{}_{}".format(image_layer, layer) for layer in layers],
         outs = [name + ".checksums"],
         # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
-        # we need to exlude it from checksums
+        # we need to exclude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
+        # TODO: also exclude node layer which is different between windows and linux
+        # and ignore sha256sum windows difference (it prints '*' before each filename)
         cmd = """
 COREUTILS_BIN=$$(realpath $(COREUTILS_BIN)) &&
 RESULT="$$($$COREUTILS_BIN sha256sum $(SRCS))"
 BINDIR="$(BINDIR)/"
-echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
+echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 | $$COREUTILS_BIN tail -n -3 | tr '*' ' ' > $@
     """,
         output_to_bindir = True,
         toolchains = ["@coreutils_toolchains//:resolved_toolchain"],

@@ -8,12 +8,13 @@ module(
 
 # Lower-bounds (minimum) versions for direct runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
-bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.0")
 bazel_dep(name = "aspect_tools_telemetry", version = "0.2.8")
 bazel_dep(name = "bazel_features", version = "1.9.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "0.0.5")
 bazel_dep(name = "rules_nodejs", version = "6.3.0")
+bazel_dep(name = "tar.bzl", version = "0.5.5")
 
 tel = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
 use_repo(tel, "aspect_tools_telemetry_report")
@@ -51,7 +52,7 @@ use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 ####### Dev dependencies ########
 
 bazel_dep(name = "bazelrc-preset.bzl", version = "1.0.1", dev_dependency = True)
-bazel_dep(name = "aspect_rules_lint", version = "1.1.0", dev_dependency = True)
+bazel_dep(name = "aspect_rules_lint", version = "1.6.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.1", dev_dependency = True)
 
 host = use_extension(
