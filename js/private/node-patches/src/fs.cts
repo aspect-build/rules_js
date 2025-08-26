@@ -402,7 +402,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
                     dir: Dir
                 ) {
                     try {
-                        cb(null, await handleDir(dir))
+                        cb(err, err ? undefined : await handleDir(dir))
                     } catch (err) {
                         cb(err)
                     }
@@ -477,12 +477,16 @@ export function patcher(fs: any = _fs, roots: string[]) {
         }
         ;(dir.read as any) = async function handleDirRead(...args: any[]) {
             if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1]
+                const cb = once(args[args.length - 1])
                 args[args.length - 1] = async function handleDirReadCb(
                     err: Error,
                     entry: Dirent
                 ) {
-                    cb(err, entry ? await handleDirent(p, entry) : null)
+                    try {
+                        cb(err, entry ?? (await handleDirent(p, entry)))
+                    } catch (err) {
+                        cb(err)
+                    }
                 }
                 origRead(...args)
             } else {
@@ -516,11 +520,11 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 v.isSymbolicLink = () => false
                 origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
-                        throw err
+                        return reject(err)
                     }
                     fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
-                            throw err
+                            return reject(err)
                         }
                         patchDirent(v, stat)
                         resolve(v)

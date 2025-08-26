@@ -334,7 +334,7 @@ function patcher(fs = _fs, roots) {
                 const cb = once(args[args.length - 1]);
                 args[args.length - 1] = async function opendirCb(err, dir) {
                     try {
-                        cb(null, await handleDir(dir));
+                        cb(err, err ? undefined : await handleDir(dir));
                     }
                     catch (err) {
                         cb(err);
@@ -424,9 +424,14 @@ function patcher(fs = _fs, roots) {
         };
         dir.read = async function handleDirRead(...args) {
             if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1];
+                const cb = once(args[args.length - 1]);
                 args[args.length - 1] = async function handleDirReadCb(err, entry) {
-                    cb(err, entry ? await handleDirent(p, entry) : null);
+                    try {
+                        cb(err, entry !== null && entry !== void 0 ? entry : (await handleDirent(p, entry)));
+                    }
+                    catch (err) {
+                        cb(err);
+                    }
                 };
                 origRead(...args);
             }
@@ -459,11 +464,11 @@ function patcher(fs = _fs, roots) {
                 v.isSymbolicLink = () => false;
                 origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
-                        throw err;
+                        return reject(err);
                     }
                     fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
-                            throw err;
+                            return reject(err);
                         }
                         patchDirent(v, stat);
                         resolve(v);
