@@ -243,7 +243,7 @@ bzl_library(
   name = "typescript_bzl_library",
   visibility = ["//visibility:public"],
   srcs = ["@npm//:typescript/package_json.bzl"],
-  deps = ["@npm__typescript__4.9.5//:typescript_bzl_library"],
+  deps = ["@npm__typescript__5.8.2//:typescript_bzl_library"],
 )
 ```
 
