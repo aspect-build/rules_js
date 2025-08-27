@@ -1136,10 +1136,10 @@ var blaze;
 })(blaze || (blaze = {}));
 
 function enterWorkerLoop(implementation) {
-    var _a, e_1, _b, _c;
-    var _d;
     return __awaiter(this, void 0, void 0, function () {
-        var abortionMap, prev, _loop_1, _e, _f, _g, e_1_1;
+        var abortionMap, prev, _loop_1, _a, _b, _c, e_1_1;
+        var _d, e_1, _e, _f;
+        var _g;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -1149,85 +1149,84 @@ function enterWorkerLoop(implementation) {
                 case 1:
                     _h.trys.push([1, 6, 7, 12]);
                     _loop_1 = function () {
-                        _c = _g.value;
-                        _e = false;
-                        try {
-                            var buffer = _c;
-                            var chunk = Buffer.concat([prev, buffer]);
-                            var current = void 0;
-                            var size = readWorkRequestSize(chunk);
-                            if (size.size <= chunk.length + size.headerSize) {
-                                chunk = chunk.slice(size.headerSize);
-                                current = chunk.slice(0, size.size);
-                                prev = chunk.slice(size.size);
+                        _f = _c.value;
+                        _a = false;
+                        var buffer = _f;
+                        var chunk = Buffer.concat([prev, buffer]);
+                        var current = void 0;
+                        var size = readWorkRequestSize(chunk);
+                        if (size.size <= chunk.length + size.headerSize) {
+                            chunk = chunk.slice(size.headerSize);
+                            current = chunk.slice(0, size.size);
+                            prev = chunk.slice(size.size);
+                        }
+                        else {
+                            prev = chunk;
+                            return "continue";
+                        }
+                        var request = blaze.worker.WorkRequest.deserialize(current);
+                        if (request.cancel) {
+                            (_g = abortionMap.get(request.request_id)) === null || _g === void 0 ? void 0 : _g.abort();
+                            return "continue";
+                        }
+                        var abortController = new AbortController();
+                        abortionMap.set(request.request_id, abortController);
+                        var response = new blaze.worker.WorkResponse({
+                            request_id: request.request_id,
+                        });
+                        var outputChunks = new Array();
+                        var outputStream = new stream.Writable({
+                            write: function (chunk, encoding, callback) {
+                                outputChunks.push(Buffer.from(chunk, encoding));
+                                callback === null || callback === void 0 ? void 0 : callback(undefined);
+                            },
+                            defaultEncoding: 'utf-8',
+                        });
+                        implementation({
+                            arguments: request.arguments,
+                            inputs: request.inputs,
+                            request_id: request.request_id,
+                            verbosity: request.verbosity,
+                            sandbox_dir: request.sandbox_dir,
+                            signal: abortController.signal,
+                            output: outputStream,
+                        })
+                            .then(function (exitCode) {
+                            response.exit_code = exitCode;
+                        })
+                            .catch(function (reason) {
+                            response.exit_code = 1;
+                            var error;
+                            if (typeof reason == 'object' && 'stack' in reason) {
+                                error = String(reason.stack);
                             }
                             else {
-                                prev = chunk;
-                                return "continue";
+                                error = String(reason);
                             }
-                            var request = blaze.worker.WorkRequest.deserialize(current);
-                            if (request.cancel) {
-                                (_d = abortionMap.get(request.request_id)) === null || _d === void 0 ? void 0 : _d.abort();
-                                return "continue";
-                            }
-                            var abortController = new AbortController();
-                            abortionMap.set(request.request_id, abortController);
-                            var response = new blaze.worker.WorkResponse({
-                                request_id: request.request_id
-                            });
-                            var outputChunks = new Array();
-                            var outputStream = new stream.Writable({
-                                write: function (chunk, encoding, callback) {
-                                    outputChunks.push(Buffer.from(chunk, encoding));
-                                    callback === null || callback === void 0 ? void 0 : callback(undefined);
-                                },
-                                defaultEncoding: 'utf-8'
-                            });
-                            implementation({
-                                arguments: request.arguments,
-                                inputs: request.inputs,
-                                request_id: request.request_id,
-                                verbosity: request.verbosity,
-                                sandbox_dir: request.sandbox_dir,
-                                signal: abortController.signal,
-                                output: outputStream
-                            })
-                                .then(function (exitCode) {
-                                response.exit_code = exitCode;
-                            })["catch"](function (reason) {
-                                response.exit_code = 1;
-                                var error;
-                                if (typeof reason == 'object' && 'stack' in reason) {
-                                    error = String(reason.stack);
-                                }
-                                else {
-                                    error = String(reason);
-                                }
-                                outputStream.write(error);
-                                // also output worker log if verbose.
-                                request.verbosity > 0 && console.error(error);
-                            })["finally"](function () {
-                                abortionMap["delete"](request.request_id);
-                                outputStream.end();
-                                response.was_cancelled = abortController.signal.aborted;
-                                response.output = Buffer.concat(outputChunks).toString('utf-8');
-                                var responseBytes = response.serialize();
-                                var responseSizeBytes = writeWorkResponseSize(responseBytes.byteLength);
-                                process.stdout.write(Buffer.concat([responseSizeBytes, responseBytes]));
-                            });
-                        }
-                        finally {
-                            _e = true;
-                        }
+                            outputStream.write(error);
+                            // also output worker log if verbose.
+                            request.verbosity > 0 && console.error(error);
+                        })
+                            .finally(function () {
+                            abortionMap.delete(request.request_id);
+                            outputStream.end();
+                            response.was_cancelled = abortController.signal.aborted;
+                            response.output = Buffer.concat(outputChunks).toString('utf-8');
+                            var responseBytes = response.serialize();
+                            var responseSizeBytes = writeWorkResponseSize(responseBytes.byteLength);
+                            process.stdout.write(Buffer.concat([responseSizeBytes, responseBytes]));
+                        });
                     };
-                    _e = true, _f = __asyncValues(process.stdin);
+                    _a = true, _b = __asyncValues(process.stdin);
                     _h.label = 2;
-                case 2: return [4 /*yield*/, _f.next()];
+                case 2: return [4 /*yield*/, _b.next()];
                 case 3:
-                    if (!(_g = _h.sent(), _a = _g.done, !_a)) return [3 /*break*/, 5];
+                    if (!(_c = _h.sent(), _d = _c.done, !_d)) return [3 /*break*/, 5];
                     _loop_1();
                     _h.label = 4;
-                case 4: return [3 /*break*/, 2];
+                case 4:
+                    _a = true;
+                    return [3 /*break*/, 2];
                 case 5: return [3 /*break*/, 12];
                 case 6:
                     e_1_1 = _h.sent();
@@ -1235,8 +1234,8 @@ function enterWorkerLoop(implementation) {
                     return [3 /*break*/, 12];
                 case 7:
                     _h.trys.push([7, , 10, 11]);
-                    if (!(!_e && !_a && (_b = _f["return"]))) return [3 /*break*/, 9];
-                    return [4 /*yield*/, _b.call(_f)];
+                    if (!(!_a && !_d && (_e = _b.return))) return [3 /*break*/, 9];
+                    return [4 /*yield*/, _e.call(_b)];
                 case 8:
                     _h.sent();
                     _h.label = 9;

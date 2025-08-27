@@ -1,7 +1,7 @@
 {
     "private": true,
     "dependencies": {
-        "typescript": "4.9.5",
+        "typescript": "^5.8.2",
         "@aspect-test/a": "5.0.2",
         "lodash": "file:vendored/lodash-4.17.19.tgz"
     },

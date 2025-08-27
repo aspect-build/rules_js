@@ -15,8 +15,8 @@ importers:
         specifier: file:vendored/lodash-4.17.19.tgz
         version: file:vendored/lodash-4.17.19.tgz
       typescript:
-        specifier: 4.9.5
-        version: 4.9.5
+        specifier: ^5.8.2
+        version: 5.9.2
     optionalDependencies:
       '@aspect-test/c':
         specifier: 2.0.2
@@ -169,9 +169,9 @@ packages:
     resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
     dev: false
 
-  /typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
+  /typescript@5.9.2:
+    resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
+    engines: {node: '>=14.17'}
     hasBin: true
     dev: false
 
