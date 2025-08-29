@@ -50,6 +50,7 @@ def resolve_pnpm_repositories(modules):
     for name, version_list in registrations.items():
         # Disregard repeated version numbers
         versions = unique(version_list)
+
         # Use "Minimal Version Selection" like bzlmod does for resolving module conflicts
         # Note, the 'sorted(list)' function in starlark doesn't allow us to provide a custom comparator
         if len(versions) > 1:
