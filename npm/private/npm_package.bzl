@@ -283,7 +283,7 @@ def npm_package(
             `path/to/file` within the output directory.
 
             ```
-            npp_package(
+            npm_package(
                 name = "dir",
                 include_external_repositories = ["external_*"],
                 srcs = ["@external_repo//path/to:file"],
