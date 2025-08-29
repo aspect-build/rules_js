@@ -1,5 +1,6 @@
 """pnpm extension logic (the extension itself is in npm/extensions.bzl)."""
 
+load("@aspect_bazel_lib//lib:lists.bzl", "unique")
 load(":pnpm_repository.bzl", "LATEST_PNPM_VERSION")
 
 DEFAULT_PNPM_REPO_NAME = "pnpm"
@@ -46,7 +47,10 @@ def resolve_pnpm_repositories(modules):
             registrations[attr.name].append(v)
             if attr.pnpm_version_integrity:
                 integrity[attr.pnpm_version] = attr.pnpm_version_integrity
-    for name, versions in registrations.items():
+    for name, version_list in registrations.items():
+        # Disregard repeated version numbers
+        versions = unique(version_list)
+
         # Use "Minimal Version Selection" like bzlmod does for resolving module conflicts
         # Note, the 'sorted(list)' function in starlark doesn't allow us to provide a custom comparator
         if len(versions) > 1:

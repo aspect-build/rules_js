@@ -106,17 +106,12 @@ def _custom_name(ctx):
 
 def _integrity_conflict(ctx):
     # What happens if two modules define the same version with conflicting integrity parameters.
-    # @gzm0, 2024-10-04: The behavior here is probably not intended and merely an implementation artifact.
-    # I've added a test anyways to capture the existing behavior.
-
+    # Currently we print nothing to indicate this, we trust whichever integrity wins.
     return _resolve_test(
         ctx,
         repositories = {
             "pnpm": ("8.6.7", "dep-integrity"),
         },
-        notes = [
-            """NOTE: repo 'pnpm' has multiple versions ["8.6.7", "8.6.7"]; selected 8.6.7""",
-        ],
         # Modules are *BFS* from root:
         # https://bazel.build/rules/lib/builtins/module_ctx#modules
         modules = [
