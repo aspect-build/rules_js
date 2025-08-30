@@ -20,6 +20,8 @@ load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 
+
+
 def _npm_extension_impl(module_ctx):
     if not bazel_lib_utils.is_bazel_6_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
@@ -144,6 +146,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
     )
+
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
@@ -164,12 +167,23 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     system_tar = detect_system_tar(module_ctx)
 
     for i in imports:
+        # Pass full platform constraints (including lists) to npm_import
+        package_cpu = getattr(i, "cpu", None)
+        package_os = getattr(i, "os", None)
+
+        # Get dependency platform constraints
+        deps_os_constraints = getattr(i, "deps_os_constraints", {})
+        deps_cpu_constraints = getattr(i, "deps_cpu_constraints", {})
+
         npm_import(
             name = i.name,
             bins = i.bins,
             commit = i.commit,
+            cpu = package_cpu,
             custom_postinstall = i.custom_postinstall,
             deps = i.deps,
+            deps_os_constraints = deps_os_constraints,
+            deps_cpu_constraints = deps_cpu_constraints,
             dev = i.dev,
             integrity = i.integrity,
             generate_bzl_library_targets = attr.generate_bzl_library_targets,
@@ -184,6 +198,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             npm_auth_basic = i.npm_auth_basic,
             npm_auth_password = i.npm_auth_password,
             npm_auth_username = i.npm_auth_username,
+            os = package_os,
             package = i.package,
             package_visibility = i.package_visibility,
             patch_tool = i.patch_tool,
@@ -203,6 +218,7 @@ def _npm_import_bzlmod(i):
         name = i.name,
         bins = i.bins,
         commit = i.commit,
+        cpu = getattr(i, "cpu", None),
         custom_postinstall = i.custom_postinstall,
         deps = i.deps,
         dev = i.dev,
@@ -218,6 +234,7 @@ def _npm_import_bzlmod(i):
         npm_auth_basic = i.npm_auth_basic,
         npm_auth_username = i.npm_auth_username,
         npm_auth_password = i.npm_auth_password,
+        os = getattr(i, "os", None),
         package = i.package,
         package_visibility = i.package_visibility,
         patch_tool = i.patch_tool,
