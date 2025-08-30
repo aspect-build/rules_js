@@ -1,0 +1,37 @@
+module(
+    name = "utils_replacement_module",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "lodash_replacement_module", version = "0.0.0")
+local_path_override(
+    module_name = "lodash_replacement_module",
+    path = "../lodash_module",
+)
+
+bazel_dep(name = "platforms", version = "0.0.5")
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../../..",
+)
+
+npm_utils = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+)
+npm_utils.npm_translate_lock(
+    name = "npm_utils",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+npm_utils.npm_replace_package(
+    package = "lodash@4.17.21",
+    replacement = "@lodash_replacement_module//:lodash_replacement",
+)
+use_repo(npm_utils, "npm_utils")
