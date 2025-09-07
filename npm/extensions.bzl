@@ -125,11 +125,12 @@ def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config):
         home_directory = repo_utils.get_home_directory(module_ctx)
         if home_directory:
             home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
-            home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
 
-            (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx.os.environ)
-            registries.update(registries2)
-            npm_auth.update(npm_auth2)
+            if module_ctx.path(home_npmrc_path).exists: 
+                home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
+                (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx.os.environ)
+                registries.update(registries2)
+                npm_auth.update(npm_auth2)
         else:
             # buildifier: disable=print
             print("""
