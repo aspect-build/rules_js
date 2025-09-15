@@ -24,6 +24,15 @@ coverage --build_runfile_links
 common:debug --nocache_test_results
 # Docs: https://registry.build/flag/bazel@7.6.1?filter=cache_test_results
 
+# Don’t encourage a rules author to update their deps if not needed.
+# These bazel_dep calls should indicate the minimum version constraint of the ruleset.
+# If the author instead updates to the newest of any of their transitives, as this flag would suggest,
+# then they'll also force their dependents to a newer version.
+# Context:
+# https://bazelbuild.slack.com/archives/C014RARENH0/p1691158021917459?thread_ts=1691156601.420349&cid=C014RARENH0
+common:ruleset --check_direct_dependencies="off"
+# Docs: https://registry.build/flag/bazel@7.6.1?filter=check_direct_dependencies
+
 # On CI, use colors to highlight output on the screen. Set to `no` if your CI does not display colors.
 common:ci --color="yes"
 # Docs: https://registry.build/flag/bazel@7.6.1?filter=color
@@ -147,6 +156,13 @@ common:ci --remote_local_fallback
 # On CI, extend the maximum amount of time to wait for remote execution and cache calls.
 common:ci --remote_timeout=3600
 # Docs: https://registry.build/flag/bazel@7.6.1?filter=remote_timeout
+
+# Do not upload locally executed action results to the remote cache.
+# This should be the default for local builds so local builds cannot poison the remote cache.
+#
+# Note that this flag is flipped to True under --config=ci, see below.
+common --noremote_upload_local_results
+# Docs: https://registry.build/flag/bazel@7.6.1?filter=remote_upload_local_results
 
 # On CI, upload locally executed action results to the remote cache.
 common:ci --remote_upload_local_results
