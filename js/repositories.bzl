@@ -14,22 +14,22 @@ def http_archive(**kwargs):
 def rules_js_dependencies():
     http_archive(
         name = "bazel_skylib",
-        sha256 = "bc283cdfcd526a52c3201279cda4bc298652efa898b10b4db0837dc51652756f",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz"],
+        sha256 = "51b5105a760b353773f904d2bbc5e664d0987fbaf22265164de65d43e910d8ac",
+        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.8.1/bazel-skylib-1.8.1.tar.gz"],
     )
 
     http_archive(
         name = "rules_nodejs",
-        sha256 = "164f1bd7e2a67ab3f6caf5b49b53c7dd625d293513154fa720e30d39eaa8285f",
-        strip_prefix = "rules_nodejs-6.3.5",
-        url = "https://github.com/bazel-contrib/rules_nodejs/releases/download/v6.3.5/rules_nodejs-v6.3.5.tar.gz",
+        sha256 = "37eaae51158b99d444c6ff277c212874aafa45302feb7dc58659113d23446165",
+        strip_prefix = "rules_nodejs-6.5.0",
+        url = "https://github.com/bazel-contrib/rules_nodejs/releases/download/v6.5.0/rules_nodejs-v6.5.0.tar.gz",
     )
 
     http_archive(
         name = "aspect_bazel_lib",
-        sha256 = "fc8fe1be58ae39f84a8613d554534760c7f0819d407afcc98bbcbd990523bfed",
-        strip_prefix = "bazel-lib-2.16.0",
-        url = "https://github.com/bazel-contrib/bazel-lib/releases/download/v2.16.0/bazel-lib-v2.16.0.tar.gz",
+        sha256 = "f525668442e4b19ae10d77e0b5ad15de5807025f321954dfb7065c0fe2429ec1",
+        strip_prefix = "bazel-lib-2.21.1",
+        url = "https://github.com/bazel-contrib/bazel-lib/releases/download/v2.21.1/bazel-lib-v2.21.1.tar.gz",
     )
 
     http_archive(
