@@ -40,8 +40,8 @@ def resolve_pnpm_repositories(mctx):
             if not registrations.get(attr.name, False):
                 registrations[attr.name] = []
 
-            if attr.pnpm_version_from and attr.pnpm_version != DEFAULT_PNPM_VERSION:
-                fail("Cannot specify both pnpm_version and pnpm_version_from")
+            if attr.pnpm_version_from and attr.pnpm_version and attr.pnpm_version != DEFAULT_PNPM_VERSION:
+                fail("Cannot specify both pnpm_version = {} and pnpm_version_from = {}".format(attr.pnpm_version, attr.pnpm_version_from))
 
             # Handle pnpm_version_from by reading package.json
             if attr.pnpm_version_from != None:
