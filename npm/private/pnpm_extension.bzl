@@ -1,7 +1,7 @@
 """pnpm extension logic (the extension itself is in npm/extensions.bzl)."""
 
 load("@aspect_bazel_lib//lib:lists.bzl", "unique")
-load(":pnpm_repository.bzl", "LATEST_PNPM_VERSION")
+load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
 
 DEFAULT_PNPM_REPO_NAME = "pnpm"
 
@@ -10,11 +10,11 @@ DEFAULT_PNPM_REPO_NAME = "pnpm"
 def _parse_version(version):
     return tuple([int(n) for n in version.split(".")])
 
-def resolve_pnpm_repositories(modules):
+def resolve_pnpm_repositories(mctx):
     """Resolves pnpm tags in all `modules`
 
     Args:
-      modules: module_ctx.modules
+      mctx: module context
 
     Returns:
       A struct with the following fields:
@@ -30,7 +30,7 @@ def resolve_pnpm_repositories(modules):
         repositories = {},
     )
 
-    for mod in modules:
+    for mod in mctx.modules:
         for attr in mod.tags.pnpm:
             if attr.name != DEFAULT_PNPM_REPO_NAME and not mod.is_root:
                 fail("""\
@@ -40,11 +40,33 @@ def resolve_pnpm_repositories(modules):
             if not registrations.get(attr.name, False):
                 registrations[attr.name] = []
 
-            v = attr.pnpm_version
-            if v == "latest":
-                v = LATEST_PNPM_VERSION
+            if attr.pnpm_version_from and attr.pnpm_version != DEFAULT_PNPM_VERSION:
+                fail("Cannot specify both pnpm_version and pnpm_version_from")
 
-            registrations[attr.name].append(v)
+            # Handle pnpm_version_from by reading package.json
+            if attr.pnpm_version_from != None:
+                # Read package.json and extract packageManager field
+                package_json_content = mctx.read(attr.pnpm_version_from)
+                package_json = json.decode(package_json_content)
+
+                if "packageManager" not in package_json:
+                    fail("packageManager field not found in package.json file: " + str(attr.pnpm_version_from))
+
+                package_manager = package_json["packageManager"]
+                if not package_manager.startswith("pnpm@"):
+                    fail("packageManager field must specify pnpm, got: " + package_manager)
+
+                # Extract version from "pnpm@8.15.9" format
+                v = package_manager[5:]  # Remove "pnpm@" prefix
+            elif attr.pnpm_version == "latest":
+                v = LATEST_PNPM_VERSION
+            else:
+                v = attr.pnpm_version
+
+            # Avoid inserting the default version from a non-root module
+            # (likely rules_js itself) if the root module already has a version.
+            if mod.is_root or len(registrations[attr.name]) == 0:
+                registrations[attr.name].append(v)
             if attr.pnpm_version_integrity:
                 integrity[attr.pnpm_version] = attr.pnpm_version_integrity
     for name, version_list in registrations.items():

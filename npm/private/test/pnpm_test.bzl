@@ -8,6 +8,7 @@ def _fake_pnpm_tag(version, name = DEFAULT_PNPM_REPO_NAME, integrity = None):
     return struct(
         name = name,
         pnpm_version = version,
+        pnpm_version_from = None,
         pnpm_version_integrity = integrity,
     )
 
@@ -25,7 +26,7 @@ def _resolve_test(ctx, repositories = [], notes = [], modules = []):
         notes = notes,
     )
 
-    result = resolve_pnpm_repositories(modules)
+    result = resolve_pnpm_repositories(struct(modules = modules))
 
     asserts.equals(env, expected, result)
     return unittest.end(env)
@@ -51,9 +52,7 @@ def _override(ctx):
     return _resolve_test(
         ctx,
         repositories = {"pnpm": "9.1.0"},
-        notes = [
-            """NOTE: repo 'pnpm' has multiple versions ["9.1.0", "8.6.7"]; selected 9.1.0""",
-        ],
+        notes = [],
         modules = [
             _fake_mod(
                 True,

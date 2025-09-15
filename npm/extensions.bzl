@@ -292,7 +292,7 @@ npm = module_extension(
 )
 
 def _pnpm_extension_impl(module_ctx):
-    resolved = resolve_pnpm_repositories(module_ctx.modules)
+    resolved = resolve_pnpm_repositories(module_ctx)
 
     for note in resolved.notes:
         # buildifier: disable=print
@@ -317,6 +317,10 @@ pnpm = module_extension(
                 "pnpm_version": attr.string(
                     doc = "pnpm version to use. The string `latest` will be resolved to LATEST_PNPM_VERSION.",
                     default = DEFAULT_PNPM_VERSION,
+                ),
+                "pnpm_version_from": attr.label(
+                    doc = "Label to a package.json file to read the pnpm version from. It should be in the packageManager attribute.",
+                    default = None,
                 ),
                 "pnpm_version_integrity": attr.string(),
             },

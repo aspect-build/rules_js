@@ -63,9 +63,13 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 # not some transitive dependency.
 pnpm.pnpm(
     name = "pnpm",
-    pnpm_version = "8.15.2",
+    pnpm_version_from = "//:package.json",
+)
+pnpm.pnpm(
+    name = "other_pnpm",
+    pnpm_version = "9.15.9",
 )
 
 # Allows developers to run the identical version of pnpm for local workflows like
 # bazel run -- @pnpm --dir $PWD install
-use_repo(pnpm, "pnpm")
+use_repo(pnpm, "other_pnpm", "pnpm")
