@@ -10,9 +10,9 @@ echo >>.git/info/attributes "js/private/test/image/non_ascii export-ignore"
 # shellcheck disable=2010
 ls e2e | grep -v bzlmod | awk 'NF{print "e2e/" $0 " export-ignore"}' >>.git/info/attributes
 
-# Set by GH actions, see
-# https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-TAG=${GITHUB_REF_NAME}
+# Argument provided by reusable workflow caller, see
+# https://github.com/bazel-contrib/.github/blob/d197a6427c5435ac22e56e33340dff912bc9334e/.github/workflows/release_ruleset.yaml#L72
+TAG=$1
 # The prefix is chosen to match what GitHub generates for source archives
 PREFIX="rules_js-${TAG:1}"
 ARCHIVE="rules_js-$TAG.tar.gz"
