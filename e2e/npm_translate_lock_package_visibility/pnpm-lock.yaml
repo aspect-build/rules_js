@@ -1,0 +1,23 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      some-dep:
+        specifier: workspace:*
+        version: link:packages/some-dep
+
+  packages/from-local:
+    dependencies:
+      some-dep:
+        specifier: workspace:*
+        version: link:../some-dep
+
+  packages/from-root: {}
+
+  packages/some-dep: {}

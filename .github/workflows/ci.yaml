@@ -56,6 +56,7 @@ jobs:
                     e2e/npm_translate_package_lock
                     e2e/npm_translate_yarn_lock
                     e2e/npm_translate_lock_exclude_package_contents
+                    e2e/npm_translate_lock_package_visibility
                     e2e/package_json_module
                     e2e/patch_from_repo
                     e2e/pnpm_lockfiles
