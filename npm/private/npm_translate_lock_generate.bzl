@@ -316,6 +316,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     i = i,
                     alias = link_alias,
                 ))
+                has_access = False
+                for visibility_rule in _import.package_visibility:
+                    if visibility_rule == "//visibility:public":
+                        has_access = True
+                        break
+                    if link_package and visibility_rule.startswith("//" + link_package + ":"):
+                        has_access = True
+                        break
+
+                if has_access:
+                    links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), link_root_name = name, link_alias = "{alias}")""".format(
+                        i = i,
+                        alias = link_alias,
+                    ))
 
                 if "//visibility:public" in _import.package_visibility:
                     add_to_link_all = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
@@ -336,6 +350,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
                     if package_scope:
                         links_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
+                    if "//visibility:public" in _import.package_visibility:
+                        add_to_link_targets = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
+                        links_bzl[link_package].append(add_to_link_targets)
+                        links_targets_bzl[link_package].append(add_to_link_targets)
+                        package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
+                        if package_scope:
+                            links_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
+                else:
+                    links_bzl[link_package].append("""            native.alias(
+                name = "{{}}/{alias}".format(name),
+                actual = "//:node_modules/{alias}",
+            )""".format(alias = link_alias))
 
                 # the resolved.json for this alias of the package
                 resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME)
@@ -479,6 +505,38 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 package_store_name = utils.package_store_name(fp_package, "0.0.0"),
                 package_store_root = utils.package_store_root,
             ))
+        if len(fp_link_packages) > 0:
+            allowed_packages = []
+            alias_packages = []
+
+            for link_package in fp_link_packages:
+                if not link_package:
+                    allowed_packages.append(link_package)
+                else:
+                    has_access = False
+                    for visibility_rule in package_visibility:
+                        if visibility_rule == "//visibility:public":
+                            has_access = True
+                            break
+                        if visibility_rule.startswith("//" + link_package + ":"):
+                            has_access = True
+                            break
+
+                    if has_access:
+                        allowed_packages.append(link_package)
+                    else:
+                        alias_packages.append(link_package)
+
+            if allowed_packages:
+                npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
+                    link_packages = allowed_packages,
+                    link_visibility = package_visibility,
+                    pkg = fp_package,
+                    package_directory_output_group = utils.package_directory_output_group,
+                    root_package = root_package,
+                    package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                    package_store_root = utils.package_store_root,
+                ))
 
         # Now handle the prod/dev specific logic for npm_link_targets
         for link_type in ["link_packages", "link_dev_packages"]:
@@ -498,6 +556,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         links_targets_bzl[fp_package_path]["dev"].append("                " + append_stmt_self)
                     else:
                         links_targets_bzl[fp_package_path]["prod"].append("                " + append_stmt_self)
+                npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
+                    link_packages = allowed_packages,
+                    pkg = fp_package,
+                ))
 
                 if "//visibility:public" in package_visibility:
                     # Also add this first-party package to npm_link_targets for packages that use it
@@ -527,6 +589,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             scope_targets["{package_scope}"] = [link_targets[-1]]
         else:
             scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))
+            if alias_packages:
+                npm_link_all_packages_bzl.append("""
+    if bazel_package in {alias_packages}:
+        native.alias(
+            name = "{{}}/{pkg}".format(name),
+            actual = "//:node_modules/{pkg}",
+        )""".format(alias_packages = alias_packages, pkg = fp_package))
+
+            if "//visibility:public" in package_visibility:
+                add_to_link_targets = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
+                npm_link_all_packages_bzl.append(add_to_link_targets)
+                package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
+                if package_scope:
+                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET2.format(package_scope = package_scope))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
