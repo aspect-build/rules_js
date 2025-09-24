@@ -1127,6 +1127,13 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
 _LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
+_NPM_PACKAGE_VISIBILITY = {
+    "unused": ["//npm/private/test:__subpackages__"],
+    "@mycorp/pkg-a": ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
+    "@mycorp/pkg-d": ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
+    "@mycorp/pkg-e": ["//examples:__subpackages__"],
+}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if not prod and not dev:
@@ -1139,6 +1146,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @_main~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _validate_npm_package_visibility(bazel_package)
+
     link_targets = []
     scope_targets = {}
 
@@ -2690,7 +2701,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-a".format(name),
             src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
-            visibility = ["//examples:__subpackages__"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
 
@@ -2700,9 +2711,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             name = "{}/@mycorp/pkg-a/dir".format(name),
             srcs = [":{}/@mycorp/pkg-a".format(name)],
             output_group = "package_directory",
-            visibility = ["//examples:__subpackages__"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
+        # Add first-party package @mycorp/pkg-a if accessible
+        if _check_package_visibility(bazel_package, "@mycorp/pkg-a"):
+            link_targets.append(":{}/@mycorp/pkg-a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2734,7 +2748,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/js_lib_pkg_a".format(name))
+        # Add first-party package js_lib_pkg_a if accessible
+        if _check_package_visibility(bazel_package, "js_lib_pkg_a"):
+            link_targets.append(":{}/js_lib_pkg_a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2766,7 +2782,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
+        # Add first-party package js_lib_pkg_a-alias if accessible
+        if _check_package_visibility(bazel_package, "js_lib_pkg_a-alias"):
+            link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2800,7 +2818,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/test".format(name))
+        # Add first-party package @lib/test if accessible
+        if _check_package_visibility(bazel_package, "@lib/test"):
+            link_targets.append(":{}/@lib/test".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -2838,7 +2858,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/test2".format(name))
+        # Add first-party package @lib/test2 if accessible
+        if _check_package_visibility(bazel_package, "@lib/test2"):
+            link_targets.append(":{}/@lib/test2".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -2864,7 +2886,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-d".format(name),
             src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
 
@@ -2874,14 +2896,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             name = "{}/@mycorp/pkg-d/dir".format(name),
             srcs = [":{}/@mycorp/pkg-d".format(name)],
             output_group = "package_directory",
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@mycorp/pkg-d".format(name))
-        if "@mycorp" not in scope_targets:
-            scope_targets["@mycorp"] = [link_targets[-1]]
-        else:
-            scope_targets["@mycorp"].append(link_targets[-1])
+        # Add first-party package @mycorp/pkg-d if accessible
+        if _check_package_visibility(bazel_package, "@mycorp/pkg-d"):
+            link_targets.append(":{}/@mycorp/pkg-d".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2902,7 +2922,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-e".format(name),
             src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__"],
             tags = ["manual"],
         )
 
@@ -2912,14 +2932,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             name = "{}/@mycorp/pkg-e/dir".format(name),
             srcs = [":{}/@mycorp/pkg-e".format(name)],
             output_group = "package_directory",
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@mycorp/pkg-e".format(name))
-        if "@mycorp" not in scope_targets:
-            scope_targets["@mycorp"] = [link_targets[-1]]
-        else:
-            scope_targets["@mycorp"].append(link_targets[-1])
+        # Add first-party package @mycorp/pkg-e if accessible
+        if _check_package_visibility(bazel_package, "@mycorp/pkg-e"):
+            link_targets.append(":{}/@mycorp/pkg-e".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2954,7 +2972,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/test-npm_package".format(name))
+        # Add first-party package test-npm_package if accessible
+        if _check_package_visibility(bazel_package, "test-npm_package"):
+            link_targets.append(":{}/test-npm_package".format(name))
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -2970,6 +2990,385 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
+
+def _validate_npm_package_visibility(accessing_package):
+    """Validate that accessing_package can access npm packages that would be created here"""
+
+    # Get packages that would be created in this location
+    packages_to_validate = []
+
+    if accessing_package in []:
+        packages_to_validate.append("is-odd")
+
+    if accessing_package in []:
+        packages_to_validate.append("semver-max")
+
+    if accessing_package in ["examples/js_binary", "examples/npm_deps", "js/private/test/image"]:
+        packages_to_validate.append("@mycorp/pkg-a")
+
+    if accessing_package in ["examples/js_lib_pkg/b"]:
+        packages_to_validate.append("js_lib_pkg_a")
+
+    if accessing_package in ["examples/js_lib_pkg/b"]:
+        packages_to_validate.append("js_lib_pkg_a-alias")
+
+    if accessing_package in ["examples/linked_consumer"]:
+        packages_to_validate.append("@lib/test")
+
+    if accessing_package in ["examples/linked_consumer"]:
+        packages_to_validate.append("@lib/test2")
+
+    if accessing_package in ["examples/npm_deps", "examples/npm_package/packages/pkg_e", "js/private/test/image"]:
+        packages_to_validate.append("@mycorp/pkg-d")
+
+    if accessing_package in ["examples/npm_deps"]:
+        packages_to_validate.append("@mycorp/pkg-e")
+
+    if accessing_package in ["npm/private/test"]:
+        packages_to_validate.append("test-npm_package")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("abortcontroller-polyfill")
+
+    if accessing_package == "js/private/test/image":
+        packages_to_validate.append("acorn")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("acorn")
+
+    if accessing_package == "examples/npm_package/packages/pkg_a":
+        packages_to_validate.append("acorn")
+
+    if accessing_package == "examples/npm_package/packages/pkg_d":
+        packages_to_validate.append("acorn")
+
+    if accessing_package == "examples/npm_package/packages/pkg_b":
+        packages_to_validate.append("acorn")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("@aspect-test/a")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("@aspect-test/c")
+
+    if accessing_package == "examples/linked_lib":
+        packages_to_validate.append("@aspect-test/e")
+
+    if accessing_package == "examples/linked_pkg":
+        packages_to_validate.append("@aspect-test/e")
+
+    if accessing_package == "examples/linked_lib":
+        packages_to_validate.append("@aspect-test/f")
+
+    if accessing_package == "examples/linked_pkg":
+        packages_to_validate.append("@aspect-test/f")
+
+    if accessing_package == "examples/runfiles":
+        packages_to_validate.append("@bazel/runfiles")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("@fastify/send")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("@figma/nodegit")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("@gregmagolan/test-b")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("@kubernetes/client-node")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("@plotly/regl")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("@rollup/plugin-commonjs")
+
+    if accessing_package == "js/private/coverage/bundle":
+        packages_to_validate.append("@rollup/plugin-commonjs")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("@rollup/plugin-commonjs")
+
+    if accessing_package == "js/private/coverage/bundle":
+        packages_to_validate.append("@rollup/plugin-json")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("@rollup/plugin-json")
+
+    if accessing_package == "js/private/coverage/bundle":
+        packages_to_validate.append("@rollup/plugin-node-resolve")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("@rollup/plugin-node-resolve")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("@rollup/plugin-typescript")
+
+    if accessing_package == "examples/nextjs":
+        packages_to_validate.append("@tailwindcss/postcss")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("@types/google-protobuf")
+
+    if accessing_package == "":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "js/private/test/js_run_devserver":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "examples/linked_lib":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "examples/linked_pkg":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "examples/js_lib_pkg/a":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "examples/js_lib_pkg/b":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("@vanilla-extract/css")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("@vanilla-extract/webpack-plugin")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("bufferutil")
+
+    if accessing_package == "js/private/coverage/bundle":
+        packages_to_validate.append("c8")
+
+    if accessing_package == "examples/npm_package/libs/lib_a":
+        packages_to_validate.append("chalk")
+
+    if accessing_package == "npm/private/test/npm_package":
+        packages_to_validate.append("chalk")
+
+    if accessing_package == "":
+        packages_to_validate.append("chalk")
+
+    if accessing_package == "npm/private/test/npm_package":
+        packages_to_validate.append("chalk")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("css-loader")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("debug")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("debug")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("esbuild")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("google-protobuf")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("hello")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("helper-date")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("hot-shots")
+
+    if accessing_package == "":
+        packages_to_validate.append("inline-fixtures")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("inline-fixtures")
+
+    if accessing_package == "js/private/test/js_run_devserver":
+        packages_to_validate.append("jasmine")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("json-stable-stringify")
+
+    if accessing_package == "":
+        packages_to_validate.append("jsonpath-plus")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("lodash")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("mathjs")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("meaning-of-life")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("mini-css-extract-plugin")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("mobx-react")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("mobx")
+
+    if accessing_package == "examples/macro":
+        packages_to_validate.append("mocha-junit-reporter")
+
+    if accessing_package == "examples/macro":
+        packages_to_validate.append("mocha-multi-reporters")
+
+    if accessing_package == "examples/macro":
+        packages_to_validate.append("mocha")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("ms")
+
+    if accessing_package == "examples/nextjs":
+        packages_to_validate.append("next")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("node-gyp")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("plotly.js")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("pngjs")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("protoc-gen-grpc")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("puppeteer")
+
+    if accessing_package == "examples/nextjs":
+        packages_to_validate.append("react-dom")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("react")
+
+    if accessing_package == "examples/nextjs":
+        packages_to_validate.append("react")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("rollup")
+
+    if accessing_package == "js/private/coverage/bundle":
+        packages_to_validate.append("rollup")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("rollup")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("segfault-handler")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("semver-first-satisfied")
+
+    if accessing_package == "examples/stack_traces":
+        packages_to_validate.append("source-map-support")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("syncpack")
+
+    if accessing_package == "examples/nextjs":
+        packages_to_validate.append("tailwindcss")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("tslib")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("typescript")
+
+    if accessing_package == "":
+        packages_to_validate.append("typescript")
+
+    if accessing_package == "js/private/worker/src":
+        packages_to_validate.append("typescript")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("unused")
+
+    if accessing_package == "examples/npm_package/packages/pkg_a":
+        packages_to_validate.append("uuid")
+
+    if accessing_package == "examples/npm_package/packages/pkg_b":
+        packages_to_validate.append("uuid")
+
+    if accessing_package == "examples/npm_package/packages/pkg_d":
+        packages_to_validate.append("uuid")
+
+    if accessing_package == "examples/npm_deps":
+        packages_to_validate.append("uvu")
+
+    if accessing_package == "npm/private/test":
+        packages_to_validate.append("webpack-bundle-analyzer")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("webpack-cli")
+
+    if accessing_package == "examples/webpack_cli":
+        packages_to_validate.append("webpack")
+
+
+    # Validate each package
+    for package_name in packages_to_validate:
+        if not _check_package_visibility(accessing_package, package_name):
+            fail("""
+Package visibility violation:
+
+  Package: {}
+  Requested by: {}
+
+This package is not visible from your location.
+Check the package_visibility configuration in your npm_translate_lock rule.
+
+For more information, see: https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock#package_visibility
+""".format(package_name, accessing_package))
+
+def _check_package_visibility(accessing_package, package_name):
+    """Check if accessing_package can access package_name"""
+
+    # Get visibility rules for this package
+    visibility_rules = _get_package_visibility_rules(package_name)
+
+    # Check each visibility rule
+    for rule in visibility_rules:
+        if rule == "//visibility:public":
+            return True
+
+        # Package-specific access: //packages/foo:__pkg__
+        if rule == "//" + accessing_package + ":__pkg__":
+            return True
+
+        # Subpackage access: //packages/foo:__subpackages__
+        if rule.endswith(":__subpackages__"):
+            rule_package = rule[2:-16]  # Remove "//" and ":__subpackages__"
+            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
+                return True
+
+        # Target-specific access: //packages/foo:target
+        if rule.startswith("//" + accessing_package + ":"):
+            return True
+
+    return False
+
+def _get_package_visibility_rules(package_name):
+    """Get visibility rules for package_name from configuration"""
+
+    # Direct package match
+    if package_name in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY[package_name]
+
+    # Wildcard match
+    if "*" in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY["*"]
+
+    # Default to public if not specified
+    return ["//visibility:public"]
+
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
