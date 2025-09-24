@@ -212,6 +212,9 @@ sh_binary(
 
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(link_packages = str(link_packages))
 
+    # Generate visibility configuration
+    npm_visibility_config = _generate_npm_visibility_config(rctx.attr.package_visibility)
+
     npm_link_targets_bzl = [
         """\
 # buildifier: disable=function-docstring
@@ -234,6 +237,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _validate_npm_package_visibility(bazel_package)
+
     link_targets = []
     scope_targets = {{}}
 
@@ -291,33 +298,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
             # for each alias of this package
             for link_alias in link_aliases:
-                has_access = False
-                for visibility_rule in _import.package_visibility:
-                    if visibility_rule == "//visibility:public":
-                        has_access = True
-                        break
-                    if link_package and visibility_rule.startswith("//" + link_package + ":"):
-                        has_access = True
-                        break
+                # link the alias to the underlying package
+                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), link_root_name = name, link_alias = "{alias}")""".format(
+                    i = i,
+                    alias = link_alias,
+                ))
 
-                if has_access:
-                    links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), link_root_name = name, link_alias = "{alias}")""".format(
-                        i = i,
-                        alias = link_alias,
-                    ))
-
-                    if "//visibility:public" in _import.package_visibility:
-                        add_to_link_targets = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
-                        links_bzl[link_package].append(add_to_link_targets)
-                        links_targets_bzl[link_package].append(add_to_link_targets)
-                        package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
-                        if package_scope:
-                            links_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
-                else:
-                    links_bzl[link_package].append("""            native.alias(
-                name = "{{}}/{alias}".format(name),
-                actual = "//:node_modules/{alias}",
-            )""".format(alias = link_alias))
+                # expose the alias if the package has access via package_visibility
+                if _check_package_has_access(link_package, _import.package_visibility):
+                    add_to_link_targets = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
+                    links_bzl[link_package].append(add_to_link_targets)
+                    links_targets_bzl[link_package].append(add_to_link_targets)
+                    package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
+                    if package_scope:
+                        links_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
 
                 # the resolved.json for this alias of the package
                 resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME)
@@ -410,54 +404,28 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             package_visibility = ["//visibility:public"]
 
         if len(fp_link_packages) > 0:
-            allowed_packages = []
-            alias_packages = []
+            npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
+                link_packages = fp_link_packages,
+                link_visibility = package_visibility,
+                pkg = fp_package,
+                package_directory_output_group = utils.package_directory_output_group,
+                root_package = root_package,
+                package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                package_store_root = utils.package_store_root,
+            ))
 
-            for link_package in fp_link_packages:
-                if not link_package:
-                    allowed_packages.append(link_package)
-                else:
-                    has_access = False
-                    for visibility_rule in package_visibility:
-                        if visibility_rule == "//visibility:public":
-                            has_access = True
-                            break
-                        if visibility_rule.startswith("//" + link_package + ":"):
-                            has_access = True
-                            break
+            npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
+                link_packages = fp_link_packages,
+                pkg = fp_package,
+            ))
 
-                    if has_access:
-                        allowed_packages.append(link_package)
-                    else:
-                        alias_packages.append(link_package)
+            # Use macro-time validation: check if accessing package can access this first-party package
+            npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package} if accessible
+        if _check_package_visibility(bazel_package, "{fp_package}"):
+            link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
 
-            if allowed_packages:
-                npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
-                    link_packages = allowed_packages,
-                    link_visibility = package_visibility,
-                    pkg = fp_package,
-                    package_directory_output_group = utils.package_directory_output_group,
-                    root_package = root_package,
-                    package_store_name = utils.package_store_name(fp_package, "0.0.0"),
-                    package_store_root = utils.package_store_root,
-                ))
-
-                npm_link_targets_bzl.append(_FP_DIRECT_TARGET_TMPL.format(
-                    link_packages = allowed_packages,
-                    pkg = fp_package,
-                ))
-
-            if alias_packages:
-                npm_link_all_packages_bzl.append("""
-    if bazel_package in {alias_packages}:
-        native.alias(
-            name = "{{}}/{pkg}".format(name),
-            actual = "//:node_modules/{pkg}",
-        )""".format(alias_packages = alias_packages, pkg = fp_package))
-
+            # For public packages, also add scope target
             if "//visibility:public" in package_visibility:
-                add_to_link_targets = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-                npm_link_all_packages_bzl.append(add_to_link_targets)
                 package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
                 if package_scope:
                     npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET2.format(package_scope = package_scope))
@@ -477,7 +445,95 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         srcs = link_targets,
         tags = ["manual"],
         visibility = ["//visibility:public"],
-    )""")
+    )
+
+def _validate_npm_package_visibility(accessing_package):
+    \"\"\"Validate that accessing_package can access npm packages that would be created here\"\"\"
+
+    # Get packages that would be created in this location
+    packages_to_validate = []""")
+
+    # Add validation logic for first-party packages
+    for fp_link in fp_links.values():
+        fp_package = fp_link.get("package")
+        fp_link_packages = list(fp_link.get("link_packages").keys())
+
+        npm_link_all_packages_bzl.append("""
+    if accessing_package in {fp_link_packages}:
+        packages_to_validate.append("{fp_package}")""".format(
+            fp_link_packages = fp_link_packages,
+            fp_package = fp_package
+        ))
+
+    # Add validation logic for npm imports
+    for (i, _import) in enumerate(npm_imports):
+        if _import.link_packages:
+            for link_package in _import.link_packages.keys():
+                npm_link_all_packages_bzl.append("""
+    if accessing_package == "{link_package}":
+        packages_to_validate.append("{package}")""".format(
+                    link_package = link_package,
+                    package = _import.package
+                ))
+
+    npm_link_all_packages_bzl.append("""
+
+    # Validate each package
+    for package_name in packages_to_validate:
+        if not _check_package_visibility(accessing_package, package_name):
+            fail(\"\"\"
+Package visibility violation:
+
+  Package: {}
+  Requested by: {}
+
+This package is not visible from your location.
+Check the package_visibility configuration in your npm_translate_lock rule.
+
+For more information, see: https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock#package_visibility
+\"\"\".format(package_name, accessing_package))
+
+def _check_package_visibility(accessing_package, package_name):
+    \"\"\"Check if accessing_package can access package_name\"\"\"
+
+    # Get visibility rules for this package
+    visibility_rules = _get_package_visibility_rules(package_name)
+
+    # Check each visibility rule
+    for rule in visibility_rules:
+        if rule == "//visibility:public":
+            return True
+
+        # Package-specific access: //packages/foo:__pkg__
+        if rule == "//" + accessing_package + ":__pkg__":
+            return True
+
+        # Subpackage access: //packages/foo:__subpackages__
+        if rule.endswith(":__subpackages__"):
+            rule_package = rule[2:-16]  # Remove "//" and ":__subpackages__"
+            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
+                return True
+
+        # Target-specific access: //packages/foo:target
+        if rule.startswith("//" + accessing_package + ":"):
+            return True
+
+    return False
+
+def _get_package_visibility_rules(package_name):
+    \"\"\"Get visibility rules for package_name from configuration\"\"\"
+
+    # Direct package match
+    if package_name in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY[package_name]
+
+    # Wildcard match
+    if "*" in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY["*"]
+
+    # Default to public if not specified
+    return ["//visibility:public"]
+""")
 
     npm_link_targets_bzl.append("""    return link_targets""")
 
@@ -496,6 +552,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         "\n".join(defs_bzl_header),
         "",
         npm_link_packages_const,
+        "",
+        npm_visibility_config,
         "",
         "\n".join(npm_link_all_packages_bzl),
         "",
@@ -626,4 +684,33 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         url = _import.url,
         version = _import.version,
         maybe_exclude_package_contents = maybe_exclude_package_contents,
+    )
+
+def _check_package_has_access(accessing_package, package_visibility_rules):
+    """Check if accessing_package can access a package with given visibility rules"""
+    for visibility_rule in package_visibility_rules:
+        if visibility_rule == "//visibility:public":
+            return True
+        if accessing_package and visibility_rule == "//" + accessing_package + ":__pkg__":
+            return True
+        if accessing_package and visibility_rule.endswith(":__subpackages__"):
+            rule_package = visibility_rule[2:-16]  # Remove "//" and ":__subpackages__"
+            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
+                return True
+        if accessing_package and visibility_rule.startswith("//" + accessing_package + ":"):
+            return True
+    return False
+
+def _generate_npm_visibility_config(package_visibility_attr):
+    """Generate visibility configuration for npm packages"""
+    if not package_visibility_attr:
+        return "_NPM_PACKAGE_VISIBILITY = {}"
+
+    # Convert the attribute to a proper dictionary with list values
+    config_dict = {}
+    for package_pattern, visibility_list in package_visibility_attr.items():
+        config_dict[package_pattern] = list(visibility_list)
+
+    return "_NPM_PACKAGE_VISIBILITY = {}".format(
+        starlark_codegen_utils.to_dict_attr(config_dict, 0, quote_value = False)
     )
