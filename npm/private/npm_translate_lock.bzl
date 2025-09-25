@@ -174,6 +174,9 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.link_workspace(),
     )
 
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
+
 npm_translate_lock_rule = repository_rule(
     implementation = _npm_translate_lock_impl,
     attrs = _ATTRS,
