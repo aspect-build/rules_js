@@ -47,7 +47,7 @@ def _basic(ctx):
         ],
     )
 
-def _from_package_json(ctx):
+def _from_package_json_simple(ctx):
     return _resolve_test(
         ctx,
         repositories = {"pnpm": "1.2.3"},
@@ -55,6 +55,16 @@ def _from_package_json(ctx):
             _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
         ],
         package_json_content = json.encode({"packageManager": "pnpm@1.2.3"}),
+    )
+
+def _from_package_json_with_hash(ctx):
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": "1.2.3"},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
+        ],
+        package_json_content = json.encode({"packageManager": "pnpm@1.2.3+sha512.97462997561378b6f52ac5c614f3a3b923a652ad5ac987100286e4aa2d84a6a0642e9e45f3d01d30c46b12b20beb0f86aeb790bf9a82bc59db42b67fe69d1a25"}),
     )
 
 def _override(ctx):
@@ -140,7 +150,8 @@ override_test = unittest.make(_override)
 latest_test = unittest.make(_latest)
 custom_name_test = unittest.make(_custom_name)
 integrity_conflict_test = unittest.make(_integrity_conflict)
-from_package_json_test = unittest.make(_from_package_json)
+from_package_json_simple_test = unittest.make(_from_package_json_simple)
+from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
 
 def pnpm_tests(name):
     unittest.suite(
@@ -150,5 +161,6 @@ def pnpm_tests(name):
         latest_test,
         custom_name_test,
         integrity_conflict_test,
-        from_package_json_test,
+        from_package_json_simple_test,
+        from_package_json_with_hash_test,
     )

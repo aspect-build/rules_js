@@ -58,6 +58,8 @@ def resolve_pnpm_repositories(mctx):
 
                 # Extract version from "pnpm@8.15.9" format
                 v = package_manager[5:]  # Remove "pnpm@" prefix
+                v = v.rsplit("+sha512.")[0]  # Remove optional "+sha512.<hash>" suffix
+
             elif attr.pnpm_version == "latest":
                 v = LATEST_PNPM_VERSION
             else:
