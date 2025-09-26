@@ -75,5 +75,10 @@ sh_test(
         "@nodejs_linux_amd64//:node_files",
         "@nodejs_linux_arm64//:node_files",
     ],
+    # on windows: bin_test: line 11: node: command not found
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
 )

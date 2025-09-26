@@ -55,6 +55,11 @@ TOOLCHAINS_VERSIONS = [
         # Without node patches on for these tests, the program is going to escape the sandbox if it
         # is on since the fs patches are not on for the tests as they are the code under test
         tags = ["no-sandbox"],
+        # on windows: The expression evaluated to a falsy value: assert.ok(isSubPath('/a/b', '/a/b/c/d'))
+        target_compatible_with = select({
+            "@platforms//os:windows": ["@platforms//:incompatible"],
+            "//conditions:default": [],
+        }),
     )
     for t in TESTS
 ]
@@ -78,6 +83,11 @@ TOOLCHAINS_VERSIONS = [
         entry_point = "spawn.js",
         node_toolchain = toolchain,
         patch_node_fs = True,
+        # on windows: Error: spawnSync node ENOENT
+        target_compatible_with = select({
+            "@platforms//os:windows": ["@platforms//:incompatible"],
+            "//conditions:default": [],
+        }),
     )
     for toolchain_name, toolchain in zip(
         TOOLCHAINS_NAMES,

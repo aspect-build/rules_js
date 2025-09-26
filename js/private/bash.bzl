@@ -8,30 +8,6 @@
 # NB: If this can be generalized fully in the future and not depend on logf_fatal
 # then it could be hoisted to bazel-lib where we have other bash snippets.
 BASH_INITIALIZE_RUNFILES = r"""
-# It helps to determine if we are running on a Windows environment (excludes WSL as it acts like Unix)
-case "$(uname -s)" in
-CYGWIN*) _IS_WINDOWS=1 ;;
-MINGW*) _IS_WINDOWS=1 ;;
-MSYS_NT*) _IS_WINDOWS=1 ;;
-*) _IS_WINDOWS=0 ;;
-esac
-
-# It helps to normalizes paths when running on Windows.
-#
-# Example:
-# C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C -> /c/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
-function _normalize_path {
-    if [ "$_IS_WINDOWS" -eq "1" ]; then
-        # Apply the followings paths transformations to normalize paths on Windows
-        # -process driver letter
-        # -convert path separator
-        sed -e 's#^\(.\):#/\L\1#' -e 's#\\#/#g' <<<"$1"
-    else
-        echo "$1"
-    fi
-    return
-}
-
 # Set a RUNFILES environment variable to the root of the runfiles tree
 # since RUNFILES_DIR is not set by Bazel in all contexts.
 # For example, `RUNFILES=/path/to/my_js_binary.sh.runfiles`.
@@ -57,9 +33,9 @@ function _normalize_path {
 # Case 6a is handled like case 3.
 if [ "${TEST_SRCDIR:-}" ]; then
     # Case 4, bazel has identified runfiles for us.
-    RUNFILES=$(_normalize_path "$TEST_SRCDIR")
+    RUNFILES=$TEST_SRCDIR
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
-    RUNFILES=$(_normalize_path "$RUNFILES_MANIFEST_FILE")
+    RUNFILES=$RUNFILES_MANIFEST_FILE
     if [[ "${RUNFILES}" == *.runfiles_manifest ]]; then
         # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
         # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
@@ -105,8 +81,6 @@ else
         logf_fatal "RUNFILES environment variable is not set"
         exit 1
     fi
-
-    RUNFILES=$(_normalize_path "$RUNFILES")
 fi
 if [ "${RUNFILES:0:1}" != "/" ]; then
     # Ensure RUNFILES set above is an absolute path. It may be a path relative

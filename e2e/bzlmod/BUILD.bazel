@@ -41,8 +41,6 @@ assert_contains(
     name = "check_styles",
     actual = "my.css",
     expected = ".box,\n.bar {\n  width: 100px;",
-    # assert_contains currently requires runfiles; needs fixing upstream
-    target_compatible_with = not_windows,
 )
 
 jasmine_bin.jasmine_test(

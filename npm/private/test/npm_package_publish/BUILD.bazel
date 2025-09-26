@@ -34,4 +34,9 @@ sh_test(
         "no-remote-exec",
         "no-sandbox",
     ],
+    # on windows: expected 'npm notice package: @mycorp/pkg-b@' error
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
