@@ -247,7 +247,7 @@ if [ ! -f "$entry_point" ]; then
     exit 1
 fi
 
-node="$(_normalize_path "{{node}}")"
+node="{{node}}"
 if [ "${node:0:1}" = "/" ]; then
     # A user may specify an absolute path to node using target_tool_path in node_toolchain
     export JS_BINARY__NODE_BINARY="$node"
@@ -274,7 +274,6 @@ fi
 
 npm="{{npm}}"
 if [ "$npm" ]; then
-    npm="$(_normalize_path "$npm")"
     if [ "${npm:0:1}" = "/" ]; then
         # A user may specify an absolute path to npm using npm_path in node_toolchain
         export JS_BINARY__NPM_BINARY="$npm"

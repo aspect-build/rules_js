@@ -1,4 +1,4 @@
-@echo off
+@if not defined DEBUG_HELPER @ECHO OFF
 setlocal enabledelayedexpansion
 
 rem This batch script is a wrapper around the NodeJS JavaScript file
@@ -155,6 +155,7 @@ if defined JS_BINARY__PUSHD (
     popd
 )
 
+endlocal
 exit /b %ERRORLEVEL%
 
 :main
