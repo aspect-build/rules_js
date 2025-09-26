@@ -267,7 +267,7 @@ else
         exit 1
     fi
 fi
-if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
+if [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
     logf_fatal "node binary '%s' is not executable" "$JS_BINARY__NODE_BINARY"
     exit 1
 fi
@@ -293,7 +293,7 @@ if [ "$npm" ]; then
             exit 1
         fi
     fi
-    if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
+    if [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
@@ -309,7 +309,7 @@ if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi
-if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
+if [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' is not executable" "$JS_BINARY__NODE_WRAPPER"
     exit 1
 fi
