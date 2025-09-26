@@ -309,7 +309,7 @@ export BAZEL_BINDIR="."
 """
 
 _LAUNCHER_PREAMBLE_WINDOWS = """\
-@echo off
+setlocal enabledelayedexpansion
 
 set BAZEL_BINDIR=%~dp0
 
@@ -328,7 +328,7 @@ def _write_launcher(ctx, real_binary):
     substitutions_unix['export JS_BINARY__BINDIR="%s"' % ctx.bin_dir.path] = 'export JS_BINARY__BINDIR="$(pwd)"'
 
     substitutions_windows = {
-        "@echo off": _LAUNCHER_PREAMBLE_WINDOWS,
+        "setlocal enabledelayedexpansion": _LAUNCHER_PREAMBLE_WINDOWS,
         'set "JS_BINARY__BINDIR=%s"' % real_binary.root.path: 'set "JS_BINARY__BINDIR=%CD%"',
         'set "JS_BINARY__TARGET_CPU=%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'set "JS_BINARY__TARGET_CPU=%PROCESSOR_ARCHITECTURE%"',
     }
