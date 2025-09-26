@@ -54,6 +54,16 @@ bazel_dep(name = "bazelrc-preset.bzl", version = "1.3.0", dev_dependency = True)
 bazel_dep(name = "aspect_rules_lint", version = "1.1.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.1", dev_dependency = True)
 
+# Overrides of non-dev deps for local testing using recent versions
+archive_override(
+    module_name = "rules_nodejs",
+    integrity = "sha256-OY23vNcf28WAxvjReCrpn1JQeRFypf/jHS+dgTjzOC4=",
+    strip_prefix = "rules_nodejs-7cbb1fb5378fb4739e4d9698a14abd9eada900f0",
+    urls = [
+        "https://github.com/bazel-contrib/rules_nodejs/archive/7cbb1fb5378fb4739e4d9698a14abd9eada900f0.tar.gz",
+    ],
+)
+
 host = use_extension(
     "@aspect_bazel_lib//lib:extensions.bzl",
     "host",
@@ -67,13 +77,6 @@ node_dev = use_extension(
     "node",
     dev_dependency = True,
 )
-use_repo(node_dev, "node20_linux_amd64")
-use_repo(node_dev, "node20_darwin_arm64")
-use_repo(node_dev, "node20_darwin_amd64")
-use_repo(node_dev, "node20_linux_arm64")
-use_repo(node_dev, "node20_linux_s390x")
-use_repo(node_dev, "node20_linux_ppc64le")
-use_repo(node_dev, "node20_windows_amd64")
 use_repo(node_dev, "node18_linux_amd64")
 use_repo(node_dev, "node18_darwin_arm64")
 use_repo(node_dev, "node18_darwin_amd64")
@@ -81,6 +84,27 @@ use_repo(node_dev, "node18_linux_arm64")
 use_repo(node_dev, "node18_linux_s390x")
 use_repo(node_dev, "node18_linux_ppc64le")
 use_repo(node_dev, "node18_windows_amd64")
+use_repo(node_dev, "node20_linux_amd64")
+use_repo(node_dev, "node20_darwin_arm64")
+use_repo(node_dev, "node20_darwin_amd64")
+use_repo(node_dev, "node20_linux_arm64")
+use_repo(node_dev, "node20_linux_s390x")
+use_repo(node_dev, "node20_linux_ppc64le")
+use_repo(node_dev, "node20_windows_amd64")
+use_repo(node_dev, "node22_linux_amd64")
+use_repo(node_dev, "node22_darwin_arm64")
+use_repo(node_dev, "node22_darwin_amd64")
+use_repo(node_dev, "node22_linux_arm64")
+use_repo(node_dev, "node22_linux_s390x")
+use_repo(node_dev, "node22_linux_ppc64le")
+use_repo(node_dev, "node22_windows_amd64")
+use_repo(node_dev, "node24_linux_amd64")
+use_repo(node_dev, "node24_darwin_arm64")
+use_repo(node_dev, "node24_darwin_amd64")
+use_repo(node_dev, "node24_linux_arm64")
+use_repo(node_dev, "node24_linux_s390x")
+use_repo(node_dev, "node24_linux_ppc64le")
+use_repo(node_dev, "node24_windows_amd64")
 node_dev.toolchain(node_version = "18.20.4")
 node_dev.toolchain(
     name = "node18",
@@ -89,6 +113,14 @@ node_dev.toolchain(
 node_dev.toolchain(
     name = "node20",
     node_version = "20.17.0",
+)
+node_dev.toolchain(
+    name = "node22",
+    node_version = "22.20.0",
+)
+node_dev.toolchain(
+    name = "node24",
+    node_version = "24.9.0",
 )
 
 ############################################
