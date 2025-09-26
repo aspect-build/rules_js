@@ -20,6 +20,7 @@ import type * as FsType from 'fs'
 import type * as UrlType from 'url'
 import * as path from 'path'
 import * as util from 'util'
+import { FsInternalStatPatcher } from './fs_stat.cjs'
 
 // windows cant find the right types
 type Dir = any
@@ -28,7 +29,7 @@ type Dirent = any
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('node:fs') as typeof FsType
+const fs = require('node:fs') as any
 const url = require('node:url') as typeof UrlType
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
@@ -36,8 +37,15 @@ const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
 
 type HopResults = string | typeof HOP_NON_LINK | typeof HOP_NOT_FOUND
 
-export function patcher(fs: any = _fs, roots: string[]) {
-    fs = fs || _fs
+/**
+ * Function that patches the `fs` module to not escape the given roots.
+ * @returns a function to undo the patches.
+ */
+export function patcher(roots: string[]): void {
+    if (fs._unpatched) {
+        throw new Error('FS is already patched.')
+    }
+
     // Make the original version of the library available for when access to the
     // unguarded file system is necessary, such as the esbuild plugin that
     // protects against sandbox escaping that occurs through module resolution
@@ -76,6 +84,19 @@ export function patcher(fs: any = _fs, roots: string[]) {
         .native as typeof FsType.realpathSync.native
 
     const { canEscape, isEscape } = escapeFunction(roots)
+
+    // =========================================================================
+    // fsInternal.lstat (to patch ESM resolve's `realpathSync`!)
+    // =========================================================================
+    const lstatEsmPatcher = new FsInternalStatPatcher(
+        { canEscape, isEscape },
+        guardedReadLink,
+        guardedReadLinkSync,
+        unguardedRealPath,
+        unguardedRealPathSync
+    )
+
+    lstatEsmPatcher.patch()
 
     // =========================================================================
     // fs.lstat
@@ -436,7 +457,6 @@ export function patcher(fs: any = _fs, roots: string[]) {
     )
     if (promisePropertyDescriptor) {
         const promises: any = {}
-        promises.lstat = util.promisify(fs.lstat)
         // NOTE: node core uses the newer realpath function fs.promises.native instead of fs.realPath
         promises.realpath = util.promisify(fs.realpath.native)
         promises.readlink = util.promisify(fs.readlink)
@@ -819,6 +839,24 @@ export function patcher(fs: any = _fs, roots: string[]) {
             }
         }
     }
+
+    return () => {
+        fs.realpath.native = origRealpathNative
+        fs.readlink = origReadlink
+        fs.readlinkSync = origReadlinkSync
+        fs.readdir = origReaddir
+        fs.readdirSync = origReaddirSync
+        fs.opendir = origReaddir
+
+        fs.promises.realpath = util.promisify(fs.realpath.native)
+        fs.promises.readlink = util.promisify(fs.readlink)
+        fs.promises.readdir = util.promisify(fs.readdir)
+        fs.promises.opendir = util.promisify(fs.opendir)
+
+        lstatEsmPatcher.revert()
+
+        fs._unpatched = undefined
+    }
 }
 
 // =========================================================================
@@ -840,7 +878,7 @@ function stringifyPathLike(p: PathLike): string {
     }
 }
 
-function resolvePathLike(p: PathLike): string {
+export function resolvePathLike(p: PathLike): string {
     return path.resolve(stringifyPathLike(p))
 }
 
