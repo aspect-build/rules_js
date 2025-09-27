@@ -615,15 +615,22 @@ def _npm_import_rule_impl(rctx):
     has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
     has_patches = not (not rctx.attr.patches)
 
+    reproducible = False
     package_src = _EXTRACT_TO_DIRNAME
     if utils.is_git_repository_url(rctx.attr.url):
         _fetch_git_repository(rctx)
+        if rctx.attr.commit:
+            reproducible = True
     elif rctx.attr.extract_full_archive or has_patches or has_lifecycle_hooks:
         _download_and_extract_archive(rctx, package_json_only = False)
+        if rctx.attr.integrity:
+            reproducible = True
     else:
         # TODO: support tarball package_src with lifecycle hooks
         _download_and_extract_archive(rctx, package_json_only = True)
         package_src = _TARBALL_FILENAME
+        if rctx.attr.integrity:
+            reproducible = True
 
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
@@ -729,6 +736,9 @@ bin = bin_factory("node_modules")
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(contents))
+
+    if reproducible and hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
 
 def _sanitize_bin_name(name):
     """ Sanitize a package name so we can use it in starlark function names """
@@ -896,6 +906,9 @@ def _npm_import_links_rule_impl(rctx):
     rctx.file(_DEFS_BZL_FILENAME, generated_by_prefix + "\n" + "\n".join(npm_link_package_bzl))
 
     rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_DEFS_BZL_FILENAME]))
+
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
 
 _COMMON_ATTRS = {
     "link_packages": attr.string_list_dict(),
