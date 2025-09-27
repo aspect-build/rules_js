@@ -9,6 +9,7 @@ package(default_visibility = ["//visibility:public"])
 exports_files(glob(["*.bzl"]))
 
 exports_files([
+    "js_binary.bat.tpl",
     "js_binary.sh.tpl",
     "node_wrapper.bat",
     "node_wrapper.sh",

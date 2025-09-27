@@ -288,10 +288,19 @@ The default layer groups are as follows and always created.
 
 """
 
+def _windows_host(ctx):
+    """Returns true if the host platform is windows.
+    
+    The typical approach using ctx.target_platform_has_constraint does not work for transitioned
+    build targets. We need to know the host platform, not the target platform.
+    """
+    return ctx.configuration.host_path_separator == ";"
+
+
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
 # See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
 # for why this is needed.
-_LAUNCHER_PREABMLE = """\
+_LAUNCHER_PREAMBLE = """\
 #!/usr/bin/env bash
 
 export BAZEL_BINDIR="."
@@ -299,21 +308,36 @@ export BAZEL_BINDIR="."
 # patched by js_image_layer for hermeticity
 """
 
-def _write_laucher(ctx, real_binary):
+_LAUNCHER_PREAMBLE_WINDOWS = """\
+setlocal enabledelayedexpansion
+
+set BAZEL_BINDIR=%~dp0
+
+rem patched by js_image_layer for hermeticity
+"""
+
+def _write_launcher(ctx, real_binary):
     "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
     launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
 
-    substitutions = {
-        "#!/usr/bin/env bash": _LAUNCHER_PREABMLE,
+    substitutions_unix = {
+        "#!/usr/bin/env bash": _LAUNCHER_PREAMBLE,
         'export JS_BINARY__BINDIR="%s"' % real_binary.root.path: 'export JS_BINARY__BINDIR="$(pwd)"',
         'export JS_BINARY__TARGET_CPU="%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'export JS_BINARY__TARGET_CPU="$(uname -m)"',
     }
-    substitutions['export JS_BINARY__BINDIR="%s"' % ctx.bin_dir.path] = 'export JS_BINARY__BINDIR="$(pwd)"'
+    substitutions_unix['export JS_BINARY__BINDIR="%s"' % ctx.bin_dir.path] = 'export JS_BINARY__BINDIR="$(pwd)"'
+
+    substitutions_windows = {
+        "setlocal enabledelayedexpansion": _LAUNCHER_PREAMBLE_WINDOWS,
+        'set "JS_BINARY__BINDIR=%s"' % real_binary.root.path: 'set "JS_BINARY__BINDIR=%CD%"',
+        'set "JS_BINARY__TARGET_CPU=%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'set "JS_BINARY__TARGET_CPU=%PROCESSOR_ARCHITECTURE%"',
+    }
+    substitutions_windows['set "JS_BINARY__BINDIR=%s"' % ctx.bin_dir.path] = 'set "JS_BINARY__BINDIR=%CD%"'
 
     ctx.actions.expand_template(
         template = real_binary,
         output = launcher,
-        substitutions = substitutions,
+        substitutions = substitutions_windows if _windows_host(ctx) else substitutions_unix,
         is_executable = True,
     )
     return launcher
@@ -450,10 +474,10 @@ def _js_image_layer_impl(ctx):
     binary_default_info = ctx.attr.binary[0][DefaultInfo]
     binary_label = ctx.attr.binary[0].label
 
-    binary_path = "./" + paths.join(ctx.attr.root.lstrip("./").lstrip("/"), binary_label.package, binary_label.name)
+    binary_path = "./" + paths.join(ctx.attr.root.lstrip("./").lstrip("/"), binary_label.package, binary_label.name + (".bat" if _windows_host(ctx) else ""))
     runfiles_dir = binary_path + ".runfiles"
 
-    launcher = _write_laucher(ctx, binary_default_info.files_to_run.executable)
+    launcher = _write_launcher(ctx, binary_default_info.files_to_run.executable)
 
     repo_mapping = _repo_mapping_manifest(binary_default_info.files_to_run)
 

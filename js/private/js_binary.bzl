@@ -18,8 +18,8 @@ js_binary(
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
-load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load(":bat.bzl", "BAT_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 
 _DOC = """Execute a program in the Node.js runtime.
@@ -296,8 +296,12 @@ _ATTRS = {
         for more information.
         """,
     ),
-    "_launcher_template": attr.label(
+    "_launcher_template_sh": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
+        allow_single_file = True,
+    ),
+    "_launcher_template_bat": attr.label(
+        default = Label("//js/private:js_binary.bat.tpl"),
         allow_single_file = True,
     ),
     "_node_wrapper_sh": attr.label(
@@ -316,7 +320,6 @@ _ATTRS = {
         default = Label("//js/private:npm_wrapper.bat"),
         allow_single_file = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
         default = [Label("@aspect_rules_js//js/private/node-patches:fs.cjs")],
@@ -327,9 +330,15 @@ _ATTRS = {
     ),
 }
 
-_ENV_SET = """export {var}=\"{value}\""""
-_ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
-_NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
+# Unix shell constants
+_ENV_SET_UNIX = """export {var}=\"{value}\""""
+_ENV_SET_IFF_NOT_SET_UNIX = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
+_NODE_OPTION_UNIX = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
+
+# Windows batch constants
+_ENV_SET_WINDOWS = """set "{var}={value}\""""
+_ENV_SET_IFF_NOT_SET_WINDOWS = """if not defined {var} set "{var}={value}\""""
+_NODE_OPTION_WINDOWS = """set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! {value}\""""
 
 # Do the opposite of _to_manifest_path in
 # https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
@@ -344,11 +353,30 @@ def _expand_env_if_needed(ctx, value):
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
 
-def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
+def _windows_host(ctx):
+    """Returns true if the host platform is windows.
+    
+    The typical approach using ctx.target_platform_has_constraint does not work for transitioned
+    build targets. We need to know the host platform, not the target platform.
+    """
+    return ctx.configuration.host_path_separator == ";"
+
+def _windows_path(path):
+    """Convert a Unix-style path to a Windows-style path.
+    """
+    return path.replace("/", "\\")
+
+def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
+    is_windows = _windows_host(ctx)
     if is_windows:
         fixed_env = dict(fixed_env, **{"JS_BINARY__PATCH_NODE_FS": "0"})
+
+    # Use Windows batch syntax or Unix shell syntax based on platform
+    _ENV_SET = _ENV_SET_WINDOWS if is_windows else _ENV_SET_UNIX
+    _ENV_SET_IFF_NOT_SET = _ENV_SET_IFF_NOT_SET_WINDOWS if is_windows else _ENV_SET_IFF_NOT_SET_UNIX
+    _NODE_OPTION = _NODE_OPTION_WINDOWS if is_windows else _NODE_OPTION_UNIX
 
     envs = [
         _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
@@ -468,30 +496,33 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         # TODO(3.0): drop support for deprecated toolchain attributes
         node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
 
+    template = ctx.file._launcher_template_bat if is_windows else ctx.file._launcher_template_sh
+    template_label = ctx.attr._launcher_template_bat.label if is_windows else ctx.attr._launcher_template_sh.label
+
     launcher_subst = {
         "{{target_label}}": str(ctx.label),
-        "{{template_label}}": str(ctx.attr._launcher_template.label),
+        "{{template_label}}": str(template_label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
-        "{{entry_point_path}}": entry_point_path,
+        "{{entry_point_path}}": _windows_path(entry_point_path) if is_windows else entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args),
-        "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
+        "{{initialize_runfiles}}": BAT_INITIALIZE_RUNFILES if is_windows else BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
-        "{{node_patches}}": ctx.file._node_patches.short_path,
-        "{{node_wrapper}}": node_wrapper.short_path,
-        "{{node}}": node_path,
-        "{{npm}}": npm_path,
+        "{{node_patches}}": _windows_path(ctx.file._node_patches.short_path) if is_windows else ctx.file._node_patches.short_path,
+        "{{node_wrapper}}": _windows_path(node_wrapper.short_path) if is_windows else node_wrapper.short_path,
+        "{{node}}": _windows_path(node_path) if is_windows else node_path,
+        "{{npm}}": _windows_path(npm_path) if is_windows else npm_path,
         "{{workspace_name}}": ctx.workspace_name,
     }
 
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
     # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
-    launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
+    launcher = ctx.actions.declare_file("{}_/{}{}".format(ctx.label.name, ctx.label.name, ".bat" if is_windows else ""))
     ctx.actions.expand_template(
-        template = ctx.file._launcher_template,
+        template = template,
         output = launcher,
         substitutions = launcher_subst,
         is_executable = True,
@@ -500,7 +531,6 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     return launcher, toolchain_files
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
     if ctx.attr.node_toolchain:
         nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
@@ -519,10 +549,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
-    launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
+    launcher, toolchain_files = _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env)
 
-    launcher_files = [bash_launcher]
+    launcher_files = [launcher]
     launcher_files.extend(toolchain_files)
     if hasattr(nodeinfo, "node"):
         if nodeinfo.node:
