@@ -7,6 +7,8 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 _LINK_PACKAGES = [""]
 
+_NPM_PACKAGE_VISIBILITY = {}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if not prod and not dev:
@@ -19,6 +21,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _validate_npm_package_visibility(bazel_package)
+
     link_targets = []
     scope_targets = {}
 
@@ -51,6 +57,73 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
+
+def _validate_npm_package_visibility(accessing_package):
+    """Validate that accessing_package can access npm packages that would be created here"""
+
+    # Get packages that would be created in this location
+    packages_to_validate = []
+
+    if accessing_package == "":
+        packages_to_validate.append("chalk")
+
+
+    # Validate each package
+    for package_name in packages_to_validate:
+        if not _check_package_visibility(accessing_package, package_name):
+            fail("""
+Package visibility violation:
+
+  Package: {}
+  Requested by: {}
+
+This package is not visible from your location.
+Check the package_visibility configuration in your npm_translate_lock rule.
+
+For more information, see: https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock#package_visibility
+""".format(package_name, accessing_package))
+
+def _check_package_visibility(accessing_package, package_name):
+    """Check if accessing_package can access package_name"""
+
+    # Get visibility rules for this package
+    visibility_rules = _get_package_visibility_rules(package_name)
+
+    # Check each visibility rule
+    for rule in visibility_rules:
+        if rule == "//visibility:public":
+            return True
+
+        # Package-specific access: //packages/foo:__pkg__
+        if rule == "//" + accessing_package + ":__pkg__":
+            return True
+
+        # Subpackage access: //packages/foo:__subpackages__
+        if rule.endswith(":__subpackages__"):
+            rule_package = rule[2:-16]  # Remove "//" and ":__subpackages__"
+            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
+                return True
+
+        # Target-specific access: //packages/foo:target
+        if rule.startswith("//" + accessing_package + ":"):
+            return True
+
+    return False
+
+def _get_package_visibility_rules(package_name):
+    """Get visibility rules for package_name from configuration"""
+
+    # Direct package match
+    if package_name in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY[package_name]
+
+    # Wildcard match
+    if "*" in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY["*"]
+
+    # Default to public if not specified
+    return ["//visibility:public"]
+
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
