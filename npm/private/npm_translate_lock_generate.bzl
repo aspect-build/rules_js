@@ -304,8 +304,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                     alias = link_alias,
                 ))
 
-                # expose the alias if the package has access via package_visibility
-                if _check_package_has_access(link_package, _import.package_visibility):
+                # expose the alias if public
+                if "//visibility:public" in _import.package_visibility:
                     add_to_link_targets = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
                     links_bzl[link_package].append(add_to_link_targets)
                     links_targets_bzl[link_package].append(add_to_link_targets)
@@ -685,21 +685,6 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         version = _import.version,
         maybe_exclude_package_contents = maybe_exclude_package_contents,
     )
-
-def _check_package_has_access(accessing_package, package_visibility_rules):
-    """Check if accessing_package can access a package with given visibility rules"""
-    for visibility_rule in package_visibility_rules:
-        if visibility_rule == "//visibility:public":
-            return True
-        if accessing_package and visibility_rule == "//" + accessing_package + ":__pkg__":
-            return True
-        if accessing_package and visibility_rule.endswith(":__subpackages__"):
-            rule_package = visibility_rule[2:-16]  # Remove "//" and ":__subpackages__"
-            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
-                return True
-        if accessing_package and visibility_rule.startswith("//" + accessing_package + ":"):
-            return True
-    return False
 
 def _generate_npm_visibility_config(package_visibility_attr):
     """Generate visibility configuration for npm packages"""

@@ -3457,7 +3457,6 @@ def npm_link_targets(name = "node_modules", package = None):
             link_targets.append(":{}/semver-first-satisfied".format(name))
             link_targets.append(":{}/syncpack".format(name))
             link_targets.append(":{}/typescript".format(name))
-            link_targets.append(":{}/unused".format(name))
             link_targets.append(":{}/webpack-bundle-analyzer".format(name))
         elif bazel_package == "js/private/coverage/bundle":
             link_targets.append(":{}/@rollup/plugin-commonjs".format(name))
