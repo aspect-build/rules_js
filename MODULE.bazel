@@ -236,8 +236,14 @@ npm.npm_translate_lock(
     npmrc = "//:.npmrc",
     package_visibility = {
         "unused": ["//npm/private/test:__subpackages__"],
-        "@mycorp/pkg-a": ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
-        "@mycorp/pkg-d": ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
+        "@mycorp/pkg-a": [
+            "//examples:__subpackages__",
+            "//js/private/test/image:__subpackages__",
+        ],
+        "@mycorp/pkg-d": [
+            "//examples:__subpackages__",
+            "//js/private/test/image:__subpackages__",
+        ],
         "@mycorp/pkg-e": ["//examples:__subpackages__"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
