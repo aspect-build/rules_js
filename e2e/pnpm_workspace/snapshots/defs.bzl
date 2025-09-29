@@ -25,6 +25,8 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store =
 
 _LINK_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d"]
 
+_NPM_PACKAGE_VISIBILITY = {}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if not prod and not dev:
@@ -37,6 +39,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _validate_npm_package_visibility(bazel_package)
+
     link_targets = []
     scope_targets = {}
 
@@ -191,7 +197,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/c".format(name))
+        # Add first-party package @lib/c if accessible
+        if _check_package_visibility(bazel_package, "@lib/c"):
+            link_targets.append(":{}/@lib/c".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -229,7 +237,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/vendored-a".format(name))
+        # Add first-party package vendored-a if accessible
+        if _check_package_visibility(bazel_package, "vendored-a"):
+            link_targets.append(":{}/vendored-a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -263,7 +273,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/vendored-b".format(name))
+        # Add first-party package vendored-b if accessible
+        if _check_package_visibility(bazel_package, "vendored-b"):
+            link_targets.append(":{}/vendored-b".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -300,7 +312,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/a".format(name))
+        # Add first-party package @lib/a if accessible
+        if _check_package_visibility(bazel_package, "@lib/a"):
+            link_targets.append(":{}/@lib/a".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -339,7 +353,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/b".format(name))
+        # Add first-party package @lib/b if accessible
+        if _check_package_visibility(bazel_package, "@lib/b"):
+            link_targets.append(":{}/@lib/b".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -378,7 +394,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/b_alias".format(name))
+        # Add first-party package @lib/b_alias if accessible
+        if _check_package_visibility(bazel_package, "@lib/b_alias"):
+            link_targets.append(":{}/@lib/b_alias".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -417,7 +435,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/d".format(name))
+        # Add first-party package @lib/d if accessible
+        if _check_package_visibility(bazel_package, "@lib/d"):
+            link_targets.append(":{}/@lib/d".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:
@@ -437,6 +457,142 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
+
+def _validate_npm_package_visibility(accessing_package):
+    """Validate that accessing_package can access npm packages that would be created here"""
+
+    # Get packages that would be created in this location
+    packages_to_validate = []
+
+    if accessing_package in ["app/c"]:
+        packages_to_validate.append("@lib/c")
+
+    if accessing_package in ["lib/a"]:
+        packages_to_validate.append("vendored-a")
+
+    if accessing_package in ["lib/a"]:
+        packages_to_validate.append("vendored-b")
+
+    if accessing_package in ["app/a"]:
+        packages_to_validate.append("@lib/a")
+
+    if accessing_package in ["app/b", "lib/a"]:
+        packages_to_validate.append("@lib/b")
+
+    if accessing_package in ["app/b"]:
+        packages_to_validate.append("@lib/b_alias")
+
+    if accessing_package in ["app/d"]:
+        packages_to_validate.append("@lib/d")
+
+    if accessing_package == "":
+        packages_to_validate.append("@aspect-test/a")
+
+    if accessing_package == "app/a":
+        packages_to_validate.append("@aspect-test/a")
+
+    if accessing_package == "app/c":
+        packages_to_validate.append("@aspect-test/a")
+
+    if accessing_package == "":
+        packages_to_validate.append("@aspect-test/b")
+
+    if accessing_package == "":
+        packages_to_validate.append("@aspect-test/c")
+
+    if accessing_package == "lib/d":
+        packages_to_validate.append("@aspect-test/d")
+
+    if accessing_package == "lib/a":
+        packages_to_validate.append("@aspect-test/e")
+
+    if accessing_package == "lib/b":
+        packages_to_validate.append("@aspect-test/f")
+
+    if accessing_package == "lib/c":
+        packages_to_validate.append("@aspect-test/f")
+
+    if accessing_package == "app/a":
+        packages_to_validate.append("@aspect-test/g")
+
+    if accessing_package == "app/c":
+        packages_to_validate.append("@aspect-test/g")
+
+    if accessing_package == "app/d":
+        packages_to_validate.append("@aspect-test/g")
+
+    if accessing_package == "app/b":
+        packages_to_validate.append("@aspect-test/h")
+
+    if accessing_package == "lib/d":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "lib/b":
+        packages_to_validate.append("@types/sizzle")
+
+    if accessing_package == "":
+        packages_to_validate.append("lodash")
+
+    if accessing_package == "":
+        packages_to_validate.append("typescript")
+
+
+    # Validate each package
+    for package_name in packages_to_validate:
+        if not _check_package_visibility(accessing_package, package_name):
+            fail("""
+Package visibility violation:
+
+  Package: {}
+  Requested by: {}
+
+This package is not visible from your location.
+Check the package_visibility configuration in your npm_translate_lock rule.
+
+For more information, see: https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock#package_visibility
+""".format(package_name, accessing_package))
+
+def _check_package_visibility(accessing_package, package_name):
+    """Check if accessing_package can access package_name"""
+
+    # Get visibility rules for this package
+    visibility_rules = _get_package_visibility_rules(package_name)
+
+    # Check each visibility rule
+    for rule in visibility_rules:
+        if rule == "//visibility:public":
+            return True
+
+        # Package-specific access: //packages/foo:__pkg__
+        if rule == "//" + accessing_package + ":__pkg__":
+            return True
+
+        # Subpackage access: //packages/foo:__subpackages__
+        if rule.endswith(":__subpackages__"):
+            rule_package = rule[2:-16]  # Remove "//" and ":__subpackages__"
+            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
+                return True
+
+        # Target-specific access: //packages/foo:target
+        if rule.startswith("//" + accessing_package + ":"):
+            return True
+
+    return False
+
+def _get_package_visibility_rules(package_name):
+    """Get visibility rules for package_name from configuration"""
+
+    # Direct package match
+    if package_name in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY[package_name]
+
+    # Wildcard match
+    if "*" in _NPM_PACKAGE_VISIBILITY:
+        return _NPM_PACKAGE_VISIBILITY["*"]
+
+    # Default to public if not specified
+    return ["//visibility:public"]
+
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
