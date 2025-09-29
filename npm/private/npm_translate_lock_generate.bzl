@@ -620,7 +620,7 @@ def _validate_npm_package_visibility(accessing_package):
     if accessing_package in {fp_link_packages}:
         packages_to_validate.append("{fp_package}")""".format(
             fp_link_packages = fp_link_packages,
-            fp_package = fp_package
+            fp_package = fp_package,
         ))
 
     # Add validation logic for npm imports
@@ -631,7 +631,7 @@ def _validate_npm_package_visibility(accessing_package):
     if accessing_package == "{link_package}":
         packages_to_validate.append("{package}")""".format(
                     link_package = link_package,
-                    package = _import.package
+                    package = _import.package,
                 ))
 
     npm_link_all_packages_bzl.append("""
@@ -869,5 +869,5 @@ def _generate_npm_visibility_config(package_visibility_attr):
         config_dict[package_pattern] = list(visibility_list)
 
     return "_NPM_PACKAGE_VISIBILITY = {}".format(
-        starlark_codegen_utils.to_dict_attr(config_dict, 0, quote_value = False)
+        starlark_codegen_utils.to_dict_attr(config_dict, 0, quote_value = False),
     )
