@@ -3111,22 +3111,22 @@ def _validate_npm_package_visibility(accessing_package):
     if accessing_package == "js/private/worker/src":
         packages_to_validate.append("@types/google-protobuf")
 
-    if accessing_package == "":
-        packages_to_validate.append("@types/node")
-
-    if accessing_package == "js/private/test/js_run_devserver":
-        packages_to_validate.append("@types/node")
-
     if accessing_package == "examples/linked_lib":
         packages_to_validate.append("@types/node")
 
     if accessing_package == "examples/linked_pkg":
         packages_to_validate.append("@types/node")
 
+    if accessing_package == "":
+        packages_to_validate.append("@types/node")
+
     if accessing_package == "examples/js_lib_pkg/a":
         packages_to_validate.append("@types/node")
 
     if accessing_package == "examples/js_lib_pkg/b":
+        packages_to_validate.append("@types/node")
+
+    if accessing_package == "js/private/test/js_run_devserver":
         packages_to_validate.append("@types/node")
 
     if accessing_package == "js/private/worker/src":
