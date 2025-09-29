@@ -20,7 +20,7 @@ npm.npm_translate_lock(
     ],
     npmrc = "//:.npmrc",
     package_visibility = {
-        "some-dep": ["//packages/nonexistent:__subpackages__"],  # Private - only nonexistent package can access
+        "some-dep": ["//visibility:public"],  # Public by default for CI, test.sh will make it private
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
