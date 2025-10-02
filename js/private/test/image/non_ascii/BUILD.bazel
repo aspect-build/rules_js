@@ -10,6 +10,10 @@ js_binary(
         "ㅑㅕㅣㅇ.ㄴㅅ",
     ],
     entry_point = "main.js",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 make_js_image_layer(
@@ -20,6 +24,10 @@ make_js_image_layer(
     },
     platform = "//js/private/test/image:linux_amd64",
     root = "/app",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 assert_js_image_layer_listings(

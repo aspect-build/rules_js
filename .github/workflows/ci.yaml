@@ -92,16 +92,14 @@ jobs:
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
             - id: os
               name: Prepare 'os' matrix axis
-              # Only run MacOS and Windows on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
+              # Only run MacOS on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
               # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
               run: |
                   a=( ubuntu )
                   if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"macos"* ]]; then
                     a+=( macos )
                   fi
-                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"windows"* ]]; then
-                    a+=( windows )
-                  fi
+                  a+=( windows )
                   printf -v j '"%s",' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
         outputs:
@@ -124,8 +122,6 @@ jobs:
                 os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
                 folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
-                    # Exclude Windows default, will opt-in to includes
-                    - os: windows
                     # Exclude MacOS by default, will opt-in to includes
                     - os: macos
                     # Don't run bzlmod smoke test under workspace

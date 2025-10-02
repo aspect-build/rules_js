@@ -9,5 +9,9 @@ js_binary(
     data = glob(["min/**"]) + ["package.json"],
     entry_point = "min/index.min.js",
     include_npm = True,
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
 )

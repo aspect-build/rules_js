@@ -12,6 +12,11 @@ js_test(
     ],
     entry_point = "test.js",
     tags = ["skip-on-bazel8"],
+    # Error: could not resolve module aspect_rules_js/examples/runfiles/test_fixture.md
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 # Path of file must start similar to `test_fixture.md` in order to regression-test a
