@@ -92,6 +92,7 @@ buildifier(
     lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "fix",
     tags = ["manual"],  # tag as manual so windows ci does not build it by default
+    visibility = ["//visibility:public"],
 )
 
 buildifier(
@@ -104,6 +105,7 @@ buildifier(
     lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "diff",
     tags = ["manual"],  # tag as manual so windows ci does not build it by default
+    visibility = ["//visibility:public"],
 )
 
 alias(
