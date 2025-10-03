@@ -179,6 +179,7 @@ npm.npm_translate_lock(
         "//examples/stack_traces:package.json",
         "//examples/webpack_cli:package.json",
         "//js/private/coverage/bundle:package.json",
+        "//js/private/devserver/src:package.json",
         "//js/private/test/image:package.json",
         "//js/private/test/js_run_devserver:package.json",
         "//js/private/worker/src:package.json",

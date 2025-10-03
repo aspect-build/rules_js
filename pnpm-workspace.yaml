@@ -4,6 +4,7 @@ packages:
     - 'examples/npm_package/libs/*'
     - 'examples/npm_package/packages/*'
     - 'js/private/coverage/bundle'
+    - 'js/private/devserver/src'
     - 'js/private/worker/src'
     - 'js/private/test/*'
     - 'npm/private/test'

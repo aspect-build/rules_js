@@ -1,6 +1,5 @@
 "Internal implementation details"
 
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
@@ -103,9 +102,4 @@ bzl_library(
         "@aspect_bazel_lib//lib:tar",
         "@bazel_skylib//lib:paths",
     ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
-)
-
-copy_to_bin(
-    name = "js_devserver_entrypoint",
-    srcs = ["js_run_devserver.mjs"],
 )

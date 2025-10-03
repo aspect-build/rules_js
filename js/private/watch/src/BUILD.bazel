@@ -1,0 +1,20 @@
+load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
+
+typescript_bin.tsc(
+    name = "compile",
+    srcs = [
+        "aspect_watch_protocol.mts",
+        "tsconfig.json",
+        "//:node_modules/@types/node",
+    ],
+    outs = [
+        "aspect_watch_protocol.d.mts",
+        "aspect_watch_protocol.mjs",
+    ],
+    args = [
+        "-p",
+        "tsconfig.json",
+    ],
+    chdir = package_name(),
+    visibility = ["//js/private/watch:__pkg__"],
+)
