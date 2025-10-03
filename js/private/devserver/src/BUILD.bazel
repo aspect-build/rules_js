@@ -1,0 +1,26 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//js/private/devserver/src:rollup/package_json.bzl", rollup_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+rollup_bin.rollup(
+    name = "js_run_devserver_bundle",
+    srcs = [
+        "js_run_devserver.mjs",
+        "rollup.config.mjs",
+        ":node_modules/@rollup/plugin-node-resolve",
+        "//js/private/watch",
+    ],
+    outs = ["bundle.mjs"],
+    args = [
+        "js_run_devserver.mjs",
+        "--config",
+        "rollup.config.mjs",
+        "--format",
+        "es",
+        "--file",
+        "bundle.mjs",
+    ],
+    chdir = package_name(),
+    visibility = ["//js/private/devserver:__pkg__"],
+)

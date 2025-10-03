@@ -3,4 +3,7 @@ pnpm-lock.yaml linguist-generated=true
 e2e/rules_foo/npm_repositories.bzl linguist-generated=true
 **/snapshots/** linguist-generated=true
 js/private/coverage/coverage.js linguist-generated=true
+js/private/devserver/js_run_devserver.mjs linguist-generated=true
+js/private/watch/aspect_watch_protocol.mjs linguist-generated=true
+js/private/watch/aspect_watch_protocol.d.mts linguist-generated=true
 js/private/js_image_layer.mjs linguist-generated=true

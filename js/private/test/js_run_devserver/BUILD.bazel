@@ -36,7 +36,7 @@ jasmine_bin.jasmine_binary(
 
 js_test(
     name = "js_run_devserver_test",
-    data = ["//js/private:js_devserver_entrypoint"],
+    data = ["//js/private/devserver:js_devserver_entrypoint"],
     entry_point = "js_run_devserver.spec.mjs",
     env = {
         "__RULES_JS_UNIT_TEST__": "1",

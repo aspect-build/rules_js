@@ -277,7 +277,7 @@ def js_run_devserver(
             Label("@aspect_bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
         }),
-        entry_point = Label("@aspect_rules_js//js/private:js_devserver_entrypoint"),
+        entry_point = Label("@aspect_rules_js//js/private/devserver:js_devserver_entrypoint"),
         # This rule speaks the ibazel protocol, supports live reload, supports incremental-build-protocol
         tags = kwargs.pop("tags", []) + [
             "ibazel_live_reload",
