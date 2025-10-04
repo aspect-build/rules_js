@@ -45,27 +45,25 @@ describe('testing lstat', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir)])
+                const revertPatches = patcher([path.join(fixturesDir)])
 
                 const linkPath = path.join(fixturesDir, 'a', 'link')
                 assert.ok(
-                    patchedFs.lstatSync(linkPath).isSymbolicLink(),
+                    fs.lstatSync(linkPath).isSymbolicLink(),
                     'lstatSync should find symbolic link if link is the root'
                 )
 
                 assert.ok(
-                    (
-                        await util.promisify(patchedFs.lstat)(linkPath)
-                    ).isSymbolicLink(),
+                    (await util.promisify(fs.lstat)(linkPath)).isSymbolicLink(),
                     'lstat should find symbolic link if link is the root'
                 )
 
                 assert.ok(
-                    (await patchedFs.promises.lstat(linkPath)).isSymbolicLink(),
+                    (await fs.promises.lstat(linkPath)).isSymbolicLink(),
                     'promises.lstat should find symbolic link if link is the root'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -79,20 +77,19 @@ describe('testing lstat', async () => {
             async (fixturesDir) => {
                 fixturesDir = fs.realpathSync(fixturesDir)
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [
+                const revertPatches = patcher([
                     path.join(fixturesDir),
                     path.join(fixturesDir, 'a', 'g'),
                 ])
 
                 assert.equal(
                     undefined,
-                    patchedFs.lstatSync(
-                        path.join(fixturesDir, 'doesnt-exist'),
-                        { throwIfNoEntry: false }
-                    )
+                    fs.lstatSync(path.join(fixturesDir, 'doesnt-exist'), {
+                        throwIfNoEntry: false,
+                    })
                 )
+
+                revertPatches()
             }
         )
     })
@@ -111,28 +108,31 @@ describe('testing lstat', async () => {
                     path.join(fixturesDir, 'a', 'g', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [
+                const revertPatches = patcher([
                     path.join(fixturesDir),
                     path.join(fixturesDir, 'a', 'g'),
                 ])
 
+                console.error('Starting')
+                console.error(fs.readlink.toString())
+
                 const linkPath = path.join(fixturesDir, 'a', 'g', 'link')
                 assert.ok(
-                    patchedFs.lstatSync(linkPath).isFile(),
+                    fs.lstatSync(linkPath).isFile(),
                     'lstatSync should find file if link is in guard'
                 )
 
                 assert.ok(
-                    (await util.promisify(patchedFs.lstat)(linkPath)).isFile(),
+                    (await util.promisify(fs.lstat)(linkPath)).isFile(),
                     'lstat should find file if link is in guard'
                 )
 
                 assert.ok(
-                    (await patchedFs.promises.lstat(linkPath)).isFile(),
+                    (await fs.promises.lstat(linkPath)).isFile(),
                     'promises.lstat should find file if link is in guard'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -151,24 +151,22 @@ describe('testing lstat', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
 
                 const linkPath = path.join(fixturesDir, 'a', 'link')
 
                 assert.ok(
-                    patchedFs.lstatSync(linkPath).isFile(),
+                    fs.lstatSync(linkPath).isFile(),
                     'lstatSync should find file it file link is out of root'
                 )
 
                 assert.ok(
-                    (await util.promisify(patchedFs.lstat)(linkPath)).isFile(),
+                    (await util.promisify(fs.lstat)(linkPath)).isFile(),
                     'lstat should find file it file link is out of root'
                 )
 
                 assert.ok(
-                    (await patchedFs.promises.lstat(linkPath)).isFile(),
+                    (await fs.promises.lstat(linkPath)).isFile(),
                     'promises.lstat should find file it file link is out of root'
                 )
 
@@ -179,19 +177,17 @@ describe('testing lstat', async () => {
                 )
 
                 assert.ok(
-                    patchedFs.lstatSync(brokenLinkPath).isSymbolicLink(),
+                    fs.lstatSync(brokenLinkPath).isSymbolicLink(),
                     'if a symlink is broken but is escaping return it as a link.'
                 )
                 assert.ok(
                     (
-                        await util.promisify(patchedFs.lstat)(brokenLinkPath)
+                        await util.promisify(fs.lstat)(brokenLinkPath)
                     ).isSymbolicLink(),
                     'if a symlink is broken but is escaping return it as a link.'
                 )
                 assert.ok(
-                    (
-                        await patchedFs.promises.lstat(brokenLinkPath)
-                    ).isSymbolicLink(),
+                    (await fs.promises.lstat(brokenLinkPath)).isSymbolicLink(),
                     'if a symlink is broken but is escaping return it as a link.'
                 )
 
@@ -201,11 +197,13 @@ describe('testing lstat', async () => {
                     brokenLinkPath
                 )
 
-                stat = await patchedFs.promises.lstat(brokenLinkPath)
+                stat = await fs.promises.lstat(brokenLinkPath)
                 assert.ok(
                     stat.isSymbolicLink(),
                     'if a symlink is broken but not escaping return it as a link.'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -224,34 +222,34 @@ describe('testing lstat', async () => {
                     path.join(fixturesDir, 'b', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
 
                 const linkPath = path.join(fixturesDir, 'b', 'link')
 
                 assert.ok(
-                    patchedFs.lstatSync(linkPath).isSymbolicLink(),
+                    fs.lstatSync(linkPath).isSymbolicLink(),
                     'lstatSync should find symbolic link if link is out of the root'
                 )
 
                 assert.ok(
-                    patchedFs
+                    fs
                         .lstatSync(new URL(`file://${linkPath}`))
                         .isSymbolicLink(),
                     'lstatSync should find symbolic link if link is out of the root'
                 )
 
-                const stat = await util.promisify(patchedFs.lstat)(linkPath)
+                const stat = await util.promisify(fs.lstat)(linkPath)
                 assert.ok(
                     stat.isSymbolicLink(),
                     'lstat should find symbolic link if link is outside'
                 )
 
                 assert.ok(
-                    (await patchedFs.promises.lstat(linkPath)).isSymbolicLink(),
+                    (await fs.promises.lstat(linkPath)).isSymbolicLink(),
                     'promises.lstat should find symbolic link if link is outside'
                 )
+
+                revertPatches()
             }
         )
     })

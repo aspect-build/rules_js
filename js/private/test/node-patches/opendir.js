@@ -45,12 +45,10 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [fixturesDir])
+                const revertPatches = patcher([fixturesDir])
 
                 let dir
-                dir = await util.promisify(patchedFs.opendir)(
+                dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'a')
                 )
                 const entry1 = await dir.read()
@@ -67,10 +65,12 @@ describe('testing opendir', async () => {
                 assert.ok(!empty, 'last read should be falsey')
 
                 // Assert reading via URL produces the same (first) result.
-                dir = await util.promisify(patchedFs.opendir)(
+                dir = await util.promisify(fs.opendir)(
                     new URL(`file://${path.join(fixturesDir, 'a')}`)
                 )
                 assert.equal(entry1.name, (await dir.read()).name)
+
+                revertPatches()
             }
         )
     })
@@ -89,12 +89,10 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
 
                 let dir
-                dir = await util.promisify(patchedFs.opendir)(
+                dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'a')
                 )
                 const entry1 = await dir.read()
@@ -111,6 +109,8 @@ describe('testing opendir', async () => {
 
                 console.error(entry1, entry2)
                 assert.ok(!maybeLink.isSymbolicLink())
+
+                revertPatches()
             }
         )
     })
@@ -129,11 +129,9 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir)])
+                const revertPatches = patcher([path.join(fixturesDir)])
 
-                const dir = await util.promisify(patchedFs.opendir)(
+                const dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'a')
                 )
                 const names = []
@@ -147,6 +145,8 @@ describe('testing opendir', async () => {
                 }
                 names.sort()
                 assert.deepStrictEqual(names, ['apples', 'link'])
+
+                revertPatches()
             }
         )
     })
@@ -165,11 +165,9 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
 
-                const dir = await util.promisify(patchedFs.opendir)(
+                const dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'a')
                 )
                 const names = []
@@ -184,6 +182,8 @@ describe('testing opendir', async () => {
                 }
                 names.sort()
                 assert.deepStrictEqual(names, ['apples', 'link'])
+
+                revertPatches()
             }
         )
     })
@@ -222,13 +222,12 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
 
                 let dir
-                dir = await util.promisify(patchedFs.opendir)(
+                dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'sandbox')
                 )
                 const entry1 = await dir.read()
@@ -257,6 +256,8 @@ describe('testing opendir', async () => {
                 )
 
                 assert.ok(!empty, 'last read should be falsey')
+
+                revertPatches()
             }
         )
     })
