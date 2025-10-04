@@ -45,18 +45,38 @@ const util = require("util");
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('node:fs');
+const fs = require('node:fs');
 const url = require('node:url');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
-function patcher(fs = _fs, roots) {
-    fs = fs || _fs;
+const PATCHED_FS_METHODS = [
+    'lstat',
+    'lstatSync',
+    'realpath',
+    'realpathSync',
+    'readlink',
+    'readlinkSync',
+    'readdir',
+    'readdirSync',
+    'opendir',
+];
+/**
+ * Function that patches the `fs` module to not escape the given roots.
+ * @returns a function to undo the patches.
+ */
+function patcher(roots) {
+    if (fs._unpatched) {
+        throw new Error('FS is already patched.');
+    }
     // Make the original version of the library available for when access to the
     // unguarded file system is necessary, such as the esbuild plugin that
     // protects against sandbox escaping that occurs through module resolution
     // in the Go binary. See
     // https://github.com/aspect-build/rules_esbuild/issues/58.
-    fs._unpatched = Object.assign({}, fs);
+    fs._unpatched = PATCHED_FS_METHODS.reduce((obj, method) => {
+        obj[method] = fs[method];
+        return obj;
+    }, {});
     roots = roots || [];
     roots = roots.filter((root) => fs.existsSync(root));
     if (!roots.length) {
@@ -245,15 +265,8 @@ function patcher(fs = _fs, roots) {
                         !isEscape(resolved, next, [escapedRoot])) {
                         return cb(null, next);
                     }
-                    // The escape from the root is not mappable back into the root; we must make
-                    // this look like a real file so we call readlink on the realpath which we
-                    // expect to return an error
-                    return origRealpath(resolved, readlinkRealpathCb);
-                    function readlinkRealpathCb(err, str) {
-                        if (err)
-                            return cb(err);
-                        return origReadlink(str, cb);
-                    }
+                    // The escape from the root is not mappable back into the root; throw EINVAL
+                    return cb(einval('readlink', args[0]));
                 }
             }
             else {
@@ -366,6 +379,7 @@ function patcher(fs = _fs, roots) {
      * this api is available as experimental without a flag so users can access it at any time.
      */
     const promisePropertyDescriptor = Object.getOwnPropertyDescriptor(fs, 'promises');
+    let unpatchPromises;
     if (promisePropertyDescriptor) {
         const promises = {};
         promises.lstat = util.promisify(fs.lstat);
@@ -380,16 +394,28 @@ function patcher(fs = _fs, roots) {
         if (promisePropertyDescriptor.get) {
             const oldGetter = promisePropertyDescriptor.get.bind(fs);
             const cachedPromises = {};
-            promisePropertyDescriptor.get = () => {
+            function promisePropertyGetter() {
                 const _promises = oldGetter();
                 Object.assign(cachedPromises, _promises, promises);
                 return cachedPromises;
+            }
+            Object.defineProperty(fs, 'promises', Object.assign(Object.create(promisePropertyDescriptor), {
+                get: promisePropertyGetter,
+            }));
+            unpatchPromises = function unpatchFsPromises() {
+                Object.defineProperty(fs, 'promises', promisePropertyDescriptor);
             };
-            Object.defineProperty(fs, 'promises', promisePropertyDescriptor);
         }
         else {
+            const unpatchedPromises = Object.keys(promises).reduce((obj, method) => {
+                obj[method] = fs.promises[method];
+                return obj;
+            }, Object.create(fs.promises));
             // api can be patched directly
             Object.assign(fs.promises, promises);
+            unpatchPromises = function unpatchFsPromises() {
+                Object.assign(fs.promises, unpatchedPromises);
+            };
         }
     }
     // =========================================================================
@@ -721,6 +747,13 @@ function patcher(fs = _fs, roots) {
             }
         }
     }
+    return function revertPatch() {
+        Object.assign(fs, fs._unpatched);
+        delete fs._unpatched;
+        if (unpatchPromises) {
+            unpatchPromises();
+        }
+    };
 }
 // =========================================================================
 // generic helper functions

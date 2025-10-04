@@ -32,33 +32,30 @@ async function it(_, fn) {
 
 describe('testing realpath', async () => {
     await it('can handle empty, dot, undefined & null values', async () => {
-        const patchedFs = Object.assign({}, fs)
-        patchedFs.promises = Object.assign({}, fs.promises)
-
-        patcher(patchedFs, [process.cwd()])
+        const revertPatches = patcher([process.cwd()])
 
         // ---------------------------------------------------------------------
         // empty string
 
         assert.deepStrictEqual(
-            patchedFs.realpathSync(''),
+            fs.realpathSync(''),
             process.cwd(),
             'should handle an empty string'
         )
 
         assert.throws(() => {
-            patchedFs.realpathSync.native('')
+            fs.realpathSync.native('')
         }, 'should throw if empty string is passed')
 
         assert.deepStrictEqual(
-            await util.promisify(patchedFs.realpath)(''),
+            await util.promisify(fs.realpath)(''),
             process.cwd(),
             'should handle an empty string'
         )
 
         let thrown
         try {
-            await util.promisify(patchedFs.realpath.native)('')
+            await util.promisify(fs.realpath.native)('')
         } catch (e) {
             thrown = e
         } finally {
@@ -69,25 +66,25 @@ describe('testing realpath', async () => {
         // '.'
 
         assert.deepStrictEqual(
-            patchedFs.realpathSync('.'),
+            fs.realpathSync('.'),
             process.cwd(),
             "should handle '.'"
         )
 
         assert.deepStrictEqual(
-            patchedFs.realpathSync.native('.'),
+            fs.realpathSync.native('.'),
             process.cwd(),
             "should handle '.'"
         )
 
         assert.deepStrictEqual(
-            await util.promisify(patchedFs.realpath)('.'),
+            await util.promisify(fs.realpath)('.'),
             process.cwd(),
             "should handle '.'"
         )
 
         assert.deepStrictEqual(
-            await util.promisify(patchedFs.realpath.native)('.'),
+            await util.promisify(fs.realpath.native)('.'),
             process.cwd(),
             "should handle '.'"
         )
@@ -96,16 +93,16 @@ describe('testing realpath', async () => {
         // undefined
 
         assert.throws(() => {
-            patchedFs.realpathSync(undefined)
+            fs.realpathSync(undefined)
         }, 'should throw if undefined is passed')
 
         assert.throws(() => {
-            patchedFs.realpathSync.native(undefined)
+            fs.realpathSync.native(undefined)
         }, 'should throw if undefined is passed')
 
         thrown = undefined
         try {
-            await util.promisify(patchedFs.realpath)(undefined)
+            await util.promisify(fs.realpath)(undefined)
         } catch (e) {
             thrown = e
         } finally {
@@ -114,7 +111,7 @@ describe('testing realpath', async () => {
 
         thrown = undefined
         try {
-            await util.promisify(patchedFs.realpath.native)(undefined)
+            await util.promisify(fs.realpath.native)(undefined)
         } catch (e) {
             thrown = e
         } finally {
@@ -125,16 +122,16 @@ describe('testing realpath', async () => {
         // null
 
         assert.throws(() => {
-            patchedFs.realpathSync(null)
+            fs.realpathSync(null)
         }, 'should throw if null is passed')
 
         assert.throws(() => {
-            patchedFs.realpathSync.native(null)
+            fs.realpathSync.native(null)
         }, 'should throw if null is passed')
 
         thrown = undefined
         try {
-            await util.promisify(patchedFs.realpath)(null)
+            await util.promisify(fs.realpath)(null)
         } catch (e) {
             thrown = e
         } finally {
@@ -143,12 +140,14 @@ describe('testing realpath', async () => {
 
         thrown = undefined
         try {
-            await util.promisify(patchedFs.realpath.native)(null)
+            await util.promisify(fs.realpath.native)(null)
         } catch (e) {
             thrown = e
         } finally {
             if (!thrown) assert.fail('should throw if null is passed')
         }
+
+        revertPatches()
     })
 
     await it('can resolve symlink in root', async () => {
@@ -167,10 +166,7 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir)])
+                const revertPatches = patcher([path.join(fixturesDir)])
                 const linkPath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
@@ -178,34 +174,36 @@ describe('testing realpath', async () => {
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(linkPath),
+                    fs.realpathSync(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'SYNC: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(linkPath),
+                    fs.realpathSync.native(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'SYNC.native: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(linkPath),
+                    await util.promisify(fs.realpath)(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'CB: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    await util.promisify(fs.realpath.native)(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'CB: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(linkPath),
+                    await fs.promises.realpath(linkPath),
                     path.join(fixturesDir, 'b', 'file'),
                     'Promise: should resolve the symlink the same because its within root'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -219,10 +217,7 @@ describe('testing realpath', async () => {
                 // on mac, inside of bazel, the fixtures dir returned here is not realpath-ed.
                 fixturesDir = fs.realpathSync(fixturesDir)
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir)])
+                const revertPatches = patcher([path.join(fixturesDir)])
                 const filePath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
@@ -230,31 +225,31 @@ describe('testing realpath', async () => {
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(filePath),
+                    fs.realpathSync(filePath),
                     filePath,
                     'SYNC: should resolve the a real file within the root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(filePath),
+                    fs.realpathSync.native(filePath),
                     filePath,
                     'SYNC.native: should resolve the a real file within the root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(filePath),
+                    await util.promisify(fs.realpath)(filePath),
                     filePath,
                     'CB: should resolve the a real file within the root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath.native)(filePath),
+                    await util.promisify(fs.realpath.native)(filePath),
                     filePath,
                     'CB: should resolve the a real file within the root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(filePath),
+                    await fs.promises.realpath(filePath),
                     filePath,
                     'Promise: should resolve the a real file within the root'
                 )
@@ -265,36 +260,36 @@ describe('testing realpath', async () => {
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(directoryPath),
+                    fs.realpathSync(directoryPath),
                     directoryPath,
                     'SYNC: should resolve the a real directory within the root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(directoryPath),
+                    fs.realpathSync.native(directoryPath),
                     directoryPath,
                     'SYNC.native: should resolve the a real directory within the root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(directoryPath),
+                    await util.promisify(fs.realpath)(directoryPath),
                     directoryPath,
                     'CB: should resolve the a real directory within the root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath.native)(
-                        directoryPath
-                    ),
+                    await util.promisify(fs.realpath.native)(directoryPath),
                     directoryPath,
                     'CB: should resolve the a real directory within the root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(directoryPath),
+                    await fs.promises.realpath(directoryPath),
                     directoryPath,
                     'Promise: should resolve the a real directory within the root'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -315,10 +310,7 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
                 const linkPath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
@@ -326,36 +318,36 @@ describe('testing realpath', async () => {
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(linkPath),
+                    fs.realpathSync(linkPath),
                     path.join(fixturesDir, 'a', 'link'),
                     'should pretend symlink is in the root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(new URL(`file://${linkPath}`)),
+                    fs.realpathSync(new URL(`file://${linkPath}`)),
                     path.join(fixturesDir, 'a', 'link'),
                     'should pretend symlink is in the root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(linkPath),
+                    await util.promisify(fs.realpath)(linkPath),
                     path.join(fixturesDir, 'a', 'link'),
                     'should pretend symlink is in the root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(linkPath),
+                    await fs.promises.realpath(linkPath),
                     path.join(fixturesDir, 'a', 'link'),
                     'should pretend symlink is in the root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(
-                        new URL(`file://${linkPath}`)
-                    ),
+                    await fs.promises.realpath(new URL(`file://${linkPath}`)),
                     path.join(fixturesDir, 'a', 'link'),
                     'should pretend symlink is in the root'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -382,63 +374,60 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
                 const linkPath = path.join(fixturesDir, 'sandbox', 'link')
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(linkPath),
+                    fs.realpathSync(linkPath),
                     linkPath,
                     'SYNC: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(new URL(`file://${linkPath}`)),
+                    fs.realpathSync(new URL(`file://${linkPath}`)),
                     linkPath,
                     'SYNC: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(linkPath),
+                    fs.realpathSync.native(linkPath),
                     linkPath,
                     'SYNC.native: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(
-                        new URL(`file://${linkPath}`)
-                    ),
+                    fs.realpathSync.native(new URL(`file://${linkPath}`)),
                     linkPath,
                     'SYNC.native: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(linkPath),
+                    await util.promisify(fs.realpath)(linkPath),
                     linkPath,
                     'CB: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    await util.promisify(fs.realpath.native)(linkPath),
                     linkPath,
                     'CB: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(linkPath),
+                    await fs.promises.realpath(linkPath),
                     linkPath,
                     'Promise: should resolve the symlink the same because its within root'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(
-                        new URL(`file://${linkPath}`)
-                    ),
+                    await fs.promises.realpath(new URL(`file://${linkPath}`)),
                     linkPath,
                     'Promise: should resolve the symlink the same because its within root'
                 )
+
+                revertPatches()
             }
         )
     })
@@ -464,23 +453,22 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
                 const linkPath = path.join(fixturesDir, 'sandbox', 'link')
 
                 assert.throws(() => {
-                    patchedFs.realpathSync(linkPath)
+                    fs.realpathSync(linkPath)
                 }, "should throw because it's not a resolvable link")
 
                 assert.throws(() => {
-                    patchedFs.realpathSync.native(linkPath)
+                    fs.realpathSync.native(linkPath)
                 }, "should throw because it's not a resolvable link")
 
                 let thrown
                 try {
-                    await util.promisify(patchedFs.realpath)(linkPath)
+                    await util.promisify(fs.realpath)(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
@@ -489,7 +477,7 @@ describe('testing realpath', async () => {
 
                 thrown = undefined
                 try {
-                    await util.promisify(patchedFs.realpath.native)(linkPath)
+                    await util.promisify(fs.realpath.native)(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
@@ -498,12 +486,14 @@ describe('testing realpath', async () => {
 
                 thrown = undefined
                 try {
-                    await patchedFs.promises.realpath(linkPath)
+                    await fs.promises.realpath(linkPath)
                 } catch (e) {
                     thrown = e
                 } finally {
                     if (!thrown) assert.fail('must throw einval error')
                 }
+
+                revertPatches()
             }
         )
     })
@@ -555,10 +545,9 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'sandbox', 'node_modules', 'pkg')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
                 const linkPath = path.join(
                     fixturesDir,
                     'sandbox',
@@ -575,31 +564,31 @@ describe('testing realpath', async () => {
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(linkPath),
+                    fs.realpathSync(linkPath),
                     filePath,
                     'SYNC: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(linkPath),
+                    fs.realpathSync.native(linkPath),
                     filePath,
                     'SYNC.native: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(linkPath),
+                    await util.promisify(fs.realpath)(linkPath),
                     filePath,
                     'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath.native)(linkPath),
+                    await util.promisify(fs.realpath.native)(linkPath),
                     filePath,
                     'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(linkPath),
+                    await fs.promises.realpath(linkPath),
                     filePath,
                     'Promise: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
@@ -618,34 +607,36 @@ describe('testing realpath', async () => {
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync(linkPath2),
+                    fs.realpathSync(linkPath2),
                     filePath2,
                     'SYNC: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    patchedFs.realpathSync.native(linkPath2),
+                    fs.realpathSync.native(linkPath2),
                     filePath2,
                     'SYNC.native: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath)(linkPath2),
+                    await util.promisify(fs.realpath)(linkPath2),
                     filePath2,
                     'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    await util.promisify(patchedFs.realpath.native)(linkPath2),
+                    await util.promisify(fs.realpath.native)(linkPath2),
                     filePath2,
                     'CB: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
 
                 assert.deepStrictEqual(
-                    await patchedFs.promises.realpath(linkPath2),
+                    await fs.promises.realpath(linkPath2),
                     filePath2,
                     'Promise: should resolve the nested escaping symlinking within a non-escaping parent directory symlink'
                 )
+
+                revertPatches()
             }
         )
     })

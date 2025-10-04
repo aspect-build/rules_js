@@ -35,7 +35,6 @@ if (
     JS_BINARY__PATCH_NODE_FS != '0' &&
     JS_BINARY__FS_PATCH_ROOTS
 ) {
-    const fs = require('node:fs')
     const module = require('node:module')
     const roots = JS_BINARY__FS_PATCH_ROOTS.split(':')
     if (JS_BINARY__LOG_DEBUG) {
@@ -43,7 +42,7 @@ if (
             `DEBUG: ${JS_BINARY__LOG_PREFIX}: node fs patches will be applied with roots: ${roots}`
         )
     }
-    patchfs(fs, roots)
+    patchfs(roots)
 
     // Sync the esm modules to use the now patched fs cjs module.
     // See: https://nodejs.org/api/esm.html#builtin-modules

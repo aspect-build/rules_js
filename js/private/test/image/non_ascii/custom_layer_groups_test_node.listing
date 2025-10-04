@@ -9,7 +9,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/node-patches/
--r-xr-xr-x  0 0      0        1702 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/node-patches/register.cjs
+-r-xr-xr-x  0 0      0        1664 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/node-patches/register.cjs
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/rules_nodejs~~node~nodejs_linux_amd64/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/

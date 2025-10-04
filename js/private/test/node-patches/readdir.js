@@ -45,22 +45,17 @@ describe('testing readdir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [fixturesDir])
+                const revertPatches = patcher([fixturesDir])
 
-                let dirents = patchedFs.readdirSync(
-                    path.join(fixturesDir, 'a'),
-                    {
-                        withFileTypes: true,
-                    }
-                )
+                let dirents = fs.readdirSync(path.join(fixturesDir, 'a'), {
+                    withFileTypes: true,
+                })
                 assert.deepStrictEqual(dirents[0].name, 'apples')
                 assert.deepStrictEqual(dirents[1].name, 'link')
                 assert.ok(dirents[0].isFile())
                 assert.ok(dirents[1].isSymbolicLink())
 
-                dirents = await util.promisify(patchedFs.readdir)(
+                dirents = await util.promisify(fs.readdir)(
                     path.join(fixturesDir, 'a'),
                     { withFileTypes: true }
                 )
@@ -69,7 +64,7 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[0].isFile())
                 assert.ok(dirents[1].isSymbolicLink())
 
-                dirents = await patchedFs.promises.readdir(
+                dirents = await fs.promises.readdir(
                     path.join(fixturesDir, 'a'),
                     { withFileTypes: true }
                 )
@@ -79,7 +74,7 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[1].isSymbolicLink())
 
                 // Assert the same with URL file references
-                dirents = patchedFs.readdirSync(
+                dirents = fs.readdirSync(
                     new URL(`file://${path.join(fixturesDir, 'a')}`),
                     {
                         withFileTypes: true,
@@ -89,6 +84,8 @@ describe('testing readdir', async () => {
                 assert.deepStrictEqual(dirents[1].name, 'link')
                 assert.ok(dirents[0].isFile())
                 assert.ok(dirents[1].isSymbolicLink())
+
+                revertPatches()
             }
         )
     })
@@ -107,18 +104,13 @@ describe('testing readdir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
-                patcher(patchedFs, [path.join(fixturesDir, 'a')])
+                const revertPatches = patcher([path.join(fixturesDir, 'a')])
 
                 console.error('FOO')
-                console.error(patchedFs.readdirSync)
-                let dirents = patchedFs.readdirSync(
-                    path.join(fixturesDir, 'a'),
-                    {
-                        withFileTypes: true,
-                    }
-                )
+                console.error(fs.readdirSync)
+                let dirents = fs.readdirSync(path.join(fixturesDir, 'a'), {
+                    withFileTypes: true,
+                })
                 console.error('BAR')
                 console.log(dirents)
                 assert.deepStrictEqual(dirents[0].name, 'apples')
@@ -128,7 +120,7 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[1].isFile())
 
                 console.error('FOO')
-                dirents = await util.promisify(patchedFs.readdir)(
+                dirents = await util.promisify(fs.readdir)(
                     path.join(fixturesDir, 'a'),
                     { withFileTypes: true }
                 )
@@ -139,7 +131,7 @@ describe('testing readdir', async () => {
                 assert.ok(!dirents[1].isSymbolicLink())
                 assert.ok(dirents[1].isFile())
 
-                dirents = await patchedFs.promises.readdir(
+                dirents = await fs.promises.readdir(
                     path.join(fixturesDir, 'a'),
                     { withFileTypes: true }
                 )
@@ -148,6 +140,8 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[0].isFile())
                 assert.ok(!dirents[1].isSymbolicLink())
                 assert.ok(dirents[1].isFile())
+
+                revertPatches()
             }
         )
     })
@@ -186,12 +180,11 @@ describe('testing readdir', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const patchedFs = Object.assign({}, fs)
-                patchedFs.promises = Object.assign({}, fs.promises)
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
 
-                patcher(patchedFs, [path.join(fixturesDir, 'sandbox')])
-
-                let dirents = patchedFs.readdirSync(
+                let dirents = fs.readdirSync(
                     path.join(fixturesDir, 'sandbox'),
                     {
                         withFileTypes: true,
@@ -204,7 +197,7 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[1].isSymbolicLink())
                 assert.ok(dirents[2].isSymbolicLink())
 
-                dirents = await util.promisify(patchedFs.readdir)(
+                dirents = await util.promisify(fs.readdir)(
                     path.join(fixturesDir, 'sandbox'),
                     { withFileTypes: true }
                 )
@@ -215,7 +208,7 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[1].isSymbolicLink())
                 assert.ok(dirents[2].isSymbolicLink())
 
-                dirents = await patchedFs.promises.readdir(
+                dirents = await fs.promises.readdir(
                     path.join(fixturesDir, 'sandbox'),
                     { withFileTypes: true }
                 )
@@ -225,6 +218,8 @@ describe('testing readdir', async () => {
                 assert.ok(dirents[0].isFile())
                 assert.ok(dirents[1].isSymbolicLink())
                 assert.ok(dirents[2].isSymbolicLink())
+
+                revertPatches()
             }
         )
     })
