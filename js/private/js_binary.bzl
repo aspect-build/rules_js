@@ -209,7 +209,7 @@ _ATTRS = {
         the execroot, runfiles and the sandbox even when using the ESM loader.
 
         This flag only has an effect when `patch_node_fs` is True.""",
-        default = False,
+        default = True,
     ),
     "include_sources": attr.bool(
         doc = """When True, `sources` from `JsInfo` providers in `data` targets are included in the runfiles of the target.""",

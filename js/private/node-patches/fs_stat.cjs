@@ -24,13 +24,6 @@ class FsInternalStatPatcher {
     patch() {
         const statPatcher = this;
         internalFs.lstat = function (path, bigint, reqCallback, throwIfNoEntry) {
-            const currentStack = new Error().stack;
-            const needsGuarding = currentStack &&
-                (currentStack.includes('finalizeResolution (node:internal/modules/esm/resolve') &&
-                    !currentStack.includes('eeguardStats'));
-            if (!needsGuarding) {
-                return statPatcher._originalFsLstat.call(internalFs, path, bigint, reqCallback, throwIfNoEntry);
-            }
             if (reqCallback === internalFs.kUsePromises) {
                 return statPatcher._originalFsLstat.call(internalFs, path, bigint, reqCallback, throwIfNoEntry).then((stats) => {
                     return new Promise((resolve, reject) => {

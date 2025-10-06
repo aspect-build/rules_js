@@ -36,6 +36,7 @@ export class FsInternalStatPatcher {
         !currentStack.includes('eeguardStats'));
 
       if (!needsGuarding) {
+        console.log("NO NEED: " + currentStack);
         return statPatcher._originalFsLstat.call(
           internalFs,
           path,
