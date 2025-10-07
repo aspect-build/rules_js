@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const assert = require('assert')
-const fs = require('fs')
-const withFixtures = require('inline-fixtures').withFixtures
-const path = require('path')
-const util = require('util')
+import * as assert from 'node:assert'
+import * as fs from 'node:fs'
+import { withFixtures } from 'inline-fixtures'
+import * as path from 'node:path'
+import * as util from 'node:util'
 
-const patcher = require('../../node-patches/src/fs.cjs').patcher
+import { patcher } from '../../node-patches/src/fs.cjs'
 
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {

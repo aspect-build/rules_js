@@ -30,6 +30,7 @@ type Dirent = any
 // es modules
 const fs = require('node:fs') as any
 const url = require('node:url') as typeof UrlType
+const esmModule = require('node:module')
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
@@ -857,6 +858,10 @@ export function patcher(roots: string[]): () => void {
         }
     }
 
+    // Sync the esm modules to use the now patched fs cjs module.
+    // See: https://nodejs.org/api/esm.html#builtin-modules
+    esmModule.syncBuiltinESMExports()
+
     return function revertPatch() {
         Object.assign(fs, fs._unpatched)
         delete fs._unpatched
@@ -864,6 +869,9 @@ export function patcher(roots: string[]): () => void {
         if (unpatchPromises) {
             unpatchPromises()
         }
+
+        // Re-sync the esm modules to revert to the unpatched module.
+        esmModule.syncBuiltinESMExports()
     }
 }
 
