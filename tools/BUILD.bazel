@@ -12,7 +12,7 @@ package(default_visibility = ["//:__subpackages__"])
 format_multirun(
     name = "format",
     shell = "@aspect_rules_lint//format:shfmt",
-    starlark = "//:buildifier",
+    starlark = "@buildifier_prebuilt//:buildifier",
 )
 
 bazelrc_preset(
