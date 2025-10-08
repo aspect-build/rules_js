@@ -12,6 +12,15 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    e2e/git_dep_metadata:
+        icon: npm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     e2e/gyp_no_install_script:
         icon: npm
         tasks:
@@ -53,6 +62,15 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    e2e/npm_link_package-rerooted:
+        icon: npm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     e2e/npm_translate_lock:
         icon: npm
         tasks:
@@ -72,6 +90,15 @@ workspaces:
             - buildifier:
                   without: true
     e2e/npm_translate_lock_empty:
+        icon: npm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+    e2e/npm_translate_lock_exclude_package_contents:
         icon: npm
         tasks:
             - test:
@@ -109,6 +136,15 @@ workspaces:
                   without: true
     # Requires an auth token
     # e2e/npm_translate_lock_auth:
+    e2e/npm_translate_lock_disable_hooks:
+        icon: npm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     # Requires an SSH token
     # e2e/npm_translate_lock_git+ssh:
     e2e/npm_translate_package_lock:
@@ -138,6 +174,15 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    e2e/patch_from_repo:
+        icon: npm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     e2e/pnpm_lockfiles:
         icon: pnpm
         tasks:
@@ -147,7 +192,25 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    e2e/pnpm_repo_install:
+        icon: pnpm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     e2e/pnpm_workspace:
+        icon: pnpm
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+    e2e/pnpm_workspace_deps:
         icon: pnpm
         tasks:
             - test:
@@ -174,6 +237,15 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    e2e/rules_foo:
+        icon: js
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     e2e/runfiles:
         icon: js
         tasks:
@@ -183,8 +255,8 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
-    e2e/rules_foo:
-        icon: js
+    e2e/stamped_package_json:
+        icon: npm
         tasks:
             - test:
                   queue: aspect-medium
@@ -201,12 +273,50 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    e2e/vendored_tarfile:
+        icon: js
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+    e2e/verify_patches:
+        icon: js
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+    e2e/worker:
+        icon: js
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+    e2e/workspace:
+        icon: js
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
     # No test targets. Requires running test.sh.
+    # e2e/update_pnpm_lock:
+    # e2e/update_pnpm_lock_with_import:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
 bazel:
-  flags:
-    - --config=ci
+    flags:
+        - --config=ci
 tasks:
     - checkout:
           update_strategy: rebase
