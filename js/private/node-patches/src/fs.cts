@@ -416,16 +416,14 @@ export function patcher(roots: string[]): () => void {
                     dir: Dir
                 ) {
                     try {
-                        cb(null, await handleDir(dir))
+                        cb(null, handleDir(dir))
                     } catch (err) {
                         cb(err)
                     }
                 }
                 origOpendir(...args)
             } else {
-                return origOpendir(...args).then((dir: Dir) => {
-                    return handleDir(dir)
-                })
+                return origOpendir(...args).then(handleDir)
             }
         }
     }
@@ -502,20 +500,23 @@ export function patcher(roots: string[]): () => void {
     // helper functions for dirs
     // =========================================================================
 
-    async function handleDir(dir: Dir) {
+    function handleDir(dir: Dir) {
         const p = path.resolve(dir.path)
-        const origIterator = dir[Symbol.asyncIterator].bind(dir)
-        const origRead: any = dir.read.bind(dir)
 
+        const origIterator = dir[Symbol.asyncIterator].bind(dir)
         dir[Symbol.asyncIterator] = async function* () {
             for await (const entry of origIterator()) {
                 await handleDirent(p, entry)
                 yield entry
             }
         }
-        ;(dir.read as any) = async function handleDirRead(...args: any[]) {
+
+        const origRead = dir.read.bind(dir)
+        dir.read = async function handleDirRead(
+            ...args: Parameters<typeof dir.read>
+        ) {
             if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1]
+                const cb = args[args.length - 1] as Function
                 args[args.length - 1] = async function handleDirReadCb(
                     err: Error,
                     entry: Dirent
@@ -531,21 +532,24 @@ export function patcher(roots: string[]): () => void {
                 return entry
             }
         }
-        const origReadSync: any = dir.readSync.bind(dir)
-        ;(dir.readSync as any) = function handleDirReadSync() {
-            return handleDirentSync(p, origReadSync()) // intentionally sync for simplicity
+        const origReadSync = dir.readSync.bind(dir)
+        dir.readSync = function handleDirReadSync() {
+            return handleDirentSync(p, origReadSync())
         }
 
         return dir
     }
 
-    function handleDirent(p: string, v: Dirent): Promise<Dirent> {
+    async function handleDirent(p: string, v: Dirent) {
+        if (!v.isSymbolicLink()) {
+            return v
+        }
+
+        const f = path.resolve(p, v.name)
+
         return new Promise(function handleDirentExecutor(resolve, reject) {
-            if (!v.isSymbolicLink()) {
-                return resolve(v)
-            }
-            const f = path.resolve(p, v.name)
             return guardedReadLink(f, handleDirentReadLinkCb)
+
             function handleDirentReadLinkCb(str: string) {
                 if (f != str) {
                     return resolve(v)
@@ -554,11 +558,11 @@ export function patcher(roots: string[]): () => void {
                 v.isSymbolicLink = () => false
                 origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
-                        throw err
+                        return reject(err)
                     }
                     fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
-                            throw err
+                            return reject(err)
                         }
                         patchDirent(v, stat)
                         resolve(v)
@@ -568,7 +572,7 @@ export function patcher(roots: string[]): () => void {
         })
     }
 
-    function handleDirentSync(p: string, v: Dirent | null): void {
+    function handleDirentSync(p: string, v: Dirent | null): Dirent | null {
         if (v && v.isSymbolicLink) {
             if (v.isSymbolicLink()) {
                 const f = path.resolve(p, v.name)
@@ -580,6 +584,7 @@ export function patcher(roots: string[]): () => void {
                 }
             }
         }
+        return v
     }
 
     function nextHop(loc: string, cb: (next: string | false) => void): void {
