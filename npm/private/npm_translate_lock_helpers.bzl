@@ -405,9 +405,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # gather all of the importers (workspace packages) that this npm package should be linked at which names
         link_packages = {}
-        for import_path, links in importer_links.items():
+        for links in importer_links.values():
             linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key, [])
+            link_names = linked_packages.get(package_key)
             if link_names:
                 link_packages[links["link_package"]] = link_names
 
