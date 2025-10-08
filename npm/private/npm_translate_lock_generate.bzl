@@ -634,12 +634,15 @@ def _generate_npm_package_locations(fp_links, npm_imports):
         if fp_link_packages:
             package_locations[fp_package] = fp_link_packages
 
-    # Add npm imports
     for _import in npm_imports:
         if _import.link_packages:
-            link_package_list = list(_import.link_packages.keys())
-            if link_package_list:
-                package_locations[_import.package] = link_package_list
+            for link_package, link_aliases in _import.link_packages.items():
+                aliases_to_add = link_aliases if link_aliases else [_import.package]
+                for alias in aliases_to_add:
+                    if alias not in package_locations:
+                        package_locations[alias] = []
+                    if link_package not in package_locations[alias]:
+                        package_locations[alias].append(link_package)
 
     return "_NPM_PACKAGE_LOCATIONS = {}".format(
         starlark_codegen_utils.to_dict_attr(package_locations, 0, quote_value = False),
