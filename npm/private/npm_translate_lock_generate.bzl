@@ -428,6 +428,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package} if accessible
         if _npm_check_package_visibility(bazel_package, "{fp_package}", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
+
                 # For public packages, also add scope target
                 if "//visibility:public" in package_visibility:
                     npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
