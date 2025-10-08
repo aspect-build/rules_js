@@ -79,7 +79,7 @@ load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_pack
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal", _npm_package_store = "npm_package_store")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/alts", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
 
@@ -406,7 +406,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package @scoped/c if accessible
         if _npm_check_package_visibility(bazel_package, "@scoped/c", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/@scoped/c".format(name))
@@ -457,7 +456,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package @scoped/a if accessible
         if _npm_check_package_visibility(bazel_package, "@scoped/a", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/@scoped/a".format(name))
@@ -498,7 +496,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package @scoped/b if accessible
         if _npm_check_package_visibility(bazel_package, "@scoped/b", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/@scoped/b".format(name))
@@ -539,7 +536,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package @scoped/d if accessible
         if _npm_check_package_visibility(bazel_package, "@scoped/d", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/@scoped/d".format(name))
@@ -578,7 +574,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package alias-project-a if accessible
         if _npm_check_package_visibility(bazel_package, "alias-project-a", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/alias-project-a".format(name))
@@ -615,7 +610,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package scoped/bad if accessible
         if _npm_check_package_visibility(bazel_package, "scoped/bad", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/scoped/bad".format(name))
@@ -653,7 +647,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package test-c200-d200 if accessible
         if _npm_check_package_visibility(bazel_package, "test-c200-d200", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/test-c200-d200".format(name))
@@ -691,7 +684,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package test-c201-d200 if accessible
         if _npm_check_package_visibility(bazel_package, "test-c201-d200", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/test-c201-d200".format(name))
@@ -726,7 +718,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package test-peer-types if accessible
         if _npm_check_package_visibility(bazel_package, "test-peer-types", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/test-peer-types".format(name))
@@ -763,7 +754,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-
         # Add first-party package a-types if accessible
         if _npm_check_package_visibility(bazel_package, "a-types", _NPM_PACKAGE_VISIBILITY):
             link_targets.append(":{}/a-types".format(name))
@@ -786,6 +776,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 def _validate_npm_package_visibility(accessing_package):
     """Validate that accessing_package can access npm packages that would be created here"""
     _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
+
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None):
