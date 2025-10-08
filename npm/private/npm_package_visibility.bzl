@@ -8,6 +8,7 @@ def validate_npm_package_visibility(accessing_package, package_locations, visibi
         package_locations: Dictionary mapping package names to lists of locations where they're available
         visibility_config: Dictionary mapping package names/patterns to visibility rules
     """
+
     # Get packages that would be created in this location
     packages_to_validate = []
 
@@ -41,6 +42,7 @@ def check_package_visibility(accessing_package, package_name, visibility_config)
     Returns:
         True if access is allowed, False otherwise
     """
+
     # Get visibility rules for this package
     visibility_rules = get_package_visibility_rules(package_name, visibility_config)
 
@@ -75,6 +77,7 @@ def get_package_visibility_rules(package_name, visibility_config):
     Returns:
         List of visibility rules for the package
     """
+
     # Direct package match
     if package_name in visibility_config:
         return visibility_config[package_name]
