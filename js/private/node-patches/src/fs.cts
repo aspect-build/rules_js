@@ -428,6 +428,16 @@ export function patcher(roots: string[]): () => void {
         }
     }
 
+    if (fs.opendirSync) {
+        const origOpendirSync = fs.opendirSync.bind(fs)
+        fs.opendirSync = function opendirSync(
+            ...args: Parameters<typeof origOpendirSync>
+        ) {
+            const dir = origOpendirSync(...args)
+            return handleDir(dir)
+        }
+    }
+
     // =========================================================================
     // fs.promises
     // =========================================================================
