@@ -351,7 +351,7 @@ function patcher(roots) {
                 const cb = once(args[args.length - 1]);
                 args[args.length - 1] = async function opendirCb(err, dir) {
                     try {
-                        cb(null, handleDir(dir));
+                        cb(err, err ? undefined : handleDir(dir));
                     }
                     catch (err) {
                         cb(err);
@@ -452,16 +452,18 @@ function patcher(roots) {
             });
         };
         const origRead = dir.read.bind(dir);
-        dir.read = async function handleDirRead(...args) {
-            if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1];
-                args[args.length - 1] = async function handleDirReadCb(err, entry) {
-                    cb(err, entry ? await handleDirent(p, entry) : null);
-                };
-                origRead(...args);
+        dir.read = async function handleDirRead(cb) {
+            if (typeof cb === 'function') {
+                origRead(function handleDirReadCb(err, entry) {
+                    if (err)
+                        return cb(err, null);
+                    handleDirent(p, entry).then(() => {
+                        cb(null, entry);
+                    }, (err) => cb(err, null));
+                });
             }
             else {
-                const entry = await origRead(...args);
+                const entry = await origRead();
                 if (entry) {
                     await handleDirent(p, entry);
                 }

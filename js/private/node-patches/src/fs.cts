@@ -22,8 +22,8 @@ import * as path from 'path'
 import * as util from 'util'
 
 // windows cant find the right types
-type Dir = any
-type Dirent = any
+type Dir = FsType.Dir
+type Dirent = FsType.Dirent
 
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
@@ -111,7 +111,7 @@ export function patcher(roots: string[]): () => void {
             return origLstat(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         // override the callback
         args[args.length - 1] = function lstatCb(err: Error, stats: Stats) {
@@ -207,7 +207,7 @@ export function patcher(roots: string[]): () => void {
             return origRealpath(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         args[args.length - 1] = function realpathCb(err: Error, str: string) {
             if (err) return cb(err)
@@ -230,7 +230,7 @@ export function patcher(roots: string[]): () => void {
             return origRealpathNative(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         args[args.length - 1] = function nativeCb(err: Error, str: string) {
             if (err) return cb(err)
@@ -277,7 +277,7 @@ export function patcher(roots: string[]): () => void {
             return origReadlink(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         args[args.length - 1] = function readlinkCb(err: Error, str: string) {
             if (err) return cb(err)
@@ -363,7 +363,7 @@ export function patcher(roots: string[]): () => void {
             return origReaddir(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
         const p = resolvePathLike(args[0])
 
         args[args.length - 1] = function readdirCb(
@@ -410,13 +410,13 @@ export function patcher(roots: string[]): () => void {
             // if this is not a function opendir should throw an error.
             // we call it so we don't have to throw a mock
             if (typeof args[args.length - 1] === 'function') {
-                const cb = once(args[args.length - 1] as any)
+                const cb = once(args[args.length - 1] as Function)
                 args[args.length - 1] = async function opendirCb(
                     err: Error,
                     dir: Dir
                 ) {
                     try {
-                        cb(null, handleDir(dir))
+                        cb(err, err ? undefined : handleDir(dir))
                     } catch (err) {
                         cb(err)
                     }
@@ -460,7 +460,7 @@ export function patcher(roots: string[]): () => void {
     let unpatchPromises: Function
 
     if (promisePropertyDescriptor) {
-        const promises: any = {}
+        const promises: typeof fs.promises = {}
         promises.lstat = util.promisify(fs.lstat)
         // NOTE: node core uses the newer realpath function fs.promises.native instead of fs.realPath
         promises.realpath = util.promisify(fs.realpath.native)
@@ -523,19 +523,20 @@ export function patcher(roots: string[]): () => void {
 
         const origRead = dir.read.bind(dir)
         dir.read = async function handleDirRead(
-            ...args: Parameters<typeof dir.read>
+            cb?: Parameters<typeof dir.read>[0]
         ) {
-            if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1] as Function
-                args[args.length - 1] = async function handleDirReadCb(
-                    err: Error,
-                    entry: Dirent
-                ) {
-                    cb(err, entry ? await handleDirent(p, entry) : null)
-                }
-                origRead(...args)
+            if (typeof cb === 'function') {
+                origRead(function handleDirReadCb(err: Error, entry: Dirent) {
+                    if (err) return cb(err, null)
+                    handleDirent(p, entry).then(
+                        () => {
+                            cb(null, entry)
+                        },
+                        (err) => cb(err, null)
+                    )
+                })
             } else {
-                const entry = await origRead(...args)
+                const entry = await origRead()
                 if (entry) {
                     await handleDirent(p, entry)
                 }
@@ -975,10 +976,10 @@ export function escapeFunction(_roots: string[]) {
     }
 }
 
-function once<T>(fn: (...args: unknown[]) => T) {
+function once(fn: Function) {
     let called = false
 
-    return function callOnce(...args: unknown[]) {
+    return function callOnce(...args: any[]) {
         if (called) return
         called = true
 
