@@ -46,7 +46,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr, label_store)
 
-    _init_link_workspace(priv, rctx, attr, label_store)
+    _init_link_workspace(priv, attr)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
     # TODO(windows): utils.exists is not yet support on Windows
@@ -134,7 +134,7 @@ def _init_pnpm_labels(priv, rctx, attr, label_store):
 
 ################################################################################
 def _init_update_labels(priv, _, attr, label_store):
-    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_lock_label = attr.pnpm_lock
     pnpm_lock_label_str = "//{}:{}".format(pnpm_lock_label.package, pnpm_lock_label.name)
     action_cache_path = paths.join(
         priv["external_repository_action_cache"],
@@ -170,7 +170,7 @@ def _init_patched_dependencies_labels(priv, _, attr, label_store):
     # Read patches from pnpm-lock.yaml `patchedDependencies`
     patches = []
     for patch_info in priv["patched_dependencies"].values():
-        patches.append("//%s:%s" % (label_store.label("pnpm_lock").package, patch_info.get("path")))
+        patches.append("//%s:%s" % (attr.pnpm_lock.package, patch_info.get("path")))
 
     # Convert patch label strings to labels
     patches = [attr.pnpm_lock.relative(p) for p in patches]
@@ -186,9 +186,9 @@ def _init_importer_labels(priv, label_store):
         label_store.add_sibling("lock", "package_json_{}".format(i), paths.join(p, PACKAGE_JSON_FILENAME))
 
 ################################################################################
-def _init_link_workspace(priv, _, attr, label_store):
+def _init_link_workspace(priv, attr):
     # initialize link_workspace either from pnpm_lock label or from override
-    priv["link_workspace"] = attr.link_workspace if attr.link_workspace else label_store.label("pnpm_lock").repo_name
+    priv["link_workspace"] = attr.link_workspace if attr.link_workspace else attr.pnpm_lock.repo_name
 
 ################################################################################
 def _init_external_repository_action_cache(priv, attr):
@@ -197,7 +197,7 @@ def _init_external_repository_action_cache(priv, attr):
 
 ################################################################################
 def _init_root_package(priv, rctx, attr, label_store):
-    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_lock_label = attr.pnpm_lock
 
     # use the directory of the pnpm_lock file as the root_package unless overridden by the root_package attribute
     if attr.root_package == DEFAULT_ROOT_PACKAGE:
@@ -284,7 +284,7 @@ def _copy_update_input_files(priv, rctx, attr, label_store):
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
 def _copy_unspecified_input_files(priv, rctx, attr, label_store):
-    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_lock_label = attr.pnpm_lock
 
     # pnpm-workspace.yaml
     pnpm_workspace_key = "pnpm_workspace"
@@ -480,7 +480,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
-def _load_lockfile(priv, rctx, _, label_store):
+def _load_lockfile(priv, rctx, attr, label_store):
     importers = {}
     packages = {}
     patched_dependencies = {}
@@ -489,7 +489,7 @@ def _load_lockfile(priv, rctx, _, label_store):
 
     yq_args = [
         str(label_store.path("host_yq")),
-        str(label_store.path("pnpm_lock")),
+        attr.pnpm_lock,
         "-o=json",
     ]
     result = rctx.execute(yq_args)

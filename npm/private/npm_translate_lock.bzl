@@ -27,7 +27,6 @@ Advanced users may want to directly fetch a package from npm rather than start f
 
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_generate.bzl", "generate_repository_files")
@@ -139,7 +138,7 @@ def _npm_translate_lock_impl(rctx):
 INFO: {} file updated. Please run your build again.
 
 See https://github.com/aspect-build/rules_js/issues/1445
-""".format(state.label_store.relative_path("pnpm_lock"))
+""".format(rctx.path(rctx.attr.pnpm_lock))
                 fail(msg)
 
     helpers.verify_node_modules_ignored(rctx, state.importers(), state.root_package())
@@ -148,7 +147,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     helpers.verify_lifecycle_hooks_specified(rctx, state)
 
-    rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
+    rctx.report_progress("Translating %s" % str(rctx.path(rctx.attr.pnpm_lock)))
 
     importers, packages = translate_to_transitive_closure(
         state.importers(),
@@ -162,7 +161,6 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     generate_repository_files(
         rctx,
-        state.label_store.label("pnpm_lock"),
         importers,
         packages,
         state.patched_dependencies(),
@@ -693,12 +691,12 @@ def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exc
 
 ################################################################################
 def _bootstrap_import(rctx, state):
-    pnpm_lock_label = state.label_store.label("pnpm_lock")
-    pnpm_lock_path = state.label_store.path("pnpm_lock")
+    pnpm_lock_label = rctx.attr.pnpm_lock
+    pnpm_lock_path = rctx.path(pnpm_lock_label)
 
     # Check if the pnpm lock file already exists and copy it over if it does.
     # When we do this, warn the user that we do.
-    if utils.exists(rctx, pnpm_lock_path):
+    if pnpm_lock_path.exists:
         # buildifier: disable=print
         print("""
 WARNING: Implicitly using pnpm-lock.yaml file `{pnpm_lock}` that is expected to be the result of running `pnpm import` on the `{lock}` lock file.
@@ -711,7 +709,7 @@ WARNING: Implicitly using pnpm-lock.yaml file `{pnpm_lock}` that is expected to 
     # because at this point the user has likely not added all package.json and data files that
     # pnpm import depends on to `npm_translate_lock`. In order to get a complete initial pnpm lock
     # file with all workspace package imports listed we likely need to run in the source tree.
-    bootstrap_working_directory = paths.dirname(pnpm_lock_path)
+    bootstrap_working_directory = pnpm_lock_path.dirname
 
     if not rctx.attr.quiet:
         # buildifier: disable=print
@@ -729,7 +727,7 @@ INFO: Running initial `pnpm import` in `{wd}` to bootstrap the pnpm-lock.yaml fi
             state.label_store.path("pnpm_entry"),
             "import",
         ],
-        working_directory = bootstrap_working_directory,
+        working_directory = str(bootstrap_working_directory),
         quiet = rctx.attr.quiet,
     )
     if result.return_code:
@@ -741,7 +739,7 @@ STDERR:
 """.format(status = result.return_code, stdout = result.stdout, stderr = result.stderr)
         fail(msg)
 
-    if not utils.exists(rctx, pnpm_lock_path):
+    if not pnpm_lock_path.exists:
         msg = """
 
 ERROR: Running `pnpm import` did not generate the {path} file.
@@ -802,11 +800,10 @@ STDERR:
 def _update_pnpm_lock(rctx, state):
     _execute_preupdate_scripts(rctx, state)
 
-    pnpm_lock_label = state.label_store.label("pnpm_lock")
-    pnpm_lock_relative_path = state.label_store.relative_path("pnpm_lock")
+    pnpm_lock_relative_path = str(rctx.path(rctx.attr.pnpm_lock))
 
     update_cmd = ["import"] if rctx.attr.npm_package_lock or rctx.attr.yarn_lock else ["install", "--lockfile-only"]
-    update_working_directory = paths.dirname(state.label_store.repository_path("pnpm_lock"))
+    update_working_directory = rctx.workspace_root.get_child(pnpm_lock_relative_path).dirname
 
     pnpm_cmd = " ".join(update_cmd)
 
@@ -833,7 +830,7 @@ INFO: Updating `{pnpm_lock}` file as its inputs have changed since the last upda
         # to be specified. This requirement means that if any data file changes then the update command will be
         # re-run. For cases where all data files cannot be specified a user can simply turn off auto-updates
         # by setting update_pnpm_lock to False and update their pnpm-lock.yaml file manually.
-        working_directory = update_working_directory,
+        working_directory = str(update_working_directory),
         quiet = rctx.attr.quiet,
     )
     if result.return_code:
@@ -863,15 +860,15 @@ STDERR:
 
     lockfile_changed = False
     if state.set_input_hash(
-        state.label_store.relative_path("pnpm_lock"),
-        utils.hash(rctx.read(state.label_store.repository_path("pnpm_lock"))),
+        pnpm_lock_relative_path,
+        utils.hash(rctx.read(rctx.attr.pnpm_lock)),
     ):
         # The lock file has changed
         if not rctx.attr.quiet:
             # buildifier: disable=print
             print("""
-INFO: {} file has changed""".format(pnpm_lock_relative_path))
-        utils.reverse_force_copy(rctx, pnpm_lock_label)
+INFO: %s file has changed""" % pnpm_lock_relative_path)
+        utils.reverse_force_copy(rctx, rctx.attr.pnpm_lock)
         lockfile_changed = True
 
     state.write_action_cache()
@@ -893,7 +890,7 @@ ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To 
 
 """.format(
             action_cache = state.label_store.relative_path("action_cache"),
-            pnpm_lock = state.label_store.relative_path("pnpm_lock"),
+            pnpm_lock = str(rctx.path(rctx.attr.pnpm_lock)),
             repo_reference_symbol = repo_reference_symbol,
             rctx_name = rctx.name,
         ))
