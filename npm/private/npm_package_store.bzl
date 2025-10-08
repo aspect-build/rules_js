@@ -180,9 +180,9 @@ def _npm_package_store_impl(ctx):
         version = ctx.attr.version
 
     if not package:
-        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
     if not version:
-        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
     package_store_name = utils.package_store_name(package, version)
     package_store_directory = None
