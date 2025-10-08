@@ -31,7 +31,7 @@ def npm_link_package(
         root_package: the root package where the node_modules package store is linked to
         link: whether or not to link in this package
             If false, only the npm_package_store target will be created _if_ this is called in the `root_package`.
-        src: the npm_package target to link; may only to be specified when linking in the root package
+        src: the target to link; may only to be specified when linking in the root package
         deps: list of npm_package_store; may only to be specified when linking in the root package
         fail_if_no_link: whether or not to fail if this is called in a package that is not the root package and `link` is False
         auto_manual: whether or not to automatically add a manual tag to the generated targets
