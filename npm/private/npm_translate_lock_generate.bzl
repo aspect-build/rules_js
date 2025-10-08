@@ -77,12 +77,6 @@ _BZL_LIBRARY_TMPL = \
 )
 """
 
-_ADD_SCOPE_TARGET2 = """\
-        if "{package_scope}" not in scope_targets:
-            scope_targets["{package_scope}"] = [link_targets[-1]]
-        else:
-            scope_targets["{package_scope}"].append(link_targets[-1])"""
-
 _ADD_SCOPE_TARGET3 = """\
             if "{package_scope}" not in scope_targets:
                 scope_targets["{package_scope}"] = [link_targets[-1]]
