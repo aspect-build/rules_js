@@ -77,6 +77,23 @@ describe('testing opendir', async () => {
                     new URL(`file://${path.join(fixturesDir, 'a')}`)
                 )
                 assert.equal(entry1.name, (await dir.read()).name)
+                assert.equal(entry2.name, (await dir.read()).name)
+
+                // Assert reading via opendirSync() produces the same result
+                dir = fs.opendirSync(path.join(fixturesDir, 'a'))
+                const entry1Sync = dir.readSync()
+                const entry2Sync = dir.readSync()
+                assert.equal(entry1.name, entry1Sync.name)
+                assert.equal(
+                    entry1.isSymbolicLink(),
+                    entry1Sync.isSymbolicLink()
+                )
+                assert.equal(entry2.name, entry2Sync.name)
+                assert.equal(
+                    entry2.isSymbolicLink(),
+                    entry2Sync.isSymbolicLink()
+                )
+                assert.ok(!dir.readSync())
 
                 revertPatches()
             }
@@ -125,6 +142,22 @@ describe('testing opendir', async () => {
 
                 console.error(entry1, entry2)
                 assert.ok(!maybeLink.isSymbolicLink())
+
+                // Assert reading via opendirSync() produces the same result
+                dir = fs.opendirSync(path.join(fixturesDir, 'a'))
+                const entry1Sync = dir.readSync()
+                const entry2Sync = dir.readSync()
+                assert.equal(entry1.name, entry1Sync.name)
+                assert.equal(
+                    entry1.isSymbolicLink(),
+                    entry1Sync.isSymbolicLink()
+                )
+                assert.equal(entry2.name, entry2Sync.name)
+                assert.equal(
+                    entry2.isSymbolicLink(),
+                    entry2Sync.isSymbolicLink()
+                )
+                assert.ok(!dir.readSync())
 
                 revertPatches()
             }
@@ -278,6 +311,28 @@ describe('testing opendir', async () => {
                 )
 
                 assert.ok(!empty, 'last read should be falsey')
+
+                // Assert reading via opendirSync() produces the same results
+                dir = fs.opendirSync(path.join(fixturesDir, 'sandbox'))
+                const entry1Sync = dir.readSync()
+                const entry2Sync = dir.readSync()
+                const entry3Sync = dir.readSync()
+                assert.equal(entry1.name, entry1Sync.name)
+                assert.equal(
+                    entry1.isSymbolicLink(),
+                    entry1Sync.isSymbolicLink()
+                )
+                assert.equal(entry2.name, entry2Sync.name)
+                assert.equal(
+                    entry2.isSymbolicLink(),
+                    entry2Sync.isSymbolicLink()
+                )
+                assert.equal(entry3.name, entry3Sync.name)
+                assert.equal(
+                    entry3.isSymbolicLink(),
+                    entry3Sync.isSymbolicLink()
+                )
+                assert.ok(!dir.readSync())
 
                 revertPatches()
             }

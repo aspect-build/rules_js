@@ -364,6 +364,13 @@ function patcher(roots) {
             }
         };
     }
+    if (fs.opendirSync) {
+        const origOpendirSync = fs.opendirSync.bind(fs);
+        fs.opendirSync = function opendirSync(...args) {
+            const dir = origOpendirSync(...args);
+            return handleDir(dir);
+        };
+    }
     // =========================================================================
     // fs.promises
     // =========================================================================
