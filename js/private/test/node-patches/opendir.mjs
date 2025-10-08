@@ -52,7 +52,15 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a')
                 )
                 const entry1 = await dir.read()
-                const entry2 = await util.promisify(dir.read.bind(dir))()
+                const entry2 = await new Promise((resolve, reject) => {
+                    dir.read(function (err, dirent) {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve(dirent)
+                        }
+                    })
+                })
                 const empty = await dir.read()
 
                 let names = [entry1.name, entry2.name]
@@ -96,7 +104,15 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a')
                 )
                 const entry1 = await dir.read()
-                const entry2 = await util.promisify(dir.read.bind(dir))()
+                const entry2 = await new Promise((resolve, reject) => {
+                    dir.read(function (err, dirent) {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve(dirent)
+                        }
+                    })
+                })
                 const empty = await dir.read()
 
                 let names = [entry1.name, entry2.name]
@@ -231,8 +247,14 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'sandbox')
                 )
                 const entry1 = await dir.read()
-                const entry2 = await util.promisify(dir.read.bind(dir))()
-                const entry3 = await util.promisify(dir.read.bind(dir))()
+                const entry2 = await new Promise((resolve, reject) => {
+                    try {
+                        resolve(dir.readSync())
+                    } catch (err) {
+                        reject(err)
+                    }
+                })
+                const entry3 = dir.readSync()
                 const empty = await dir.read()
 
                 let names = [entry1.name, entry2.name, entry3.name]
