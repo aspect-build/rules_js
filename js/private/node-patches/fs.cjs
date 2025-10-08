@@ -351,7 +351,7 @@ function patcher(roots) {
                 const cb = once(args[args.length - 1]);
                 args[args.length - 1] = async function opendirCb(err, dir) {
                     try {
-                        cb(null, await handleDir(dir));
+                        cb(null, handleDir(dir));
                     }
                     catch (err) {
                         cb(err);
@@ -360,9 +360,7 @@ function patcher(roots) {
                 origOpendir(...args);
             }
             else {
-                return origOpendir(...args).then((dir) => {
-                    return handleDir(dir);
-                });
+                return origOpendir(...args).then(handleDir);
             }
         };
     }
@@ -422,10 +420,9 @@ function patcher(roots) {
     // =========================================================================
     // helper functions for dirs
     // =========================================================================
-    async function handleDir(dir) {
+    function handleDir(dir) {
         const p = path.resolve(dir.path);
         const origIterator = dir[Symbol.asyncIterator].bind(dir);
-        const origRead = dir.read.bind(dir);
         dir[Symbol.asyncIterator] = function () {
             return __asyncGenerator(this, arguments, function* () {
                 var _a, e_1, _b, _c;
@@ -447,6 +444,7 @@ function patcher(roots) {
                 }
             });
         };
+        const origRead = dir.read.bind(dir);
         dir.read = async function handleDirRead(...args) {
             if (typeof args[args.length - 1] === 'function') {
                 const cb = args[args.length - 1];
@@ -465,16 +463,16 @@ function patcher(roots) {
         };
         const origReadSync = dir.readSync.bind(dir);
         dir.readSync = function handleDirReadSync() {
-            return handleDirentSync(p, origReadSync()); // intentionally sync for simplicity
+            return handleDirentSync(p, origReadSync());
         };
         return dir;
     }
-    function handleDirent(p, v) {
+    async function handleDirent(p, v) {
+        if (!v.isSymbolicLink()) {
+            return v;
+        }
+        const f = path.resolve(p, v.name);
         return new Promise(function handleDirentExecutor(resolve, reject) {
-            if (!v.isSymbolicLink()) {
-                return resolve(v);
-            }
-            const f = path.resolve(p, v.name);
             return guardedReadLink(f, handleDirentReadLinkCb);
             function handleDirentReadLinkCb(str) {
                 if (f != str) {
@@ -484,11 +482,11 @@ function patcher(roots) {
                 v.isSymbolicLink = () => false;
                 origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
-                        throw err;
+                        return reject(err);
                     }
                     fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
-                            throw err;
+                            return reject(err);
                         }
                         patchDirent(v, stat);
                         resolve(v);
@@ -509,6 +507,7 @@ function patcher(roots) {
                 }
             }
         }
+        return v;
     }
     function nextHop(loc, cb) {
         let nested = '';
