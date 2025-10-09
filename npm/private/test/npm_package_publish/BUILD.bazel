@@ -1,3 +1,4 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//npm:defs.bzl", "npm_package")
 
 npm_package(
