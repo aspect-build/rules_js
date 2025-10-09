@@ -77,12 +77,6 @@ _BZL_LIBRARY_TMPL = \
 )
 """
 
-_ADD_SCOPE_TARGET2 = """\
-        if "{package_scope}" not in scope_targets:
-            scope_targets["{package_scope}"] = [link_targets[-1]]
-        else:
-            scope_targets["{package_scope}"].append(link_targets[-1])"""
-
 _ADD_SCOPE_TARGET3 = """\
             if "{package_scope}" not in scope_targets:
                 scope_targets["{package_scope}"] = [link_targets[-1]]
@@ -212,6 +206,12 @@ sh_binary(
 
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(link_packages = str(link_packages))
 
+    # Generate visibility configuration
+    npm_visibility_config = _generate_npm_visibility_config(rctx.attr.package_visibility)
+
+    # Generate package locations mapping
+    npm_package_locations = _generate_npm_package_locations(fp_links, npm_imports)
+
     npm_link_targets_bzl = [
         """\
 # buildifier: disable=function-docstring
@@ -234,6 +234,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _validate_npm_package_visibility(bazel_package)
+
     link_targets = []
     scope_targets = {{}}
 
@@ -412,12 +416,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 pkg = fp_package,
             ))
 
-            if "//visibility:public" in package_visibility:
-                add_to_link_targets = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-                npm_link_all_packages_bzl.append(add_to_link_targets)
-                package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
-                if package_scope:
-                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET2.format(package_scope = package_scope))
+            # Use macro-time validation: check if accessing package can access this first-party package
+            package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
+            if package_scope:
+                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package} if accessible
+        if _npm_check_package_visibility(bazel_package, "{fp_package}", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
+
+                # For public packages, also add scope target
+                if "//visibility:public" in package_visibility:
+                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
+            else:
+                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package} if accessible
+        if _npm_check_package_visibility(bazel_package, "{fp_package}", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
@@ -434,13 +446,21 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         srcs = link_targets,
         tags = ["manual"],
         visibility = ["//visibility:public"],
-    )""")
+    )
+
+def _validate_npm_package_visibility(accessing_package):
+    \"\"\"Validate that accessing_package can access npm packages that would be created here\"\"\"
+    _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
+""")
 
     npm_link_targets_bzl.append("""    return link_targets""")
 
     defs_bzl_header.append("")
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
     defs_bzl_header.append("""load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")""")
+    defs_bzl_header.append("")
+    defs_bzl_header.append("# buildifier: disable=bzl-visibility")
+    defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_package_visibility = "check_package_visibility", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
     if fp_links:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
@@ -453,6 +473,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         "\n".join(defs_bzl_header),
         "",
         npm_link_packages_const,
+        "",
+        npm_visibility_config,
+        "",
+        npm_package_locations,
         "",
         "\n".join(npm_link_all_packages_bzl),
         "",
@@ -583,4 +607,43 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
         url = _import.url,
         version = _import.version,
         maybe_exclude_package_contents = maybe_exclude_package_contents,
+    )
+
+def _generate_npm_visibility_config(package_visibility_attr):
+    """Generate visibility configuration for npm packages"""
+    if not package_visibility_attr:
+        return "_NPM_PACKAGE_VISIBILITY = {}"
+
+    # Convert the attribute to a proper dictionary with list values
+    config_dict = {}
+    for package_pattern, visibility_list in package_visibility_attr.items():
+        config_dict[package_pattern] = list(visibility_list)
+
+    return "_NPM_PACKAGE_VISIBILITY = {}".format(
+        starlark_codegen_utils.to_dict_attr(config_dict, 0, quote_value = False),
+    )
+
+def _generate_npm_package_locations(fp_links, npm_imports):
+    """Generate a dictionary mapping package names to the locations where they're available."""
+    package_locations = {}
+
+    # Add first-party packages
+    for fp_link in fp_links.values():
+        fp_package = fp_link.get("package")
+        fp_link_packages = list(fp_link.get("link_packages").keys())
+        if fp_link_packages:
+            package_locations[fp_package] = fp_link_packages
+
+    for _import in npm_imports:
+        if _import.link_packages:
+            for link_package, link_aliases in _import.link_packages.items():
+                aliases_to_add = link_aliases if link_aliases else [_import.package]
+                for alias in aliases_to_add:
+                    if alias not in package_locations:
+                        package_locations[alias] = []
+                    if link_package not in package_locations[alias]:
+                        package_locations[alias].append(link_package)
+
+    return "_NPM_PACKAGE_LOCATIONS = {}".format(
+        starlark_codegen_utils.to_dict_attr(package_locations, 0, quote_value = False),
     )

@@ -18,12 +18,39 @@ load("@@aspect_rules_js~~npm~npm__undici-types__5.26.5__links//:defs.bzl", store
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_package_visibility = "check_package_visibility", _npm_validate_package_visibility = "validate_npm_package_visibility")
+
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d"]
+
+_NPM_PACKAGE_VISIBILITY = {}
+
+_NPM_PACKAGE_LOCATIONS = {
+    "@lib/c": ["app/c"],
+    "vendored-a": ["lib/a"],
+    "vendored-b": ["lib/a"],
+    "@lib/a": ["app/a"],
+    "@lib/b": ["app/b", "lib/a"],
+    "@lib/b_alias": ["app/b"],
+    "@lib/d": ["app/d"],
+    "@aspect-test/a": ["", "app/a", "app/c"],
+    "@aspect-test/b": [""],
+    "@aspect-test/c": [""],
+    "@aspect-test/d": ["lib/d"],
+    "@aspect-test/e": ["lib/a"],
+    "@aspect-test/f": ["lib/b", "lib/c"],
+    "@aspect-test/g": ["app/a", "app/c", "app/d"],
+    "@aspect-test/h": ["app/b"],
+    "alias-2": ["lib/d"],
+    "alias-1": ["lib/b"],
+    "lodash": [""],
+    "typescript": [""],
+}
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = []):
@@ -34,6 +61,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _validate_npm_package_visibility(bazel_package)
+
     link_targets = []
     scope_targets = {}
 
@@ -188,11 +219,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/c".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
+        # Add first-party package @lib/c if accessible
+        if _npm_check_package_visibility(bazel_package, "@lib/c", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/@lib/c".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -226,7 +259,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/vendored-a".format(name))
+        # Add first-party package vendored-a if accessible
+        if _npm_check_package_visibility(bazel_package, "vendored-a", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/vendored-a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -260,7 +295,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/vendored-b".format(name))
+        # Add first-party package vendored-b if accessible
+        if _npm_check_package_visibility(bazel_package, "vendored-b", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/vendored-b".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -297,11 +334,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/a".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
+        # Add first-party package @lib/a if accessible
+        if _npm_check_package_visibility(bazel_package, "@lib/a", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/@lib/a".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -336,11 +375,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/b".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
+        # Add first-party package @lib/b if accessible
+        if _npm_check_package_visibility(bazel_package, "@lib/b", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/@lib/b".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -375,11 +416,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/b_alias".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
+        # Add first-party package @lib/b_alias if accessible
+        if _npm_check_package_visibility(bazel_package, "@lib/b_alias", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/@lib/b_alias".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -414,11 +457,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/@lib/d".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
+        # Add first-party package @lib/d if accessible
+        if _npm_check_package_visibility(bazel_package, "@lib/d", _NPM_PACKAGE_VISIBILITY):
+            link_targets.append(":{}/@lib/d".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -434,6 +479,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
+
+def _validate_npm_package_visibility(accessing_package):
+    """Validate that accessing_package can access npm packages that would be created here"""
+    _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
+
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None):
