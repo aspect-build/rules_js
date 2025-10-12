@@ -601,6 +601,12 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     );
 }
 
+function isWindowsScript(tool) {
+    const toolExtension = path.extname(tool)
+    const isScriptFile = toolExtension === '.bat' || toolExtension === '.cmd'
+    return isScriptFile && os.platform() === 'win32'
+}
+
 async function main(args, sandbox) {
     console.error(
         `\n\nStarting js_run_devserver ${process.env.JS_BINARY__TARGET}`
@@ -692,6 +698,10 @@ async function runIBazelProtocol(
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
             env: env,
+
+            // `.cmd` and `.bat` are always executed in a shell on windows
+            // and require the flag to be set per CVE-2024-27980
+            shell: isWindowsScript(tool),
 
             // Pipe stdin data to the child process rather than simply letting
             // the child process inherit the stream and consume the data itself.
@@ -805,6 +815,11 @@ async function runWatchProtocol(
         const proc = child_process.spawn(tool, toolArgs, {
             cwd,
             env,
+
+            // `.cmd` and `.bat` are always executed in a shell on windows
+            // and require the flag to be set per CVE-2024-27980
+            shell: isWindowsScript(tool),
+
             stdio: 'inherit',
         });
         proc.on('close', resolve);
