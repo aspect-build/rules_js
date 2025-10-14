@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
@@ -17,7 +17,5 @@ importers:
       some-dep:
         specifier: workspace:*
         version: link:../some-dep
-
-  packages/from-root: {}
 
   packages/some-dep: {}
