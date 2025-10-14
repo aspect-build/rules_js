@@ -461,19 +461,29 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
+        # Collect all link packages from both prod and dev to avoid duplication
+        all_fp_link_packages = {}
+        for link_type in ["link_packages", "link_dev_packages"]:
+            fp_link_packages = fp_link.get(link_type, {}).keys()
+            for pkg in fp_link_packages:
+                all_fp_link_packages[pkg] = True
+
+        # Generate a single _FP_DIRECT_TMPL block with all link packages
+        if len(all_fp_link_packages) > 0:
+            npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
+                link_packages = list(all_fp_link_packages.keys()),
+                link_visibility = package_visibility,
+                pkg = fp_package,
+                package_directory_output_group = utils.package_directory_output_group,
+                root_package = root_package,
+                package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                package_store_root = utils.package_store_root,
+            ))
+
+        # Now handle the prod/dev specific logic for npm_link_targets
         for link_type in ["link_packages", "link_dev_packages"]:
             fp_link_packages = fp_link.get(link_type, {}).keys()
             if len(fp_link_packages) > 0:
-                npm_link_all_packages_bzl.append(_FP_DIRECT_TMPL.format(
-                    link_packages = fp_link_packages,
-                    link_visibility = package_visibility,
-                    pkg = fp_package,
-                    package_directory_output_group = utils.package_directory_output_group,
-                    root_package = root_package,
-                    package_store_name = utils.package_store_name(fp_package, "0.0.0"),
-                    package_store_root = utils.package_store_root,
-                ))
-
                 # Also add the first-party package to its own package context
                 fp_package_path = fp_link.get("path")
                 if fp_package_path and fp_package_path not in links_targets_bzl:
@@ -490,11 +500,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         links_targets_bzl[fp_package_path]["prod"].append("                " + append_stmt_self)
 
                 if "//visibility:public" in package_visibility:
-                    add_to_link_all = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(
-                        pkg = fp_package,
-                    )
-                    npm_link_all_packages_bzl.append(add_to_link_all)
-
                     # Also add this first-party package to npm_link_targets for packages that use it
                     for fp_link_package in fp_link_packages:
                         if fp_link_package not in links_targets_bzl:
@@ -509,9 +514,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         else:
                             links_targets_bzl[fp_link_package]["prod"].append("                " + fp_append_stmt)
 
-                    package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
-                    if package_scope:
-                        npm_link_all_packages_bzl.append("""        if "{package_scope}" not in scope_targets:
+        # Add to link_all and scope targets (only once, not per link_type)
+        if len(all_fp_link_packages) > 0 and "//visibility:public" in package_visibility:
+            add_to_link_all = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(
+                pkg = fp_package,
+            )
+            npm_link_all_packages_bzl.append(add_to_link_all)
+
+            package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
+            if package_scope:
+                npm_link_all_packages_bzl.append("""        if "{package_scope}" not in scope_targets:
             scope_targets["{package_scope}"] = [link_targets[-1]]
         else:
             scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))

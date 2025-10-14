@@ -2685,26 +2685,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
 
-    if bazel_package in ["js/private/test/image"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@mycorp/pkg-a".format(name),
-            src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
-            visibility = ["//examples:__subpackages__"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@mycorp/pkg-a/dir".format(name),
-            srcs = [":{}/@mycorp/pkg-a".format(name)],
-            output_group = "package_directory",
-            visibility = ["//examples:__subpackages__"],
-            tags = ["manual"],
-        )
-
-    if bazel_package in ["examples/js_binary", "examples/npm_deps"]:
+    if bazel_package in ["js/private/test/image", "examples/js_binary", "examples/npm_deps"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-a".format(name),
@@ -2878,31 +2859,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
 
-    if bazel_package in ["examples/npm_package/packages/pkg_e", "js/private/test/image"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@mycorp/pkg-d".format(name),
-            src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@mycorp/pkg-d/dir".format(name),
-            srcs = [":{}/@mycorp/pkg-d".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@mycorp/pkg-d".format(name))
-        if "@mycorp" not in scope_targets:
-            scope_targets["@mycorp"] = [link_targets[-1]]
-        else:
-            scope_targets["@mycorp"].append(link_targets[-1])
-
-    if bazel_package in ["examples/npm_deps"]:
+    if bazel_package in ["examples/npm_package/packages/pkg_e", "js/private/test/image", "examples/npm_deps"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-d".format(name),
