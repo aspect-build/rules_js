@@ -4,5 +4,8 @@
   "private": true,
   "dependencies": {
     "some-dep": "workspace:*"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
   }
 }

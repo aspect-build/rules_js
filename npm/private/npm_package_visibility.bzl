@@ -9,17 +9,11 @@ def validate_npm_package_visibility(accessing_package, package_locations, visibi
         visibility_config: Dictionary mapping package names/patterns to visibility rules
     """
 
-    # Get packages that would be created in this location
-    packages_to_validate = []
-
+    # Validate each package available at this location
     for package_name, locations in package_locations.items():
         if accessing_package in locations:
-            packages_to_validate.append(package_name)
-
-    # Validate each package
-    for package_name in packages_to_validate:
-        if not check_package_visibility(accessing_package, package_name, visibility_config):
-            fail("""
+            if not check_package_visibility(accessing_package, package_name, visibility_config):
+                fail("""
 Package visibility violation:
 
   Package: {}
@@ -44,7 +38,14 @@ def check_package_visibility(accessing_package, package_name, visibility_config)
     """
 
     # Get visibility rules for this package
-    visibility_rules = get_package_visibility_rules(package_name, visibility_config)
+    visibility_rules = []
+    if package_name in visibility_config:
+        visibility_rules = visibility_config[package_name]
+    elif "*" in visibility_config:
+        visibility_rules = visibility_config["*"]
+    else:
+        # Default to public if not specified
+        return True
 
     # Check each visibility rule
     for rule in visibility_rules:
@@ -52,8 +53,10 @@ def check_package_visibility(accessing_package, package_name, visibility_config)
             return True
 
         # Package-specific access: //packages/foo:__pkg__
-        if rule == "//" + accessing_package + ":__pkg__":
-            return True
+        if rule.endswith(":__pkg__") and rule.startswith("//"):
+            # Extract package part: //some/package:__pkg__ -> some/package
+            if rule[2:-8] == accessing_package:
+                return True
 
         # Subpackage access: //packages/foo:__subpackages__
         if rule.endswith(":__subpackages__"):
@@ -62,29 +65,9 @@ def check_package_visibility(accessing_package, package_name, visibility_config)
                 return True
 
         # Target-specific access: //packages/foo:target
-        if rule.startswith("//" + accessing_package + ":"):
-            return True
+        if rule.startswith("//"):
+            colon_pos = rule.find(":", 2)  # Find first colon after "//"
+            if colon_pos > 2 and rule[2:colon_pos] == accessing_package:
+                return True
 
     return False
-
-def get_package_visibility_rules(package_name, visibility_config):
-    """Get visibility rules for package_name from configuration.
-
-    Args:
-        package_name: The name of the npm package
-        visibility_config: Dictionary mapping package names/patterns to visibility rules
-
-    Returns:
-        List of visibility rules for the package
-    """
-
-    # Direct package match
-    if package_name in visibility_config:
-        return visibility_config[package_name]
-
-    # Wildcard match
-    if "*" in visibility_config:
-        return visibility_config["*"]
-
-    # Default to public if not specified
-    return ["//visibility:public"]
