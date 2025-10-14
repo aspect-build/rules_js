@@ -5,9 +5,9 @@ load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 
 npm_link_all_packages(name = "node_modules")
 
-PROD_TARGETS = npm_link_targets(prod = True)
+PROD_TARGETS = npm_link_targets(prod = True, dev = False)
 
-DEV_TARGETS = npm_link_targets(dev = True)
+DEV_TARGETS = npm_link_targets(prod = False, dev = True)
 
 js_test(
     name = "test_prod_filtering",

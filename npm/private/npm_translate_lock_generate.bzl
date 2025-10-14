@@ -161,6 +161,15 @@ sh_binary(
                 if dep_version.startswith("file:"):
                     dep_key = "{}+{}".format(dep_package, dep_version)
                     if not dep_key in fp_links.keys():
+                        # Ignore file: dependencies on packages such as file: tarballs
+                        # TODO(3.0): remove with pnpm <v9
+                        if dep_version in packages:
+                            continue
+
+                        # pnpm >=v9 where packages always have name@version
+                        if "{}@{}".format(dep_package, dep_version) in packages:
+                            continue
+
                         msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
                         fail(msg)
                     if deps_type not in fp_links[dep_key]:

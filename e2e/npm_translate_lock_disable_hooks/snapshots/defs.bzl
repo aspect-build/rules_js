@@ -8,7 +8,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 _LINK_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -20,7 +20,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     scope_targets = {}
 
     for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name)
+        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
             if _scope not in scope_targets:
@@ -54,9 +54,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     )
 
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None, prod = False, dev = False):
-    if prod and dev:
-        fail("prod and dev attributes cannot both be set to true")
+def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
 
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
@@ -67,8 +65,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = False, dev = 
         if bazel_package == "":
             if prod:
                 link_targets.append(":{}/@aspect-test/c".format(name))
-            elif dev:
+            if dev:
                 pass
-            else:
-                link_targets.append(":{}/@aspect-test/c".format(name))
     return link_targets
