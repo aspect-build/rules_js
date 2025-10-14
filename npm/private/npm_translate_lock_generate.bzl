@@ -234,7 +234,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     npm_link_all_packages_bzl = [
         """\
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
@@ -246,7 +246,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     scope_targets = {{}}
 
     for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name)
+        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
             if _scope not in scope_targets:
