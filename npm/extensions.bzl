@@ -125,12 +125,24 @@ def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_pa
     # TODO(3.0): remove this warning when replace_packages attribute is removed
     if attr.replace_packages:
         # buildifier: disable=print
-        print("WARNING: replace_packages attribute is deprecated in bzlmod. Use npm.npm_replace_package() tag instead. This attribute will be removed in rules_js 3.0.")
+        print("""
+WARNING: The 'replace_packages' attribute in npm_translate_lock is DEPRECATED in bzlmod.
 
-        # Merge replace_packages attribute with replace_package tags
+Please migrate to using the npm.npm_replace_package() tag instead:
+
+  npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+  npm.npm_replace_package(
+      package = "your-package@version",
+      replacement = "//your:target",
+  )
+
+The 'replace_packages' attribute will be removed in rules_js version 3.0.
+""")
+
+        # Merge replace_packages attribute with npm_replace_package tags
         for package, replacement in attr.replace_packages.items():
             if package in replace_packages:
-                fail("Package replacement conflict: {} specified in both replace_packages attribute and replace_package tag".format(package))
+                fail("Package replacement conflict: {} specified in both replace_packages attribute and npm_replace_package tag".format(package))
             replace_packages[package] = replacement
 
     npm_translate_lock_rule(

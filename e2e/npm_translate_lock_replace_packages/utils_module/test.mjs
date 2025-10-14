@@ -13,7 +13,3 @@ if (uniqueArray.length !== 3) {
 }
 
 console.log('[utils_module] All tests passed ✓');
-
-export function testUtilsModule() {
-    return true;
-}
