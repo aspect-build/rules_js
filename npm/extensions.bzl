@@ -20,6 +20,44 @@ load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 
+_FORBIDDEN_OVERRIDE_TAG = """\
+The "npm.{tag_class}" tag can only be used in the root Bazel module, \
+but module "{module_name}" attempted to use it.
+
+Package replacements affect the entire dependency graph and must be controlled \
+by the root module to ensure consistency across all dependencies.
+
+If you need to replace a package in a non-root module:
+1. Move the npm_replace_package() call to your root MODULE.bazel file
+2. Alternatively, use the replace_packages attribute in npm_translate_lock() \
+   within your module (though this is deprecated and will be removed in 3.0)
+
+For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/pnpm.md
+"""
+
+def _fail_on_non_root_overrides(module_ctx, module, tag_class):
+    """Prevents non-root modules from using restricted tags.
+
+    Args:
+        module_ctx: The module extension context
+        module: The module being processed
+        tag_class: The name of the tag class to check (e.g., "npm_replace_package")
+    """
+    if module.is_root:
+        return
+
+    # Isolated module extension usages only contain tags from a single module, so we can allow
+    # overrides. This is a new feature in Bazel 6.3.0, earlier versions do not allow module usages
+    # to be isolated.
+    if getattr(module_ctx, "is_isolated", False):
+        return
+
+    if getattr(module.tags, tag_class):
+        fail(_FORBIDDEN_OVERRIDE_TAG.format(
+            tag_class = tag_class,
+            module_name = module.name,
+        ))
+
 def _npm_extension_impl(module_ctx):
     if not bazel_lib_utils.is_bazel_6_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
@@ -27,6 +65,10 @@ def _npm_extension_impl(module_ctx):
 
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
+
+    # Validate that only root modules (or isolated extensions) use npm_replace_package
+    for mod in module_ctx.modules:
+        _fail_on_non_root_overrides(module_ctx, mod, "npm_replace_package")
 
     # Collect all package replacements across all modules
     replace_packages = {}
