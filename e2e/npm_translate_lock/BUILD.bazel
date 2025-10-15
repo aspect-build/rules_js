@@ -1,13 +1,38 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 
 npm_link_all_packages(name = "node_modules")
+
+PROD_TARGETS = npm_link_targets(
+    dev = False,
+    prod = True,
+)
+
+DEV_TARGETS = npm_link_targets(
+    dev = True,
+    prod = False,
+)
+
+js_test(
+    name = "test_prod_filtering",
+    data = PROD_TARGETS,
+    entry_point = "test_prod_filtering.js",
+)
+
+js_test(
+    name = "test_dev_filtering",
+    data = DEV_TARGETS,
+    entry_point = "test_dev_filtering.js",
+)
 
 build_test(
     name = "test",
     targets = [
         ":node_modules",
+        ":test_prod_filtering",
+        ":test_dev_filtering",
     ],
 )
 

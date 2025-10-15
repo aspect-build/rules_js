@@ -17,7 +17,7 @@ load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 # Instead, we define the interfaces in this file, while the implementations live in npm_translate_lock_generate.bzl.
 
 # buildifier: disable=unused-variable
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     """Generated list of target names that are linked by npm_link_all_packages()
 
     Args:
@@ -28,13 +28,19 @@ def npm_link_targets(name = "node_modules", package = None):
 
             If unspecified, the current package (`native.package_name()`) is used.
 
+        prod: If False, excludes production dependencies (dependencies from package.json).
+            Default True includes production dependencies.
+
+        dev: If False, excludes development dependencies (devDependencies from package.json).
+            Default True includes development dependencies.
+
     Returns:
         A list of target names that are linked by npm_link_all_packages()
     """
     pass
 
 # buildifier: disable=unused-variable
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     """Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
 
     If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you can link these as well, for example,
@@ -52,5 +58,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     Args:
         name: name of catch all target to generate for all packages linked
         imported_links: optional list link functions from manually imported packages that were fetched with npm_import rules.
+        prod: If False, excludes production dependencies (dependencies from package.json).
+            Default True includes production dependencies.
+        dev: If False, excludes development dependencies (devDependencies from package.json).
+            Default True includes development dependencies.
     """
     pass

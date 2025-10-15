@@ -8,7 +8,10 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 _LINK_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
-def npm_link_all_packages(name = "node_modules", imported_links = []):
+def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if not prod and not dev:
+        fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
+
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -20,7 +23,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     scope_targets = {}
 
     for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name)
+        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         link_targets.extend(new_link_targets)
         for _scope, _targets in new_scope_targets.items():
             if _scope not in scope_targets:
@@ -50,7 +53,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     )
 
 # buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None):
+def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if not prod and not dev:
+        fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
+
     bazel_package = package if package != None else native.package_name()
     link = bazel_package in _LINK_PACKAGES
 
@@ -58,5 +64,8 @@ def npm_link_targets(name = "node_modules", package = None):
 
     if link:
         if bazel_package == "":
-            link_targets.append(":{}/chalk".format(name))
+            if prod:
+                link_targets.append(":{}/chalk".format(name))
+            if dev:
+                pass
     return link_targets
