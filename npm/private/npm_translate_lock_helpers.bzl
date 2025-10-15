@@ -1,7 +1,6 @@
 """Starlark helpers for npm_translate_lock."""
 
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
@@ -332,7 +331,7 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
             continue
 
         if not attr.no_optional:
-            deps = dicts.add(optional_deps, deps)
+            deps = optional_deps | deps
 
         friendly_name = utils.friendly_name(name, friendly_version)
         unfriendly_name = utils.friendly_name(name, version)

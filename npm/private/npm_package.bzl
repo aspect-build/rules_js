@@ -12,7 +12,6 @@ load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_acti
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//tools:version.bzl", BAZEL_LIB_VERSION = "VERSION")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:versions.bzl", "versions")
 load("//js:defs.bzl", "js_binary")
 load("//js:libs.bzl", "js_lib_helpers")
@@ -26,11 +25,11 @@ copy_to_directory_lib_attrs.pop(
     None,
 )
 
-_NPM_PACKAGE_ATTRS = dicts.add(copy_to_directory_lib_attrs, {
+_NPM_PACKAGE_ATTRS = copy_to_directory_lib_attrs | {
     "data": attr.label_list(),
     "package": attr.string(),
     "version": attr.string(),
-})
+}
 
 _NPM_PACKAGE_FILES_ATTRS = {
     "include_types": attr.bool(),
