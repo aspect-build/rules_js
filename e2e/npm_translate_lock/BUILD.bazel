@@ -36,6 +36,7 @@ build_test(
     ],
 )
 
+# Strip the system-dependent 'system_tar' attribute from the generated repositories.bzl
 genrule(
     name = "npm_translate_lock_wksp-repositories",
     srcs = ["@npm//:repositories.bzl"],
