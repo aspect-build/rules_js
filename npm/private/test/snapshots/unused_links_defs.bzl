@@ -9,10 +9,15 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_link_imported_package = "npm_link_imported_package_internal",
     _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
 
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:platform_utils.bzl", "build_select_dict_for_platform_compatibility")
+
 PACKAGE = "unused"
 VERSION = "0.2.2"
 _ROOT_PACKAGE = ""
 _PACKAGE_STORE_NAME = "unused@0.2.2"
+_PACKAGE_OS = None
+_PACKAGE_CPU = None
 
 # Generated npm_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
@@ -49,6 +54,8 @@ def npm_imported_package_store(link_root_name):
         lifecycle_hooks_execution_requirements = {},
         use_default_shell_env = False,
         exclude_package_contents = [],
+        package_os = _PACKAGE_OS,
+        package_cpu = _PACKAGE_CPU,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package unused@0.2.2

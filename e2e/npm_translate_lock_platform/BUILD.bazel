@@ -1,0 +1,14 @@
+# No load needed - sh_test is a built-in rule
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+npm_link_all_packages(name = "node_modules")
+
+# Simple functionality test - just verify esbuild can be required and works
+js_test(
+    name = "test",
+    entry_point = "basic_require_test.js",
+    data = [":node_modules"],
+)
+
+ 
