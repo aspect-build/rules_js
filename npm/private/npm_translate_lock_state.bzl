@@ -59,7 +59,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
 
-    _init_npmrc(priv, rctx, attr, label_store, is_windows)
+    _init_npmrc(priv, rctx, attr, label_store)
 
     _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists)
 
@@ -216,25 +216,21 @@ def _init_root_package(priv, rctx, attr, label_store):
         priv["root_package_json"] = {}
 
 ################################################################################
-def _init_npmrc(priv, rctx, attr, label_store, is_windows):
+def _init_npmrc(priv, rctx, attr, label_store):
     if not label_store.has("npmrc"):
         # check for a .npmrc next to the pnpm-lock.yaml file
-        _maybe_npmrc(priv, rctx, attr, label_store, "sibling_npmrc", is_windows)
+        _maybe_npmrc(priv, rctx, attr, label_store, "sibling_npmrc")
 
     if label_store.has("npmrc"):
         _load_npmrc(priv, rctx, label_store.path("npmrc"))
 
     if attr.use_home_npmrc:
-        _load_home_npmrc(priv, rctx, is_windows)
+        _load_home_npmrc(priv, rctx)
 
 ################################################################################
-def _maybe_npmrc(priv, rctx, attr, label_store, key, is_windows):
-    if is_windows:
-        # TODO(windows): utils.exists is not yet support on Windows
-        return
-    if utils.exists(rctx, label_store.path(key)):
-        npmrc_label = label_store.label(key)
-
+def _maybe_npmrc(priv, rctx, attr, label_store, key):
+    npmrc_label = label_store.label(key)
+    if rctx.path(npmrc_label).exists:
         # buildifier: disable=print
         print("""
 WARNING: Implicitly using .npmrc file `{npmrc}`.
@@ -450,7 +446,7 @@ def _load_npmrc(priv, rctx, npmrc_path):
     priv["npm_auth"].update(auth)
 
 ################################################################################
-def _load_home_npmrc(priv, rctx, is_windows):
+def _load_home_npmrc(priv, rctx):
     home_directory = repo_utils.get_home_directory(rctx)
     if not home_directory:
         # buildifier: disable=print
@@ -461,8 +457,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
     home_npmrc_path = "{}/{}".format(home_directory, NPM_RC_FILENAME)
 
-    # TODO(windows): utils.exists is not yet support on Windows
-    if is_windows or utils.exists(rctx, home_npmrc_path):
+    if rctx.path(home_npmrc_path).exists:
         _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
