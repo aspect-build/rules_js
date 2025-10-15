@@ -1,6 +1,5 @@
 "Helper utility for working with pnpm lockfile"
 
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":utils.bzl", "utils")
 
 def gather_transitive_closure(packages, package, no_optional, cache = {}):
@@ -69,7 +68,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
     return utils.sorted_map(transitive_closure)
 
 def _get_package_info_deps(package_info, no_optional):
-    return package_info["dependencies"] if no_optional else dicts.add(package_info["dependencies"], package_info["optional_dependencies"])
+    return package_info["dependencies"] if no_optional else (package_info["dependencies"] | package_info["optional_dependencies"])
 
 def translate_to_transitive_closure(importers, packages, prod = False, dev = False, no_optional = False):
     """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
@@ -101,8 +100,8 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
         dev_deps = {} if prod else lock_importer.get("dev_dependencies")
         opt_deps = {} if no_optional else lock_importer.get("optional_dependencies")
 
-        deps = dicts.add(prod_deps, opt_deps)
-        all_deps = dicts.add(prod_deps, dev_deps, opt_deps)
+        deps = prod_deps | opt_deps
+        all_deps = prod_deps | dev_deps | opt_deps
 
         # Package versions mapped to alternate versions
         for info in package_version_map.values():

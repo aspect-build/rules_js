@@ -1,10 +1,9 @@
 "Implementation details for js_run_devserver rule"
 
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(":js_binary.bzl", "js_binary_lib")
 load(":js_helpers.bzl", _gather_files_from_js_infos = "gather_files_from_js_infos")
 
-_attrs = dicts.add(js_binary_lib.attrs, {
+_attrs = js_binary_lib.attrs | {
     "tool_exec_cfg": attr.label(
         executable = True,
         cfg = "exec",
@@ -19,7 +18,7 @@ _attrs = dicts.add(js_binary_lib.attrs, {
     "grant_sandbox_write_permissions": attr.bool(),
     "allow_execroot_entry_point_with_no_copy_data_to_bin": attr.bool(),
     "command": attr.string(),
-})
+}
 
 def _file_to_entry_json(f):
     if "/.aspect_rules_js/" in f.short_path:

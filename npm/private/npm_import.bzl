@@ -20,7 +20,6 @@ for a given lockfile.
 load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
     "@bazel_tools//tools/build_defs/repo:git_worker.bzl",
@@ -904,7 +903,7 @@ _COMMON_ATTRS = {
     "version": attr.string(mandatory = True),
 }
 
-_ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
+_ATTRS_LINKS = _COMMON_ATTRS | {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "dev": attr.bool(),
@@ -916,9 +915,9 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
     "exclude_package_contents": attr.string_list(default = []),
-})
+}
 
-_ATTRS = dicts.add(_COMMON_ATTRS, {
+_ATTRS = _COMMON_ATTRS | {
     "commit": attr.string(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
@@ -942,7 +941,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
         values = ["gnu", "non-gnu", "auto"],
         default = "auto",
     ),
-})
+}
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin

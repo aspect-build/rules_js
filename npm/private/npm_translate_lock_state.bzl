@@ -3,7 +3,6 @@ and maintain"""
 
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
@@ -459,8 +458,8 @@ def _load_npmrc(priv, rctx, npmrc_path):
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
 
     (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx.os.environ)
-    priv["npm_registries"] = dicts.add(priv["npm_registries"], registries)
-    priv["npm_auth"] = dicts.add(priv["npm_auth"], auth)
+    priv["npm_registries"].update(registries)
+    priv["npm_auth"].update(auth)
 
 ################################################################################
 def _load_home_npmrc(priv, rctx):
