@@ -73,7 +73,7 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_package_visibility = "check_package_visibility", _npm_validate_package_visibility = "validate_npm_package_visibility")
+load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
@@ -424,13 +424,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/c if accessible
-        if _npm_check_package_visibility(bazel_package, "@scoped/c", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@scoped/c".format(name))
-            if "@scoped" not in scope_targets:
-                scope_targets["@scoped"] = [link_targets[-1]]
-            else:
-                scope_targets["@scoped"].append(link_targets[-1])
+        # Add first-party package @scoped/c
+        link_targets.append(":{}/@scoped/c".format(name))
+        if "@scoped" not in scope_targets:
+            scope_targets["@scoped"] = [link_targets[-1]]
+        else:
+            scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -474,13 +473,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/a if accessible
-        if _npm_check_package_visibility(bazel_package, "@scoped/a", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@scoped/a".format(name))
-            if "@scoped" not in scope_targets:
-                scope_targets["@scoped"] = [link_targets[-1]]
-            else:
-                scope_targets["@scoped"].append(link_targets[-1])
+        # Add first-party package @scoped/a
+        link_targets.append(":{}/@scoped/a".format(name))
+        if "@scoped" not in scope_targets:
+            scope_targets["@scoped"] = [link_targets[-1]]
+        else:
+            scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -514,13 +512,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/b if accessible
-        if _npm_check_package_visibility(bazel_package, "@scoped/b", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@scoped/b".format(name))
-            if "@scoped" not in scope_targets:
-                scope_targets["@scoped"] = [link_targets[-1]]
-            else:
-                scope_targets["@scoped"].append(link_targets[-1])
+        # Add first-party package @scoped/b
+        link_targets.append(":{}/@scoped/b".format(name))
+        if "@scoped" not in scope_targets:
+            scope_targets["@scoped"] = [link_targets[-1]]
+        else:
+            scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -554,13 +551,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/d if accessible
-        if _npm_check_package_visibility(bazel_package, "@scoped/d", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@scoped/d".format(name))
-            if "@scoped" not in scope_targets:
-                scope_targets["@scoped"] = [link_targets[-1]]
-            else:
-                scope_targets["@scoped"].append(link_targets[-1])
+        # Add first-party package @scoped/d
+        link_targets.append(":{}/@scoped/d".format(name))
+        if "@scoped" not in scope_targets:
+            scope_targets["@scoped"] = [link_targets[-1]]
+        else:
+            scope_targets["@scoped"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -592,9 +588,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package alias-project-a if accessible
-        if _npm_check_package_visibility(bazel_package, "alias-project-a", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/alias-project-a".format(name))
+        # Add first-party package alias-project-a
+        link_targets.append(":{}/alias-project-a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -628,9 +623,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package scoped/bad if accessible
-        if _npm_check_package_visibility(bazel_package, "scoped/bad", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/scoped/bad".format(name))
+        # Add first-party package scoped/bad
+        link_targets.append(":{}/scoped/bad".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -665,9 +659,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-c200-d200 if accessible
-        if _npm_check_package_visibility(bazel_package, "test-c200-d200", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/test-c200-d200".format(name))
+        # Add first-party package test-c200-d200
+        link_targets.append(":{}/test-c200-d200".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -702,9 +695,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-c201-d200 if accessible
-        if _npm_check_package_visibility(bazel_package, "test-c201-d200", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/test-c201-d200".format(name))
+        # Add first-party package test-c201-d200
+        link_targets.append(":{}/test-c201-d200".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -736,9 +728,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-peer-types if accessible
-        if _npm_check_package_visibility(bazel_package, "test-peer-types", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/test-peer-types".format(name))
+        # Add first-party package test-peer-types
+        link_targets.append(":{}/test-peer-types".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -772,9 +763,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package a-types if accessible
-        if _npm_check_package_visibility(bazel_package, "a-types", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/a-types".format(name))
+        # Add first-party package a-types
+        link_targets.append(":{}/a-types".format(name))
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(

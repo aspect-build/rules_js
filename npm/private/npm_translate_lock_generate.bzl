@@ -416,20 +416,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
                 pkg = fp_package,
             ))
 
-            # Use macro-time validation: check if accessing package can access this first-party package
+            # Validation at the top of npm_link_all_packages() already checked access to this package.
+            # If we reached this point, the calling package can access it, so unconditionally add it.
             package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
             if package_scope:
-                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package} if accessible
-        if _npm_check_package_visibility(bazel_package, "{fp_package}", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
-
-                # For public packages, also add scope target
-                if "//visibility:public" in package_visibility:
-                    npm_link_all_packages_bzl.append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
+                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package}
+        link_targets.append(":{{}}/{fp_package}".format(name))
+        if "{package_scope}" not in scope_targets:
+            scope_targets["{package_scope}"] = [link_targets[-1]]
+        else:
+            scope_targets["{package_scope}"].append(link_targets[-1])""".format(fp_package = fp_package, package_scope = package_scope))
             else:
-                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package} if accessible
-        if _npm_check_package_visibility(bazel_package, "{fp_package}", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
+                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package}
+        link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
@@ -460,7 +459,7 @@ def _validate_npm_package_visibility(accessing_package):
     defs_bzl_header.append("""load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")""")
     defs_bzl_header.append("")
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-    defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_package_visibility = "check_package_visibility", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
+    defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
     if fp_links:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
