@@ -162,6 +162,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     generate_repository_files(
         rctx,
+        state.label_store.label("pnpm_lock"),
         importers,
         packages,
         state.patched_dependencies(),
