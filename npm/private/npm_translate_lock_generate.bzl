@@ -249,8 +249,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
-{validation_call}
-    link_targets = []
+{validation_call}    link_targets = []
     scope_targets = {{}}
 
     for link_fn in imported_links:

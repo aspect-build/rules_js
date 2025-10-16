@@ -1233,7 +1233,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
 
     # Validate package visibility before creating any targets
     _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
-
     link_targets = []
     scope_targets = {}
 
