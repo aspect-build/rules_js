@@ -57,6 +57,12 @@ build_test(
 
         # @fastify/send (@3.3.0) contains spaces and a ☃ character in paths
         ":node_modules/@fastify/send",
+
+        # Test scope targets (aggregated js_library for all packages in a scope)
+        ":node_modules/@fastify",
+        ":node_modules/@figma",
+        ":node_modules/@kubernetes",
+        ":node_modules/@plotly",
     ],
 )
 
