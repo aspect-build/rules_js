@@ -3071,7 +3071,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         visibility = ["//visibility:public"],
     )
 
-
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None):
     bazel_package = package if package != None else native.package_name()
