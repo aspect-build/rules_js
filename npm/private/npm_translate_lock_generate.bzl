@@ -456,8 +456,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         srcs = link_targets,
         tags = ["manual"],
         visibility = ["//visibility:public"],
-    )
-""")
+    )""")
 
     npm_link_targets_bzl.append("""    return link_targets""")
 

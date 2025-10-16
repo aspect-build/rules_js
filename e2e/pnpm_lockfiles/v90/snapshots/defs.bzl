@@ -723,7 +723,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         visibility = ["//visibility:public"],
     )
 
-
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if not prod and not dev:
