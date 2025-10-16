@@ -13,37 +13,37 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 print_section() {
-  echo -e "${BLUE}==> $1${NC}"
+    echo -e "${BLUE}==> $1${NC}"
 }
 
 print_success() {
-  echo -e "${GREEN}✓ $1${NC}"
+    echo -e "${GREEN}✓ $1${NC}"
 }
 
 print_category() {
-  echo ""
-  echo -e "${YELLOW}========================================${NC}"
-  echo -e "${YELLOW}$1${NC}"
-  echo -e "${YELLOW}========================================${NC}"
+    echo ""
+    echo -e "${YELLOW}========================================${NC}"
+    echo -e "${YELLOW}$1${NC}"
+    echo -e "${YELLOW}========================================${NC}"
 }
 
 # Track failures
 FAILED_TARGETS=()
 
 run_target() {
-  local dir="$1"
-  local target="$2"
-  local description="$3"
-  local extra_flags="${4:-}"
+    local dir="$1"
+    local target="$2"
+    local description="$3"
+    local extra_flags="${4:-}"
 
-  echo ""
-  print_section "$description"
-  if (cd "$dir" && bazel run $extra_flags "$target"); then
-    print_success "$description"
-  else
-    echo "✗ Failed: $description"
-    FAILED_TARGETS+=("$dir -> $target")
-  fi
+    echo ""
+    print_section "$description"
+    if (cd "$dir" && bazel run $extra_flags "$target"); then
+        print_success "$description"
+    else
+        echo "✗ Failed: $description"
+        FAILED_TARGETS+=("$dir -> $target")
+    fi
 }
 
 echo "========================================"
@@ -58,7 +58,7 @@ print_category "E2E TEST SNAPSHOTS"
 
 # pnpm_lockfiles - Multiple versions (bzlmod only, no workspace mode in this repo)
 for version in v54 v60 v61 v90 v101; do
-  run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:repos" "pnpm_lockfiles/$version" "--enable_bzlmod=true"
+    run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:repos" "pnpm_lockfiles/$version" "--enable_bzlmod=true"
 done
 
 # npm_translate_lock
@@ -125,12 +125,12 @@ run_target "$REPO_ROOT" "//js/private/coverage:coverage_checked" "Coverage bundl
 echo ""
 echo "========================================"
 if [ ${#FAILED_TARGETS[@]} -eq 0 ]; then
-  print_success "All updates completed successfully!"
+    print_success "All updates completed successfully!"
 else
-  echo "✗ Some targets failed:"
-  for failed in "${FAILED_TARGETS[@]}"; do
-    echo "  - $failed"
-  done
-  exit 1
+    echo "✗ Some targets failed:"
+    for failed in "${FAILED_TARGETS[@]}"; do
+        echo "  - $failed"
+    done
+    exit 1
 fi
 echo "========================================"
