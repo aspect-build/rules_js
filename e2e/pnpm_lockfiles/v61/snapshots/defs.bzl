@@ -74,67 +74,12 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
-
-# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/alts", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
-
-_NPM_PACKAGE_VISIBILITY = {}
-
-_NPM_PACKAGE_LOCATIONS = {
-    "@scoped/c": ["<LOCKVERSION>", "projects/peer-types"],
-    "@scoped/a": ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d", "projects/peer-types"],
-    "@scoped/b": ["<LOCKVERSION>", "projects/c", "projects/d", "projects/peer-types"],
-    "@scoped/d": ["<LOCKVERSION>"],
-    "alias-project-a": ["<LOCKVERSION>"],
-    "scoped/bad": ["<LOCKVERSION>"],
-    "test-c200-d200": ["<LOCKVERSION>"],
-    "test-c201-d200": ["<LOCKVERSION>"],
-    "test-peer-types": ["<LOCKVERSION>"],
-    "a-types": ["projects/b"],
-    "@aspect-test-a-bad-scope": ["<LOCKVERSION>"],
-    "@aspect-test-custom-scope/a": ["<LOCKVERSION>"],
-    "@aspect-test/a": ["<LOCKVERSION>"],
-    "@aspect-test/a2": ["<LOCKVERSION>"],
-    "aspect-test-a-no-scope": ["<LOCKVERSION>"],
-    "aspect-test-a/no-at": ["<LOCKVERSION>"],
-    "@aspect-test/b": ["<LOCKVERSION>"],
-    "@aspect-test/c": ["<LOCKVERSION>", "projects/peers-combo-2", "projects/peers-combo-1"],
-    "@aspect-test/d": ["projects/peers-combo-2", "projects/peers-combo-1"],
-    "@aspect-test/e": ["<LOCKVERSION>"],
-    "@aspect-test/h-is-only-optional": ["<LOCKVERSION>"],
-    "jsonify": ["<LOCKVERSION>", "projects/peer-types"],
-    "@isaacs/cliui": ["<LOCKVERSION>"],
-    "rollup-plugin-with-peers": ["<LOCKVERSION>"],
-    "@types/archiver": ["<LOCKVERSION>"],
-    "@types/node": ["<LOCKVERSION>", "projects/a-types", "projects/b"],
-    "alias-types-node": ["<LOCKVERSION>"],
-    "alias-only-sizzle": ["<LOCKVERSION>"],
-    "debug": ["<LOCKVERSION>"],
-    "hello": ["<LOCKVERSION>", "projects/peer-types"],
-    "is-odd-v0": ["<LOCKVERSION>"],
-    "is-odd-v1": ["<LOCKVERSION>"],
-    "is-odd-v2": ["<LOCKVERSION>"],
-    "is-odd-v3": ["<LOCKVERSION>"],
-    "is-odd": ["<LOCKVERSION>"],
-    "is-odd-alias": ["<LOCKVERSION>"],
-    "jquery-git-ssh-399b201": ["<LOCKVERSION>"],
-    "jquery-git-ssh-e61fccb": ["<LOCKVERSION>"],
-    "lodash-dupe": ["projects/alts"],
-    "lodash": ["<LOCKVERSION>", "projects/alts"],
-    "lodash-file": ["projects/alts"],
-    "meaning-of-life": ["<LOCKVERSION>"],
-    "rollup": ["<LOCKVERSION>"],
-    "rollup3": ["<LOCKVERSION>"],
-    "tslib": ["<LOCKVERSION>"],
-    "typescript": ["<LOCKVERSION>"],
-    "uvu": ["<LOCKVERSION>"],
-}
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -148,9 +93,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~lock-<LOCKVERSION>//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '<LOCKVERSION>', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
-
-    # Validate package visibility before creating any targets
-    _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 
     link_targets = []
     scope_targets = {}
