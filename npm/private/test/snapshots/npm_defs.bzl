@@ -1120,7 +1120,7 @@ load("@@_main~npm~npm__zod__3.21.4__links//:defs.bzl", store_1114 = "npm_importe
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_package_visibility = "check_package_visibility", _npm_validate_package_visibility = "validate_npm_package_visibility")
+load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
@@ -1232,7 +1232,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         fail(msg)
 
     # Validate package visibility before creating any targets
-    _validate_npm_package_visibility(bazel_package)
+    _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 
     link_targets = []
     scope_targets = {}
@@ -2798,9 +2798,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
-        # Add first-party package @mycorp/pkg-a if accessible
-        if _npm_check_package_visibility(bazel_package, "@mycorp/pkg-a", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@mycorp/pkg-a".format(name))
+        link_targets.append(":{}/@mycorp/pkg-a".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2832,9 +2834,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package js_lib_pkg_a if accessible
-        if _npm_check_package_visibility(bazel_package, "js_lib_pkg_a", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/js_lib_pkg_a".format(name))
+        link_targets.append(":{}/js_lib_pkg_a".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2866,9 +2866,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package js_lib_pkg_a-alias if accessible
-        if _npm_check_package_visibility(bazel_package, "js_lib_pkg_a-alias", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
+        link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -2902,13 +2900,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @lib/test if accessible
-        if _npm_check_package_visibility(bazel_package, "@lib/test", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@lib/test".format(name))
-            if "@lib" not in scope_targets:
-                scope_targets["@lib"] = [link_targets[-1]]
-            else:
-                scope_targets["@lib"].append(link_targets[-1])
+        link_targets.append(":{}/@lib/test".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2942,13 +2938,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @lib/test2 if accessible
-        if _npm_check_package_visibility(bazel_package, "@lib/test2", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@lib/test2".format(name))
-            if "@lib" not in scope_targets:
-                scope_targets["@lib"] = [link_targets[-1]]
-            else:
-                scope_targets["@lib"].append(link_targets[-1])
+        link_targets.append(":{}/@lib/test2".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2983,9 +2977,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
-        # Add first-party package @mycorp/pkg-d if accessible
-        if _npm_check_package_visibility(bazel_package, "@mycorp/pkg-d", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@mycorp/pkg-d".format(name))
+        link_targets.append(":{}/@mycorp/pkg-d".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -3019,9 +3015,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//examples:__subpackages__"],
             tags = ["manual"],
         )
-        # Add first-party package @mycorp/pkg-e if accessible
-        if _npm_check_package_visibility(bazel_package, "@mycorp/pkg-e", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/@mycorp/pkg-e".format(name))
+        link_targets.append(":{}/@mycorp/pkg-e".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -3056,9 +3054,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-npm_package if accessible
-        if _npm_check_package_visibility(bazel_package, "test-npm_package", _NPM_PACKAGE_VISIBILITY):
-            link_targets.append(":{}/test-npm_package".format(name))
+        link_targets.append(":{}/test-npm_package".format(name))
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -3074,10 +3070,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
-
-def _validate_npm_package_visibility(accessing_package):
-    """Validate that accessing_package can access npm packages that would be created here"""
-    _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 
 
 # buildifier: disable=function-docstring

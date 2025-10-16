@@ -5,16 +5,7 @@ load("@@aspect_rules_js~~npm~npm__chalk__5.3.0__links//:defs.bzl", link_0 = "npm
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
-# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_check_package_visibility = "check_package_visibility", _npm_validate_package_visibility = "validate_npm_package_visibility")
-
 _LINK_PACKAGES = [""]
-
-_NPM_PACKAGE_VISIBILITY = {}
-
-_NPM_PACKAGE_LOCATIONS = {
-    "chalk": [""],
-}
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -28,9 +19,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
-
-    # Validate package visibility before creating any targets
-    _validate_npm_package_visibility(bazel_package)
 
     link_targets = []
     scope_targets = {}
@@ -64,10 +52,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
-
-def _validate_npm_package_visibility(accessing_package):
-    """Validate that accessing_package can access npm packages that would be created here"""
-    _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 
 
 # buildifier: disable=function-docstring
