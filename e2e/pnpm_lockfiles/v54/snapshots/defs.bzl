@@ -148,7 +148,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         fail(msg)
 
     # Validate package visibility before creating any targets
-    _validate_npm_package_visibility(bazel_package)
+    _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 
     link_targets = []
     scope_targets = {}
@@ -424,7 +424,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/c
         link_targets.append(":{}/@scoped/c".format(name))
         if "@scoped" not in scope_targets:
             scope_targets["@scoped"] = [link_targets[-1]]
@@ -473,7 +472,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/a
         link_targets.append(":{}/@scoped/a".format(name))
         if "@scoped" not in scope_targets:
             scope_targets["@scoped"] = [link_targets[-1]]
@@ -512,7 +510,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/b
         link_targets.append(":{}/@scoped/b".format(name))
         if "@scoped" not in scope_targets:
             scope_targets["@scoped"] = [link_targets[-1]]
@@ -551,7 +548,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package @scoped/d
         link_targets.append(":{}/@scoped/d".format(name))
         if "@scoped" not in scope_targets:
             scope_targets["@scoped"] = [link_targets[-1]]
@@ -588,7 +584,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package alias-project-a
         link_targets.append(":{}/alias-project-a".format(name))
 
     if is_root:
@@ -623,7 +618,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package scoped/bad
         link_targets.append(":{}/scoped/bad".format(name))
 
     if is_root:
@@ -659,7 +653,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-c200-d200
         link_targets.append(":{}/test-c200-d200".format(name))
 
     if is_root:
@@ -695,7 +688,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-c201-d200
         link_targets.append(":{}/test-c201-d200".format(name))
 
     if is_root:
@@ -728,7 +720,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package test-peer-types
         link_targets.append(":{}/test-peer-types".format(name))
 
     if is_root:
@@ -763,7 +754,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        # Add first-party package a-types
         link_targets.append(":{}/a-types".format(name))
 
     for scope, scoped_targets in scope_targets.items():
@@ -780,10 +770,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
-
-def _validate_npm_package_visibility(accessing_package):
-    """Validate that accessing_package can access npm packages that would be created here"""
-    _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 
 
 # buildifier: disable=function-docstring

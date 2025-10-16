@@ -206,11 +206,18 @@ sh_binary(
 
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(link_packages = str(link_packages))
 
-    # Generate visibility configuration
-    npm_visibility_config = _generate_npm_visibility_config(rctx.attr.package_visibility)
+    # Generate visibility configuration first to check if it's actually non-empty
+    npm_visibility_config_generated = _generate_npm_visibility_config(rctx.attr.package_visibility)
 
-    # Generate package locations mapping
-    npm_package_locations = _generate_npm_package_locations(fp_links, npm_imports)
+    # Check if the generated visibility config is actually non-empty
+    # An empty config looks like "_NPM_PACKAGE_VISIBILITY = {}"
+    has_package_visibility = rctx.attr.package_visibility != None and npm_visibility_config_generated != "_NPM_PACKAGE_VISIBILITY = {}"
+
+    # Only keep the generated config if it's non-empty
+    npm_visibility_config = npm_visibility_config_generated if has_package_visibility else None
+
+    # Generate package locations mapping only if we have visibility config
+    npm_package_locations = _generate_npm_package_locations(fp_links, npm_imports) if has_package_visibility else None
 
     npm_link_targets_bzl = [
         """\
@@ -223,6 +230,14 @@ def npm_link_targets(name = "node_modules", package = None):
 """,
     ]
 
+    # Build the validation call conditionally
+    validation_call = ""
+    if has_package_visibility:
+        validation_call = """
+    # Validate package visibility before creating any targets
+    _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
+"""
+
     npm_link_all_packages_bzl = [
         """\
 # buildifier: disable=function-docstring
@@ -234,10 +249,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
-
-    # Validate package visibility before creating any targets
-    _validate_npm_package_visibility(bazel_package)
-
+{validation_call}
     link_targets = []
     scope_targets = {{}}
 
@@ -253,6 +265,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "\"\"",
             root_package = root_package,
             pnpm_lock_label = pnpm_lock_label,
+            validation_call = validation_call,
         ),
     ]
 
@@ -420,15 +433,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
             # If we reached this point, the calling package can access it, so unconditionally add it.
             package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
             if package_scope:
-                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package}
-        link_targets.append(":{{}}/{fp_package}".format(name))
+                npm_link_all_packages_bzl.append("""        link_targets.append(":{{}}/{fp_package}".format(name))
         if "{package_scope}" not in scope_targets:
             scope_targets["{package_scope}"] = [link_targets[-1]]
         else:
             scope_targets["{package_scope}"].append(link_targets[-1])""".format(fp_package = fp_package, package_scope = package_scope))
             else:
-                npm_link_all_packages_bzl.append("""        # Add first-party package {fp_package}
-        link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
+                npm_link_all_packages_bzl.append("""        link_targets.append(":{{}}/{fp_package}".format(name))""".format(fp_package = fp_package))
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
@@ -446,10 +457,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = []):
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
-
-def _validate_npm_package_visibility(accessing_package):
-    \"\"\"Validate that accessing_package can access npm packages that would be created here\"\"\"
-    _npm_validate_package_visibility(accessing_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
 """)
 
     npm_link_targets_bzl.append("""    return link_targets""")
@@ -457,9 +464,13 @@ def _validate_npm_package_visibility(accessing_package):
     defs_bzl_header.append("")
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
     defs_bzl_header.append("""load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")""")
-    defs_bzl_header.append("")
-    defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-    defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
+
+    # Only add visibility load if package visibility is configured
+    if has_package_visibility:
+        defs_bzl_header.append("")
+        defs_bzl_header.append("# buildifier: disable=bzl-visibility")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
+
     if fp_links:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
@@ -468,20 +479,31 @@ def _validate_npm_package_visibility(accessing_package):
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")""")
 
-    rctx_files[rctx.attr.defs_bzl_filename] = [
+    # Build the defs.bzl file contents
+    defs_bzl_contents = [
         "\n".join(defs_bzl_header),
         "",
         npm_link_packages_const,
-        "",
-        npm_visibility_config,
-        "",
-        npm_package_locations,
+    ]
+
+    # Only include visibility config and locations if package visibility is configured
+    if has_package_visibility:
+        defs_bzl_contents.extend([
+            "",
+            npm_visibility_config,
+            "",
+            npm_package_locations,
+        ])
+
+    defs_bzl_contents.extend([
         "",
         "\n".join(npm_link_all_packages_bzl),
         "",
         "\n".join(npm_link_targets_bzl),
         "",
-    ]
+    ])
+
+    rctx_files[rctx.attr.defs_bzl_filename] = defs_bzl_contents
 
     for filename, contents in rctx.attr.additional_file_contents.items():
         if not rctx_files.get(filename, False):
