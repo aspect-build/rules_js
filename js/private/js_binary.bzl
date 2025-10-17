@@ -204,6 +204,13 @@ _ATTRS = {
         which can lead to non-hermetic behavior.""",
         default = True,
     ),
+    "patch_node_esm_loader": attr.bool(
+        doc = """Apply the internal lstat patch to prevent the program from following symlinks out of
+        the execroot, runfiles and the sandbox even when using the ESM loader.
+
+        This flag only has an effect when `patch_node_fs` is True.""",
+        default = True,
+    ),
     "include_sources": attr.bool(
         doc = """When True, `sources` from `JsInfo` providers in `data` targets are included in the runfiles of the target.""",
         default = True,
@@ -319,7 +326,10 @@ _ATTRS = {
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
-        default = [Label("@aspect_rules_js//js/private/node-patches:fs.cjs")],
+        default = [
+            Label("@aspect_rules_js//js/private/node-patches:fs.cjs"),
+            Label("@aspect_rules_js//js/private/node-patches:fs_stat.cjs"),
+        ],
     ),
     "_node_patches": attr.label(
         allow_single_file = True,
@@ -564,11 +574,18 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     )
 
 def _js_binary_impl(ctx):
+    # Only apply lstat patch if it's requested
+    JS_BINARY__PATCH_NODE_ESM_LOADER = "1" if ctx.attr.patch_node_esm_loader else "0"
+    fixed_env = {
+        "JS_BINARY__PATCH_NODE_ESM_LOADER": JS_BINARY__PATCH_NODE_ESM_LOADER,
+    }
+
     launcher = _create_launcher(
         ctx,
         log_prefix_rule_set = "aspect_rules_js",
         log_prefix_rule = "js_test" if ctx.attr.testonly else "js_binary",
         fixed_args = ctx.attr.fixed_args,
+        fixed_env = fixed_env,
     )
     runfiles = launcher.runfiles
 
