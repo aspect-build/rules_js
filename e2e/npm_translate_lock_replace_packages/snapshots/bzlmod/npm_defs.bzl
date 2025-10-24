@@ -70,6 +70,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         if bazel_package == "":
             if prod:
                 link_targets.append(":{}/chalk".format(name))
+                link_targets.append(":{}/lodash".format(name))
             if dev:
                 pass
     return link_targets
