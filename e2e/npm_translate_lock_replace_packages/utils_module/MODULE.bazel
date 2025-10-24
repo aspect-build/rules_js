@@ -1,0 +1,29 @@
+module(
+    name = "utils_replacement_module",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "lodash_replacement_module", version = "0.0.0")
+local_path_override(
+    module_name = "lodash_replacement_module",
+    path = "../lodash_module",
+)
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../../..",
+)
+
+npm_utils = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+)
+npm_utils.npm_translate_lock(
+    name = "npm_utils",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm_utils, "npm_utils")

@@ -1,8 +1,9 @@
 {
-    "private": true,
+    "name": "my-utils",
+    "version": "1.0.0",
     "type": "module",
+    "main": "utils.mjs",
     "dependencies": {
-        "chalk": "5.3.0",
         "lodash": "4.17.21"
     },
     "pnpm": {
