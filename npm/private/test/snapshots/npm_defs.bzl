@@ -1120,12 +1120,49 @@ load("@@_main~npm~npm__zod__3.21.4__links//:defs.bzl", store_1114 = "npm_importe
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
+
+# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
 _LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+
+_NPM_PACKAGE_VISIBILITY = {
+    "unused": ["//npm/private/test:__subpackages__"],
+    "@mycorp/pkg-a": ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
+    "@mycorp/pkg-d": ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
+    "@mycorp/pkg-e": ["//examples:__subpackages__"],
+}
+
+_NPM_PACKAGE_LOCATIONS = {
+    "js/private/test/image": ["@mycorp/pkg-a", "@mycorp/pkg-d", "acorn"],
+    "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias", "@types/node"],
+    "examples/linked_consumer": ["@lib/test", "@lib/test2"],
+    "examples/npm_package/packages/pkg_e": ["@mycorp/pkg-d"],
+    "js/private/worker/src": ["abortcontroller-polyfill", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
+    "examples/npm_deps": ["acorn", "@aspect-test/a", "@aspect-test/c", "@gregmagolan/test-b", "@rollup/plugin-commonjs", "debug", "meaning-of-life", "mobx-react", "mobx", "ms", "react", "rollup", "uvu"],
+    "examples/npm_package/packages/pkg_a": ["acorn", "uuid"],
+    "examples/npm_package/packages/pkg_d": ["acorn", "uuid"],
+    "examples/npm_package/packages/pkg_b": ["acorn", "uuid"],
+    "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
+    "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
+    "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "inline-fixtures", "jsonpath-plus", "typescript"],
+    "examples/runfiles": ["@bazel/runfiles"],
+    "npm/private/test": ["@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
+    "js/private/coverage/bundle": ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "c8", "rollup"],
+    "js/private/devserver/src": ["@rollup/plugin-node-resolve", "@types/node", "rollup"],
+    "examples/nextjs": ["@tailwindcss/postcss", "next", "react-dom", "react", "tailwindcss"],
+    "examples/js_lib_pkg/a": ["@types/node"],
+    "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
+    "examples/webpack_cli": ["@vanilla-extract/css", "@vanilla-extract/webpack-plugin", "css-loader", "mathjs", "mini-css-extract-plugin", "webpack-cli", "webpack"],
+    "examples/npm_package/libs/lib_a": ["chalk"],
+    "npm/private/test/npm_package": ["chalk", "chalk-alt"],
+    "examples/macro": ["mocha-junit-reporter", "mocha-multi-reporters", "mocha"],
+    "examples/stack_traces": ["source-map-support"],
+}
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -1139,6 +1176,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @_main~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
         fail(msg)
+
+    # Validate package visibility before creating any targets
+    _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
     link_targets = []
     scope_targets = {}
 
@@ -2690,7 +2730,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-a".format(name),
             src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
-            visibility = ["//examples:__subpackages__"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
 
@@ -2700,9 +2740,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             name = "{}/@mycorp/pkg-a/dir".format(name),
             srcs = [":{}/@mycorp/pkg-a".format(name)],
             output_group = "package_directory",
-            visibility = ["//examples:__subpackages__"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
+        link_targets.append(":{}/@mycorp/pkg-a".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2864,7 +2909,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-d".format(name),
             src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
 
@@ -2874,7 +2919,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             name = "{}/@mycorp/pkg-d/dir".format(name),
             srcs = [":{}/@mycorp/pkg-d".format(name)],
             output_group = "package_directory",
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
         link_targets.append(":{}/@mycorp/pkg-d".format(name))
@@ -2902,7 +2947,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         _npm_link_package_store(
             name = "{}/@mycorp/pkg-e".format(name),
             src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__"],
             tags = ["manual"],
         )
 
@@ -2912,7 +2957,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             name = "{}/@mycorp/pkg-e/dir".format(name),
             srcs = [":{}/@mycorp/pkg-e".format(name)],
             output_group = "package_directory",
-            visibility = ["//visibility:public"],
+            visibility = ["//examples:__subpackages__"],
             tags = ["manual"],
         )
         link_targets.append(":{}/@mycorp/pkg-e".format(name))

@@ -97,6 +97,13 @@ run_target "$REPO_ROOT" "//npm/private/test:write_npm_translate_lock" "npm/priva
 # js/private/test - js_binary launcher snapshot
 run_target "$REPO_ROOT" "//js/private/test:write_launcher" "js/private/test" "--enable_bzlmod=true"
 
+# js/private/test/image - js_image_layer test snapshots
+run_target "$REPO_ROOT" "//js/private/test/image:checksum_test_test" "js/private/test/image checksum" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test/image:default_test_update_all" "js/private/test/image default" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test/image:custom_owner_test_update_all" "js/private/test/image custom_owner" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test/image:regex_edge_cases_test_update_all" "js/private/test/image regex_edge_cases" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_update_all" "js/private/test/image custom_layers_nomatch" "--enable_bzlmod=true"
+
 ##############################################################################
 # GENERATED SOURCES
 ##############################################################################

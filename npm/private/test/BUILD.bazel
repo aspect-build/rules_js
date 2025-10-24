@@ -4,6 +4,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
+load(":npm_package_visibility_test.bzl", "npm_package_visibility_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":parse_pnpm_lock_tests.bzl", "parse_pnpm_lock_tests")
 load(":pnpm_test.bzl", "pnpm_tests")
@@ -27,6 +28,8 @@ translate_lock_helpers_tests(name = "test_translate_lock")
 parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
 
 generated_pkg_json_test(name = "test_generated_pkg_json")
+
+npm_package_visibility_tests(name = "test_npm_package_visibility")
 
 npm_auth_test_suite()
 
@@ -57,6 +60,12 @@ build_test(
 
         # @fastify/send (@3.3.0) contains spaces and a ☃ character in paths
         ":node_modules/@fastify/send",
+
+        # Test scope targets (aggregated js_library for all packages in a scope)
+        ":node_modules/@fastify",
+        ":node_modules/@figma",
+        ":node_modules/@kubernetes",
+        ":node_modules/@plotly",
     ],
 )
 

@@ -125,6 +125,8 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
+    # No test targets. Requires running test.sh.
+    # e2e/npm_translate_lock_package_visibility:
     e2e/npm_translate_lock_subdir_patch:
         icon: npm
         tasks:
