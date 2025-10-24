@@ -27,10 +27,7 @@ but module "{module_name}" attempted to use it.
 Package replacements affect the entire dependency graph and must be controlled \
 by the root module to ensure consistency across all dependencies.
 
-If you need to replace a package in a non-root module:
-1. Move the npm_replace_package() call to your root MODULE.bazel file
-2. Alternatively, use the replace_packages attribute in npm_translate_lock() \
-   within your module (though this is deprecated and will be removed in 3.0)
+If you need to replace a package in a non-root module move the npm_replace_package() call to your root MODULE.bazel file
 
 For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/pnpm.md
 """
@@ -66,13 +63,12 @@ def _npm_extension_impl(module_ctx):
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
 
-    # Validate that only root modules (or isolated extensions) use npm_replace_package
-    for mod in module_ctx.modules:
-        _fail_on_non_root_overrides(module_ctx, mod, "npm_replace_package")
-
     # Collect all package replacements across all modules
     replace_packages = {}
     for mod in module_ctx.modules:
+        # Validate that only root modules (or isolated extensions) use npm_replace_package
+        _fail_on_non_root_overrides(module_ctx, mod, "npm_replace_package")
+
         for attr in mod.tags.npm_replace_package:
             if attr.package in replace_packages:
                 fail("Package '{}' already has a replacement defined in another module".format(attr.package))
@@ -323,8 +319,6 @@ def _npm_translate_lock_attrs():
     attrs.pop("repositories_bzl_filename")
     attrs.pop("exclude_package_contents")  # Use npm_exclude_package_contents tag instead
 
-    # TODO(3.0): remove replace_packages attribute in favor of npm_replace_package tag
-    # attrs.pop("replace_packages")
     return attrs
 
 def _npm_import_attrs():
