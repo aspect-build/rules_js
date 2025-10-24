@@ -2743,6 +2743,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
+        link_targets.append(":{}/@mycorp/pkg-a".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2917,6 +2922,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
             tags = ["manual"],
         )
+        link_targets.append(":{}/@mycorp/pkg-d".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -2950,6 +2960,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//examples:__subpackages__"],
             tags = ["manual"],
         )
+        link_targets.append(":{}/@mycorp/pkg-e".format(name))
+        if "@mycorp" not in scope_targets:
+            scope_targets["@mycorp"] = [link_targets[-1]]
+        else:
+            scope_targets["@mycorp"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
