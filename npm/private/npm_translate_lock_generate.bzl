@@ -63,11 +63,6 @@ _FP_DIRECT_TMPL = \
             tags = ["manual"],
         )"""
 
-_FP_DIRECT_TARGET_TMPL = \
-    """
-    if bazel_package in {link_packages}:
-        link_targets.append(":{{}}/{pkg}".format(name))"""
-
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
     name = "{name}_bzl_library",
