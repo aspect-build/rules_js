@@ -5,6 +5,7 @@ const {
     JS_BINARY__LOG_PREFIX,
     JS_BINARY__NODE_WRAPPER,
     JS_BINARY__PATCH_NODE_FS,
+    JS_BINARY__PATCH_NODE_ESM_LOADER,
 } = process.env
 
 // Keep a count of how many times these patches are applied; this should reflect the depth
@@ -41,5 +42,8 @@ if (
             `DEBUG: ${JS_BINARY__LOG_PREFIX}: node fs patches will be applied with roots: ${roots}`
         )
     }
-    patchfs(roots)
+    const useLstatPatch =
+        JS_BINARY__PATCH_NODE_ESM_LOADER &&
+        JS_BINARY__PATCH_NODE_ESM_LOADER != '0'
+    patchfs(roots, useLstatPatch)
 }
