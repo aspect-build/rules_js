@@ -237,8 +237,7 @@ sh_binary(
     npm_visibility_config_generated = _generate_npm_visibility_config(rctx.attr.package_visibility)
 
     # Check if the generated visibility config is actually non-empty
-    # An empty config looks like "_NPM_PACKAGE_VISIBILITY = {}"
-    has_package_visibility = rctx.attr.package_visibility != None and npm_visibility_config_generated != "_NPM_PACKAGE_VISIBILITY = {}"
+    has_package_visibility = rctx.attr.package_visibility != None and npm_visibility_config_generated != None
 
     # Only keep the generated config if it's non-empty
     npm_visibility_config = npm_visibility_config_generated if has_package_visibility else None
@@ -746,7 +745,7 @@ def _gen_npm_import(rctx, system_tar, _import, link_workspace):
 def _generate_npm_visibility_config(package_visibility_attr):
     """Generate visibility configuration for npm packages"""
     if not package_visibility_attr:
-        return "_NPM_PACKAGE_VISIBILITY = {}"
+        return None
 
     # Convert the attribute to a proper dictionary with list values
     config_dict = {}
@@ -758,26 +757,30 @@ def _generate_npm_visibility_config(package_visibility_attr):
     )
 
 def _generate_npm_package_locations(fp_links, npm_imports):
-    """Generate a dictionary mapping package names to the locations where they're available."""
-    package_locations = {}
+    """Generate a dictionary mapping locations to the package names available at each location."""
+    location_to_packages = {}
 
     # Add first-party packages
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
         fp_link_packages = list(fp_link.get("link_packages").keys())
-        if fp_link_packages:
-            package_locations[fp_package] = fp_link_packages
+        for location in fp_link_packages:
+            if location not in location_to_packages:
+                location_to_packages[location] = []
+            if fp_package not in location_to_packages[location]:
+                location_to_packages[location].append(fp_package)
 
+    # Add npm imports
     for _import in npm_imports:
         if _import.link_packages:
             for link_package, link_aliases in _import.link_packages.items():
                 aliases_to_add = link_aliases if link_aliases else [_import.package]
                 for alias in aliases_to_add:
-                    if alias not in package_locations:
-                        package_locations[alias] = []
-                    if link_package not in package_locations[alias]:
-                        package_locations[alias].append(link_package)
+                    if link_package not in location_to_packages:
+                        location_to_packages[link_package] = []
+                    if alias not in location_to_packages[link_package]:
+                        location_to_packages[link_package].append(alias)
 
     return "_NPM_PACKAGE_LOCATIONS = {}".format(
-        starlark_codegen_utils.to_dict_attr(package_locations, 0, quote_value = False),
+        starlark_codegen_utils.to_dict_attr(location_to_packages, 0, quote_value = False),
     )
