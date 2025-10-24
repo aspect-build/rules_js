@@ -1,19 +1,6 @@
 """Helper functions for checking npm package visibility rules."""
 
-def validate_npm_package_visibility(accessing_package, package_locations, visibility_config):
-    """Validate that accessing_package can access all packages available at its location.
-
-    Args:
-        accessing_package: The bazel package trying to access npm packages
-        package_locations: Dictionary mapping package names to lists of locations where they're available
-        visibility_config: Dictionary mapping package names/patterns to visibility rules
-    """
-
-    # Validate each package available at this location
-    for package_name, locations in package_locations.items():
-        if accessing_package in locations:
-            if not check_package_visibility(accessing_package, package_name, visibility_config):
-                fail("""
+_PACKAGE_VISIBILITY_ERROR_TEMPLATE = """
 Package visibility violation:
 
   Package: {}
@@ -23,7 +10,24 @@ This package is not visible from your location.
 Check the package_visibility configuration in your npm_translate_lock rule.
 
 For more information, see: https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock#package_visibility
-""".format(package_name, accessing_package))
+"""
+
+def validate_npm_package_visibility(accessing_package, package_locations, visibility_config):
+    """Validate that accessing_package can access all packages available at its location.
+
+    Args:
+        accessing_package: The bazel package trying to access npm packages
+        package_locations: Dictionary mapping locations to lists of package names available at each location
+        visibility_config: Dictionary mapping package names/patterns to visibility rules
+    """
+
+    # Direct lookup of packages available at this location
+    packages_at_location = package_locations.get(accessing_package, [])
+
+    # Validate each package
+    for package_name in packages_at_location:
+        if not check_package_visibility(accessing_package, package_name, visibility_config):
+            fail(_PACKAGE_VISIBILITY_ERROR_TEMPLATE.format(package_name, accessing_package))
 
 def check_package_visibility(accessing_package, package_name, visibility_config):
     """Check if accessing_package can access package_name based on visibility_config.
