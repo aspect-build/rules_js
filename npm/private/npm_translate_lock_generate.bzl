@@ -541,7 +541,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                             links_targets_bzl[fp_link_package]["prod"].append("                " + fp_append_stmt)
 
         # Add to link_all and scope targets (only once, not per link_type)
-        if len(all_fp_link_packages) > 0 and "//visibility:public" in package_visibility:
+        if len(all_fp_link_packages) > 0:
             add_to_link_all = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(
                 pkg = fp_package,
             )
