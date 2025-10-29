@@ -6,7 +6,7 @@ Package visibility violation:
   Package: {}
   Requested by: {}
 
-This package is not visible from your location.
+This package is not visible from the requesting package.
 Check the package_visibility configuration in your npm_translate_lock rule.
 
 For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/npm_translate_lock.md#npm_translate_lock
