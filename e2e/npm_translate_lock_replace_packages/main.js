@@ -2,9 +2,10 @@ import chalk from 'chalk'
 import lodash from 'lodash'
 import { readFileSync } from 'fs'
 
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'))
+
 // Test chalk replacement
-const chalkPackageJsonDep = JSON.parse(readFileSync('./package.json', 'utf-8'))
-    .dependencies['chalk']
+const chalkPackageJsonDep = packageJson.dependencies['chalk']
 if (chalkPackageJsonDep !== '5.3.0') {
     throw new Error(
         `Expected chalk version 5.3.0 declared in package.json, but got ${chalkPackageJsonDep}`
@@ -21,8 +22,7 @@ if (chalkActualDep !== '5.0.1') {
 }
 
 // Test lodash replacement
-const lodashPackageJsonDep = JSON.parse(readFileSync('./package.json', 'utf-8'))
-    .dependencies['lodash']
+const lodashPackageJsonDep = packageJson.dependencies['lodash']
 if (lodashPackageJsonDep !== '4.17.21') {
     throw new Error(
         `Expected lodash version 4.17.21 declared in package.json, but got ${lodashPackageJsonDep}`
