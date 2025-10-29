@@ -2,7 +2,7 @@
 
 module(
     name = "aspect_rules_js",
-    bazel_compatibility = [">=6.0.0"],
+    bazel_compatibility = [">=6.3.0"],
     compatibility_level = 1,
 )
 
