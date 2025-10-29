@@ -44,8 +44,9 @@ def _fail_on_non_root_overrides(module_ctx, module, tag_class):
         return
 
     # Isolated module extension usages only contain tags from a single module, so we can allow
-    # overrides.
-    if module_ctx.is_isolated:
+    # overrides. The is_isolated property was added in Bazel 6.3.0 but requires the
+    # --experimental_isolated_extension_usages flag to be available.
+    if getattr(module_ctx, "is_isolated", False):
         return
 
     if getattr(module.tags, tag_class):
