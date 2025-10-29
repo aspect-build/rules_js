@@ -9,7 +9,7 @@ Package visibility violation:
 This package is not visible from your location.
 Check the package_visibility configuration in your npm_translate_lock rule.
 
-For more information, see: https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock#package_visibility
+For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/npm_translate_lock.md#npm_translate_lock
 """
 
 def validate_npm_package_visibility(accessing_package, package_locations, visibility_config):
