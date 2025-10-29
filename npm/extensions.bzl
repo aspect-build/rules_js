@@ -20,6 +20,41 @@ load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
 
+_FORBIDDEN_OVERRIDE_TAG = """\
+The "npm.{tag_class}" tag can only be used in the root Bazel module, \
+but module "{module_name}" attempted to use it.
+
+Package replacements affect the entire dependency graph and must be controlled \
+by the root module to ensure consistency across all dependencies.
+
+If you need to replace a package in a non-root module move the npm_replace_package() call to your root MODULE.bazel file
+
+For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/pnpm.md
+"""
+
+def _fail_on_non_root_overrides(module_ctx, module, tag_class):
+    """Prevents non-root modules from using restricted tags.
+
+    Args:
+        module_ctx: The module extension context
+        module: The module being processed
+        tag_class: The name of the tag class to check (e.g., "npm_replace_package")
+    """
+    if module.is_root:
+        return
+
+    # Isolated module extension usages only contain tags from a single module, so we can allow
+    # overrides. The is_isolated property was added in Bazel 6.3.0 but requires the
+    # --experimental_isolated_extension_usages flag to be available.
+    if getattr(module_ctx, "is_isolated", False):
+        return
+
+    if getattr(module.tags, tag_class):
+        fail(_FORBIDDEN_OVERRIDE_TAG.format(
+            tag_class = tag_class,
+            module_name = module.name,
+        ))
+
 def _npm_extension_impl(module_ctx):
     if not bazel_lib_utils.is_bazel_6_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
@@ -28,16 +63,28 @@ def _npm_extension_impl(module_ctx):
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
 
+    # Collect all package replacements across all modules
+    replace_packages = {}
+    for mod in module_ctx.modules:
+        # Validate that only root modules (or isolated extensions) use npm_replace_package
+        _fail_on_non_root_overrides(module_ctx, mod, "npm_replace_package")
+
+        for attr in mod.tags.npm_replace_package:
+            if attr.package in replace_packages:
+                fail("Package '{}' already has a replacement defined in another module".format(attr.package))
+            replace_packages[attr.package] = "@@{}//{}:{}".format(attr.replacement.repo_name, attr.replacement.package, attr.replacement.name)
+
+    # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(attr, exclude_package_contents_config)
+            _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 if hasattr(module_ctx, "watch"):
                     module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config)
+                _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -70,7 +117,30 @@ def _build_exclude_package_contents_config(module_ctx):
 
     return exclusions
 
-def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
+def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages):
+    # TODO(3.0): remove this warning when replace_packages attribute is removed
+    if attr.replace_packages:
+        # buildifier: disable=print
+        print("""
+WARNING: The 'replace_packages' attribute in npm_translate_lock is DEPRECATED in bzlmod.
+
+Please migrate to using the npm.npm_replace_package() tag instead:
+
+  npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+  npm.npm_replace_package(
+      package = "your-package@version",
+      replacement = "//your:target",
+  )
+
+The 'replace_packages' attribute will be removed in rules_js version 3.0.
+""")
+
+        # Merge replace_packages attribute with npm_replace_package tags
+        for package, replacement in attr.replace_packages.items():
+            if package in replace_packages:
+                fail("Package replacement conflict: {} specified in both replace_packages attribute and npm_replace_package tag".format(package))
+            replace_packages[package] = replacement
+
     npm_translate_lock_rule(
         name = attr.name,
         bins = attr.bins,
@@ -93,7 +163,7 @@ def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
         prod = attr.prod,
         public_hoist_packages = attr.public_hoist_packages,
         quiet = attr.quiet,
-        replace_packages = attr.replace_packages,
+        replace_packages = replace_packages,
         root_package = attr.root_package,
         update_pnpm_lock = attr.update_pnpm_lock,
         use_home_npmrc = attr.use_home_npmrc,
@@ -104,7 +174,7 @@ def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config):
         bzlmod = True,
     )
 
-def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config):
+def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
     state = npm_translate_lock_state.new(attr.name, module_ctx, attr, True)
 
     importers, packages = translate_to_transitive_closure(
@@ -147,6 +217,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     imports = npm_translate_lock_helpers.get_npm_imports(
         importers = importers,
         packages = packages,
+        replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
         root_package = attr.pnpm_lock.package,
@@ -246,7 +317,7 @@ def _npm_translate_lock_attrs():
 
     # Args not supported or unnecessary in bzlmod
     attrs.pop("repositories_bzl_filename")
-    attrs.pop("exclude_package_contents")  # Use tag classes only for MODULE.bazel
+    attrs.pop("exclude_package_contents")  # Use npm_exclude_package_contents tag instead
 
     return attrs
 
@@ -282,12 +353,38 @@ def _npm_exclude_package_contents_attrs():
         ),
     }
 
+_REPLACE_PACKAGE_ATTRS = {
+    "package": attr.string(
+        doc = "The package name and version to replace (e.g., 'chalk@5.3.0')",
+        mandatory = True,
+    ),
+    "replacement": attr.label(
+        doc = "The target to use as replacement for this package",
+        mandatory = True,
+    ),
+}
+
 npm = module_extension(
     implementation = _npm_extension_impl,
     tag_classes = {
         "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
         "npm_import": tag_class(attrs = _npm_import_attrs()),
         "npm_exclude_package_contents": tag_class(attrs = _npm_exclude_package_contents_attrs()),
+        "npm_replace_package": tag_class(
+            attrs = _REPLACE_PACKAGE_ATTRS,
+            doc = """Replace a package with a custom target.
+
+This allows you to replace packages declared in package.json with custom implementations.
+Multiple npm_replace_package tags can be used to replace different packages.
+
+Example:
+```starlark
+npm.npm_replace_package(
+    package = "chalk@5.3.0",
+    replacement = "@chalk_501//:pkg",
+)
+```""",
+        ),
     },
 )
 
