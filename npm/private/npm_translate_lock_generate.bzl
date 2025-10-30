@@ -594,13 +594,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     ]
 
     # Only include visibility config and locations if package visibility is configured
-    if has_package_visibility:
-        defs_bzl_contents.extend([
-            "",
-            npm_visibility_config,
-            "",
-            npm_package_locations,
-        ])
+    defs_bzl_contents.extend(["", npm_visibility_config] if npm_visibility_config else [])
+    defs_bzl_contents.extend(["", npm_package_locations] if npm_package_locations else [])
 
     defs_bzl_contents.extend([
         "",
