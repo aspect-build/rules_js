@@ -6,7 +6,7 @@ Package visibility violation:
   Package: {}
   Requested by: {}
 
-This package is not visible from the requesting package.
+This package is not visible from {}.
 Check the package_visibility configuration in your npm_translate_lock rule.
 
 For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/npm_translate_lock.md#npm_translate_lock
@@ -27,7 +27,7 @@ def validate_npm_package_visibility(accessing_package, package_locations, visibi
     # Validate each package
     for package_name in packages_at_location:
         if not check_package_visibility(accessing_package, package_name, visibility_config):
-            fail(_PACKAGE_VISIBILITY_ERROR_TEMPLATE.format(package_name, accessing_package))
+            fail(_PACKAGE_VISIBILITY_ERROR_TEMPLATE.format(package_name, accessing_package, accessing_package))
 
 def check_package_visibility(accessing_package, package_name, visibility_config):
     """Check if accessing_package can access package_name based on visibility_config.
