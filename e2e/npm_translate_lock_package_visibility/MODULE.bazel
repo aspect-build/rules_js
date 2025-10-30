@@ -1,0 +1,26 @@
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
+npm.npm_translate_lock(
+    name = "npm",
+    data = [
+        "//:package.json",
+        "//packages/from-local:package.json",
+        "//packages/some-dep:package.json",
+    ],
+    npmrc = "//:.npmrc",
+    package_visibility = {
+        "some-dep": ["//visibility:public"],  # Public by default for CI, test.sh will make it private
+    },
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")

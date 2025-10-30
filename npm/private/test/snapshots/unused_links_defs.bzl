@@ -59,7 +59,7 @@ def npm_link_imported_package_store(name, link_root_name, link_alias):
         link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
-        link_visibility = ["//visibility:private"],
+        link_visibility = ["//npm/private/test:__subpackages__"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = False,

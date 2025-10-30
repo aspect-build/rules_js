@@ -1,0 +1,11 @@
+{
+  "name": "visibility-test-root",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "some-dep": "workspace:*"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  }
+}

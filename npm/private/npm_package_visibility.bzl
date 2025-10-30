@@ -1,0 +1,77 @@
+"""Helper functions for checking npm package visibility rules."""
+
+_PACKAGE_VISIBILITY_ERROR_TEMPLATE = """
+Package visibility violation:
+
+  Package: {}
+  Requested by: {}
+
+This package is not visible from {}.
+Check the package_visibility configuration in your npm_translate_lock rule.
+
+For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/npm_translate_lock.md#npm_translate_lock
+"""
+
+def validate_npm_package_visibility(accessing_package, package_locations, visibility_config):
+    """Validate that accessing_package can access all packages available at its location.
+
+    Args:
+        accessing_package: The bazel package trying to access npm packages
+        package_locations: Dictionary mapping locations to lists of package names available at each location
+        visibility_config: Dictionary mapping package names/patterns to visibility rules
+    """
+
+    # Direct lookup of packages available at this location
+    packages_at_location = package_locations.get(accessing_package, [])
+
+    # Validate each package
+    for package_name in packages_at_location:
+        if not check_package_visibility(accessing_package, package_name, visibility_config):
+            fail(_PACKAGE_VISIBILITY_ERROR_TEMPLATE.format(package_name, accessing_package, accessing_package))
+
+def check_package_visibility(accessing_package, package_name, visibility_config):
+    """Check if accessing_package can access package_name based on visibility_config.
+
+    Args:
+        accessing_package: The bazel package trying to access the npm package
+        package_name: The name of the npm package being accessed
+        visibility_config: Dictionary mapping package names/patterns to visibility rules
+
+    Returns:
+        True if access is allowed, False otherwise
+    """
+
+    # Get visibility rules for this package
+    visibility_rules = []
+    if package_name in visibility_config:
+        visibility_rules = visibility_config[package_name]
+    elif "*" in visibility_config:
+        visibility_rules = visibility_config["*"]
+    else:
+        # Default to public if not specified
+        return True
+
+    # Check each visibility rule
+    for rule in visibility_rules:
+        if rule == "//visibility:public":
+            return True
+
+        # Package-specific access: //packages/foo:__pkg__
+        if rule.endswith(":__pkg__") and rule.startswith("//"):
+            # Extract package part: //some/package:__pkg__ -> some/package
+            if rule[2:-8] == accessing_package:
+                return True
+
+        # Subpackage access: //packages/foo:__subpackages__
+        if rule.endswith(":__subpackages__"):
+            rule_package = rule[2:-16]  # Remove "//" and ":__subpackages__"
+            if accessing_package.startswith(rule_package + "/") or accessing_package == rule_package:
+                return True
+
+        # Target-specific access: //packages/foo:target
+        if rule.startswith("//"):
+            colon_pos = rule.find(":", 2)  # Find first colon after "//"
+            if colon_pos > 2 and rule[2:colon_pos] == accessing_package:
+                return True
+
+    return False
