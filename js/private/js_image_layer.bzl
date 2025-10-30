@@ -408,7 +408,7 @@ else {
         transitive = [files],
     )
 
-    nodeinfo = ctx.attr._current_node[platform_common.ToolchainInfo].nodeinfo
+    nodeinfo = ctx.attr._node_tool[platform_common.ToolchainInfo].nodeinfo
     if hasattr(nodeinfo, "node"):
         node_exec = nodeinfo.node
     else:
@@ -627,8 +627,8 @@ js_image_layer_lib = struct(
             default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
         ),
-        "_current_node": attr.label(
-            default = "@nodejs_toolchains//:resolved_toolchain",
+        "_node_tool": attr.label(
+            default = "@rules_nodejs//nodejs:current_node_toolchain",
             cfg = "exec",
         ),
         "binary": attr.label(
@@ -687,6 +687,5 @@ js_image_layer = rule(
     doc = _DOC,
     toolchains = [
         tar_lib.toolchain_type,
-        "@rules_nodejs//nodejs:toolchain_type",
     ],
 )
