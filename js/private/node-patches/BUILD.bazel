@@ -4,10 +4,12 @@ write_source_files(
     name = "checked_in_compile",
     files = {
         "fs.cjs": "//js/private/node-patches/src:fs-generated.cjs",
+        "fs_stat.cjs": "//js/private/node-patches/src:fs_stat.cjs",
     },
 )
 
 exports_files([
     "fs.cjs",
+    "fs_stat.cjs",
     "register.cjs",
 ])

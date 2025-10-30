@@ -81,6 +81,7 @@ babel_bin.babel(
                     "//js/private/node-patches/src:compile",
                 ],
                 entry_point = "copy_entry_{}".format(t),
+                node_options = ["--expose-internals"],
                 node_toolchain = toolchain,
                 patch_node_fs = False,
                 # Without node patches on for these tests, the program is going to escape the sandbox if it
@@ -101,7 +102,8 @@ babel_bin.babel(
                     "//:node_modules/inline-fixtures",
                     "//js/private/node-patches/src:compile",
                 ],
-                entry_point = t,
+                entry_point = "copy_entry_{}".format(t) if (t in TESTS) else t,
+                node_options = ["--expose-internals"],
                 node_toolchain = toolchain,
                 patch_node_fs = False,
                 # Without node patches on for these tests, the program is going to escape the sandbox if it
