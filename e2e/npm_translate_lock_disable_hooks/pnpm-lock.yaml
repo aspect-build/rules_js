@@ -1,11 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
-
-onlyBuiltDependencies:
-  - '@aspect-test/c'
 
 importers:
 
@@ -17,8 +14,13 @@ importers:
 
 packages:
 
-  /@aspect-test/c@2.0.0:
+  '@aspect-test/c@2.0.0':
     resolution: {integrity: sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==}
     hasBin: true
-    requiresBuild: true
-    dev: false
+
+onlyBuiltDependencies:
+  - '@aspect-test/c'
+
+snapshots:
+
+  '@aspect-test/c@2.0.0': {}
