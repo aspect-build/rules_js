@@ -11,23 +11,10 @@ build_test(
     ],
 )
 
-genrule(
-    name = "snapshot-extracted-wksp",
-    srcs = ["@npm//:repositories.bzl"],
-    outs = ["snapshot-extracted-wksp.bzl"],
-    cmd = 'sed "s/system_tar = \\".*\\"/system_tar = \\"<TAR>\\"/" "$<" > "$@"',
-    # Target names may be different on workspace vs bzlmod
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:private"],
-)
-
 write_source_files(
     name = "write_npm_translate_lock_wksp",
     files = {
-        "snapshots/wksp/repositories.bzl": ":snapshot-extracted-wksp.bzl",
+        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
     },
     # Target names may be different on bazel versions
     tags = ["skip-on-bazel6"],
