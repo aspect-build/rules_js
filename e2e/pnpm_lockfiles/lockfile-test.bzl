@@ -257,7 +257,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             name = "extract-%s" % out,
             srcs = [what.replace("VERSION", lock_version).replace("REPO_NAME", lock_repo)],
             outs = ["snapshot-extracted-%s" % out],
-            cmd = 'sed "s/{}/<LOCKVERSION>/g" "$<" | sed "s/system_tar = \\".*\\"/system_tar = \\"<TAR>\\"/" > "$@"'.format(lock_version),
+            cmd = 'sed "s/{}/<LOCKVERSION>/g" "$<" > "$@"'.format(lock_version),
             visibility = ["//visibility:private"],
             # Target names may be different on workspace vs bzlmod
             target_compatible_with = select({

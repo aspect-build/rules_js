@@ -29,7 +29,6 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
-load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
@@ -573,16 +572,11 @@ def _download_and_extract_archive(rctx, package_json_only):
             exclude_pattern_args.append("--exclude")
             exclude_pattern_args.append(pattern)
 
+    tar = Label("@bsd_tar_{}//:tar{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
+
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    tar_args = ["tar", "-xf", _TARBALL_FILENAME] + ["--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"] + exclude_pattern_args
-
-    system_tar = detect_system_tar(rctx) if rctx.attr.system_tar == "auto" else rctx.attr.system_tar
-    if system_tar == "gnu":
-        # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
-        # extracting files into the directory. Delay permission restoration for directories until all files
-        # have been extracted.
-        tar_args.append("--delay-directory-restore")
+    tar_args = [tar, "-xf", _TARBALL_FILENAME] + ["--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"] + exclude_pattern_args
 
     if package_json_only:
         # Try to extract package/package.json; 'package' as the root folder is the common
@@ -935,12 +929,6 @@ _ATTRS = _COMMON_ATTRS | {
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
-    "system_tar": attr.string(
-        # The system tar type can be precomputed for performance, or "auto" to
-        # determine at rule execution time.
-        values = ["gnu", "non-gnu", "auto"],
-        default = "auto",
-    ),
 }
 
 def _get_bin_entries(pkg_json, package):
@@ -1281,7 +1269,6 @@ def npm_import(
 
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
-    system_tar = kwargs.pop("system_tar", "auto")
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
@@ -1313,7 +1300,6 @@ def npm_import(
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
-        system_tar = system_tar,
     )
 
     has_custom_postinstall = not (not custom_postinstall)
