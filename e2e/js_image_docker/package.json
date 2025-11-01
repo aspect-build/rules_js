@@ -1,5 +1,8 @@
 {
     "name": "image",
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "chalk": "^4.0.0"
     }

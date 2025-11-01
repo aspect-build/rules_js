@@ -31,8 +31,8 @@ use_repo(node, "nodejs_windows_amd64")
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
-    pnpm_version = "8.6.7",
-    pnpm_version_integrity = "sha512-vRIWpD/L4phf9Bk2o/O2TDR8fFoJnpYrp2TKqTIZF/qZ2/rgL3qKXzHofHgbXsinwMoSEigz28sqk3pQ+yMEQQ==",
+    pnpm_version = "9.15.9",
+    pnpm_version_integrity = "sha512-aARhQYk8ZvrQHAeSMRKOmvuJ74fiaR1p5NQO7iKJiClf1GghgbrlW1hBjDolO95lpQXsfF+UA+zlzDzTfc8lMQ==",
 )
 use_repo(pnpm, "pnpm", "pnpm__links")
 
@@ -267,7 +267,7 @@ npm.npm_exclude_package_contents(
 use_repo(
     npm,
     "npm",
-    "npm__fsevents__2.3.2__links",
+    "npm__fsevents__2.3.3__links",
     "npm__rollup__2.70.2",
     "npm__rollup__2.70.2__links",
     "npm__unused__0.2.2__links",

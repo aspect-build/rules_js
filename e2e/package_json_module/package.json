@@ -1,6 +1,9 @@
 {
     "private": "true",
     "type": "module",
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "mocha": "10.2.0"
     }

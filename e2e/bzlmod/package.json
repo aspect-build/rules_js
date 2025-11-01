@@ -8,6 +8,7 @@
         "jasmine": "5.0.2"
     },
     "pnpm": {
+        "onlyBuiltDependencies": [],
         "packageExtensions": {
             "jasmine": {
                 "dependencies": {
