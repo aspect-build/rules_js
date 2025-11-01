@@ -8,7 +8,7 @@ module(
 
 # Lower-bounds (minimum) versions for direct runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
-bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.16.0")
 bazel_dep(name = "aspect_tools_telemetry", version = "0.2.8")
 bazel_dep(name = "bazel_features", version = "1.9.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
@@ -38,15 +38,24 @@ use_repo(pnpm, "pnpm", "pnpm__links")
 
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
 bazel_lib_toolchains.tar()
-use_repo(bazel_lib_toolchains, "coreutils_toolchains")
-use_repo(bazel_lib_toolchains, "yq_darwin_amd64")
-use_repo(bazel_lib_toolchains, "yq_darwin_arm64")
-use_repo(bazel_lib_toolchains, "yq_linux_amd64")
-use_repo(bazel_lib_toolchains, "yq_linux_arm64")
-use_repo(bazel_lib_toolchains, "yq_linux_ppc64le")
-use_repo(bazel_lib_toolchains, "yq_linux_s390x")
-use_repo(bazel_lib_toolchains, "yq_windows_amd64")
-use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
+use_repo(
+    bazel_lib_toolchains,
+    "bsd_tar_darwin_amd64",
+    "bsd_tar_darwin_arm64",
+    "bsd_tar_linux_amd64",
+    "bsd_tar_linux_arm64",
+    "bsd_tar_toolchains",
+    "bsd_tar_windows_amd64",
+    "bsd_tar_windows_arm64",
+    "coreutils_toolchains",
+    "yq_darwin_amd64",
+    "yq_darwin_arm64",
+    "yq_linux_amd64",
+    "yq_linux_arm64",
+    "yq_linux_ppc64le",
+    "yq_linux_s390x",
+    "yq_windows_amd64",
+)
 
 ####### Dev dependencies ########
 

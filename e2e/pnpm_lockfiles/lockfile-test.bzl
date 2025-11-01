@@ -251,32 +251,15 @@ def lockfile_test(npm_link_all_packages, name = None):
         tags = ["skip-on-bazel6"],
     )
 
-    # buildifier: disable=no-effect
-    [
-        native.genrule(
-            name = "extract-%s" % out,
-            srcs = [what.replace("VERSION", lock_version).replace("REPO_NAME", lock_repo)],
-            outs = ["snapshot-extracted-%s" % out],
-            cmd = 'sed "s/{}/<LOCKVERSION>/g" "$<" | sed "s/system_tar = \\".*\\"/system_tar = \\"<TAR>\\"/" > "$@"'.format(lock_version),
-            visibility = ["//visibility:private"],
-            # Target names may be different on workspace vs bzlmod
-            target_compatible_with = select({
-                "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
-                "//conditions:default": [],
-            }),
-        )
-        for (out, what) in WKSP_FILES.items()
-    ]
-
     write_source_files(
         name = "wksp-repos",
         files = dict(
             [
                 (
-                    "snapshots/%s" % f,
-                    ":extract-%s" % f,
+                    "snapshots/%s" % out,
+                    what.replace("VERSION", lock_version).replace("REPO_NAME", lock_repo),
                 )
-                for f in WKSP_FILES.keys()
+                for (out, what) in WKSP_FILES.items()
             ],
         ),
         # Target names may be different on workspace vs bzlmod

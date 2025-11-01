@@ -40,23 +40,11 @@ build_test(
     ],
 )
 
-# Strip the system-dependent 'system_tar' attribute from the generated repositories.bzl
-genrule(
-    name = "npm_translate_lock_wksp-repositories",
-    srcs = ["@npm//:repositories.bzl"],
-    outs = ["wksp_repos_stripped.bzl"],
-    cmd = 'sed "s/system_tar = .*,/system_tar = \\"xxx\\",/" "$<" > "$@"',
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-)
-
 write_source_files(
     name = "write_npm_translate_lock_wksp",
     files = {
         "snapshots/wksp/npm_defs.bzl": "@npm//:defs.bzl",
-        "snapshots/wksp/repositories.bzl": ":npm_translate_lock_wksp-repositories",
+        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
     },
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],

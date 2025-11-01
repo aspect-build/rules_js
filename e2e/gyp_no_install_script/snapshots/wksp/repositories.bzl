@@ -13,7 +13,6 @@ def npm_repositories():
         package = "abbrev",
         version = "1.1.1",
         url = "https://registry.npmjs.org/abbrev/-/abbrev-1.1.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==",
         transitive_closure = {
@@ -29,7 +28,6 @@ def npm_repositories():
         package = "agent-base",
         version = "6.0.2",
         url = "https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==",
         deps = {
@@ -50,7 +48,6 @@ def npm_repositories():
         package = "agentkeepalive",
         version = "4.2.1",
         url = "https://registry.npmjs.org/agentkeepalive/-/agentkeepalive-4.2.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Zn4cw2NEqd+9fiSVWMscnjyQ1a8Yfoc5oBajLeo5w+YBHgDUcEBY2hS4YpTz6iN5f/2zQiktcuM6tS8x1p9dpA==",
         deps = {
@@ -75,7 +72,6 @@ def npm_repositories():
         package = "aggregate-error",
         version = "3.1.0",
         url = "https://registry.npmjs.org/aggregate-error/-/aggregate-error-3.1.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==",
         deps = {
@@ -97,7 +93,6 @@ def npm_repositories():
         package = "ansi-regex",
         version = "5.0.1",
         url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
         transitive_closure = {
@@ -113,7 +108,6 @@ def npm_repositories():
         package = "aproba",
         version = "2.0.0",
         url = "https://registry.npmjs.org/aproba/-/aproba-2.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==",
         transitive_closure = {
@@ -129,7 +123,6 @@ def npm_repositories():
         package = "are-we-there-yet",
         version = "3.0.1",
         url = "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-3.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-QZW4EDmGwlYur0Yyf/b2uGucHQMa8aFUP7eu9ddR73vvhFyt4V0Vl3QHPcTNJ8l6qYOBdxgXdnBXQrHilfRQBg==",
         deps = {
@@ -155,7 +148,6 @@ def npm_repositories():
         package = "@gar/promisify",
         version = "1.1.3",
         url = "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==",
         transitive_closure = {
@@ -171,7 +163,6 @@ def npm_repositories():
         package = "@npmcli/fs",
         version = "2.1.2",
         url = "https://registry.npmjs.org/@npmcli/fs/-/fs-2.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-yOJKRvohFOaLqipNtwYB9WugyZKhC/DZC4VYPmpaCzDBrA8YpK3qHZ8/HGscMnE4GqbkLNuVcCnxkeQEdGt6LQ==",
         deps = {
@@ -195,7 +186,6 @@ def npm_repositories():
         package = "@npmcli/move-file",
         version = "2.0.1",
         url = "https://registry.npmjs.org/@npmcli/move-file/-/move-file-2.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-mJd2Z5TjYWq/ttPLLGqArdtnC74J6bOzg4rMDnN+p1xTacZ2yPRCk2y0oSWQtygLR9YVQXgOcONrwtnk3JupxQ==",
         deps = {
@@ -228,7 +218,6 @@ def npm_repositories():
         package = "@tootallnate/once",
         version = "2.0.0",
         url = "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==",
         transitive_closure = {
@@ -244,7 +233,6 @@ def npm_repositories():
         package = "balanced-match",
         version = "1.0.2",
         url = "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         transitive_closure = {
@@ -260,7 +248,6 @@ def npm_repositories():
         package = "bindings",
         version = "1.5.0",
         url = "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==",
         deps = {
@@ -280,7 +267,6 @@ def npm_repositories():
         package = "brace-expansion",
         version = "1.1.11",
         url = "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==",
         deps = {
@@ -302,7 +288,6 @@ def npm_repositories():
         package = "brace-expansion",
         version = "2.0.1",
         url = "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
         deps = {
@@ -322,7 +307,6 @@ def npm_repositories():
         package = "cacache",
         version = "16.1.3",
         url = "https://registry.npmjs.org/cacache/-/cacache-16.1.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-/+Emcj9DAXxX4cwlLmRI9c166RuL3w30zp4R7Joiv2cQTtTtA+jeuCAjH3ZlGnYS3tKENSrKhAzVVP9GVyzeYQ==",
         deps = {
@@ -395,7 +379,6 @@ def npm_repositories():
         package = "chownr",
         version = "2.0.0",
         url = "https://registry.npmjs.org/chownr/-/chownr-2.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==",
         transitive_closure = {
@@ -411,7 +394,6 @@ def npm_repositories():
         package = "clean-stack",
         version = "2.2.0",
         url = "https://registry.npmjs.org/clean-stack/-/clean-stack-2.2.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==",
         transitive_closure = {
@@ -427,7 +409,6 @@ def npm_repositories():
         package = "color-support",
         version = "1.1.3",
         url = "https://registry.npmjs.org/color-support/-/color-support-1.1.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==",
         transitive_closure = {
@@ -443,7 +424,6 @@ def npm_repositories():
         package = "concat-map",
         version = "0.0.1",
         url = "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==",
         transitive_closure = {
@@ -459,7 +439,6 @@ def npm_repositories():
         package = "console-control-strings",
         version = "1.1.0",
         url = "https://registry.npmjs.org/console-control-strings/-/console-control-strings-1.1.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ty/fTekppD2fIwRvnZAVdeOiGd1c7YXEixbgJTNzqcxJWKQnjJ/V1bNEEE6hygpM3WjwHFUVK6HTjWSzV4a8sQ==",
         transitive_closure = {
@@ -475,7 +454,6 @@ def npm_repositories():
         package = "debug",
         version = "4.3.4",
         url = "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==",
         deps = {
@@ -495,7 +473,6 @@ def npm_repositories():
         package = "delegates",
         version = "1.0.0",
         url = "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==",
         transitive_closure = {
@@ -511,7 +488,6 @@ def npm_repositories():
         package = "depd",
         version = "1.1.2",
         url = "https://registry.npmjs.org/depd/-/depd-1.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==",
         transitive_closure = {
@@ -527,7 +503,6 @@ def npm_repositories():
         package = "emoji-regex",
         version = "8.0.0",
         url = "https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
         transitive_closure = {
@@ -543,7 +518,6 @@ def npm_repositories():
         package = "encoding",
         version = "0.1.13",
         url = "https://registry.npmjs.org/encoding/-/encoding-0.1.13.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==",
         deps = {
@@ -566,7 +540,6 @@ def npm_repositories():
         package = "env-paths",
         version = "2.2.1",
         url = "https://registry.npmjs.org/env-paths/-/env-paths-2.2.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
         transitive_closure = {
@@ -582,7 +555,6 @@ def npm_repositories():
         package = "err-code",
         version = "2.0.3",
         url = "https://registry.npmjs.org/err-code/-/err-code-2.0.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==",
         transitive_closure = {
@@ -598,7 +570,6 @@ def npm_repositories():
         package = "file-uri-to-path",
         version = "1.0.0",
         url = "https://registry.npmjs.org/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==",
         transitive_closure = {
@@ -614,7 +585,6 @@ def npm_repositories():
         package = "fs-minipass",
         version = "2.1.0",
         url = "https://registry.npmjs.org/fs-minipass/-/fs-minipass-2.1.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==",
         deps = {
@@ -635,7 +605,6 @@ def npm_repositories():
         package = "fs.realpath",
         version = "1.0.0",
         url = "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==",
         transitive_closure = {
@@ -651,7 +620,6 @@ def npm_repositories():
         package = "gauge",
         version = "4.0.4",
         url = "https://registry.npmjs.org/gauge/-/gauge-4.0.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-f9m+BEN5jkg6a0fZjleidjN51VE1X+mPFQ2DJ0uv1V39oCLCbsGe6yjbBnp7eK7z/+GAon99a3nHuqbuuthyPg==",
         deps = {
@@ -688,7 +656,6 @@ def npm_repositories():
         package = "glob",
         version = "7.2.3",
         url = "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==",
         deps = {
@@ -722,7 +689,6 @@ def npm_repositories():
         package = "glob",
         version = "8.1.0",
         url = "https://registry.npmjs.org/glob/-/glob-8.1.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==",
         deps = {
@@ -753,7 +719,6 @@ def npm_repositories():
         package = "graceful-fs",
         version = "4.2.10",
         url = "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.10.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==",
         transitive_closure = {
@@ -769,7 +734,6 @@ def npm_repositories():
         package = "has-unicode",
         version = "2.0.1",
         url = "https://registry.npmjs.org/has-unicode/-/has-unicode-2.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-8Rf9Y83NBReMnx0gFzA8JImQACstCYWUplepDa9xprwwtmgEZUF0h/i5xSA625zB/I37EtrswSST6OXxwaaIJQ==",
         transitive_closure = {
@@ -785,7 +749,6 @@ def npm_repositories():
         package = "http-cache-semantics",
         version = "4.1.1",
         url = "https://registry.npmjs.org/http-cache-semantics/-/http-cache-semantics-4.1.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==",
         transitive_closure = {
@@ -801,7 +764,6 @@ def npm_repositories():
         package = "http-proxy-agent",
         version = "5.0.0",
         url = "https://registry.npmjs.org/http-proxy-agent/-/http-proxy-agent-5.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==",
         deps = {
@@ -826,7 +788,6 @@ def npm_repositories():
         package = "https-proxy-agent",
         version = "5.0.1",
         url = "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==",
         deps = {
@@ -849,7 +810,6 @@ def npm_repositories():
         package = "humanize-ms",
         version = "1.2.1",
         url = "https://registry.npmjs.org/humanize-ms/-/humanize-ms-1.2.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==",
         deps = {
@@ -869,7 +829,6 @@ def npm_repositories():
         package = "iconv-lite",
         version = "0.6.3",
         url = "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==",
         deps = {
@@ -889,7 +848,6 @@ def npm_repositories():
         package = "imurmurhash",
         version = "0.1.4",
         url = "https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==",
         transitive_closure = {
@@ -905,7 +863,6 @@ def npm_repositories():
         package = "indent-string",
         version = "4.0.0",
         url = "https://registry.npmjs.org/indent-string/-/indent-string-4.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==",
         transitive_closure = {
@@ -921,7 +878,6 @@ def npm_repositories():
         package = "infer-owner",
         version = "1.0.4",
         url = "https://registry.npmjs.org/infer-owner/-/infer-owner-1.0.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-IClj+Xz94+d7irH5qRyfJonOdfTzuDaifE6ZPWfx0N0+/ATZCbuTPq2prFl526urkQd90WyUKIh1DfBQ2hMz9A==",
         transitive_closure = {
@@ -937,7 +893,6 @@ def npm_repositories():
         package = "inflight",
         version = "1.0.6",
         url = "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==",
         deps = {
@@ -959,7 +914,6 @@ def npm_repositories():
         package = "inherits",
         version = "2.0.4",
         url = "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
         transitive_closure = {
@@ -975,7 +929,6 @@ def npm_repositories():
         package = "ip",
         version = "2.0.0",
         url = "https://registry.npmjs.org/ip/-/ip-2.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==",
         transitive_closure = {
@@ -991,7 +944,6 @@ def npm_repositories():
         package = "is-fullwidth-code-point",
         version = "3.0.0",
         url = "https://registry.npmjs.org/is-fullwidth-code-point/-/is-fullwidth-code-point-3.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==",
         transitive_closure = {
@@ -1007,7 +959,6 @@ def npm_repositories():
         package = "is-lambda",
         version = "1.0.1",
         url = "https://registry.npmjs.org/is-lambda/-/is-lambda-1.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-z7CMFGNrENq5iFB9Bqo64Xk6Y9sg+epq1myIcdHaGnbMTYOxvzsEtdYqQUylB7LxfkvgrrjP32T6Ywciio9UIQ==",
         transitive_closure = {
@@ -1023,7 +974,6 @@ def npm_repositories():
         package = "isexe",
         version = "2.0.0",
         url = "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==",
         transitive_closure = {
@@ -1039,7 +989,6 @@ def npm_repositories():
         package = "lru-cache",
         version = "6.0.0",
         url = "https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==",
         deps = {
@@ -1059,7 +1008,6 @@ def npm_repositories():
         package = "lru-cache",
         version = "7.17.0",
         url = "https://registry.npmjs.org/lru-cache/-/lru-cache-7.17.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-zSxlVVwOabhVyTi6E8gYv2cr6bXK+8ifYz5/uyJb9feXX6NACVDwY4p5Ut3WC3Ivo/QhpARHU3iujx2xGAYHbQ==",
         transitive_closure = {
@@ -1075,7 +1023,6 @@ def npm_repositories():
         package = "make-fetch-happen",
         version = "10.2.1",
         url = "https://registry.npmjs.org/make-fetch-happen/-/make-fetch-happen-10.2.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-NgOPbRiaQM10DYXvN3/hhGVI2M5MtITFryzBGxHM5p4wnFxsVCbxkrBrDsk+EZ5OB4jEOT7AjDxtdF+KVEFT7w==",
         deps = {
@@ -1171,7 +1118,6 @@ def npm_repositories():
         package = "minimatch",
         version = "3.1.2",
         url = "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
         deps = {
@@ -1193,7 +1139,6 @@ def npm_repositories():
         package = "minimatch",
         version = "5.1.6",
         url = "https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==",
         deps = {
@@ -1214,7 +1159,6 @@ def npm_repositories():
         package = "minipass-collect",
         version = "1.0.2",
         url = "https://registry.npmjs.org/minipass-collect/-/minipass-collect-1.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-6T6lH0H8OG9kITm/Jm6tdooIbogG9e0tLgpY6mphXSm/A9u8Nq1ryBG+Qspiub9LjWlBPsPS3tWQ/Botq4FdxA==",
         deps = {
@@ -1235,7 +1179,6 @@ def npm_repositories():
         package = "minipass-fetch",
         version = "2.1.2",
         url = "https://registry.npmjs.org/minipass-fetch/-/minipass-fetch-2.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-LT49Zi2/WMROHYoqGgdlQIZh8mLPZmOrN2NdJjMXxYe4nkN6FUyuPuOAOedNJDrx0IRGg9+4guZewtp8hE6TxA==",
         deps = {
@@ -1264,7 +1207,6 @@ def npm_repositories():
         package = "minipass-flush",
         version = "1.0.5",
         url = "https://registry.npmjs.org/minipass-flush/-/minipass-flush-1.0.5.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JmQSYYpPUqX5Jyn1mXaRwOda1uQ8HP5KAT/oDSLCzt1BYRhQU0/hDtsB1ufZfEEzMZ9aAVmsBw8+FWsIXlClWw==",
         deps = {
@@ -1285,7 +1227,6 @@ def npm_repositories():
         package = "minipass-pipeline",
         version = "1.2.4",
         url = "https://registry.npmjs.org/minipass-pipeline/-/minipass-pipeline-1.2.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-xuIq7cIOt09RPRJ19gdi4b+RiNvDFYe5JH+ggNvBqGqpQXcru3PcRmOZuHBKWK1Txf9+cQ+HMVN4d6z46LZP7A==",
         deps = {
@@ -1306,7 +1247,6 @@ def npm_repositories():
         package = "minipass-sized",
         version = "1.0.3",
         url = "https://registry.npmjs.org/minipass-sized/-/minipass-sized-1.0.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-MbkQQ2CTiBMlA2Dm/5cY+9SWFEN8pzzOXi6rlM5Xxq0Yqbda5ZQy9sU75a673FE9ZK0Zsbr6Y5iP6u9nktfg2g==",
         deps = {
@@ -1327,7 +1267,6 @@ def npm_repositories():
         package = "minipass",
         version = "3.3.6",
         url = "https://registry.npmjs.org/minipass/-/minipass-3.3.6.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-DxiNidxSEK+tHG6zOIklvNOwm3hvCrbUrdtzY74U6HKTJxvIDfOUL5W5P2Ghd3DTkhhKPYGqeNUIh5qcM4YBfw==",
         deps = {
@@ -1347,7 +1286,6 @@ def npm_repositories():
         package = "minipass",
         version = "4.2.4",
         url = "https://registry.npmjs.org/minipass/-/minipass-4.2.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-lwycX3cBMTvcejsHITUgYj6Gy6A7Nh4Q6h9NP4sTHY1ccJlC7yKzDmiShEHsJ16Jf1nKGDEaiHxiltsJEvk0nQ==",
         transitive_closure = {
@@ -1363,7 +1301,6 @@ def npm_repositories():
         package = "minizlib",
         version = "2.1.2",
         url = "https://registry.npmjs.org/minizlib/-/minizlib-2.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-bAxsR8BVfj60DWXHE3u30oHzfl4G7khkSuPW+qvpd7jFRHm7dLxOjUk1EHACJ/hxLY8phGJ0YhYHZo7jil7Qdg==",
         deps = {
@@ -1385,7 +1322,6 @@ def npm_repositories():
         package = "mkdirp",
         version = "1.0.4",
         url = "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==",
         transitive_closure = {
@@ -1401,7 +1337,6 @@ def npm_repositories():
         package = "ms",
         version = "2.1.2",
         url = "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
         transitive_closure = {
@@ -1417,7 +1352,6 @@ def npm_repositories():
         package = "ms",
         version = "2.1.3",
         url = "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
         transitive_closure = {
@@ -1433,7 +1367,6 @@ def npm_repositories():
         package = "nan",
         version = "2.17.0",
         url = "https://registry.npmjs.org/nan/-/nan-2.17.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==",
         transitive_closure = {
@@ -1449,7 +1382,6 @@ def npm_repositories():
         package = "negotiator",
         version = "0.6.3",
         url = "https://registry.npmjs.org/negotiator/-/negotiator-0.6.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==",
         transitive_closure = {
@@ -1465,7 +1397,6 @@ def npm_repositories():
         package = "node-gyp",
         version = "9.3.1",
         url = "https://registry.npmjs.org/node-gyp/-/node-gyp-9.3.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-4Q16ZCqq3g8awk6UplT7AuxQ35XN4R/yf/+wSAwcBUAjg7l58RTactWaP8fIDTi0FzI7YcVLujwExakZlfWkXg==",
         deps = {
@@ -1582,7 +1513,6 @@ def npm_repositories():
         package = "nopt",
         version = "6.0.0",
         url = "https://registry.npmjs.org/nopt/-/nopt-6.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ZwLpbTgdhuZUnZzjd7nb1ZV+4DoiC6/sfiVKok72ym/4Tlf+DFdlHYmT2JPmcNNWV6Pi3SDf1kT+A4r9RTuT9g==",
         deps = {
@@ -1602,7 +1532,6 @@ def npm_repositories():
         package = "npmlog",
         version = "6.0.2",
         url = "https://registry.npmjs.org/npmlog/-/npmlog-6.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-/vBvz5Jfr9dT/aFWd0FIRf+T/Q2WBsLENygUaFUqstqsycmZAP/t5BvFJTK0viFmSUxiUKTUplWy5vt+rvKIxg==",
         deps = {
@@ -1644,7 +1573,6 @@ def npm_repositories():
         package = "once",
         version = "1.4.0",
         url = "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==",
         deps = {
@@ -1664,7 +1592,6 @@ def npm_repositories():
         package = "p-map",
         version = "4.0.0",
         url = "https://registry.npmjs.org/p-map/-/p-map-4.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==",
         deps = {
@@ -1686,7 +1613,6 @@ def npm_repositories():
         package = "path-is-absolute",
         version = "1.0.1",
         url = "https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==",
         transitive_closure = {
@@ -1702,7 +1628,6 @@ def npm_repositories():
         package = "promise-inflight",
         version = "1.0.1",
         url = "https://registry.npmjs.org/promise-inflight/-/promise-inflight-1.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==",
         transitive_closure = {
@@ -1718,7 +1643,6 @@ def npm_repositories():
         package = "promise-retry",
         version = "2.0.1",
         url = "https://registry.npmjs.org/promise-retry/-/promise-retry-2.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-y+WKFlBR8BGXnsNlIHFGPZmyDf3DFMoLhaflAnyZgV6rG6xu+JwesTo2Q9R6XwYmtmwAFCkAk3e35jEdoeh/3g==",
         deps = {
@@ -1740,7 +1664,6 @@ def npm_repositories():
         package = "readable-stream",
         version = "3.6.1",
         url = "https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-+rQmrWMYGA90yenhTYsLWAsLsqVC8osOw6PKE1HDYiO0gdPeKe/xDHNzIAIn4C91YQ6oenEhfYqqc1883qHbjQ==",
         deps = {
@@ -1765,7 +1688,6 @@ def npm_repositories():
         package = "retry",
         version = "0.12.0",
         url = "https://registry.npmjs.org/retry/-/retry-0.12.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==",
         transitive_closure = {
@@ -1781,7 +1703,6 @@ def npm_repositories():
         package = "rimraf",
         version = "3.0.2",
         url = "https://registry.npmjs.org/rimraf/-/rimraf-3.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==",
         deps = {
@@ -1811,7 +1732,6 @@ def npm_repositories():
         package = "safe-buffer",
         version = "5.2.1",
         url = "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==",
         transitive_closure = {
@@ -1827,7 +1747,6 @@ def npm_repositories():
         package = "safer-buffer",
         version = "2.1.2",
         url = "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==",
         transitive_closure = {
@@ -1845,7 +1764,6 @@ def npm_repositories():
         package = "segfault-handler",
         version = "1.3.0",
         url = "https://registry.npmjs.org/segfault-handler/-/segfault-handler-1.3.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-p7kVHo+4uoYkr0jmIiTBthwV5L2qmWtben/KDunDZ834mbos+tY+iO0//HpAJpOFSQZZ+wxKWuRo4DxV02B7Lg==",
         deps = {
@@ -1962,7 +1880,6 @@ def npm_repositories():
         package = "semver",
         version = "7.3.8",
         url = "https://registry.npmjs.org/semver/-/semver-7.3.8.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==",
         deps = {
@@ -1983,7 +1900,6 @@ def npm_repositories():
         package = "set-blocking",
         version = "2.0.0",
         url = "https://registry.npmjs.org/set-blocking/-/set-blocking-2.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==",
         transitive_closure = {
@@ -1999,7 +1915,6 @@ def npm_repositories():
         package = "signal-exit",
         version = "3.0.7",
         url = "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.7.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==",
         transitive_closure = {
@@ -2015,7 +1930,6 @@ def npm_repositories():
         package = "smart-buffer",
         version = "4.2.0",
         url = "https://registry.npmjs.org/smart-buffer/-/smart-buffer-4.2.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==",
         transitive_closure = {
@@ -2031,7 +1945,6 @@ def npm_repositories():
         package = "socks-proxy-agent",
         version = "7.0.0",
         url = "https://registry.npmjs.org/socks-proxy-agent/-/socks-proxy-agent-7.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Fgl0YPZ902wEsAyiQ+idGd1A7rSFx/ayC1CQVMw5P+EQx2V0SgpGtf6OKFhVjPflPUl9YMmEOnmfjCdMUsygww==",
         deps = {
@@ -2058,7 +1971,6 @@ def npm_repositories():
         package = "socks",
         version = "2.7.1",
         url = "https://registry.npmjs.org/socks/-/socks-2.7.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-7maUZy1N7uo6+WVEX6psASxtNlKaNVMlGQKkG/63nEDdLOWNbiUMoLK7X4uYoLhQstau72mLgfEWcXcwsaHbYQ==",
         deps = {
@@ -2080,7 +1992,6 @@ def npm_repositories():
         package = "ssri",
         version = "9.0.1",
         url = "https://registry.npmjs.org/ssri/-/ssri-9.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-o57Wcn66jMQvfHG1FlYbWeZWW/dHZhJXjpIcTfXldXEk5nz5lStPo3mK0OJQfGR3RbZUlbISexbljkJzuEj/8Q==",
         deps = {
@@ -2101,7 +2012,6 @@ def npm_repositories():
         package = "string-width",
         version = "4.2.3",
         url = "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==",
         deps = {
@@ -2126,7 +2036,6 @@ def npm_repositories():
         package = "string_decoder",
         version = "1.3.0",
         url = "https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==",
         deps = {
@@ -2146,7 +2055,6 @@ def npm_repositories():
         package = "strip-ansi",
         version = "6.0.1",
         url = "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==",
         deps = {
@@ -2166,7 +2074,6 @@ def npm_repositories():
         package = "tar",
         version = "6.1.13",
         url = "https://registry.npmjs.org/tar/-/tar-6.1.13.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-jdIBIN6LTIe2jqzay/2vtYLlBHa3JF42ot3h1dW8Q0PaAG4v8rm0cvpVePtau5C6OKXGGcgO9q2AMNSWxiLqKw==",
         deps = {
@@ -2196,7 +2103,6 @@ def npm_repositories():
         package = "unique-filename",
         version = "2.0.1",
         url = "https://registry.npmjs.org/unique-filename/-/unique-filename-2.0.1.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ODWHtkkdx3IAR+veKxFV+VBkUMcN+FaqzUUd7IZzt+0zhDZFPFxhlqwPF3YQvMHx1TD0tdgYl+kuPnJ8E6ql7A==",
         deps = {
@@ -2217,7 +2123,6 @@ def npm_repositories():
         package = "unique-slug",
         version = "3.0.0",
         url = "https://registry.npmjs.org/unique-slug/-/unique-slug-3.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-8EyMynh679x/0gqE9fT9oilG+qEt+ibFyqjuVTsZn1+CMxH+XLlpvr2UZx4nVcCwTpx81nICr2JQFkM+HPLq4w==",
         deps = {
@@ -2237,7 +2142,6 @@ def npm_repositories():
         package = "util-deprecate",
         version = "1.0.2",
         url = "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
         transitive_closure = {
@@ -2253,7 +2157,6 @@ def npm_repositories():
         package = "which",
         version = "2.0.2",
         url = "https://registry.npmjs.org/which/-/which-2.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==",
         deps = {
@@ -2273,7 +2176,6 @@ def npm_repositories():
         package = "wide-align",
         version = "1.1.5",
         url = "https://registry.npmjs.org/wide-align/-/wide-align-1.1.5.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==",
         deps = {
@@ -2297,7 +2199,6 @@ def npm_repositories():
         package = "wrappy",
         version = "1.0.2",
         url = "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==",
         transitive_closure = {
@@ -2313,7 +2214,6 @@ def npm_repositories():
         package = "yallist",
         version = "4.0.0",
         url = "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==",
         transitive_closure = {
