@@ -11,11 +11,44 @@ export enum MessageType {
     CYCLE_COMPLETED = 'CYCLE_COMPLETED',
     NEGOTIATE = 'NEGOTIATE',
     NEGOTIATE_RESPONSE = 'NEGOTIATE_RESPONSE',
+    CAPS = 'CAPS',
+    CAPS_RESPONSE = 'CAPS_RESPONSE',
     EXIT = 'EXIT',
 }
 
 export interface Message {
     readonly kind: MessageType
+
+    // OTEL data may be present on any message if OTEL capabilities are available and negotiated.
+    readonly traceId?: string
+    readonly spanId?: string
+}
+
+export interface NegotiateMessage extends Message {
+    readonly kind: MessageType.NEGOTIATE
+    readonly versions: number[]
+}
+
+export interface NegotiateResponseMessage extends Message {
+    readonly kind: MessageType.NEGOTIATE_RESPONSE
+    readonly version: number
+}
+
+export type WatchType = 'sources' | 'runfiles'
+
+export interface Capabilities {
+    scope: WatchType[]
+    otel: boolean
+}
+
+export interface CapsMessage extends Message {
+    readonly kind: MessageType.CAPS
+    readonly caps: Partial<Capabilities>
+}
+
+export interface CapsResponseMessage extends Message {
+    readonly kind: MessageType.CAPS_RESPONSE
+    readonly caps: Capabilities
 }
 
 export interface SourceInfo {
@@ -40,12 +73,38 @@ export interface CycleSourcesMessage extends CycleMessage {
     readonly sources: CycleMessageSources
 }
 
+export interface CycleFailedMessage extends CycleMessage {
+    readonly kind: MessageType.CYCLE_FAILED
+    readonly description: string
+}
+
+export interface CycleCompletedMessage extends CycleMessage {
+    readonly kind: MessageType.CYCLE_COMPLETED
+}
+
+export interface ExitMessage extends Message {
+    readonly kind: MessageType.EXIT
+}
+
 // Environment constants
 const { JS_BINARY__LOG_DEBUG } = process.env
+
+function selectVersion(versions: number[]): number {
+    if (versions.includes(1)) {
+        return 1
+    }
+    if (versions.includes(0)) {
+        return 0
+    }
+
+    throw new Error(`No supported protocol versions: ${versions.join(', ')}`)
+}
 
 export class AspectWatchProtocol {
     private readonly socketFile: string
     private readonly connection: net.Socket
+
+    private _version: number = -1
     private _error: (err: Error) => void
     private _cycle: (msg: CycleMessage) => Promise<void>
 
@@ -61,7 +120,7 @@ export class AspectWatchProtocol {
      * Establish a connection to the Aspect Watcher server and complete the initial
      * handshake + negotiation.
      */
-    async connect() {
+    async connect(requestedCaps: Partial<Capabilities> = {}) {
         await new Promise<void>((resolve, reject) => {
             // Initial connection + success vs failure
             this.connection.once('error', reject)
@@ -74,9 +133,36 @@ export class AspectWatchProtocol {
             }
         })
 
-        await this._receive(MessageType.NEGOTIATE)
-        // TODO: throw if unsupported version
-        await this._send(MessageType.NEGOTIATE_RESPONSE, { version: 0 })
+        const { versions } = await this._receive<NegotiateMessage>(
+            MessageType.NEGOTIATE
+        )
+
+        const version = selectVersion(versions)
+
+        await this._send<NegotiateResponseMessage>(
+            MessageType.NEGOTIATE_RESPONSE,
+            { version }
+        )
+
+        this._version = version
+
+        if (version >= 1) {
+            await this._send<CapsMessage>(MessageType.CAPS, {
+                caps: requestedCaps,
+            })
+
+            const { caps: actualCaps } =
+                await this._receive<CapsResponseMessage>(
+                    MessageType.CAPS_RESPONSE
+                )
+
+            if (JS_BINARY__LOG_DEBUG) {
+                console.log(
+                    'AspectWatchProtocol[connect]: negotiated capabilities:',
+                    actualCaps
+                )
+            }
+        }
 
         return this
     }
@@ -87,7 +173,7 @@ export class AspectWatchProtocol {
     async disconnect() {
         if (this.connection.writable) {
             try {
-                await this._send(MessageType.EXIT)
+                await this._send<ExitMessage>(MessageType.EXIT, {})
             } catch (e) {
                 if (JS_BINARY__LOG_DEBUG) {
                     console.log(
@@ -150,20 +236,23 @@ export class AspectWatchProtocol {
             // Respond with COMPLETE or FAILED for this cycle.
             // Connection errors will propagate.
             if (cycleError) {
-                await this._send(MessageType.CYCLE_FAILED, {
+                await this._send<CycleFailedMessage>(MessageType.CYCLE_FAILED, {
                     cycle_id: cycleMsg.cycle_id,
                     description: cycleError.message,
                 })
             } else {
-                await this._send(MessageType.CYCLE_COMPLETED, {
-                    cycle_id: cycleMsg.cycle_id,
-                })
+                await this._send<CycleCompletedMessage>(
+                    MessageType.CYCLE_COMPLETED,
+                    {
+                        cycle_id: cycleMsg.cycle_id,
+                    }
+                )
             }
         } while (!once && this.connection.readable && this.connection.writable)
     }
 
     async _receive<M extends Message>(
-        type: MessageType | null = null
+        type: M['kind'] | null = null
     ): Promise<M> {
         return await new Promise((resolve, reject) => {
             const dataBufs: Buffer[] = []
@@ -217,7 +306,7 @@ export class AspectWatchProtocol {
         })
     }
 
-    async _send(type: MessageType, data: Omit<Message, 'kind'> = {}) {
+    async _send<M extends Message>(type: M['kind'], data: Omit<M, 'kind'>) {
         await new Promise<void>((resolve, reject) => {
             try {
                 this.connection.write(
