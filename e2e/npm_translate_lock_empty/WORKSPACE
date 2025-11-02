@@ -18,7 +18,12 @@ npm_translate_lock(
     data = ["//:package.json"],
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_version = "9.15.9",
     prod = True,
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
+
+load("@@npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
