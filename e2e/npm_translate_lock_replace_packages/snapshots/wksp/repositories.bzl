@@ -15,7 +15,6 @@ def npm_repositories():
         package = "chalk",
         version = "5.3.0",
         url = "https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==",
         transitive_closure = {

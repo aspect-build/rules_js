@@ -92,7 +92,6 @@ bzl_library(
         ":npm_package_internal",
         ":npm_package_store_internal",
         ":starlark_codegen_utils",
-        ":tar",
         ":utils",
         "@aspect_bazel_lib//lib:directory_path",
         "@aspect_bazel_lib//lib:repo_utils",
@@ -120,7 +119,6 @@ bzl_library(
     visibility = ["//npm:__subpackages__"],
     deps = [
         ":starlark_codegen_utils",
-        ":tar",
         ":utils",
         "@aspect_bazel_lib//lib:base64",
         "@bazel_skylib//lib:dicts",
@@ -275,13 +273,6 @@ bzl_library(
     name = "starlark_codegen_utils",
     srcs = ["starlark_codegen_utils.bzl"],
     visibility = ["//npm:__subpackages__"],
-)
-
-bzl_library(
-    name = "tar",
-    srcs = ["tar.bzl"],
-    visibility = ["//npm:__subpackages__"],
-    deps = ["@aspect_bazel_lib//lib:repo_utils"],
 )
 
 bzl_library(
