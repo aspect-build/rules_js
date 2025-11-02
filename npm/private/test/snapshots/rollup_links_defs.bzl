@@ -23,17 +23,17 @@ def npm_imported_package_store(link_root_name):
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.2/pkg": "fsevents",
+            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
             ":.aspect_rules_js/{link_root_name}/rollup@2.70.2/pkg": "rollup",
         },
         ref_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.2/ref": "fsevents",
+            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/ref": "fsevents",
         },
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.2/pkg": "fsevents",
+            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
             ":.aspect_rules_js/{link_root_name}/rollup@2.70.2/pkg_pre_lc_lite": "rollup",
         },
-        dev = True,
+        dev = False,
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__rollup__2.70.2//:pkg",

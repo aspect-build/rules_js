@@ -1,6 +1,7 @@
 {
     "private": true,
-    "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
+    "// devDependencies": "test linking & building 3rd party npm packages with problematic version specifiers, postinstalls etc",
+    "// devDependencies2": "See also: root package.json pnpm.onlyBuiltDependencies+packageExtensions",
     "devDependencies": {
         "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "@fastify/send": "3.3.0",
