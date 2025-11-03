@@ -19,6 +19,7 @@ load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
+load("@bazel_features//:features.bzl", "bazel_features")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 
@@ -504,6 +505,8 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     if ctx.attr.node_toolchain:
         nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
+    elif "test" in ctx.exec_groups:
+        nodeinfo = ctx.exec_groups["test"].toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
     else:
         nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
@@ -636,7 +639,6 @@ js_binary_lib = struct(
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
-        "@rules_nodejs//nodejs:toolchain_type",
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )
 
@@ -645,7 +647,9 @@ js_binary = rule(
     implementation = js_binary_lib.implementation,
     attrs = js_binary_lib.attrs,
     executable = True,
-    toolchains = js_binary_lib.toolchains,
+    toolchains = js_binary_lib.toolchains + [
+        "@rules_nodejs//nodejs:toolchain_type",
+    ],
 )
 
 js_test = rule(
@@ -671,6 +675,15 @@ or if the `--coverage` flag is set.
 See the Bazel [Test encyclopedia](https://bazel.build/reference/test-encyclopedia) for details on
 the contract between Bazel and a test runner.""",
     implementation = js_binary_lib.implementation,
+    exec_groups = {
+        "test": exec_group(
+            toolchains = [
+                "@rules_nodejs//nodejs:toolchain_type",
+            ] + ([
+                "@bazel_tools//tools/test:default_test_toolchain_type",
+            ]) if bazel_features.toolchains.has_default_test_toolchain_type else [],
+        ),
+    },
     attrs = dict(js_binary_lib.attrs, **{
         "env_inherit": attr.string_list(
             default = [],
