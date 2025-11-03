@@ -42,7 +42,7 @@ def lockfile_test(npm_link_all_packages, name = None):
     lock_version = name if name else native.package_name()
     lock_repo = "lock-%s" % lock_version
 
-    npm_link_all_packages(name = "node_modules")
+    npm_link_all_packages()
 
     # Copy each test to this lockfile dir
     for test in ["patched-dependencies-test.js", "aliases-test.js"]:

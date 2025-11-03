@@ -3,7 +3,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//examples/nextjs:next/package_json.bzl", next_bin = "bin")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # The nextjs binary target to used by nextjs:defs.bzl
 next_bin.next_binary(

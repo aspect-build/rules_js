@@ -5,7 +5,7 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 sh_test(
     name = "node_test",

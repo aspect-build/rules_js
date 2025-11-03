@@ -18,7 +18,7 @@ load(":custom_rule.bzl", "custom_rule")
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # A simple program that runs the Acorn JS parser to produce an AST
 js_binary(

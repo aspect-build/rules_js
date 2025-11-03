@@ -3,7 +3,7 @@ load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@aspect_rules_js//js:defs.bzl", "js_info_files", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # Exposed by js_library()
 js_test(

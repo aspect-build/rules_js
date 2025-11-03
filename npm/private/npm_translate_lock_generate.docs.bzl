@@ -49,7 +49,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
 
         npm_link_all_packages(
-            name = "node_modules",
             imported_links = [
                 npm_link_meaning_of_life,
             ],

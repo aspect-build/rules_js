@@ -14,7 +14,7 @@ def foo_repositories():
         additional_file_contents = {
             "BUILD.bazel": [
                 """load("//:npm_link_all_packages.bzl", "npm_link_all_packages")""",
-                """npm_link_all_packages(name = "node_modules")""",
+                """npm_link_all_packages()""",
             ],
             # Test that we can add statements to the generated defs bzl file
             "npm_link_all_packages.bzl": [
