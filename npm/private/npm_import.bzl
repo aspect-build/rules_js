@@ -730,8 +730,11 @@ bin = bin_factory("node_modules")
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(contents))
 
-    if reproducible and hasattr(rctx, "repo_metadata"):
-        return rctx.repo_metadata(reproducible = True)
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = reproducible)
 
 def _sanitize_bin_name(name):
     """ Sanitize a package name so we can use it in starlark function names """
@@ -900,8 +903,11 @@ def _npm_import_links_rule_impl(rctx):
 
     rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_DEFS_BZL_FILENAME]))
 
-    if hasattr(rctx, "repo_metadata"):
-        return rctx.repo_metadata(reproducible = True)
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = True)
 
 _COMMON_ATTRS = {
     "link_packages": attr.string_list_dict(),
