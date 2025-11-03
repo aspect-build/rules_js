@@ -17,7 +17,7 @@ load("@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl", "rollup", "roll
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 #######################################
 # Use case 1: transitive npm dependencies

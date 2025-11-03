@@ -1,7 +1,7 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/devserver/src:rollup/package_json.bzl", rollup_bin = "bin")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 rollup_bin.rollup(
     name = "js_run_devserver_bundle",

@@ -6,7 +6,6 @@ load("@rules_js-repo_name//js:defs.bzl", "js_test")
 load("@rules_js-repo_name//npm:defs.bzl", "npm_link_package", "npm_package")
 
 npm_link_all_packages(
-    name = "node_modules",
     imported_links = [
         npm_link_types_node,
     ],

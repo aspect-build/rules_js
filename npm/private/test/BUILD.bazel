@@ -12,7 +12,7 @@ load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_helpers_tests.bzl", "translate_lock_helpers_tests")
 load(":utils_tests.bzl", "utils_tests")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # Unit tests
 utils_tests(name = "test_utils")
