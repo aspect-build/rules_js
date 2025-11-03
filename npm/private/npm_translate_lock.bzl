@@ -173,6 +173,12 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.link_workspace(),
     )
 
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = True)
+
 npm_translate_lock_rule = repository_rule(
     implementation = _npm_translate_lock_impl,
     attrs = _ATTRS,
