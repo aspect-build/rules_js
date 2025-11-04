@@ -16,18 +16,17 @@ _PACKAGE_STORE_NAME = "lodash@file+..+vendored+lodash-4.17.21.tgz"
 
 # Generated npm_package_store targets for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
-def npm_imported_package_store(link_root_name):
+def npm_imported_package_store():
     _npm_imported_package_store(
-        link_root_name = link_root_name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg": "lodash",
+            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg": "lodash",
         },
         ref_deps = {},
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg_pre_lc_lite": "lodash",
+            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg_pre_lc_lite": "lodash",
         },
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
@@ -41,11 +40,10 @@ def npm_imported_package_store(link_root_name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_alias):
     return _npm_link_imported_package_store(
         name,
         dev,
-        link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = ["//visibility:public"],
@@ -61,8 +59,9 @@ def npm_link_imported_package(
         dev = False,
         link = None,
         fail_if_no_link = True):
+    if name != "node_modules":
+        fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
-        name,
         package = PACKAGE,
         version = VERSION,
         dev = dev,

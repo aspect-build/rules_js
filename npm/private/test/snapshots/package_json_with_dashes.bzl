@@ -5,54 +5,38 @@ load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin
 _link_workspace_and_package = "@@//"
 _package_store_name = "webpack-bundle-analyzer@4.5.0_bufferutil_4.0.8"
 
-def _webpack_bundle_analyzer_internal(name, link_root_name, **kwargs):
+def webpack_bundle_analyzer(name, **kwargs):
     bin_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "lib/bin/analyzer.js",
         bin_mnemonic = "WebpackBundleAnalyzer",
         **kwargs,
     )
 
-def _webpack_bundle_analyzer_test_internal(name, link_root_name, **kwargs):
+def webpack_bundle_analyzer_test(name, **kwargs):
     bin_test_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "lib/bin/analyzer.js",
         **kwargs,
     )
 
 
-def _webpack_bundle_analyzer_binary_internal(name, link_root_name, **kwargs):
+def webpack_bundle_analyzer_binary(name, **kwargs):
     bin_binary_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "lib/bin/analyzer.js",
         **kwargs,
     )
 
-def webpack_bundle_analyzer(name, **kwargs):
-    _webpack_bundle_analyzer_internal(name, "node_modules", **kwargs)
-
-def webpack_bundle_analyzer_test(name, **kwargs):
-    _webpack_bundle_analyzer_test_internal(name, "node_modules", **kwargs)
-
-def webpack_bundle_analyzer_binary(name, **kwargs):
-    _webpack_bundle_analyzer_binary_internal(name, "node_modules", **kwargs)
-
-def bin_factory(link_root_name):
-    # bind link_root_name using lambdas
-    return struct(
-        webpack_bundle_analyzer = lambda name, **kwargs: _webpack_bundle_analyzer_internal(name, link_root_name = link_root_name, **kwargs),
-        webpack_bundle_analyzer_test = lambda name, **kwargs: _webpack_bundle_analyzer_test_internal(name, link_root_name = link_root_name, **kwargs),
-        webpack_bundle_analyzer_binary = lambda name, **kwargs: _webpack_bundle_analyzer_binary_internal(name, link_root_name = link_root_name, **kwargs),
-        webpack_bundle_analyzer_path = "lib/bin/analyzer.js",
-    )
-
-bin = bin_factory("node_modules")
+bin = struct(
+    webpack_bundle_analyzer = webpack_bundle_analyzer,
+    webpack_bundle_analyzer_test = webpack_bundle_analyzer_test,
+    webpack_bundle_analyzer_binary = webpack_bundle_analyzer_binary,
+    webpack_bundle_analyzer_path = "lib/bin/analyzer.js",
+)

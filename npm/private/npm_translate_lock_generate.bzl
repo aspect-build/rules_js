@@ -9,14 +9,12 @@ load(":utils.bzl", "utils")
 ################################################################################
 
 _BIN_TMPL = \
-    """load("{repo_package_json_bzl}", _bin = "bin", _bin_factory = "bin_factory")
+    """load("{repo_package_json_bzl}", _bin = "bin")
 bin = _bin
-bin_factory = _bin_factory
 """
 
 _FP_STORE_TMPL = \
     """        _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "{package_store_name}",
             src = "{npm_package_target}",
             package = "{package}",
@@ -30,10 +28,10 @@ _FP_DIRECT_TMPL = \
     """
 # Generated npm_link_package_store for linking of first-party "{pkg}" package
 # buildifier: disable=function-docstring
-def _fp_link_{i}(name):
+def _fp_link_{i}():
     _npm_local_link_package_store(
-        name = "{{}}/{pkg}".format(name),
-        src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),{maybe_visibility}
+        name = "node_modules/{pkg}",
+        src = "//{root_package}:{package_store_root}/node_modules/{package_store_name}",{maybe_visibility}
     )"""
 
 _BZL_LIBRARY_TMPL = \
@@ -93,7 +91,7 @@ js_binary(name = "sync", entry_point = "noop.js")
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
                 package_store_name = utils.package_store_name(raw_package, raw_version)
-                dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
+                dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
                     root_package = root_package,
                     package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
@@ -148,7 +146,7 @@ js_binary(name = "sync", entry_point = "noop.js")
                         raw_deps = importers.get(dep_link).get("deps")
                     for raw_package, raw_version in raw_deps.items():
                         package_store_name = utils.package_store_name(raw_package, raw_version)
-                        dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
+                        dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
                             root_package = root_package,
                             package_store_name = package_store_name,
                             package_store_root = utils.package_store_root,
@@ -196,6 +194,8 @@ js_binary(name = "sync", entry_point = "noop.js")
         """\
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
 
@@ -251,7 +251,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ),
             )
 
-        stores_bzl.append("""        store_{i}(name)""".format(i = i))
+        stores_bzl.append("""        store_{i}()""".format(i = i))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
@@ -275,14 +275,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             for link_alias in link_aliases:
                 is_dev = link_alias not in link_prod_deps
 
-                links_pkg_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), {dev}, name, "{alias}")""".format(
+                links_pkg_bzl[link_package].append("""            link_{i}("node_modules/{alias}", {dev}, "{alias}")""".format(
                     i = i,
                     dev = is_dev,
                     alias = link_alias,
                 ))
 
                 if "//visibility:public" in _import.package_visibility:
-                    link_target = '":{{}}/{alias}".format(name)'.format(alias = link_alias)
+                    link_target = '":node_modules/{alias}"'.format(alias = link_alias)
 
                     links_targets[link_package]["dev" if is_dev else "prod"].append(link_target)
 
@@ -351,7 +351,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             if fp_link_package not in links_targets:
                 links_targets[fp_link_package] = {"prod": [], "dev": []}
 
-            link_target = '":{{}}/{alias}".format(name)'.format(alias = fp_package)
+            link_target = '":node_modules/{alias}"'.format(alias = fp_package)
 
             links_targets[fp_link_package]["dev" if is_dev else "prod"].append(link_target)
 
@@ -390,7 +390,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         for link_package in fp_link["link_packages"].keys():
             if link_package not in links_pkg_bzl:
                 links_pkg_bzl[link_package] = []
-            links_pkg_bzl[link_package].append("""            _fp_link_{i}(name)""".format(i = i))
+            links_pkg_bzl[link_package].append("""            _fp_link_{i}()""".format(i = i))
 
     if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
@@ -526,6 +526,8 @@ def _generate_npm_link_targets(links_targets):
         """\
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 

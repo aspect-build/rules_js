@@ -5,54 +5,38 @@ load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin
 _link_workspace_and_package = "@@//"
 _package_store_name = "rollup@2.70.2"
 
-def _rollup_internal(name, link_root_name, **kwargs):
+def rollup(name, **kwargs):
     bin_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "dist/bin/rollup",
         bin_mnemonic = "Rollup",
         **kwargs,
     )
 
-def _rollup_test_internal(name, link_root_name, **kwargs):
+def rollup_test(name, **kwargs):
     bin_test_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "dist/bin/rollup",
         **kwargs,
     )
 
 
-def _rollup_binary_internal(name, link_root_name, **kwargs):
+def rollup_binary(name, **kwargs):
     bin_binary_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "dist/bin/rollup",
         **kwargs,
     )
 
-def rollup(name, **kwargs):
-    _rollup_internal(name, "node_modules", **kwargs)
-
-def rollup_test(name, **kwargs):
-    _rollup_test_internal(name, "node_modules", **kwargs)
-
-def rollup_binary(name, **kwargs):
-    _rollup_binary_internal(name, "node_modules", **kwargs)
-
-def bin_factory(link_root_name):
-    # bind link_root_name using lambdas
-    return struct(
-        rollup = lambda name, **kwargs: _rollup_internal(name, link_root_name = link_root_name, **kwargs),
-        rollup_test = lambda name, **kwargs: _rollup_test_internal(name, link_root_name = link_root_name, **kwargs),
-        rollup_binary = lambda name, **kwargs: _rollup_binary_internal(name, link_root_name = link_root_name, **kwargs),
-        rollup_path = "dist/bin/rollup",
-    )
-
-bin = bin_factory("node_modules")
+bin = struct(
+    rollup = rollup,
+    rollup_test = rollup_test,
+    rollup_binary = rollup_binary,
+    rollup_path = "dist/bin/rollup",
+)

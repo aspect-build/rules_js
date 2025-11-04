@@ -85,6 +85,8 @@ _IMPORTER_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projec
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
 
@@ -98,92 +100,90 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 
     if is_root:
-        store_0(name)
-        store_1(name)
-        store_2(name)
-        store_3(name)
-        store_4(name)
-        store_5(name)
-        store_6(name)
-        store_7(name)
-        store_8(name)
-        store_9(name)
-        store_10(name)
-        store_11(name)
-        store_12(name)
-        store_13(name)
-        store_14(name)
-        store_15(name)
-        store_16(name)
-        store_17(name)
-        store_18(name)
-        store_19(name)
-        store_20(name)
-        store_21(name)
-        store_22(name)
-        store_23(name)
-        store_24(name)
-        store_25(name)
-        store_26(name)
-        store_27(name)
-        store_28(name)
-        store_29(name)
-        store_30(name)
-        store_31(name)
-        store_32(name)
-        store_33(name)
-        store_34(name)
-        store_35(name)
-        store_36(name)
-        store_37(name)
-        store_38(name)
-        store_39(name)
-        store_40(name)
-        store_41(name)
-        store_42(name)
-        store_43(name)
-        store_44(name)
-        store_45(name)
-        store_46(name)
-        store_47(name)
-        store_48(name)
-        store_49(name)
-        store_50(name)
-        store_51(name)
-        store_52(name)
-        store_53(name)
-        store_54(name)
-        store_55(name)
-        store_56(name)
-        store_57(name)
-        store_58(name)
-        store_59(name)
-        store_60(name)
-        store_61(name)
-        store_62(name)
-        store_63(name)
-        store_64(name)
-        store_65(name)
-        store_66(name)
-        store_67(name)
-        store_68(name)
-        store_69(name)
-        store_70(name)
+        store_0()
+        store_1()
+        store_2()
+        store_3()
+        store_4()
+        store_5()
+        store_6()
+        store_7()
+        store_8()
+        store_9()
+        store_10()
+        store_11()
+        store_12()
+        store_13()
+        store_14()
+        store_15()
+        store_16()
+        store_17()
+        store_18()
+        store_19()
+        store_20()
+        store_21()
+        store_22()
+        store_23()
+        store_24()
+        store_25()
+        store_26()
+        store_27()
+        store_28()
+        store_29()
+        store_30()
+        store_31()
+        store_32()
+        store_33()
+        store_34()
+        store_35()
+        store_36()
+        store_37()
+        store_38()
+        store_39()
+        store_40()
+        store_41()
+        store_42()
+        store_43()
+        store_44()
+        store_45()
+        store_46()
+        store_47()
+        store_48()
+        store_49()
+        store_50()
+        store_51()
+        store_52()
+        store_53()
+        store_54()
+        store_55()
+        store_56()
+        store_57()
+        store_58()
+        store_59()
+        store_60()
+        store_61()
+        store_62()
+        store_63()
+        store_64()
+        store_65()
+        store_66()
+        store_67()
+        store_68()
+        store_69()
+        store_70()
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
             version = "file:../projects/c_at_scoped_b_projects+b",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "is-number@file+..+vendored+is-number",
             src = "//vendored/is-number:pkg",
             package = "is-number",
@@ -193,7 +193,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@scoped+a@0.0.0",
             src = "//projects/a:pkg",
             package = "@scoped/a",
@@ -203,32 +202,29 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@scoped+b@0.0.0",
             src = "//projects/b:pkg",
             package = "@scoped/b",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@scoped+d@0.0.0",
             src = "//projects/d:pkg",
             package = "@scoped/d",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "alias-project-a@0.0.0",
             src = "//projects/a:pkg",
             package = "alias-project-a",
@@ -238,45 +234,41 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "scoped+bad@0.0.0",
             src = "//projects/b:pkg",
             package = "scoped/bad",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "test-c200-d200@0.0.0",
             src = "//projects/peers-combo-2:pkg",
             package = "test-c200-d200",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+c@2.0.0".format(name): "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.0".format(name): "@aspect-test/d",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+c@2.0.0": "@aspect-test/c",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.0": "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "test-c201-d200@0.0.0",
             src = "//projects/peers-combo-1:pkg",
             package = "test-c201-d200",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+c@2.0.1".format(name): "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.1".format(name): "@aspect-test/d",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+c@2.0.1": "@aspect-test/c",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.1": "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "test-peer-types@0.0.0",
             src = "//projects/peer-types:pkg",
             package = "test-peer-types",
@@ -286,13 +278,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "a-types@0.0.0",
             src = "//projects/a-types:pkg",
             package = "a-types",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@18.19.54".format(name): "@types/node",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@types+node@18.19.54": "@types/node",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -303,219 +294,219 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "<LOCKVERSION>":
-            link_4("{}/@aspect-test-a-bad-scope".format(name), False, name, "@aspect-test-a-bad-scope")
-            link_4("{}/@aspect-test-custom-scope/a".format(name), False, name, "@aspect-test-custom-scope/a")
-            link_4("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
-            link_4("{}/@aspect-test/a2".format(name), False, name, "@aspect-test/a2")
-            link_4("{}/aspect-test-a-no-scope".format(name), False, name, "aspect-test-a-no-scope")
-            link_4("{}/aspect-test-a/no-at".format(name), False, name, "aspect-test-a/no-at")
-            link_5("{}/@aspect-test/b".format(name), True, name, "@aspect-test/b")
-            link_6("{}/@aspect-test/c".format(name), False, name, "@aspect-test/c")
-            link_12("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
-            link_13("{}/@aspect-test/h-is-only-optional".format(name), False, name, "@aspect-test/h-is-only-optional")
-            link_14("{}/jsonify".format(name), False, name, "jsonify")
-            link_15("{}/@isaacs/cliui".format(name), False, name, "@isaacs/cliui")
-            link_16("{}/rollup-plugin-with-peers".format(name), False, name, "rollup-plugin-with-peers")
-            link_18("{}/@types/archiver".format(name), True, name, "@types/archiver")
-            link_22("{}/@types/node".format(name), True, name, "@types/node")
-            link_22("{}/alias-types-node".format(name), True, name, "alias-types-node")
-            link_23("{}/alias-only-sizzle".format(name), True, name, "alias-only-sizzle")
-            link_26("{}/debug".format(name), False, name, "debug")
-            link_36("{}/hello".format(name), False, name, "hello")
-            link_39("{}/is-odd-v0".format(name), False, name, "is-odd-v0")
-            link_40("{}/is-odd-v1".format(name), False, name, "is-odd-v1")
-            link_41("{}/is-odd-v2".format(name), False, name, "is-odd-v2")
-            link_42("{}/is-odd-v3".format(name), False, name, "is-odd-v3")
-            link_43("{}/is-odd".format(name), False, name, "is-odd")
-            link_43("{}/is-odd-alias".format(name), False, name, "is-odd-alias")
-            link_44("{}/jquery-git-ssh-399b201".format(name), False, name, "jquery-git-ssh-399b201")
-            link_45("{}/jquery-git-ssh-e61fccb".format(name), False, name, "jquery-git-ssh-e61fccb")
-            link_50("{}/lodash".format(name), False, name, "lodash")
-            link_51("{}/meaning-of-life".format(name), False, name, "meaning-of-life")
-            link_57("{}/rollup".format(name), False, name, "rollup")
-            link_58("{}/rollup3".format(name), False, name, "rollup3")
-            link_65("{}/tslib".format(name), False, name, "tslib")
-            link_66("{}/typescript".format(name), False, name, "typescript")
-            link_68("{}/uvu".format(name), False, name, "uvu")
-            _fp_link_0(name)
-            _fp_link_2(name)
-            _fp_link_3(name)
-            _fp_link_4(name)
-            _fp_link_5(name)
-            _fp_link_6(name)
-            _fp_link_7(name)
-            _fp_link_8(name)
-            _fp_link_9(name)
+            link_4("node_modules/@aspect-test-a-bad-scope", False, "@aspect-test-a-bad-scope")
+            link_4("node_modules/@aspect-test-custom-scope/a", False, "@aspect-test-custom-scope/a")
+            link_4("node_modules/@aspect-test/a", False, "@aspect-test/a")
+            link_4("node_modules/@aspect-test/a2", False, "@aspect-test/a2")
+            link_4("node_modules/aspect-test-a-no-scope", False, "aspect-test-a-no-scope")
+            link_4("node_modules/aspect-test-a/no-at", False, "aspect-test-a/no-at")
+            link_5("node_modules/@aspect-test/b", True, "@aspect-test/b")
+            link_6("node_modules/@aspect-test/c", False, "@aspect-test/c")
+            link_12("node_modules/@aspect-test/e", False, "@aspect-test/e")
+            link_13("node_modules/@aspect-test/h-is-only-optional", False, "@aspect-test/h-is-only-optional")
+            link_14("node_modules/jsonify", False, "jsonify")
+            link_15("node_modules/@isaacs/cliui", False, "@isaacs/cliui")
+            link_16("node_modules/rollup-plugin-with-peers", False, "rollup-plugin-with-peers")
+            link_18("node_modules/@types/archiver", True, "@types/archiver")
+            link_22("node_modules/@types/node", True, "@types/node")
+            link_22("node_modules/alias-types-node", True, "alias-types-node")
+            link_23("node_modules/alias-only-sizzle", True, "alias-only-sizzle")
+            link_26("node_modules/debug", False, "debug")
+            link_36("node_modules/hello", False, "hello")
+            link_39("node_modules/is-odd-v0", False, "is-odd-v0")
+            link_40("node_modules/is-odd-v1", False, "is-odd-v1")
+            link_41("node_modules/is-odd-v2", False, "is-odd-v2")
+            link_42("node_modules/is-odd-v3", False, "is-odd-v3")
+            link_43("node_modules/is-odd", False, "is-odd")
+            link_43("node_modules/is-odd-alias", False, "is-odd-alias")
+            link_44("node_modules/jquery-git-ssh-399b201", False, "jquery-git-ssh-399b201")
+            link_45("node_modules/jquery-git-ssh-e61fccb", False, "jquery-git-ssh-e61fccb")
+            link_50("node_modules/lodash", False, "lodash")
+            link_51("node_modules/meaning-of-life", False, "meaning-of-life")
+            link_57("node_modules/rollup", False, "rollup")
+            link_58("node_modules/rollup3", False, "rollup3")
+            link_65("node_modules/tslib", False, "tslib")
+            link_66("node_modules/typescript", False, "typescript")
+            link_68("node_modules/uvu", False, "uvu")
+            _fp_link_0()
+            _fp_link_2()
+            _fp_link_3()
+            _fp_link_4()
+            _fp_link_5()
+            _fp_link_6()
+            _fp_link_7()
+            _fp_link_8()
+            _fp_link_9()
             link_targets = [
-                ":{}/@aspect-test-a-bad-scope".format(name),
-                ":{}/@aspect-test-custom-scope/a".format(name),
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/a2".format(name),
-                ":{}/aspect-test-a-no-scope".format(name),
-                ":{}/aspect-test-a/no-at".format(name),
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@aspect-test/e".format(name),
-                ":{}/@aspect-test/h-is-only-optional".format(name),
-                ":{}/jsonify".format(name),
-                ":{}/@isaacs/cliui".format(name),
-                ":{}/rollup-plugin-with-peers".format(name),
-                ":{}/debug".format(name),
-                ":{}/hello".format(name),
-                ":{}/is-odd-v0".format(name),
-                ":{}/is-odd-v1".format(name),
-                ":{}/is-odd-v2".format(name),
-                ":{}/is-odd-v3".format(name),
-                ":{}/is-odd".format(name),
-                ":{}/is-odd-alias".format(name),
-                ":{}/jquery-git-ssh-399b201".format(name),
-                ":{}/jquery-git-ssh-e61fccb".format(name),
-                ":{}/lodash".format(name),
-                ":{}/meaning-of-life".format(name),
-                ":{}/rollup".format(name),
-                ":{}/rollup3".format(name),
-                ":{}/tslib".format(name),
-                ":{}/typescript".format(name),
-                ":{}/uvu".format(name),
-                ":{}/@scoped/c".format(name),
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
-                ":{}/@scoped/d".format(name),
-                ":{}/alias-project-a".format(name),
-                ":{}/scoped/bad".format(name),
-                ":{}/test-c200-d200".format(name),
-                ":{}/test-c201-d200".format(name),
-                ":{}/test-peer-types".format(name),
-                ":{}/@aspect-test/b".format(name),
-                ":{}/@types/archiver".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/alias-types-node".format(name),
-                ":{}/alias-only-sizzle".format(name),
+                ":node_modules/@aspect-test-a-bad-scope",
+                ":node_modules/@aspect-test-custom-scope/a",
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/a2",
+                ":node_modules/aspect-test-a-no-scope",
+                ":node_modules/aspect-test-a/no-at",
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@aspect-test/e",
+                ":node_modules/@aspect-test/h-is-only-optional",
+                ":node_modules/jsonify",
+                ":node_modules/@isaacs/cliui",
+                ":node_modules/rollup-plugin-with-peers",
+                ":node_modules/debug",
+                ":node_modules/hello",
+                ":node_modules/is-odd-v0",
+                ":node_modules/is-odd-v1",
+                ":node_modules/is-odd-v2",
+                ":node_modules/is-odd-v3",
+                ":node_modules/is-odd",
+                ":node_modules/is-odd-alias",
+                ":node_modules/jquery-git-ssh-399b201",
+                ":node_modules/jquery-git-ssh-e61fccb",
+                ":node_modules/lodash",
+                ":node_modules/meaning-of-life",
+                ":node_modules/rollup",
+                ":node_modules/rollup3",
+                ":node_modules/tslib",
+                ":node_modules/typescript",
+                ":node_modules/uvu",
+                ":node_modules/@scoped/c",
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
+                ":node_modules/@scoped/d",
+                ":node_modules/alias-project-a",
+                ":node_modules/scoped/bad",
+                ":node_modules/test-c200-d200",
+                ":node_modules/test-c201-d200",
+                ":node_modules/test-peer-types",
+                ":node_modules/@aspect-test/b",
+                ":node_modules/@types/archiver",
+                ":node_modules/@types/node",
+                ":node_modules/alias-types-node",
+                ":node_modules/alias-only-sizzle",
             ]
             scope_targets = {
-                "@aspect-test-a-bad-scop": [":{}/@aspect-test-a-bad-scope".format(name)],
-                "@aspect-test-custom-scope": [":{}/@aspect-test-custom-scope/a".format(name)],
+                "@aspect-test-a-bad-scop": [":node_modules/@aspect-test-a-bad-scope"],
+                "@aspect-test-custom-scope": [":node_modules/@aspect-test-custom-scope/a"],
                 "@aspect-test": [
-                    ":{}/@aspect-test/a".format(name),
-                    ":{}/@aspect-test/a2".format(name),
-                    ":{}/@aspect-test/b".format(name),
-                    ":{}/@aspect-test/c".format(name),
-                    ":{}/@aspect-test/e".format(name),
-                    ":{}/@aspect-test/h-is-only-optional".format(name),
+                    ":node_modules/@aspect-test/a",
+                    ":node_modules/@aspect-test/a2",
+                    ":node_modules/@aspect-test/b",
+                    ":node_modules/@aspect-test/c",
+                    ":node_modules/@aspect-test/e",
+                    ":node_modules/@aspect-test/h-is-only-optional",
                 ],
-                "@isaacs": [":{}/@isaacs/cliui".format(name)],
+                "@isaacs": [":node_modules/@isaacs/cliui"],
                 "@types": [
-                    ":{}/@types/archiver".format(name),
-                    ":{}/@types/node".format(name),
+                    ":node_modules/@types/archiver",
+                    ":node_modules/@types/node",
                 ],
                 "@scoped": [
-                    ":{}/@scoped/c".format(name),
-                    ":{}/@scoped/a".format(name),
-                    ":{}/@scoped/b".format(name),
-                    ":{}/@scoped/d".format(name),
+                    ":node_modules/@scoped/c",
+                    ":node_modules/@scoped/a",
+                    ":node_modules/@scoped/b",
+                    ":node_modules/@scoped/d",
                 ],
             }
         elif bazel_package == "projects/peers-combo-2":
-            link_6("{}/@aspect-test/c".format(name), False, name, "@aspect-test/c")
-            link_9("{}/@aspect-test/d".format(name), False, name, "@aspect-test/d")
+            link_6("node_modules/@aspect-test/c", False, "@aspect-test/c")
+            link_9("node_modules/@aspect-test/d", False, "@aspect-test/d")
             link_targets = [
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@aspect-test/d".format(name),
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@aspect-test/d",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/c".format(name),
-                    ":{}/@aspect-test/d".format(name),
+                    ":node_modules/@aspect-test/c",
+                    ":node_modules/@aspect-test/d",
                 ],
             }
         elif bazel_package == "projects/peers-combo-1":
-            link_7("{}/@aspect-test/c".format(name), False, name, "@aspect-test/c")
-            link_10("{}/@aspect-test/d".format(name), False, name, "@aspect-test/d")
+            link_7("node_modules/@aspect-test/c", False, "@aspect-test/c")
+            link_10("node_modules/@aspect-test/d", False, "@aspect-test/d")
             link_targets = [
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@aspect-test/d".format(name),
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@aspect-test/d",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/c".format(name),
-                    ":{}/@aspect-test/d".format(name),
+                    ":node_modules/@aspect-test/c",
+                    ":node_modules/@aspect-test/d",
                 ],
             }
         elif bazel_package == "projects/peer-types":
-            link_14("{}/jsonify".format(name), True, name, "jsonify")
-            link_36("{}/hello".format(name), True, name, "hello")
-            _fp_link_0(name)
-            _fp_link_2(name)
-            _fp_link_3(name)
+            link_14("node_modules/jsonify", True, "jsonify")
+            link_36("node_modules/hello", True, "hello")
+            _fp_link_0()
+            _fp_link_2()
+            _fp_link_3()
             link_targets = [
-                ":{}/jsonify".format(name),
-                ":{}/hello".format(name),
-                ":{}/@scoped/c".format(name),
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
+                ":node_modules/jsonify",
+                ":node_modules/hello",
+                ":node_modules/@scoped/c",
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
             ]
             scope_targets = {
                 "@scoped": [
-                    ":{}/@scoped/c".format(name),
-                    ":{}/@scoped/a".format(name),
-                    ":{}/@scoped/b".format(name),
+                    ":node_modules/@scoped/c",
+                    ":node_modules/@scoped/a",
+                    ":node_modules/@scoped/b",
                 ],
             }
         elif bazel_package == "projects/a-types":
-            link_22("{}/@types/node".format(name), False, name, "@types/node")
-            link_targets = [":{}/@types/node".format(name)]
+            link_22("node_modules/@types/node", False, "@types/node")
+            link_targets = [":node_modules/@types/node"]
             scope_targets = {
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "projects/b":
-            link_22("{}/@types/node".format(name), True, name, "@types/node")
-            _fp_link_2(name)
-            _fp_link_10(name)
+            link_22("node_modules/@types/node", True, "@types/node")
+            _fp_link_2()
+            _fp_link_10()
             link_targets = [
-                ":{}/@scoped/a".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/a-types".format(name),
+                ":node_modules/@scoped/a",
+                ":node_modules/@types/node",
+                ":node_modules/a-types",
             ]
             scope_targets = {
-                "@types": [":{}/@types/node".format(name)],
-                "@scoped": [":{}/@scoped/a".format(name)],
+                "@types": [":node_modules/@types/node"],
+                "@scoped": [":node_modules/@scoped/a"],
             }
         elif bazel_package == "projects/alts":
-            link_48("{}/lodash-4.17.20".format(name), False, name, "lodash-4.17.20")
-            link_49("{}/lodash-4.17.21".format(name), False, name, "lodash-4.17.21")
-            link_50("{}/lodash".format(name), False, name, "lodash")
-            link_50("{}/lodash-4.17.21-file".format(name), False, name, "lodash-4.17.21-file")
+            link_48("node_modules/lodash-4.17.20", False, "lodash-4.17.20")
+            link_49("node_modules/lodash-4.17.21", False, "lodash-4.17.21")
+            link_50("node_modules/lodash", False, "lodash")
+            link_50("node_modules/lodash-4.17.21-file", False, "lodash-4.17.21-file")
             link_targets = [
-                ":{}/lodash-4.17.20".format(name),
-                ":{}/lodash-4.17.21".format(name),
-                ":{}/lodash".format(name),
-                ":{}/lodash-4.17.21-file".format(name),
+                ":node_modules/lodash-4.17.20",
+                ":node_modules/lodash-4.17.21",
+                ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21-file",
             ]
         elif bazel_package == "projects/c":
-            _fp_link_2(name)
-            _fp_link_3(name)
-            _fp_link_10(name)
+            _fp_link_2()
+            _fp_link_3()
+            _fp_link_10()
             link_targets = [
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
-                ":{}/a-types".format(name),
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
+                ":node_modules/a-types",
             ]
             scope_targets = {
                 "@scoped": [
-                    ":{}/@scoped/a".format(name),
-                    ":{}/@scoped/b".format(name),
+                    ":node_modules/@scoped/a",
+                    ":node_modules/@scoped/b",
                 ],
             }
         elif bazel_package == "projects/d":
-            _fp_link_2(name)
-            _fp_link_3(name)
+            _fp_link_2()
+            _fp_link_3()
             link_targets = [
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
             ]
             scope_targets = {
                 "@scoped": [
-                    ":{}/@scoped/a".format(name),
-                    ":{}/@scoped/b".format(name),
+                    ":node_modules/@scoped/a",
+                    ":node_modules/@scoped/b",
                 ],
             }
     
@@ -550,6 +541,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
@@ -560,186 +553,186 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     if bazel_package == "<LOCKVERSION>":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test-a-bad-scope".format(name),
-                ":{}/@aspect-test-custom-scope/a".format(name),
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/a2".format(name),
-                ":{}/aspect-test-a-no-scope".format(name),
-                ":{}/aspect-test-a/no-at".format(name),
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@aspect-test/e".format(name),
-                ":{}/@aspect-test/h-is-only-optional".format(name),
-                ":{}/jsonify".format(name),
-                ":{}/@isaacs/cliui".format(name),
-                ":{}/rollup-plugin-with-peers".format(name),
-                ":{}/debug".format(name),
-                ":{}/hello".format(name),
-                ":{}/is-odd-v0".format(name),
-                ":{}/is-odd-v1".format(name),
-                ":{}/is-odd-v2".format(name),
-                ":{}/is-odd-v3".format(name),
-                ":{}/is-odd".format(name),
-                ":{}/is-odd-alias".format(name),
-                ":{}/jquery-git-ssh-399b201".format(name),
-                ":{}/jquery-git-ssh-e61fccb".format(name),
-                ":{}/lodash".format(name),
-                ":{}/meaning-of-life".format(name),
-                ":{}/rollup".format(name),
-                ":{}/rollup3".format(name),
-                ":{}/tslib".format(name),
-                ":{}/typescript".format(name),
-                ":{}/uvu".format(name),
-                ":{}/@scoped/c".format(name),
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
-                ":{}/@scoped/d".format(name),
-                ":{}/alias-project-a".format(name),
-                ":{}/scoped/bad".format(name),
-                ":{}/test-c200-d200".format(name),
-                ":{}/test-c201-d200".format(name),
-                ":{}/test-peer-types".format(name),
+                ":node_modules/@aspect-test-a-bad-scope",
+                ":node_modules/@aspect-test-custom-scope/a",
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/a2",
+                ":node_modules/aspect-test-a-no-scope",
+                ":node_modules/aspect-test-a/no-at",
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@aspect-test/e",
+                ":node_modules/@aspect-test/h-is-only-optional",
+                ":node_modules/jsonify",
+                ":node_modules/@isaacs/cliui",
+                ":node_modules/rollup-plugin-with-peers",
+                ":node_modules/debug",
+                ":node_modules/hello",
+                ":node_modules/is-odd-v0",
+                ":node_modules/is-odd-v1",
+                ":node_modules/is-odd-v2",
+                ":node_modules/is-odd-v3",
+                ":node_modules/is-odd",
+                ":node_modules/is-odd-alias",
+                ":node_modules/jquery-git-ssh-399b201",
+                ":node_modules/jquery-git-ssh-e61fccb",
+                ":node_modules/lodash",
+                ":node_modules/meaning-of-life",
+                ":node_modules/rollup",
+                ":node_modules/rollup3",
+                ":node_modules/tslib",
+                ":node_modules/typescript",
+                ":node_modules/uvu",
+                ":node_modules/@scoped/c",
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
+                ":node_modules/@scoped/d",
+                ":node_modules/alias-project-a",
+                ":node_modules/scoped/bad",
+                ":node_modules/test-c200-d200",
+                ":node_modules/test-c201-d200",
+                ":node_modules/test-peer-types",
             ])
         if dev:
             link_targets.extend([
-                ":{}/@aspect-test/b".format(name),
-                ":{}/@types/archiver".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/alias-types-node".format(name),
-                ":{}/alias-only-sizzle".format(name),
+                ":node_modules/@aspect-test/b",
+                ":node_modules/@types/archiver",
+                ":node_modules/@types/node",
+                ":node_modules/alias-types-node",
+                ":node_modules/alias-only-sizzle",
             ])
     elif bazel_package == "projects/peers-combo-2":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@aspect-test/d".format(name),
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@aspect-test/d",
             ])
     elif bazel_package == "projects/peers-combo-1":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@aspect-test/d".format(name),
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@aspect-test/d",
             ])
     elif bazel_package == "projects/peer-types":
         if dev:
             link_targets.extend([
-                ":{}/jsonify".format(name),
-                ":{}/hello".format(name),
-                ":{}/@scoped/c".format(name),
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
+                ":node_modules/jsonify",
+                ":node_modules/hello",
+                ":node_modules/@scoped/c",
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
             ])
     elif bazel_package == "projects/a-types":
         if prod:
-            link_targets.extend([":{}/@types/node".format(name)])
+            link_targets.extend([":node_modules/@types/node"])
     elif bazel_package == "projects/b":
         if prod:
-            link_targets.extend([":{}/@scoped/a".format(name)])
+            link_targets.extend([":node_modules/@scoped/a"])
         if dev:
             link_targets.extend([
-                ":{}/@types/node".format(name),
-                ":{}/a-types".format(name),
+                ":node_modules/@types/node",
+                ":node_modules/a-types",
             ])
     elif bazel_package == "projects/alts":
         if prod:
             link_targets.extend([
-                ":{}/lodash-4.17.20".format(name),
-                ":{}/lodash-4.17.21".format(name),
-                ":{}/lodash".format(name),
-                ":{}/lodash-4.17.21-file".format(name),
+                ":node_modules/lodash-4.17.20",
+                ":node_modules/lodash-4.17.21",
+                ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21-file",
             ])
     elif bazel_package == "projects/c":
         if prod:
             link_targets.extend([
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
             ])
         if dev:
-            link_targets.extend([":{}/a-types".format(name)])
+            link_targets.extend([":node_modules/a-types"])
     elif bazel_package == "projects/d":
         if prod:
             link_targets.extend([
-                ":{}/@scoped/a".format(name),
-                ":{}/@scoped/b".format(name),
+                ":node_modules/@scoped/a",
+                ":node_modules/@scoped/b",
             ])
     return link_targets
 
 
 # Generated npm_link_package_store for linking of first-party "@scoped/c" package
 # buildifier: disable=function-docstring
-def _fp_link_0(name):
+def _fp_link_0():
     _npm_local_link_package_store(
-        name = "{}/@scoped/c".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@file+..+projects+c_at_scoped_b_projects+b".format(name),
+        name = "node_modules/@scoped/c",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package
 # buildifier: disable=function-docstring
-def _fp_link_2(name):
+def _fp_link_2():
     _npm_local_link_package_store(
-        name = "{}/@scoped/a".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+        name = "node_modules/@scoped/a",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/b" package
 # buildifier: disable=function-docstring
-def _fp_link_3(name):
+def _fp_link_3():
     _npm_local_link_package_store(
-        name = "{}/@scoped/b".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+        name = "node_modules/@scoped/b",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/d" package
 # buildifier: disable=function-docstring
-def _fp_link_4(name):
+def _fp_link_4():
     _npm_local_link_package_store(
-        name = "{}/@scoped/d".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+        name = "node_modules/@scoped/d",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+d@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "alias-project-a" package
 # buildifier: disable=function-docstring
-def _fp_link_5(name):
+def _fp_link_5():
     _npm_local_link_package_store(
-        name = "{}/alias-project-a".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
+        name = "node_modules/alias-project-a",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/alias-project-a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "scoped/bad" package
 # buildifier: disable=function-docstring
-def _fp_link_6(name):
+def _fp_link_6():
     _npm_local_link_package_store(
-        name = "{}/scoped/bad".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+        name = "node_modules/scoped/bad",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/scoped+bad@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-c200-d200" package
 # buildifier: disable=function-docstring
-def _fp_link_7(name):
+def _fp_link_7():
     _npm_local_link_package_store(
-        name = "{}/test-c200-d200".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
+        name = "node_modules/test-c200-d200",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-c201-d200" package
 # buildifier: disable=function-docstring
-def _fp_link_8(name):
+def _fp_link_8():
     _npm_local_link_package_store(
-        name = "{}/test-c201-d200".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
+        name = "node_modules/test-c201-d200",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-peer-types" package
 # buildifier: disable=function-docstring
-def _fp_link_9(name):
+def _fp_link_9():
     _npm_local_link_package_store(
-        name = "{}/test-peer-types".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-peer-types@0.0.0".format(name),
+        name = "node_modules/test-peer-types",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-peer-types@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "a-types" package
 # buildifier: disable=function-docstring
-def _fp_link_10(name):
+def _fp_link_10():
     _npm_local_link_package_store(
-        name = "{}/a-types".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),
+        name = "node_modules/a-types",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/a-types@0.0.0",
     )

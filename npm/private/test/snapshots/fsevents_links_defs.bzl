@@ -16,18 +16,17 @@ _PACKAGE_STORE_NAME = "fsevents@2.3.3"
 
 # Generated npm_package_store targets for npm package fsevents@2.3.3
 # buildifier: disable=function-docstring
-def npm_imported_package_store(link_root_name):
+def npm_imported_package_store():
     _npm_imported_package_store(
-        link_root_name = link_root_name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg": "fsevents",
+            ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
         },
         ref_deps = {},
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg_pre_lc_lite": "fsevents",
+            ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg_pre_lc_lite": "fsevents",
         },
         has_lifecycle_build_target = True,
         transitive_closure_pattern = True,
@@ -43,11 +42,10 @@ def npm_imported_package_store(link_root_name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package fsevents@2.3.3
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_alias):
     return _npm_link_imported_package_store(
         name,
         dev,
-        link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = ["//visibility:public"],
@@ -63,8 +61,9 @@ def npm_link_imported_package(
         dev = False,
         link = True,
         fail_if_no_link = True):
+    if name != "node_modules":
+        fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
-        name,
         package = PACKAGE,
         version = VERSION,
         dev = dev,

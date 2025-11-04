@@ -10,6 +10,8 @@ _IMPORTER_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
 
@@ -23,19 +25,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 
     if is_root:
-        store_0(name)
-        store_1(name)
+        store_0()
+        store_1()
 
     link_targets = None
     scope_targets = None
 
     if link:
         if bazel_package == "":
-            link_0("{}/chalk".format(name), False, name, "chalk")
-            link_1("{}/lodash".format(name), False, name, "lodash")
+            link_0("node_modules/chalk", False, "chalk")
+            link_1("node_modules/lodash", False, "lodash")
             link_targets = [
-                ":{}/chalk".format(name),
-                ":{}/lodash".format(name),
+                ":node_modules/chalk",
+                ":node_modules/lodash",
             ]
     
     for link_fn in imported_links:
@@ -69,6 +71,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
@@ -79,7 +83,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     if bazel_package == "":
         if prod:
             link_targets.extend([
-                ":{}/chalk".format(name),
-                ":{}/lodash".format(name),
+                ":node_modules/chalk",
+                ":node_modules/lodash",
             ])
     return link_targets
