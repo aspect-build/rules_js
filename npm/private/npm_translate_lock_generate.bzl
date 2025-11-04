@@ -142,6 +142,18 @@ sh_binary(
                 "deps": transitive_deps,
             }
 
+    importer_deps_map = {}
+    for import_path, importer in importers.items():
+        link_package = helpers.link_package(root_package, import_path)
+        prod_deps = importer.get("deps", {})
+        all_deps = importer.get("all_deps", {})
+
+        pkg_deps = {}
+        for dep_name, dep_version in all_deps.items():
+            pkg_deps[dep_name] = {"version": dep_version, "dev": dep_name not in prod_deps}
+
+        importer_deps_map[link_package] = pkg_deps
+
     # Look for first-party links in importers
     for import_path, importer in importers.items():
         link_package = helpers.link_package(root_package, import_path)
@@ -208,19 +220,6 @@ sh_binary(
                             "deps": transitive_deps,
                         }
                         fp_links[dep_key][deps_type][link_package] = True
-
-    importer_deps_map = {}
-    for import_path, importer in importers.items():
-        link_package = helpers.link_package(root_package, import_path)
-        prod_deps = importer.get("deps", {})
-        all_deps = importer.get("all_deps", {})
-
-        pkg_deps = {}
-        for dep_name, dep_version in all_deps.items():
-            is_dev = dep_name not in prod_deps
-            pkg_deps[dep_name] = {"version": dep_version, "dev": is_dev}
-
-        importer_deps_map[link_package] = pkg_deps
 
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(
         link_packages = str(link_packages),
