@@ -34,7 +34,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_0(name)
     if link:
         if bazel_package == "":
-            link_0("{}/@aspect-test/c".format(name), link_root_name = name, link_alias = "@aspect-test/c")
+            link_0("{}/@aspect-test/c".format(name), name, "@aspect-test/c")
             link_targets.append(":{}/@aspect-test/c".format(name))
             if "@aspect-test" not in scope_targets:
                 scope_targets["@aspect-test"] = [link_targets[-1]]
