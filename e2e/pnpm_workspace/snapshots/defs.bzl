@@ -11,7 +11,7 @@ load("@@aspect_rules_js~~npm~npm__at_aspect-test_h__1.0.0__links//:defs.bzl", li
 load("@@aspect_rules_js~~npm~npm__at_types_node__18.19.54__links//:defs.bzl", link_8 = "npm_link_imported_package_store", store_8 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~npm__at_types_sizzle__2.3.8__links//:defs.bzl", link_9 = "npm_link_imported_package_store", store_9 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~npm__lodash__file_vendored_lodash-4.17.19.tgz__links//:defs.bzl", link_10 = "npm_link_imported_package_store", store_10 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~npm__typescript__5.9.2__links//:defs.bzl", link_11 = "npm_link_imported_package_store", store_11 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~npm__typescript__5.9.3__links//:defs.bzl", link_11 = "npm_link_imported_package_store", store_11 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~npm__undici-types__5.26.5__links//:defs.bzl", store_12 = "npm_imported_package_store")
 
 # buildifier: disable=bzl-visibility
@@ -158,44 +158,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+c@0.0.0",
-            src = "//lib/c:pkg",
-            package = "@lib/c",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-    if bazel_package in ["app/c"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@lib/c".format(name),
-            src = "//:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@lib/c/dir".format(name),
-            srcs = [":{}/@lib/c".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@lib/c".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
 
     if is_root:
         _npm_local_package_store(
@@ -379,6 +341,44 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         link_targets.append(":{}/@lib/b_alias".format(name))
+        if "@lib" not in scope_targets:
+            scope_targets["@lib"] = [link_targets[-1]]
+        else:
+            scope_targets["@lib"].append(link_targets[-1])
+
+    if is_root:
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+c@0.0.0",
+            src = "//lib/c:pkg",
+            package = "@lib/c",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["app/c"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/@lib/c".format(name),
+            src = "//:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/@lib/c/dir".format(name),
+            srcs = [":{}/@lib/c".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/@lib/c".format(name))
         if "@lib" not in scope_targets:
             scope_targets["@lib"] = [link_targets[-1]]
         else:

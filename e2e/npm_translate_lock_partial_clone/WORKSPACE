@@ -23,6 +23,7 @@ npm_translate_lock(
     ],
     npmrc = "//:.npmrc",
     pnpm_lock = "//root:pnpm-lock.yaml",
+    pnpm_version = "9.15.9",
     # Some users may have update_pnpm_lock set to True and set ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK on the env
     # for a CI job with a partial clone. For this test, setting update_pnpm_lock to False tests the same thing.
     update_pnpm_lock = False,

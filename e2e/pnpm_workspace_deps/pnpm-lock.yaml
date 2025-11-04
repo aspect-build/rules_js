@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
@@ -25,7 +25,7 @@ importers:
         version: 2.0.2
       '@aspect-test/c1':
         specifier: npm:@aspect-test/c@1.0.0
-        version: /@aspect-test/c@1.0.0
+        version: '@aspect-test/c@1.0.0'
 
   tests:
     dependencies:
@@ -38,24 +38,28 @@ importers:
 
 packages:
 
-  /@aspect-test/c@1.0.0:
+  '@aspect-test/c@1.0.0':
     resolution: {integrity: sha512-UorLD4TFr9CWFeYbUd5etaxSo201fYEFR+rSxXytfzefX41EWCBabsXhdhvXjK6v/HRuo1y1I1NiW2P3/bKJeA==}
     hasBin: true
-    requiresBuild: true
-    dev: false
 
-  /@aspect-test/c@2.0.2:
+  '@aspect-test/c@2.0.2':
     resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
-    requiresBuild: true
-    dev: false
 
-  /@aspect-test/e@1.0.0:
+  '@aspect-test/e@1.0.0':
     resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
     hasBin: true
-    dev: false
 
-  /@aspect-test/f@1.0.0:
+  '@aspect-test/f@1.0.0':
     resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
     hasBin: true
-    dev: true
+
+snapshots:
+
+  '@aspect-test/c@1.0.0': {}
+
+  '@aspect-test/c@2.0.2': {}
+
+  '@aspect-test/e@1.0.0': {}
+
+  '@aspect-test/f@1.0.0': {}

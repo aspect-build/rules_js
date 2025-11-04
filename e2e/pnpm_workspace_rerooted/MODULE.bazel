@@ -22,6 +22,13 @@ use_repo(node, "nodejs_darwin_arm64")
 use_repo(node, "nodejs_linux_amd64")
 use_repo(node, "nodejs_linux_arm64")
 
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(
+    name = "pnpm",
+    pnpm_version = "9.15.9",
+)
+use_repo(pnpm, "pnpm", "pnpm__links")
+
 npm = use_extension(
     "@aspect_rules_js//npm:extensions.bzl",
     "npm",

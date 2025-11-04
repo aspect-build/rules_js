@@ -30,6 +30,7 @@ npm_translate_lock(
         "@gregmagolan/test-b": ["//:patches/test-b.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_version = "9.15.9",
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
     verify_patches = "//patches:patches.list",

@@ -1,7 +1,10 @@
 {
     "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
-        "typescript": "^5.8.2",
+        "typescript": "^5.9.2",
         "@aspect-test/a": "5.0.2",
         "lodash": "file:vendored/lodash-4.17.19.tgz"
     },
