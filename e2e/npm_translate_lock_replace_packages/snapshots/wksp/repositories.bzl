@@ -33,7 +33,6 @@ def npm_repositories():
         package = "lodash",
         version = "4.17.21",
         url = "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
-        system_tar = "xxx",
         package_visibility = ["//visibility:public"],
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         transitive_closure = {

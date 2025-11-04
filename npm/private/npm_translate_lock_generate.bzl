@@ -331,7 +331,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             # for each alias of this package
             for link_alias in link_aliases:
-                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), link_root_name = name, link_alias = "{alias}")""".format(
+                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), name, "{alias}")""".format(
                     i = i,
                     alias = link_alias,
                 ))
