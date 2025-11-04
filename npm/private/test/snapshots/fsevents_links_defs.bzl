@@ -29,7 +29,7 @@ def npm_imported_package_store(link_root_name):
         lc_deps = {
             ":.aspect_rules_js/{link_root_name}/fsevents@2.3.3/pkg_pre_lc_lite": "fsevents",
         },
-        dev = False,
+        dev_only = False,
         has_lifecycle_build_target = True,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__fsevents__2.3.3//:pkg",

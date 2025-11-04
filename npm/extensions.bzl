@@ -238,7 +238,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             commit = i.commit,
             custom_postinstall = i.custom_postinstall,
             deps = i.deps,
-            dev = i.dev,
+            dev = i.dev_only,
             integrity = i.integrity,
             generate_bzl_library_targets = attr.generate_bzl_library_targets,
             lifecycle_hooks = i.lifecycle_hooks if i.lifecycle_hooks else [],
