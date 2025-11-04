@@ -305,6 +305,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             link_importer_key = package_to_importer.get(link_package)
             link_importer = importers.get(link_importer_key)
+            link_prod_deps = link_importer.get("deps", {})
 
             # the build file for the package being linked
             build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
@@ -318,8 +319,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             # for each alias of this package
             for link_alias in link_aliases:
-                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), name, "{alias}")""".format(
+                is_dev = link_alias not in link_prod_deps
+
+                links_bzl[link_package].append("""            link_{i}("{{}}/{alias}".format(name), {dev}, name, "{alias}")""".format(
                     i = i,
+                    dev = is_dev,
                     alias = link_alias,
                 ))
 
@@ -328,8 +332,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     links_bzl[link_package].append(add_to_link_all)
 
                     append_stmt_base = """link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
-                    link_prod_deps = link_importer.get("deps", {})
-                    is_dev = link_alias not in link_prod_deps
 
                     if is_dev:
                         links_targets_bzl[link_package]["dev"].append("                " + append_stmt_base)

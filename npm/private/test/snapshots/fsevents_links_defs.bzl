@@ -44,9 +44,10 @@ def npm_imported_package_store(link_root_name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package fsevents@2.3.3
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
     return _npm_link_imported_package_store(
         name,
+        dev,
         link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
@@ -60,12 +61,14 @@ def npm_link_imported_package_store(name, link_root_name, link_alias):
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
         name = "node_modules",
+        dev = False,
         link = True,
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
         package = PACKAGE,
         version = VERSION,
+        dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {
