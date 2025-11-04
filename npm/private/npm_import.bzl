@@ -1273,6 +1273,11 @@ def npm_import(
 
         dev: Whether this npm package is a dev dependency
 
+            DEPRECATED: this field is deprecated and will be removed in a future release.
+
+            A package should be marked as a dev dependency as part of the dependency declaration,
+            not as part of the package definition or import.
+
         exclude_package_contents: List of glob patterns to exclude from the linked package.
 
             This is useful for excluding files that are not needed in the linked package.
