@@ -10,6 +10,8 @@ _IMPORTER_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
 
@@ -23,8 +25,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 
     if is_root:
-        store_0(name)
-        store_1(name)
+        store_0()
+        store_1()
 
     link_targets = None
     scope_targets = None
@@ -61,6 +63,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 

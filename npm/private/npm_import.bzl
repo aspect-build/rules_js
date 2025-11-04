@@ -54,9 +54,8 @@ _PACKAGE_STORE_NAME = "{package_store_name}"
 
 # Generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_imported_package_store(link_root_name):
+def npm_imported_package_store():
     _npm_imported_package_store(
-        link_root_name = link_root_name,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
@@ -78,7 +77,6 @@ def npm_imported_package_store(link_root_name):
 # buildifier: disable=function-docstring
 # buildifier: disable=unnamed-macro
 def npm_imported_package_store_internal(
-        link_root_name,
         package,
         version,
         root_package,
@@ -103,11 +101,7 @@ def npm_imported_package_store_internal(
         )
         fail(msg)
 
-    deps = {k.format(link_root_name = link_root_name): v for k, v in deps.items()}
-    ref_deps = {k.format(link_root_name = link_root_name): v for k, v in ref_deps.items()}
-    lc_deps = {k.format(link_root_name = link_root_name): v for k, v in lc_deps.items()}
-
-    store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
+    store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
 
     # reference target used to avoid circular deps
     _npm_package_store(
@@ -227,14 +221,13 @@ def npm_imported_package_store_internal(
 def npm_link_imported_package_store_internal(
         name,
         dev,
-        link_root_name,
         link_alias,
         root_package,
         link_visibility,
         bins,
         package_store_name,
         public_visibility):
-    store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
+    store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
 
     # terminal package store target to link
     npm_link_package_store(
@@ -262,11 +255,10 @@ def npm_link_imported_package_store_internal(
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_alias):
     return _npm_link_imported_package_store(
         name,
         dev,
-        link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = {link_visibility},
@@ -279,7 +271,6 @@ def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
 # Invoked by generated npm_link_imported_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package_internal(
-        name,
         package,
         version,
         dev,
@@ -316,11 +307,10 @@ def npm_link_imported_package_internal(
         if not link_aliases:
             link_aliases = [package]
         for link_alias in link_aliases:
-            link_target_name = "{}/{}".format(name, link_alias)
+            link_target_name = "node_modules/{}".format(link_alias)
             npm_link_imported_package_store_macro(
                 name = link_target_name,
                 dev = dev,
-                link_root_name = name,
                 link_alias = link_alias,
             )
             if public_visibility:
@@ -332,7 +322,7 @@ def npm_link_imported_package_internal(
                     scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
-        npm_imported_package_store_macro(name)
+        npm_imported_package_store_macro()
 
     return (link_targets, scoped_targets)
 
@@ -344,8 +334,9 @@ def npm_link_imported_package(
         dev = False,
         link = {link_default},
         fail_if_no_link = True):
+    if name != "node_modules":
+        fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
-        name,
         package = PACKAGE,
         version = VERSION,
         dev = dev,
@@ -359,8 +350,8 @@ def npm_link_imported_package(
     )
 """
 
-def bin_internal(name, link_workspace_and_package, link_root_name, package_store_name, bin_path, bin_mnemonic, **kwargs):
-    target = "%s:%s/%s/%s" % (link_workspace_and_package, utils.package_store_root, link_root_name, package_store_name)
+def bin_internal(name, link_workspace_and_package, package_store_name, bin_path, bin_mnemonic, **kwargs):
+    target = "%s:%s/node_modules/%s" % (link_workspace_and_package, utils.package_store_root, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -381,8 +372,8 @@ def bin_internal(name, link_workspace_and_package, link_root_name, package_store
         **kwargs
     )
 
-def bin_test_internal(name, link_workspace_and_package, link_root_name, package_store_name, bin_path, **kwargs):
-    target = "%s:%s/%s/%s" % (link_workspace_and_package, utils.package_store_root, link_root_name, package_store_name)
+def bin_test_internal(name, link_workspace_and_package, package_store_name, bin_path, **kwargs):
+    target = "%s:%s/node_modules/%s" % (link_workspace_and_package, utils.package_store_root, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -396,8 +387,8 @@ def bin_test_internal(name, link_workspace_and_package, link_root_name, package_
         **kwargs
     )
 
-def bin_binary_internal(name, link_workspace_and_package, link_root_name, package_store_name, bin_path, **kwargs):
-    target = "%s:%s/%s/%s" % (link_workspace_and_package, utils.package_store_root, link_root_name, package_store_name)
+def bin_binary_internal(name, link_workspace_and_package, package_store_name, bin_path, **kwargs):
+    target = "%s:%s/node_modules/%s" % (link_workspace_and_package, utils.package_store_root, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -412,46 +403,34 @@ def bin_binary_internal(name, link_workspace_and_package, link_root_name, packag
     )
 
 _BIN_MACRO_TMPL = """
-def _{bin_name}_internal(name, link_root_name, **kwargs):
+def {bin_name}(name, **kwargs):
     bin_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
         bin_mnemonic = "{bin_mnemonic}",
         **kwargs,
     )
 
-def _{bin_name}_test_internal(name, link_root_name, **kwargs):
+def {bin_name}_test(name, **kwargs):
     bin_test_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
         **kwargs,
     )
 
 
-def _{bin_name}_binary_internal(name, link_root_name, **kwargs):
+def {bin_name}_binary(name, **kwargs):
     bin_binary_internal(
         name,
         link_workspace_and_package = _link_workspace_and_package,
-        link_root_name = link_root_name,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
         **kwargs,
     )
-
-def {bin_name}(name, **kwargs):
-    _{bin_name}_internal(name, "node_modules", **kwargs)
-
-def {bin_name}_test(name, **kwargs):
-    _{bin_name}_test_internal(name, "node_modules", **kwargs)
-
-def {bin_name}_binary(name, **kwargs):
-    _{bin_name}_binary_internal(name, "node_modules", **kwargs)
 """
 
 _JS_PACKAGE_TMPL = """
@@ -680,30 +659,26 @@ def _npm_import_rule_impl(rctx):
                     ),
                 )
 
-            bin_struct_fields = []
+            bin_fields = []
             for bin_name in bins:
                 sanitized_bin_name = _sanitize_bin_name(bin_name)
-                bin_struct_fields.append(
-                    """        {bin_name} = lambda name, **kwargs: _{bin_name}_internal(name, link_root_name = link_root_name, **kwargs),
-        {bin_name}_test = lambda name, **kwargs: _{bin_name}_test_internal(name, link_root_name = link_root_name, **kwargs),
-        {bin_name}_binary = lambda name, **kwargs: _{bin_name}_binary_internal(name, link_root_name = link_root_name, **kwargs),
-        {bin_name}_path = "{bin_path}",""".format(
+                bin_fields.append(
+                    """    {bin_name} = {bin_name},
+    {bin_name}_test = {bin_name}_test,
+    {bin_name}_binary = {bin_name}_binary,
+    {bin_name}_path = "{bin_path}",""".format(
                         bin_name = sanitized_bin_name,
                         bin_path = bins[bin_name],
                     ),
                 )
 
-            bin_bzl.append("""def bin_factory(link_root_name):
-    # bind link_root_name using lambdas
-    return struct(
-{bin_struct_fields}
-    )
-
-bin = bin_factory("node_modules")
+            bin_bzl.append("""bin = struct(
+{bin_fields}
+)
 """.format(
                 package = rctx.attr.package,
                 version = rctx.attr.version,
-                bin_struct_fields = "\n".join(bin_struct_fields),
+                bin_fields = "\n".join(bin_fields),
             ))
 
             # Duplicate the bzl+BUILD into each linking package
@@ -758,7 +733,7 @@ def _npm_import_links_rule_impl(rctx):
     deps = {}
 
     for (dep_name, dep_version) in rctx.attr.deps.items():
-        dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/ref"'.format(
+        dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/ref"'.format(
             package_store_name = utils.package_store_name(dep_name, dep_version),
             package_store_root = utils.package_store_root,
         )
@@ -773,13 +748,13 @@ def _npm_import_links_rule_impl(rctx):
         # party npm deps; it is not used for 1st party deps
         for (dep_name, dep_versions) in rctx.attr.transitive_closure.items():
             for dep_version in dep_versions:
-                dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg"'
+                dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/pkg"'
                 lc_dep_store_target = dep_store_target
                 if dep_name == rctx.attr.package and dep_version == rctx.attr.version:
                     # special case for lifecycle transitive closure deps; do not depend on
                     # the __pkg of this package as that will be the output directory
                     # of the lifecycle action
-                    lc_dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}/pkg_pre_lc_lite"'
+                    lc_dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/pkg_pre_lc_lite"'
 
                 dep_package_store_name = utils.package_store_name(dep_name, dep_version)
 
@@ -803,7 +778,7 @@ def _npm_import_links_rule_impl(rctx):
                 deps[dep_store_target].append(dep_name)
     else:
         for (dep_name, dep_version) in rctx.attr.deps.items():
-            dep_store_target = '":{package_store_root}/{{link_root_name}}/{package_store_name}"'.format(
+            dep_store_target = '":{package_store_root}/node_modules/{package_store_name}"'.format(
                 package_store_name = utils.package_store_name(dep_name, dep_version),
                 package_store_root = utils.package_store_root,
             )

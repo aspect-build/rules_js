@@ -27,6 +27,8 @@ _IMPORTER_PACKAGES = ["root", "", "app/a", "app/b", "app/c", "app/d", "lib/a", "
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
 
@@ -40,105 +42,98 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 
     if is_root:
-        store_0(name)
-        store_1(name)
-        store_2(name)
-        store_3(name)
-        store_4(name)
-        store_5(name)
-        store_6(name)
-        store_7(name)
-        store_8(name)
-        store_9(name)
-        store_10(name)
-        store_11(name)
-        store_12(name)
+        store_0()
+        store_1()
+        store_2()
+        store_3()
+        store_4()
+        store_5()
+        store_6()
+        store_7()
+        store_8()
+        store_9()
+        store_10()
+        store_11()
+        store_12()
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "vendored-a@file+..+vendored+a",
             src = "//vendored/a:pkg",
             package = "vendored-a",
             version = "file:../vendored/a",
             deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+                "//root:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "vendored-b@file+..+vendored+b_at_lib_b_lib+b",
             src = "//vendored/b:pkg",
             package = "vendored-b",
             version = "file:../vendored/b_at_lib_b_lib+b",
             deps = {
-                "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
+                "//root:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+a@0.0.0",
             src = "//lib/a:pkg",
             package = "@lib/a",
             version = "0.0.0",
             deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e",
-                "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
-                "//root:.aspect_rules_js/{}/vendored-a@file+..+vendored+a".format(name): "vendored-a",
-                "//root:.aspect_rules_js/{}/vendored-b@file+..+vendored+b_at_lib_b_lib+b".format(name): "vendored-b",
+                "//root:.aspect_rules_js/node_modules/@aspect-test+e@1.0.0": "@aspect-test/e",
+                "//root:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
+                "//root:.aspect_rules_js/node_modules/vendored-a@file+..+vendored+a": "vendored-a",
+                "//root:.aspect_rules_js/node_modules/vendored-b@file+..+vendored+b_at_lib_b_lib+b": "vendored-b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+b@0.0.0",
             src = "//lib/b:pkg",
             package = "@lib/b",
             version = "0.0.0",
             deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-                "//root:.aspect_rules_js/{}/@types+sizzle@2.3.8".format(name): "alias-1",
+                "//root:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
+                "//root:.aspect_rules_js/node_modules/@types+sizzle@2.3.8": "alias-1",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+b_alias@0.0.0",
             src = "//lib/b:pkg",
             package = "@lib/b_alias",
             version = "0.0.0",
             deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-                "//root:.aspect_rules_js/{}/@types+sizzle@2.3.8".format(name): "alias-1",
+                "//root:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
+                "//root:.aspect_rules_js/node_modules/@types+sizzle@2.3.8": "alias-1",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+c@0.0.0",
             src = "//lib/c:pkg",
             package = "@lib/c",
             version = "0.0.0",
             deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+                "//root:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+d@0.0.0",
             src = "//lib/d:pkg",
             package = "@lib/d",
             version = "0.0.0",
             deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2".format(name): "@aspect-test/d",
-                "//root:.aspect_rules_js/{}/@types+node@18.19.54".format(name): "alias-2",
+                "//root:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2": "@aspect-test/d",
+                "//root:.aspect_rules_js/node_modules/@types+node@18.19.54": "alias-2",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -149,123 +144,123 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "":
-            link_0("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
-            link_1("{}/@aspect-test/b".format(name), True, name, "@aspect-test/b")
-            link_2("{}/@aspect-test/c".format(name), False, name, "@aspect-test/c")
-            link_10("{}/lodash".format(name), False, name, "lodash")
-            link_11("{}/typescript".format(name), False, name, "typescript")
+            link_0("node_modules/@aspect-test/a", False, "@aspect-test/a")
+            link_1("node_modules/@aspect-test/b", True, "@aspect-test/b")
+            link_2("node_modules/@aspect-test/c", False, "@aspect-test/c")
+            link_10("node_modules/lodash", False, "lodash")
+            link_11("node_modules/typescript", False, "typescript")
             link_targets = [
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/c".format(name),
-                ":{}/lodash".format(name),
-                ":{}/typescript".format(name),
-                ":{}/@aspect-test/b".format(name),
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/c",
+                ":node_modules/lodash",
+                ":node_modules/typescript",
+                ":node_modules/@aspect-test/b",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/a".format(name),
-                    ":{}/@aspect-test/b".format(name),
-                    ":{}/@aspect-test/c".format(name),
+                    ":node_modules/@aspect-test/a",
+                    ":node_modules/@aspect-test/b",
+                    ":node_modules/@aspect-test/c",
                 ],
             }
         elif bazel_package == "app/a":
-            link_0("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
-            link_6("{}/@aspect-test/g".format(name), False, name, "@aspect-test/g")
-            _fp_link_2(name)
+            link_0("node_modules/@aspect-test/a", False, "@aspect-test/a")
+            link_6("node_modules/@aspect-test/g", False, "@aspect-test/g")
+            _fp_link_2()
             link_targets = [
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/g".format(name),
-                ":{}/@lib/a".format(name),
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/g",
+                ":node_modules/@lib/a",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/a".format(name),
-                    ":{}/@aspect-test/g".format(name),
+                    ":node_modules/@aspect-test/a",
+                    ":node_modules/@aspect-test/g",
                 ],
-                "@lib": [":{}/@lib/a".format(name)],
+                "@lib": [":node_modules/@lib/a"],
             }
         elif bazel_package == "app/c":
-            link_0("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
-            link_6("{}/@aspect-test/g".format(name), False, name, "@aspect-test/g")
-            _fp_link_5(name)
+            link_0("node_modules/@aspect-test/a", False, "@aspect-test/a")
+            link_6("node_modules/@aspect-test/g", False, "@aspect-test/g")
+            _fp_link_5()
             link_targets = [
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/g".format(name),
-                ":{}/@lib/c".format(name),
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/g",
+                ":node_modules/@lib/c",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/a".format(name),
-                    ":{}/@aspect-test/g".format(name),
+                    ":node_modules/@aspect-test/a",
+                    ":node_modules/@aspect-test/g",
                 ],
-                "@lib": [":{}/@lib/c".format(name)],
+                "@lib": [":node_modules/@lib/c"],
             }
         elif bazel_package == "lib/d":
-            link_3("{}/@aspect-test/d".format(name), False, name, "@aspect-test/d")
-            link_8("{}/alias-2".format(name), False, name, "alias-2")
+            link_3("node_modules/@aspect-test/d", False, "@aspect-test/d")
+            link_8("node_modules/alias-2", False, "alias-2")
             link_targets = [
-                ":{}/@aspect-test/d".format(name),
-                ":{}/alias-2".format(name),
+                ":node_modules/@aspect-test/d",
+                ":node_modules/alias-2",
             ]
             scope_targets = {
-                "@aspect-test": [":{}/@aspect-test/d".format(name)],
+                "@aspect-test": [":node_modules/@aspect-test/d"],
             }
         elif bazel_package == "lib/a":
-            link_4("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
-            _fp_link_0(name)
-            _fp_link_1(name)
-            _fp_link_3(name)
+            link_4("node_modules/@aspect-test/e", False, "@aspect-test/e")
+            _fp_link_0()
+            _fp_link_1()
+            _fp_link_3()
             link_targets = [
-                ":{}/@aspect-test/e".format(name),
-                ":{}/vendored-a".format(name),
-                ":{}/vendored-b".format(name),
-                ":{}/@lib/b".format(name),
+                ":node_modules/@aspect-test/e",
+                ":node_modules/vendored-a",
+                ":node_modules/vendored-b",
+                ":node_modules/@lib/b",
             ]
             scope_targets = {
-                "@aspect-test": [":{}/@aspect-test/e".format(name)],
-                "@lib": [":{}/@lib/b".format(name)],
+                "@aspect-test": [":node_modules/@aspect-test/e"],
+                "@lib": [":node_modules/@lib/b"],
             }
         elif bazel_package == "lib/b":
-            link_5("{}/@aspect-test/f".format(name), False, name, "@aspect-test/f")
-            link_9("{}/alias-1".format(name), False, name, "alias-1")
+            link_5("node_modules/@aspect-test/f", False, "@aspect-test/f")
+            link_9("node_modules/alias-1", False, "alias-1")
             link_targets = [
-                ":{}/@aspect-test/f".format(name),
-                ":{}/alias-1".format(name),
+                ":node_modules/@aspect-test/f",
+                ":node_modules/alias-1",
             ]
             scope_targets = {
-                "@aspect-test": [":{}/@aspect-test/f".format(name)],
+                "@aspect-test": [":node_modules/@aspect-test/f"],
             }
         elif bazel_package == "lib/c":
-            link_5("{}/@aspect-test/f".format(name), False, name, "@aspect-test/f")
-            link_targets = [":{}/@aspect-test/f".format(name)]
+            link_5("node_modules/@aspect-test/f", False, "@aspect-test/f")
+            link_targets = [":node_modules/@aspect-test/f"]
             scope_targets = {
-                "@aspect-test": [":{}/@aspect-test/f".format(name)],
+                "@aspect-test": [":node_modules/@aspect-test/f"],
             }
         elif bazel_package == "app/d":
-            link_6("{}/@aspect-test/g".format(name), False, name, "@aspect-test/g")
-            _fp_link_6(name)
+            link_6("node_modules/@aspect-test/g", False, "@aspect-test/g")
+            _fp_link_6()
             link_targets = [
-                ":{}/@aspect-test/g".format(name),
-                ":{}/@lib/d".format(name),
+                ":node_modules/@aspect-test/g",
+                ":node_modules/@lib/d",
             ]
             scope_targets = {
-                "@aspect-test": [":{}/@aspect-test/g".format(name)],
-                "@lib": [":{}/@lib/d".format(name)],
+                "@aspect-test": [":node_modules/@aspect-test/g"],
+                "@lib": [":node_modules/@lib/d"],
             }
         elif bazel_package == "app/b":
-            link_7("{}/@aspect-test/h".format(name), False, name, "@aspect-test/h")
-            _fp_link_3(name)
-            _fp_link_4(name)
+            link_7("node_modules/@aspect-test/h", False, "@aspect-test/h")
+            _fp_link_3()
+            _fp_link_4()
             link_targets = [
-                ":{}/@aspect-test/h".format(name),
-                ":{}/@lib/b".format(name),
-                ":{}/@lib/b_alias".format(name),
+                ":node_modules/@aspect-test/h",
+                ":node_modules/@lib/b",
+                ":node_modules/@lib/b_alias",
             ]
             scope_targets = {
-                "@aspect-test": [":{}/@aspect-test/h".format(name)],
+                "@aspect-test": [":node_modules/@aspect-test/h"],
                 "@lib": [
-                    ":{}/@lib/b".format(name),
-                    ":{}/@lib/b_alias".format(name),
+                    ":node_modules/@lib/b",
+                    ":node_modules/@lib/b_alias",
                 ],
             }
     
@@ -300,6 +295,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
@@ -310,118 +307,118 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     if bazel_package == "":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/c".format(name),
-                ":{}/lodash".format(name),
-                ":{}/typescript".format(name),
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/c",
+                ":node_modules/lodash",
+                ":node_modules/typescript",
             ])
         if dev:
-            link_targets.extend([":{}/@aspect-test/b".format(name)])
+            link_targets.extend([":node_modules/@aspect-test/b"])
     elif bazel_package == "app/a":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/g".format(name),
-                ":{}/@lib/a".format(name),
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/g",
+                ":node_modules/@lib/a",
             ])
     elif bazel_package == "app/c":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/g".format(name),
-                ":{}/@lib/c".format(name),
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/g",
+                ":node_modules/@lib/c",
             ])
     elif bazel_package == "lib/d":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/d".format(name),
-                ":{}/alias-2".format(name),
+                ":node_modules/@aspect-test/d",
+                ":node_modules/alias-2",
             ])
     elif bazel_package == "lib/a":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/e".format(name),
-                ":{}/vendored-a".format(name),
-                ":{}/vendored-b".format(name),
-                ":{}/@lib/b".format(name),
+                ":node_modules/@aspect-test/e",
+                ":node_modules/vendored-a",
+                ":node_modules/vendored-b",
+                ":node_modules/@lib/b",
             ])
     elif bazel_package == "lib/b":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/f".format(name),
-                ":{}/alias-1".format(name),
+                ":node_modules/@aspect-test/f",
+                ":node_modules/alias-1",
             ])
     elif bazel_package == "lib/c":
         if prod:
-            link_targets.extend([":{}/@aspect-test/f".format(name)])
+            link_targets.extend([":node_modules/@aspect-test/f"])
     elif bazel_package == "app/d":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/g".format(name),
-                ":{}/@lib/d".format(name),
+                ":node_modules/@aspect-test/g",
+                ":node_modules/@lib/d",
             ])
     elif bazel_package == "app/b":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/h".format(name),
-                ":{}/@lib/b".format(name),
-                ":{}/@lib/b_alias".format(name),
+                ":node_modules/@aspect-test/h",
+                ":node_modules/@lib/b",
+                ":node_modules/@lib/b_alias",
             ])
     return link_targets
 
 
 # Generated npm_link_package_store for linking of first-party "vendored-a" package
 # buildifier: disable=function-docstring
-def _fp_link_0(name):
+def _fp_link_0():
     _npm_local_link_package_store(
-        name = "{}/vendored-a".format(name),
-        src = "//root:.aspect_rules_js/{}/vendored-a@file+..+vendored+a".format(name),
+        name = "node_modules/vendored-a",
+        src = "//root:.aspect_rules_js/node_modules/vendored-a@file+..+vendored+a",
     )
 
 # Generated npm_link_package_store for linking of first-party "vendored-b" package
 # buildifier: disable=function-docstring
-def _fp_link_1(name):
+def _fp_link_1():
     _npm_local_link_package_store(
-        name = "{}/vendored-b".format(name),
-        src = "//root:.aspect_rules_js/{}/vendored-b@file+..+vendored+b_at_lib_b_lib+b".format(name),
+        name = "node_modules/vendored-b",
+        src = "//root:.aspect_rules_js/node_modules/vendored-b@file+..+vendored+b_at_lib_b_lib+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/a" package
 # buildifier: disable=function-docstring
-def _fp_link_2(name):
+def _fp_link_2():
     _npm_local_link_package_store(
-        name = "{}/@lib/a".format(name),
-        src = "//root:.aspect_rules_js/{}/@lib+a@0.0.0".format(name),
+        name = "node_modules/@lib/a",
+        src = "//root:.aspect_rules_js/node_modules/@lib+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/b" package
 # buildifier: disable=function-docstring
-def _fp_link_3(name):
+def _fp_link_3():
     _npm_local_link_package_store(
-        name = "{}/@lib/b".format(name),
-        src = "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name),
+        name = "node_modules/@lib/b",
+        src = "//root:.aspect_rules_js/node_modules/@lib+b@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/b_alias" package
 # buildifier: disable=function-docstring
-def _fp_link_4(name):
+def _fp_link_4():
     _npm_local_link_package_store(
-        name = "{}/@lib/b_alias".format(name),
-        src = "//root:.aspect_rules_js/{}/@lib+b_alias@0.0.0".format(name),
+        name = "node_modules/@lib/b_alias",
+        src = "//root:.aspect_rules_js/node_modules/@lib+b_alias@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/c" package
 # buildifier: disable=function-docstring
-def _fp_link_5(name):
+def _fp_link_5():
     _npm_local_link_package_store(
-        name = "{}/@lib/c".format(name),
-        src = "//root:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
+        name = "node_modules/@lib/c",
+        src = "//root:.aspect_rules_js/node_modules/@lib+c@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/d" package
 # buildifier: disable=function-docstring
-def _fp_link_6(name):
+def _fp_link_6():
     _npm_local_link_package_store(
-        name = "{}/@lib/d".format(name),
-        src = "//root:.aspect_rules_js/{}/@lib+d@0.0.0".format(name),
+        name = "node_modules/@lib/d",
+        src = "//root:.aspect_rules_js/node_modules/@lib+d@0.0.0",
     )

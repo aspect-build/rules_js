@@ -1186,6 +1186,8 @@ _NPM_PACKAGE_LOCATIONS = {
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
 
@@ -1202,1180 +1204,1176 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 
     if is_root:
-        store_0(name)
-        store_1(name)
-        store_2(name)
-        store_3(name)
-        store_4(name)
-        store_5(name)
-        store_6(name)
-        store_7(name)
-        store_8(name)
-        store_9(name)
-        store_10(name)
-        store_11(name)
-        store_12(name)
-        store_13(name)
-        store_14(name)
-        store_15(name)
-        store_16(name)
-        store_17(name)
-        store_18(name)
-        store_19(name)
-        store_20(name)
-        store_21(name)
-        store_22(name)
-        store_23(name)
-        store_24(name)
-        store_25(name)
-        store_26(name)
-        store_27(name)
-        store_28(name)
-        store_29(name)
-        store_30(name)
-        store_31(name)
-        store_32(name)
-        store_33(name)
-        store_34(name)
-        store_35(name)
-        store_36(name)
-        store_37(name)
-        store_38(name)
-        store_39(name)
-        store_40(name)
-        store_41(name)
-        store_42(name)
-        store_43(name)
-        store_44(name)
-        store_45(name)
-        store_46(name)
-        store_47(name)
-        store_48(name)
-        store_49(name)
-        store_50(name)
-        store_51(name)
-        store_52(name)
-        store_53(name)
-        store_54(name)
-        store_55(name)
-        store_56(name)
-        store_57(name)
-        store_58(name)
-        store_59(name)
-        store_60(name)
-        store_61(name)
-        store_62(name)
-        store_63(name)
-        store_64(name)
-        store_65(name)
-        store_66(name)
-        store_67(name)
-        store_68(name)
-        store_69(name)
-        store_70(name)
-        store_71(name)
-        store_72(name)
-        store_73(name)
-        store_74(name)
-        store_75(name)
-        store_76(name)
-        store_77(name)
-        store_78(name)
-        store_79(name)
-        store_80(name)
-        store_81(name)
-        store_82(name)
-        store_83(name)
-        store_84(name)
-        store_85(name)
-        store_86(name)
-        store_87(name)
-        store_88(name)
-        store_89(name)
-        store_90(name)
-        store_91(name)
-        store_92(name)
-        store_93(name)
-        store_94(name)
-        store_95(name)
-        store_96(name)
-        store_97(name)
-        store_98(name)
-        store_99(name)
-        store_100(name)
-        store_101(name)
-        store_102(name)
-        store_103(name)
-        store_104(name)
-        store_105(name)
-        store_106(name)
-        store_107(name)
-        store_108(name)
-        store_109(name)
-        store_110(name)
-        store_111(name)
-        store_112(name)
-        store_113(name)
-        store_114(name)
-        store_115(name)
-        store_116(name)
-        store_117(name)
-        store_118(name)
-        store_119(name)
-        store_120(name)
-        store_121(name)
-        store_122(name)
-        store_123(name)
-        store_124(name)
-        store_125(name)
-        store_126(name)
-        store_127(name)
-        store_128(name)
-        store_129(name)
-        store_130(name)
-        store_131(name)
-        store_132(name)
-        store_133(name)
-        store_134(name)
-        store_135(name)
-        store_136(name)
-        store_137(name)
-        store_138(name)
-        store_139(name)
-        store_140(name)
-        store_141(name)
-        store_142(name)
-        store_143(name)
-        store_144(name)
-        store_145(name)
-        store_146(name)
-        store_147(name)
-        store_148(name)
-        store_149(name)
-        store_150(name)
-        store_151(name)
-        store_152(name)
-        store_153(name)
-        store_154(name)
-        store_155(name)
-        store_156(name)
-        store_157(name)
-        store_158(name)
-        store_159(name)
-        store_160(name)
-        store_161(name)
-        store_162(name)
-        store_163(name)
-        store_164(name)
-        store_165(name)
-        store_166(name)
-        store_167(name)
-        store_168(name)
-        store_169(name)
-        store_170(name)
-        store_171(name)
-        store_172(name)
-        store_173(name)
-        store_174(name)
-        store_175(name)
-        store_176(name)
-        store_177(name)
-        store_178(name)
-        store_179(name)
-        store_180(name)
-        store_181(name)
-        store_182(name)
-        store_183(name)
-        store_184(name)
-        store_185(name)
-        store_186(name)
-        store_187(name)
-        store_188(name)
-        store_189(name)
-        store_190(name)
-        store_191(name)
-        store_192(name)
-        store_193(name)
-        store_194(name)
-        store_195(name)
-        store_196(name)
-        store_197(name)
-        store_198(name)
-        store_199(name)
-        store_200(name)
-        store_201(name)
-        store_202(name)
-        store_203(name)
-        store_204(name)
-        store_205(name)
-        store_206(name)
-        store_207(name)
-        store_208(name)
-        store_209(name)
-        store_210(name)
-        store_211(name)
-        store_212(name)
-        store_213(name)
-        store_214(name)
-        store_215(name)
-        store_216(name)
-        store_217(name)
-        store_218(name)
-        store_219(name)
-        store_220(name)
-        store_221(name)
-        store_222(name)
-        store_223(name)
-        store_224(name)
-        store_225(name)
-        store_226(name)
-        store_227(name)
-        store_228(name)
-        store_229(name)
-        store_230(name)
-        store_231(name)
-        store_232(name)
-        store_233(name)
-        store_234(name)
-        store_235(name)
-        store_236(name)
-        store_237(name)
-        store_238(name)
-        store_239(name)
-        store_240(name)
-        store_241(name)
-        store_242(name)
-        store_243(name)
-        store_244(name)
-        store_245(name)
-        store_246(name)
-        store_247(name)
-        store_248(name)
-        store_249(name)
-        store_250(name)
-        store_251(name)
-        store_252(name)
-        store_253(name)
-        store_254(name)
-        store_255(name)
-        store_256(name)
-        store_257(name)
-        store_258(name)
-        store_259(name)
-        store_260(name)
-        store_261(name)
-        store_262(name)
-        store_263(name)
-        store_264(name)
-        store_265(name)
-        store_266(name)
-        store_267(name)
-        store_268(name)
-        store_269(name)
-        store_270(name)
-        store_271(name)
-        store_272(name)
-        store_273(name)
-        store_274(name)
-        store_275(name)
-        store_276(name)
-        store_277(name)
-        store_278(name)
-        store_279(name)
-        store_280(name)
-        store_281(name)
-        store_282(name)
-        store_283(name)
-        store_284(name)
-        store_285(name)
-        store_286(name)
-        store_287(name)
-        store_288(name)
-        store_289(name)
-        store_290(name)
-        store_291(name)
-        store_292(name)
-        store_293(name)
-        store_294(name)
-        store_295(name)
-        store_296(name)
-        store_297(name)
-        store_298(name)
-        store_299(name)
-        store_300(name)
-        store_301(name)
-        store_302(name)
-        store_303(name)
-        store_304(name)
-        store_305(name)
-        store_306(name)
-        store_307(name)
-        store_308(name)
-        store_309(name)
-        store_310(name)
-        store_311(name)
-        store_312(name)
-        store_313(name)
-        store_314(name)
-        store_315(name)
-        store_316(name)
-        store_317(name)
-        store_318(name)
-        store_319(name)
-        store_320(name)
-        store_321(name)
-        store_322(name)
-        store_323(name)
-        store_324(name)
-        store_325(name)
-        store_326(name)
-        store_327(name)
-        store_328(name)
-        store_329(name)
-        store_330(name)
-        store_331(name)
-        store_332(name)
-        store_333(name)
-        store_334(name)
-        store_335(name)
-        store_336(name)
-        store_337(name)
-        store_338(name)
-        store_339(name)
-        store_340(name)
-        store_341(name)
-        store_342(name)
-        store_343(name)
-        store_344(name)
-        store_345(name)
-        store_346(name)
-        store_347(name)
-        store_348(name)
-        store_349(name)
-        store_350(name)
-        store_351(name)
-        store_352(name)
-        store_353(name)
-        store_354(name)
-        store_355(name)
-        store_356(name)
-        store_357(name)
-        store_358(name)
-        store_359(name)
-        store_360(name)
-        store_361(name)
-        store_362(name)
-        store_363(name)
-        store_364(name)
-        store_365(name)
-        store_366(name)
-        store_367(name)
-        store_368(name)
-        store_369(name)
-        store_370(name)
-        store_371(name)
-        store_372(name)
-        store_373(name)
-        store_374(name)
-        store_375(name)
-        store_376(name)
-        store_377(name)
-        store_378(name)
-        store_379(name)
-        store_380(name)
-        store_381(name)
-        store_382(name)
-        store_383(name)
-        store_384(name)
-        store_385(name)
-        store_386(name)
-        store_387(name)
-        store_388(name)
-        store_389(name)
-        store_390(name)
-        store_391(name)
-        store_392(name)
-        store_393(name)
-        store_394(name)
-        store_395(name)
-        store_396(name)
-        store_397(name)
-        store_398(name)
-        store_399(name)
-        store_400(name)
-        store_401(name)
-        store_402(name)
-        store_403(name)
-        store_404(name)
-        store_405(name)
-        store_406(name)
-        store_407(name)
-        store_408(name)
-        store_409(name)
-        store_410(name)
-        store_411(name)
-        store_412(name)
-        store_413(name)
-        store_414(name)
-        store_415(name)
-        store_416(name)
-        store_417(name)
-        store_418(name)
-        store_419(name)
-        store_420(name)
-        store_421(name)
-        store_422(name)
-        store_423(name)
-        store_424(name)
-        store_425(name)
-        store_426(name)
-        store_427(name)
-        store_428(name)
-        store_429(name)
-        store_430(name)
-        store_431(name)
-        store_432(name)
-        store_433(name)
-        store_434(name)
-        store_435(name)
-        store_436(name)
-        store_437(name)
-        store_438(name)
-        store_439(name)
-        store_440(name)
-        store_441(name)
-        store_442(name)
-        store_443(name)
-        store_444(name)
-        store_445(name)
-        store_446(name)
-        store_447(name)
-        store_448(name)
-        store_449(name)
-        store_450(name)
-        store_451(name)
-        store_452(name)
-        store_453(name)
-        store_454(name)
-        store_455(name)
-        store_456(name)
-        store_457(name)
-        store_458(name)
-        store_459(name)
-        store_460(name)
-        store_461(name)
-        store_462(name)
-        store_463(name)
-        store_464(name)
-        store_465(name)
-        store_466(name)
-        store_467(name)
-        store_468(name)
-        store_469(name)
-        store_470(name)
-        store_471(name)
-        store_472(name)
-        store_473(name)
-        store_474(name)
-        store_475(name)
-        store_476(name)
-        store_477(name)
-        store_478(name)
-        store_479(name)
-        store_480(name)
-        store_481(name)
-        store_482(name)
-        store_483(name)
-        store_484(name)
-        store_485(name)
-        store_486(name)
-        store_487(name)
-        store_488(name)
-        store_489(name)
-        store_490(name)
-        store_491(name)
-        store_492(name)
-        store_493(name)
-        store_494(name)
-        store_495(name)
-        store_496(name)
-        store_497(name)
-        store_498(name)
-        store_499(name)
-        store_500(name)
-        store_501(name)
-        store_502(name)
-        store_503(name)
-        store_504(name)
-        store_505(name)
-        store_506(name)
-        store_507(name)
-        store_508(name)
-        store_509(name)
-        store_510(name)
-        store_511(name)
-        store_512(name)
-        store_513(name)
-        store_514(name)
-        store_515(name)
-        store_516(name)
-        store_517(name)
-        store_518(name)
-        store_519(name)
-        store_520(name)
-        store_521(name)
-        store_522(name)
-        store_523(name)
-        store_524(name)
-        store_525(name)
-        store_526(name)
-        store_527(name)
-        store_528(name)
-        store_529(name)
-        store_530(name)
-        store_531(name)
-        store_532(name)
-        store_533(name)
-        store_534(name)
-        store_535(name)
-        store_536(name)
-        store_537(name)
-        store_538(name)
-        store_539(name)
-        store_540(name)
-        store_541(name)
-        store_542(name)
-        store_543(name)
-        store_544(name)
-        store_545(name)
-        store_546(name)
-        store_547(name)
-        store_548(name)
-        store_549(name)
-        store_550(name)
-        store_551(name)
-        store_552(name)
-        store_553(name)
-        store_554(name)
-        store_555(name)
-        store_556(name)
-        store_557(name)
-        store_558(name)
-        store_559(name)
-        store_560(name)
-        store_561(name)
-        store_562(name)
-        store_563(name)
-        store_564(name)
-        store_565(name)
-        store_566(name)
-        store_567(name)
-        store_568(name)
-        store_569(name)
-        store_570(name)
-        store_571(name)
-        store_572(name)
-        store_573(name)
-        store_574(name)
-        store_575(name)
-        store_576(name)
-        store_577(name)
-        store_578(name)
-        store_579(name)
-        store_580(name)
-        store_581(name)
-        store_582(name)
-        store_583(name)
-        store_584(name)
-        store_585(name)
-        store_586(name)
-        store_587(name)
-        store_588(name)
-        store_589(name)
-        store_590(name)
-        store_591(name)
-        store_592(name)
-        store_593(name)
-        store_594(name)
-        store_595(name)
-        store_596(name)
-        store_597(name)
-        store_598(name)
-        store_599(name)
-        store_600(name)
-        store_601(name)
-        store_602(name)
-        store_603(name)
-        store_604(name)
-        store_605(name)
-        store_606(name)
-        store_607(name)
-        store_608(name)
-        store_609(name)
-        store_610(name)
-        store_611(name)
-        store_612(name)
-        store_613(name)
-        store_614(name)
-        store_615(name)
-        store_616(name)
-        store_617(name)
-        store_618(name)
-        store_619(name)
-        store_620(name)
-        store_621(name)
-        store_622(name)
-        store_623(name)
-        store_624(name)
-        store_625(name)
-        store_626(name)
-        store_627(name)
-        store_628(name)
-        store_629(name)
-        store_630(name)
-        store_631(name)
-        store_632(name)
-        store_633(name)
-        store_634(name)
-        store_635(name)
-        store_636(name)
-        store_637(name)
-        store_638(name)
-        store_639(name)
-        store_640(name)
-        store_641(name)
-        store_642(name)
-        store_643(name)
-        store_644(name)
-        store_645(name)
-        store_646(name)
-        store_647(name)
-        store_648(name)
-        store_649(name)
-        store_650(name)
-        store_651(name)
-        store_652(name)
-        store_653(name)
-        store_654(name)
-        store_655(name)
-        store_656(name)
-        store_657(name)
-        store_658(name)
-        store_659(name)
-        store_660(name)
-        store_661(name)
-        store_662(name)
-        store_663(name)
-        store_664(name)
-        store_665(name)
-        store_666(name)
-        store_667(name)
-        store_668(name)
-        store_669(name)
-        store_670(name)
-        store_671(name)
-        store_672(name)
-        store_673(name)
-        store_674(name)
-        store_675(name)
-        store_676(name)
-        store_677(name)
-        store_678(name)
-        store_679(name)
-        store_680(name)
-        store_681(name)
-        store_682(name)
-        store_683(name)
-        store_684(name)
-        store_685(name)
-        store_686(name)
-        store_687(name)
-        store_688(name)
-        store_689(name)
-        store_690(name)
-        store_691(name)
-        store_692(name)
-        store_693(name)
-        store_694(name)
-        store_695(name)
-        store_696(name)
-        store_697(name)
-        store_698(name)
-        store_699(name)
-        store_700(name)
-        store_701(name)
-        store_702(name)
-        store_703(name)
-        store_704(name)
-        store_705(name)
-        store_706(name)
-        store_707(name)
-        store_708(name)
-        store_709(name)
-        store_710(name)
-        store_711(name)
-        store_712(name)
-        store_713(name)
-        store_714(name)
-        store_715(name)
-        store_716(name)
-        store_717(name)
-        store_718(name)
-        store_719(name)
-        store_720(name)
-        store_721(name)
-        store_722(name)
-        store_723(name)
-        store_724(name)
-        store_725(name)
-        store_726(name)
-        store_727(name)
-        store_728(name)
-        store_729(name)
-        store_730(name)
-        store_731(name)
-        store_732(name)
-        store_733(name)
-        store_734(name)
-        store_735(name)
-        store_736(name)
-        store_737(name)
-        store_738(name)
-        store_739(name)
-        store_740(name)
-        store_741(name)
-        store_742(name)
-        store_743(name)
-        store_744(name)
-        store_745(name)
-        store_746(name)
-        store_747(name)
-        store_748(name)
-        store_749(name)
-        store_750(name)
-        store_751(name)
-        store_752(name)
-        store_753(name)
-        store_754(name)
-        store_755(name)
-        store_756(name)
-        store_757(name)
-        store_758(name)
-        store_759(name)
-        store_760(name)
-        store_761(name)
-        store_762(name)
-        store_763(name)
-        store_764(name)
-        store_765(name)
-        store_766(name)
-        store_767(name)
-        store_768(name)
-        store_769(name)
-        store_770(name)
-        store_771(name)
-        store_772(name)
-        store_773(name)
-        store_774(name)
-        store_775(name)
-        store_776(name)
-        store_777(name)
-        store_778(name)
-        store_779(name)
-        store_780(name)
-        store_781(name)
-        store_782(name)
-        store_783(name)
-        store_784(name)
-        store_785(name)
-        store_786(name)
-        store_787(name)
-        store_788(name)
-        store_789(name)
-        store_790(name)
-        store_791(name)
-        store_792(name)
-        store_793(name)
-        store_794(name)
-        store_795(name)
-        store_796(name)
-        store_797(name)
-        store_798(name)
-        store_799(name)
-        store_800(name)
-        store_801(name)
-        store_802(name)
-        store_803(name)
-        store_804(name)
-        store_805(name)
-        store_806(name)
-        store_807(name)
-        store_808(name)
-        store_809(name)
-        store_810(name)
-        store_811(name)
-        store_812(name)
-        store_813(name)
-        store_814(name)
-        store_815(name)
-        store_816(name)
-        store_817(name)
-        store_818(name)
-        store_819(name)
-        store_820(name)
-        store_821(name)
-        store_822(name)
-        store_823(name)
-        store_824(name)
-        store_825(name)
-        store_826(name)
-        store_827(name)
-        store_828(name)
-        store_829(name)
-        store_830(name)
-        store_831(name)
-        store_832(name)
-        store_833(name)
-        store_834(name)
-        store_835(name)
-        store_836(name)
-        store_837(name)
-        store_838(name)
-        store_839(name)
-        store_840(name)
-        store_841(name)
-        store_842(name)
-        store_843(name)
-        store_844(name)
-        store_845(name)
-        store_846(name)
-        store_847(name)
-        store_848(name)
-        store_849(name)
-        store_850(name)
-        store_851(name)
-        store_852(name)
-        store_853(name)
-        store_854(name)
-        store_855(name)
-        store_856(name)
-        store_857(name)
-        store_858(name)
-        store_859(name)
-        store_860(name)
-        store_861(name)
-        store_862(name)
-        store_863(name)
-        store_864(name)
-        store_865(name)
-        store_866(name)
-        store_867(name)
-        store_868(name)
-        store_869(name)
-        store_870(name)
-        store_871(name)
-        store_872(name)
-        store_873(name)
-        store_874(name)
-        store_875(name)
-        store_876(name)
-        store_877(name)
-        store_878(name)
-        store_879(name)
-        store_880(name)
-        store_881(name)
-        store_882(name)
-        store_883(name)
-        store_884(name)
-        store_885(name)
-        store_886(name)
-        store_887(name)
-        store_888(name)
-        store_889(name)
-        store_890(name)
-        store_891(name)
-        store_892(name)
-        store_893(name)
-        store_894(name)
-        store_895(name)
-        store_896(name)
-        store_897(name)
-        store_898(name)
-        store_899(name)
-        store_900(name)
-        store_901(name)
-        store_902(name)
-        store_903(name)
-        store_904(name)
-        store_905(name)
-        store_906(name)
-        store_907(name)
-        store_908(name)
-        store_909(name)
-        store_910(name)
-        store_911(name)
-        store_912(name)
-        store_913(name)
-        store_914(name)
-        store_915(name)
-        store_916(name)
-        store_917(name)
-        store_918(name)
-        store_919(name)
-        store_920(name)
-        store_921(name)
-        store_922(name)
-        store_923(name)
-        store_924(name)
-        store_925(name)
-        store_926(name)
-        store_927(name)
-        store_928(name)
-        store_929(name)
-        store_930(name)
-        store_931(name)
-        store_932(name)
-        store_933(name)
-        store_934(name)
-        store_935(name)
-        store_936(name)
-        store_937(name)
-        store_938(name)
-        store_939(name)
-        store_940(name)
-        store_941(name)
-        store_942(name)
-        store_943(name)
-        store_944(name)
-        store_945(name)
-        store_946(name)
-        store_947(name)
-        store_948(name)
-        store_949(name)
-        store_950(name)
-        store_951(name)
-        store_952(name)
-        store_953(name)
-        store_954(name)
-        store_955(name)
-        store_956(name)
-        store_957(name)
-        store_958(name)
-        store_959(name)
-        store_960(name)
-        store_961(name)
-        store_962(name)
-        store_963(name)
-        store_964(name)
-        store_965(name)
-        store_966(name)
-        store_967(name)
-        store_968(name)
-        store_969(name)
-        store_970(name)
-        store_971(name)
-        store_972(name)
-        store_973(name)
-        store_974(name)
-        store_975(name)
-        store_976(name)
-        store_977(name)
-        store_978(name)
-        store_979(name)
-        store_980(name)
-        store_981(name)
-        store_982(name)
-        store_983(name)
-        store_984(name)
-        store_985(name)
-        store_986(name)
-        store_987(name)
-        store_988(name)
-        store_989(name)
-        store_990(name)
-        store_991(name)
-        store_992(name)
-        store_993(name)
-        store_994(name)
-        store_995(name)
-        store_996(name)
-        store_997(name)
-        store_998(name)
-        store_999(name)
-        store_1000(name)
-        store_1001(name)
-        store_1002(name)
-        store_1003(name)
-        store_1004(name)
-        store_1005(name)
-        store_1006(name)
-        store_1007(name)
-        store_1008(name)
-        store_1009(name)
-        store_1010(name)
-        store_1011(name)
-        store_1012(name)
-        store_1013(name)
-        store_1014(name)
-        store_1015(name)
-        store_1016(name)
-        store_1017(name)
-        store_1018(name)
-        store_1019(name)
-        store_1020(name)
-        store_1021(name)
-        store_1022(name)
-        store_1023(name)
-        store_1024(name)
-        store_1025(name)
-        store_1026(name)
-        store_1027(name)
-        store_1028(name)
-        store_1029(name)
-        store_1030(name)
-        store_1031(name)
-        store_1032(name)
-        store_1033(name)
-        store_1034(name)
-        store_1035(name)
-        store_1036(name)
-        store_1037(name)
-        store_1038(name)
-        store_1039(name)
-        store_1040(name)
-        store_1041(name)
-        store_1042(name)
-        store_1043(name)
-        store_1044(name)
-        store_1045(name)
-        store_1046(name)
-        store_1047(name)
-        store_1048(name)
-        store_1049(name)
-        store_1050(name)
-        store_1051(name)
-        store_1052(name)
-        store_1053(name)
-        store_1054(name)
-        store_1055(name)
-        store_1056(name)
-        store_1057(name)
-        store_1058(name)
-        store_1059(name)
-        store_1060(name)
-        store_1061(name)
-        store_1062(name)
-        store_1063(name)
-        store_1064(name)
-        store_1065(name)
-        store_1066(name)
-        store_1067(name)
-        store_1068(name)
-        store_1069(name)
-        store_1070(name)
-        store_1071(name)
-        store_1072(name)
-        store_1073(name)
-        store_1074(name)
-        store_1075(name)
-        store_1076(name)
-        store_1077(name)
-        store_1078(name)
-        store_1079(name)
-        store_1080(name)
-        store_1081(name)
-        store_1082(name)
-        store_1083(name)
-        store_1084(name)
-        store_1085(name)
-        store_1086(name)
-        store_1087(name)
-        store_1088(name)
-        store_1089(name)
-        store_1090(name)
-        store_1091(name)
-        store_1092(name)
-        store_1093(name)
-        store_1094(name)
-        store_1095(name)
-        store_1096(name)
-        store_1097(name)
-        store_1098(name)
-        store_1099(name)
-        store_1100(name)
-        store_1101(name)
-        store_1102(name)
-        store_1103(name)
-        store_1104(name)
-        store_1105(name)
-        store_1106(name)
-        store_1107(name)
-        store_1108(name)
-        store_1109(name)
-        store_1110(name)
-        store_1111(name)
-        store_1112(name)
-        store_1113(name)
-        store_1114(name)
-        store_1115(name)
-        store_1116(name)
-        store_1117(name)
-        store_1118(name)
-        store_1119(name)
-        store_1120(name)
-        store_1121(name)
-        store_1122(name)
-        store_1123(name)
-        store_1124(name)
-        store_1125(name)
-        store_1126(name)
-        store_1127(name)
-        store_1128(name)
-        store_1129(name)
-        store_1130(name)
-        store_1131(name)
-        store_1132(name)
-        store_1133(name)
+        store_0()
+        store_1()
+        store_2()
+        store_3()
+        store_4()
+        store_5()
+        store_6()
+        store_7()
+        store_8()
+        store_9()
+        store_10()
+        store_11()
+        store_12()
+        store_13()
+        store_14()
+        store_15()
+        store_16()
+        store_17()
+        store_18()
+        store_19()
+        store_20()
+        store_21()
+        store_22()
+        store_23()
+        store_24()
+        store_25()
+        store_26()
+        store_27()
+        store_28()
+        store_29()
+        store_30()
+        store_31()
+        store_32()
+        store_33()
+        store_34()
+        store_35()
+        store_36()
+        store_37()
+        store_38()
+        store_39()
+        store_40()
+        store_41()
+        store_42()
+        store_43()
+        store_44()
+        store_45()
+        store_46()
+        store_47()
+        store_48()
+        store_49()
+        store_50()
+        store_51()
+        store_52()
+        store_53()
+        store_54()
+        store_55()
+        store_56()
+        store_57()
+        store_58()
+        store_59()
+        store_60()
+        store_61()
+        store_62()
+        store_63()
+        store_64()
+        store_65()
+        store_66()
+        store_67()
+        store_68()
+        store_69()
+        store_70()
+        store_71()
+        store_72()
+        store_73()
+        store_74()
+        store_75()
+        store_76()
+        store_77()
+        store_78()
+        store_79()
+        store_80()
+        store_81()
+        store_82()
+        store_83()
+        store_84()
+        store_85()
+        store_86()
+        store_87()
+        store_88()
+        store_89()
+        store_90()
+        store_91()
+        store_92()
+        store_93()
+        store_94()
+        store_95()
+        store_96()
+        store_97()
+        store_98()
+        store_99()
+        store_100()
+        store_101()
+        store_102()
+        store_103()
+        store_104()
+        store_105()
+        store_106()
+        store_107()
+        store_108()
+        store_109()
+        store_110()
+        store_111()
+        store_112()
+        store_113()
+        store_114()
+        store_115()
+        store_116()
+        store_117()
+        store_118()
+        store_119()
+        store_120()
+        store_121()
+        store_122()
+        store_123()
+        store_124()
+        store_125()
+        store_126()
+        store_127()
+        store_128()
+        store_129()
+        store_130()
+        store_131()
+        store_132()
+        store_133()
+        store_134()
+        store_135()
+        store_136()
+        store_137()
+        store_138()
+        store_139()
+        store_140()
+        store_141()
+        store_142()
+        store_143()
+        store_144()
+        store_145()
+        store_146()
+        store_147()
+        store_148()
+        store_149()
+        store_150()
+        store_151()
+        store_152()
+        store_153()
+        store_154()
+        store_155()
+        store_156()
+        store_157()
+        store_158()
+        store_159()
+        store_160()
+        store_161()
+        store_162()
+        store_163()
+        store_164()
+        store_165()
+        store_166()
+        store_167()
+        store_168()
+        store_169()
+        store_170()
+        store_171()
+        store_172()
+        store_173()
+        store_174()
+        store_175()
+        store_176()
+        store_177()
+        store_178()
+        store_179()
+        store_180()
+        store_181()
+        store_182()
+        store_183()
+        store_184()
+        store_185()
+        store_186()
+        store_187()
+        store_188()
+        store_189()
+        store_190()
+        store_191()
+        store_192()
+        store_193()
+        store_194()
+        store_195()
+        store_196()
+        store_197()
+        store_198()
+        store_199()
+        store_200()
+        store_201()
+        store_202()
+        store_203()
+        store_204()
+        store_205()
+        store_206()
+        store_207()
+        store_208()
+        store_209()
+        store_210()
+        store_211()
+        store_212()
+        store_213()
+        store_214()
+        store_215()
+        store_216()
+        store_217()
+        store_218()
+        store_219()
+        store_220()
+        store_221()
+        store_222()
+        store_223()
+        store_224()
+        store_225()
+        store_226()
+        store_227()
+        store_228()
+        store_229()
+        store_230()
+        store_231()
+        store_232()
+        store_233()
+        store_234()
+        store_235()
+        store_236()
+        store_237()
+        store_238()
+        store_239()
+        store_240()
+        store_241()
+        store_242()
+        store_243()
+        store_244()
+        store_245()
+        store_246()
+        store_247()
+        store_248()
+        store_249()
+        store_250()
+        store_251()
+        store_252()
+        store_253()
+        store_254()
+        store_255()
+        store_256()
+        store_257()
+        store_258()
+        store_259()
+        store_260()
+        store_261()
+        store_262()
+        store_263()
+        store_264()
+        store_265()
+        store_266()
+        store_267()
+        store_268()
+        store_269()
+        store_270()
+        store_271()
+        store_272()
+        store_273()
+        store_274()
+        store_275()
+        store_276()
+        store_277()
+        store_278()
+        store_279()
+        store_280()
+        store_281()
+        store_282()
+        store_283()
+        store_284()
+        store_285()
+        store_286()
+        store_287()
+        store_288()
+        store_289()
+        store_290()
+        store_291()
+        store_292()
+        store_293()
+        store_294()
+        store_295()
+        store_296()
+        store_297()
+        store_298()
+        store_299()
+        store_300()
+        store_301()
+        store_302()
+        store_303()
+        store_304()
+        store_305()
+        store_306()
+        store_307()
+        store_308()
+        store_309()
+        store_310()
+        store_311()
+        store_312()
+        store_313()
+        store_314()
+        store_315()
+        store_316()
+        store_317()
+        store_318()
+        store_319()
+        store_320()
+        store_321()
+        store_322()
+        store_323()
+        store_324()
+        store_325()
+        store_326()
+        store_327()
+        store_328()
+        store_329()
+        store_330()
+        store_331()
+        store_332()
+        store_333()
+        store_334()
+        store_335()
+        store_336()
+        store_337()
+        store_338()
+        store_339()
+        store_340()
+        store_341()
+        store_342()
+        store_343()
+        store_344()
+        store_345()
+        store_346()
+        store_347()
+        store_348()
+        store_349()
+        store_350()
+        store_351()
+        store_352()
+        store_353()
+        store_354()
+        store_355()
+        store_356()
+        store_357()
+        store_358()
+        store_359()
+        store_360()
+        store_361()
+        store_362()
+        store_363()
+        store_364()
+        store_365()
+        store_366()
+        store_367()
+        store_368()
+        store_369()
+        store_370()
+        store_371()
+        store_372()
+        store_373()
+        store_374()
+        store_375()
+        store_376()
+        store_377()
+        store_378()
+        store_379()
+        store_380()
+        store_381()
+        store_382()
+        store_383()
+        store_384()
+        store_385()
+        store_386()
+        store_387()
+        store_388()
+        store_389()
+        store_390()
+        store_391()
+        store_392()
+        store_393()
+        store_394()
+        store_395()
+        store_396()
+        store_397()
+        store_398()
+        store_399()
+        store_400()
+        store_401()
+        store_402()
+        store_403()
+        store_404()
+        store_405()
+        store_406()
+        store_407()
+        store_408()
+        store_409()
+        store_410()
+        store_411()
+        store_412()
+        store_413()
+        store_414()
+        store_415()
+        store_416()
+        store_417()
+        store_418()
+        store_419()
+        store_420()
+        store_421()
+        store_422()
+        store_423()
+        store_424()
+        store_425()
+        store_426()
+        store_427()
+        store_428()
+        store_429()
+        store_430()
+        store_431()
+        store_432()
+        store_433()
+        store_434()
+        store_435()
+        store_436()
+        store_437()
+        store_438()
+        store_439()
+        store_440()
+        store_441()
+        store_442()
+        store_443()
+        store_444()
+        store_445()
+        store_446()
+        store_447()
+        store_448()
+        store_449()
+        store_450()
+        store_451()
+        store_452()
+        store_453()
+        store_454()
+        store_455()
+        store_456()
+        store_457()
+        store_458()
+        store_459()
+        store_460()
+        store_461()
+        store_462()
+        store_463()
+        store_464()
+        store_465()
+        store_466()
+        store_467()
+        store_468()
+        store_469()
+        store_470()
+        store_471()
+        store_472()
+        store_473()
+        store_474()
+        store_475()
+        store_476()
+        store_477()
+        store_478()
+        store_479()
+        store_480()
+        store_481()
+        store_482()
+        store_483()
+        store_484()
+        store_485()
+        store_486()
+        store_487()
+        store_488()
+        store_489()
+        store_490()
+        store_491()
+        store_492()
+        store_493()
+        store_494()
+        store_495()
+        store_496()
+        store_497()
+        store_498()
+        store_499()
+        store_500()
+        store_501()
+        store_502()
+        store_503()
+        store_504()
+        store_505()
+        store_506()
+        store_507()
+        store_508()
+        store_509()
+        store_510()
+        store_511()
+        store_512()
+        store_513()
+        store_514()
+        store_515()
+        store_516()
+        store_517()
+        store_518()
+        store_519()
+        store_520()
+        store_521()
+        store_522()
+        store_523()
+        store_524()
+        store_525()
+        store_526()
+        store_527()
+        store_528()
+        store_529()
+        store_530()
+        store_531()
+        store_532()
+        store_533()
+        store_534()
+        store_535()
+        store_536()
+        store_537()
+        store_538()
+        store_539()
+        store_540()
+        store_541()
+        store_542()
+        store_543()
+        store_544()
+        store_545()
+        store_546()
+        store_547()
+        store_548()
+        store_549()
+        store_550()
+        store_551()
+        store_552()
+        store_553()
+        store_554()
+        store_555()
+        store_556()
+        store_557()
+        store_558()
+        store_559()
+        store_560()
+        store_561()
+        store_562()
+        store_563()
+        store_564()
+        store_565()
+        store_566()
+        store_567()
+        store_568()
+        store_569()
+        store_570()
+        store_571()
+        store_572()
+        store_573()
+        store_574()
+        store_575()
+        store_576()
+        store_577()
+        store_578()
+        store_579()
+        store_580()
+        store_581()
+        store_582()
+        store_583()
+        store_584()
+        store_585()
+        store_586()
+        store_587()
+        store_588()
+        store_589()
+        store_590()
+        store_591()
+        store_592()
+        store_593()
+        store_594()
+        store_595()
+        store_596()
+        store_597()
+        store_598()
+        store_599()
+        store_600()
+        store_601()
+        store_602()
+        store_603()
+        store_604()
+        store_605()
+        store_606()
+        store_607()
+        store_608()
+        store_609()
+        store_610()
+        store_611()
+        store_612()
+        store_613()
+        store_614()
+        store_615()
+        store_616()
+        store_617()
+        store_618()
+        store_619()
+        store_620()
+        store_621()
+        store_622()
+        store_623()
+        store_624()
+        store_625()
+        store_626()
+        store_627()
+        store_628()
+        store_629()
+        store_630()
+        store_631()
+        store_632()
+        store_633()
+        store_634()
+        store_635()
+        store_636()
+        store_637()
+        store_638()
+        store_639()
+        store_640()
+        store_641()
+        store_642()
+        store_643()
+        store_644()
+        store_645()
+        store_646()
+        store_647()
+        store_648()
+        store_649()
+        store_650()
+        store_651()
+        store_652()
+        store_653()
+        store_654()
+        store_655()
+        store_656()
+        store_657()
+        store_658()
+        store_659()
+        store_660()
+        store_661()
+        store_662()
+        store_663()
+        store_664()
+        store_665()
+        store_666()
+        store_667()
+        store_668()
+        store_669()
+        store_670()
+        store_671()
+        store_672()
+        store_673()
+        store_674()
+        store_675()
+        store_676()
+        store_677()
+        store_678()
+        store_679()
+        store_680()
+        store_681()
+        store_682()
+        store_683()
+        store_684()
+        store_685()
+        store_686()
+        store_687()
+        store_688()
+        store_689()
+        store_690()
+        store_691()
+        store_692()
+        store_693()
+        store_694()
+        store_695()
+        store_696()
+        store_697()
+        store_698()
+        store_699()
+        store_700()
+        store_701()
+        store_702()
+        store_703()
+        store_704()
+        store_705()
+        store_706()
+        store_707()
+        store_708()
+        store_709()
+        store_710()
+        store_711()
+        store_712()
+        store_713()
+        store_714()
+        store_715()
+        store_716()
+        store_717()
+        store_718()
+        store_719()
+        store_720()
+        store_721()
+        store_722()
+        store_723()
+        store_724()
+        store_725()
+        store_726()
+        store_727()
+        store_728()
+        store_729()
+        store_730()
+        store_731()
+        store_732()
+        store_733()
+        store_734()
+        store_735()
+        store_736()
+        store_737()
+        store_738()
+        store_739()
+        store_740()
+        store_741()
+        store_742()
+        store_743()
+        store_744()
+        store_745()
+        store_746()
+        store_747()
+        store_748()
+        store_749()
+        store_750()
+        store_751()
+        store_752()
+        store_753()
+        store_754()
+        store_755()
+        store_756()
+        store_757()
+        store_758()
+        store_759()
+        store_760()
+        store_761()
+        store_762()
+        store_763()
+        store_764()
+        store_765()
+        store_766()
+        store_767()
+        store_768()
+        store_769()
+        store_770()
+        store_771()
+        store_772()
+        store_773()
+        store_774()
+        store_775()
+        store_776()
+        store_777()
+        store_778()
+        store_779()
+        store_780()
+        store_781()
+        store_782()
+        store_783()
+        store_784()
+        store_785()
+        store_786()
+        store_787()
+        store_788()
+        store_789()
+        store_790()
+        store_791()
+        store_792()
+        store_793()
+        store_794()
+        store_795()
+        store_796()
+        store_797()
+        store_798()
+        store_799()
+        store_800()
+        store_801()
+        store_802()
+        store_803()
+        store_804()
+        store_805()
+        store_806()
+        store_807()
+        store_808()
+        store_809()
+        store_810()
+        store_811()
+        store_812()
+        store_813()
+        store_814()
+        store_815()
+        store_816()
+        store_817()
+        store_818()
+        store_819()
+        store_820()
+        store_821()
+        store_822()
+        store_823()
+        store_824()
+        store_825()
+        store_826()
+        store_827()
+        store_828()
+        store_829()
+        store_830()
+        store_831()
+        store_832()
+        store_833()
+        store_834()
+        store_835()
+        store_836()
+        store_837()
+        store_838()
+        store_839()
+        store_840()
+        store_841()
+        store_842()
+        store_843()
+        store_844()
+        store_845()
+        store_846()
+        store_847()
+        store_848()
+        store_849()
+        store_850()
+        store_851()
+        store_852()
+        store_853()
+        store_854()
+        store_855()
+        store_856()
+        store_857()
+        store_858()
+        store_859()
+        store_860()
+        store_861()
+        store_862()
+        store_863()
+        store_864()
+        store_865()
+        store_866()
+        store_867()
+        store_868()
+        store_869()
+        store_870()
+        store_871()
+        store_872()
+        store_873()
+        store_874()
+        store_875()
+        store_876()
+        store_877()
+        store_878()
+        store_879()
+        store_880()
+        store_881()
+        store_882()
+        store_883()
+        store_884()
+        store_885()
+        store_886()
+        store_887()
+        store_888()
+        store_889()
+        store_890()
+        store_891()
+        store_892()
+        store_893()
+        store_894()
+        store_895()
+        store_896()
+        store_897()
+        store_898()
+        store_899()
+        store_900()
+        store_901()
+        store_902()
+        store_903()
+        store_904()
+        store_905()
+        store_906()
+        store_907()
+        store_908()
+        store_909()
+        store_910()
+        store_911()
+        store_912()
+        store_913()
+        store_914()
+        store_915()
+        store_916()
+        store_917()
+        store_918()
+        store_919()
+        store_920()
+        store_921()
+        store_922()
+        store_923()
+        store_924()
+        store_925()
+        store_926()
+        store_927()
+        store_928()
+        store_929()
+        store_930()
+        store_931()
+        store_932()
+        store_933()
+        store_934()
+        store_935()
+        store_936()
+        store_937()
+        store_938()
+        store_939()
+        store_940()
+        store_941()
+        store_942()
+        store_943()
+        store_944()
+        store_945()
+        store_946()
+        store_947()
+        store_948()
+        store_949()
+        store_950()
+        store_951()
+        store_952()
+        store_953()
+        store_954()
+        store_955()
+        store_956()
+        store_957()
+        store_958()
+        store_959()
+        store_960()
+        store_961()
+        store_962()
+        store_963()
+        store_964()
+        store_965()
+        store_966()
+        store_967()
+        store_968()
+        store_969()
+        store_970()
+        store_971()
+        store_972()
+        store_973()
+        store_974()
+        store_975()
+        store_976()
+        store_977()
+        store_978()
+        store_979()
+        store_980()
+        store_981()
+        store_982()
+        store_983()
+        store_984()
+        store_985()
+        store_986()
+        store_987()
+        store_988()
+        store_989()
+        store_990()
+        store_991()
+        store_992()
+        store_993()
+        store_994()
+        store_995()
+        store_996()
+        store_997()
+        store_998()
+        store_999()
+        store_1000()
+        store_1001()
+        store_1002()
+        store_1003()
+        store_1004()
+        store_1005()
+        store_1006()
+        store_1007()
+        store_1008()
+        store_1009()
+        store_1010()
+        store_1011()
+        store_1012()
+        store_1013()
+        store_1014()
+        store_1015()
+        store_1016()
+        store_1017()
+        store_1018()
+        store_1019()
+        store_1020()
+        store_1021()
+        store_1022()
+        store_1023()
+        store_1024()
+        store_1025()
+        store_1026()
+        store_1027()
+        store_1028()
+        store_1029()
+        store_1030()
+        store_1031()
+        store_1032()
+        store_1033()
+        store_1034()
+        store_1035()
+        store_1036()
+        store_1037()
+        store_1038()
+        store_1039()
+        store_1040()
+        store_1041()
+        store_1042()
+        store_1043()
+        store_1044()
+        store_1045()
+        store_1046()
+        store_1047()
+        store_1048()
+        store_1049()
+        store_1050()
+        store_1051()
+        store_1052()
+        store_1053()
+        store_1054()
+        store_1055()
+        store_1056()
+        store_1057()
+        store_1058()
+        store_1059()
+        store_1060()
+        store_1061()
+        store_1062()
+        store_1063()
+        store_1064()
+        store_1065()
+        store_1066()
+        store_1067()
+        store_1068()
+        store_1069()
+        store_1070()
+        store_1071()
+        store_1072()
+        store_1073()
+        store_1074()
+        store_1075()
+        store_1076()
+        store_1077()
+        store_1078()
+        store_1079()
+        store_1080()
+        store_1081()
+        store_1082()
+        store_1083()
+        store_1084()
+        store_1085()
+        store_1086()
+        store_1087()
+        store_1088()
+        store_1089()
+        store_1090()
+        store_1091()
+        store_1092()
+        store_1093()
+        store_1094()
+        store_1095()
+        store_1096()
+        store_1097()
+        store_1098()
+        store_1099()
+        store_1100()
+        store_1101()
+        store_1102()
+        store_1103()
+        store_1104()
+        store_1105()
+        store_1106()
+        store_1107()
+        store_1108()
+        store_1109()
+        store_1110()
+        store_1111()
+        store_1112()
+        store_1113()
+        store_1114()
+        store_1115()
+        store_1116()
+        store_1117()
+        store_1118()
+        store_1119()
+        store_1120()
+        store_1121()
+        store_1122()
+        store_1123()
+        store_1124()
+        store_1125()
+        store_1126()
+        store_1127()
+        store_1128()
+        store_1129()
+        store_1130()
+        store_1131()
+        store_1132()
+        store_1133()
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "is-odd@file+npm+private+test+vendored+is-odd",
             src = "//npm/private/test/vendored/is-odd:pkg",
             package = "is-odd",
             version = "file:npm/private/test/vendored/is-odd",
             deps = {
-                "//:.aspect_rules_js/{}/is-number@6.0.0".format(name): "is-number",
+                "//:.aspect_rules_js/node_modules/is-number@6.0.0": "is-number",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "semver-max@file+npm+private+test+vendored+semver-max",
             src = "//npm/private/test/vendored/semver-max:pkg",
             package = "semver-max",
             version = "file:npm/private/test/vendored/semver-max",
             deps = {
-                "//:.aspect_rules_js/{}/is-odd@file+npm+private+test+vendored+is-odd".format(name): "is-odd",
-                "//:.aspect_rules_js/{}/semver@5.7.2".format(name): "semver",
+                "//:.aspect_rules_js/node_modules/is-odd@file+npm+private+test+vendored+is-odd": "is-odd",
+                "//:.aspect_rules_js/node_modules/semver@5.7.2": "semver",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@mycorp+pkg-a@0.0.0",
             src = "//examples/npm_package/packages/pkg_a:pkg",
             package = "@mycorp/pkg-a",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
-                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
+                "//:.aspect_rules_js/node_modules/acorn@8.7.1": "acorn",
+                "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "js_lib_pkg_a@0.0.0",
             src = "//examples/js_lib_pkg/a:pkg",
             package = "js_lib_pkg_a",
@@ -2385,7 +2383,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "js_lib_pkg_a-alias_1@0.0.0",
             src = "//examples/js_lib_pkg/a:pkg",
             package = "js_lib_pkg_a-alias_1",
@@ -2395,7 +2392,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "js_lib_pkg_a-alias_2@0.0.0",
             src = "//examples/js_lib_pkg/a:pkg",
             package = "js_lib_pkg_a-alias_2",
@@ -2405,63 +2401,58 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+test@0.0.0",
             src = "//examples/linked_pkg:pkg",
             package = "@lib/test",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e,alias-e",
+                "//:.aspect_rules_js/node_modules/@aspect-test+e@1.0.0": "@aspect-test/e,alias-e",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@lib+test2@0.0.0",
             src = "//examples/linked_lib:pkg",
             package = "@lib/test2",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e,alias-e",
+                "//:.aspect_rules_js/node_modules/@aspect-test+e@1.0.0": "@aspect-test/e,alias-e",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@mycorp+pkg-d@0.0.0",
             src = "//examples/npm_package/packages/pkg_d:pkg",
             package = "@mycorp/pkg-d",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
-                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
+                "//:.aspect_rules_js/node_modules/acorn@8.7.1": "acorn",
+                "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "@mycorp+pkg-e@0.0.0",
             src = "//examples/npm_package/packages/pkg_e:pkg",
             package = "@mycorp/pkg-e",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name): "@mycorp/pkg-d",
+                "//:.aspect_rules_js/node_modules/@mycorp+pkg-d@0.0.0": "@mycorp/pkg-d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
         _npm_local_package_store(
-            link_root_name = name,
             package_store_name = "test-npm_package@0.0.0",
             src = "//npm/private/test/npm_package:pkg",
             package = "test-npm_package",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/{}/chalk@5.0.1".format(name): "chalk",
-                "//:.aspect_rules_js/{}/chalk@5.1.1".format(name): "chalk-alt",
+                "//:.aspect_rules_js/node_modules/chalk@5.0.1": "chalk",
+                "//:.aspect_rules_js/node_modules/chalk@5.1.1": "chalk-alt",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -2472,403 +2463,403 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "js/private/worker/src":
-            link_1("{}/abortcontroller-polyfill".format(name), True, name, "abortcontroller-polyfill")
-            link_212("{}/@rollup/plugin-commonjs".format(name), True, name, "@rollup/plugin-commonjs")
-            link_213("{}/@rollup/plugin-json".format(name), True, name, "@rollup/plugin-json")
-            link_214("{}/@rollup/plugin-node-resolve".format(name), True, name, "@rollup/plugin-node-resolve")
-            link_215("{}/@rollup/plugin-typescript".format(name), True, name, "@rollup/plugin-typescript")
-            link_269("{}/@types/google-protobuf".format(name), True, name, "@types/google-protobuf")
-            link_277("{}/@types/node".format(name), True, name, "@types/node")
-            link_589("{}/google-protobuf".format(name), False, name, "google-protobuf")
-            link_953("{}/rollup".format(name), True, name, "rollup")
-            link_1059("{}/tslib".format(name), True, name, "tslib")
-            link_1070("{}/typescript".format(name), True, name, "typescript")
+            link_1("node_modules/abortcontroller-polyfill", True, "abortcontroller-polyfill")
+            link_212("node_modules/@rollup/plugin-commonjs", True, "@rollup/plugin-commonjs")
+            link_213("node_modules/@rollup/plugin-json", True, "@rollup/plugin-json")
+            link_214("node_modules/@rollup/plugin-node-resolve", True, "@rollup/plugin-node-resolve")
+            link_215("node_modules/@rollup/plugin-typescript", True, "@rollup/plugin-typescript")
+            link_269("node_modules/@types/google-protobuf", True, "@types/google-protobuf")
+            link_277("node_modules/@types/node", True, "@types/node")
+            link_589("node_modules/google-protobuf", False, "google-protobuf")
+            link_953("node_modules/rollup", True, "rollup")
+            link_1059("node_modules/tslib", True, "tslib")
+            link_1070("node_modules/typescript", True, "typescript")
             link_targets = [
-                ":{}/google-protobuf".format(name),
-                ":{}/abortcontroller-polyfill".format(name),
-                ":{}/@rollup/plugin-commonjs".format(name),
-                ":{}/@rollup/plugin-json".format(name),
-                ":{}/@rollup/plugin-node-resolve".format(name),
-                ":{}/@rollup/plugin-typescript".format(name),
-                ":{}/@types/google-protobuf".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/rollup".format(name),
-                ":{}/tslib".format(name),
-                ":{}/typescript".format(name),
+                ":node_modules/google-protobuf",
+                ":node_modules/abortcontroller-polyfill",
+                ":node_modules/@rollup/plugin-commonjs",
+                ":node_modules/@rollup/plugin-json",
+                ":node_modules/@rollup/plugin-node-resolve",
+                ":node_modules/@rollup/plugin-typescript",
+                ":node_modules/@types/google-protobuf",
+                ":node_modules/@types/node",
+                ":node_modules/rollup",
+                ":node_modules/tslib",
+                ":node_modules/typescript",
             ]
             scope_targets = {
                 "@rollup": [
-                    ":{}/@rollup/plugin-commonjs".format(name),
-                    ":{}/@rollup/plugin-json".format(name),
-                    ":{}/@rollup/plugin-node-resolve".format(name),
-                    ":{}/@rollup/plugin-typescript".format(name),
+                    ":node_modules/@rollup/plugin-commonjs",
+                    ":node_modules/@rollup/plugin-json",
+                    ":node_modules/@rollup/plugin-node-resolve",
+                    ":node_modules/@rollup/plugin-typescript",
                 ],
                 "@types": [
-                    ":{}/@types/google-protobuf".format(name),
-                    ":{}/@types/node".format(name),
+                    ":node_modules/@types/google-protobuf",
+                    ":node_modules/@types/node",
                 ],
             }
         elif bazel_package == "js/private/test/image":
-            link_6("{}/acorn".format(name), False, name, "acorn")
-            _fp_link_2(name)
-            _fp_link_8(name)
+            link_6("node_modules/acorn", False, "acorn")
+            _fp_link_2()
+            _fp_link_8()
             link_targets = [
-                ":{}/acorn".format(name),
-                ":{}/@mycorp/pkg-a".format(name),
-                ":{}/@mycorp/pkg-d".format(name),
+                ":node_modules/acorn",
+                ":node_modules/@mycorp/pkg-a",
+                ":node_modules/@mycorp/pkg-d",
             ]
             scope_targets = {
                 "@mycorp": [
-                    ":{}/@mycorp/pkg-a".format(name),
-                    ":{}/@mycorp/pkg-d".format(name),
+                    ":node_modules/@mycorp/pkg-a",
+                    ":node_modules/@mycorp/pkg-d",
                 ],
             }
         elif bazel_package == "examples/npm_deps":
-            link_8("{}/acorn".format(name), True, name, "acorn")
-            link_41("{}/@aspect-test/a".format(name), True, name, "@aspect-test/a")
-            link_43("{}/@aspect-test/c".format(name), True, name, "@aspect-test/c")
-            link_149("{}/@gregmagolan/test-b".format(name), True, name, "@gregmagolan/test-b")
-            link_211("{}/@rollup/plugin-commonjs".format(name), True, name, "@rollup/plugin-commonjs")
-            link_439("{}/debug".format(name), True, name, "debug")
-            link_755("{}/meaning-of-life".format(name), True, name, "meaning-of-life")
-            link_790("{}/mobx-react".format(name), True, name, "mobx-react")
-            link_791("{}/mobx".format(name), True, name, "mobx")
-            link_808("{}/ms".format(name), True, name, "ms")
-            link_923("{}/react".format(name), True, name, "react")
-            link_952("{}/rollup".format(name), True, name, "rollup")
-            link_1089("{}/uvu".format(name), True, name, "uvu")
-            _fp_link_2(name)
-            _fp_link_8(name)
-            _fp_link_9(name)
+            link_8("node_modules/acorn", True, "acorn")
+            link_41("node_modules/@aspect-test/a", True, "@aspect-test/a")
+            link_43("node_modules/@aspect-test/c", True, "@aspect-test/c")
+            link_149("node_modules/@gregmagolan/test-b", True, "@gregmagolan/test-b")
+            link_211("node_modules/@rollup/plugin-commonjs", True, "@rollup/plugin-commonjs")
+            link_439("node_modules/debug", True, "debug")
+            link_755("node_modules/meaning-of-life", True, "meaning-of-life")
+            link_790("node_modules/mobx-react", True, "mobx-react")
+            link_791("node_modules/mobx", True, "mobx")
+            link_808("node_modules/ms", True, "ms")
+            link_923("node_modules/react", True, "react")
+            link_952("node_modules/rollup", True, "rollup")
+            link_1089("node_modules/uvu", True, "uvu")
+            _fp_link_2()
+            _fp_link_8()
+            _fp_link_9()
             link_targets = [
-                ":{}/acorn".format(name),
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@gregmagolan/test-b".format(name),
-                ":{}/@rollup/plugin-commonjs".format(name),
-                ":{}/debug".format(name),
-                ":{}/meaning-of-life".format(name),
-                ":{}/mobx-react".format(name),
-                ":{}/mobx".format(name),
-                ":{}/ms".format(name),
-                ":{}/react".format(name),
-                ":{}/rollup".format(name),
-                ":{}/uvu".format(name),
-                ":{}/@mycorp/pkg-a".format(name),
-                ":{}/@mycorp/pkg-d".format(name),
-                ":{}/@mycorp/pkg-e".format(name),
+                ":node_modules/acorn",
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@gregmagolan/test-b",
+                ":node_modules/@rollup/plugin-commonjs",
+                ":node_modules/debug",
+                ":node_modules/meaning-of-life",
+                ":node_modules/mobx-react",
+                ":node_modules/mobx",
+                ":node_modules/ms",
+                ":node_modules/react",
+                ":node_modules/rollup",
+                ":node_modules/uvu",
+                ":node_modules/@mycorp/pkg-a",
+                ":node_modules/@mycorp/pkg-d",
+                ":node_modules/@mycorp/pkg-e",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/a".format(name),
-                    ":{}/@aspect-test/c".format(name),
+                    ":node_modules/@aspect-test/a",
+                    ":node_modules/@aspect-test/c",
                 ],
-                "@gregmagolan": [":{}/@gregmagolan/test-b".format(name)],
-                "@rollup": [":{}/@rollup/plugin-commonjs".format(name)],
+                "@gregmagolan": [":node_modules/@gregmagolan/test-b"],
+                "@rollup": [":node_modules/@rollup/plugin-commonjs"],
                 "@mycorp": [
-                    ":{}/@mycorp/pkg-a".format(name),
-                    ":{}/@mycorp/pkg-d".format(name),
-                    ":{}/@mycorp/pkg-e".format(name),
+                    ":node_modules/@mycorp/pkg-a",
+                    ":node_modules/@mycorp/pkg-d",
+                    ":node_modules/@mycorp/pkg-e",
                 ],
             }
         elif bazel_package == "examples/npm_package/packages/pkg_a":
-            link_8("{}/acorn".format(name), False, name, "acorn")
-            link_1088("{}/uuid".format(name), False, name, "uuid")
+            link_8("node_modules/acorn", False, "acorn")
+            link_1088("node_modules/uuid", False, "uuid")
             link_targets = [
-                ":{}/acorn".format(name),
-                ":{}/uuid".format(name),
+                ":node_modules/acorn",
+                ":node_modules/uuid",
             ]
         elif bazel_package == "examples/npm_package/packages/pkg_b":
-            link_8("{}/acorn".format(name), False, name, "acorn")
-            link_1088("{}/uuid".format(name), False, name, "uuid")
+            link_8("node_modules/acorn", False, "acorn")
+            link_1088("node_modules/uuid", False, "uuid")
             link_targets = [
-                ":{}/acorn".format(name),
-                ":{}/uuid".format(name),
+                ":node_modules/acorn",
+                ":node_modules/uuid",
             ]
         elif bazel_package == "examples/npm_package/packages/pkg_d":
-            link_8("{}/acorn".format(name), False, name, "acorn")
-            link_1088("{}/uuid".format(name), False, name, "uuid")
+            link_8("node_modules/acorn", False, "acorn")
+            link_1088("node_modules/uuid", False, "uuid")
             link_targets = [
-                ":{}/acorn".format(name),
-                ":{}/uuid".format(name),
+                ":node_modules/acorn",
+                ":node_modules/uuid",
             ]
         elif bazel_package == "examples/linked_lib":
-            link_45("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
-            link_45("{}/alias-e".format(name), False, name, "alias-e")
-            link_46("{}/@aspect-test/f".format(name), True, name, "@aspect-test/f")
-            link_276("{}/@types/node".format(name), True, name, "@types/node")
+            link_45("node_modules/@aspect-test/e", False, "@aspect-test/e")
+            link_45("node_modules/alias-e", False, "alias-e")
+            link_46("node_modules/@aspect-test/f", True, "@aspect-test/f")
+            link_276("node_modules/@types/node", True, "@types/node")
             link_targets = [
-                ":{}/@aspect-test/e".format(name),
-                ":{}/alias-e".format(name),
-                ":{}/@aspect-test/f".format(name),
-                ":{}/@types/node".format(name),
+                ":node_modules/@aspect-test/e",
+                ":node_modules/alias-e",
+                ":node_modules/@aspect-test/f",
+                ":node_modules/@types/node",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/e".format(name),
-                    ":{}/@aspect-test/f".format(name),
+                    ":node_modules/@aspect-test/e",
+                    ":node_modules/@aspect-test/f",
                 ],
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/linked_pkg":
-            link_45("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
-            link_45("{}/alias-e".format(name), False, name, "alias-e")
-            link_46("{}/@aspect-test/f".format(name), True, name, "@aspect-test/f")
-            link_276("{}/@types/node".format(name), True, name, "@types/node")
+            link_45("node_modules/@aspect-test/e", False, "@aspect-test/e")
+            link_45("node_modules/alias-e", False, "alias-e")
+            link_46("node_modules/@aspect-test/f", True, "@aspect-test/f")
+            link_276("node_modules/@types/node", True, "@types/node")
             link_targets = [
-                ":{}/@aspect-test/e".format(name),
-                ":{}/alias-e".format(name),
-                ":{}/@aspect-test/f".format(name),
-                ":{}/@types/node".format(name),
+                ":node_modules/@aspect-test/e",
+                ":node_modules/alias-e",
+                ":node_modules/@aspect-test/f",
+                ":node_modules/@types/node",
             ]
             scope_targets = {
                 "@aspect-test": [
-                    ":{}/@aspect-test/e".format(name),
-                    ":{}/@aspect-test/f".format(name),
+                    ":node_modules/@aspect-test/e",
+                    ":node_modules/@aspect-test/f",
                 ],
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "":
-            link_47("{}/@babel/cli".format(name), True, name, "@babel/cli")
-            link_50("{}/@babel/core".format(name), True, name, "@babel/core")
-            link_63("{}/@babel/plugin-transform-modules-commonjs".format(name), True, name, "@babel/plugin-transform-modules-commonjs")
-            link_277("{}/@types/node".format(name), True, name, "@types/node")
-            link_356("{}/chalk".format(name), True, name, "chalk")
-            link_632("{}/inline-fixtures".format(name), True, name, "inline-fixtures")
-            link_699("{}/jsonpath-plus".format(name), True, name, "jsonpath-plus")
-            link_1070("{}/typescript".format(name), True, name, "typescript")
+            link_47("node_modules/@babel/cli", True, "@babel/cli")
+            link_50("node_modules/@babel/core", True, "@babel/core")
+            link_63("node_modules/@babel/plugin-transform-modules-commonjs", True, "@babel/plugin-transform-modules-commonjs")
+            link_277("node_modules/@types/node", True, "@types/node")
+            link_356("node_modules/chalk", True, "chalk")
+            link_632("node_modules/inline-fixtures", True, "inline-fixtures")
+            link_699("node_modules/jsonpath-plus", True, "jsonpath-plus")
+            link_1070("node_modules/typescript", True, "typescript")
             link_targets = [
-                ":{}/@babel/cli".format(name),
-                ":{}/@babel/core".format(name),
-                ":{}/@babel/plugin-transform-modules-commonjs".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/chalk".format(name),
-                ":{}/inline-fixtures".format(name),
-                ":{}/jsonpath-plus".format(name),
-                ":{}/typescript".format(name),
+                ":node_modules/@babel/cli",
+                ":node_modules/@babel/core",
+                ":node_modules/@babel/plugin-transform-modules-commonjs",
+                ":node_modules/@types/node",
+                ":node_modules/chalk",
+                ":node_modules/inline-fixtures",
+                ":node_modules/jsonpath-plus",
+                ":node_modules/typescript",
             ]
             scope_targets = {
                 "@babel": [
-                    ":{}/@babel/cli".format(name),
-                    ":{}/@babel/core".format(name),
-                    ":{}/@babel/plugin-transform-modules-commonjs".format(name),
+                    ":node_modules/@babel/cli",
+                    ":node_modules/@babel/core",
+                    ":node_modules/@babel/plugin-transform-modules-commonjs",
                 ],
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/runfiles":
-            link_68("{}/@bazel/runfiles".format(name), False, name, "@bazel/runfiles")
-            link_targets = [":{}/@bazel/runfiles".format(name)]
+            link_68("node_modules/@bazel/runfiles", False, "@bazel/runfiles")
+            link_targets = [":node_modules/@bazel/runfiles"]
             scope_targets = {
-                "@bazel": [":{}/@bazel/runfiles".format(name)],
+                "@bazel": [":node_modules/@bazel/runfiles"],
             }
         elif bazel_package == "npm/private/test":
-            link_144("{}/@fastify/send".format(name), True, name, "@fastify/send")
-            link_145("{}/@figma/nodegit".format(name), True, name, "@figma/nodegit")
-            link_180("{}/@kubernetes/client-node".format(name), True, name, "@kubernetes/client-node")
-            link_208("{}/@plotly/regl".format(name), True, name, "@plotly/regl")
-            link_208("{}/regl".format(name), True, name, "regl")
-            link_339("{}/bufferutil".format(name), True, name, "bufferutil")
-            link_442("{}/debug".format(name), True, name, "debug")
-            link_497("{}/esbuild".format(name), True, name, "esbuild")
-            link_607("{}/hello".format(name), True, name, "hello")
-            link_608("{}/handlebars-helpers/helper-date".format(name), True, name, "handlebars-helpers/helper-date")
-            link_609("{}/hot-shots".format(name), True, name, "hot-shots")
-            link_633("{}/inline-fixtures".format(name), True, name, "inline-fixtures")
-            link_693("{}/json-stable-stringify".format(name), True, name, "json-stable-stringify")
-            link_736("{}/lodash".format(name), True, name, "lodash")
-            link_824("{}/node-gyp".format(name), True, name, "node-gyp")
-            link_888("{}/plotly.js".format(name), True, name, "plotly.js")
-            link_889("{}/pngjs".format(name), True, name, "pngjs")
-            link_907("{}/protoc-gen-grpc".format(name), True, name, "protoc-gen-grpc")
-            link_915("{}/puppeteer".format(name), True, name, "puppeteer")
-            link_964("{}/segfault-handler".format(name), True, name, "segfault-handler")
-            link_965("{}/semver-first-satisfied".format(name), True, name, "semver-first-satisfied")
-            link_1026("{}/syncpack".format(name), True, name, "syncpack")
-            link_1070("{}/typescript".format(name), True, name, "typescript")
-            link_1082("{}/unused".format(name), True, name, "unused")
-            link_1099("{}/webpack-bundle-analyzer".format(name), True, name, "webpack-bundle-analyzer")
-            _fp_link_10(name)
+            link_144("node_modules/@fastify/send", True, "@fastify/send")
+            link_145("node_modules/@figma/nodegit", True, "@figma/nodegit")
+            link_180("node_modules/@kubernetes/client-node", True, "@kubernetes/client-node")
+            link_208("node_modules/@plotly/regl", True, "@plotly/regl")
+            link_208("node_modules/regl", True, "regl")
+            link_339("node_modules/bufferutil", True, "bufferutil")
+            link_442("node_modules/debug", True, "debug")
+            link_497("node_modules/esbuild", True, "esbuild")
+            link_607("node_modules/hello", True, "hello")
+            link_608("node_modules/handlebars-helpers/helper-date", True, "handlebars-helpers/helper-date")
+            link_609("node_modules/hot-shots", True, "hot-shots")
+            link_633("node_modules/inline-fixtures", True, "inline-fixtures")
+            link_693("node_modules/json-stable-stringify", True, "json-stable-stringify")
+            link_736("node_modules/lodash", True, "lodash")
+            link_824("node_modules/node-gyp", True, "node-gyp")
+            link_888("node_modules/plotly.js", True, "plotly.js")
+            link_889("node_modules/pngjs", True, "pngjs")
+            link_907("node_modules/protoc-gen-grpc", True, "protoc-gen-grpc")
+            link_915("node_modules/puppeteer", True, "puppeteer")
+            link_964("node_modules/segfault-handler", True, "segfault-handler")
+            link_965("node_modules/semver-first-satisfied", True, "semver-first-satisfied")
+            link_1026("node_modules/syncpack", True, "syncpack")
+            link_1070("node_modules/typescript", True, "typescript")
+            link_1082("node_modules/unused", True, "unused")
+            link_1099("node_modules/webpack-bundle-analyzer", True, "webpack-bundle-analyzer")
+            _fp_link_10()
             link_targets = [
-                ":{}/@fastify/send".format(name),
-                ":{}/@figma/nodegit".format(name),
-                ":{}/@kubernetes/client-node".format(name),
-                ":{}/@plotly/regl".format(name),
-                ":{}/regl".format(name),
-                ":{}/bufferutil".format(name),
-                ":{}/debug".format(name),
-                ":{}/esbuild".format(name),
-                ":{}/hello".format(name),
-                ":{}/handlebars-helpers/helper-date".format(name),
-                ":{}/hot-shots".format(name),
-                ":{}/inline-fixtures".format(name),
-                ":{}/json-stable-stringify".format(name),
-                ":{}/lodash".format(name),
-                ":{}/node-gyp".format(name),
-                ":{}/plotly.js".format(name),
-                ":{}/pngjs".format(name),
-                ":{}/protoc-gen-grpc".format(name),
-                ":{}/puppeteer".format(name),
-                ":{}/segfault-handler".format(name),
-                ":{}/semver-first-satisfied".format(name),
-                ":{}/syncpack".format(name),
-                ":{}/typescript".format(name),
-                ":{}/webpack-bundle-analyzer".format(name),
-                ":{}/test-npm_package".format(name),
+                ":node_modules/@fastify/send",
+                ":node_modules/@figma/nodegit",
+                ":node_modules/@kubernetes/client-node",
+                ":node_modules/@plotly/regl",
+                ":node_modules/regl",
+                ":node_modules/bufferutil",
+                ":node_modules/debug",
+                ":node_modules/esbuild",
+                ":node_modules/hello",
+                ":node_modules/handlebars-helpers/helper-date",
+                ":node_modules/hot-shots",
+                ":node_modules/inline-fixtures",
+                ":node_modules/json-stable-stringify",
+                ":node_modules/lodash",
+                ":node_modules/node-gyp",
+                ":node_modules/plotly.js",
+                ":node_modules/pngjs",
+                ":node_modules/protoc-gen-grpc",
+                ":node_modules/puppeteer",
+                ":node_modules/segfault-handler",
+                ":node_modules/semver-first-satisfied",
+                ":node_modules/syncpack",
+                ":node_modules/typescript",
+                ":node_modules/webpack-bundle-analyzer",
+                ":node_modules/test-npm_package",
             ]
             scope_targets = {
-                "@fastify": [":{}/@fastify/send".format(name)],
-                "@figma": [":{}/@figma/nodegit".format(name)],
-                "@kubernetes": [":{}/@kubernetes/client-node".format(name)],
-                "@plotly": [":{}/@plotly/regl".format(name)],
+                "@fastify": [":node_modules/@fastify/send"],
+                "@figma": [":node_modules/@figma/nodegit"],
+                "@kubernetes": [":node_modules/@kubernetes/client-node"],
+                "@plotly": [":node_modules/@plotly/regl"],
             }
         elif bazel_package == "js/private/coverage/bundle":
-            link_212("{}/@rollup/plugin-commonjs".format(name), True, name, "@rollup/plugin-commonjs")
-            link_213("{}/@rollup/plugin-json".format(name), True, name, "@rollup/plugin-json")
-            link_214("{}/@rollup/plugin-node-resolve".format(name), True, name, "@rollup/plugin-node-resolve")
-            link_341("{}/c8".format(name), False, name, "c8")
-            link_953("{}/rollup".format(name), True, name, "rollup")
+            link_212("node_modules/@rollup/plugin-commonjs", True, "@rollup/plugin-commonjs")
+            link_213("node_modules/@rollup/plugin-json", True, "@rollup/plugin-json")
+            link_214("node_modules/@rollup/plugin-node-resolve", True, "@rollup/plugin-node-resolve")
+            link_341("node_modules/c8", False, "c8")
+            link_953("node_modules/rollup", True, "rollup")
             link_targets = [
-                ":{}/c8".format(name),
-                ":{}/@rollup/plugin-commonjs".format(name),
-                ":{}/@rollup/plugin-json".format(name),
-                ":{}/@rollup/plugin-node-resolve".format(name),
-                ":{}/rollup".format(name),
+                ":node_modules/c8",
+                ":node_modules/@rollup/plugin-commonjs",
+                ":node_modules/@rollup/plugin-json",
+                ":node_modules/@rollup/plugin-node-resolve",
+                ":node_modules/rollup",
             ]
             scope_targets = {
                 "@rollup": [
-                    ":{}/@rollup/plugin-commonjs".format(name),
-                    ":{}/@rollup/plugin-json".format(name),
-                    ":{}/@rollup/plugin-node-resolve".format(name),
+                    ":node_modules/@rollup/plugin-commonjs",
+                    ":node_modules/@rollup/plugin-json",
+                    ":node_modules/@rollup/plugin-node-resolve",
                 ],
             }
         elif bazel_package == "js/private/devserver/src":
-            link_214("{}/@rollup/plugin-node-resolve".format(name), True, name, "@rollup/plugin-node-resolve")
-            link_277("{}/@types/node".format(name), True, name, "@types/node")
-            link_953("{}/rollup".format(name), True, name, "rollup")
+            link_214("node_modules/@rollup/plugin-node-resolve", True, "@rollup/plugin-node-resolve")
+            link_277("node_modules/@types/node", True, "@types/node")
+            link_953("node_modules/rollup", True, "rollup")
             link_targets = [
-                ":{}/@rollup/plugin-node-resolve".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/rollup".format(name),
+                ":node_modules/@rollup/plugin-node-resolve",
+                ":node_modules/@types/node",
+                ":node_modules/rollup",
             ]
             scope_targets = {
-                "@rollup": [":{}/@rollup/plugin-node-resolve".format(name)],
-                "@types": [":{}/@types/node".format(name)],
+                "@rollup": [":node_modules/@rollup/plugin-node-resolve"],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/nextjs":
-            link_255("{}/@tailwindcss/postcss".format(name), True, name, "@tailwindcss/postcss")
-            link_819("{}/next".format(name), False, name, "next")
-            link_922("{}/react-dom".format(name), False, name, "react-dom")
-            link_924("{}/react".format(name), False, name, "react")
-            link_1027("{}/tailwindcss".format(name), True, name, "tailwindcss")
+            link_255("node_modules/@tailwindcss/postcss", True, "@tailwindcss/postcss")
+            link_819("node_modules/next", False, "next")
+            link_922("node_modules/react-dom", False, "react-dom")
+            link_924("node_modules/react", False, "react")
+            link_1027("node_modules/tailwindcss", True, "tailwindcss")
             link_targets = [
-                ":{}/next".format(name),
-                ":{}/react-dom".format(name),
-                ":{}/react".format(name),
-                ":{}/@tailwindcss/postcss".format(name),
-                ":{}/tailwindcss".format(name),
+                ":node_modules/next",
+                ":node_modules/react-dom",
+                ":node_modules/react",
+                ":node_modules/@tailwindcss/postcss",
+                ":node_modules/tailwindcss",
             ]
             scope_targets = {
-                "@tailwindcss": [":{}/@tailwindcss/postcss".format(name)],
+                "@tailwindcss": [":node_modules/@tailwindcss/postcss"],
             }
         elif bazel_package == "examples/js_lib_pkg/a":
-            link_277("{}/@types/node".format(name), True, name, "@types/node")
-            link_targets = [":{}/@types/node".format(name)]
+            link_277("node_modules/@types/node", True, "@types/node")
+            link_targets = [":node_modules/@types/node"]
             scope_targets = {
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/js_lib_pkg/b":
-            link_277("{}/@types/node".format(name), True, name, "@types/node")
-            _fp_link_3(name)
-            _fp_link_4(name)
-            _fp_link_5(name)
+            link_277("node_modules/@types/node", True, "@types/node")
+            _fp_link_3()
+            _fp_link_4()
+            _fp_link_5()
             link_targets = [
-                ":{}/js_lib_pkg_a".format(name),
-                ":{}/js_lib_pkg_a-alias_1".format(name),
-                ":{}/js_lib_pkg_a-alias_2".format(name),
-                ":{}/@types/node".format(name),
+                ":node_modules/js_lib_pkg_a",
+                ":node_modules/js_lib_pkg_a-alias_1",
+                ":node_modules/js_lib_pkg_a-alias_2",
+                ":node_modules/@types/node",
             ]
             scope_targets = {
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "js/private/test/js_run_devserver":
-            link_277("{}/@types/node".format(name), False, name, "@types/node")
-            link_677("{}/jasmine".format(name), False, name, "jasmine")
+            link_277("node_modules/@types/node", False, "@types/node")
+            link_677("node_modules/jasmine", False, "jasmine")
             link_targets = [
-                ":{}/@types/node".format(name),
-                ":{}/jasmine".format(name),
+                ":node_modules/@types/node",
+                ":node_modules/jasmine",
             ]
             scope_targets = {
-                "@types": [":{}/@types/node".format(name)],
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/webpack_cli":
-            link_288("{}/@vanilla-extract/css".format(name), False, name, "@vanilla-extract/css")
-            link_291("{}/@vanilla-extract/webpack-plugin".format(name), True, name, "@vanilla-extract/webpack-plugin")
-            link_411("{}/css-loader".format(name), False, name, "css-loader")
-            link_753("{}/mathjs".format(name), False, name, "mathjs")
-            link_763("{}/mini-css-extract-plugin".format(name), True, name, "mini-css-extract-plugin")
-            link_1100("{}/webpack-cli".format(name), True, name, "webpack-cli")
-            link_1103("{}/webpack".format(name), True, name, "webpack")
+            link_288("node_modules/@vanilla-extract/css", False, "@vanilla-extract/css")
+            link_291("node_modules/@vanilla-extract/webpack-plugin", True, "@vanilla-extract/webpack-plugin")
+            link_411("node_modules/css-loader", False, "css-loader")
+            link_753("node_modules/mathjs", False, "mathjs")
+            link_763("node_modules/mini-css-extract-plugin", True, "mini-css-extract-plugin")
+            link_1100("node_modules/webpack-cli", True, "webpack-cli")
+            link_1103("node_modules/webpack", True, "webpack")
             link_targets = [
-                ":{}/@vanilla-extract/css".format(name),
-                ":{}/css-loader".format(name),
-                ":{}/mathjs".format(name),
-                ":{}/@vanilla-extract/webpack-plugin".format(name),
-                ":{}/mini-css-extract-plugin".format(name),
-                ":{}/webpack-cli".format(name),
-                ":{}/webpack".format(name),
+                ":node_modules/@vanilla-extract/css",
+                ":node_modules/css-loader",
+                ":node_modules/mathjs",
+                ":node_modules/@vanilla-extract/webpack-plugin",
+                ":node_modules/mini-css-extract-plugin",
+                ":node_modules/webpack-cli",
+                ":node_modules/webpack",
             ]
             scope_targets = {
                 "@vanilla-extract": [
-                    ":{}/@vanilla-extract/css".format(name),
-                    ":{}/@vanilla-extract/webpack-plugin".format(name),
+                    ":node_modules/@vanilla-extract/css",
+                    ":node_modules/@vanilla-extract/webpack-plugin",
                 ],
             }
         elif bazel_package == "examples/npm_package/libs/lib_a":
-            link_355("{}/chalk".format(name), False, name, "chalk")
-            link_targets = [":{}/chalk".format(name)]
+            link_355("node_modules/chalk", False, "chalk")
+            link_targets = [":node_modules/chalk"]
         elif bazel_package == "npm/private/test/npm_package":
-            link_355("{}/chalk".format(name), False, name, "chalk")
-            link_356("{}/chalk-alt".format(name), False, name, "chalk-alt")
+            link_355("node_modules/chalk", False, "chalk")
+            link_356("node_modules/chalk-alt", False, "chalk-alt")
             link_targets = [
-                ":{}/chalk".format(name),
-                ":{}/chalk-alt".format(name),
+                ":node_modules/chalk",
+                ":node_modules/chalk-alt",
             ]
         elif bazel_package == "examples/macro":
-            link_792("{}/mocha-junit-reporter".format(name), True, name, "mocha-junit-reporter")
-            link_793("{}/mocha-multi-reporters".format(name), True, name, "mocha-multi-reporters")
-            link_794("{}/mocha".format(name), True, name, "mocha")
+            link_792("node_modules/mocha-junit-reporter", True, "mocha-junit-reporter")
+            link_793("node_modules/mocha-multi-reporters", True, "mocha-multi-reporters")
+            link_794("node_modules/mocha", True, "mocha")
             link_targets = [
-                ":{}/mocha-junit-reporter".format(name),
-                ":{}/mocha-multi-reporters".format(name),
-                ":{}/mocha".format(name),
+                ":node_modules/mocha-junit-reporter",
+                ":node_modules/mocha-multi-reporters",
+                ":node_modules/mocha",
             ]
         elif bazel_package == "examples/stack_traces":
-            link_991("{}/source-map-support".format(name), True, name, "source-map-support")
-            link_targets = [":{}/source-map-support".format(name)]
+            link_991("node_modules/source-map-support", True, "source-map-support")
+            link_targets = [":node_modules/source-map-support"]
         elif bazel_package == "examples/js_binary":
-            _fp_link_2(name)
-            link_targets = [":{}/@mycorp/pkg-a".format(name)]
+            _fp_link_2()
+            link_targets = [":node_modules/@mycorp/pkg-a"]
             scope_targets = {
-                "@mycorp": [":{}/@mycorp/pkg-a".format(name)],
+                "@mycorp": [":node_modules/@mycorp/pkg-a"],
             }
         elif bazel_package == "examples/linked_consumer":
-            _fp_link_6(name)
-            _fp_link_7(name)
+            _fp_link_6()
+            _fp_link_7()
             link_targets = [
-                ":{}/@lib/test".format(name),
-                ":{}/@lib/test2".format(name),
+                ":node_modules/@lib/test",
+                ":node_modules/@lib/test2",
             ]
             scope_targets = {
                 "@lib": [
-                    ":{}/@lib/test".format(name),
-                    ":{}/@lib/test2".format(name),
+                    ":node_modules/@lib/test",
+                    ":node_modules/@lib/test2",
                 ],
             }
         elif bazel_package == "examples/npm_package/packages/pkg_e":
-            _fp_link_8(name)
-            link_targets = [":{}/@mycorp/pkg-d".format(name)]
+            _fp_link_8()
+            link_targets = [":node_modules/@mycorp/pkg-d"]
             scope_targets = {
-                "@mycorp": [":{}/@mycorp/pkg-d".format(name)],
+                "@mycorp": [":node_modules/@mycorp/pkg-d"],
             }
     
     for link_fn in imported_links:
@@ -2902,6 +2893,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if name != "node_modules":
+        fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
@@ -2911,297 +2904,297 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     if bazel_package == "js/private/worker/src":
         if prod:
-            link_targets.extend([":{}/google-protobuf".format(name)])
+            link_targets.extend([":node_modules/google-protobuf"])
         if dev:
             link_targets.extend([
-                ":{}/abortcontroller-polyfill".format(name),
-                ":{}/@rollup/plugin-commonjs".format(name),
-                ":{}/@rollup/plugin-json".format(name),
-                ":{}/@rollup/plugin-node-resolve".format(name),
-                ":{}/@rollup/plugin-typescript".format(name),
-                ":{}/@types/google-protobuf".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/rollup".format(name),
-                ":{}/tslib".format(name),
-                ":{}/typescript".format(name),
+                ":node_modules/abortcontroller-polyfill",
+                ":node_modules/@rollup/plugin-commonjs",
+                ":node_modules/@rollup/plugin-json",
+                ":node_modules/@rollup/plugin-node-resolve",
+                ":node_modules/@rollup/plugin-typescript",
+                ":node_modules/@types/google-protobuf",
+                ":node_modules/@types/node",
+                ":node_modules/rollup",
+                ":node_modules/tslib",
+                ":node_modules/typescript",
             ])
     elif bazel_package == "js/private/test/image":
         if prod:
             link_targets.extend([
-                ":{}/acorn".format(name),
-                ":{}/@mycorp/pkg-a".format(name),
-                ":{}/@mycorp/pkg-d".format(name),
+                ":node_modules/acorn",
+                ":node_modules/@mycorp/pkg-a",
+                ":node_modules/@mycorp/pkg-d",
             ])
     elif bazel_package == "examples/npm_deps":
         if dev:
             link_targets.extend([
-                ":{}/acorn".format(name),
-                ":{}/@aspect-test/a".format(name),
-                ":{}/@aspect-test/c".format(name),
-                ":{}/@gregmagolan/test-b".format(name),
-                ":{}/@rollup/plugin-commonjs".format(name),
-                ":{}/debug".format(name),
-                ":{}/meaning-of-life".format(name),
-                ":{}/mobx-react".format(name),
-                ":{}/mobx".format(name),
-                ":{}/ms".format(name),
-                ":{}/react".format(name),
-                ":{}/rollup".format(name),
-                ":{}/uvu".format(name),
-                ":{}/@mycorp/pkg-a".format(name),
-                ":{}/@mycorp/pkg-d".format(name),
-                ":{}/@mycorp/pkg-e".format(name),
+                ":node_modules/acorn",
+                ":node_modules/@aspect-test/a",
+                ":node_modules/@aspect-test/c",
+                ":node_modules/@gregmagolan/test-b",
+                ":node_modules/@rollup/plugin-commonjs",
+                ":node_modules/debug",
+                ":node_modules/meaning-of-life",
+                ":node_modules/mobx-react",
+                ":node_modules/mobx",
+                ":node_modules/ms",
+                ":node_modules/react",
+                ":node_modules/rollup",
+                ":node_modules/uvu",
+                ":node_modules/@mycorp/pkg-a",
+                ":node_modules/@mycorp/pkg-d",
+                ":node_modules/@mycorp/pkg-e",
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_a":
         if prod:
             link_targets.extend([
-                ":{}/acorn".format(name),
-                ":{}/uuid".format(name),
+                ":node_modules/acorn",
+                ":node_modules/uuid",
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_b":
         if prod:
             link_targets.extend([
-                ":{}/acorn".format(name),
-                ":{}/uuid".format(name),
+                ":node_modules/acorn",
+                ":node_modules/uuid",
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_d":
         if prod:
             link_targets.extend([
-                ":{}/acorn".format(name),
-                ":{}/uuid".format(name),
+                ":node_modules/acorn",
+                ":node_modules/uuid",
             ])
     elif bazel_package == "examples/linked_lib":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/e".format(name),
-                ":{}/alias-e".format(name),
+                ":node_modules/@aspect-test/e",
+                ":node_modules/alias-e",
             ])
         if dev:
             link_targets.extend([
-                ":{}/@aspect-test/f".format(name),
-                ":{}/@types/node".format(name),
+                ":node_modules/@aspect-test/f",
+                ":node_modules/@types/node",
             ])
     elif bazel_package == "examples/linked_pkg":
         if prod:
             link_targets.extend([
-                ":{}/@aspect-test/e".format(name),
-                ":{}/alias-e".format(name),
+                ":node_modules/@aspect-test/e",
+                ":node_modules/alias-e",
             ])
         if dev:
             link_targets.extend([
-                ":{}/@aspect-test/f".format(name),
-                ":{}/@types/node".format(name),
+                ":node_modules/@aspect-test/f",
+                ":node_modules/@types/node",
             ])
     elif bazel_package == "":
         if dev:
             link_targets.extend([
-                ":{}/@babel/cli".format(name),
-                ":{}/@babel/core".format(name),
-                ":{}/@babel/plugin-transform-modules-commonjs".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/chalk".format(name),
-                ":{}/inline-fixtures".format(name),
-                ":{}/jsonpath-plus".format(name),
-                ":{}/typescript".format(name),
+                ":node_modules/@babel/cli",
+                ":node_modules/@babel/core",
+                ":node_modules/@babel/plugin-transform-modules-commonjs",
+                ":node_modules/@types/node",
+                ":node_modules/chalk",
+                ":node_modules/inline-fixtures",
+                ":node_modules/jsonpath-plus",
+                ":node_modules/typescript",
             ])
     elif bazel_package == "examples/runfiles":
         if prod:
-            link_targets.extend([":{}/@bazel/runfiles".format(name)])
+            link_targets.extend([":node_modules/@bazel/runfiles"])
     elif bazel_package == "npm/private/test":
         if dev:
             link_targets.extend([
-                ":{}/@fastify/send".format(name),
-                ":{}/@figma/nodegit".format(name),
-                ":{}/@kubernetes/client-node".format(name),
-                ":{}/@plotly/regl".format(name),
-                ":{}/regl".format(name),
-                ":{}/bufferutil".format(name),
-                ":{}/debug".format(name),
-                ":{}/esbuild".format(name),
-                ":{}/hello".format(name),
-                ":{}/handlebars-helpers/helper-date".format(name),
-                ":{}/hot-shots".format(name),
-                ":{}/inline-fixtures".format(name),
-                ":{}/json-stable-stringify".format(name),
-                ":{}/lodash".format(name),
-                ":{}/node-gyp".format(name),
-                ":{}/plotly.js".format(name),
-                ":{}/pngjs".format(name),
-                ":{}/protoc-gen-grpc".format(name),
-                ":{}/puppeteer".format(name),
-                ":{}/segfault-handler".format(name),
-                ":{}/semver-first-satisfied".format(name),
-                ":{}/syncpack".format(name),
-                ":{}/typescript".format(name),
-                ":{}/webpack-bundle-analyzer".format(name),
-                ":{}/test-npm_package".format(name),
+                ":node_modules/@fastify/send",
+                ":node_modules/@figma/nodegit",
+                ":node_modules/@kubernetes/client-node",
+                ":node_modules/@plotly/regl",
+                ":node_modules/regl",
+                ":node_modules/bufferutil",
+                ":node_modules/debug",
+                ":node_modules/esbuild",
+                ":node_modules/hello",
+                ":node_modules/handlebars-helpers/helper-date",
+                ":node_modules/hot-shots",
+                ":node_modules/inline-fixtures",
+                ":node_modules/json-stable-stringify",
+                ":node_modules/lodash",
+                ":node_modules/node-gyp",
+                ":node_modules/plotly.js",
+                ":node_modules/pngjs",
+                ":node_modules/protoc-gen-grpc",
+                ":node_modules/puppeteer",
+                ":node_modules/segfault-handler",
+                ":node_modules/semver-first-satisfied",
+                ":node_modules/syncpack",
+                ":node_modules/typescript",
+                ":node_modules/webpack-bundle-analyzer",
+                ":node_modules/test-npm_package",
             ])
     elif bazel_package == "js/private/coverage/bundle":
         if prod:
-            link_targets.extend([":{}/c8".format(name)])
+            link_targets.extend([":node_modules/c8"])
         if dev:
             link_targets.extend([
-                ":{}/@rollup/plugin-commonjs".format(name),
-                ":{}/@rollup/plugin-json".format(name),
-                ":{}/@rollup/plugin-node-resolve".format(name),
-                ":{}/rollup".format(name),
+                ":node_modules/@rollup/plugin-commonjs",
+                ":node_modules/@rollup/plugin-json",
+                ":node_modules/@rollup/plugin-node-resolve",
+                ":node_modules/rollup",
             ])
     elif bazel_package == "js/private/devserver/src":
         if dev:
             link_targets.extend([
-                ":{}/@rollup/plugin-node-resolve".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/rollup".format(name),
+                ":node_modules/@rollup/plugin-node-resolve",
+                ":node_modules/@types/node",
+                ":node_modules/rollup",
             ])
     elif bazel_package == "examples/nextjs":
         if prod:
             link_targets.extend([
-                ":{}/next".format(name),
-                ":{}/react-dom".format(name),
-                ":{}/react".format(name),
+                ":node_modules/next",
+                ":node_modules/react-dom",
+                ":node_modules/react",
             ])
         if dev:
             link_targets.extend([
-                ":{}/@tailwindcss/postcss".format(name),
-                ":{}/tailwindcss".format(name),
+                ":node_modules/@tailwindcss/postcss",
+                ":node_modules/tailwindcss",
             ])
     elif bazel_package == "examples/js_lib_pkg/a":
         if dev:
-            link_targets.extend([":{}/@types/node".format(name)])
+            link_targets.extend([":node_modules/@types/node"])
     elif bazel_package == "examples/js_lib_pkg/b":
         if prod:
             link_targets.extend([
-                ":{}/js_lib_pkg_a".format(name),
-                ":{}/js_lib_pkg_a-alias_1".format(name),
-                ":{}/js_lib_pkg_a-alias_2".format(name),
+                ":node_modules/js_lib_pkg_a",
+                ":node_modules/js_lib_pkg_a-alias_1",
+                ":node_modules/js_lib_pkg_a-alias_2",
             ])
         if dev:
-            link_targets.extend([":{}/@types/node".format(name)])
+            link_targets.extend([":node_modules/@types/node"])
     elif bazel_package == "js/private/test/js_run_devserver":
         if prod:
             link_targets.extend([
-                ":{}/@types/node".format(name),
-                ":{}/jasmine".format(name),
+                ":node_modules/@types/node",
+                ":node_modules/jasmine",
             ])
     elif bazel_package == "examples/webpack_cli":
         if prod:
             link_targets.extend([
-                ":{}/@vanilla-extract/css".format(name),
-                ":{}/css-loader".format(name),
-                ":{}/mathjs".format(name),
+                ":node_modules/@vanilla-extract/css",
+                ":node_modules/css-loader",
+                ":node_modules/mathjs",
             ])
         if dev:
             link_targets.extend([
-                ":{}/@vanilla-extract/webpack-plugin".format(name),
-                ":{}/mini-css-extract-plugin".format(name),
-                ":{}/webpack-cli".format(name),
-                ":{}/webpack".format(name),
+                ":node_modules/@vanilla-extract/webpack-plugin",
+                ":node_modules/mini-css-extract-plugin",
+                ":node_modules/webpack-cli",
+                ":node_modules/webpack",
             ])
     elif bazel_package == "examples/npm_package/libs/lib_a":
         if prod:
-            link_targets.extend([":{}/chalk".format(name)])
+            link_targets.extend([":node_modules/chalk"])
     elif bazel_package == "npm/private/test/npm_package":
         if prod:
             link_targets.extend([
-                ":{}/chalk".format(name),
-                ":{}/chalk-alt".format(name),
+                ":node_modules/chalk",
+                ":node_modules/chalk-alt",
             ])
     elif bazel_package == "examples/macro":
         if dev:
             link_targets.extend([
-                ":{}/mocha-junit-reporter".format(name),
-                ":{}/mocha-multi-reporters".format(name),
-                ":{}/mocha".format(name),
+                ":node_modules/mocha-junit-reporter",
+                ":node_modules/mocha-multi-reporters",
+                ":node_modules/mocha",
             ])
     elif bazel_package == "examples/stack_traces":
         if dev:
-            link_targets.extend([":{}/source-map-support".format(name)])
+            link_targets.extend([":node_modules/source-map-support"])
     elif bazel_package == "examples/js_binary":
         if dev:
-            link_targets.extend([":{}/@mycorp/pkg-a".format(name)])
+            link_targets.extend([":node_modules/@mycorp/pkg-a"])
     elif bazel_package == "examples/linked_consumer":
         if prod:
             link_targets.extend([
-                ":{}/@lib/test".format(name),
-                ":{}/@lib/test2".format(name),
+                ":node_modules/@lib/test",
+                ":node_modules/@lib/test2",
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_e":
         if prod:
-            link_targets.extend([":{}/@mycorp/pkg-d".format(name)])
+            link_targets.extend([":node_modules/@mycorp/pkg-d"])
     return link_targets
 
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
 # buildifier: disable=function-docstring
-def _fp_link_2(name):
+def _fp_link_2():
     _npm_local_link_package_store(
-        name = "{}/@mycorp/pkg-a".format(name),
-        src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
+        name = "node_modules/@mycorp/pkg-a",
+        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-a@0.0.0",
         link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a" package
 # buildifier: disable=function-docstring
-def _fp_link_3(name):
+def _fp_link_3():
     _npm_local_link_package_store(
-        name = "{}/js_lib_pkg_a".format(name),
-        src = "//:.aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
+        name = "node_modules/js_lib_pkg_a",
+        src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a-alias_1" package
 # buildifier: disable=function-docstring
-def _fp_link_4(name):
+def _fp_link_4():
     _npm_local_link_package_store(
-        name = "{}/js_lib_pkg_a-alias_1".format(name),
-        src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias_1@0.0.0".format(name),
+        name = "node_modules/js_lib_pkg_a-alias_1",
+        src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a-alias_1@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a-alias_2" package
 # buildifier: disable=function-docstring
-def _fp_link_5(name):
+def _fp_link_5():
     _npm_local_link_package_store(
-        name = "{}/js_lib_pkg_a-alias_2".format(name),
-        src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias_2@0.0.0".format(name),
+        name = "node_modules/js_lib_pkg_a-alias_2",
+        src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a-alias_2@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test" package
 # buildifier: disable=function-docstring
-def _fp_link_6(name):
+def _fp_link_6():
     _npm_local_link_package_store(
-        name = "{}/@lib/test".format(name),
-        src = "//:.aspect_rules_js/{}/@lib+test@0.0.0".format(name),
+        name = "node_modules/@lib/test",
+        src = "//:.aspect_rules_js/node_modules/@lib+test@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test2" package
 # buildifier: disable=function-docstring
-def _fp_link_7(name):
+def _fp_link_7():
     _npm_local_link_package_store(
-        name = "{}/@lib/test2".format(name),
-        src = "//:.aspect_rules_js/{}/@lib+test2@0.0.0".format(name),
+        name = "node_modules/@lib/test2",
+        src = "//:.aspect_rules_js/node_modules/@lib+test2@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-d" package
 # buildifier: disable=function-docstring
-def _fp_link_8(name):
+def _fp_link_8():
     _npm_local_link_package_store(
-        name = "{}/@mycorp/pkg-d".format(name),
-        src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
+        name = "node_modules/@mycorp/pkg-d",
+        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-d@0.0.0",
         link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-e" package
 # buildifier: disable=function-docstring
-def _fp_link_9(name):
+def _fp_link_9():
     _npm_local_link_package_store(
-        name = "{}/@mycorp/pkg-e".format(name),
-        src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
+        name = "node_modules/@mycorp/pkg-e",
+        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-e@0.0.0",
         link_visibility = ["//examples:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "test-npm_package" package
 # buildifier: disable=function-docstring
-def _fp_link_10(name):
+def _fp_link_10():
     _npm_local_link_package_store(
-        name = "{}/test-npm_package".format(name),
-        src = "//:.aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
+        name = "node_modules/test-npm_package",
+        src = "//:.aspect_rules_js/node_modules/test-npm_package@0.0.0",
     )
