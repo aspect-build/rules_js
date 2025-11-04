@@ -233,6 +233,7 @@ def npm_imported_package_store_internal(
 
 def npm_link_imported_package_store_internal(
         name,
+        dev,
         link_root_name,
         link_alias,
         root_package,
@@ -245,6 +246,7 @@ def npm_link_imported_package_store_internal(
     # terminal package store target to link
     npm_link_package_store(
         name = name,
+        dev = dev,
         package = link_alias,
         src = "//%s:%s" % (root_package, store_target_name),
         visibility = link_visibility,
@@ -267,9 +269,10 @@ def npm_link_imported_package_store_internal(
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
     return _npm_link_imported_package_store(
         name,
+        dev,
         link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
@@ -286,6 +289,7 @@ def npm_link_imported_package_internal(
         name,
         package,
         version,
+        dev,
         root_package,
         link,
         link_packages,
@@ -322,6 +326,7 @@ def npm_link_imported_package_internal(
             link_target_name = "{}/{}".format(name, link_alias)
             npm_link_imported_package_store_macro(
                 name = link_target_name,
+                dev = dev,
                 link_root_name = name,
                 link_alias = link_alias,
             )
@@ -343,12 +348,14 @@ _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
         name = "node_modules",
+        dev = False,
         link = {link_default},
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
         package = PACKAGE,
         version = VERSION,
+        dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {link_packages},

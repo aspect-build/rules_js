@@ -32,6 +32,10 @@ If unset, the package name of the src npm_package_store is used.
 If set, takes precendance over the package name in the src npm_package_store.
 """,
     ),
+    "dev": attr.bool(
+        doc = """Whether or not the linked package is a dev dependency.
+""",
+    ),
     "bins": attr.string_dict(
         doc = """Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
 
@@ -62,6 +66,11 @@ exec node "$basedir/{bin_path}" "$@"
 def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
     store_js_info = ctx.attr.src[JsInfo]
+
+    # Ensure the DEPRECATED NpmPackageStoreInfo.dev flag is never True when linking
+    # as a non-devDependency
+    if store_info.dev and not ctx.attr.dev:
+        fail("cannot link a devDependency package as a non-devDependency")
 
     package_store_directory = store_info.package_store_directory
     if not package_store_directory:
@@ -129,7 +138,7 @@ def _npm_link_package_store_impl(ctx):
             transitive_types = store_js_info.transitive_types,
             npm_sources = npm_sources,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
-            npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
+            npm_package_store_infos = depset([store_info]) if not ctx.attr.dev else depset(),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
