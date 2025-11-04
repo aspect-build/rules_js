@@ -492,7 +492,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             version = version,
             bins = bins,
             package_info = package_info,
-            dev = dev_only,
+            dev_only = dev_only,
             replace_package = replace_package,
         )
 

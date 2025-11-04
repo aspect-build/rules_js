@@ -662,7 +662,7 @@ def _gen_npm_import(rctx, _import, link_workspace):
     maybe_npm_auth_password = ("""
         npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
     maybe_dev = ("""
-        dev = True,""") if _import.dev else ""
+        dev = True,""") if _import.dev_only else ""
     maybe_replace_package = ("""
         replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
     maybe_exclude_package_contents = ("""

@@ -39,7 +39,7 @@ def npm_imported_package_store(link_root_name):
             ":.aspect_rules_js/{link_root_name}/@aspect-test+c@2.0.2/pkg": "@aspect-test/c",
             ":.aspect_rules_js/{link_root_name}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2/pkg": "@aspect-test/d",
         },
-        dev = False,
+        dev_only = False,
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_b__5.0.2//:pkg",
