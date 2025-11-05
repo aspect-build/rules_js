@@ -131,17 +131,30 @@ def lockfile_test(npm_link_all_packages, name = None):
             # a package with various `npm:` cases
             ":node_modules/@isaacs/cliui",
 
+            # cases involving peer deps
+            ":node_modules/test-c200-d200",
+            ":node_modules/test-c201-d200",
+            ":node_modules/test-peer-types",
+            ":.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
+            ":.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
+
             # link:, workspace:, file:, ./rel/path
             ":node_modules/@scoped",  # target for the scope
             ":node_modules/@scoped/a",
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
-            ":node_modules/test-c200-d200",
-            ":node_modules/test-c201-d200",
-            ":node_modules/test-peer-types",
             ":node_modules/scoped/bad",
+            ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
+            ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
+            ":.aspect_rules_js/node_modules/@scoped+c@0.0.0",
+            ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
+            ":.aspect_rules_js/node_modules/scoped+bad@0.0.0",
+
+            # file: tarbals
             ":node_modules/lodash",
+            ":.aspect_rules_js/node_modules/lodash@0.0.0",
+            ":.aspect_rules_js/node_modules/lodash@0.0.0/dir",
 
             # Packages involving overrides
             ":node_modules/is-odd",
@@ -194,16 +207,6 @@ def lockfile_test(npm_link_all_packages, name = None):
             # Direct deps with lifecycles
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/lc",
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
-
-            # link:, workspace:, file:, ./rel/path
-            ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+c@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
-            ":.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
-            ":.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
-            ":.aspect_rules_js/node_modules/lodash@4.17.21",
-            ":.aspect_rules_js/node_modules/lodash@4.17.21/dir",
 
             # Patched dependencies
             ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
