@@ -155,71 +155,62 @@ sh_binary(
         importer_deps_map[link_package] = pkg_deps
 
     # Look for first-party links in importers
-    for import_path, importer in importers.items():
-        link_package = helpers.link_package(root_package, import_path)
+    for link_package, importer_deps in importer_deps_map.items():
+        for dep_package, dep in importer_deps.items():
+            deps_type = "link_dev_packages" if dep["dev"] else "link_packages"
+            dep_version = dep["version"]
+            if dep_version.startswith("file:"):
+                dep_key = "{}+{}".format(dep_package, dep_version)
+                if not dep_key in fp_links.keys():
+                    # Ignore file: dependencies on packages such as file: tarballs
+                    # TODO(3.0): remove with pnpm <v9
+                    if dep_version in packages:
+                        continue
 
-        prod_deps = importer.get("deps", {})
-        all_deps = importer.get("all_deps", {})
+                    # pnpm >=v9 where packages always have name@version
+                    if "{}@{}".format(dep_package, dep_version) in packages:
+                        continue
 
-        dev_deps = {}
-        for dep_name, dep_version in all_deps.items():
-            if dep_name not in prod_deps:
-                dev_deps[dep_name] = dep_version
-
-        for deps_type, deps in [("link_packages", prod_deps), ("link_dev_packages", dev_deps)]:
-            for dep_package, dep_version in deps.items():
-                if dep_version.startswith("file:"):
-                    dep_key = "{}+{}".format(dep_package, dep_version)
-                    if not dep_key in fp_links.keys():
-                        # Ignore file: dependencies on packages such as file: tarballs
-                        # TODO(3.0): remove with pnpm <v9
-                        if dep_version in packages:
-                            continue
-
-                        # pnpm >=v9 where packages always have name@version
-                        if "{}@{}".format(dep_package, dep_version) in packages:
-                            continue
-
-                        msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
-                        fail(msg)
+                    msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
+                    fail(msg)
+                if deps_type not in fp_links[dep_key]:
+                    fp_links[dep_key][deps_type] = {}
+                fp_links[dep_key][deps_type][link_package] = True
+            elif dep_version.startswith("link:"):
+                dep_link = dep_version[len("link:"):]
+                dep_path = helpers.link_package(root_package, dep_link)
+                dep_key = "{}+{}".format(dep_package, dep_path)
+                if fp_links.get(dep_key, False):
                     if deps_type not in fp_links[dep_key]:
                         fp_links[dep_key][deps_type] = {}
                     fp_links[dep_key][deps_type][link_package] = True
-                elif dep_version.startswith("link:"):
-                    dep_link = dep_version[len("link:"):]
-                    dep_path = helpers.link_package(root_package, dep_link)
-                    dep_key = "{}+{}".format(dep_package, dep_path)
-                    if fp_links.get(dep_key, False):
-                        if deps_type not in fp_links[dep_key]:
-                            fp_links[dep_key][deps_type] = {}
-                        fp_links[dep_key][deps_type][link_package] = True
-                    else:
-                        transitive_deps = {}
-                        raw_deps = {}
-                        if importers.get(dep_link, False):
-                            raw_deps = importers.get(dep_link).get("deps")
-                        for raw_package, raw_version in raw_deps.items():
-                            package_store_name = utils.package_store_name(raw_package, raw_version)
-                            dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
-                                root_package = root_package,
-                                package_store_name = package_store_name,
-                                package_store_root = utils.package_store_root,
-                            )
-                            if dep_store_target not in transitive_deps:
-                                transitive_deps[dep_store_target] = [raw_package]
-                            else:
-                                transitive_deps[dep_store_target].append(raw_package)
+                else:
+                    transitive_deps = {}
+                    raw_deps = {}
+                    if importers.get(dep_link, False):
+                        raw_deps = importers.get(dep_link).get("deps")
+                    for raw_package, raw_version in raw_deps.items():
+                        package_store_name = utils.package_store_name(raw_package, raw_version)
+                        dep_store_target = """"//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name)""".format(
+                            root_package = root_package,
+                            package_store_name = package_store_name,
+                            package_store_root = utils.package_store_root,
+                        )
+                        if dep_store_target not in transitive_deps:
+                            transitive_deps[dep_store_target] = [raw_package]
+                        else:
+                            transitive_deps[dep_store_target].append(raw_package)
 
-                        for dep_store_target in transitive_deps.keys():
-                            transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
-                        fp_links[dep_key] = {
-                            "package": dep_package,
-                            "path": dep_path,
-                            "link_packages": {},
-                            "link_dev_packages": {},
-                            "deps": transitive_deps,
-                        }
-                        fp_links[dep_key][deps_type][link_package] = True
+                    for dep_store_target in transitive_deps.keys():
+                        transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+                    fp_links[dep_key] = {
+                        "package": dep_package,
+                        "path": dep_path,
+                        "link_packages": {},
+                        "link_dev_packages": {},
+                        "deps": transitive_deps,
+                    }
+                    fp_links[dep_key][deps_type][link_package] = True
 
     npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(
         link_packages = str(link_packages),
