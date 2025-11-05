@@ -23,7 +23,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_LINK_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d"]
+_IMPORTER_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -33,9 +33,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
+        msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
     link_targets = []
     scope_targets = {}
@@ -444,7 +444,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 
