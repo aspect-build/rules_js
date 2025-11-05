@@ -16,9 +16,10 @@ js_binary(
 """
 
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
-load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("@aspect_bazel_lib//lib:directory_path.bzl", _LegacyDirectoryPathInfo = "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@aspect_bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
+load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 
@@ -107,10 +108,10 @@ _ATTRS = {
         This is the module referenced by the `require.main` property in the runtime.
 
         This must be a target that provides a single file or a `DirectoryPathInfo`
-        from `@aspect_bazel_lib//lib::directory_path.bzl`.
+        from `@bazel_lib//lib::directory_path.bzl`.
         
         See https://github.com/bazel-contrib/bazel-lib/blob/main/docs/directory_path.md
-        for more info on creating a target that provides a `DirectoryPathInfo`.
+        for more info on creating a target that provides a `Info`.
         """,
         mandatory = True,
     ),
@@ -507,11 +508,12 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     else:
         nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
-    if DirectoryPathInfo in ctx.attr.entry_point:
-        entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
+    directory_path_provider = DirectoryPathInfo if DirectoryPathInfo in ctx.attr.entry_point else _LegacyDirectoryPathInfo
+    if directory_path_provider in ctx.attr.entry_point:
+        entry_point = ctx.attr.entry_point[directory_path_provider].directory
         entry_point_path = "/".join([
-            ctx.attr.entry_point[DirectoryPathInfo].directory.short_path,
-            ctx.attr.entry_point[DirectoryPathInfo].path,
+            ctx.attr.entry_point[directory_path_provider].directory.short_path,
+            ctx.attr.entry_point[directory_path_provider].path,
         ])
     else:
         if len(ctx.files.entry_point) != 1:
