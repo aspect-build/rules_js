@@ -1,8 +1,9 @@
 {
     "name": "alternate-versions",
     "dependencies": {
-        "lodash": "4.17.21",
-        "lodash-dupe": "npm:lodash@4.17.21",
-        "lodash-file": "file:../../vendored/lodash-4.17.21.tgz"
+        "lodash": "4.0.1",
+        "lodash-4.17.20": "npm:lodash@4.17.20",
+        "lodash-4.17.21": "npm:lodash@4.17.21",
+        "lodash-4.17.21-file": "file:../../vendored/lodash-4.17.21.tgz"
     }
 }

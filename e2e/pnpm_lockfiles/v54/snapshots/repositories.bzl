@@ -21,17 +21,17 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__ansi-regex__6.2.0",
+        name = "lock-<LOCKVERSION>__ansi-regex__6.2.2",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "ansi-regex",
-        version = "6.2.0",
-        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.2.0.tgz",
+        version = "6.2.2",
+        url = "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.2.2.tgz",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-TKY5pyBkHyADOPYlRT9Lx6F544mPl0vS5Ew7BJ45hA08Q+t3GjbueLliBWN3sMICk6+y7HdyxSzC4bWS8baBdg==",
+        integrity = "sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==",
         transitive_closure = {
-            "ansi-regex": ["6.2.0"],
+            "ansi-regex": ["6.2.2"],
         },
     )
 
@@ -56,17 +56,17 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__ansi-styles__6.2.1",
+        name = "lock-<LOCKVERSION>__ansi-styles__6.2.3",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "ansi-styles",
-        version = "6.2.1",
-        url = "https://registry.npmjs.org/ansi-styles/-/ansi-styles-6.2.1.tgz",
+        version = "6.2.3",
+        url = "https://registry.npmjs.org/ansi-styles/-/ansi-styles-6.2.3.tgz",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==",
+        integrity = "sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==",
         transitive_closure = {
-            "ansi-styles": ["6.2.1"],
+            "ansi-styles": ["6.2.3"],
         },
     )
 
@@ -286,22 +286,22 @@ def npm_repositories():
         deps = {
             "string-width": "5.1.2",
             "string-width-cjs": "npm:string-width@4.2.3",
-            "strip-ansi": "7.1.0",
+            "strip-ansi": "7.1.2",
             "strip-ansi-cjs": "npm:strip-ansi@6.0.1",
             "wrap-ansi": "8.1.0",
             "wrap-ansi-cjs": "npm:wrap-ansi@7.0.0",
         },
         transitive_closure = {
             "@isaacs/cliui": ["8.0.2"],
-            "ansi-regex": ["5.0.1", "6.2.0"],
-            "ansi-styles": ["4.3.0", "6.2.1"],
+            "ansi-regex": ["5.0.1", "6.2.2"],
+            "ansi-styles": ["4.3.0", "6.2.3"],
             "color-convert": ["2.0.1"],
             "color-name": ["1.1.4"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["8.0.0", "9.2.2"],
             "is-fullwidth-code-point": ["3.0.0"],
             "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.0", "6.0.1"],
+            "strip-ansi": ["7.1.2", "6.0.1"],
             "wrap-ansi": ["8.1.0", "7.0.0"],
         },
     )
@@ -320,7 +320,7 @@ def npm_repositories():
         integrity = "sha512-Qd2E1pleDR4bwyFxqbjt4eJf+wB0UKVMLc7/BAFDGVdAXQMCsD4DUv5/7/ww47BZCYxWtJqe1Lo0KVNswBJlRw==",
         deps = {
             "@rollup/pluginutils": "3.1.0_rollup_2.14.0",
-            "resolve": "1.22.10",
+            "resolve": "1.22.11",
             "rollup": "2.14.0",
             "tslib": "2.8.1",
             "typescript": "5.5.2",
@@ -336,7 +336,7 @@ def npm_repositories():
             "is-core-module": ["2.16.1"],
             "path-parse": ["1.0.7"],
             "picomatch": ["2.3.1"],
-            "resolve": ["1.22.10"],
+            "resolve": ["1.22.11"],
             "rollup": ["2.14.0"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
             "tslib": ["2.8.1"],
@@ -887,11 +887,43 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__lodash__4.0.1",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "lodash",
+        version = "4.0.1",
+        url = "https://registry.npmjs.org/lodash/-/lodash-4.0.1.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-jA3EFncTLSpNOJLgZUlI7Xrsg3t/DYbgPuRVD1qbLoyUXgzUEvB0EpJimh+WBM6CUNtAyKJ1CVPD+7wE+LrraQ==",
+        transitive_closure = {
+            "lodash": ["4.0.1"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__lodash__4.17.20",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "projects/alts": ["lodash-4.17.20"],
+        },
+        package = "lodash",
+        version = "4.17.20",
+        url = "https://registry.npmjs.org/lodash/-/lodash-4.17.20.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==",
+        transitive_closure = {
+            "lodash": ["4.17.20"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__lodash__4.17.21",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {
-            "projects/alts": ["lodash-dupe"],
+            "projects/alts": ["lodash-4.17.21"],
         },
         package = "lodash",
         version = "4.17.21",
@@ -909,7 +941,7 @@ def npm_repositories():
         link_workspace = "",
         link_packages = {
             "<LOCKVERSION>": ["lodash"],
-            "projects/alts": ["lodash", "lodash-file"],
+            "projects/alts": ["lodash", "lodash-4.17.21-file"],
         },
         package = "lodash",
         version = "file:../vendored/lodash-4.17.21.tgz",
@@ -1001,15 +1033,15 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__resolve__1.22.10",
+        name = "lock-<LOCKVERSION>__resolve__1.22.11",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "resolve",
-        version = "1.22.10",
-        url = "https://registry.npmjs.org/resolve/-/resolve-1.22.10.tgz",
+        version = "1.22.11",
+        url = "https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-NPRy+/ncIMeDlTAsuqwKIiferiawhefFJtkNSW0qZJEqMEb+qBt/77B/jGeeek+F0uOeN05CDa6HXbbIgtVX4w==",
+        integrity = "sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==",
         deps = {
             "is-core-module": "2.16.1",
             "path-parse": "1.0.7",
@@ -1020,7 +1052,7 @@ def npm_repositories():
             "hasown": ["2.0.2"],
             "is-core-module": ["2.16.1"],
             "path-parse": ["1.0.7"],
-            "resolve": ["1.22.10"],
+            "resolve": ["1.22.11"],
             "supports-preserve-symlinks-flag": ["1.0.0"],
         },
     )
@@ -1123,14 +1155,14 @@ def npm_repositories():
         deps = {
             "eastasianwidth": "0.2.0",
             "emoji-regex": "9.2.2",
-            "strip-ansi": "7.1.0",
+            "strip-ansi": "7.1.2",
         },
         transitive_closure = {
-            "ansi-regex": ["6.2.0"],
+            "ansi-regex": ["6.2.2"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["9.2.2"],
             "string-width": ["5.1.2"],
-            "strip-ansi": ["7.1.0"],
+            "strip-ansi": ["7.1.2"],
         },
     )
 
@@ -1154,21 +1186,21 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__strip-ansi__7.1.0",
+        name = "lock-<LOCKVERSION>__strip-ansi__7.1.2",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
         link_packages = {},
         package = "strip-ansi",
-        version = "7.1.0",
-        url = "https://registry.npmjs.org/strip-ansi/-/strip-ansi-7.1.0.tgz",
+        version = "7.1.2",
+        url = "https://registry.npmjs.org/strip-ansi/-/strip-ansi-7.1.2.tgz",
         package_visibility = ["//visibility:public"],
-        integrity = "sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==",
+        integrity = "sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==",
         deps = {
-            "ansi-regex": "6.2.0",
+            "ansi-regex": "6.2.2",
         },
         transitive_closure = {
-            "ansi-regex": ["6.2.0"],
-            "strip-ansi": ["7.1.0"],
+            "ansi-regex": ["6.2.2"],
+            "strip-ansi": ["7.1.2"],
         },
     )
 
@@ -1303,17 +1335,17 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ==",
         deps = {
-            "ansi-styles": "6.2.1",
+            "ansi-styles": "6.2.3",
             "string-width": "5.1.2",
-            "strip-ansi": "7.1.0",
+            "strip-ansi": "7.1.2",
         },
         transitive_closure = {
-            "ansi-regex": ["6.2.0"],
-            "ansi-styles": ["6.2.1"],
+            "ansi-regex": ["6.2.2"],
+            "ansi-styles": ["6.2.3"],
             "eastasianwidth": ["0.2.0"],
             "emoji-regex": ["9.2.2"],
             "string-width": ["5.1.2"],
-            "strip-ansi": ["7.1.0"],
+            "strip-ansi": ["7.1.2"],
             "wrap-ansi": ["8.1.0"],
         },
     )
