@@ -107,7 +107,7 @@ _ATTRS = {
 
         This is the module referenced by the `require.main` property in the runtime.
 
-        This must be a target that provides a single file or a `Info`
+        This must be a target that provides a single file or a `DirectoryPathInfo`
         from `@bazel_lib//lib::directory_path.bzl`.
         
         See https://github.com/bazel-contrib/bazel-lib/blob/main/docs/directory_path.md
