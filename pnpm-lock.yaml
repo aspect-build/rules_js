@@ -405,8 +405,14 @@ importers:
         specifier: 1.0.1
         version: 1.0.1
       lodash:
+        specifier: 4.0.0
+        version: 4.0.0
+      lodash-4.17.21:
+        specifier: npm:lodash@4.17.21
+        version: lodash@4.17.21
+      lodash-4.17.21-tar:
         specifier: file:vendored/lodash-4.17.21.tgz
-        version: file:npm/private/test/vendored/lodash-4.17.21.tgz
+        version: lodash@file:npm/private/test/vendored/lodash-4.17.21.tgz
       node-gyp:
         specifier: 9.3.0
         version: 9.3.0
@@ -3529,6 +3535,9 @@ packages:
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  lodash@4.0.0:
+    resolution: {integrity: sha512-bWpSlBobTcHYK9eUzcBYHhSBGzvSzEsxocnW5+v7p6wCRlY1icneTe2ACam3mGdAu82+RLL32cmyl7TRlJHqZw==}
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -8121,6 +8130,8 @@ snapshots:
       p-locate: 5.0.0
 
   lodash.merge@4.6.2: {}
+
+  lodash@4.0.0: {}
 
   lodash@4.17.21: {}
 
