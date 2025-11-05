@@ -86,9 +86,6 @@ def generate_repository_files(rctx, importers, packages, patched_dependencies, o
 
     npm_imports = helpers.get_npm_imports(importers, packages, rctx.attr.replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx.name, rctx.attr, rctx.attr.lifecycle_hooks, rctx.attr.lifecycle_hooks_execution_requirements, rctx.attr.lifecycle_hooks_use_default_shell_env, npm_registries, default_registry, npm_auth)
 
-    link_packages = [helpers.link_package(root_package, import_path) for import_path in importers.keys()]
-
-    fp_links = {}
     rctx_files = {
         "BUILD.bazel": [
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
@@ -109,7 +106,14 @@ sh_binary(
         ],
     }
 
-    # Look for first-party file: links in packages
+    # Map repo-relative package paths to lockfile importer paths
+    package_to_importer = {}
+    for import_path in importers.keys():
+        link_package = helpers.link_package(root_package, import_path)
+        package_to_importer[link_package] = import_path
+
+    # Collect first-party file: links in packages
+    fp_links = {}
     for package_info in packages.values():
         name = package_info.get("name")
         version = package_info.get("version")
@@ -142,23 +146,13 @@ sh_binary(
                 "deps": transitive_deps,
             }
 
-    importer_deps_map = {}
-    for import_path, importer in importers.items():
-        link_package = helpers.link_package(root_package, import_path)
+    # Collect first-party links in importers
+    for link_package, import_path in package_to_importer.items():
+        importer = importers[import_path]
         prod_deps = importer.get("deps", {})
         all_deps = importer.get("all_deps", {})
-
-        pkg_deps = {}
-        for dep_name, dep_version in all_deps.items():
-            pkg_deps[dep_name] = {"version": dep_version, "dev": dep_name not in prod_deps}
-
-        importer_deps_map[link_package] = pkg_deps
-
-    # Look for first-party links in importers
-    for link_package, importer_deps in importer_deps_map.items():
-        for dep_package, dep in importer_deps.items():
-            deps_type = "link_dev_packages" if dep["dev"] else "link_packages"
-            dep_version = dep["version"]
+        for dep_package, dep_version in all_deps.items():
+            deps_type = "link_packages" if dep_package in prod_deps else "link_dev_packages"
             if dep_version.startswith("file:"):
                 dep_key = "{}+{}".format(dep_package, dep_version)
                 if not dep_key in fp_links.keys():
@@ -212,8 +206,8 @@ sh_binary(
                     }
                     fp_links[dep_key][deps_type][link_package] = True
 
-    npm_link_packages_const = """_LINK_PACKAGES = {link_packages}""".format(
-        link_packages = str(link_packages),
+    npm_link_packages_const = """_IMPORTER_PACKAGES = {pkgs}""".format(
+        pkgs = str(package_to_importer.keys()),
     )
 
     # Generate visibility configuration first to check if it's actually non-empty
@@ -236,7 +230,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 """,
@@ -260,7 +254,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
@@ -276,7 +270,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             scope_targets[_scope].extend(_targets)
 """.format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
-            link_packages_comma_separated = "\"'\" + \"', '\".join(_LINK_PACKAGES) + \"'\"" if len(link_packages) else "\"\"",
+            link_packages_comma_separated = "\"'\" + \"', '\".join(_IMPORTER_PACKAGES) + \"'\"" if len(package_to_importer) else "\"\"",
             root_package = root_package,
             pnpm_lock_label = rctx.attr.pnpm_lock,
             validation_call = validation_call,
@@ -309,6 +303,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
+            link_importer_key = package_to_importer.get(link_package)
+            link_importer = importers.get(link_importer_key)
+
             # the build file for the package being linked
             build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
             if build_file not in rctx_files:
@@ -331,10 +328,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     links_bzl[link_package].append(add_to_link_all)
 
                     append_stmt_base = """link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
-
-                    importer_deps = importer_deps_map.get(link_package, {})
-                    dep_info = importer_deps.get(link_alias, {})
-                    is_dev = dep_info.get("dev", False)
+                    link_prod_deps = link_importer.get("deps", {})
+                    is_dev = link_alias not in link_prod_deps
 
                     if is_dev:
                         links_targets_bzl[link_package]["dev"].append("                " + append_stmt_base)

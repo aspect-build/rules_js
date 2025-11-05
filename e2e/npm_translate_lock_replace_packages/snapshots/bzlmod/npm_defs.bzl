@@ -6,7 +6,7 @@ load("@@aspect_rules_js~~npm~npm__lodash__4.17.21__links//:defs.bzl", link_1 = "
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
-_LINK_PACKAGES = [""]
+_IMPORTER_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -16,9 +16,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
+        msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
     link_targets = []
     scope_targets = {}
@@ -62,7 +62,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 

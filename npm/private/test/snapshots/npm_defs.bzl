@@ -1147,7 +1147,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_packa
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_LINK_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 _NPM_PACKAGE_VISIBILITY = {
     "unused": ["//npm/private/test:__subpackages__"],
@@ -1191,9 +1191,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
     if not is_root and not link:
-        msg = "The npm_link_all_packages() macro loaded from @_main~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_LINK_PACKAGES) + "'")
+        msg = "The npm_link_all_packages() macro loaded from @_main~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
 
     # Validate package visibility before creating any targets
@@ -3060,7 +3060,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _LINK_PACKAGES
+    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 
@@ -3088,7 +3088,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 pass
         elif bazel_package == "examples/npm_deps":
             if prod:
-                link_targets.append(":{}/ms".format(name))
+                pass
             if dev:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/@aspect-test/a".format(name))
@@ -3099,6 +3099,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/meaning-of-life".format(name))
                 link_targets.append(":{}/mobx-react".format(name))
                 link_targets.append(":{}/mobx".format(name))
+                link_targets.append(":{}/ms".format(name))
                 link_targets.append(":{}/react".format(name))
                 link_targets.append(":{}/rollup".format(name))
                 link_targets.append(":{}/uvu".format(name))
