@@ -67,3 +67,5 @@ if (lodashPackageJson.version !== '4.17.21') {
         `lodash aliased to file: should be version 4.17.21, got ${lodashPackageJson.version}`
     )
 }
+
+require('alternate-versions/package.json')
