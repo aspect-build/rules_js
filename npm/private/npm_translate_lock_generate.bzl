@@ -317,7 +317,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             if link_package not in links_bzl:
                 links_bzl[link_package] = []
             if link_package not in links_targets_bzl:
-                links_targets_bzl[link_package] = {"all": [], "prod": [], "dev": []}
+                links_targets_bzl[link_package] = {"prod": [], "dev": []}
 
             # for each alias of this package
             for link_alias in link_aliases:
@@ -331,8 +331,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     links_bzl[link_package].append(add_to_link_all)
 
                     append_stmt_base = """link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
-
-                    links_targets_bzl[link_package]["all"].append("            " + append_stmt_base)
 
                     importer_deps = importer_deps_map.get(link_package, {})
                     dep_info = importer_deps.get(link_alias, {})
@@ -412,11 +410,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 # Add first-party package links to npm_link_targets for each package that uses it
                 for fp_link_package in fp_link_packages:
                     if fp_link_package not in links_targets_bzl:
-                        links_targets_bzl[fp_link_package] = {"all": [], "prod": [], "dev": []}
+                        links_targets_bzl[fp_link_package] = {"prod": [], "dev": []}
 
                     fp_append_stmt = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-
-                    links_targets_bzl[fp_link_package]["all"].append("            " + fp_append_stmt)
 
                     if link_type == "link_dev_packages":
                         links_targets_bzl[fp_link_package]["dev"].append("                " + fp_append_stmt)
@@ -432,20 +428,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 pkg = link_package,
             ))
 
-            if lists["prod"] or lists["dev"]:
-                npm_link_targets_bzl.append("""            if prod:""")
-                if lists["prod"]:
-                    npm_link_targets_bzl.extend(lists["prod"])
-                else:
-                    npm_link_targets_bzl.append("""                pass""")
-
-                npm_link_targets_bzl.append("""            if dev:""")
-                if lists["dev"]:
-                    npm_link_targets_bzl.extend(lists["dev"])
-                else:
-                    npm_link_targets_bzl.append("""                pass""")
+            npm_link_targets_bzl.append("""            if prod:""")
+            if lists["prod"]:
+                npm_link_targets_bzl.extend(lists["prod"])
             else:
-                npm_link_targets_bzl.extend(lists["all"])
+                npm_link_targets_bzl.append("""                pass""")
+
+            npm_link_targets_bzl.append("""            if dev:""")
+            if lists["dev"]:
+                npm_link_targets_bzl.extend(lists["dev"])
+            else:
+                npm_link_targets_bzl.append("""                pass""")
 
             first_link = False
 
@@ -496,12 +489,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 # Also add the first-party package to its own package context
                 fp_package_path = fp_link.get("path")
                 if fp_package_path and fp_package_path not in links_targets_bzl:
-                    links_targets_bzl[fp_package_path] = {"all": [], "prod": [], "dev": []}
+                    links_targets_bzl[fp_package_path] = {"prod": [], "dev": []}
 
                 if fp_package_path:
                     append_stmt_self = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-
-                    links_targets_bzl[fp_package_path]["all"].append("            " + append_stmt_self)
 
                     if link_type == "link_dev_packages":
                         links_targets_bzl[fp_package_path]["dev"].append("                " + append_stmt_self)
@@ -512,11 +503,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     # Also add this first-party package to npm_link_targets for packages that use it
                     for fp_link_package in fp_link_packages:
                         if fp_link_package not in links_targets_bzl:
-                            links_targets_bzl[fp_link_package] = {"all": [], "prod": [], "dev": []}
+                            links_targets_bzl[fp_link_package] = {"prod": [], "dev": []}
 
                         fp_append_stmt = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-
-                        links_targets_bzl[fp_link_package]["all"].append("            " + fp_append_stmt)
 
                         if link_type == "link_dev_packages":
                             links_targets_bzl[fp_link_package]["dev"].append("                " + fp_append_stmt)
