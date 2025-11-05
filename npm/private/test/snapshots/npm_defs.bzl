@@ -1159,7 +1159,7 @@ _NPM_PACKAGE_VISIBILITY = {
 _NPM_PACKAGE_LOCATIONS = {
     "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "inline-fixtures", "jsonpath-plus", "typescript"],
     "examples/js_lib_pkg/a": ["@types/node"],
-    "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias", "@types/node"],
+    "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias_1", "js_lib_pkg_a-alias_2", "@types/node"],
     "examples/linked_consumer": ["@lib/test", "@lib/test2"],
     "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
     "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
@@ -2822,9 +2822,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if is_root:
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "js_lib_pkg_a-alias@0.0.0",
+            package_store_name = "js_lib_pkg_a-alias_1@0.0.0",
             src = "//examples/js_lib_pkg/a:pkg",
-            package = "js_lib_pkg_a-alias",
+            package = "js_lib_pkg_a-alias_1",
             version = "0.0.0",
             deps = {},
             visibility = ["//visibility:public"],
@@ -2834,8 +2834,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if bazel_package in ["examples/js_lib_pkg/b"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
-            name = "{}/js_lib_pkg_a-alias".format(name),
-            src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias@0.0.0".format(name),
+            name = "{}/js_lib_pkg_a-alias_1".format(name),
+            src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias_1@0.0.0".format(name),
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -2843,13 +2843,45 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         # filegroup target that provides a single file which is
         # package directory for use in $(execpath) and $(rootpath)
         native.filegroup(
-            name = "{}/js_lib_pkg_a-alias/dir".format(name),
-            srcs = [":{}/js_lib_pkg_a-alias".format(name)],
+            name = "{}/js_lib_pkg_a-alias_1/dir".format(name),
+            srcs = [":{}/js_lib_pkg_a-alias_1".format(name)],
             output_group = "package_directory",
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
-        link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
+        link_targets.append(":{}/js_lib_pkg_a-alias_1".format(name))
+
+    if is_root:
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "js_lib_pkg_a-alias_2@0.0.0",
+            src = "//examples/js_lib_pkg/a:pkg",
+            package = "js_lib_pkg_a-alias_2",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+    if bazel_package in ["examples/js_lib_pkg/b"]:
+        # terminal target for direct dependencies
+        _npm_link_package_store(
+            name = "{}/js_lib_pkg_a-alias_2".format(name),
+            src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias_2@0.0.0".format(name),
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+
+        # filegroup target that provides a single file which is
+        # package directory for use in $(execpath) and $(rootpath)
+        native.filegroup(
+            name = "{}/js_lib_pkg_a-alias_2/dir".format(name),
+            srcs = [":{}/js_lib_pkg_a-alias_2".format(name)],
+            output_group = "package_directory",
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        link_targets.append(":{}/js_lib_pkg_a-alias_2".format(name))
 
     if is_root:
         _npm_local_package_store(
@@ -3215,7 +3247,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         elif bazel_package == "examples/js_lib_pkg/b":
             if prod:
                 link_targets.append(":{}/js_lib_pkg_a".format(name))
-                link_targets.append(":{}/js_lib_pkg_a-alias".format(name))
+                link_targets.append(":{}/js_lib_pkg_a-alias_1".format(name))
+                link_targets.append(":{}/js_lib_pkg_a-alias_2".format(name))
             if dev:
                 link_targets.append(":{}/@types/node".format(name))
         elif bazel_package == "js/private/test/js_run_devserver":

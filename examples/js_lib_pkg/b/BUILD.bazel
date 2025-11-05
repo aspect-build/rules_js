@@ -4,7 +4,18 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 npm_link_all_packages(name = "node_modules")
 
 js_test(
-    name = "test",
+    name = "test_parent_target",
     data = [":node_modules"],
+    entry_point = "test.js",
+)
+
+js_test(
+    name = "test_each_target",
+    data = [
+        ":node_modules/@types/node",
+        ":node_modules/js_lib_pkg_a",
+        ":node_modules/js_lib_pkg_a-alias_1",
+        ":node_modules/js_lib_pkg_a-alias_2",
+    ],
     entry_point = "test.js",
 )
