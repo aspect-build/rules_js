@@ -1,4 +1,6 @@
 const { strict: assert } = require('node:assert')
 const { test } = require('js_lib_pkg_a')
-const { test: test2 } = require('js_lib_pkg_a-alias')
+const { test: test2 } = require('js_lib_pkg_a-alias_1')
+const { test: test3 } = require('js_lib_pkg_a-alias_2')
 assert.equal(test, test2, 'test')
+assert.equal(test, test3, 'test')

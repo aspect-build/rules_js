@@ -62,7 +62,10 @@ importers:
       js_lib_pkg_a:
         specifier: workspace:*
         version: link:../a
-      js_lib_pkg_a-alias:
+      js_lib_pkg_a-alias_1:
+        specifier: link:../a
+        version: link:../a
+      js_lib_pkg_a-alias_2:
         specifier: link:../a
         version: link:../a
     devDependencies:
