@@ -60,6 +60,9 @@ print_category "E2E TEST SNAPSHOTS"
 for version in v54 v60 v61 v90 v101; do
     run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:repos" "pnpm_lockfiles/$version" "--enable_bzlmod=true"
 done
+for version in v54 v60 v61 v90 v101; do
+    run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:wksp-repos" "pnpm_lockfiles/$version" "--enable_bzlmod=false"
+done
 
 # npm_translate_lock
 run_target "$REPO_ROOT/e2e/npm_translate_lock" "//:write_npm_translate_lock_wksp" "npm_translate_lock" "--enable_bzlmod=false"

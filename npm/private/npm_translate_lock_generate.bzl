@@ -57,12 +57,6 @@ _BZL_LIBRARY_TMPL = \
 )
 """
 
-_ADD_SCOPE_TARGET3 = """\
-            if "{package_scope}" not in scope_targets:
-                scope_targets["{package_scope}"] = [link_targets[-1]]
-            else:
-                scope_targets["{package_scope}"].append(link_targets[-1])"""
-
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 _RESOLVED_JSON_FILENAME = "resolved.json"
 
@@ -202,19 +196,6 @@ sh_binary(
     # Generate package locations mapping only if we have visibility config
     npm_package_locations = _generate_npm_package_locations(fp_links, npm_imports) if has_package_visibility else None
 
-    npm_link_targets_bzl = [
-        """\
-# buildifier: disable=function-docstring
-def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
-    if not prod and not dev:
-        fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
-
-    bazel_package = package if package != None else native.package_name()
-
-    link_targets = []
-""",
-    ]
-
     # Build the validation call conditionally
     validation_call = ""
     if has_package_visibility:
@@ -237,16 +218,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
-{validation_call}    link_targets = []
-    scope_targets = {{}}
-
-    for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
-        link_targets.extend(new_link_targets)
-        for _scope, _targets in new_scope_targets.items():
-            if _scope not in scope_targets:
-                scope_targets[_scope] = []
-            scope_targets[_scope].extend(_targets)
+{validation_call}
 """.format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
             link_packages_comma_separated = "\"'\" + \"', '\".join(_IMPORTER_PACKAGES) + \"'\"" if len(package_to_importer) else "\"\"",
@@ -256,15 +228,23 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         ),
     ]
 
-    # The 3 code sections that will make up the body of npm_link_all_packages()
+    # Imports and header comments at the top of the generatedfile
     defs_bzl_header = []
+
+    # The store invocations and setup code done once at the root package
     stores_bzl = []
+
+    # The code for the first-party link factory functions
     link_factories_bzl = []
 
     # The per-package code sections for links and targets that will later be merged into the main lists
     links_pkg_bzl = {}
-    links_targets_bzl = {}
 
+    # The links and scopes per package
+    links_targets = {}
+    links_scope_targets = {}
+
+    # Generate the store_bzl and associated links_* code for every npm package
     for (i, _import) in enumerate(npm_imports):
         if _import.link_packages:
             defs_bzl_header.append(
@@ -298,8 +278,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             if link_package not in links_pkg_bzl:
                 links_pkg_bzl[link_package] = []
-            if link_package not in links_targets_bzl:
-                links_targets_bzl[link_package] = {"prod": [], "dev": []}
+            if link_package not in links_scope_targets:
+                links_scope_targets[link_package] = {}
+            if link_package not in links_targets:
+                links_targets[link_package] = {"prod": [], "dev": []}
 
             # for each alias of this package
             for link_alias in link_aliases:
@@ -312,18 +294,15 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ))
 
                 if "//visibility:public" in _import.package_visibility:
-                    add_to_link_all = """            link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
-                    links_pkg_bzl[link_package].append(add_to_link_all)
+                    link_target = '":{{}}/{alias}".format(name)'.format(alias = link_alias)
 
-                    append_stmt_base = """link_targets.append(":{{}}/{alias}".format(name))""".format(alias = link_alias)
+                    links_targets[link_package]["dev" if is_dev else "prod"].append(link_target)
 
-                    if is_dev:
-                        links_targets_bzl[link_package]["dev"].append("                " + append_stmt_base)
-                    else:
-                        links_targets_bzl[link_package]["prod"].append("                " + append_stmt_base)
-                    package_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
-                    if package_scope:
-                        links_pkg_bzl[link_package].append(_ADD_SCOPE_TARGET3.format(package_scope = package_scope))
+                    if link_alias[0] == "@":
+                        package_scope = link_alias[:link_alias.find("/", 1)]
+                        if package_scope not in links_scope_targets[link_package]:
+                            links_scope_targets[link_package][package_scope] = []
+                        links_scope_targets[link_package][package_scope].append(link_target)
 
                 # the resolved.json for this alias of the package
                 resolved_json_rel_path = "{}/{}".format(link_alias, _RESOLVED_JSON_FILENAME)
@@ -367,35 +346,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         ),
                     )
 
-    # Add first-party packages to npm_link_targets before generating the function
-    for fp_link in fp_links.values():
-        fp_package = fp_link.get("package")
-
-        # Add first-party package links to npm_link_targets for each package that uses it
-        for fp_link_package, is_dev in fp_link.get("link_packages", {}).items():
-            if fp_link_package not in links_targets_bzl:
-                links_targets_bzl[fp_link_package] = {"prod": [], "dev": []}
-
-            fp_append_stmt = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-
-            links_targets_bzl[fp_link_package]["dev" if is_dev else "prod"].append("                " + fp_append_stmt)
-
-    # Generate the npm_link_targets function body
-    first_link = True
-    for link_package, lists in links_targets_bzl.items():
-        npm_link_targets_bzl.append("""    {els}if bazel_package == "{pkg}":""".format(
-            els = "" if first_link else "el",
-            pkg = link_package,
-        ))
-        if lists["prod"]:
-            npm_link_targets_bzl.append("""        if prod:""")
-            npm_link_targets_bzl.extend(lists["prod"])
-        if lists["dev"]:
-            npm_link_targets_bzl.append("""        if dev:""")
-            npm_link_targets_bzl.extend(lists["dev"])
-        first_link = False
-    npm_link_targets_bzl.append("""    return link_targets""")
-
+    # Generate the first-party package stores and linking of first-party packages
     for i, fp_link in enumerate(fp_links.values()):
         fp_package = fp_link.get("package")
         fp_path = fp_link.get("path")
@@ -404,6 +355,23 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             fp_path,
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
+
+        # Add first-party package links to npm_link_targets for each package that uses it
+        for fp_link_package, is_dev in fp_link.get("link_packages", {}).items():
+            if fp_link_package not in links_targets:
+                links_targets[fp_link_package] = {"prod": [], "dev": []}
+
+            link_target = '":{{}}/{alias}".format(name)'.format(alias = fp_package)
+
+            links_targets[fp_link_package]["dev" if is_dev else "prod"].append(link_target)
+
+            if fp_package[0] == "@":
+                package_scope = fp_package[:fp_package.find("/", 1)]
+                if fp_link_package not in links_scope_targets:
+                    links_scope_targets[fp_link_package] = {}
+                if package_scope not in links_scope_targets[fp_link_package]:
+                    links_scope_targets[fp_link_package][package_scope] = []
+                links_scope_targets[fp_link_package][package_scope].append(link_target)
 
         stores_bzl.append(_FP_STORE_TMPL.format(
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
@@ -433,22 +401,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 links_pkg_bzl[link_package] = []
             links_pkg_bzl[link_package].append("""            _fp_link_{i}(name)""".format(i = i))
 
-            add_to_link_all = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(
-                pkg = fp_package,
-            )
-            links_pkg_bzl[link_package].append(add_to_link_all)
-
-            package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
-            if package_scope:
-                links_pkg_bzl[link_package].append("""            if "{package_scope}" not in scope_targets:
-                scope_targets["{package_scope}"] = [link_targets[-1]]
-            else:
-                scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))
-
     if len(stores_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if is_root:""")
         npm_link_all_packages_bzl.extend(stores_bzl)
 
+    # Start with empty link and scope targets
+    npm_link_all_packages_bzl.append("""
+    link_targets = None
+    scope_targets = None
+""")
+
+    # Invoke and collect link targets based on package
     if len(links_pkg_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if link:""")
         first_link = True
@@ -458,24 +421,54 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 pkg = link_package,
             ))
             npm_link_all_packages_bzl.extend(bzl)
+
+            if link_package in links_targets and (len(links_targets[link_package]["prod"]) > 0 or len(links_targets[link_package]["dev"]) > 0):
+                npm_link_all_packages_bzl.append("""            link_targets = {targets}""".format(
+                    targets = starlark_codegen_utils.to_list_attr(links_targets[link_package]["prod"] + links_targets[link_package]["dev"], 3, 4, quote_value = False),
+                ))
+
+            if link_package in links_scope_targets and len(links_scope_targets[link_package]) > 0:
+                npm_link_all_packages_bzl.append("""            scope_targets = {targets}""".format(
+                    targets = starlark_codegen_utils.to_dict_list_attr(links_scope_targets[link_package], 3, 4, quote_list_value = False),
+                ))
+
             first_link = False
 
+    # Invoke and collect link targets from the `imported_links` param
+    npm_link_all_packages_bzl.append("""    
+    for link_fn in imported_links:
+        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
+        if not link_targets:
+            link_targets = []
+        link_targets.extend(new_link_targets)
+        for _scope, _targets in new_scope_targets.items():
+            if not scope_targets:
+                scope_targets = {}
+            if _scope not in scope_targets:
+                scope_targets[_scope] = []
+            scope_targets[_scope].extend(_targets)
+""")
+
     # Generate catch all & scoped js_library targets
+    # TODO(3.0): don't generate empty js_library targets?
     npm_link_all_packages_bzl.append("""
-    for scope, scoped_targets in scope_targets.items():
-        _js_library(
-            name = "{}/{}".format(name, scope),
-            srcs = scoped_targets,
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+    if scope_targets:
+        for scope, scoped_targets in scope_targets.items():
+            _js_library(
+                name = "{}/{}".format(name, scope),
+                srcs = scoped_targets,
+                tags = ["manual"],
+                visibility = ["//visibility:public"],
+            )
 
     _js_library(
         name = name,
-        srcs = link_targets,
+        srcs = link_targets if link_targets else [],
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )""")
+
+    npm_link_targets_bzl = _generate_npm_link_targets(links_targets)
 
     defs_bzl_header.append("")
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
@@ -637,6 +630,41 @@ def _gen_npm_import(rctx, _import, link_workspace):
         version = _import.version,
         maybe_exclude_package_contents = maybe_exclude_package_contents,
     )
+
+def _generate_npm_link_targets(links_targets):
+    """Generate the npm_link_targets() macro given the links_targets struct"""
+    npm_link_targets_bzl = [
+        """\
+# buildifier: disable=function-docstring
+def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    if not prod and not dev:
+        fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
+
+    bazel_package = package if package != None else native.package_name()
+
+    link_targets = []
+""",
+    ]
+    first_link = True
+    for link_package, lists in links_targets.items():
+        npm_link_targets_bzl.append("""    {els}if bazel_package == "{pkg}":""".format(
+            els = "" if first_link else "el",
+            pkg = link_package,
+        ))
+        if lists["prod"]:
+            npm_link_targets_bzl.append("""        if prod:""")
+            npm_link_targets_bzl.append("""            link_targets.extend({targets})""".format(
+                targets = starlark_codegen_utils.to_list_attr(lists["prod"], 3, 4, quote_value = False),
+            ))
+
+        if lists["dev"]:
+            npm_link_targets_bzl.append("""        if dev:""")
+            npm_link_targets_bzl.append("""            link_targets.extend({targets})""".format(
+                targets = starlark_codegen_utils.to_list_attr(lists["dev"], 3, 4, quote_value = False),
+            ))
+        first_link = False
+    npm_link_targets_bzl.append("""    return link_targets""")
+    return npm_link_targets_bzl
 
 def _generate_npm_visibility_config(package_visibility_attr):
     """Generate visibility configuration for npm packages"""

@@ -20,38 +20,49 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
-    link_targets = []
-    scope_targets = {}
 
-    for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
-        link_targets.extend(new_link_targets)
-        for _scope, _targets in new_scope_targets.items():
-            if _scope not in scope_targets:
-                scope_targets[_scope] = []
-            scope_targets[_scope].extend(_targets)
 
     if is_root:
         store_0(name)
         store_1(name)
+
+    link_targets = None
+    scope_targets = None
+
     if link:
         if bazel_package == "":
             link_0("{}/chalk".format(name), False, name, "chalk")
-            link_targets.append(":{}/chalk".format(name))
             link_1("{}/lodash".format(name), False, name, "lodash")
-            link_targets.append(":{}/lodash".format(name))
+            link_targets = [
+                ":{}/chalk".format(name),
+                ":{}/lodash".format(name),
+            ]
+    
+    for link_fn in imported_links:
+        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
+        if not link_targets:
+            link_targets = []
+        link_targets.extend(new_link_targets)
+        for _scope, _targets in new_scope_targets.items():
+            if not scope_targets:
+                scope_targets = {}
+            if _scope not in scope_targets:
+                scope_targets[_scope] = []
+            scope_targets[_scope].extend(_targets)
 
-    for scope, scoped_targets in scope_targets.items():
-        _js_library(
-            name = "{}/{}".format(name, scope),
-            srcs = scoped_targets,
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+
+    if scope_targets:
+        for scope, scoped_targets in scope_targets.items():
+            _js_library(
+                name = "{}/{}".format(name, scope),
+                srcs = scoped_targets,
+                tags = ["manual"],
+                visibility = ["//visibility:public"],
+            )
 
     _js_library(
         name = name,
-        srcs = link_targets,
+        srcs = link_targets if link_targets else [],
         tags = ["manual"],
         visibility = ["//visibility:public"],
     )
@@ -67,6 +78,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     if bazel_package == "":
         if prod:
-                link_targets.append(":{}/chalk".format(name))
-                link_targets.append(":{}/lodash".format(name))
+            link_targets.extend([
+                ":{}/chalk".format(name),
+                ":{}/lodash".format(name),
+            ])
     return link_targets
