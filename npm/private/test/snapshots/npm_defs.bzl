@@ -1142,7 +1142,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
+load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
@@ -3118,152 +3118,74 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
 # buildifier: disable=function-docstring
 def _fp_link_2(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@mycorp/pkg-a".format(name),
         src = "//:.aspect_rules_js/{}/@mycorp+pkg-a@0.0.0".format(name),
-        visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@mycorp/pkg-a/dir".format(name),
-        srcs = [":{}/@mycorp/pkg-a".format(name)],
-        output_group = "package_directory",
-        visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
-        tags = ["manual"],
+        link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a" package
 # buildifier: disable=function-docstring
 def _fp_link_3(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/js_lib_pkg_a".format(name),
         src = "//:.aspect_rules_js/{}/js_lib_pkg_a@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/js_lib_pkg_a/dir".format(name),
-        srcs = [":{}/js_lib_pkg_a".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a-alias_1" package
 # buildifier: disable=function-docstring
 def _fp_link_4(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/js_lib_pkg_a-alias_1".format(name),
         src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias_1@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/js_lib_pkg_a-alias_1/dir".format(name),
-        srcs = [":{}/js_lib_pkg_a-alias_1".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a-alias_2" package
 # buildifier: disable=function-docstring
 def _fp_link_5(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/js_lib_pkg_a-alias_2".format(name),
         src = "//:.aspect_rules_js/{}/js_lib_pkg_a-alias_2@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/js_lib_pkg_a-alias_2/dir".format(name),
-        srcs = [":{}/js_lib_pkg_a-alias_2".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test" package
 # buildifier: disable=function-docstring
 def _fp_link_6(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/test".format(name),
         src = "//:.aspect_rules_js/{}/@lib+test@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/test/dir".format(name),
-        srcs = [":{}/@lib/test".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test2" package
 # buildifier: disable=function-docstring
 def _fp_link_7(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/test2".format(name),
         src = "//:.aspect_rules_js/{}/@lib+test2@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/test2/dir".format(name),
-        srcs = [":{}/@lib/test2".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-d" package
 # buildifier: disable=function-docstring
 def _fp_link_8(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@mycorp/pkg-d".format(name),
         src = "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name),
-        visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@mycorp/pkg-d/dir".format(name),
-        srcs = [":{}/@mycorp/pkg-d".format(name)],
-        output_group = "package_directory",
-        visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
-        tags = ["manual"],
+        link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-e" package
 # buildifier: disable=function-docstring
 def _fp_link_9(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@mycorp/pkg-e".format(name),
         src = "//:.aspect_rules_js/{}/@mycorp+pkg-e@0.0.0".format(name),
-        visibility = ["//examples:__subpackages__"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@mycorp/pkg-e/dir".format(name),
-        srcs = [":{}/@mycorp/pkg-e".format(name)],
-        output_group = "package_directory",
-        visibility = ["//examples:__subpackages__"],
-        tags = ["manual"],
+        link_visibility = ["//examples:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "test-npm_package" package
 # buildifier: disable=function-docstring
 def _fp_link_10(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/test-npm_package".format(name),
         src = "//:.aspect_rules_js/{}/test-npm_package@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/test-npm_package/dir".format(name),
-        srcs = [":{}/test-npm_package".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
