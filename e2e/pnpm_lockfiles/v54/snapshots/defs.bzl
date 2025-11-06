@@ -411,6 +411,40 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_targets.append(":{}/typescript".format(name))
             link_67("{}/uvu".format(name), False, name, "uvu")
             link_targets.append(":{}/uvu".format(name))
+            _fp_link_0(name)
+            link_targets.append(":{}/@scoped/c".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_2(name)
+            link_targets.append(":{}/@scoped/a".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_3(name)
+            link_targets.append(":{}/@scoped/b".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_4(name)
+            link_targets.append(":{}/@scoped/d".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_5(name)
+            link_targets.append(":{}/alias-project-a".format(name))
+            _fp_link_6(name)
+            link_targets.append(":{}/scoped/bad".format(name))
+            _fp_link_7(name)
+            link_targets.append(":{}/test-c200-d200".format(name))
+            _fp_link_8(name)
+            link_targets.append(":{}/test-c201-d200".format(name))
+            _fp_link_9(name)
+            link_targets.append(":{}/test-peer-types".format(name))
         elif bazel_package == "projects/peers-combo-2":
             link_6("{}/@aspect-test/c".format(name), False, name, "@aspect-test/c")
             link_targets.append(":{}/@aspect-test/c".format(name))
@@ -442,6 +476,24 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_targets.append(":{}/jsonify".format(name))
             link_35("{}/hello".format(name), True, name, "hello")
             link_targets.append(":{}/hello".format(name))
+            _fp_link_0(name)
+            link_targets.append(":{}/@scoped/c".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_2(name)
+            link_targets.append(":{}/@scoped/a".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_3(name)
+            link_targets.append(":{}/@scoped/b".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
         elif bazel_package == "projects/a-types":
             link_21("{}/@types/node".format(name), False, name, "@types/node")
             link_targets.append(":{}/@types/node".format(name))
@@ -456,6 +508,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@types"] = [link_targets[-1]]
             else:
                 scope_targets["@types"].append(link_targets[-1])
+            _fp_link_2(name)
+            link_targets.append(":{}/@scoped/a".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+            _fp_link_10(name)
+            link_targets.append(":{}/a-types".format(name))
         elif bazel_package == "projects/alts":
             link_47("{}/lodash-4.17.20".format(name), False, name, "lodash-4.17.20")
             link_targets.append(":{}/lodash-4.17.20".format(name))
@@ -465,222 +525,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_targets.append(":{}/lodash".format(name))
             link_49("{}/lodash-4.17.21-file".format(name), False, name, "lodash-4.17.21-file")
             link_targets.append(":{}/lodash-4.17.21-file".format(name))
-
-    if bazel_package in ["<LOCKVERSION>", "projects/peer-types"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@scoped/c".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@scoped/c/dir".format(name),
-            srcs = [":{}/@scoped/c".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@scoped/c".format(name))
-        if "@scoped" not in scope_targets:
-            scope_targets["@scoped"] = [link_targets[-1]]
-        else:
-            scope_targets["@scoped"].append(link_targets[-1])
-
-    if bazel_package in ["<LOCKVERSION>", "projects/b", "projects/c", "projects/d", "projects/peer-types"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@scoped/a".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@scoped/a/dir".format(name),
-            srcs = [":{}/@scoped/a".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@scoped/a".format(name))
-        if "@scoped" not in scope_targets:
-            scope_targets["@scoped"] = [link_targets[-1]]
-        else:
-            scope_targets["@scoped"].append(link_targets[-1])
-
-    if bazel_package in ["<LOCKVERSION>", "projects/peer-types"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@scoped/b".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@scoped/b/dir".format(name),
-            srcs = [":{}/@scoped/b".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@scoped/b".format(name))
-        if "@scoped" not in scope_targets:
-            scope_targets["@scoped"] = [link_targets[-1]]
-        else:
-            scope_targets["@scoped"].append(link_targets[-1])
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@scoped/d".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@scoped/d/dir".format(name),
-            srcs = [":{}/@scoped/d".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@scoped/d".format(name))
-        if "@scoped" not in scope_targets:
-            scope_targets["@scoped"] = [link_targets[-1]]
-        else:
-            scope_targets["@scoped"].append(link_targets[-1])
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/alias-project-a".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/alias-project-a/dir".format(name),
-            srcs = [":{}/alias-project-a".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/alias-project-a".format(name))
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/scoped/bad".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/scoped/bad/dir".format(name),
-            srcs = [":{}/scoped/bad".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/scoped/bad".format(name))
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/test-c200-d200".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/test-c200-d200/dir".format(name),
-            srcs = [":{}/test-c200-d200".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/test-c200-d200".format(name))
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/test-c201-d200".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/test-c201-d200/dir".format(name),
-            srcs = [":{}/test-c201-d200".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/test-c201-d200".format(name))
-
-    if bazel_package in ["<LOCKVERSION>"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/test-peer-types".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-peer-types@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/test-peer-types/dir".format(name),
-            srcs = [":{}/test-peer-types".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/test-peer-types".format(name))
-
-    if bazel_package in ["projects/b"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/a-types".format(name),
-            src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/a-types/dir".format(name),
-            srcs = [":{}/a-types".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/a-types".format(name))
+        elif bazel_package == "projects/c":
+            _fp_link_2(name)
+            link_targets.append(":{}/@scoped/a".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
+        elif bazel_package == "projects/d":
+            _fp_link_2(name)
+            link_targets.append(":{}/@scoped/a".format(name))
+            if "@scoped" not in scope_targets:
+                scope_targets["@scoped"] = [link_targets[-1]]
+            else:
+                scope_targets["@scoped"].append(link_targets[-1])
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -788,3 +646,174 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         if prod:
                 link_targets.append(":{}/@scoped/a".format(name))
     return link_targets
+
+
+# Generated npm_link_package_store for linking of first-party "@scoped/c" package
+# buildifier: disable=function-docstring
+def _fp_link_0(name):
+    _npm_link_package_store(
+        name = "{}/@scoped/c".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@scoped/c/dir".format(name),
+        srcs = [":{}/@scoped/c".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@scoped/a" package
+# buildifier: disable=function-docstring
+def _fp_link_2(name):
+    _npm_link_package_store(
+        name = "{}/@scoped/a".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@scoped/a/dir".format(name),
+        srcs = [":{}/@scoped/a".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@scoped/b" package
+# buildifier: disable=function-docstring
+def _fp_link_3(name):
+    _npm_link_package_store(
+        name = "{}/@scoped/b".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@scoped/b/dir".format(name),
+        srcs = [":{}/@scoped/b".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@scoped/d" package
+# buildifier: disable=function-docstring
+def _fp_link_4(name):
+    _npm_link_package_store(
+        name = "{}/@scoped/d".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@scoped/d/dir".format(name),
+        srcs = [":{}/@scoped/d".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "alias-project-a" package
+# buildifier: disable=function-docstring
+def _fp_link_5(name):
+    _npm_link_package_store(
+        name = "{}/alias-project-a".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/alias-project-a/dir".format(name),
+        srcs = [":{}/alias-project-a".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "scoped/bad" package
+# buildifier: disable=function-docstring
+def _fp_link_6(name):
+    _npm_link_package_store(
+        name = "{}/scoped/bad".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/scoped/bad/dir".format(name),
+        srcs = [":{}/scoped/bad".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "test-c200-d200" package
+# buildifier: disable=function-docstring
+def _fp_link_7(name):
+    _npm_link_package_store(
+        name = "{}/test-c200-d200".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/test-c200-d200/dir".format(name),
+        srcs = [":{}/test-c200-d200".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "test-c201-d200" package
+# buildifier: disable=function-docstring
+def _fp_link_8(name):
+    _npm_link_package_store(
+        name = "{}/test-c201-d200".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/test-c201-d200/dir".format(name),
+        srcs = [":{}/test-c201-d200".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "test-peer-types" package
+# buildifier: disable=function-docstring
+def _fp_link_9(name):
+    _npm_link_package_store(
+        name = "{}/test-peer-types".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-peer-types@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/test-peer-types/dir".format(name),
+        srcs = [":{}/test-peer-types".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "a-types" package
+# buildifier: disable=function-docstring
+def _fp_link_10(name):
+    _npm_link_package_store(
+        name = "{}/a-types".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/a-types/dir".format(name),
+        srcs = [":{}/a-types".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
