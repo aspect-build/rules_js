@@ -16,7 +16,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-AO2ac6pjRB3SJmGJo+v5/aK6Omggp6fsLrs6wN9bd35ulu4cCwaAU9+7ZhXjeqHVkaHThLuzH0nZr0YpCDhygg==",
         transitive_closure = {
-            "abbrev": ["3.0.1"],
+            "abbrev": [
+                "3.0.1",
+            ],
         },
     )
 
@@ -31,7 +33,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==",
         transitive_closure = {
-            "agent-base": ["7.1.4"],
+            "agent-base": [
+                "7.1.4",
+            ],
         },
     )
 
@@ -46,7 +50,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
         transitive_closure = {
-            "ansi-regex": ["5.0.1"],
+            "ansi-regex": [
+                "5.0.1",
+            ],
         },
     )
 
@@ -61,7 +67,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==",
         transitive_closure = {
-            "ansi-regex": ["6.2.2"],
+            "ansi-regex": [
+                "6.2.2",
+            ],
         },
     )
 
@@ -79,9 +87,15 @@ def npm_repositories():
             "color-convert": "2.0.1",
         },
         transitive_closure = {
-            "ansi-styles": ["4.3.0"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
+            "ansi-styles": [
+                "4.3.0",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
         },
     )
 
@@ -96,7 +110,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==",
         transitive_closure = {
-            "ansi-styles": ["6.2.3"],
+            "ansi-styles": [
+                "6.2.3",
+            ],
         },
     )
 
@@ -119,17 +135,45 @@ def npm_repositories():
             "wrap-ansi-cjs": "npm:wrap-ansi@7.0.0",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
         },
     )
 
@@ -147,8 +191,12 @@ def npm_repositories():
             "minipass": "7.1.2",
         },
         transitive_closure = {
-            "@isaacs/fs-minipass": ["4.0.1"],
-            "minipass": ["7.1.2"],
+            "@isaacs/fs-minipass": [
+                "4.0.1",
+            ],
+            "minipass": [
+                "7.1.2",
+            ],
         },
     )
 
@@ -170,17 +218,39 @@ def npm_repositories():
             "socks-proxy-agent": "8.0.5",
         },
         transitive_closure = {
-            "@npmcli/agent": ["3.0.0"],
-            "agent-base": ["7.1.4"],
-            "debug": ["4.4.3"],
-            "http-proxy-agent": ["7.0.2"],
-            "https-proxy-agent": ["7.0.6"],
-            "ip-address": ["10.0.1"],
-            "lru-cache": ["10.4.3"],
-            "ms": ["2.1.3"],
-            "smart-buffer": ["4.2.0"],
-            "socks": ["2.8.7"],
-            "socks-proxy-agent": ["8.0.5"],
+            "@npmcli/agent": [
+                "3.0.0",
+            ],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "http-proxy-agent": [
+                "7.0.2",
+            ],
+            "https-proxy-agent": [
+                "7.0.6",
+            ],
+            "ip-address": [
+                "10.0.1",
+            ],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
+            "smart-buffer": [
+                "4.2.0",
+            ],
+            "socks": [
+                "2.8.7",
+            ],
+            "socks-proxy-agent": [
+                "8.0.5",
+            ],
         },
     )
 
@@ -198,8 +268,12 @@ def npm_repositories():
             "semver": "7.7.3",
         },
         transitive_closure = {
-            "@npmcli/fs": ["4.0.0"],
-            "semver": ["7.7.3"],
+            "@npmcli/fs": [
+                "4.0.0",
+            ],
+            "semver": [
+                "7.7.3",
+            ],
         },
     )
 
@@ -214,7 +288,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==",
         transitive_closure = {
-            "@pkgjs/parseargs": ["0.11.0"],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
         },
     )
 
@@ -229,7 +305,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         transitive_closure = {
-            "balanced-match": ["1.0.2"],
+            "balanced-match": [
+                "1.0.2",
+            ],
         },
     )
 
@@ -247,8 +325,12 @@ def npm_repositories():
             "file-uri-to-path": "1.0.0",
         },
         transitive_closure = {
-            "bindings": ["1.5.0"],
-            "file-uri-to-path": ["1.0.0"],
+            "bindings": [
+                "1.5.0",
+            ],
+            "file-uri-to-path": [
+                "1.0.0",
+            ],
         },
     )
 
@@ -266,8 +348,12 @@ def npm_repositories():
             "balanced-match": "1.0.2",
         },
         transitive_closure = {
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["2.0.2"],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
         },
     )
 
@@ -296,52 +382,152 @@ def npm_repositories():
             "unique-filename": "4.0.0",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "@isaacs/fs-minipass": ["4.0.1"],
-            "@npmcli/fs": ["4.0.0"],
-            "@pkgjs/parseargs": ["0.11.0"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["2.0.2"],
-            "cacache": ["19.0.1"],
-            "chownr": ["3.0.0"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "cross-spawn": ["7.0.6"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "foreground-child": ["3.3.1"],
-            "fs-minipass": ["3.0.3"],
-            "glob": ["10.4.5"],
-            "imurmurhash": ["0.1.4"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "isexe": ["2.0.0"],
-            "jackspeak": ["3.4.3"],
-            "lru-cache": ["10.4.3"],
-            "minimatch": ["9.0.5"],
-            "minipass": ["7.1.2", "3.3.6"],
-            "minipass-collect": ["2.0.1"],
-            "minipass-flush": ["1.0.5"],
-            "minipass-pipeline": ["1.2.4"],
-            "minizlib": ["3.1.0"],
-            "p-map": ["7.0.3"],
-            "package-json-from-dist": ["1.0.1"],
-            "path-key": ["3.1.1"],
-            "path-scurry": ["1.11.1"],
-            "semver": ["7.7.3"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "signal-exit": ["4.1.0"],
-            "ssri": ["12.0.0"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "tar": ["7.5.2"],
-            "unique-filename": ["4.0.0"],
-            "unique-slug": ["5.0.0"],
-            "which": ["2.0.2"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
-            "yallist": ["5.0.0", "4.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "@isaacs/fs-minipass": [
+                "4.0.1",
+            ],
+            "@npmcli/fs": [
+                "4.0.0",
+            ],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
+            "cacache": [
+                "19.0.1",
+            ],
+            "chownr": [
+                "3.0.0",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "foreground-child": [
+                "3.3.1",
+            ],
+            "fs-minipass": [
+                "3.0.3",
+            ],
+            "glob": [
+                "10.4.5",
+            ],
+            "imurmurhash": [
+                "0.1.4",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "isexe": [
+                "2.0.0",
+            ],
+            "jackspeak": [
+                "3.4.3",
+            ],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "minimatch": [
+                "9.0.5",
+            ],
+            "minipass": [
+                "7.1.2",
+                "3.3.6",
+            ],
+            "minipass-collect": [
+                "2.0.1",
+            ],
+            "minipass-flush": [
+                "1.0.5",
+            ],
+            "minipass-pipeline": [
+                "1.2.4",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
+            "p-map": [
+                "7.0.3",
+            ],
+            "package-json-from-dist": [
+                "1.0.1",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "path-scurry": [
+                "1.11.1",
+            ],
+            "semver": [
+                "7.7.3",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "signal-exit": [
+                "4.1.0",
+            ],
+            "ssri": [
+                "12.0.0",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "tar": [
+                "7.5.2",
+            ],
+            "unique-filename": [
+                "4.0.0",
+            ],
+            "unique-slug": [
+                "5.0.0",
+            ],
+            "which": [
+                "2.0.2",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
+            "yallist": [
+                "5.0.0",
+                "4.0.0",
+            ],
         },
     )
 
@@ -356,7 +542,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==",
         transitive_closure = {
-            "chownr": ["3.0.0"],
+            "chownr": [
+                "3.0.0",
+            ],
         },
     )
 
@@ -374,8 +562,12 @@ def npm_repositories():
             "color-name": "1.1.4",
         },
         transitive_closure = {
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
         },
     )
 
@@ -390,7 +582,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
         transitive_closure = {
-            "color-name": ["1.1.4"],
+            "color-name": [
+                "1.1.4",
+            ],
         },
     )
 
@@ -410,12 +604,24 @@ def npm_repositories():
             "which": "2.0.2",
         },
         transitive_closure = {
-            "cross-spawn": ["7.0.6"],
-            "isexe": ["2.0.0"],
-            "path-key": ["3.1.1"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "which": ["2.0.2"],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "isexe": [
+                "2.0.0",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "which": [
+                "2.0.2",
+            ],
         },
     )
 
@@ -433,8 +639,12 @@ def npm_repositories():
             "ms": "2.1.3",
         },
         transitive_closure = {
-            "debug": ["4.4.3"],
-            "ms": ["2.1.3"],
+            "debug": [
+                "4.4.3",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
         },
     )
 
@@ -449,7 +659,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==",
         transitive_closure = {
-            "eastasianwidth": ["0.2.0"],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
         },
     )
 
@@ -464,7 +676,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
         transitive_closure = {
-            "emoji-regex": ["8.0.0"],
+            "emoji-regex": [
+                "8.0.0",
+            ],
         },
     )
 
@@ -479,7 +693,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==",
         transitive_closure = {
-            "emoji-regex": ["9.2.2"],
+            "emoji-regex": [
+                "9.2.2",
+            ],
         },
     )
 
@@ -497,9 +713,15 @@ def npm_repositories():
             "iconv-lite": "0.6.3",
         },
         transitive_closure = {
-            "encoding": ["0.1.13"],
-            "iconv-lite": ["0.6.3"],
-            "safer-buffer": ["2.1.2"],
+            "encoding": [
+                "0.1.13",
+            ],
+            "iconv-lite": [
+                "0.6.3",
+            ],
+            "safer-buffer": [
+                "2.1.2",
+            ],
         },
     )
 
@@ -514,7 +736,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
         transitive_closure = {
-            "env-paths": ["2.2.1"],
+            "env-paths": [
+                "2.2.1",
+            ],
         },
     )
 
@@ -529,7 +753,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==",
         transitive_closure = {
-            "err-code": ["2.0.3"],
+            "err-code": [
+                "2.0.3",
+            ],
         },
     )
 
@@ -544,7 +770,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==",
         transitive_closure = {
-            "exponential-backoff": ["3.1.3"],
+            "exponential-backoff": [
+                "3.1.3",
+            ],
         },
     )
 
@@ -562,8 +790,12 @@ def npm_repositories():
             "picomatch": "4.0.3",
         },
         transitive_closure = {
-            "fdir": ["6.5.0_picomatch_4.0.3"],
-            "picomatch": ["4.0.3"],
+            "fdir": [
+                "6.5.0_picomatch_4.0.3",
+            ],
+            "picomatch": [
+                "4.0.3",
+            ],
         },
     )
 
@@ -578,7 +810,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==",
         transitive_closure = {
-            "file-uri-to-path": ["1.0.0"],
+            "file-uri-to-path": [
+                "1.0.0",
+            ],
         },
     )
 
@@ -597,14 +831,30 @@ def npm_repositories():
             "signal-exit": "4.1.0",
         },
         transitive_closure = {
-            "cross-spawn": ["7.0.6"],
-            "foreground-child": ["3.3.1"],
-            "isexe": ["2.0.0"],
-            "path-key": ["3.1.1"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "signal-exit": ["4.1.0"],
-            "which": ["2.0.2"],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "foreground-child": [
+                "3.3.1",
+            ],
+            "isexe": [
+                "2.0.0",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "signal-exit": [
+                "4.1.0",
+            ],
+            "which": [
+                "2.0.2",
+            ],
         },
     )
 
@@ -622,8 +872,12 @@ def npm_repositories():
             "minipass": "7.1.2",
         },
         transitive_closure = {
-            "fs-minipass": ["3.0.3"],
-            "minipass": ["7.1.2"],
+            "fs-minipass": [
+                "3.0.3",
+            ],
+            "minipass": [
+                "7.1.2",
+            ],
         },
     )
 
@@ -646,35 +900,99 @@ def npm_repositories():
             "path-scurry": "1.11.1",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "@pkgjs/parseargs": ["0.11.0"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["2.0.2"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "cross-spawn": ["7.0.6"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "foreground-child": ["3.3.1"],
-            "glob": ["10.4.5"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "isexe": ["2.0.0"],
-            "jackspeak": ["3.4.3"],
-            "lru-cache": ["10.4.3"],
-            "minimatch": ["9.0.5"],
-            "minipass": ["7.1.2"],
-            "package-json-from-dist": ["1.0.1"],
-            "path-key": ["3.1.1"],
-            "path-scurry": ["1.11.1"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "signal-exit": ["4.1.0"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "which": ["2.0.2"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "foreground-child": [
+                "3.3.1",
+            ],
+            "glob": [
+                "10.4.5",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "isexe": [
+                "2.0.0",
+            ],
+            "jackspeak": [
+                "3.4.3",
+            ],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "minimatch": [
+                "9.0.5",
+            ],
+            "minipass": [
+                "7.1.2",
+            ],
+            "package-json-from-dist": [
+                "1.0.1",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "path-scurry": [
+                "1.11.1",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "signal-exit": [
+                "4.1.0",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "which": [
+                "2.0.2",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
         },
     )
 
@@ -689,7 +1007,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==",
         transitive_closure = {
-            "graceful-fs": ["4.2.11"],
+            "graceful-fs": [
+                "4.2.11",
+            ],
         },
     )
 
@@ -704,7 +1024,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dTxcvPXqPvXBQpq5dUr6mEMJX4oIEFv6bwom3FDwKRDsuIjjJGANqhBuoAn9c1RQJIdAKav33ED65E2ys+87QQ==",
         transitive_closure = {
-            "http-cache-semantics": ["4.2.0"],
+            "http-cache-semantics": [
+                "4.2.0",
+            ],
         },
     )
 
@@ -723,10 +1045,18 @@ def npm_repositories():
             "debug": "4.4.3",
         },
         transitive_closure = {
-            "agent-base": ["7.1.4"],
-            "debug": ["4.4.3"],
-            "http-proxy-agent": ["7.0.2"],
-            "ms": ["2.1.3"],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "http-proxy-agent": [
+                "7.0.2",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
         },
     )
 
@@ -745,10 +1075,18 @@ def npm_repositories():
             "debug": "4.4.3",
         },
         transitive_closure = {
-            "agent-base": ["7.1.4"],
-            "debug": ["4.4.3"],
-            "https-proxy-agent": ["7.0.6"],
-            "ms": ["2.1.3"],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "https-proxy-agent": [
+                "7.0.6",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
         },
     )
 
@@ -766,8 +1104,12 @@ def npm_repositories():
             "safer-buffer": "2.1.2",
         },
         transitive_closure = {
-            "iconv-lite": ["0.6.3"],
-            "safer-buffer": ["2.1.2"],
+            "iconv-lite": [
+                "0.6.3",
+            ],
+            "safer-buffer": [
+                "2.1.2",
+            ],
         },
     )
 
@@ -782,7 +1124,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==",
         transitive_closure = {
-            "imurmurhash": ["0.1.4"],
+            "imurmurhash": [
+                "0.1.4",
+            ],
         },
     )
 
@@ -797,7 +1141,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-NWv9YLW4PoW2B7xtzaS3NCot75m6nK7Icdv0o3lfMceJVRfSoQwqD4wEH5rLwoKJwUiZ/rfpiVBhnaF0FK4HoA==",
         transitive_closure = {
-            "ip-address": ["10.0.1"],
+            "ip-address": [
+                "10.0.1",
+            ],
         },
     )
 
@@ -812,7 +1158,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==",
         transitive_closure = {
-            "is-fullwidth-code-point": ["3.0.0"],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
         },
     )
 
@@ -827,7 +1175,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==",
         transitive_closure = {
-            "isexe": ["2.0.0"],
+            "isexe": [
+                "2.0.0",
+            ],
         },
     )
 
@@ -842,7 +1192,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-LpB/54B+/2J5hqQ7imZHfdU31OlgQqx7ZicVlkm9kzg9/w8GKLEcFfJl/t7DCEDueOyBAD6zCCwTO6Fzs0NoEQ==",
         transitive_closure = {
-            "isexe": ["3.1.1"],
+            "isexe": [
+                "3.1.1",
+            ],
         },
     )
 
@@ -861,19 +1213,51 @@ def npm_repositories():
             "@isaacs/cliui": "8.0.2",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "@pkgjs/parseargs": ["0.11.0"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "jackspeak": ["3.4.3"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "jackspeak": [
+                "3.4.3",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
         },
     )
 
@@ -888,7 +1272,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==",
         transitive_closure = {
-            "lru-cache": ["10.4.3"],
+            "lru-cache": [
+                "10.4.3",
+            ],
         },
     )
 
@@ -916,74 +1302,218 @@ def npm_repositories():
             "ssri": "12.0.0",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "@isaacs/fs-minipass": ["4.0.1"],
-            "@npmcli/agent": ["3.0.0"],
-            "@npmcli/fs": ["4.0.0"],
-            "@pkgjs/parseargs": ["0.11.0"],
-            "agent-base": ["7.1.4"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["2.0.2"],
-            "cacache": ["19.0.1"],
-            "chownr": ["3.0.0"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "cross-spawn": ["7.0.6"],
-            "debug": ["4.4.3"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "encoding": ["0.1.13"],
-            "err-code": ["2.0.3"],
-            "foreground-child": ["3.3.1"],
-            "fs-minipass": ["3.0.3"],
-            "glob": ["10.4.5"],
-            "http-cache-semantics": ["4.2.0"],
-            "http-proxy-agent": ["7.0.2"],
-            "https-proxy-agent": ["7.0.6"],
-            "iconv-lite": ["0.6.3"],
-            "imurmurhash": ["0.1.4"],
-            "ip-address": ["10.0.1"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "isexe": ["2.0.0"],
-            "jackspeak": ["3.4.3"],
-            "lru-cache": ["10.4.3"],
-            "make-fetch-happen": ["14.0.3"],
-            "minimatch": ["9.0.5"],
-            "minipass": ["7.1.2", "3.3.6"],
-            "minipass-collect": ["2.0.1"],
-            "minipass-fetch": ["4.0.1"],
-            "minipass-flush": ["1.0.5"],
-            "minipass-pipeline": ["1.2.4"],
-            "minipass-sized": ["1.0.3"],
-            "minizlib": ["3.1.0"],
-            "ms": ["2.1.3"],
-            "negotiator": ["1.0.0"],
-            "p-map": ["7.0.3"],
-            "package-json-from-dist": ["1.0.1"],
-            "path-key": ["3.1.1"],
-            "path-scurry": ["1.11.1"],
-            "proc-log": ["5.0.0"],
-            "promise-retry": ["2.0.1"],
-            "retry": ["0.12.0"],
-            "safer-buffer": ["2.1.2"],
-            "semver": ["7.7.3"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "signal-exit": ["4.1.0"],
-            "smart-buffer": ["4.2.0"],
-            "socks": ["2.8.7"],
-            "socks-proxy-agent": ["8.0.5"],
-            "ssri": ["12.0.0"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "tar": ["7.5.2"],
-            "unique-filename": ["4.0.0"],
-            "unique-slug": ["5.0.0"],
-            "which": ["2.0.2"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
-            "yallist": ["5.0.0", "4.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "@isaacs/fs-minipass": [
+                "4.0.1",
+            ],
+            "@npmcli/agent": [
+                "3.0.0",
+            ],
+            "@npmcli/fs": [
+                "4.0.0",
+            ],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
+            "cacache": [
+                "19.0.1",
+            ],
+            "chownr": [
+                "3.0.0",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "encoding": [
+                "0.1.13",
+            ],
+            "err-code": [
+                "2.0.3",
+            ],
+            "foreground-child": [
+                "3.3.1",
+            ],
+            "fs-minipass": [
+                "3.0.3",
+            ],
+            "glob": [
+                "10.4.5",
+            ],
+            "http-cache-semantics": [
+                "4.2.0",
+            ],
+            "http-proxy-agent": [
+                "7.0.2",
+            ],
+            "https-proxy-agent": [
+                "7.0.6",
+            ],
+            "iconv-lite": [
+                "0.6.3",
+            ],
+            "imurmurhash": [
+                "0.1.4",
+            ],
+            "ip-address": [
+                "10.0.1",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "isexe": [
+                "2.0.0",
+            ],
+            "jackspeak": [
+                "3.4.3",
+            ],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "make-fetch-happen": [
+                "14.0.3",
+            ],
+            "minimatch": [
+                "9.0.5",
+            ],
+            "minipass": [
+                "7.1.2",
+                "3.3.6",
+            ],
+            "minipass-collect": [
+                "2.0.1",
+            ],
+            "minipass-fetch": [
+                "4.0.1",
+            ],
+            "minipass-flush": [
+                "1.0.5",
+            ],
+            "minipass-pipeline": [
+                "1.2.4",
+            ],
+            "minipass-sized": [
+                "1.0.3",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
+            "negotiator": [
+                "1.0.0",
+            ],
+            "p-map": [
+                "7.0.3",
+            ],
+            "package-json-from-dist": [
+                "1.0.1",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "path-scurry": [
+                "1.11.1",
+            ],
+            "proc-log": [
+                "5.0.0",
+            ],
+            "promise-retry": [
+                "2.0.1",
+            ],
+            "retry": [
+                "0.12.0",
+            ],
+            "safer-buffer": [
+                "2.1.2",
+            ],
+            "semver": [
+                "7.7.3",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "signal-exit": [
+                "4.1.0",
+            ],
+            "smart-buffer": [
+                "4.2.0",
+            ],
+            "socks": [
+                "2.8.7",
+            ],
+            "socks-proxy-agent": [
+                "8.0.5",
+            ],
+            "ssri": [
+                "12.0.0",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "tar": [
+                "7.5.2",
+            ],
+            "unique-filename": [
+                "4.0.0",
+            ],
+            "unique-slug": [
+                "5.0.0",
+            ],
+            "which": [
+                "2.0.2",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
+            "yallist": [
+                "5.0.0",
+                "4.0.0",
+            ],
         },
     )
 
@@ -1001,9 +1531,15 @@ def npm_repositories():
             "brace-expansion": "2.0.2",
         },
         transitive_closure = {
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["2.0.2"],
-            "minimatch": ["9.0.5"],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
+            "minimatch": [
+                "9.0.5",
+            ],
         },
     )
 
@@ -1021,8 +1557,12 @@ def npm_repositories():
             "minipass": "7.1.2",
         },
         transitive_closure = {
-            "minipass": ["7.1.2"],
-            "minipass-collect": ["2.0.1"],
+            "minipass": [
+                "7.1.2",
+            ],
+            "minipass-collect": [
+                "2.0.1",
+            ],
         },
     )
 
@@ -1043,14 +1583,31 @@ def npm_repositories():
             "minizlib": "3.1.0",
         },
         transitive_closure = {
-            "encoding": ["0.1.13"],
-            "iconv-lite": ["0.6.3"],
-            "minipass": ["7.1.2", "3.3.6"],
-            "minipass-fetch": ["4.0.1"],
-            "minipass-sized": ["1.0.3"],
-            "minizlib": ["3.1.0"],
-            "safer-buffer": ["2.1.2"],
-            "yallist": ["4.0.0"],
+            "encoding": [
+                "0.1.13",
+            ],
+            "iconv-lite": [
+                "0.6.3",
+            ],
+            "minipass": [
+                "7.1.2",
+                "3.3.6",
+            ],
+            "minipass-fetch": [
+                "4.0.1",
+            ],
+            "minipass-sized": [
+                "1.0.3",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
+            "safer-buffer": [
+                "2.1.2",
+            ],
+            "yallist": [
+                "4.0.0",
+            ],
         },
     )
 
@@ -1068,9 +1625,15 @@ def npm_repositories():
             "minipass": "3.3.6",
         },
         transitive_closure = {
-            "minipass": ["3.3.6"],
-            "minipass-flush": ["1.0.5"],
-            "yallist": ["4.0.0"],
+            "minipass": [
+                "3.3.6",
+            ],
+            "minipass-flush": [
+                "1.0.5",
+            ],
+            "yallist": [
+                "4.0.0",
+            ],
         },
     )
 
@@ -1088,9 +1651,15 @@ def npm_repositories():
             "minipass": "3.3.6",
         },
         transitive_closure = {
-            "minipass": ["3.3.6"],
-            "minipass-pipeline": ["1.2.4"],
-            "yallist": ["4.0.0"],
+            "minipass": [
+                "3.3.6",
+            ],
+            "minipass-pipeline": [
+                "1.2.4",
+            ],
+            "yallist": [
+                "4.0.0",
+            ],
         },
     )
 
@@ -1108,9 +1677,15 @@ def npm_repositories():
             "minipass": "3.3.6",
         },
         transitive_closure = {
-            "minipass": ["3.3.6"],
-            "minipass-sized": ["1.0.3"],
-            "yallist": ["4.0.0"],
+            "minipass": [
+                "3.3.6",
+            ],
+            "minipass-sized": [
+                "1.0.3",
+            ],
+            "yallist": [
+                "4.0.0",
+            ],
         },
     )
 
@@ -1128,8 +1703,12 @@ def npm_repositories():
             "yallist": "4.0.0",
         },
         transitive_closure = {
-            "minipass": ["3.3.6"],
-            "yallist": ["4.0.0"],
+            "minipass": [
+                "3.3.6",
+            ],
+            "yallist": [
+                "4.0.0",
+            ],
         },
     )
 
@@ -1144,7 +1723,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==",
         transitive_closure = {
-            "minipass": ["7.1.2"],
+            "minipass": [
+                "7.1.2",
+            ],
         },
     )
 
@@ -1162,8 +1743,12 @@ def npm_repositories():
             "minipass": "7.1.2",
         },
         transitive_closure = {
-            "minipass": ["7.1.2"],
-            "minizlib": ["3.1.0"],
+            "minipass": [
+                "7.1.2",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
         },
     )
 
@@ -1178,7 +1763,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
         transitive_closure = {
-            "ms": ["2.1.3"],
+            "ms": [
+                "2.1.3",
+            ],
         },
     )
 
@@ -1193,7 +1780,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-1UxuyYGdoQHcGg87Lkqm3FzefucTa0NAiOcuRsDmysep3c1LVCRK2krrUDafMWtjSG04htvAmvg96+SDknOmgQ==",
         transitive_closure = {
-            "nan": ["2.23.0"],
+            "nan": [
+                "2.23.0",
+            ],
         },
     )
 
@@ -1208,7 +1797,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==",
         transitive_closure = {
-            "negotiator": ["1.0.0"],
+            "negotiator": [
+                "1.0.0",
+            ],
         },
     )
 
@@ -1235,83 +1826,247 @@ def npm_repositories():
             "which": "5.0.0",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "@isaacs/fs-minipass": ["4.0.1"],
-            "@npmcli/agent": ["3.0.0"],
-            "@npmcli/fs": ["4.0.0"],
-            "@pkgjs/parseargs": ["0.11.0"],
-            "abbrev": ["3.0.1"],
-            "agent-base": ["7.1.4"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "balanced-match": ["1.0.2"],
-            "brace-expansion": ["2.0.2"],
-            "cacache": ["19.0.1"],
-            "chownr": ["3.0.0"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "cross-spawn": ["7.0.6"],
-            "debug": ["4.4.3"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "encoding": ["0.1.13"],
-            "env-paths": ["2.2.1"],
-            "err-code": ["2.0.3"],
-            "exponential-backoff": ["3.1.3"],
-            "fdir": ["6.5.0_picomatch_4.0.3"],
-            "foreground-child": ["3.3.1"],
-            "fs-minipass": ["3.0.3"],
-            "glob": ["10.4.5"],
-            "graceful-fs": ["4.2.11"],
-            "http-cache-semantics": ["4.2.0"],
-            "http-proxy-agent": ["7.0.2"],
-            "https-proxy-agent": ["7.0.6"],
-            "iconv-lite": ["0.6.3"],
-            "imurmurhash": ["0.1.4"],
-            "ip-address": ["10.0.1"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "isexe": ["2.0.0", "3.1.1"],
-            "jackspeak": ["3.4.3"],
-            "lru-cache": ["10.4.3"],
-            "make-fetch-happen": ["14.0.3"],
-            "minimatch": ["9.0.5"],
-            "minipass": ["7.1.2", "3.3.6"],
-            "minipass-collect": ["2.0.1"],
-            "minipass-fetch": ["4.0.1"],
-            "minipass-flush": ["1.0.5"],
-            "minipass-pipeline": ["1.2.4"],
-            "minipass-sized": ["1.0.3"],
-            "minizlib": ["3.1.0"],
-            "ms": ["2.1.3"],
-            "negotiator": ["1.0.0"],
-            "node-gyp": ["11.5.0"],
-            "nopt": ["8.1.0"],
-            "p-map": ["7.0.3"],
-            "package-json-from-dist": ["1.0.1"],
-            "path-key": ["3.1.1"],
-            "path-scurry": ["1.11.1"],
-            "picomatch": ["4.0.3"],
-            "proc-log": ["5.0.0"],
-            "promise-retry": ["2.0.1"],
-            "retry": ["0.12.0"],
-            "safer-buffer": ["2.1.2"],
-            "semver": ["7.7.3"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "signal-exit": ["4.1.0"],
-            "smart-buffer": ["4.2.0"],
-            "socks": ["2.8.7"],
-            "socks-proxy-agent": ["8.0.5"],
-            "ssri": ["12.0.0"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "tar": ["7.5.2"],
-            "tinyglobby": ["0.2.15"],
-            "unique-filename": ["4.0.0"],
-            "unique-slug": ["5.0.0"],
-            "which": ["2.0.2", "5.0.0"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
-            "yallist": ["5.0.0", "4.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "@isaacs/fs-minipass": [
+                "4.0.1",
+            ],
+            "@npmcli/agent": [
+                "3.0.0",
+            ],
+            "@npmcli/fs": [
+                "4.0.0",
+            ],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
+            "abbrev": [
+                "3.0.1",
+            ],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
+            "cacache": [
+                "19.0.1",
+            ],
+            "chownr": [
+                "3.0.0",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "encoding": [
+                "0.1.13",
+            ],
+            "env-paths": [
+                "2.2.1",
+            ],
+            "err-code": [
+                "2.0.3",
+            ],
+            "exponential-backoff": [
+                "3.1.3",
+            ],
+            "fdir": [
+                "6.5.0_picomatch_4.0.3",
+            ],
+            "foreground-child": [
+                "3.3.1",
+            ],
+            "fs-minipass": [
+                "3.0.3",
+            ],
+            "glob": [
+                "10.4.5",
+            ],
+            "graceful-fs": [
+                "4.2.11",
+            ],
+            "http-cache-semantics": [
+                "4.2.0",
+            ],
+            "http-proxy-agent": [
+                "7.0.2",
+            ],
+            "https-proxy-agent": [
+                "7.0.6",
+            ],
+            "iconv-lite": [
+                "0.6.3",
+            ],
+            "imurmurhash": [
+                "0.1.4",
+            ],
+            "ip-address": [
+                "10.0.1",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "isexe": [
+                "2.0.0",
+                "3.1.1",
+            ],
+            "jackspeak": [
+                "3.4.3",
+            ],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "make-fetch-happen": [
+                "14.0.3",
+            ],
+            "minimatch": [
+                "9.0.5",
+            ],
+            "minipass": [
+                "7.1.2",
+                "3.3.6",
+            ],
+            "minipass-collect": [
+                "2.0.1",
+            ],
+            "minipass-fetch": [
+                "4.0.1",
+            ],
+            "minipass-flush": [
+                "1.0.5",
+            ],
+            "minipass-pipeline": [
+                "1.2.4",
+            ],
+            "minipass-sized": [
+                "1.0.3",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
+            "negotiator": [
+                "1.0.0",
+            ],
+            "node-gyp": [
+                "11.5.0",
+            ],
+            "nopt": [
+                "8.1.0",
+            ],
+            "p-map": [
+                "7.0.3",
+            ],
+            "package-json-from-dist": [
+                "1.0.1",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "path-scurry": [
+                "1.11.1",
+            ],
+            "picomatch": [
+                "4.0.3",
+            ],
+            "proc-log": [
+                "5.0.0",
+            ],
+            "promise-retry": [
+                "2.0.1",
+            ],
+            "retry": [
+                "0.12.0",
+            ],
+            "safer-buffer": [
+                "2.1.2",
+            ],
+            "semver": [
+                "7.7.3",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "signal-exit": [
+                "4.1.0",
+            ],
+            "smart-buffer": [
+                "4.2.0",
+            ],
+            "socks": [
+                "2.8.7",
+            ],
+            "socks-proxy-agent": [
+                "8.0.5",
+            ],
+            "ssri": [
+                "12.0.0",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "tar": [
+                "7.5.2",
+            ],
+            "tinyglobby": [
+                "0.2.15",
+            ],
+            "unique-filename": [
+                "4.0.0",
+            ],
+            "unique-slug": [
+                "5.0.0",
+            ],
+            "which": [
+                "2.0.2",
+                "5.0.0",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
+            "yallist": [
+                "5.0.0",
+                "4.0.0",
+            ],
         },
     )
 
@@ -1329,8 +2084,12 @@ def npm_repositories():
             "abbrev": "3.0.1",
         },
         transitive_closure = {
-            "abbrev": ["3.0.1"],
-            "nopt": ["8.1.0"],
+            "abbrev": [
+                "3.0.1",
+            ],
+            "nopt": [
+                "8.1.0",
+            ],
         },
     )
 
@@ -1345,7 +2104,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==",
         transitive_closure = {
-            "p-map": ["7.0.3"],
+            "p-map": [
+                "7.0.3",
+            ],
         },
     )
 
@@ -1360,7 +2121,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==",
         transitive_closure = {
-            "package-json-from-dist": ["1.0.1"],
+            "package-json-from-dist": [
+                "1.0.1",
+            ],
         },
     )
 
@@ -1375,7 +2138,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==",
         transitive_closure = {
-            "path-key": ["3.1.1"],
+            "path-key": [
+                "3.1.1",
+            ],
         },
     )
 
@@ -1394,9 +2159,15 @@ def npm_repositories():
             "minipass": "7.1.2",
         },
         transitive_closure = {
-            "lru-cache": ["10.4.3"],
-            "minipass": ["7.1.2"],
-            "path-scurry": ["1.11.1"],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "minipass": [
+                "7.1.2",
+            ],
+            "path-scurry": [
+                "1.11.1",
+            ],
         },
     )
 
@@ -1411,7 +2182,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==",
         transitive_closure = {
-            "picomatch": ["4.0.3"],
+            "picomatch": [
+                "4.0.3",
+            ],
         },
     )
 
@@ -1426,7 +2199,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Azwzvl90HaF0aCz1JrDdXQykFakSSNPaPoiZ9fm5qJIMHioDZEi7OAdRwSm6rSoPtY3Qutnm3L7ogmg3dc+wbQ==",
         transitive_closure = {
-            "proc-log": ["5.0.0"],
+            "proc-log": [
+                "5.0.0",
+            ],
         },
     )
 
@@ -1445,9 +2220,15 @@ def npm_repositories():
             "retry": "0.12.0",
         },
         transitive_closure = {
-            "err-code": ["2.0.3"],
-            "promise-retry": ["2.0.1"],
-            "retry": ["0.12.0"],
+            "err-code": [
+                "2.0.3",
+            ],
+            "promise-retry": [
+                "2.0.1",
+            ],
+            "retry": [
+                "0.12.0",
+            ],
         },
     )
 
@@ -1462,7 +2243,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==",
         transitive_closure = {
-            "retry": ["0.12.0"],
+            "retry": [
+                "0.12.0",
+            ],
         },
     )
 
@@ -1477,7 +2260,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==",
         transitive_closure = {
-            "safer-buffer": ["2.1.2"],
+            "safer-buffer": [
+                "2.1.2",
+            ],
         },
     )
 
@@ -1499,87 +2284,259 @@ def npm_repositories():
             "node-gyp": "11.5.0",
         },
         transitive_closure = {
-            "@isaacs/cliui": ["8.0.2"],
-            "@isaacs/fs-minipass": ["4.0.1"],
-            "@npmcli/agent": ["3.0.0"],
-            "@npmcli/fs": ["4.0.0"],
-            "@pkgjs/parseargs": ["0.11.0"],
-            "abbrev": ["3.0.1"],
-            "agent-base": ["7.1.4"],
-            "ansi-regex": ["5.0.1", "6.2.2"],
-            "ansi-styles": ["4.3.0", "6.2.3"],
-            "balanced-match": ["1.0.2"],
-            "bindings": ["1.5.0"],
-            "brace-expansion": ["2.0.2"],
-            "cacache": ["19.0.1"],
-            "chownr": ["3.0.0"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "cross-spawn": ["7.0.6"],
-            "debug": ["4.4.3"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["8.0.0", "9.2.2"],
-            "encoding": ["0.1.13"],
-            "env-paths": ["2.2.1"],
-            "err-code": ["2.0.3"],
-            "exponential-backoff": ["3.1.3"],
-            "fdir": ["6.5.0_picomatch_4.0.3"],
-            "file-uri-to-path": ["1.0.0"],
-            "foreground-child": ["3.3.1"],
-            "fs-minipass": ["3.0.3"],
-            "glob": ["10.4.5"],
-            "graceful-fs": ["4.2.11"],
-            "http-cache-semantics": ["4.2.0"],
-            "http-proxy-agent": ["7.0.2"],
-            "https-proxy-agent": ["7.0.6"],
-            "iconv-lite": ["0.6.3"],
-            "imurmurhash": ["0.1.4"],
-            "ip-address": ["10.0.1"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "isexe": ["2.0.0", "3.1.1"],
-            "jackspeak": ["3.4.3"],
-            "lru-cache": ["10.4.3"],
-            "make-fetch-happen": ["14.0.3"],
-            "minimatch": ["9.0.5"],
-            "minipass": ["7.1.2", "3.3.6"],
-            "minipass-collect": ["2.0.1"],
-            "minipass-fetch": ["4.0.1"],
-            "minipass-flush": ["1.0.5"],
-            "minipass-pipeline": ["1.2.4"],
-            "minipass-sized": ["1.0.3"],
-            "minizlib": ["3.1.0"],
-            "ms": ["2.1.3"],
-            "nan": ["2.23.0"],
-            "negotiator": ["1.0.0"],
-            "node-gyp": ["11.5.0"],
-            "nopt": ["8.1.0"],
-            "p-map": ["7.0.3"],
-            "package-json-from-dist": ["1.0.1"],
-            "path-key": ["3.1.1"],
-            "path-scurry": ["1.11.1"],
-            "picomatch": ["4.0.3"],
-            "proc-log": ["5.0.0"],
-            "promise-retry": ["2.0.1"],
-            "retry": ["0.12.0"],
-            "safer-buffer": ["2.1.2"],
-            "segfault-handler": ["1.3.0"],
-            "semver": ["7.7.3"],
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
-            "signal-exit": ["4.1.0"],
-            "smart-buffer": ["4.2.0"],
-            "socks": ["2.8.7"],
-            "socks-proxy-agent": ["8.0.5"],
-            "ssri": ["12.0.0"],
-            "string-width": ["5.1.2", "4.2.3"],
-            "strip-ansi": ["7.1.2", "6.0.1"],
-            "tar": ["7.5.2"],
-            "tinyglobby": ["0.2.15"],
-            "unique-filename": ["4.0.0"],
-            "unique-slug": ["5.0.0"],
-            "which": ["2.0.2", "5.0.0"],
-            "wrap-ansi": ["8.1.0", "7.0.0"],
-            "yallist": ["5.0.0", "4.0.0"],
+            "@isaacs/cliui": [
+                "8.0.2",
+            ],
+            "@isaacs/fs-minipass": [
+                "4.0.1",
+            ],
+            "@npmcli/agent": [
+                "3.0.0",
+            ],
+            "@npmcli/fs": [
+                "4.0.0",
+            ],
+            "@pkgjs/parseargs": [
+                "0.11.0",
+            ],
+            "abbrev": [
+                "3.0.1",
+            ],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "ansi-regex": [
+                "5.0.1",
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+                "6.2.3",
+            ],
+            "balanced-match": [
+                "1.0.2",
+            ],
+            "bindings": [
+                "1.5.0",
+            ],
+            "brace-expansion": [
+                "2.0.2",
+            ],
+            "cacache": [
+                "19.0.1",
+            ],
+            "chownr": [
+                "3.0.0",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "cross-spawn": [
+                "7.0.6",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+                "9.2.2",
+            ],
+            "encoding": [
+                "0.1.13",
+            ],
+            "env-paths": [
+                "2.2.1",
+            ],
+            "err-code": [
+                "2.0.3",
+            ],
+            "exponential-backoff": [
+                "3.1.3",
+            ],
+            "fdir": [
+                "6.5.0_picomatch_4.0.3",
+            ],
+            "file-uri-to-path": [
+                "1.0.0",
+            ],
+            "foreground-child": [
+                "3.3.1",
+            ],
+            "fs-minipass": [
+                "3.0.3",
+            ],
+            "glob": [
+                "10.4.5",
+            ],
+            "graceful-fs": [
+                "4.2.11",
+            ],
+            "http-cache-semantics": [
+                "4.2.0",
+            ],
+            "http-proxy-agent": [
+                "7.0.2",
+            ],
+            "https-proxy-agent": [
+                "7.0.6",
+            ],
+            "iconv-lite": [
+                "0.6.3",
+            ],
+            "imurmurhash": [
+                "0.1.4",
+            ],
+            "ip-address": [
+                "10.0.1",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "isexe": [
+                "2.0.0",
+                "3.1.1",
+            ],
+            "jackspeak": [
+                "3.4.3",
+            ],
+            "lru-cache": [
+                "10.4.3",
+            ],
+            "make-fetch-happen": [
+                "14.0.3",
+            ],
+            "minimatch": [
+                "9.0.5",
+            ],
+            "minipass": [
+                "7.1.2",
+                "3.3.6",
+            ],
+            "minipass-collect": [
+                "2.0.1",
+            ],
+            "minipass-fetch": [
+                "4.0.1",
+            ],
+            "minipass-flush": [
+                "1.0.5",
+            ],
+            "minipass-pipeline": [
+                "1.2.4",
+            ],
+            "minipass-sized": [
+                "1.0.3",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
+            "nan": [
+                "2.23.0",
+            ],
+            "negotiator": [
+                "1.0.0",
+            ],
+            "node-gyp": [
+                "11.5.0",
+            ],
+            "nopt": [
+                "8.1.0",
+            ],
+            "p-map": [
+                "7.0.3",
+            ],
+            "package-json-from-dist": [
+                "1.0.1",
+            ],
+            "path-key": [
+                "3.1.1",
+            ],
+            "path-scurry": [
+                "1.11.1",
+            ],
+            "picomatch": [
+                "4.0.3",
+            ],
+            "proc-log": [
+                "5.0.0",
+            ],
+            "promise-retry": [
+                "2.0.1",
+            ],
+            "retry": [
+                "0.12.0",
+            ],
+            "safer-buffer": [
+                "2.1.2",
+            ],
+            "segfault-handler": [
+                "1.3.0",
+            ],
+            "semver": [
+                "7.7.3",
+            ],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
+            "signal-exit": [
+                "4.1.0",
+            ],
+            "smart-buffer": [
+                "4.2.0",
+            ],
+            "socks": [
+                "2.8.7",
+            ],
+            "socks-proxy-agent": [
+                "8.0.5",
+            ],
+            "ssri": [
+                "12.0.0",
+            ],
+            "string-width": [
+                "5.1.2",
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+                "6.0.1",
+            ],
+            "tar": [
+                "7.5.2",
+            ],
+            "tinyglobby": [
+                "0.2.15",
+            ],
+            "unique-filename": [
+                "4.0.0",
+            ],
+            "unique-slug": [
+                "5.0.0",
+            ],
+            "which": [
+                "2.0.2",
+                "5.0.0",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+                "7.0.0",
+            ],
+            "yallist": [
+                "5.0.0",
+                "4.0.0",
+            ],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -1597,7 +2554,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==",
         transitive_closure = {
-            "semver": ["7.7.3"],
+            "semver": [
+                "7.7.3",
+            ],
         },
     )
 
@@ -1615,8 +2574,12 @@ def npm_repositories():
             "shebang-regex": "3.0.0",
         },
         transitive_closure = {
-            "shebang-command": ["2.0.0"],
-            "shebang-regex": ["3.0.0"],
+            "shebang-command": [
+                "2.0.0",
+            ],
+            "shebang-regex": [
+                "3.0.0",
+            ],
         },
     )
 
@@ -1631,7 +2594,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==",
         transitive_closure = {
-            "shebang-regex": ["3.0.0"],
+            "shebang-regex": [
+                "3.0.0",
+            ],
         },
     )
 
@@ -1646,7 +2611,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==",
         transitive_closure = {
-            "signal-exit": ["4.1.0"],
+            "signal-exit": [
+                "4.1.0",
+            ],
         },
     )
 
@@ -1661,7 +2628,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==",
         transitive_closure = {
-            "smart-buffer": ["4.2.0"],
+            "smart-buffer": [
+                "4.2.0",
+            ],
         },
     )
 
@@ -1681,13 +2650,27 @@ def npm_repositories():
             "socks": "2.8.7",
         },
         transitive_closure = {
-            "agent-base": ["7.1.4"],
-            "debug": ["4.4.3"],
-            "ip-address": ["10.0.1"],
-            "ms": ["2.1.3"],
-            "smart-buffer": ["4.2.0"],
-            "socks": ["2.8.7"],
-            "socks-proxy-agent": ["8.0.5"],
+            "agent-base": [
+                "7.1.4",
+            ],
+            "debug": [
+                "4.4.3",
+            ],
+            "ip-address": [
+                "10.0.1",
+            ],
+            "ms": [
+                "2.1.3",
+            ],
+            "smart-buffer": [
+                "4.2.0",
+            ],
+            "socks": [
+                "2.8.7",
+            ],
+            "socks-proxy-agent": [
+                "8.0.5",
+            ],
         },
     )
 
@@ -1706,9 +2689,15 @@ def npm_repositories():
             "smart-buffer": "4.2.0",
         },
         transitive_closure = {
-            "ip-address": ["10.0.1"],
-            "smart-buffer": ["4.2.0"],
-            "socks": ["2.8.7"],
+            "ip-address": [
+                "10.0.1",
+            ],
+            "smart-buffer": [
+                "4.2.0",
+            ],
+            "socks": [
+                "2.8.7",
+            ],
         },
     )
 
@@ -1726,8 +2715,12 @@ def npm_repositories():
             "minipass": "7.1.2",
         },
         transitive_closure = {
-            "minipass": ["7.1.2"],
-            "ssri": ["12.0.0"],
+            "minipass": [
+                "7.1.2",
+            ],
+            "ssri": [
+                "12.0.0",
+            ],
         },
     )
 
@@ -1747,11 +2740,21 @@ def npm_repositories():
             "strip-ansi": "6.0.1",
         },
         transitive_closure = {
-            "ansi-regex": ["5.0.1"],
-            "emoji-regex": ["8.0.0"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "string-width": ["4.2.3"],
-            "strip-ansi": ["6.0.1"],
+            "ansi-regex": [
+                "5.0.1",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "string-width": [
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "6.0.1",
+            ],
         },
     )
 
@@ -1771,11 +2774,21 @@ def npm_repositories():
             "strip-ansi": "7.1.2",
         },
         transitive_closure = {
-            "ansi-regex": ["6.2.2"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["9.2.2"],
-            "string-width": ["5.1.2"],
-            "strip-ansi": ["7.1.2"],
+            "ansi-regex": [
+                "6.2.2",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "9.2.2",
+            ],
+            "string-width": [
+                "5.1.2",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+            ],
         },
     )
 
@@ -1793,8 +2806,12 @@ def npm_repositories():
             "ansi-regex": "5.0.1",
         },
         transitive_closure = {
-            "ansi-regex": ["5.0.1"],
-            "strip-ansi": ["6.0.1"],
+            "ansi-regex": [
+                "5.0.1",
+            ],
+            "strip-ansi": [
+                "6.0.1",
+            ],
         },
     )
 
@@ -1812,8 +2829,12 @@ def npm_repositories():
             "ansi-regex": "6.2.2",
         },
         transitive_closure = {
-            "ansi-regex": ["6.2.2"],
-            "strip-ansi": ["7.1.2"],
+            "ansi-regex": [
+                "6.2.2",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+            ],
         },
     )
 
@@ -1835,12 +2856,24 @@ def npm_repositories():
             "yallist": "5.0.0",
         },
         transitive_closure = {
-            "@isaacs/fs-minipass": ["4.0.1"],
-            "chownr": ["3.0.0"],
-            "minipass": ["7.1.2"],
-            "minizlib": ["3.1.0"],
-            "tar": ["7.5.2"],
-            "yallist": ["5.0.0"],
+            "@isaacs/fs-minipass": [
+                "4.0.1",
+            ],
+            "chownr": [
+                "3.0.0",
+            ],
+            "minipass": [
+                "7.1.2",
+            ],
+            "minizlib": [
+                "3.1.0",
+            ],
+            "tar": [
+                "7.5.2",
+            ],
+            "yallist": [
+                "5.0.0",
+            ],
         },
     )
 
@@ -1859,9 +2892,15 @@ def npm_repositories():
             "picomatch": "4.0.3",
         },
         transitive_closure = {
-            "fdir": ["6.5.0_picomatch_4.0.3"],
-            "picomatch": ["4.0.3"],
-            "tinyglobby": ["0.2.15"],
+            "fdir": [
+                "6.5.0_picomatch_4.0.3",
+            ],
+            "picomatch": [
+                "4.0.3",
+            ],
+            "tinyglobby": [
+                "0.2.15",
+            ],
         },
     )
 
@@ -1879,9 +2918,15 @@ def npm_repositories():
             "unique-slug": "5.0.0",
         },
         transitive_closure = {
-            "imurmurhash": ["0.1.4"],
-            "unique-filename": ["4.0.0"],
-            "unique-slug": ["5.0.0"],
+            "imurmurhash": [
+                "0.1.4",
+            ],
+            "unique-filename": [
+                "4.0.0",
+            ],
+            "unique-slug": [
+                "5.0.0",
+            ],
         },
     )
 
@@ -1899,8 +2944,12 @@ def npm_repositories():
             "imurmurhash": "0.1.4",
         },
         transitive_closure = {
-            "imurmurhash": ["0.1.4"],
-            "unique-slug": ["5.0.0"],
+            "imurmurhash": [
+                "0.1.4",
+            ],
+            "unique-slug": [
+                "5.0.0",
+            ],
         },
     )
 
@@ -1918,8 +2967,12 @@ def npm_repositories():
             "isexe": "2.0.0",
         },
         transitive_closure = {
-            "isexe": ["2.0.0"],
-            "which": ["2.0.2"],
+            "isexe": [
+                "2.0.0",
+            ],
+            "which": [
+                "2.0.2",
+            ],
         },
     )
 
@@ -1937,8 +2990,12 @@ def npm_repositories():
             "isexe": "3.1.1",
         },
         transitive_closure = {
-            "isexe": ["3.1.1"],
-            "which": ["5.0.0"],
+            "isexe": [
+                "3.1.1",
+            ],
+            "which": [
+                "5.0.0",
+            ],
         },
     )
 
@@ -1958,15 +3015,33 @@ def npm_repositories():
             "strip-ansi": "6.0.1",
         },
         transitive_closure = {
-            "ansi-regex": ["5.0.1"],
-            "ansi-styles": ["4.3.0"],
-            "color-convert": ["2.0.1"],
-            "color-name": ["1.1.4"],
-            "emoji-regex": ["8.0.0"],
-            "is-fullwidth-code-point": ["3.0.0"],
-            "string-width": ["4.2.3"],
-            "strip-ansi": ["6.0.1"],
-            "wrap-ansi": ["7.0.0"],
+            "ansi-regex": [
+                "5.0.1",
+            ],
+            "ansi-styles": [
+                "4.3.0",
+            ],
+            "color-convert": [
+                "2.0.1",
+            ],
+            "color-name": [
+                "1.1.4",
+            ],
+            "emoji-regex": [
+                "8.0.0",
+            ],
+            "is-fullwidth-code-point": [
+                "3.0.0",
+            ],
+            "string-width": [
+                "4.2.3",
+            ],
+            "strip-ansi": [
+                "6.0.1",
+            ],
+            "wrap-ansi": [
+                "7.0.0",
+            ],
         },
     )
 
@@ -1986,13 +3061,27 @@ def npm_repositories():
             "strip-ansi": "7.1.2",
         },
         transitive_closure = {
-            "ansi-regex": ["6.2.2"],
-            "ansi-styles": ["6.2.3"],
-            "eastasianwidth": ["0.2.0"],
-            "emoji-regex": ["9.2.2"],
-            "string-width": ["5.1.2"],
-            "strip-ansi": ["7.1.2"],
-            "wrap-ansi": ["8.1.0"],
+            "ansi-regex": [
+                "6.2.2",
+            ],
+            "ansi-styles": [
+                "6.2.3",
+            ],
+            "eastasianwidth": [
+                "0.2.0",
+            ],
+            "emoji-regex": [
+                "9.2.2",
+            ],
+            "string-width": [
+                "5.1.2",
+            ],
+            "strip-ansi": [
+                "7.1.2",
+            ],
+            "wrap-ansi": [
+                "8.1.0",
+            ],
         },
     )
 
@@ -2007,7 +3096,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==",
         transitive_closure = {
-            "yallist": ["4.0.0"],
+            "yallist": [
+                "4.0.0",
+            ],
         },
     )
 
@@ -2022,6 +3113,8 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==",
         transitive_closure = {
-            "yallist": ["5.0.0"],
+            "yallist": [
+                "5.0.0",
+            ],
         },
     )

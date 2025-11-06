@@ -18,6 +18,8 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==",
         transitive_closure = {
-            "@aspect-test/c": ["2.0.0"],
+            "@aspect-test/c": [
+                "2.0.0",
+            ],
         },
     )

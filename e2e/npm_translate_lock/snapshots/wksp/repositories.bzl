@@ -26,24 +26,60 @@ def npm_repositories():
             "magic-string": "https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz",
         },
         transitive_closure = {
-            "@rollup/plugin-commonjs": ["23.0.4"],
-            "@rollup/pluginutils": ["5.3.0"],
-            "@types/estree": ["https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz"],
-            "balanced-match": ["https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"],
-            "brace-expansion": ["https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz"],
-            "commondir": ["https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz"],
-            "estree-walker": ["https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"],
-            "fs.realpath": ["https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"],
-            "glob": ["https://registry.npmjs.org/glob/-/glob-8.1.0.tgz"],
-            "inflight": ["https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz"],
-            "inherits": ["https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz"],
-            "is-reference": ["https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz"],
-            "magic-string": ["https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz"],
-            "minimatch": ["https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz"],
-            "once": ["https://registry.npmjs.org/once/-/once-1.4.0.tgz"],
-            "picomatch": ["https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz"],
-            "sourcemap-codec": ["https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz"],
-            "wrappy": ["https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"],
+            "@rollup/plugin-commonjs": [
+                "23.0.4",
+            ],
+            "@rollup/pluginutils": [
+                "5.3.0",
+            ],
+            "@types/estree": [
+                "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+            ],
+            "balanced-match": [
+                "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+            ],
+            "brace-expansion": [
+                "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz",
+            ],
+            "commondir": [
+                "https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz",
+            ],
+            "estree-walker": [
+                "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz",
+            ],
+            "fs.realpath": [
+                "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz",
+            ],
+            "glob": [
+                "https://registry.npmjs.org/glob/-/glob-8.1.0.tgz",
+            ],
+            "inflight": [
+                "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz",
+            ],
+            "inherits": [
+                "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+            ],
+            "is-reference": [
+                "https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz",
+            ],
+            "magic-string": [
+                "https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz",
+            ],
+            "minimatch": [
+                "https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz",
+            ],
+            "once": [
+                "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
+            ],
+            "picomatch": [
+                "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
+            ],
+            "sourcemap-codec": [
+                "https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz",
+            ],
+            "wrappy": [
+                "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
+            ],
         },
     )
 
@@ -63,11 +99,21 @@ def npm_repositories():
             "@rollup/pluginutils": "5.3.0",
         },
         transitive_closure = {
-            "@rollup/plugin-json": ["5.0.2"],
-            "@rollup/pluginutils": ["5.3.0"],
-            "@types/estree": ["https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz"],
-            "estree-walker": ["https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"],
-            "picomatch": ["https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz"],
+            "@rollup/plugin-json": [
+                "5.0.2",
+            ],
+            "@rollup/pluginutils": [
+                "5.3.0",
+            ],
+            "@types/estree": [
+                "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+            ],
+            "estree-walker": [
+                "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz",
+            ],
+            "picomatch": [
+                "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
+            ],
         },
     )
 
@@ -92,22 +138,54 @@ def npm_repositories():
             "resolve": "https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz",
         },
         transitive_closure = {
-            "@rollup/plugin-node-resolve": ["15.0.1"],
-            "@rollup/pluginutils": ["5.3.0"],
-            "@types/estree": ["https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz"],
-            "@types/resolve": ["https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz"],
-            "builtin-modules": ["https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz"],
-            "deepmerge": ["https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz"],
-            "estree-walker": ["https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"],
-            "function-bind": ["https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz"],
-            "hasown": ["https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz"],
-            "is-builtin-module": ["https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz"],
-            "is-core-module": ["https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz"],
-            "is-module": ["https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz"],
-            "path-parse": ["https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz"],
-            "picomatch": ["https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz"],
-            "resolve": ["https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz"],
-            "supports-preserve-symlinks-flag": ["https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"],
+            "@rollup/plugin-node-resolve": [
+                "15.0.1",
+            ],
+            "@rollup/pluginutils": [
+                "5.3.0",
+            ],
+            "@types/estree": [
+                "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+            ],
+            "@types/resolve": [
+                "https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz",
+            ],
+            "builtin-modules": [
+                "https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz",
+            ],
+            "deepmerge": [
+                "https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz",
+            ],
+            "estree-walker": [
+                "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz",
+            ],
+            "function-bind": [
+                "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+            ],
+            "hasown": [
+                "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+            ],
+            "is-builtin-module": [
+                "https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz",
+            ],
+            "is-core-module": [
+                "https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz",
+            ],
+            "is-module": [
+                "https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz",
+            ],
+            "path-parse": [
+                "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz",
+            ],
+            "picomatch": [
+                "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
+            ],
+            "resolve": [
+                "https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz",
+            ],
+            "supports-preserve-symlinks-flag": [
+                "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz",
+            ],
         },
     )
 
@@ -127,10 +205,18 @@ def npm_repositories():
             "picomatch": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
         },
         transitive_closure = {
-            "@rollup/pluginutils": ["5.3.0"],
-            "@types/estree": ["https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz"],
-            "estree-walker": ["https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"],
-            "picomatch": ["https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz"],
+            "@rollup/pluginutils": [
+                "5.3.0",
+            ],
+            "@types/estree": [
+                "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+            ],
+            "estree-walker": [
+                "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz",
+            ],
+            "picomatch": [
+                "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
+            ],
         },
     )
 
@@ -145,7 +231,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==",
         transitive_closure = {
-            "@types/estree": ["https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz"],
+            "@types/estree": [
+                "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+            ],
         },
     )
 
@@ -162,7 +250,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==",
         transitive_closure = {
-            "@types/node": ["https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz"],
+            "@types/node": [
+                "https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz",
+            ],
         },
     )
 
@@ -177,7 +267,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==",
         transitive_closure = {
-            "@types/resolve": ["https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz"],
+            "@types/resolve": [
+                "https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz",
+            ],
         },
     )
 
@@ -194,7 +286,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==",
         transitive_closure = {
-            "@types/semver": ["https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz"],
+            "@types/semver": [
+                "https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz",
+            ],
         },
     )
 
@@ -209,7 +303,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==",
         transitive_closure = {
-            "balanced-match": ["https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"],
+            "balanced-match": [
+                "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+            ],
         },
     )
 
@@ -227,8 +323,12 @@ def npm_repositories():
             "balanced-match": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
         },
         transitive_closure = {
-            "balanced-match": ["https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"],
-            "brace-expansion": ["https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz"],
+            "balanced-match": [
+                "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+            ],
+            "brace-expansion": [
+                "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz",
+            ],
         },
     )
 
@@ -243,7 +343,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==",
         transitive_closure = {
-            "builtin-modules": ["https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz"],
+            "builtin-modules": [
+                "https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz",
+            ],
         },
     )
 
@@ -258,7 +360,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==",
         transitive_closure = {
-            "commondir": ["https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz"],
+            "commondir": [
+                "https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz",
+            ],
         },
     )
 
@@ -278,8 +382,12 @@ def npm_repositories():
             "ms": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
         },
         transitive_closure = {
-            "debug": ["https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"],
-            "ms": ["https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"],
+            "debug": [
+                "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz",
+            ],
+            "ms": [
+                "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
+            ],
         },
     )
 
@@ -294,7 +402,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==",
         transitive_closure = {
-            "deepmerge": ["https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz"],
+            "deepmerge": [
+                "https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz",
+            ],
         },
     )
 
@@ -309,7 +419,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==",
         transitive_closure = {
-            "estree-walker": ["https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"],
+            "estree-walker": [
+                "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz",
+            ],
         },
     )
 
@@ -324,7 +436,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==",
         transitive_closure = {
-            "fs.realpath": ["https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"],
+            "fs.realpath": [
+                "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz",
+            ],
         },
     )
 
@@ -339,7 +453,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==",
         transitive_closure = {
-            "function-bind": ["https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz"],
+            "function-bind": [
+                "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+            ],
         },
     )
 
@@ -361,15 +477,33 @@ def npm_repositories():
             "once": "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
         },
         transitive_closure = {
-            "balanced-match": ["https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"],
-            "brace-expansion": ["https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz"],
-            "fs.realpath": ["https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"],
-            "glob": ["https://registry.npmjs.org/glob/-/glob-8.1.0.tgz"],
-            "inflight": ["https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz"],
-            "inherits": ["https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz"],
-            "minimatch": ["https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz"],
-            "once": ["https://registry.npmjs.org/once/-/once-1.4.0.tgz"],
-            "wrappy": ["https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"],
+            "balanced-match": [
+                "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+            ],
+            "brace-expansion": [
+                "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz",
+            ],
+            "fs.realpath": [
+                "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz",
+            ],
+            "glob": [
+                "https://registry.npmjs.org/glob/-/glob-8.1.0.tgz",
+            ],
+            "inflight": [
+                "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz",
+            ],
+            "inherits": [
+                "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+            ],
+            "minimatch": [
+                "https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz",
+            ],
+            "once": [
+                "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
+            ],
+            "wrappy": [
+                "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
+            ],
         },
     )
 
@@ -387,8 +521,12 @@ def npm_repositories():
             "function-bind": "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
         },
         transitive_closure = {
-            "function-bind": ["https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz"],
-            "hasown": ["https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz"],
+            "function-bind": [
+                "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+            ],
+            "hasown": [
+                "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+            ],
         },
     )
 
@@ -407,9 +545,15 @@ def npm_repositories():
             "wrappy": "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
         },
         transitive_closure = {
-            "inflight": ["https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz"],
-            "once": ["https://registry.npmjs.org/once/-/once-1.4.0.tgz"],
-            "wrappy": ["https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"],
+            "inflight": [
+                "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz",
+            ],
+            "once": [
+                "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
+            ],
+            "wrappy": [
+                "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
+            ],
         },
     )
 
@@ -424,7 +568,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
         transitive_closure = {
-            "inherits": ["https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz"],
+            "inherits": [
+                "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+            ],
         },
     )
 
@@ -442,8 +588,12 @@ def npm_repositories():
             "builtin-modules": "https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz",
         },
         transitive_closure = {
-            "builtin-modules": ["https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz"],
-            "is-builtin-module": ["https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz"],
+            "builtin-modules": [
+                "https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz",
+            ],
+            "is-builtin-module": [
+                "https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz",
+            ],
         },
     )
 
@@ -461,9 +611,15 @@ def npm_repositories():
             "hasown": "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
         },
         transitive_closure = {
-            "function-bind": ["https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz"],
-            "hasown": ["https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz"],
-            "is-core-module": ["https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz"],
+            "function-bind": [
+                "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+            ],
+            "hasown": [
+                "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+            ],
+            "is-core-module": [
+                "https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz",
+            ],
         },
     )
 
@@ -478,7 +634,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==",
         transitive_closure = {
-            "is-module": ["https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz"],
+            "is-module": [
+                "https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz",
+            ],
         },
     )
 
@@ -493,7 +651,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==",
         transitive_closure = {
-            "is-number": ["https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz"],
+            "is-number": [
+                "https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz",
+            ],
         },
     )
 
@@ -513,8 +673,12 @@ def npm_repositories():
             "is-number": "https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz",
         },
         transitive_closure = {
-            "is-number": ["https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz"],
-            "is-odd": ["https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz"],
+            "is-number": [
+                "https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz",
+            ],
+            "is-odd": [
+                "https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz",
+            ],
         },
         exclude_package_contents = [
     "**/README*",
@@ -535,8 +699,12 @@ def npm_repositories():
             "@types/estree": "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
         },
         transitive_closure = {
-            "@types/estree": ["https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz"],
-            "is-reference": ["https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz"],
+            "@types/estree": [
+                "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+            ],
+            "is-reference": [
+                "https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz",
+            ],
         },
     )
 
@@ -554,8 +722,12 @@ def npm_repositories():
             "yallist": "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz",
         },
         transitive_closure = {
-            "lru-cache": ["https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz"],
-            "yallist": ["https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz"],
+            "lru-cache": [
+                "https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz",
+            ],
+            "yallist": [
+                "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz",
+            ],
         },
     )
 
@@ -573,8 +745,12 @@ def npm_repositories():
             "sourcemap-codec": "https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz",
         },
         transitive_closure = {
-            "magic-string": ["https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz"],
-            "sourcemap-codec": ["https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz"],
+            "magic-string": [
+                "https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz",
+            ],
+            "sourcemap-codec": [
+                "https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz",
+            ],
         },
     )
 
@@ -592,9 +768,15 @@ def npm_repositories():
             "brace-expansion": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz",
         },
         transitive_closure = {
-            "balanced-match": ["https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"],
-            "brace-expansion": ["https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz"],
-            "minimatch": ["https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz"],
+            "balanced-match": [
+                "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+            ],
+            "brace-expansion": [
+                "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz",
+            ],
+            "minimatch": [
+                "https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz",
+            ],
         },
     )
 
@@ -609,7 +791,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
         transitive_closure = {
-            "ms": ["https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"],
+            "ms": [
+                "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
+            ],
         },
     )
 
@@ -627,8 +811,12 @@ def npm_repositories():
             "wrappy": "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
         },
         transitive_closure = {
-            "once": ["https://registry.npmjs.org/once/-/once-1.4.0.tgz"],
-            "wrappy": ["https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"],
+            "once": [
+                "https://registry.npmjs.org/once/-/once-1.4.0.tgz",
+            ],
+            "wrappy": [
+                "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
+            ],
         },
     )
 
@@ -643,7 +831,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==",
         transitive_closure = {
-            "path-parse": ["https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz"],
+            "path-parse": [
+                "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz",
+            ],
         },
     )
 
@@ -658,7 +848,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==",
         transitive_closure = {
-            "picomatch": ["https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz"],
+            "picomatch": [
+                "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
+            ],
         },
     )
 
@@ -678,12 +870,24 @@ def npm_repositories():
             "supports-preserve-symlinks-flag": "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz",
         },
         transitive_closure = {
-            "function-bind": ["https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz"],
-            "hasown": ["https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz"],
-            "is-core-module": ["https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz"],
-            "path-parse": ["https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz"],
-            "resolve": ["https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz"],
-            "supports-preserve-symlinks-flag": ["https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"],
+            "function-bind": [
+                "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+            ],
+            "hasown": [
+                "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+            ],
+            "is-core-module": [
+                "https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz",
+            ],
+            "path-parse": [
+                "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz",
+            ],
+            "resolve": [
+                "https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz",
+            ],
+            "supports-preserve-symlinks-flag": [
+                "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz",
+            ],
         },
     )
 
@@ -703,9 +907,15 @@ def npm_repositories():
             "lru-cache": "https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz",
         },
         transitive_closure = {
-            "lru-cache": ["https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz"],
-            "semver": ["https://registry.npmjs.org/semver/-/semver-7.5.1.tgz"],
-            "yallist": ["https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz"],
+            "lru-cache": [
+                "https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz",
+            ],
+            "semver": [
+                "https://registry.npmjs.org/semver/-/semver-7.5.1.tgz",
+            ],
+            "yallist": [
+                "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz",
+            ],
         },
     )
 
@@ -720,7 +930,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==",
         transitive_closure = {
-            "sourcemap-codec": ["https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz"],
+            "sourcemap-codec": [
+                "https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz",
+            ],
         },
     )
 
@@ -735,7 +947,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==",
         transitive_closure = {
-            "supports-preserve-symlinks-flag": ["https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"],
+            "supports-preserve-symlinks-flag": [
+                "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz",
+            ],
         },
     )
 
@@ -750,7 +964,9 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==",
         transitive_closure = {
-            "wrappy": ["https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"],
+            "wrappy": [
+                "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz",
+            ],
         },
     )
 
@@ -765,6 +981,8 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==",
         transitive_closure = {
-            "yallist": ["https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz"],
+            "yallist": [
+                "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz",
+            ],
         },
     )
