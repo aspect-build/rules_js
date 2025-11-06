@@ -473,36 +473,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 package_store_root = utils.package_store_root,
             ))
 
-        # Now handle the prod/dev specific logic for npm_link_targets
-        for link_type in ["link_packages", "link_dev_packages"]:
-            fp_link_packages = fp_link.get(link_type, {}).keys()
-            if len(fp_link_packages) > 0:
-                # Also add the first-party package to its own package context
-                fp_package_path = fp_link.get("path")
-                if fp_package_path and fp_package_path not in links_targets_bzl:
-                    links_targets_bzl[fp_package_path] = {"prod": [], "dev": []}
-
-                if fp_package_path:
-                    append_stmt_self = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-
-                    if link_type == "link_dev_packages":
-                        links_targets_bzl[fp_package_path]["dev"].append("                " + append_stmt_self)
-                    else:
-                        links_targets_bzl[fp_package_path]["prod"].append("                " + append_stmt_self)
-
-                if "//visibility:public" in package_visibility:
-                    # Also add this first-party package to npm_link_targets for packages that use it
-                    for fp_link_package in fp_link_packages:
-                        if fp_link_package not in links_targets_bzl:
-                            links_targets_bzl[fp_link_package] = {"prod": [], "dev": []}
-
-                        fp_append_stmt = """link_targets.append(":{{}}/{pkg}".format(name))""".format(pkg = fp_package)
-
-                        if link_type == "link_dev_packages":
-                            links_targets_bzl[fp_link_package]["dev"].append("                " + fp_append_stmt)
-                        else:
-                            links_targets_bzl[fp_link_package]["prod"].append("                " + fp_append_stmt)
-
         # Add to link_all and scope targets (only once, not per link_type)
         if len(all_fp_link_packages) > 0:
             add_to_link_all = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(
