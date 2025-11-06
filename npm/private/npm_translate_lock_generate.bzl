@@ -40,24 +40,22 @@ _FP_STORE_TMPL = \
 
 _FP_DIRECT_TMPL = \
     """
-    if bazel_package in {link_packages}:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{{}}/{pkg}".format(name),
-            src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
-            visibility = {link_visibility},
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{{}}/{pkg}/dir".format(name),
-            srcs = [":{{}}/{pkg}".format(name)],
-            output_group = "{package_directory_output_group}",
-            visibility = {link_visibility},
-            tags = ["manual"],
-        )"""
+# Generated npm_link_package_store for linking of first-party "{pkg}" package
+# buildifier: disable=function-docstring
+def _fp_link_{i}(name):
+    _npm_link_package_store(
+        name = "{{}}/{pkg}".format(name),
+        src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
+        visibility = {link_visibility},
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{{}}/{pkg}/dir".format(name),
+        srcs = [":{{}}/{pkg}".format(name)],
+        output_group = "{package_directory_output_group}",
+        visibility = {link_visibility},
+        tags = ["manual"],
+    )"""
 
 _BZL_LIBRARY_TMPL = \
     """bzl_library(
@@ -277,7 +275,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     # The 3 code sections that will make up the body of npm_link_all_packages()
     defs_bzl_header = []
     stores_bzl = []
-    links_bzl = []
+    link_factories_bzl = []
 
     # The per-package code sections for links and targets that will later be merged into the main lists
     links_pkg_bzl = {}
@@ -385,20 +383,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         ),
                     )
 
-    if len(links_pkg_bzl) > 0:
-        links_bzl.append("""    if link:""")
-        first_link = True
-        for link_package, bzl in links_pkg_bzl.items():
-            links_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
-                els = "" if first_link else "el",
-                pkg = link_package,
-            ))
-            links_bzl.extend(bzl)
-            first_link = False
-
-    # Clear so it can not accidentally be used again now that it has been merged into links_bzl[]
-    links_pkg_bzl = None
-
     # Add first-party packages to npm_link_targets before generating the function
     for fp_link in fp_links.values():
         fp_package = fp_link.get("package")
@@ -433,7 +417,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         first_link = False
     npm_link_targets_bzl.append("""    return link_targets""")
 
-    for fp_link in fp_links.values():
+    for i, fp_link in enumerate(fp_links.values()):
         fp_package = fp_link.get("package")
         fp_path = fp_link.get("path")
         fp_deps = fp_link.get("deps")
@@ -463,7 +447,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
         # Generate a single _FP_DIRECT_TMPL block with all link packages
         if len(all_fp_link_packages) > 0:
-            links_bzl.append(_FP_DIRECT_TMPL.format(
+            link_factories_bzl.append(_FP_DIRECT_TMPL.format(
+                i = i,
                 link_packages = list(all_fp_link_packages.keys()),
                 link_visibility = package_visibility,
                 pkg = fp_package,
@@ -473,25 +458,37 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 package_store_root = utils.package_store_root,
             ))
 
-        # Add to link_all and scope targets (only once, not per link_type)
-        if len(all_fp_link_packages) > 0:
-            add_to_link_all = """        link_targets.append(":{{}}/{pkg}".format(name))""".format(
+        for link_package in all_fp_link_packages.keys():
+            if link_package not in links_pkg_bzl:
+                links_pkg_bzl[link_package] = []
+            links_pkg_bzl[link_package].append("""            _fp_link_{i}(name)""".format(i = i))
+
+            add_to_link_all = """            link_targets.append(":{{}}/{pkg}".format(name))""".format(
                 pkg = fp_package,
             )
-            links_bzl.append(add_to_link_all)
+            links_pkg_bzl[link_package].append(add_to_link_all)
 
             package_scope = fp_package[:fp_package.find("/", 1)] if fp_package[0] == "@" else None
             if package_scope:
-                links_bzl.append("""        if "{package_scope}" not in scope_targets:
-            scope_targets["{package_scope}"] = [link_targets[-1]]
-        else:
-            scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))
+                links_pkg_bzl[link_package].append("""            if "{package_scope}" not in scope_targets:
+                scope_targets["{package_scope}"] = [link_targets[-1]]
+            else:
+                scope_targets["{package_scope}"].append(link_targets[-1])""".format(package_scope = package_scope))
 
     if len(stores_bzl) > 0:
         npm_link_all_packages_bzl.append("""    if is_root:""")
         npm_link_all_packages_bzl.extend(stores_bzl)
 
-    npm_link_all_packages_bzl.extend(links_bzl)
+    if len(links_pkg_bzl) > 0:
+        npm_link_all_packages_bzl.append("""    if link:""")
+        first_link = True
+        for link_package, bzl in links_pkg_bzl.items():
+            npm_link_all_packages_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
+                els = "" if first_link else "el",
+                pkg = link_package,
+            ))
+            npm_link_all_packages_bzl.extend(bzl)
+            first_link = False
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
@@ -545,6 +542,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         "",
         "\n".join(npm_link_targets_bzl),
         "",
+        "\n".join(link_factories_bzl),
     ])
 
     rctx_files[rctx.attr.defs_bzl_filename] = defs_bzl_contents
@@ -573,7 +571,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
 
     for filename, contents in rctx_files.items():
-        rctx.file(filename, generated_by_prefix + "\n" + "\n".join(contents))
+        rctx.file(filename, generated_by_prefix + "\n" + "\n".join(contents).rstrip() + "\n")
 
 def _generate_repositories(rctx, npm_imports, link_workspace):
     repositories_bzl = []

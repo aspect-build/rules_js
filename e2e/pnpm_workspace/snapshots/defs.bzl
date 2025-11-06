@@ -189,6 +189,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
+            _fp_link_2(name)
+            link_targets.append(":{}/@lib/a".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
         elif bazel_package == "app/c":
             link_0("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
             link_targets.append(":{}/@aspect-test/a".format(name))
@@ -202,6 +208,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
+            _fp_link_5(name)
+            link_targets.append(":{}/@lib/c".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
         elif bazel_package == "lib/d":
             link_3("{}/@aspect-test/d".format(name), False, name, "@aspect-test/d")
             link_targets.append(":{}/@aspect-test/d".format(name))
@@ -218,6 +230,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
+            _fp_link_0(name)
+            link_targets.append(":{}/vendored-a".format(name))
+            _fp_link_1(name)
+            link_targets.append(":{}/vendored-b".format(name))
+            _fp_link_3(name)
+            link_targets.append(":{}/@lib/b".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
         elif bazel_package == "lib/b":
             link_5("{}/@aspect-test/f".format(name), False, name, "@aspect-test/f")
             link_targets.append(":{}/@aspect-test/f".format(name))
@@ -241,6 +263,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
+            _fp_link_6(name)
+            link_targets.append(":{}/@lib/d".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
         elif bazel_package == "app/b":
             link_7("{}/@aspect-test/h".format(name), False, name, "@aspect-test/h")
             link_targets.append(":{}/@aspect-test/h".format(name))
@@ -248,166 +276,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets["@aspect-test"] = [link_targets[-1]]
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
-
-    if bazel_package in ["lib/a"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/vendored-a".format(name),
-            src = "//:.aspect_rules_js/{}/vendored-a@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/vendored-a/dir".format(name),
-            srcs = [":{}/vendored-a".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/vendored-a".format(name))
-
-    if bazel_package in ["lib/a"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/vendored-b".format(name),
-            src = "//:.aspect_rules_js/{}/vendored-b@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/vendored-b/dir".format(name),
-            srcs = [":{}/vendored-b".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/vendored-b".format(name))
-
-    if bazel_package in ["app/a"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@lib/a".format(name),
-            src = "//:.aspect_rules_js/{}/@lib+a@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@lib/a/dir".format(name),
-            srcs = [":{}/@lib/a".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@lib/a".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
-
-    if bazel_package in ["app/b", "lib/a"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@lib/b".format(name),
-            src = "//:.aspect_rules_js/{}/@lib+b@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@lib/b/dir".format(name),
-            srcs = [":{}/@lib/b".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@lib/b".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
-
-    if bazel_package in ["app/b"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@lib/b_alias".format(name),
-            src = "//:.aspect_rules_js/{}/@lib+b_alias@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@lib/b_alias/dir".format(name),
-            srcs = [":{}/@lib/b_alias".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@lib/b_alias".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
-
-    if bazel_package in ["app/c"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@lib/c".format(name),
-            src = "//:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@lib/c/dir".format(name),
-            srcs = [":{}/@lib/c".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@lib/c".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
-
-    if bazel_package in ["app/d"]:
-        # terminal target for direct dependencies
-        _npm_link_package_store(
-            name = "{}/@lib/d".format(name),
-            src = "//:.aspect_rules_js/{}/@lib+d@0.0.0".format(name),
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-        # filegroup target that provides a single file which is
-        # package directory for use in $(execpath) and $(rootpath)
-        native.filegroup(
-            name = "{}/@lib/d/dir".format(name),
-            srcs = [":{}/@lib/d".format(name)],
-            output_group = "package_directory",
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        link_targets.append(":{}/@lib/d".format(name))
-        if "@lib" not in scope_targets:
-            scope_targets["@lib"] = [link_targets[-1]]
-        else:
-            scope_targets["@lib"].append(link_targets[-1])
+            _fp_link_3(name)
+            link_targets.append(":{}/@lib/b".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
+            _fp_link_4(name)
+            link_targets.append(":{}/@lib/b_alias".format(name))
+            if "@lib" not in scope_targets:
+                scope_targets["@lib"] = [link_targets[-1]]
+            else:
+                scope_targets["@lib"].append(link_targets[-1])
 
     for scope, scoped_targets in scope_targets.items():
         _js_library(
@@ -478,3 +358,123 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/@lib/b".format(name))
                 link_targets.append(":{}/@lib/b_alias".format(name))
     return link_targets
+
+
+# Generated npm_link_package_store for linking of first-party "vendored-a" package
+# buildifier: disable=function-docstring
+def _fp_link_0(name):
+    _npm_link_package_store(
+        name = "{}/vendored-a".format(name),
+        src = "//:.aspect_rules_js/{}/vendored-a@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/vendored-a/dir".format(name),
+        srcs = [":{}/vendored-a".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "vendored-b" package
+# buildifier: disable=function-docstring
+def _fp_link_1(name):
+    _npm_link_package_store(
+        name = "{}/vendored-b".format(name),
+        src = "//:.aspect_rules_js/{}/vendored-b@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/vendored-b/dir".format(name),
+        srcs = [":{}/vendored-b".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@lib/a" package
+# buildifier: disable=function-docstring
+def _fp_link_2(name):
+    _npm_link_package_store(
+        name = "{}/@lib/a".format(name),
+        src = "//:.aspect_rules_js/{}/@lib+a@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@lib/a/dir".format(name),
+        srcs = [":{}/@lib/a".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@lib/b" package
+# buildifier: disable=function-docstring
+def _fp_link_3(name):
+    _npm_link_package_store(
+        name = "{}/@lib/b".format(name),
+        src = "//:.aspect_rules_js/{}/@lib+b@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@lib/b/dir".format(name),
+        srcs = [":{}/@lib/b".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@lib/b_alias" package
+# buildifier: disable=function-docstring
+def _fp_link_4(name):
+    _npm_link_package_store(
+        name = "{}/@lib/b_alias".format(name),
+        src = "//:.aspect_rules_js/{}/@lib+b_alias@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@lib/b_alias/dir".format(name),
+        srcs = [":{}/@lib/b_alias".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@lib/c" package
+# buildifier: disable=function-docstring
+def _fp_link_5(name):
+    _npm_link_package_store(
+        name = "{}/@lib/c".format(name),
+        src = "//:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@lib/c/dir".format(name),
+        srcs = [":{}/@lib/c".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+
+# Generated npm_link_package_store for linking of first-party "@lib/d" package
+# buildifier: disable=function-docstring
+def _fp_link_6(name):
+    _npm_link_package_store(
+        name = "{}/@lib/d".format(name),
+        src = "//:.aspect_rules_js/{}/@lib+d@0.0.0".format(name),
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/@lib/d/dir".format(name),
+        srcs = [":{}/@lib/d".format(name)],
+        output_group = "package_directory",
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
