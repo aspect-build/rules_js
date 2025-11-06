@@ -62,6 +62,96 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_10(name)
         store_11(name)
         store_12(name)
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+c@0.0.0",
+            src = "//lib/c:pkg",
+            package = "@lib/c",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "vendored-a@0.0.0",
+            src = "//vendored/a:pkg",
+            package = "vendored-a",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "vendored-b@0.0.0",
+            src = "//vendored/b:pkg",
+            package = "vendored-b",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+a@0.0.0",
+            src = "//lib/a:pkg",
+            package = "@lib/a",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e",
+                "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
+                "//root:.aspect_rules_js/{}/vendored-a@0.0.0".format(name): "vendored-a",
+                "//root:.aspect_rules_js/{}/vendored-b@0.0.0".format(name): "vendored-b",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+b@0.0.0",
+            src = "//lib/b:pkg",
+            package = "@lib/b",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+                "//root:.aspect_rules_js/{}/@types+sizzle@2.3.8".format(name): "alias-1",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+b_alias@0.0.0",
+            src = "//lib/b:pkg",
+            package = "@lib/b_alias",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
+                "//root:.aspect_rules_js/{}/@types+sizzle@2.3.8".format(name): "alias-1",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+d@0.0.0",
+            src = "//lib/d:pkg",
+            package = "@lib/d",
+            version = "0.0.0",
+            deps = {
+                "//root:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2".format(name): "@aspect-test/d",
+                "//root:.aspect_rules_js/{}/@types+node@18.19.54".format(name): "alias-2",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
     if link:
         if bazel_package == "":
             link_0("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
@@ -159,20 +249,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             else:
                 scope_targets["@aspect-test"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+c@0.0.0",
-            src = "//lib/c:pkg",
-            package = "@lib/c",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["app/c"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -197,20 +273,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         else:
             scope_targets["@lib"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "vendored-a@0.0.0",
-            src = "//vendored/a:pkg",
-            package = "vendored-a",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["lib/a"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -231,20 +293,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
         link_targets.append(":{}/vendored-a".format(name))
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "vendored-b@0.0.0",
-            src = "//vendored/b:pkg",
-            package = "vendored-b",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["lib/a"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -264,23 +312,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         link_targets.append(":{}/vendored-b".format(name))
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+a@0.0.0",
-            src = "//lib/a:pkg",
-            package = "@lib/a",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e",
-                "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
-                "//root:.aspect_rules_js/{}/vendored-a@0.0.0".format(name): "vendored-a",
-                "//root:.aspect_rules_js/{}/vendored-b@0.0.0".format(name): "vendored-b",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     if bazel_package in ["app/a"]:
         # terminal target for direct dependencies
@@ -306,21 +337,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         else:
             scope_targets["@lib"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+b@0.0.0",
-            src = "//lib/b:pkg",
-            package = "@lib/b",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-                "//root:.aspect_rules_js/{}/@types+sizzle@2.3.8".format(name): "alias-1",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["app/b", "lib/a"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -345,21 +361,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         else:
             scope_targets["@lib"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+b_alias@0.0.0",
-            src = "//lib/b:pkg",
-            package = "@lib/b_alias",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
-                "//root:.aspect_rules_js/{}/@types+sizzle@2.3.8".format(name): "alias-1",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["app/b"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -383,21 +384,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             scope_targets["@lib"] = [link_targets[-1]]
         else:
             scope_targets["@lib"].append(link_targets[-1])
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+d@0.0.0",
-            src = "//lib/d:pkg",
-            package = "@lib/d",
-            version = "0.0.0",
-            deps = {
-                "//root:.aspect_rules_js/{}/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2".format(name): "@aspect-test/d",
-                "//root:.aspect_rules_js/{}/@types+node@18.19.54".format(name): "alias-2",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     if bazel_package in ["app/d"]:
         # terminal target for direct dependencies
