@@ -2344,6 +2344,136 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_1131(name)
         store_1132(name)
         store_1133(name)
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "is-odd@0.0.0",
+            src = "//npm/private/test/vendored/is-odd:pkg",
+            package = "is-odd",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/is-number@6.0.0".format(name): "is-number",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "semver-max@0.0.0",
+            src = "//npm/private/test/vendored/semver-max:pkg",
+            package = "semver-max",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/is-odd@0.0.0".format(name): "is-odd",
+                "//:.aspect_rules_js/{}/semver@5.7.2".format(name): "semver",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-a@0.0.0",
+            src = "//examples/npm_package/packages/pkg_a:pkg",
+            package = "@mycorp/pkg-a",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
+                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "js_lib_pkg_a@0.0.0",
+            src = "//examples/js_lib_pkg/a:pkg",
+            package = "js_lib_pkg_a",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "js_lib_pkg_a-alias_1@0.0.0",
+            src = "//examples/js_lib_pkg/a:pkg",
+            package = "js_lib_pkg_a-alias_1",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "js_lib_pkg_a-alias_2@0.0.0",
+            src = "//examples/js_lib_pkg/a:pkg",
+            package = "js_lib_pkg_a-alias_2",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+test@0.0.0",
+            src = "//examples/linked_pkg:pkg",
+            package = "@lib/test",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e,alias-e",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@lib+test2@0.0.0",
+            src = "//examples/linked_lib:pkg",
+            package = "@lib/test2",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e,alias-e",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-d@0.0.0",
+            src = "//examples/npm_package/packages/pkg_d:pkg",
+            package = "@mycorp/pkg-d",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
+                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-e@0.0.0",
+            src = "//examples/npm_package/packages/pkg_e:pkg",
+            package = "@mycorp/pkg-e",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name): "@mycorp/pkg-d",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "test-npm_package@0.0.0",
+            src = "//npm/private/test/npm_package:pkg",
+            package = "test-npm_package",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/chalk@5.0.1".format(name): "chalk",
+                "//:.aspect_rules_js/{}/chalk@5.1.1".format(name): "chalk-alt",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
     if link:
         if bazel_package == "js/private/worker/src":
             link_1("{}/abortcontroller-polyfill".format(name), True, name, "abortcontroller-polyfill")
@@ -2719,50 +2849,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_991("{}/source-map-support".format(name), True, name, "source-map-support")
             link_targets.append(":{}/source-map-support".format(name))
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "is-odd@0.0.0",
-            src = "//npm/private/test/vendored/is-odd:pkg",
-            package = "is-odd",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/is-number@6.0.0".format(name): "is-number",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "semver-max@0.0.0",
-            src = "//npm/private/test/vendored/semver-max:pkg",
-            package = "semver-max",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/is-odd@0.0.0".format(name): "is-odd",
-                "//:.aspect_rules_js/{}/semver@5.7.2".format(name): "semver",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@mycorp+pkg-a@0.0.0",
-            src = "//examples/npm_package/packages/pkg_a:pkg",
-            package = "@mycorp/pkg-a",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
-                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["js/private/test/image", "examples/js_binary", "examples/npm_deps"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -2787,18 +2873,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         else:
             scope_targets["@mycorp"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "js_lib_pkg_a@0.0.0",
-            src = "//examples/js_lib_pkg/a:pkg",
-            package = "js_lib_pkg_a",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["examples/js_lib_pkg/b"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -2818,18 +2892,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         link_targets.append(":{}/js_lib_pkg_a".format(name))
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "js_lib_pkg_a-alias_1@0.0.0",
-            src = "//examples/js_lib_pkg/a:pkg",
-            package = "js_lib_pkg_a-alias_1",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     if bazel_package in ["examples/js_lib_pkg/b"]:
         # terminal target for direct dependencies
@@ -2851,18 +2913,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
         link_targets.append(":{}/js_lib_pkg_a-alias_1".format(name))
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "js_lib_pkg_a-alias_2@0.0.0",
-            src = "//examples/js_lib_pkg/a:pkg",
-            package = "js_lib_pkg_a-alias_2",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["examples/js_lib_pkg/b"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -2882,20 +2932,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         link_targets.append(":{}/js_lib_pkg_a-alias_2".format(name))
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+test@0.0.0",
-            src = "//examples/linked_pkg:pkg",
-            package = "@lib/test",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e,alias-e",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     if bazel_package in ["examples/linked_consumer"]:
         # terminal target for direct dependencies
@@ -2921,20 +2957,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         else:
             scope_targets["@lib"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@lib+test2@0.0.0",
-            src = "//examples/linked_lib:pkg",
-            package = "@lib/test2",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e,alias-e",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["examples/linked_consumer"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -2958,21 +2980,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             scope_targets["@lib"] = [link_targets[-1]]
         else:
             scope_targets["@lib"].append(link_targets[-1])
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@mycorp+pkg-d@0.0.0",
-            src = "//examples/npm_package/packages/pkg_d:pkg",
-            package = "@mycorp/pkg-d",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
-                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     if bazel_package in ["examples/npm_package/packages/pkg_e", "js/private/test/image", "examples/npm_deps"]:
         # terminal target for direct dependencies
@@ -2998,20 +3005,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         else:
             scope_targets["@mycorp"].append(link_targets[-1])
 
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "@mycorp+pkg-e@0.0.0",
-            src = "//examples/npm_package/packages/pkg_e:pkg",
-            package = "@mycorp/pkg-e",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name): "@mycorp/pkg-d",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-
     if bazel_package in ["examples/npm_deps"]:
         # terminal target for direct dependencies
         _npm_link_package_store(
@@ -3035,21 +3028,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             scope_targets["@mycorp"] = [link_targets[-1]]
         else:
             scope_targets["@mycorp"].append(link_targets[-1])
-
-    if is_root:
-        _npm_local_package_store(
-            link_root_name = name,
-            package_store_name = "test-npm_package@0.0.0",
-            src = "//npm/private/test/npm_package:pkg",
-            package = "test-npm_package",
-            version = "0.0.0",
-            deps = {
-                "//:.aspect_rules_js/{}/chalk@5.0.1".format(name): "chalk",
-                "//:.aspect_rules_js/{}/chalk@5.1.1".format(name): "chalk-alt",
-            },
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
 
     if bazel_package in ["npm/private/test"]:
         # terminal target for direct dependencies
