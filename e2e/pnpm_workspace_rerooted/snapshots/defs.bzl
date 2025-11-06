@@ -182,9 +182,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@aspect-test/a".format(name),
                     ":{}/@aspect-test/g".format(name),
                 ],
-                "@lib": [
-                    ":{}/@lib/a".format(name),
-                ],
+                "@lib": [":{}/@lib/a".format(name)],
             }
         elif bazel_package == "app/c":
             link_0("{}/@aspect-test/a".format(name), False, name, "@aspect-test/a")
@@ -200,9 +198,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@aspect-test/a".format(name),
                     ":{}/@aspect-test/g".format(name),
                 ],
-                "@lib": [
-                    ":{}/@lib/c".format(name),
-                ],
+                "@lib": [":{}/@lib/c".format(name)],
             }
         elif bazel_package == "lib/d":
             link_3("{}/@aspect-test/d".format(name), False, name, "@aspect-test/d")
@@ -212,9 +208,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/alias-2".format(name),
             ]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/d".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/d".format(name)],
             }
         elif bazel_package == "lib/a":
             link_4("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
@@ -228,12 +222,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/@lib/b".format(name),
             ]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/e".format(name),
-                ],
-                "@lib": [
-                    ":{}/@lib/b".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/e".format(name)],
+                "@lib": [":{}/@lib/b".format(name)],
             }
         elif bazel_package == "lib/b":
             link_5("{}/@aspect-test/f".format(name), False, name, "@aspect-test/f")
@@ -243,19 +233,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/alias-1".format(name),
             ]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/f".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/f".format(name)],
             }
         elif bazel_package == "lib/c":
             link_5("{}/@aspect-test/f".format(name), False, name, "@aspect-test/f")
-            link_targets = [
-                ":{}/@aspect-test/f".format(name),
-            ]
+            link_targets = [":{}/@aspect-test/f".format(name)]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/f".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/f".format(name)],
             }
         elif bazel_package == "app/d":
             link_6("{}/@aspect-test/g".format(name), False, name, "@aspect-test/g")
@@ -265,12 +249,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/@lib/d".format(name),
             ]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/g".format(name),
-                ],
-                "@lib": [
-                    ":{}/@lib/d".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/g".format(name)],
+                "@lib": [":{}/@lib/d".format(name)],
             }
         elif bazel_package == "app/b":
             link_7("{}/@aspect-test/h".format(name), False, name, "@aspect-test/h")
@@ -282,9 +262,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/@lib/b_alias".format(name),
             ]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/h".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/h".format(name)],
                 "@lib": [
                     ":{}/@lib/b".format(name),
                     ":{}/@lib/b_alias".format(name),
@@ -338,9 +316,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/typescript".format(name),
             ])
         if dev:
-            link_targets.extend([
-                ":{}/@aspect-test/b".format(name),
-            ])
+            link_targets.extend([":{}/@aspect-test/b".format(name)])
     elif bazel_package == "app/a":
         if prod:
             link_targets.extend([
@@ -377,9 +353,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "lib/c":
         if prod:
-            link_targets.extend([
-                ":{}/@aspect-test/f".format(name),
-            ])
+            link_targets.extend([":{}/@aspect-test/f".format(name)])
     elif bazel_package == "app/d":
         if prod:
             link_targets.extend([

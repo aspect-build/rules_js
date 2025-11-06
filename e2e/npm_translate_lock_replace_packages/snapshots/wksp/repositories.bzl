@@ -18,9 +18,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==",
         transitive_closure = {
-            "chalk": [
-                "5.3.0",
-            ],
+            "chalk": ["5.3.0"],
         },
         replace_package = "@chalk_501//:pkg",
     )
@@ -38,8 +36,6 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         transitive_closure = {
-            "lodash": [
-                "4.17.21",
-            ],
+            "lodash": ["4.17.21"],
         },
     )

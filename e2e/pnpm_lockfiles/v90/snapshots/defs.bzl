@@ -392,12 +392,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/alias-only-sizzle".format(name),
             ]
             scope_targets = {
-                "@aspect-test-a-bad-scop": [
-                    ":{}/@aspect-test-a-bad-scope".format(name),
-                ],
-                "@aspect-test-custom-scope": [
-                    ":{}/@aspect-test-custom-scope/a".format(name),
-                ],
+                "@aspect-test-a-bad-scop": [":{}/@aspect-test-a-bad-scope".format(name)],
+                "@aspect-test-custom-scope": [":{}/@aspect-test-custom-scope/a".format(name)],
                 "@aspect-test": [
                     ":{}/@aspect-test/a".format(name),
                     ":{}/@aspect-test/a2".format(name),
@@ -406,9 +402,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@aspect-test/e".format(name),
                     ":{}/@aspect-test/h-is-only-optional".format(name),
                 ],
-                "@isaacs": [
-                    ":{}/@isaacs/cliui".format(name),
-                ],
+                "@isaacs": [":{}/@isaacs/cliui".format(name)],
                 "@types": [
                     ":{}/@types/archiver".format(name),
                     ":{}/@types/node".format(name),
@@ -468,13 +462,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "projects/a-types":
             link_22("{}/@types/node".format(name), False, name, "@types/node")
-            link_targets = [
-                ":{}/@types/node".format(name),
-            ]
+            link_targets = [":{}/@types/node".format(name)]
             scope_targets = {
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "projects/b":
             link_22("{}/@types/node".format(name), True, name, "@types/node")
@@ -486,12 +476,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/a-types".format(name),
             ]
             scope_targets = {
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
-                "@scoped": [
-                    ":{}/@scoped/a".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
+                "@scoped": [":{}/@scoped/a".format(name)],
             }
         elif bazel_package == "projects/alts":
             link_48("{}/lodash-4.17.20".format(name), False, name, "lodash-4.17.20")
@@ -642,14 +628,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "projects/a-types":
         if prod:
-            link_targets.extend([
-                ":{}/@types/node".format(name),
-            ])
+            link_targets.extend([":{}/@types/node".format(name)])
     elif bazel_package == "projects/b":
         if prod:
-            link_targets.extend([
-                ":{}/@scoped/a".format(name),
-            ])
+            link_targets.extend([":{}/@scoped/a".format(name)])
         if dev:
             link_targets.extend([
                 ":{}/@types/node".format(name),
