@@ -725,13 +725,11 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 
-    if link:
-        if bazel_package == "<LOCKVERSION>":
-            if prod:
+    if bazel_package == "<LOCKVERSION>":
+        if prod:
                 link_targets.append(":{}/@aspect-test-a-bad-scope".format(name))
                 link_targets.append(":{}/@aspect-test-custom-scope/a".format(name))
                 link_targets.append(":{}/@aspect-test/a".format(name))
@@ -769,60 +767,46 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/test-c200-d200".format(name))
                 link_targets.append(":{}/test-c201-d200".format(name))
                 link_targets.append(":{}/test-peer-types".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@aspect-test/b".format(name))
                 link_targets.append(":{}/@types/archiver".format(name))
                 link_targets.append(":{}/@types/node".format(name))
                 link_targets.append(":{}/alias-types-node".format(name))
                 link_targets.append(":{}/alias-only-sizzle".format(name))
-        elif bazel_package == "projects/peers-combo-2":
-            if prod:
+    elif bazel_package == "projects/peers-combo-2":
+        if prod:
                 link_targets.append(":{}/@aspect-test/c".format(name))
                 link_targets.append(":{}/@aspect-test/d".format(name))
-            if dev:
-                pass
-        elif bazel_package == "projects/peers-combo-1":
-            if prod:
+    elif bazel_package == "projects/peers-combo-1":
+        if prod:
                 link_targets.append(":{}/@aspect-test/c".format(name))
                 link_targets.append(":{}/@aspect-test/d".format(name))
-            if dev:
-                pass
-        elif bazel_package == "projects/peer-types":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "projects/peer-types":
+        if dev:
                 link_targets.append(":{}/jsonify".format(name))
                 link_targets.append(":{}/hello".format(name))
                 link_targets.append(":{}/@scoped/c".format(name))
                 link_targets.append(":{}/@scoped/a".format(name))
                 link_targets.append(":{}/@scoped/b".format(name))
-        elif bazel_package == "projects/a-types":
-            if prod:
+    elif bazel_package == "projects/a-types":
+        if prod:
                 link_targets.append(":{}/@types/node".format(name))
-            if dev:
-                pass
-        elif bazel_package == "projects/b":
-            if prod:
+    elif bazel_package == "projects/b":
+        if prod:
                 link_targets.append(":{}/@scoped/a".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@types/node".format(name))
                 link_targets.append(":{}/a-types".format(name))
-        elif bazel_package == "projects/alts":
-            if prod:
+    elif bazel_package == "projects/alts":
+        if prod:
                 link_targets.append(":{}/lodash-4.17.20".format(name))
                 link_targets.append(":{}/lodash-4.17.21".format(name))
                 link_targets.append(":{}/lodash".format(name))
                 link_targets.append(":{}/lodash-4.17.21-file".format(name))
-            if dev:
-                pass
-        elif bazel_package == "projects/c":
-            if prod:
+    elif bazel_package == "projects/c":
+        if prod:
                 link_targets.append(":{}/@scoped/a".format(name))
-            if dev:
-                pass
-        elif bazel_package == "projects/d":
-            if prod:
+    elif bazel_package == "projects/d":
+        if prod:
                 link_targets.append(":{}/@scoped/a".format(name))
-            if dev:
-                pass
     return link_targets

@@ -230,7 +230,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 """,
@@ -417,25 +416,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         links_targets_bzl[fp_link_package]["prod"].append("                " + fp_append_stmt)
 
     if len(links_targets_bzl) > 0:
-        npm_link_targets_bzl.append("""    if link:""")
         first_link = True
         for link_package, lists in links_targets_bzl.items():
-            npm_link_targets_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
+            npm_link_targets_bzl.append("""    {els}if bazel_package == "{pkg}":""".format(
                 els = "" if first_link else "el",
                 pkg = link_package,
             ))
 
-            npm_link_targets_bzl.append("""            if prod:""")
             if lists["prod"]:
+                npm_link_targets_bzl.append("""        if prod:""")
                 npm_link_targets_bzl.extend(lists["prod"])
-            else:
-                npm_link_targets_bzl.append("""                pass""")
 
-            npm_link_targets_bzl.append("""            if dev:""")
             if lists["dev"]:
+                npm_link_targets_bzl.append("""        if dev:""")
                 npm_link_targets_bzl.extend(lists["dev"])
-            else:
-                npm_link_targets_bzl.append("""                pass""")
 
             first_link = False
 
