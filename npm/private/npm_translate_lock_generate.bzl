@@ -163,16 +163,12 @@ sh_binary(
 
                     msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
                     fail(msg)
-                if deps_type not in fp_links[dep_key]:
-                    fp_links[dep_key][deps_type] = {}
                 fp_links[dep_key][deps_type][link_package] = True
             elif dep_version.startswith("link:"):
                 dep_link = dep_version[len("link:"):]
                 dep_path = helpers.link_package(root_package, dep_link)
                 dep_key = "{}+{}".format(dep_package, dep_path)
                 if fp_links.get(dep_key, False):
-                    if deps_type not in fp_links[dep_key]:
-                        fp_links[dep_key][deps_type] = {}
                     fp_links[dep_key][deps_type][link_package] = True
                 else:
                     transitive_deps = {}
