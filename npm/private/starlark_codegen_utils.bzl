@@ -3,6 +3,9 @@
 def _to_list_attr(list, indent_count = 0, indent_size = 4, quote_value = True):
     if not list:
         return "[]"
+    if len(list) == 1:
+        val = "\"{}\"".format(list[0]) if quote_value else list[0]
+        return "[%s]" % val
     tab = " " * indent_size
     indent = tab * indent_count
     result = "["

@@ -19,12 +19,8 @@ def npm_repositories():
             "ms": "2.1.3",
         },
         transitive_closure = {
-            "debug": [
-                "4.4.3",
-            ],
-            "ms": [
-                "2.1.3",
-            ],
+            "debug": ["4.4.3"],
+            "ms": ["2.1.3"],
         },
     )
 
@@ -39,8 +35,6 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==",
         transitive_closure = {
-            "ms": [
-                "2.1.3",
-            ],
+            "ms": ["2.1.3"],
         },
     )

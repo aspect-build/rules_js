@@ -30,13 +30,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if link:
         if bazel_package == "":
             link_0("{}/@aspect-test/c".format(name), False, name, "@aspect-test/c")
-            link_targets = [
-                ":{}/@aspect-test/c".format(name),
-            ]
+            link_targets = [":{}/@aspect-test/c".format(name)]
             scope_targets = {
-                "@aspect-test": [
-                    ":{}/@aspect-test/c".format(name),
-                ],
+                "@aspect-test": [":{}/@aspect-test/c".format(name)],
             }
     
     for link_fn in imported_links:
@@ -79,7 +75,5 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     if bazel_package == "":
         if prod:
-            link_targets.extend([
-                ":{}/@aspect-test/c".format(name),
-            ])
+            link_targets.extend([":{}/@aspect-test/c".format(name)])
     return link_targets

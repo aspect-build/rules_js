@@ -16,9 +16,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==",
         transitive_closure = {
-            "ansi-regex": [
-                "5.0.1",
-            ],
+            "ansi-regex": ["5.0.1"],
         },
     )
 
@@ -33,9 +31,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==",
         transitive_closure = {
-            "ansi-regex": [
-                "6.2.2",
-            ],
+            "ansi-regex": ["6.2.2"],
         },
     )
 
@@ -53,15 +49,9 @@ def npm_repositories():
             "color-convert": "2.0.1",
         },
         transitive_closure = {
-            "ansi-styles": [
-                "4.3.0",
-            ],
-            "color-convert": [
-                "2.0.1",
-            ],
-            "color-name": [
-                "1.1.4",
-            ],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
         },
     )
 
@@ -76,9 +66,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==",
         transitive_closure = {
-            "ansi-styles": [
-                "6.2.3",
-            ],
+            "ansi-styles": ["6.2.3"],
         },
     )
 
@@ -100,18 +88,10 @@ def npm_repositories():
             "@aspect-test/d": "2.0.0_at_aspect-test_c_2.0.2",
         },
         transitive_closure = {
-            "@aspect-test/a": [
-                "5.0.2",
-            ],
-            "@aspect-test/b": [
-                "5.0.2",
-            ],
-            "@aspect-test/c": [
-                "2.0.2",
-            ],
-            "@aspect-test/d": [
-                "2.0.0_at_aspect-test_c_2.0.2",
-            ],
+            "@aspect-test/a": ["5.0.2"],
+            "@aspect-test/b": ["5.0.2"],
+            "@aspect-test/c": ["2.0.2"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.2"],
         },
     )
 
@@ -133,18 +113,10 @@ def npm_repositories():
             "@aspect-test/d": "2.0.0_at_aspect-test_c_2.0.2",
         },
         transitive_closure = {
-            "@aspect-test/a": [
-                "5.0.2",
-            ],
-            "@aspect-test/b": [
-                "5.0.2",
-            ],
-            "@aspect-test/c": [
-                "2.0.2",
-            ],
-            "@aspect-test/d": [
-                "2.0.0_at_aspect-test_c_2.0.2",
-            ],
+            "@aspect-test/a": ["5.0.2"],
+            "@aspect-test/b": ["5.0.2"],
+            "@aspect-test/c": ["2.0.2"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.2"],
         },
     )
 
@@ -162,9 +134,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-vRuHi/8zxZ+IRGdgdX4VoMNFZrR9UqO87yQx61IGIkjgV7QcKUeu5jfvIE3Mr0WNQeMdO1JpyTx1UUpsE73iug==",
         transitive_closure = {
-            "@aspect-test/c": [
-                "2.0.0",
-            ],
+            "@aspect-test/c": ["2.0.0"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -183,9 +153,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-pyetgkZm4yfHYJYFaIi0rXM2VeR9qGw+gukEkrUO7LXuDIfkuvQd5TDduwIYIVvXGRjHKKjCa2BaA153nZfFyQ==",
         transitive_closure = {
-            "@aspect-test/c": [
-                "2.0.1",
-            ],
+            "@aspect-test/c": ["2.0.1"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -202,9 +170,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==",
         transitive_closure = {
-            "@aspect-test/c": [
-                "2.0.2",
-            ],
+            "@aspect-test/c": ["2.0.2"],
         },
         lifecycle_hooks = ["preinstall", "install", "postinstall"],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
@@ -226,12 +192,8 @@ def npm_repositories():
             "@aspect-test/c": "2.0.0",
         },
         transitive_closure = {
-            "@aspect-test/c": [
-                "2.0.0",
-            ],
-            "@aspect-test/d": [
-                "2.0.0_at_aspect-test_c_2.0.0",
-            ],
+            "@aspect-test/c": ["2.0.0"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.0"],
         },
     )
 
@@ -251,12 +213,8 @@ def npm_repositories():
             "@aspect-test/c": "2.0.1",
         },
         transitive_closure = {
-            "@aspect-test/c": [
-                "2.0.1",
-            ],
-            "@aspect-test/d": [
-                "2.0.0_at_aspect-test_c_2.0.1",
-            ],
+            "@aspect-test/c": ["2.0.1"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.1"],
         },
     )
 
@@ -274,12 +232,8 @@ def npm_repositories():
             "@aspect-test/c": "2.0.2",
         },
         transitive_closure = {
-            "@aspect-test/c": [
-                "2.0.2",
-            ],
-            "@aspect-test/d": [
-                "2.0.0_at_aspect-test_c_2.0.2",
-            ],
+            "@aspect-test/c": ["2.0.2"],
+            "@aspect-test/d": ["2.0.0_at_aspect-test_c_2.0.2"],
         },
     )
 
@@ -296,9 +250,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==",
         transitive_closure = {
-            "@aspect-test/e": [
-                "1.0.0",
-            ],
+            "@aspect-test/e": ["1.0.0"],
         },
     )
 
@@ -315,9 +267,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==",
         transitive_closure = {
-            "@aspect-test/h": [
-                "1.0.0",
-            ],
+            "@aspect-test/h": ["1.0.0"],
         },
     )
 
@@ -334,9 +284,7 @@ def npm_repositories():
         url = "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "@foo/jsonify": [
-                "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
-            ],
+            "@foo/jsonify": ["https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"],
         },
     )
 
@@ -361,9 +309,7 @@ def npm_repositories():
             "wrap-ansi-cjs": "npm:wrap-ansi@7.0.0",
         },
         transitive_closure = {
-            "@isaacs/cliui": [
-                "8.0.2",
-            ],
+            "@isaacs/cliui": ["8.0.2"],
             "ansi-regex": [
                 "5.0.1",
                 "6.2.2",
@@ -372,22 +318,14 @@ def npm_repositories():
                 "4.3.0",
                 "6.2.3",
             ],
-            "color-convert": [
-                "2.0.1",
-            ],
-            "color-name": [
-                "1.1.4",
-            ],
-            "eastasianwidth": [
-                "0.2.0",
-            ],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "eastasianwidth": ["0.2.0"],
             "emoji-regex": [
                 "8.0.0",
                 "9.2.2",
             ],
-            "is-fullwidth-code-point": [
-                "3.0.0",
-            ],
+            "is-fullwidth-code-point": ["3.0.0"],
             "string-width": [
                 "5.1.2",
                 "4.2.3",
@@ -423,51 +361,21 @@ def npm_repositories():
             "typescript": "5.5.2",
         },
         transitive_closure = {
-            "@rollup/plugin-typescript": [
-                "8.2.1_626159424",
-            ],
-            "@rollup/pluginutils": [
-                "3.1.0_rollup_2.14.0",
-            ],
-            "@types/estree": [
-                "0.0.39",
-            ],
-            "estree-walker": [
-                "1.0.1",
-            ],
-            "fsevents": [
-                "2.3.3",
-            ],
-            "function-bind": [
-                "1.1.2",
-            ],
-            "hasown": [
-                "2.0.2",
-            ],
-            "is-core-module": [
-                "2.16.1",
-            ],
-            "path-parse": [
-                "1.0.7",
-            ],
-            "picomatch": [
-                "2.3.1",
-            ],
-            "resolve": [
-                "1.22.11",
-            ],
-            "rollup": [
-                "2.14.0",
-            ],
-            "supports-preserve-symlinks-flag": [
-                "1.0.0",
-            ],
-            "tslib": [
-                "2.8.1",
-            ],
-            "typescript": [
-                "5.5.2",
-            ],
+            "@rollup/plugin-typescript": ["8.2.1_626159424"],
+            "@rollup/pluginutils": ["3.1.0_rollup_2.14.0"],
+            "@types/estree": ["0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "fsevents": ["2.3.3"],
+            "function-bind": ["1.1.2"],
+            "hasown": ["2.0.2"],
+            "is-core-module": ["2.16.1"],
+            "path-parse": ["1.0.7"],
+            "picomatch": ["2.3.1"],
+            "resolve": ["1.22.11"],
+            "rollup": ["2.14.0"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
+            "tslib": ["2.8.1"],
+            "typescript": ["5.5.2"],
         },
     )
 
@@ -488,24 +396,12 @@ def npm_repositories():
             "rollup": "2.14.0",
         },
         transitive_closure = {
-            "@rollup/pluginutils": [
-                "3.1.0_rollup_2.14.0",
-            ],
-            "@types/estree": [
-                "0.0.39",
-            ],
-            "estree-walker": [
-                "1.0.1",
-            ],
-            "fsevents": [
-                "2.3.3",
-            ],
-            "picomatch": [
-                "2.3.1",
-            ],
-            "rollup": [
-                "2.14.0",
-            ],
+            "@rollup/pluginutils": ["3.1.0_rollup_2.14.0"],
+            "@types/estree": ["0.0.39"],
+            "estree-walker": ["1.0.1"],
+            "fsevents": ["2.3.3"],
+            "picomatch": ["2.3.1"],
+            "rollup": ["2.14.0"],
         },
     )
 
@@ -525,21 +421,11 @@ def npm_repositories():
             "@types/glob": "8.1.0",
         },
         transitive_closure = {
-            "@types/archiver": [
-                "5.3.1",
-            ],
-            "@types/glob": [
-                "8.1.0",
-            ],
-            "@types/minimatch": [
-                "5.1.2",
-            ],
-            "@types/node": [
-                "18.19.54",
-            ],
-            "undici-types": [
-                "5.26.5",
-            ],
+            "@types/archiver": ["5.3.1"],
+            "@types/glob": ["8.1.0"],
+            "@types/minimatch": ["5.1.2"],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -554,9 +440,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==",
         transitive_closure = {
-            "@types/estree": [
-                "0.0.39",
-            ],
+            "@types/estree": ["0.0.39"],
         },
     )
 
@@ -575,18 +459,10 @@ def npm_repositories():
             "@types/node": "18.19.54",
         },
         transitive_closure = {
-            "@types/glob": [
-                "8.1.0",
-            ],
-            "@types/minimatch": [
-                "5.1.2",
-            ],
-            "@types/node": [
-                "18.19.54",
-            ],
-            "undici-types": [
-                "5.26.5",
-            ],
+            "@types/glob": ["8.1.0"],
+            "@types/minimatch": ["5.1.2"],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -601,9 +477,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==",
         transitive_closure = {
-            "@types/minimatch": [
-                "5.1.2",
-            ],
+            "@types/minimatch": ["5.1.2"],
         },
     )
 
@@ -625,12 +499,8 @@ def npm_repositories():
             "undici-types": "5.26.5",
         },
         transitive_closure = {
-            "@types/node": [
-                "18.19.54",
-            ],
-            "undici-types": [
-                "5.26.5",
-            ],
+            "@types/node": ["18.19.54"],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -647,9 +517,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==",
         transitive_closure = {
-            "@types/sizzle": [
-                "2.3.10",
-            ],
+            "@types/sizzle": ["2.3.10"],
         },
     )
 
@@ -667,12 +535,8 @@ def npm_repositories():
             "color-name": "1.1.4",
         },
         transitive_closure = {
-            "color-convert": [
-                "2.0.1",
-            ],
-            "color-name": [
-                "1.1.4",
-            ],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
         },
     )
 
@@ -687,9 +551,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
         transitive_closure = {
-            "color-name": [
-                "1.1.4",
-            ],
+            "color-name": ["1.1.4"],
         },
     )
 
@@ -708,12 +570,8 @@ def npm_repositories():
             "ms": "0.7.3",
         },
         transitive_closure = {
-            "debug": [
-                "https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53",
-            ],
-            "ms": [
-                "0.7.3",
-            ],
+            "debug": ["https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53"],
+            "ms": ["0.7.3"],
         },
     )
 
@@ -728,9 +586,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==",
         transitive_closure = {
-            "dequal": [
-                "2.0.3",
-            ],
+            "dequal": ["2.0.3"],
         },
     )
 
@@ -744,9 +600,7 @@ def npm_repositories():
         url = "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "diff": [
-                "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
-            ],
+            "diff": ["https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"],
         },
     )
 
@@ -761,9 +615,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==",
         transitive_closure = {
-            "eastasianwidth": [
-                "0.2.0",
-            ],
+            "eastasianwidth": ["0.2.0"],
         },
     )
 
@@ -778,9 +630,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==",
         transitive_closure = {
-            "emoji-regex": [
-                "8.0.0",
-            ],
+            "emoji-regex": ["8.0.0"],
         },
     )
 
@@ -795,9 +645,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==",
         transitive_closure = {
-            "emoji-regex": [
-                "9.2.2",
-            ],
+            "emoji-regex": ["9.2.2"],
         },
     )
 
@@ -812,9 +660,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==",
         transitive_closure = {
-            "estree-walker": [
-                "1.0.1",
-            ],
+            "estree-walker": ["1.0.1"],
         },
     )
 
@@ -829,9 +675,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
         transitive_closure = {
-            "fsevents": [
-                "2.3.3",
-            ],
+            "fsevents": ["2.3.3"],
         },
     )
 
@@ -846,9 +690,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==",
         transitive_closure = {
-            "function-bind": [
-                "1.1.2",
-            ],
+            "function-bind": ["1.1.2"],
         },
     )
 
@@ -866,12 +708,8 @@ def npm_repositories():
             "function-bind": "1.1.2",
         },
         transitive_closure = {
-            "function-bind": [
-                "1.1.2",
-            ],
-            "hasown": [
-                "2.0.2",
-            ],
+            "function-bind": ["1.1.2"],
+            "hasown": ["2.0.2"],
         },
     )
 
@@ -888,9 +726,7 @@ def npm_repositories():
         url = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "hello": [
-                "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
-            ],
+            "hello": ["https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello"],
         },
     )
 
@@ -908,15 +744,9 @@ def npm_repositories():
             "hasown": "2.0.2",
         },
         transitive_closure = {
-            "function-bind": [
-                "1.1.2",
-            ],
-            "hasown": [
-                "2.0.2",
-            ],
-            "is-core-module": [
-                "2.16.1",
-            ],
+            "function-bind": ["1.1.2"],
+            "hasown": ["2.0.2"],
+            "is-core-module": ["2.16.1"],
         },
     )
 
@@ -931,9 +761,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==",
         transitive_closure = {
-            "is-fullwidth-code-point": [
-                "3.0.0",
-            ],
+            "is-fullwidth-code-point": ["3.0.0"],
         },
     )
 
@@ -953,12 +781,8 @@ def npm_repositories():
             "is-number": "file:../vendored/is-number",
         },
         transitive_closure = {
-            "is-number": [
-                "file:../vendored/is-number",
-            ],
-            "is-odd": [
-                "0.1.0",
-            ],
+            "is-number": ["file:../vendored/is-number"],
+            "is-odd": ["0.1.0"],
         },
     )
 
@@ -978,12 +802,8 @@ def npm_repositories():
             "is-number": "file:../vendored/is-number",
         },
         transitive_closure = {
-            "is-number": [
-                "file:../vendored/is-number",
-            ],
-            "is-odd": [
-                "1.0.0",
-            ],
+            "is-number": ["file:../vendored/is-number"],
+            "is-odd": ["1.0.0"],
         },
     )
 
@@ -1003,12 +823,8 @@ def npm_repositories():
             "is-number": "file:../vendored/is-number",
         },
         transitive_closure = {
-            "is-number": [
-                "file:../vendored/is-number",
-            ],
-            "is-odd": [
-                "2.0.0",
-            ],
+            "is-number": ["file:../vendored/is-number"],
+            "is-odd": ["2.0.0"],
         },
     )
 
@@ -1028,12 +844,8 @@ def npm_repositories():
             "is-number": "file:../vendored/is-number",
         },
         transitive_closure = {
-            "is-number": [
-                "file:../vendored/is-number",
-            ],
-            "is-odd": [
-                "3.0.0",
-            ],
+            "is-number": ["file:../vendored/is-number"],
+            "is-odd": ["3.0.0"],
         },
     )
 
@@ -1053,12 +865,8 @@ def npm_repositories():
             "is-number": "file:../vendored/is-number",
         },
         transitive_closure = {
-            "is-number": [
-                "file:../vendored/is-number",
-            ],
-            "is-odd": [
-                "3.0.1",
-            ],
+            "is-number": ["file:../vendored/is-number"],
+            "is-odd": ["3.0.1"],
         },
     )
 
@@ -1074,9 +882,7 @@ def npm_repositories():
         url = "https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "jquery": [
-                "https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967",
-            ],
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"],
         },
     )
 
@@ -1092,9 +898,7 @@ def npm_repositories():
         url = "https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d",
         package_visibility = ["//visibility:public"],
         transitive_closure = {
-            "jquery": [
-                "https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d",
-            ],
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d"],
         },
     )
 
@@ -1109,9 +913,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==",
         transitive_closure = {
-            "kleur": [
-                "4.1.5",
-            ],
+            "kleur": ["4.1.5"],
         },
     )
 
@@ -1126,9 +928,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-jA3EFncTLSpNOJLgZUlI7Xrsg3t/DYbgPuRVD1qbLoyUXgzUEvB0EpJimh+WBM6CUNtAyKJ1CVPD+7wE+LrraQ==",
         transitive_closure = {
-            "lodash": [
-                "4.0.1",
-            ],
+            "lodash": ["4.0.1"],
         },
     )
 
@@ -1145,9 +945,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==",
         transitive_closure = {
-            "lodash": [
-                "4.17.20",
-            ],
+            "lodash": ["4.17.20"],
         },
     )
 
@@ -1164,9 +962,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         transitive_closure = {
-            "lodash": [
-                "4.17.21",
-            ],
+            "lodash": ["4.17.21"],
         },
     )
 
@@ -1184,9 +980,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
         transitive_closure = {
-            "lodash": [
-                "file:../vendored/lodash-4.17.21.tgz",
-            ],
+            "lodash": ["file:../vendored/lodash-4.17.21.tgz"],
         },
     )
 
@@ -1203,9 +997,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-fVA4xSydqtK9owabGcYw1r4EKEsMOVVeYQLeCXPu77Z+8Y2j2B2I16UqZlKIOHnYkJ4RSvpJ00ywy9IWjmuxYw==",
         transitive_closure = {
-            "meaning-of-life": [
-                "1.0.0_1541309197",
-            ],
+            "meaning-of-life": ["1.0.0_1541309197"],
         },
         patches = ["@//<LOCKVERSION>:patches/meaning-of-life@1.0.0-pnpm.patch"],
         patch_args = ["-p1"],
@@ -1222,9 +1014,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==",
         transitive_closure = {
-            "mri": [
-                "1.2.0",
-            ],
+            "mri": ["1.2.0"],
         },
     )
 
@@ -1239,9 +1029,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-lrKNzMWqQZgwJahtrtrM+9NgOoDUveDrVmm5aGXrf3BdtL0mq7X6IVzoZaw+TfNti29eHd1/8GI+h45K5cQ6/w==",
         transitive_closure = {
-            "ms": [
-                "0.7.3",
-            ],
+            "ms": ["0.7.3"],
         },
     )
 
@@ -1256,9 +1044,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==",
         transitive_closure = {
-            "path-parse": [
-                "1.0.7",
-            ],
+            "path-parse": ["1.0.7"],
         },
     )
 
@@ -1273,9 +1059,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==",
         transitive_closure = {
-            "picomatch": [
-                "2.3.1",
-            ],
+            "picomatch": ["2.3.1"],
         },
     )
 
@@ -1295,24 +1079,12 @@ def npm_repositories():
             "supports-preserve-symlinks-flag": "1.0.0",
         },
         transitive_closure = {
-            "function-bind": [
-                "1.1.2",
-            ],
-            "hasown": [
-                "2.0.2",
-            ],
-            "is-core-module": [
-                "2.16.1",
-            ],
-            "path-parse": [
-                "1.0.7",
-            ],
-            "resolve": [
-                "1.22.11",
-            ],
-            "supports-preserve-symlinks-flag": [
-                "1.0.0",
-            ],
+            "function-bind": ["1.1.2"],
+            "hasown": ["2.0.2"],
+            "is-core-module": ["2.16.1"],
+            "path-parse": ["1.0.7"],
+            "resolve": ["1.22.11"],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
         },
     )
 
@@ -1332,12 +1104,8 @@ def npm_repositories():
             "fsevents": "2.3.3",
         },
         transitive_closure = {
-            "fsevents": [
-                "2.3.3",
-            ],
-            "rollup": [
-                "2.14.0",
-            ],
+            "fsevents": ["2.3.3"],
+            "rollup": ["2.14.0"],
         },
     )
 
@@ -1357,12 +1125,8 @@ def npm_repositories():
             "fsevents": "2.3.3",
         },
         transitive_closure = {
-            "fsevents": [
-                "2.3.3",
-            ],
-            "rollup": [
-                "3.29.4",
-            ],
+            "fsevents": ["2.3.3"],
+            "rollup": ["3.29.4"],
         },
     )
 
@@ -1380,12 +1144,8 @@ def npm_repositories():
             "mri": "1.2.0",
         },
         transitive_closure = {
-            "mri": [
-                "1.2.0",
-            ],
-            "sade": [
-                "1.8.1",
-            ],
+            "mri": ["1.2.0"],
+            "sade": ["1.8.1"],
         },
     )
 
@@ -1405,21 +1165,11 @@ def npm_repositories():
             "strip-ansi": "6.0.1",
         },
         transitive_closure = {
-            "ansi-regex": [
-                "5.0.1",
-            ],
-            "emoji-regex": [
-                "8.0.0",
-            ],
-            "is-fullwidth-code-point": [
-                "3.0.0",
-            ],
-            "string-width": [
-                "4.2.3",
-            ],
-            "strip-ansi": [
-                "6.0.1",
-            ],
+            "ansi-regex": ["5.0.1"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
         },
     )
 
@@ -1439,21 +1189,11 @@ def npm_repositories():
             "strip-ansi": "7.1.2",
         },
         transitive_closure = {
-            "ansi-regex": [
-                "6.2.2",
-            ],
-            "eastasianwidth": [
-                "0.2.0",
-            ],
-            "emoji-regex": [
-                "9.2.2",
-            ],
-            "string-width": [
-                "5.1.2",
-            ],
-            "strip-ansi": [
-                "7.1.2",
-            ],
+            "ansi-regex": ["6.2.2"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["9.2.2"],
+            "string-width": ["5.1.2"],
+            "strip-ansi": ["7.1.2"],
         },
     )
 
@@ -1471,12 +1211,8 @@ def npm_repositories():
             "ansi-regex": "5.0.1",
         },
         transitive_closure = {
-            "ansi-regex": [
-                "5.0.1",
-            ],
-            "strip-ansi": [
-                "6.0.1",
-            ],
+            "ansi-regex": ["5.0.1"],
+            "strip-ansi": ["6.0.1"],
         },
     )
 
@@ -1494,12 +1230,8 @@ def npm_repositories():
             "ansi-regex": "6.2.2",
         },
         transitive_closure = {
-            "ansi-regex": [
-                "6.2.2",
-            ],
-            "strip-ansi": [
-                "7.1.2",
-            ],
+            "ansi-regex": ["6.2.2"],
+            "strip-ansi": ["7.1.2"],
         },
     )
 
@@ -1514,9 +1246,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==",
         transitive_closure = {
-            "supports-preserve-symlinks-flag": [
-                "1.0.0",
-            ],
+            "supports-preserve-symlinks-flag": ["1.0.0"],
         },
     )
 
@@ -1533,9 +1263,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
         transitive_closure = {
-            "tslib": [
-                "2.8.1",
-            ],
+            "tslib": ["2.8.1"],
         },
     )
 
@@ -1552,9 +1280,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-NcRtPEOsPFFWjobJEtfihkLCZCXZt/os3zf8nTxjVH3RvTSxjrCamJpbExGvYOF+tFHc3pA65qpdwPbzjohhew==",
         transitive_closure = {
-            "typescript": [
-                "5.5.2",
-            ],
+            "typescript": ["5.5.2"],
         },
     )
 
@@ -1569,9 +1295,7 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         integrity = "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==",
         transitive_closure = {
-            "undici-types": [
-                "5.26.5",
-            ],
+            "undici-types": ["5.26.5"],
         },
     )
 
@@ -1594,24 +1318,12 @@ def npm_repositories():
             "sade": "1.8.1",
         },
         transitive_closure = {
-            "dequal": [
-                "2.0.3",
-            ],
-            "diff": [
-                "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
-            ],
-            "kleur": [
-                "4.1.5",
-            ],
-            "mri": [
-                "1.2.0",
-            ],
-            "sade": [
-                "1.8.1",
-            ],
-            "uvu": [
-                "0.5.6",
-            ],
+            "dequal": ["2.0.3"],
+            "diff": ["https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"],
+            "kleur": ["4.1.5"],
+            "mri": ["1.2.0"],
+            "sade": ["1.8.1"],
+            "uvu": ["0.5.6"],
         },
     )
 
@@ -1631,33 +1343,15 @@ def npm_repositories():
             "strip-ansi": "6.0.1",
         },
         transitive_closure = {
-            "ansi-regex": [
-                "5.0.1",
-            ],
-            "ansi-styles": [
-                "4.3.0",
-            ],
-            "color-convert": [
-                "2.0.1",
-            ],
-            "color-name": [
-                "1.1.4",
-            ],
-            "emoji-regex": [
-                "8.0.0",
-            ],
-            "is-fullwidth-code-point": [
-                "3.0.0",
-            ],
-            "string-width": [
-                "4.2.3",
-            ],
-            "strip-ansi": [
-                "6.0.1",
-            ],
-            "wrap-ansi": [
-                "7.0.0",
-            ],
+            "ansi-regex": ["5.0.1"],
+            "ansi-styles": ["4.3.0"],
+            "color-convert": ["2.0.1"],
+            "color-name": ["1.1.4"],
+            "emoji-regex": ["8.0.0"],
+            "is-fullwidth-code-point": ["3.0.0"],
+            "string-width": ["4.2.3"],
+            "strip-ansi": ["6.0.1"],
+            "wrap-ansi": ["7.0.0"],
         },
     )
 
@@ -1677,26 +1371,12 @@ def npm_repositories():
             "strip-ansi": "7.1.2",
         },
         transitive_closure = {
-            "ansi-regex": [
-                "6.2.2",
-            ],
-            "ansi-styles": [
-                "6.2.3",
-            ],
-            "eastasianwidth": [
-                "0.2.0",
-            ],
-            "emoji-regex": [
-                "9.2.2",
-            ],
-            "string-width": [
-                "5.1.2",
-            ],
-            "strip-ansi": [
-                "7.1.2",
-            ],
-            "wrap-ansi": [
-                "8.1.0",
-            ],
+            "ansi-regex": ["6.2.2"],
+            "ansi-styles": ["6.2.3"],
+            "eastasianwidth": ["0.2.0"],
+            "emoji-regex": ["9.2.2"],
+            "string-width": ["5.1.2"],
+            "strip-ansi": ["7.1.2"],
+            "wrap-ansi": ["8.1.0"],
         },
     )

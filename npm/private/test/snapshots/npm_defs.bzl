@@ -2563,12 +2563,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@aspect-test/a".format(name),
                     ":{}/@aspect-test/c".format(name),
                 ],
-                "@gregmagolan": [
-                    ":{}/@gregmagolan/test-b".format(name),
-                ],
-                "@rollup": [
-                    ":{}/@rollup/plugin-commonjs".format(name),
-                ],
+                "@gregmagolan": [":{}/@gregmagolan/test-b".format(name)],
+                "@rollup": [":{}/@rollup/plugin-commonjs".format(name)],
                 "@mycorp": [
                     ":{}/@mycorp/pkg-a".format(name),
                     ":{}/@mycorp/pkg-d".format(name),
@@ -2612,9 +2608,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@aspect-test/e".format(name),
                     ":{}/@aspect-test/f".format(name),
                 ],
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/linked_pkg":
             link_45("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
@@ -2632,9 +2626,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@aspect-test/e".format(name),
                     ":{}/@aspect-test/f".format(name),
                 ],
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "":
             link_47("{}/@babel/cli".format(name), True, name, "@babel/cli")
@@ -2661,19 +2653,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@babel/core".format(name),
                     ":{}/@babel/plugin-transform-modules-commonjs".format(name),
                 ],
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/runfiles":
             link_68("{}/@bazel/runfiles".format(name), False, name, "@bazel/runfiles")
-            link_targets = [
-                ":{}/@bazel/runfiles".format(name),
-            ]
+            link_targets = [":{}/@bazel/runfiles".format(name)]
             scope_targets = {
-                "@bazel": [
-                    ":{}/@bazel/runfiles".format(name),
-                ],
+                "@bazel": [":{}/@bazel/runfiles".format(name)],
             }
         elif bazel_package == "npm/private/test":
             link_144("{}/@fastify/send".format(name), True, name, "@fastify/send")
@@ -2730,18 +2716,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/test-npm_package".format(name),
             ]
             scope_targets = {
-                "@fastify": [
-                    ":{}/@fastify/send".format(name),
-                ],
-                "@figma": [
-                    ":{}/@figma/nodegit".format(name),
-                ],
-                "@kubernetes": [
-                    ":{}/@kubernetes/client-node".format(name),
-                ],
-                "@plotly": [
-                    ":{}/@plotly/regl".format(name),
-                ],
+                "@fastify": [":{}/@fastify/send".format(name)],
+                "@figma": [":{}/@figma/nodegit".format(name)],
+                "@kubernetes": [":{}/@kubernetes/client-node".format(name)],
+                "@plotly": [":{}/@plotly/regl".format(name)],
             }
         elif bazel_package == "js/private/coverage/bundle":
             link_212("{}/@rollup/plugin-commonjs".format(name), True, name, "@rollup/plugin-commonjs")
@@ -2773,12 +2751,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/rollup".format(name),
             ]
             scope_targets = {
-                "@rollup": [
-                    ":{}/@rollup/plugin-node-resolve".format(name),
-                ],
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@rollup": [":{}/@rollup/plugin-node-resolve".format(name)],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/nextjs":
             link_255("{}/@tailwindcss/postcss".format(name), True, name, "@tailwindcss/postcss")
@@ -2794,19 +2768,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/tailwindcss".format(name),
             ]
             scope_targets = {
-                "@tailwindcss": [
-                    ":{}/@tailwindcss/postcss".format(name),
-                ],
+                "@tailwindcss": [":{}/@tailwindcss/postcss".format(name)],
             }
         elif bazel_package == "examples/js_lib_pkg/a":
             link_277("{}/@types/node".format(name), True, name, "@types/node")
-            link_targets = [
-                ":{}/@types/node".format(name),
-            ]
+            link_targets = [":{}/@types/node".format(name)]
             scope_targets = {
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/js_lib_pkg/b":
             link_277("{}/@types/node".format(name), True, name, "@types/node")
@@ -2820,9 +2788,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/@types/node".format(name),
             ]
             scope_targets = {
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "js/private/test/js_run_devserver":
             link_277("{}/@types/node".format(name), False, name, "@types/node")
@@ -2832,9 +2798,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/jasmine".format(name),
             ]
             scope_targets = {
-                "@types": [
-                    ":{}/@types/node".format(name),
-                ],
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/webpack_cli":
             link_288("{}/@vanilla-extract/css".format(name), False, name, "@vanilla-extract/css")
@@ -2861,9 +2825,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "examples/npm_package/libs/lib_a":
             link_355("{}/chalk".format(name), False, name, "chalk")
-            link_targets = [
-                ":{}/chalk".format(name),
-            ]
+            link_targets = [":{}/chalk".format(name)]
         elif bazel_package == "npm/private/test/npm_package":
             link_355("{}/chalk".format(name), False, name, "chalk")
             link_356("{}/chalk-alt".format(name), False, name, "chalk-alt")
@@ -2882,18 +2844,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             ]
         elif bazel_package == "examples/stack_traces":
             link_991("{}/source-map-support".format(name), True, name, "source-map-support")
-            link_targets = [
-                ":{}/source-map-support".format(name),
-            ]
+            link_targets = [":{}/source-map-support".format(name)]
         elif bazel_package == "examples/js_binary":
             _fp_link_2(name)
-            link_targets = [
-                ":{}/@mycorp/pkg-a".format(name),
-            ]
+            link_targets = [":{}/@mycorp/pkg-a".format(name)]
             scope_targets = {
-                "@mycorp": [
-                    ":{}/@mycorp/pkg-a".format(name),
-                ],
+                "@mycorp": [":{}/@mycorp/pkg-a".format(name)],
             }
         elif bazel_package == "examples/linked_consumer":
             _fp_link_6(name)
@@ -2910,13 +2866,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "examples/npm_package/packages/pkg_e":
             _fp_link_8(name)
-            link_targets = [
-                ":{}/@mycorp/pkg-d".format(name),
-            ]
+            link_targets = [":{}/@mycorp/pkg-d".format(name)]
             scope_targets = {
-                "@mycorp": [
-                    ":{}/@mycorp/pkg-d".format(name),
-                ],
+                "@mycorp": [":{}/@mycorp/pkg-d".format(name)],
             }
     
     for link_fn in imported_links:
@@ -2959,9 +2911,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     if bazel_package == "js/private/worker/src":
         if prod:
-            link_targets.extend([
-                ":{}/google-protobuf".format(name),
-            ])
+            link_targets.extend([":{}/google-protobuf".format(name)])
         if dev:
             link_targets.extend([
                 ":{}/abortcontroller-polyfill".format(name),
@@ -3056,9 +3006,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/runfiles":
         if prod:
-            link_targets.extend([
-                ":{}/@bazel/runfiles".format(name),
-            ])
+            link_targets.extend([":{}/@bazel/runfiles".format(name)])
     elif bazel_package == "npm/private/test":
         if dev:
             link_targets.extend([
@@ -3090,9 +3038,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "js/private/coverage/bundle":
         if prod:
-            link_targets.extend([
-                ":{}/c8".format(name),
-            ])
+            link_targets.extend([":{}/c8".format(name)])
         if dev:
             link_targets.extend([
                 ":{}/@rollup/plugin-commonjs".format(name),
@@ -3121,9 +3067,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/js_lib_pkg/a":
         if dev:
-            link_targets.extend([
-                ":{}/@types/node".format(name),
-            ])
+            link_targets.extend([":{}/@types/node".format(name)])
     elif bazel_package == "examples/js_lib_pkg/b":
         if prod:
             link_targets.extend([
@@ -3132,9 +3076,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/js_lib_pkg_a-alias_2".format(name),
             ])
         if dev:
-            link_targets.extend([
-                ":{}/@types/node".format(name),
-            ])
+            link_targets.extend([":{}/@types/node".format(name)])
     elif bazel_package == "js/private/test/js_run_devserver":
         if prod:
             link_targets.extend([
@@ -3157,9 +3099,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/npm_package/libs/lib_a":
         if prod:
-            link_targets.extend([
-                ":{}/chalk".format(name),
-            ])
+            link_targets.extend([":{}/chalk".format(name)])
     elif bazel_package == "npm/private/test/npm_package":
         if prod:
             link_targets.extend([
@@ -3175,14 +3115,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/stack_traces":
         if dev:
-            link_targets.extend([
-                ":{}/source-map-support".format(name),
-            ])
+            link_targets.extend([":{}/source-map-support".format(name)])
     elif bazel_package == "examples/js_binary":
         if dev:
-            link_targets.extend([
-                ":{}/@mycorp/pkg-a".format(name),
-            ])
+            link_targets.extend([":{}/@mycorp/pkg-a".format(name)])
     elif bazel_package == "examples/linked_consumer":
         if prod:
             link_targets.extend([
@@ -3191,9 +3127,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_e":
         if prod:
-            link_targets.extend([
-                ":{}/@mycorp/pkg-d".format(name),
-            ])
+            link_targets.extend([":{}/@mycorp/pkg-d".format(name)])
     return link_targets
 
 
