@@ -65,6 +65,7 @@ done
 run_target "$REPO_ROOT/e2e/npm_translate_lock" "//:write_npm_translate_lock_wksp" "npm_translate_lock" "--enable_bzlmod=false"
 
 # npm_translate_lock_empty
+run_target "$REPO_ROOT/e2e/npm_translate_lock_empty" "//:write_npm_translate_lock_bzlmod" "npm_translate_lock_empty"
 run_target "$REPO_ROOT/e2e/npm_translate_lock_empty" "//:write_npm_translate_lock_wksp" "npm_translate_lock_empty" "--enable_bzlmod=false"
 
 # npm_translate_lock_replace_packages

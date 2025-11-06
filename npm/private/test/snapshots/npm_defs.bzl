@@ -3092,15 +3092,13 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
 
     bazel_package = package if package != None else native.package_name()
-    link = bazel_package in _IMPORTER_PACKAGES
 
     link_targets = []
 
-    if link:
-        if bazel_package == "js/private/worker/src":
-            if prod:
+    if bazel_package == "js/private/worker/src":
+        if prod:
                 link_targets.append(":{}/google-protobuf".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/abortcontroller-polyfill".format(name))
                 link_targets.append(":{}/@rollup/plugin-commonjs".format(name))
                 link_targets.append(":{}/@rollup/plugin-json".format(name))
@@ -3111,17 +3109,13 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/rollup".format(name))
                 link_targets.append(":{}/tslib".format(name))
                 link_targets.append(":{}/typescript".format(name))
-        elif bazel_package == "js/private/test/image":
-            if prod:
+    elif bazel_package == "js/private/test/image":
+        if prod:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/@mycorp/pkg-a".format(name))
                 link_targets.append(":{}/@mycorp/pkg-d".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/npm_deps":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "examples/npm_deps":
+        if dev:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/@aspect-test/a".format(name))
                 link_targets.append(":{}/@aspect-test/c".format(name))
@@ -3138,42 +3132,34 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/@mycorp/pkg-a".format(name))
                 link_targets.append(":{}/@mycorp/pkg-d".format(name))
                 link_targets.append(":{}/@mycorp/pkg-e".format(name))
-        elif bazel_package == "examples/npm_package/packages/pkg_a":
-            if prod:
+    elif bazel_package == "examples/npm_package/packages/pkg_a":
+        if prod:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/uuid".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/npm_package/packages/pkg_b":
-            if prod:
+    elif bazel_package == "examples/npm_package/packages/pkg_b":
+        if prod:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/uuid".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/npm_package/packages/pkg_d":
-            if prod:
+    elif bazel_package == "examples/npm_package/packages/pkg_d":
+        if prod:
                 link_targets.append(":{}/acorn".format(name))
                 link_targets.append(":{}/uuid".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/linked_lib":
-            if prod:
+    elif bazel_package == "examples/linked_lib":
+        if prod:
                 link_targets.append(":{}/@aspect-test/e".format(name))
                 link_targets.append(":{}/alias-e".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@aspect-test/f".format(name))
                 link_targets.append(":{}/@types/node".format(name))
-        elif bazel_package == "examples/linked_pkg":
-            if prod:
+    elif bazel_package == "examples/linked_pkg":
+        if prod:
                 link_targets.append(":{}/@aspect-test/e".format(name))
                 link_targets.append(":{}/alias-e".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@aspect-test/f".format(name))
                 link_targets.append(":{}/@types/node".format(name))
-        elif bazel_package == "":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "":
+        if dev:
                 link_targets.append(":{}/@babel/cli".format(name))
                 link_targets.append(":{}/@babel/core".format(name))
                 link_targets.append(":{}/@babel/plugin-transform-modules-commonjs".format(name))
@@ -3182,15 +3168,11 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/inline-fixtures".format(name))
                 link_targets.append(":{}/jsonpath-plus".format(name))
                 link_targets.append(":{}/typescript".format(name))
-        elif bazel_package == "examples/runfiles":
-            if prod:
+    elif bazel_package == "examples/runfiles":
+        if prod:
                 link_targets.append(":{}/@bazel/runfiles".format(name))
-            if dev:
-                pass
-        elif bazel_package == "npm/private/test":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "npm/private/test":
+        if dev:
                 link_targets.append(":{}/@fastify/send".format(name))
                 link_targets.append(":{}/@figma/nodegit".format(name))
                 link_targets.append(":{}/@kubernetes/client-node".format(name))
@@ -3216,94 +3198,74 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 link_targets.append(":{}/typescript".format(name))
                 link_targets.append(":{}/webpack-bundle-analyzer".format(name))
                 link_targets.append(":{}/test-npm_package".format(name))
-        elif bazel_package == "js/private/coverage/bundle":
-            if prod:
+    elif bazel_package == "js/private/coverage/bundle":
+        if prod:
                 link_targets.append(":{}/c8".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@rollup/plugin-commonjs".format(name))
                 link_targets.append(":{}/@rollup/plugin-json".format(name))
                 link_targets.append(":{}/@rollup/plugin-node-resolve".format(name))
                 link_targets.append(":{}/rollup".format(name))
-        elif bazel_package == "js/private/devserver/src":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "js/private/devserver/src":
+        if dev:
                 link_targets.append(":{}/@rollup/plugin-node-resolve".format(name))
                 link_targets.append(":{}/@types/node".format(name))
                 link_targets.append(":{}/rollup".format(name))
-        elif bazel_package == "examples/nextjs":
-            if prod:
+    elif bazel_package == "examples/nextjs":
+        if prod:
                 link_targets.append(":{}/next".format(name))
                 link_targets.append(":{}/react-dom".format(name))
                 link_targets.append(":{}/react".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@tailwindcss/postcss".format(name))
                 link_targets.append(":{}/tailwindcss".format(name))
-        elif bazel_package == "examples/js_lib_pkg/a":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "examples/js_lib_pkg/a":
+        if dev:
                 link_targets.append(":{}/@types/node".format(name))
-        elif bazel_package == "examples/js_lib_pkg/b":
-            if prod:
+    elif bazel_package == "examples/js_lib_pkg/b":
+        if prod:
                 link_targets.append(":{}/js_lib_pkg_a".format(name))
                 link_targets.append(":{}/js_lib_pkg_a-alias_1".format(name))
                 link_targets.append(":{}/js_lib_pkg_a-alias_2".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@types/node".format(name))
-        elif bazel_package == "js/private/test/js_run_devserver":
-            if prod:
+    elif bazel_package == "js/private/test/js_run_devserver":
+        if prod:
                 link_targets.append(":{}/@types/node".format(name))
                 link_targets.append(":{}/jasmine".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/webpack_cli":
-            if prod:
+    elif bazel_package == "examples/webpack_cli":
+        if prod:
                 link_targets.append(":{}/@vanilla-extract/css".format(name))
                 link_targets.append(":{}/css-loader".format(name))
                 link_targets.append(":{}/mathjs".format(name))
-            if dev:
+        if dev:
                 link_targets.append(":{}/@vanilla-extract/webpack-plugin".format(name))
                 link_targets.append(":{}/mini-css-extract-plugin".format(name))
                 link_targets.append(":{}/webpack-cli".format(name))
                 link_targets.append(":{}/webpack".format(name))
-        elif bazel_package == "examples/npm_package/libs/lib_a":
-            if prod:
+    elif bazel_package == "examples/npm_package/libs/lib_a":
+        if prod:
                 link_targets.append(":{}/chalk".format(name))
-            if dev:
-                pass
-        elif bazel_package == "npm/private/test/npm_package":
-            if prod:
+    elif bazel_package == "npm/private/test/npm_package":
+        if prod:
                 link_targets.append(":{}/chalk".format(name))
                 link_targets.append(":{}/chalk-alt".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/macro":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "examples/macro":
+        if dev:
                 link_targets.append(":{}/mocha-junit-reporter".format(name))
                 link_targets.append(":{}/mocha-multi-reporters".format(name))
                 link_targets.append(":{}/mocha".format(name))
-        elif bazel_package == "examples/stack_traces":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "examples/stack_traces":
+        if dev:
                 link_targets.append(":{}/source-map-support".format(name))
-        elif bazel_package == "examples/js_binary":
-            if prod:
-                pass
-            if dev:
+    elif bazel_package == "examples/js_binary":
+        if dev:
                 link_targets.append(":{}/@mycorp/pkg-a".format(name))
-        elif bazel_package == "examples/linked_consumer":
-            if prod:
+    elif bazel_package == "examples/linked_consumer":
+        if prod:
                 link_targets.append(":{}/@lib/test".format(name))
                 link_targets.append(":{}/@lib/test2".format(name))
-            if dev:
-                pass
-        elif bazel_package == "examples/npm_package/packages/pkg_e":
-            if prod:
+    elif bazel_package == "examples/npm_package/packages/pkg_e":
+        if prod:
                 link_targets.append(":{}/@mycorp/pkg-d".format(name))
-            if dev:
-                pass
     return link_targets
