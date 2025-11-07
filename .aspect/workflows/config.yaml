@@ -3,6 +3,9 @@ workspaces:
     .:
         icon: js
         label: rules_js
+        tasks:
+            - bazel-9:
+                  without: true
     e2e/bzlmod:
         icon: bazel
         tasks: &e2e_tasks
