@@ -1158,6 +1158,7 @@ _NPM_PACKAGE_VISIBILITY = {
 
 _NPM_PACKAGE_LOCATIONS = {
     "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "inline-fixtures", "jsonpath-plus", "typescript"],
+    "examples/js_binary": ["@mycorp/pkg-a"],
     "examples/js_lib_pkg/a": ["@types/node"],
     "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias_1", "js_lib_pkg_a-alias_2", "@types/node"],
     "examples/linked_consumer": ["@lib/test", "@lib/test2"],
@@ -1165,7 +1166,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
     "examples/macro": ["mocha-junit-reporter", "mocha-multi-reporters", "mocha"],
     "examples/nextjs": ["@tailwindcss/postcss", "next", "react-dom", "react", "tailwindcss"],
-    "examples/npm_deps": ["acorn", "@aspect-test/a", "@aspect-test/c", "@gregmagolan/test-b", "@rollup/plugin-commonjs", "debug", "meaning-of-life", "mobx-react", "mobx", "ms", "react", "rollup", "uvu"],
+    "examples/npm_deps": ["@mycorp/pkg-a", "@mycorp/pkg-d", "@mycorp/pkg-e", "acorn", "@aspect-test/a", "@aspect-test/c", "@gregmagolan/test-b", "@rollup/plugin-commonjs", "debug", "meaning-of-life", "mobx-react", "mobx", "ms", "react", "rollup", "uvu"],
     "examples/npm_package/libs/lib_a": ["chalk"],
     "examples/npm_package/packages/pkg_a": ["acorn", "uuid"],
     "examples/npm_package/packages/pkg_b": ["acorn", "uuid"],
@@ -1179,7 +1180,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/image": ["@mycorp/pkg-a", "@mycorp/pkg-d", "acorn"],
     "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
     "js/private/worker/src": ["abortcontroller-polyfill", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
-    "npm/private/test": ["@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
+    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "npm/private/test/npm_package": ["chalk", "chalk-alt"],
 }
 
