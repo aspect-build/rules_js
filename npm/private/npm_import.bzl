@@ -641,10 +641,6 @@ def _npm_import_rule_impl(rctx):
         patch_directory = _EXTRACT_TO_DIRNAME,
     )
 
-    pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
-
-    bins = _get_bin_entries(pkg_json, rctx.attr.package)
-
     generated_by_prefix = _make_generated_by_prefix(rctx.attr.package, rctx.attr.version)
 
     rctx_files = {
@@ -663,11 +659,17 @@ def _npm_import_rule_impl(rctx):
     if rctx.attr.extra_build_content:
         rctx_files["BUILD.bazel"].append("\n" + rctx.attr.extra_build_content)
 
-    if bins:
-        package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
-        package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
+    # If this package has binaries and is linked into any other packages:
+    # - generate the bin bzl and build files
+    # - write ^ into each package linking to this package.
+    if rctx.attr.link_packages:
+        pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
+        bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
-        for link_package in rctx.attr.link_packages.keys():
+        if bins:
+            package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
+            package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
+
             bin_bzl = [
                 generated_by_prefix,
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
@@ -711,18 +713,20 @@ bin = bin_factory("node_modules")
                 bin_struct_fields = "\n".join(bin_struct_fields),
             ))
 
-            rctx_files["{}/{}".format(link_package, _PACKAGE_JSON_BZL_FILENAME) if link_package else _PACKAGE_JSON_BZL_FILENAME] = bin_bzl
+            # Duplicate the bzl+BUILD into each linking package
+            for link_package in rctx.attr.link_packages.keys():
+                rctx_files["{}/{}".format(link_package, _PACKAGE_JSON_BZL_FILENAME) if link_package else _PACKAGE_JSON_BZL_FILENAME] = bin_bzl
 
-            build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
-            if build_file not in rctx_files:
-                rctx_files[build_file] = [generated_by_prefix]
-            if rctx.attr.generate_bzl_library_targets:
-                rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
-                rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                    name = link_package[link_package.rfind("/") + 1] if link_package else package_name_no_scope,
-                    src = _PACKAGE_JSON_BZL_FILENAME,
-                ))
-            rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
+                build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
+                if build_file not in rctx_files:
+                    rctx_files[build_file] = [generated_by_prefix]
+                if rctx.attr.generate_bzl_library_targets:
+                    rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
+                    rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
+                        name = link_package[link_package.rfind("/") + 1] if link_package else package_name_no_scope,
+                        src = _PACKAGE_JSON_BZL_FILENAME,
+                    ))
+                rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
 
     rules_js_metadata = {}
     if rctx.attr.lifecycle_hooks:
