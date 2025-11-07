@@ -16,10 +16,12 @@ workspaces:
                   without: true
             - bazel-9:
                   without: true
-    e2e/git_dep_metadata: &npm_e2e
+    e2e/git_dep_metadata:
         icon: npm
         tasks: *e2e_tasks
-    e2e/gyp_no_install_script: *npm_e2e
+    e2e/gyp_no_install_script:
+        icon: npm
+        tasks: *e2e_tasks
     # rules_docker not compatible with Bazel 7.
     # See https://github.com/bazelbuild/bazel/issues/20494#issuecomment-1852401451.
     # e2e/js_image_docker:
@@ -28,47 +30,99 @@ workspaces:
         tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/js_run_devserver:
-    e2e/npm_link_package: *npm_e2e
-    e2e/npm_link_package-esm: *npm_e2e
-    e2e/npm_link_package-rerooted: *npm_e2e
-    e2e/npm_translate_lock: *npm_e2e
-    e2e/npm_translate_lock_replace_packages: *npm_e2e
-    e2e/npm_translate_lock_empty: *npm_e2e
-    e2e/npm_translate_lock_exclude_package_contents: *npm_e2e
-    e2e/npm_translate_lock_multi: *npm_e2e
-    e2e/npm_translate_lock_partial_clone: *npm_e2e
+    e2e/npm_link_package:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_link_package-esm:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_link_package-rerooted:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_replace_packages:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_empty:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_exclude_package_contents:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_multi:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_partial_clone:
+        icon: npm
+        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/npm_translate_lock_package_visibility:
-    e2e/npm_translate_lock_subdir_patch: *npm_e2e
+    e2e/npm_translate_lock_subdir_patch:
+        icon: npm
+        tasks: *e2e_tasks
     # Requires an auth token
     # e2e/npm_translate_lock_auth:
-    e2e/npm_translate_lock_disable_hooks: *npm_e2e
+    e2e/npm_translate_lock_disable_hooks:
+        icon: npm
+        tasks: *e2e_tasks
     # Requires an SSH token
     # e2e/npm_translate_lock_git+ssh:
-    e2e/npm_translate_package_lock: *npm_e2e
+    e2e/npm_translate_package_lock:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/npm_translate_yarn_lock:
         icon: yarn
         tasks: *e2e_tasks
-    e2e/package_json_module: *npm_e2e
-    e2e/patch_from_repo: *npm_e2e
-    e2e/pnpm_lockfiles: &pnpm_e2e
+    e2e/package_json_module:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/patch_from_repo:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/pnpm_lockfiles:
         icon: pnpm
         tasks: *e2e_tasks
-    e2e/pnpm_repo_install: *pnpm_e2e
-    e2e/pnpm_workspace: *pnpm_e2e
-    e2e/pnpm_workspace_deps: *pnpm_e2e
-    e2e/pnpm_workspace_rerooted: *pnpm_e2e
-    e2e/repo_mapping: &js_e2e
+    e2e/pnpm_repo_install:
+        icon: pnpm
+        tasks: *e2e_tasks
+    e2e/pnpm_workspace:
+        icon: pnpm
+        tasks: *e2e_tasks
+    e2e/pnpm_workspace_deps:
+        icon: pnpm
+        tasks: *e2e_tasks
+    e2e/pnpm_workspace_rerooted:
+        icon: pnpm
+        tasks: *e2e_tasks
+    e2e/repo_mapping:
         icon: js
         tasks: *e2e_tasks
-    e2e/rules_foo: *js_e2e
-    e2e/runfiles: *js_e2e
-    e2e/stamped_package_json: *npm_e2e
-    e2e/vendored_node: *js_e2e
-    e2e/vendored_tarfile: *js_e2e
-    e2e/verify_patches: *js_e2e
-    e2e/worker: *js_e2e
-    e2e/workspace: *js_e2e
+    e2e/rules_foo:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/runfiles:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/stamped_package_json:
+        icon: npm
+        tasks: *e2e_tasks
+    e2e/vendored_node:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/vendored_tarfile:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/verify_patches:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/worker:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/workspace:
+        icon: js
+        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/update_pnpm_lock:
     # e2e/update_pnpm_lock_with_import:
