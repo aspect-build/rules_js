@@ -75,16 +75,16 @@ def generate_repository_files(rctx, importers, packages, patched_dependencies, o
 
     rctx_files = {
         "BUILD.bazel": [
+            """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
-            "",
+            """load("@bazel_skylib//rules:write_file.bzl", "write_file")""",
             """
 # A no-op run target that can be run to invalidate the repository
 # to update the pnpm lockfile. Useful under bzlmod where
 # `bazel sync --only=repo` is a no-op.
-sh_binary(
-    name = "sync",
-    srcs = ["@aspect_rules_js//npm/private:noop.sh"],
-)""",
+write_file(name="noop", out="noop.js", content=["#!/usr/bin/env node"])
+js_binary(name = "sync", entry_point = "noop.js")
+""",
             "",
             "exports_files({})".format(starlark_codegen_utils.to_list_attr([
                 rctx.attr.defs_bzl_filename,
