@@ -152,3 +152,20 @@ npm_link_package_store = rule(
     attrs = _ATTRS,
     provides = [DefaultInfo, JsInfo],
 )
+
+# A private util method to minimize the generated code for local package store links.
+# May be changed/deleted at any time to minimize code from the generated npm_link_all_packages().
+def npm_local_link_package_store_internal(name, src, link_visibility = ["//visibility:public"]):
+    npm_link_package_store(
+        name = name,
+        src = src,
+        visibility = link_visibility,
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/dir".format(name),
+        srcs = [":" + name],
+        output_group = utils.package_directory_output_group,
+        visibility = link_visibility,
+        tags = ["manual"],
+    )

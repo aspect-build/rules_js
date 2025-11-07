@@ -43,18 +43,9 @@ _FP_DIRECT_TMPL = \
 # Generated npm_link_package_store for linking of first-party "{pkg}" package
 # buildifier: disable=function-docstring
 def _fp_link_{i}(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{{}}/{pkg}".format(name),
-        src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),
-        visibility = {link_visibility},
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{{}}/{pkg}/dir".format(name),
-        srcs = [":{{}}/{pkg}".format(name)],
-        output_group = "{package_directory_output_group}",
-        visibility = {link_visibility},
-        tags = ["manual"],
+        src = "//{root_package}:{package_store_root}/{{}}/{package_store_name}".format(name),{maybe_visibility}
     )"""
 
 _BZL_LIBRARY_TMPL = \
@@ -422,18 +413,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package_store_root = utils.package_store_root,
         ))
 
-        package_visibility, _ = helpers.gather_values_from_matching_names(True, rctx.attr.package_visibility, "*", fp_package)
-        if len(package_visibility) == 0:
-            package_visibility = ["//visibility:public"]
-
         # Generate a single _FP_DIRECT_TMPL block with all link packages
         if len(fp_link["link_packages"]) > 0:
+            package_visibility, _ = helpers.gather_values_from_matching_names(True, rctx.attr.package_visibility, "*", fp_package)
+            if len(package_visibility) == 0:
+                package_visibility = None
+
             link_factories_bzl.append(_FP_DIRECT_TMPL.format(
                 i = i,
-                link_packages = list(fp_link["link_packages"].keys()),
-                link_visibility = package_visibility,
+                maybe_visibility = "\n        link_visibility = {},".format(package_visibility) if package_visibility else "",
                 pkg = fp_package,
-                package_directory_output_group = utils.package_directory_output_group,
                 root_package = root_package,
                 package_store_name = utils.package_store_name(fp_package, "0.0.0"),
                 package_store_root = utils.package_store_root,
@@ -501,7 +490,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if fp_links:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")""")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")""")
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")""")

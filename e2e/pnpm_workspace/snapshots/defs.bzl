@@ -18,7 +18,7 @@ load("@@aspect_rules_js~~npm~npm__undici-types__5.26.5__links//:defs.bzl", store
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_link_package_store = "npm_link_package_store")
+load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
@@ -363,118 +363,55 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 # Generated npm_link_package_store for linking of first-party "vendored-a" package
 # buildifier: disable=function-docstring
 def _fp_link_0(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/vendored-a".format(name),
         src = "//:.aspect_rules_js/{}/vendored-a@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/vendored-a/dir".format(name),
-        srcs = [":{}/vendored-a".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "vendored-b" package
 # buildifier: disable=function-docstring
 def _fp_link_1(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/vendored-b".format(name),
         src = "//:.aspect_rules_js/{}/vendored-b@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/vendored-b/dir".format(name),
-        srcs = [":{}/vendored-b".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/a" package
 # buildifier: disable=function-docstring
 def _fp_link_2(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/a".format(name),
         src = "//:.aspect_rules_js/{}/@lib+a@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/a/dir".format(name),
-        srcs = [":{}/@lib/a".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/b" package
 # buildifier: disable=function-docstring
 def _fp_link_3(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/b".format(name),
         src = "//:.aspect_rules_js/{}/@lib+b@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/b/dir".format(name),
-        srcs = [":{}/@lib/b".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/b_alias" package
 # buildifier: disable=function-docstring
 def _fp_link_4(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/b_alias".format(name),
         src = "//:.aspect_rules_js/{}/@lib+b_alias@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/b_alias/dir".format(name),
-        srcs = [":{}/@lib/b_alias".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/c" package
 # buildifier: disable=function-docstring
 def _fp_link_5(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/c".format(name),
         src = "//:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/c/dir".format(name),
-        srcs = [":{}/@lib/c".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/d" package
 # buildifier: disable=function-docstring
 def _fp_link_6(name):
-    _npm_link_package_store(
+    _npm_local_link_package_store(
         name = "{}/@lib/d".format(name),
         src = "//:.aspect_rules_js/{}/@lib+d@0.0.0".format(name),
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
-    )
-    native.filegroup(
-        name = "{}/@lib/d/dir".format(name),
-        srcs = [":{}/@lib/d".format(name)],
-        output_group = "package_directory",
-        visibility = ["//visibility:public"],
-        tags = ["manual"],
     )
