@@ -37,15 +37,15 @@ def rules_js_dependencies():
     # We include them here to avoid breakages for users who may have been relying on the implicit presence of these dependencies.
     http_archive(
         name = "tar.bzl",
-        sha256 = "a147d473a359742db2a43c8a9a8e04e31321582e6bb669dafc5ba6b2c59845d1",
-        strip_prefix = "tar.bzl-0.6.0",
-        url = "https://github.com/bazel-contrib/tar.bzl/releases/download/v0.6.0/tar.bzl-v0.6.0.tar.gz",
+        sha256 = "8710443803496e1b9b5b66f56ae55aa586338cb09a4ddeb9bb3d6df4e6da44c7",
+        strip_prefix = "tar.bzl-0.2.0",
+        url = "https://github.com/alexeagle/tar.bzl/releases/download/v0.2.0/tar.bzl-v0.2.0.tar.gz",
     )
     http_archive(
         name = "jq.bzl",
-        sha256 = "21617eb71fb775a748ef5639131ab943ef39946bd2a4ce96ea60b03f985db0c5",
-        strip_prefix = "jq.bzl-0.4.0",
-        url = "https://github.com/bazel-contrib/jq.bzl/releases/download/v0.4.0/jq.bzl-v0.4.0.tar.gz",
+        sha256 = "7b63435aa19cc6a0cfd1a82fbdf2c7a2f0a94db1a79ff7a4469ffa94286261ab",
+        strip_prefix = "jq.bzl-0.1.0",
+        url = "https://github.com/bazel-contrib/jq.bzl/releases/download/v0.1.0/jq.bzl-v0.1.0.tar.gz",
     )
     http_archive(
         name = "rules_shell",
