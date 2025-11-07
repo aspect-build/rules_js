@@ -32,7 +32,7 @@ _FP_STORE_TMPL = \
             package_store_name = "{package_store_name}",
             src = "{npm_package_target}",
             package = "{package}",
-            version = "0.0.0",
+            version = "{version}",
             deps = {deps},
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -228,7 +228,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         ),
     ]
 
-    # Imports and header comments at the top of the generatedfile
+    # Imports and header comments at the top of the generated file
     defs_bzl_header = []
 
     # The store invocations and setup code done once at the root package
@@ -349,12 +349,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     # Generate the first-party package stores and linking of first-party packages
     for i, fp_link in enumerate(fp_links.values()):
         fp_package = fp_link.get("package")
+        fp_version = fp_link.get("version", "0.0.0")
         fp_path = fp_link.get("path")
         fp_deps = fp_link.get("deps")
         fp_target = "//{}:{}".format(
             fp_path,
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
+        fp_package_store_name = utils.package_store_name(fp_package, fp_version)
 
         # Add first-party package links to npm_link_targets for each package that uses it
         for fp_link_package, is_dev in fp_link.get("link_packages", {}).items():
@@ -377,7 +379,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
             npm_package_target = fp_target,
             package = fp_package,
-            package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+            version = fp_version,
+            package_store_name = fp_package_store_name,
             package_store_root = utils.package_store_root,
         ))
 
@@ -392,7 +395,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 maybe_visibility = "\n        link_visibility = {},".format(package_visibility) if package_visibility else "",
                 pkg = fp_package,
                 root_package = root_package,
-                package_store_name = utils.package_store_name(fp_package, "0.0.0"),
+                package_store_name = fp_package_store_name,
                 package_store_root = utils.package_store_root,
             ))
 
