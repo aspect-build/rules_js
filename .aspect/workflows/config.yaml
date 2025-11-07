@@ -14,6 +14,8 @@ workspaces:
                   without: true
             - bazel-8:
                   without: true
+            - bazel-9:
+                  without: true
     e2e/git_dep_metadata:
         icon: npm
         tasks: *e2e_tasks
@@ -146,6 +148,13 @@ tasks:
               flags: ['--test_tag_filters=-skip-on-bazel8']
           env:
               USE_BAZEL_VERSION: '8.x'
+    - test:
+          name: Bazel 9
+          id: bazel-9
+          bazel:
+              flags: ['--test_tag_filters=-skip-on-bazel9']
+          env:
+              USE_BAZEL_VERSION: '9.*'
     - format:
           queue: aspect-medium
     - buildifier:
