@@ -4,13 +4,7 @@ local_path_override(
     path = "../..",
 )
 
-bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
-
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
-pnpm.pnpm(
-    name = "pnpm",
-)
-use_repo(pnpm, "pnpm", "pnpm__links")
+# Use the DEFAULT pnpm_version and do not override
 
 npm = use_extension(
     "@aspect_rules_js//npm:extensions.bzl",
@@ -19,8 +13,6 @@ npm = use_extension(
 )
 npm.npm_translate_lock(
     name = "npm",
-    data = ["//:package.json"],
-    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",

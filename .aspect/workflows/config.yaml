@@ -99,6 +99,9 @@ workspaces:
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
         tasks: *e2e_tasks
+    e2e/pnpm_version:
+        icon: pnpm
+        tasks: *e2e_tasks
     e2e/repo_mapping:
         icon: js
         tasks: *e2e_tasks

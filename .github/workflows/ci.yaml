@@ -64,6 +64,7 @@ jobs:
                     e2e/pnpm_workspace
                     e2e/pnpm_workspace_deps
                     e2e/pnpm_workspace_rerooted
+                    e2e/pnpm_version
                     e2e/runfiles
                     e2e/rules_foo
                     e2e/stamped_package_json
