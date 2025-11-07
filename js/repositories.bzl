@@ -32,15 +32,22 @@ def rules_js_dependencies():
         url = "https://github.com/bazel-contrib/bazel-lib/releases/download/v2.17.1/bazel-lib-v2.17.1.tar.gz",
     )
 
-    # A transitive dependency of aspect_bazel_lib.
+    # Transitive dependencies of aspect_bazel_lib.
     # Prior to upgrading bazel-lib past 2.16.0, users didn't need to call the bazel_lib_dependencies function.
-    # We include it here to avoid breakages for users who may have been relying on the implicit presence of this dependency.
+    # We include them here to avoid breakages for users who may have been relying on the implicit presence of these dependencies.
     http_archive(
         name = "tar.bzl",
         sha256 = "a147d473a359742db2a43c8a9a8e04e31321582e6bb669dafc5ba6b2c59845d1",
         strip_prefix = "tar.bzl-0.6.0",
         url = "https://github.com/bazel-contrib/tar.bzl/releases/download/v0.6.0/tar.bzl-v0.6.0.tar.gz",
     )
+    http_archive(
+        name = "jq.bzl",
+        sha256 = "21617eb71fb775a748ef5639131ab943ef39946bd2a4ce96ea60b03f985db0c5",
+        strip_prefix = "jq.bzl-0.4.0",
+        url = "https://github.com/bazel-contrib/jq.bzl/releases/download/v0.4.0/jq.bzl-v0.4.0.tar.gz",
+    )
+    # End aspect_bazel_lib transitive dependencies
 
     http_archive(
         name = "bazel_lib",
