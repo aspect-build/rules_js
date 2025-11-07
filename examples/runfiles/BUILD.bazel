@@ -11,7 +11,10 @@ js_test(
         ":node_modules/@bazel/runfiles",
     ],
     entry_point = "test.js",
-    tags = ["skip-on-bazel8"],
+    tags = [
+        "skip-on-bazel8",
+        "skip-on-bazel9",
+    ],
 )
 
 # Path of file must start similar to `test_fixture.md` in order to regression-test a
