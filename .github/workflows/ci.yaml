@@ -141,7 +141,7 @@ jobs:
                     # and remove the need for bazel 6 workspace support for local development.
                     - bazel-version:
                           major: 6
-                      bzlmod: 0
+                      folder: .
                     # Don't run workspace tests unit tests.
                     - bzlmod: 0
                       folder: .
