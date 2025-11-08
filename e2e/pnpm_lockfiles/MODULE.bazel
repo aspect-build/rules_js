@@ -98,6 +98,10 @@ npm = use_extension(
             version,
             "1541309197" if version == "v101" else "o3deharooos255qt5xdujc3cuq",
         ),
+
+        # Vendored tarball
+        "lock-%s__lodash__file_.._vendored_lodash-4.17.21.tgz" % version,
+        "lock-%s__lodash__file_.._vendored_lodash-4.17.21.tgz__links" % version,
     )
     for version in PNPM_LOCK_VERSIONS
 ]
