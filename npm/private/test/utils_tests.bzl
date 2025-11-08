@@ -32,8 +32,9 @@ def test_pnpm_name(ctx):
 def test_link_version(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "link:foo"))
-    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "file:bar"))
-    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "file:@foo/bar"))
+    asserts.equals(env, "@scope+y@file+bar", utils.package_store_name("@scope/y", "file:bar"))
+    asserts.equals(env, "@scope+y@file+..+foo+bar", utils.package_store_name("@scope/y", "file:../foo/bar"))
+    asserts.equals(env, "@scope+y@file+@foo+bar", utils.package_store_name("@scope/y", "file:@foo/bar"))
     return unittest.end(env)
 
 def test_friendly_name(ctx):

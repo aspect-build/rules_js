@@ -121,6 +121,7 @@ js_binary(name = "sync", entry_point = "noop.js")
                 transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
             fp_links[dep_key] = {
                 "package": name,
+                "version": version,
                 "path": dep_path,
                 "link_packages": {},
                 "deps": transitive_deps,

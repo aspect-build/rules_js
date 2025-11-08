@@ -12,7 +12,7 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "lodash"
 VERSION = "file:../vendored/lodash-4.17.21.tgz"
 _ROOT_PACKAGE = "<LOCKVERSION>"
-_PACKAGE_STORE_NAME = "lodash@0.0.0"
+_PACKAGE_STORE_NAME = "lodash@file+..+vendored+lodash-4.17.21.tgz"
 
 # Generated npm_package_store targets for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
@@ -23,11 +23,11 @@ def npm_imported_package_store(link_root_name):
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/{link_root_name}/lodash@0.0.0/pkg": "lodash",
+            ":.aspect_rules_js/{link_root_name}/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg": "lodash",
         },
         ref_deps = {},
         lc_deps = {
-            ":.aspect_rules_js/{link_root_name}/lodash@0.0.0/pkg_pre_lc_lite": "lodash",
+            ":.aspect_rules_js/{link_root_name}/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg_pre_lc_lite": "lodash",
         },
         dev_only = False,
         has_lifecycle_build_target = False,

@@ -169,10 +169,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_69(name)
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@scoped+c@0.0.0",
+            package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects_b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
-            version = "0.0.0",
+            version = "file:../projects/c_at_scoped_b_projects_b",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name): "@scoped/a",
                 "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name): "@scoped/b",
@@ -182,10 +182,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "is-number@0.0.0",
+            package_store_name = "is-number@file+..+vendored+is-number",
             src = "//vendored/is-number:pkg",
             package = "is-number",
-            version = "0.0.0",
+            version = "file:../vendored/is-number",
             deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -638,7 +638,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 def _fp_link_0(name):
     _npm_local_link_package_store(
         name = "{}/@scoped/c".format(name),
-        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@0.0.0".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@file+..+projects+c_at_scoped_b_projects_b".format(name),
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package

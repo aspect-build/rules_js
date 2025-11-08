@@ -2338,10 +2338,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_1133(name)
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "is-odd@0.0.0",
+            package_store_name = "is-odd@file+npm+private+test+vendored+is-odd",
             src = "//npm/private/test/vendored/is-odd:pkg",
             package = "is-odd",
-            version = "0.0.0",
+            version = "file:npm/private/test/vendored/is-odd",
             deps = {
                 "//:.aspect_rules_js/{}/is-number@6.0.0".format(name): "is-number",
             },
@@ -2350,12 +2350,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "semver-max@0.0.0",
+            package_store_name = "semver-max@file+npm+private+test+vendored+semver-max",
             src = "//npm/private/test/vendored/semver-max:pkg",
             package = "semver-max",
-            version = "0.0.0",
+            version = "file:npm/private/test/vendored/semver-max",
             deps = {
-                "//:.aspect_rules_js/{}/is-odd@0.0.0".format(name): "is-odd",
+                "//:.aspect_rules_js/{}/is-odd@file+npm+private+test+vendored+is-odd".format(name): "is-odd",
                 "//:.aspect_rules_js/{}/semver@5.7.2".format(name): "semver",
             },
             visibility = ["//visibility:public"],
