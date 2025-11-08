@@ -113,6 +113,7 @@ def _convert_v5_importer_dependency_map(import_path, specifiers, deps):
             version = _convert_pnpm_v5_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
         elif version.startswith("link:"):
+            # Convert link: to be relative to the workspace root instead of importer
             version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
         elif version.startswith("file:"):
             version = _convert_pnpm_v5_version_peer_dep(version)
@@ -276,6 +277,7 @@ def _convert_pnpm_v6_importer_dependency_map(import_path, deps):
             version = _convert_pnpm_v6_v9_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
         elif version.startswith("link:"):
+            # Convert link: to be relative to the workspace root instead of importer
             version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
         elif version.startswith("file:"):
             version = _convert_pnpm_v6_v9_version_peer_dep(version)
@@ -429,9 +431,8 @@ def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
             # Keep the npm: specifier for aliased dependencies
             version = "npm:{}".format(version)
         elif version.startswith("link:"):
+            # Convert link: to be relative to the workspace root instead of importer
             version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
-        elif version.startswith("file:"):
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
         result[name] = version
     return result
@@ -618,7 +619,7 @@ def _validate_lockfile_deps(packages, importer_type, importer, deps):
                 packages.keys(),
             )
 
-            # TODO: fail instead of print
+            # TODO(3.0): fail instead of print
             # buildifier: disable=print
             print(msg)
 
