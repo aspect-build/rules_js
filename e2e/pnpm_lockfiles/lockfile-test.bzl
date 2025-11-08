@@ -7,14 +7,6 @@ load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
-# Each version being tested
-PNPM_LOCK_VERSIONS = [
-    "v54",
-    "v60",
-    "v61",
-    "v90",
-]
-
 BZLMOD_FILES = {
     # global
     "defs.bzl": "@REPO_NAME//:defs.bzl",
@@ -32,6 +24,10 @@ BZLMOD_FILES = {
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
     "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",
     "rollup3_package_json.bzl": "@REPO_NAME__rollup__3.29.4//VERSION:package_json.bzl",
+
+    # file: tarball packages
+    "lodash_resolved.json": "@REPO_NAME//VERSION:lodash/resolved.json",
+    "lodash-4.17.21_tgz_defs.bzl": "@REPO_NAME__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl",
 }
 
 WKSP_FILES = {
@@ -151,10 +147,12 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
             ":.aspect_rules_js/node_modules/scoped+bad@0.0.0",
 
-            # file: tarbals
+            # file: 4.17.21.tgz tarbal
             ":node_modules/lodash",
             ":.aspect_rules_js/node_modules/lodash@0.0.0",
             ":.aspect_rules_js/node_modules/lodash@0.0.0/dir",
+            "@%s__lodash__file_.._vendored_lodash-4.17.21.tgz//:pkg" % lock_repo,
+            "@%s__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl" % lock_repo,
 
             # Packages involving overrides
             ":node_modules/is-odd",
@@ -196,6 +194,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/alias-only-sizzle",
             ":.aspect_rules_js/node_modules/@types+sizzle@2.3.10",
             "@%s__at_types_sizzle__2.3.10//:pkg" % lock_repo,
+            "@%s__at_types_sizzle__2.3.10__links//:defs.bzl" % lock_repo,
 
             # Targets within the virtual store...
             # Direct dep targets
