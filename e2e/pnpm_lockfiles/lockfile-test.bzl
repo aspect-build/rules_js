@@ -143,21 +143,21 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/scoped/bad",
             ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+c@0.0.0",
+            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_at_scoped_b_projects%sb" % ("_" if lock_version == "v54" else "+"),  # is declared as a file: instead of link:
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
             ":.aspect_rules_js/node_modules/scoped+bad@0.0.0",
 
             # file: 4.17.21.tgz tarbal
             ":node_modules/lodash",
-            ":.aspect_rules_js/node_modules/lodash@0.0.0",
-            ":.aspect_rules_js/node_modules/lodash@0.0.0/dir",
+            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz",
+            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/dir",
             "@%s__lodash__file_.._vendored_lodash-4.17.21.tgz//:pkg" % lock_repo,
             "@%s__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl" % lock_repo,
 
             # Packages involving overrides
             ":node_modules/is-odd",
             ":.aspect_rules_js/node_modules/is-odd@3.0.1",
-            ":.aspect_rules_js/node_modules/is-number@0.0.0",
+            ":.aspect_rules_js/node_modules/is-number@file+..+vendored+is-number",
 
             # Odd git/http versions
             ":node_modules/debug",

@@ -55,10 +55,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_12(name)
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "@lib+c@0.0.0",
+            package_store_name = "@lib+c@file+..+lib+c",
             src = "//lib/c:pkg",
             package = "@lib/c",
-            version = "0.0.0",
+            version = "file:../lib/c",
             deps = {
                 "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
             },
@@ -67,10 +67,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "vendored-a@0.0.0",
+            package_store_name = "vendored-a@file+..+vendored+a",
             src = "//vendored/a:pkg",
             package = "vendored-a",
-            version = "0.0.0",
+            version = "file:../vendored/a",
             deps = {
                 "//root:.aspect_rules_js/{}/@aspect-test+f@1.0.0".format(name): "@aspect-test/f",
             },
@@ -79,10 +79,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         )
         _npm_local_package_store(
             link_root_name = name,
-            package_store_name = "vendored-b@0.0.0",
+            package_store_name = "vendored-b@file+..+vendored+b_at_lib_b_lib+b",
             src = "//vendored/b:pkg",
             package = "vendored-b",
-            version = "0.0.0",
+            version = "file:../vendored/b_at_lib_b_lib+b",
             deps = {
                 "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
             },
@@ -98,8 +98,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             deps = {
                 "//root:.aspect_rules_js/{}/@aspect-test+e@1.0.0".format(name): "@aspect-test/e",
                 "//root:.aspect_rules_js/{}/@lib+b@0.0.0".format(name): "@lib/b",
-                "//root:.aspect_rules_js/{}/vendored-a@0.0.0".format(name): "vendored-a",
-                "//root:.aspect_rules_js/{}/vendored-b@0.0.0".format(name): "vendored-b",
+                "//root:.aspect_rules_js/{}/vendored-a@file+..+vendored+a".format(name): "vendored-a",
+                "//root:.aspect_rules_js/{}/vendored-b@file+..+vendored+b_at_lib_b_lib+b".format(name): "vendored-b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -375,7 +375,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 def _fp_link_0(name):
     _npm_local_link_package_store(
         name = "{}/@lib/c".format(name),
-        src = "//root:.aspect_rules_js/{}/@lib+c@0.0.0".format(name),
+        src = "//root:.aspect_rules_js/{}/@lib+c@file+..+lib+c".format(name),
     )
 
 # Generated npm_link_package_store for linking of first-party "vendored-a" package
@@ -383,7 +383,7 @@ def _fp_link_0(name):
 def _fp_link_1(name):
     _npm_local_link_package_store(
         name = "{}/vendored-a".format(name),
-        src = "//root:.aspect_rules_js/{}/vendored-a@0.0.0".format(name),
+        src = "//root:.aspect_rules_js/{}/vendored-a@file+..+vendored+a".format(name),
     )
 
 # Generated npm_link_package_store for linking of first-party "vendored-b" package
@@ -391,7 +391,7 @@ def _fp_link_1(name):
 def _fp_link_2(name):
     _npm_local_link_package_store(
         name = "{}/vendored-b".format(name),
-        src = "//root:.aspect_rules_js/{}/vendored-b@0.0.0".format(name),
+        src = "//root:.aspect_rules_js/{}/vendored-b@file+..+vendored+b_at_lib_b_lib+b".format(name),
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/a" package
