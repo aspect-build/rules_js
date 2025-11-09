@@ -196,6 +196,10 @@ importers:
       '@scoped/b':
         specifier: workspace:*
         version: link:../b
+    devDependencies:
+      a-types:
+        specifier: file:../a-types
+        version: link:../a-types
 
   ../projects/d:
     dependencies:

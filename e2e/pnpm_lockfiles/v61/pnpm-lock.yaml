@@ -199,6 +199,10 @@ importers:
       '@scoped/b':
         specifier: workspace:*
         version: link:../b
+    devDependencies:
+      a-types:
+        specifier: file:../a-types
+        version: file:../projects/a-types
 
   ../projects/d:
     dependencies:
@@ -645,6 +649,13 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
     name: hello
     version: 1.0.0
+
+  file:../projects/a-types:
+    resolution: {directory: ../projects/a-types, type: directory}
+    name: a-types
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
+    dev: true
 
   file:../projects/c(@scoped/b@projects+b):
     resolution: {directory: ../projects/c, type: directory}
