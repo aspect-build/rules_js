@@ -47,7 +47,7 @@ load("@lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_43 = "npm_link
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_44 = "npm_link_imported_package_store_internal", store_44 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_45 = "npm_link_imported_package_store_internal", store_45 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_46 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", store_47 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", link_47 = "npm_link_imported_package_store_internal", store_47 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_48 = "npm_link_imported_package_store_internal", store_48 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_49 = "npm_link_imported_package_store_internal", store_49 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_50 = "npm_link_imported_package_store_internal", store_50 = "npm_imported_package_store_internal")
@@ -230,10 +230,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "alternate-versions",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.0.1": "lodash",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.17.20": "lodash-4.17.20",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.17.21": "lodash-4.17.21",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash-4.17.21-file@lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash-4.17.21-file",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash-4.17.21-file",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -467,14 +467,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@scoped": [":node_modules/@scoped/a"],
             }
         elif bazel_package == "projects/alts":
+            link_47()
             link_48("lodash-4.17.20")
             link_49("lodash-4.17.21")
-            link_50()
             link_50("lodash-4.17.21-file")
             link_targets = [
+                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.20",
                 ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.21-file",
             ]
         elif bazel_package == "projects/c":
@@ -632,9 +632,9 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     elif bazel_package == "projects/alts":
         if prod:
             link_targets.extend([
+                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.20",
                 ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash",
                 ":node_modules/lodash-4.17.21-file",
             ])
     elif bazel_package == "projects/c":

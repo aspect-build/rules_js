@@ -573,7 +573,7 @@ load("@npm-no_optional__loader-utils__2.0.4__links//:defs.bzl", store_569 = "npm
 load("@npm-no_optional__locate-path__5.0.0__links//:defs.bzl", store_570 = "npm_imported_package_store_internal")
 load("@npm-no_optional__locate-path__6.0.0__links//:defs.bzl", store_571 = "npm_imported_package_store_internal")
 load("@npm-no_optional__lodash.merge__4.6.2__links//:defs.bzl", store_572 = "npm_imported_package_store_internal")
-load("@npm-no_optional__lodash__4.0.0__links//:defs.bzl", store_573 = "npm_imported_package_store_internal")
+load("@npm-no_optional__lodash__4.0.0__links//:defs.bzl", link_573 = "npm_link_imported_package_store_internal", store_573 = "npm_imported_package_store_internal")
 load("@npm-no_optional__lodash__4.17.21__links//:defs.bzl", link_574 = "npm_link_imported_package_store_internal", store_574 = "npm_imported_package_store_internal")
 load("@npm-no_optional__lodash__file_npm_private_test_vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_575 = "npm_link_imported_package_store_internal", store_575 = "npm_imported_package_store_internal")
 load("@npm-no_optional__log-symbols__4.1.0__links//:defs.bzl", store_576 = "npm_imported_package_store_internal")
@@ -2281,8 +2281,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_471(dev=True)
             link_494(dev=True)
             link_553(dev=True)
+            link_573(dev=True)
             link_574("lodash-4.17.21", dev=True)
-            link_575(dev=True)
             link_575("lodash-4.17.21-tar", dev=True)
             link_663(dev=True)
             link_727(dev=True)
@@ -2310,8 +2310,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
@@ -2637,8 +2637,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",

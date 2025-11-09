@@ -735,7 +735,7 @@ load("@npm__loader-utils__2.0.4__links//:defs.bzl", store_731 = "npm_imported_pa
 load("@npm__locate-path__5.0.0__links//:defs.bzl", store_732 = "npm_imported_package_store_internal")
 load("@npm__locate-path__6.0.0__links//:defs.bzl", store_733 = "npm_imported_package_store_internal")
 load("@npm__lodash.merge__4.6.2__links//:defs.bzl", store_734 = "npm_imported_package_store_internal")
-load("@npm__lodash__4.0.0__links//:defs.bzl", store_735 = "npm_imported_package_store_internal")
+load("@npm__lodash__4.0.0__links//:defs.bzl", link_735 = "npm_link_imported_package_store_internal", store_735 = "npm_imported_package_store_internal")
 load("@npm__lodash__4.17.21__links//:defs.bzl", link_736 = "npm_link_imported_package_store_internal", store_736 = "npm_imported_package_store_internal")
 load("@npm__lodash__file_npm_private_test_vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_737 = "npm_link_imported_package_store_internal", store_737 = "npm_imported_package_store_internal")
 load("@npm__log-symbols__4.1.0__links//:defs.bzl", store_738 = "npm_imported_package_store_internal")
@@ -1181,7 +1181,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/image": ["@mycorp/pkg-a", "@mycorp/pkg-d", "acorn"],
     "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
     "js/private/worker/src": ["abortcontroller-polyfill", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
-    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash-4.17.21", "lodash", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
+    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "lodash-4.17.21", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "npm/private/test/npm_package": ["chalk", "chalk-alt"],
 }
 
@@ -2656,8 +2656,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_609(dev=True)
             link_633(dev=True)
             link_693(dev=True)
+            link_735(dev=True)
             link_736("lodash-4.17.21", dev=True)
-            link_737(dev=True)
             link_737("lodash-4.17.21-tar", dev=True)
             link_825(dev=True)
             link_889(dev=True)
@@ -2685,8 +2685,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
@@ -3012,8 +3012,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
