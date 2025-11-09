@@ -735,7 +735,7 @@ load("@@_main~npm~npm__loader-utils__2.0.4__links//:defs.bzl", store_731 = "npm_
 load("@@_main~npm~npm__locate-path__5.0.0__links//:defs.bzl", store_732 = "npm_imported_package_store")
 load("@@_main~npm~npm__locate-path__6.0.0__links//:defs.bzl", store_733 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash.merge__4.6.2__links//:defs.bzl", store_734 = "npm_imported_package_store")
-load("@@_main~npm~npm__lodash__4.0.0__links//:defs.bzl", store_735 = "npm_imported_package_store")
+load("@@_main~npm~npm__lodash__4.0.0__links//:defs.bzl", link_735 = "npm_link_imported_package_store", store_735 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash__4.17.21__links//:defs.bzl", link_736 = "npm_link_imported_package_store", store_736 = "npm_imported_package_store")
 load("@@_main~npm~npm__lodash__file_npm_private_test_vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_737 = "npm_link_imported_package_store", store_737 = "npm_imported_package_store")
 load("@@_main~npm~npm__log-symbols__4.1.0__links//:defs.bzl", store_738 = "npm_imported_package_store")
@@ -1181,7 +1181,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/image": ["@mycorp/pkg-a", "@mycorp/pkg-d", "acorn"],
     "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
     "js/private/worker/src": ["abortcontroller-polyfill", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
-    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash-4.17.21", "lodash", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
+    "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "hello", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "lodash-4.17.21", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "npm/private/test/npm_package": ["chalk", "chalk-alt"],
 }
 
@@ -2668,8 +2668,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_609("node_modules/hot-shots", True, "hot-shots")
             link_633("node_modules/inline-fixtures", True, "inline-fixtures")
             link_693("node_modules/json-stable-stringify", True, "json-stable-stringify")
+            link_735("node_modules/lodash", True, "lodash")
             link_736("node_modules/lodash-4.17.21", True, "lodash-4.17.21")
-            link_737("node_modules/lodash", True, "lodash")
             link_737("node_modules/lodash-4.17.21-tar", True, "lodash-4.17.21-tar")
             link_825("node_modules/node-gyp", True, "node-gyp")
             link_889("node_modules/plotly.js", True, "plotly.js")
@@ -2697,8 +2697,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
@@ -3022,8 +3022,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/hot-shots",
                 ":node_modules/inline-fixtures",
                 ":node_modules/json-stable-stringify",
-                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash",
+                ":node_modules/lodash-4.17.21",
                 ":node_modules/lodash-4.17.21-tar",
                 ":node_modules/node-gyp",
                 ":node_modules/plotly.js",
