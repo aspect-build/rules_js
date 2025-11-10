@@ -1,6 +1,7 @@
 # NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
 
 node_modules/
+root/node_modules/
 app/a/node_modules/
 app/b/node_modules/
 app/c/node_modules/
