@@ -1,4 +1,7 @@
 {
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "private": true,
     "dependencies": {
         "@aspect-build/a": "1.0.0",

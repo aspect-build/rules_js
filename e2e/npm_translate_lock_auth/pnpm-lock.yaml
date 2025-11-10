@@ -1,23 +1,29 @@
-lockfileVersion: 5.4
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
   .:
-    specifiers:
-      '@aspect-build/a': 1.0.0
-      '@aspect-priv-npm/a': 1.0.0
-    dependencies:
-      '@aspect-build/a': 1.0.0
-      '@aspect-priv-npm/a': 1.0.0
+    '@aspect-build/a':
+      specifier: 1.0.0
+      version: 1.0.0
+    '@aspect-priv-npm/a':
+      specifier: 1.0.0
+      version: 1.0.0
 
 packages:
 
-  /@aspect-build/a/1.0.0:
+  '@aspect-build/a@1.0.0':
     resolution: {integrity: sha512-TQ8SpBPjKkHmLJoxVTU+TRU+9utF9hABiFuql5zJWPAtyUGAc3KM5+VsgpNHytqyXe5AyOUV2Ff+ScsQLNEQ7Q==, tarball: download/@aspect-build/a/1.0.0/95cfc2dab39ada95aec1736778d545403edfbf9e}
     hasBin: true
-    dev: false
 
-  /@aspect-priv-npm/a/1.0.0:
+  '@aspect-priv-npm/a@1.0.0':
     resolution: {integrity: sha512-M2Bt2VHhbKAtn94EVNtigQncBPo0tHCjM/6k1JV79GOLbVxtFSpwzLEyuivvjc+kyL8b2nAimlfEPhOI3G3OEA==}
     hasBin: true
-    dev: false
+
+snapshots:
+  '@aspect-build/a@1.0.0': {}
+  '@aspect-priv-npm/a@1.0.0': {}
