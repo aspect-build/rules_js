@@ -2,9 +2,9 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_features//:features.bzl", "bazel_features")
+load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("//npm:repositories.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")

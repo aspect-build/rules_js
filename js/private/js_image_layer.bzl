@@ -109,7 +109,7 @@ oci_image(
         ":layers"
     ],
     workdir = select({
-        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+        "@bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
         "//conditions:default": "/app/bin.runfiles/__main__",
     }),
 )
@@ -150,7 +150,7 @@ js_binary(
             ":{}_layers".format(arch)
         ],
         workdir = select({
-            "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+            "@bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
             "//conditions:default": "/app/bin.runfiles/__main__",
         }),
     )
@@ -257,7 +257,7 @@ container_image(
         ":app_layer",
     ],
     workdir = select({
-        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
+        "@bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
         "//conditions:default": "/app/bin.runfiles/__main__",
     }),
 )
@@ -423,7 +423,7 @@ else {
 
     return expected_layer_groups
 
-# This function exactly same as the one from "@aspect_bazel_lib//lib:paths.bzl"
+# This function exactly same as the one from "@bazel_lib//lib:paths.bzl"
 # except that it takes workspace_name directly instead of the ctx object.
 # Reason is the performance of Args.add_all closures where we use this function.
 # https://bazel.build/rules/lib/builtins/Args#add_all `allow_closure` explains this.

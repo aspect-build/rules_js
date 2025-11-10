@@ -1,5 +1,5 @@
 load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_imported_package")
-load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
