@@ -11,7 +11,7 @@ load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "npm_translate_lock_rule")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
-load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state")
+load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state", _DEFAULT_ROOT_PACKAGE = "DEFAULT_ROOT_PACKAGE")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
@@ -213,7 +213,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
-        root_package = attr.pnpm_lock.package,
+        root_package = attr.pnpm_lock.package if attr.root_package == _DEFAULT_ROOT_PACKAGE else attr.root_package,
         rctx_name = attr.name,
         attr = attr,
         all_lifecycle_hooks = lifecycle_hooks,
