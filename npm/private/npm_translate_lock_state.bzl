@@ -575,7 +575,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         "npm_auth": {},
         "npm_registries": {},
         "packages": {},
-        "root_package": None,
+        "root_package": attr.root_package,
         "root_package_json": {},
         "patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
