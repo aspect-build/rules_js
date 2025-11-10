@@ -16,7 +16,7 @@ _NPM_IMPORT_TMPL = \
         package = "{package}",
         version = "{version}",
         url = "{url}",
-        package_visibility = {package_visibility},{maybe_dev}{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_package_contents}
+        package_visibility = {package_visibility},{maybe_commit}{maybe_generate_bzl_library_targets}{maybe_integrity}{maybe_deps}{maybe_transitive_closure}{maybe_patches}{maybe_patch_tool}{maybe_patch_args}{maybe_lifecycle_hooks}{maybe_custom_postinstall}{maybe_lifecycle_hooks_env}{maybe_lifecycle_hooks_execution_requirements}{maybe_bins}{maybe_npm_auth}{maybe_npm_auth_basic}{maybe_npm_auth_username}{maybe_npm_auth_password}{maybe_replace_package}{maybe_lifecycle_hooks_use_default_shell_env}{maybe_exclude_package_contents}
     )
 """
 
@@ -596,8 +596,6 @@ def _gen_npm_import(rctx, _import, link_workspace):
         npm_auth_username = "%s",""" % _import.npm_auth_username) if _import.npm_auth_username else ""
     maybe_npm_auth_password = ("""
         npm_auth_password = "%s",""" % _import.npm_auth_password) if _import.npm_auth_password else ""
-    maybe_dev = ("""
-        dev = True,""") if _import.dev_only else ""
     maybe_replace_package = ("""
         replace_package = "%s",""" % _import.replace_package) if _import.replace_package else ""
     maybe_exclude_package_contents = ("""
@@ -610,7 +608,6 @@ def _gen_npm_import(rctx, _import, link_workspace):
         maybe_commit = maybe_commit,
         maybe_custom_postinstall = maybe_custom_postinstall,
         maybe_deps = maybe_deps,
-        maybe_dev = maybe_dev,
         maybe_generate_bzl_library_targets = maybe_generate_bzl_library_targets,
         maybe_integrity = maybe_integrity,
         maybe_lifecycle_hooks = maybe_lifecycle_hooks,

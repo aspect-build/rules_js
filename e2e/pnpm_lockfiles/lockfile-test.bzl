@@ -116,10 +116,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             # npm: alias to a package that has many peers
             ":node_modules/rollup-plugin-with-peers",
             # underlying repo for the many-peers package
-            "@%s__at_rollup_plugin-typescript__8.2.1_%s//:pkg" % (
-                lock_repo,
-                "3vgsug3mjv7wvue74swjdxifxy" if lock_version == "v54" else "626159424" if (lock_version == "v90" or lock_version == "v101") else "1813138439" if (lock_version == "v61" or lock_version == "v60") else "unknown",
-            ),
+            "@%s__at_rollup_plugin-typescript__8.2.1_626159424//:pkg" % lock_repo,
 
             # uuv 'hasBin'
             ":node_modules/uvu",

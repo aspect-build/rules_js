@@ -6,19 +6,14 @@ local_path_override(
 
 # The same primary lockfile across all versions
 PNPM_LOCK_VERSIONS = [
-    "v54",
-    "v60",
-    "v61",
     "v90",
     "v101",
 ]
 
 # Lockfiles with unique test cases
 PNPM_LOCK_TEST_CASES = [
-    "tarball-no-url-v54",
     "override-with-alias-url-v9",
     "isaacs-cliui-v90",
-    "docusaurus-direct-peer-v6",
     "docusaurus-direct-peer-v9",
     "versionless-patch-v9",
 ]
@@ -88,10 +83,7 @@ npm = use_extension(
         "lock-%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links" % version,
 
         # Deep with many peers
-        "lock-%s__at_rollup_plugin-typescript__8.2.1_%s" % (
-            version,
-            "3vgsug3mjv7wvue74swjdxifxy" if version == "v54" else "626159424" if (version == "v90" or version == "v101") else "1813138439" if (version == "v61" or version == "v60") else "unknown",
-        ),
+        "lock-%s__at_rollup_plugin-typescript__8.2.1_626159424" % version,
 
         # Dep with patch
         "lock-%s__meaning-of-life__1.0.0_%s" % (
