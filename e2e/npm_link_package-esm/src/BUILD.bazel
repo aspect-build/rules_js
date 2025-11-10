@@ -11,7 +11,6 @@ js_binary(
         "//:node_modules/@e2e/pkg",
         "//:node_modules/@e2e/wrapper-lib",
         "//:node_modules/sharp",
-        "@foo//:node_modules/@aspect-test/a",
     ],
     entry_point = "main.mjs",
     node_options = [
@@ -30,7 +29,6 @@ js_test(
         "//:node_modules/@e2e/pkg",
         "//:node_modules/@e2e/wrapper-lib",
         "//:node_modules/sharp",
-        "@foo//:node_modules/@aspect-test/a",
     ],
     entry_point = "main.mjs",
     log_level = "info",

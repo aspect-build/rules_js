@@ -1,4 +1,4 @@
-module(name = "rules_foo")
+module(name = "npm_translate_lock_link_workspace")
 
 bazel_dep(name = "aspect_rules_js", version = "0.0.0")
 local_path_override(
