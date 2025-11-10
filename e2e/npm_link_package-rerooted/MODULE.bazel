@@ -14,9 +14,9 @@ npm = use_extension(
 )
 npm.npm_translate_lock(
     name = "npm",
-    data = ["//:package.json"],
+    data = ["//root:package.json"],
     npmrc = "//:.npmrc",
-    pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_lock = "//root:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")

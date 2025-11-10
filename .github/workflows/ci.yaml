@@ -46,6 +46,7 @@ jobs:
                     e2e/js_run_devserver
                     e2e/npm_link_package
                     e2e/npm_link_package-esm
+                    e2e/npm_link_package-rerooted
                     e2e/npm_translate_lock
                     e2e/npm_translate_lock_disable_hooks
                     e2e/npm_translate_lock_empty
@@ -65,7 +66,7 @@ jobs:
                     e2e/pnpm_workspace_rerooted
                     e2e/pnpm_version
                     e2e/runfiles
-                    e2e/rules_foo
+                    e2e/npm_translate_lock_link_workspace
                     e2e/stamped_package_json
                     e2e/update_pnpm_lock
                     e2e/update_pnpm_lock_with_import
@@ -153,12 +154,6 @@ jobs:
                           major: 7
                       bzlmod: 0
                       folder: e2e/js_image_oci
-                    - bzlmod: 1
-                      folder: e2e/npm_link_package-esm
-                    - bzlmod: 1
-                      folder: e2e/npm_link_package
-                    - bzlmod: 1
-                      folder: e2e/rules_foo
                     # @bazel/runfiles seems broken with non-bzlmod + bazel7
                     # https://github.com/bazel-contrib/rules_nodejs/issues/3797
                     - bzlmod: 0

@@ -5,7 +5,7 @@ load("@aspect_rules_js//npm:repositories.bzl", _npm_translate_lock = "npm_transl
 def foo_repositories():
     _npm_translate_lock(
         name = "foo",
-        pnpm_lock = "@rules_foo//foo:pnpm-lock.yaml",
+        pnpm_lock = "@npm_translate_lock_link_workspace//foo:pnpm-lock.yaml",
         # We'll be linking in the @foo repository and not the repository where the pnpm-lock file is located
         link_workspace = "foo",
         # Override the Bazel package where pnpm-lock.yaml is located and link to the specified package instead
