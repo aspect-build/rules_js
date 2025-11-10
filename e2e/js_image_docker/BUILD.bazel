@@ -118,10 +118,7 @@ container_image(
         ":app_layer",
     ],
     # This is `cmd` + `.runfiles/[workspace name]`
-    workdir = select({
-        "@aspect_bazel_lib//lib:bzlmod": "/app/src/bin.runfiles/_main",
-        "//conditions:default": "/app/src/bin.runfiles/__main__",
-    }),
+    workdir = "/app/src/bin.runfiles/__main__",
 )
 
 container_test(

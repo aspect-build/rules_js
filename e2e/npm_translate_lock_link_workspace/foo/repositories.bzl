@@ -11,7 +11,6 @@ def foo_repositories():
         # Override the Bazel package where pnpm-lock.yaml is located and link to the specified package instead
         root_package = "",
         defs_bzl_filename = "npm_link_all_packages.bzl",
-        repositories_bzl_filename = "npm_repositories.bzl",
         additional_file_contents = {
             "BUILD.bazel": [
                 """load("//:npm_link_all_packages.bzl", "npm_link_all_packages")""",

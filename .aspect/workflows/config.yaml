@@ -126,9 +126,6 @@ workspaces:
     e2e/worker:
         icon: js
         tasks: *e2e_tasks
-    e2e/workspace:
-        icon: js
-        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/update_pnpm_lock:
     # e2e/update_pnpm_lock_with_import:

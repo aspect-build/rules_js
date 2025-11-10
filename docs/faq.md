@@ -65,15 +65,7 @@ Try running Bazel with `--experimental_check_output_files=false` so that your ed
 
 Yes, just run `bazel run -- @pnpm//:pnpm --dir $PWD` followed by the usual arguments to pnpm.
 
-If you're bootstrapping a new project, you'll need to add this to your WORKSPACE:
-
-```starlark
-load("@aspect_rules_js//npm:repositories.bzl", "pnpm_repository")
-
-pnpm_repository(name = "pnpm")
-```
-
-Or, if you're using [bzlmod](https://bazel.build/external/overview#bzlmod), add these lines to your MODULE.bazel:
+Add these lines to your MODULE.bazel:
 
 ```starlark
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)

@@ -39,13 +39,11 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     if _should_update_pnpm_lock(priv) or not attr.pnpm_lock:
         # labels only needed when updating or bootstrapping the pnpm lock file
-        _init_pnpm_labels(priv, rctx, attr, label_store)
+        _init_pnpm_labels(rctx, attr, label_store)
 
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr, label_store)
-
-    _init_link_workspace(priv, attr, label_store)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
     # TODO(windows): utils.exists is not yet support on Windows
@@ -116,7 +114,7 @@ def _init_common_labels(priv, attr, label_store):
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
 
 ################################################################################
-def _init_pnpm_labels(priv, rctx, attr, label_store):
+def _init_pnpm_labels(rctx, attr, label_store):
     # Note that we must reference the node binary under the platform-specific node
     # toolchain repository rather than under @nodejs_host since running rctx.path
     # (called outside this function) on the alias in the host repo fails under bzlmod.
@@ -127,7 +125,7 @@ def _init_pnpm_labels(priv, rctx, attr, label_store):
     #  Label("@nodejs_host//:bin/node")
     label_store.add("host_node", Label("@{}_{}//:bin/node".format(attr.node_toolchain_prefix, repo_utils.platform(rctx))))
 
-    label_store.add("pnpm_entry", attr.use_pnpm if priv["bzlmod"] and attr.use_pnpm else Label("@pnpm//:package/bin/pnpm.cjs"))
+    label_store.add("pnpm_entry", attr.use_pnpm)
 
 ################################################################################
 def _init_update_labels(priv, _, attr, label_store):
@@ -179,11 +177,6 @@ def _init_patched_dependencies_labels(priv, _, attr, label_store):
 def _init_importer_labels(priv, label_store):
     for i, p in enumerate(priv["importers"].keys()):
         label_store.add_sibling("lock", "package_json_{}".format(i), paths.join(p, PACKAGE_JSON_FILENAME))
-
-################################################################################
-def _init_link_workspace(priv, attr, label_store):
-    # initialize link_workspace either from pnpm_lock label or from override
-    priv["link_workspace"] = attr.link_workspace if attr.link_workspace else label_store.label("pnpm_lock").repo_name
 
 ################################################################################
 def _init_external_repository_action_cache(priv, attr):
@@ -522,9 +515,6 @@ def _should_update_pnpm_lock(priv):
 def _default_registry(priv):
     return priv["default_registry"]
 
-def _link_workspace(priv):
-    return priv["link_workspace"]
-
 def _lockfile_version(priv):
     return priv["lock_version"]
 
@@ -556,7 +546,7 @@ def _root_package_json(priv):
     return priv["root_package_json"]
 
 ################################################################################
-def _new(rctx_name, rctx, attr, bzlmod):
+def _new(rctx_name, rctx, attr):
     label_store = repository_label_store.new(rctx.path)
 
     should_update_pnpm_lock = attr.update_pnpm_lock
@@ -566,12 +556,10 @@ def _new(rctx_name, rctx, attr, bzlmod):
 
     priv = {
         "rctx_name": rctx_name,
-        "bzlmod": bzlmod,
         "default_registry": utils.default_registry(),
         "external_repository_action_cache": None,
         "importers": {},
         "input_hashes": {},
-        "link_workspace": None,
         "npm_auth": {},
         "npm_registries": {},
         "packages": {},
@@ -587,7 +575,6 @@ def _new(rctx_name, rctx, attr, bzlmod):
         label_store = label_store,  # pass-through access to the label store
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
-        link_workspace = lambda: _link_workspace(priv),
         lockfile_version = lambda: _lockfile_version(priv),
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),

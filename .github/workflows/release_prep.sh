@@ -17,7 +17,6 @@ TAG=$1
 PREFIX="rules_js-${TAG:1}"
 ARCHIVE="rules_js-$TAG.tar.gz"
 git archive --format=tar --prefix="${PREFIX}/" "${TAG}" | gzip >"$ARCHIVE"
-SHA=$(shasum -a 256 "$ARCHIVE" | awk '{print $1}')
 
 cat <<EOF
 
@@ -55,21 +54,6 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 # bazel run -- @pnpm --dir $PWD install
 use_repo(pnpm, "pnpm")
 \`\`\`
-
-## Using WORKSPACE
-
-Paste this snippet into your \`WORKSPACE\` file:
-
-\`\`\`starlark
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "aspect_rules_js",
-    sha256 = "${SHA}",
-    strip_prefix = "${PREFIX}",
-    url = "https://github.com/aspect-build/rules_js/releases/download/${TAG}/${ARCHIVE}",
-)
 EOF
 
-awk 'f;/--SNIP--/{f=1}' e2e/workspace/WORKSPACE
 echo "\`\`\`"

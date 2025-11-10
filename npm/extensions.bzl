@@ -165,11 +165,10 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         exclude_package_contents = exclude_package_contents_config,
         defs_bzl_filename = attr.defs_bzl_filename,
         additional_file_contents = attr.additional_file_contents,
-        bzlmod = True,
     )
 
 def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
-    state = npm_translate_lock_state.new(attr.name, module_ctx, attr, True)
+    state = npm_translate_lock_state.new(attr.name, module_ctx, attr)
 
     importers, packages = translate_to_transitive_closure(
         state.importers(),
@@ -304,10 +303,6 @@ def _npm_translate_lock_attrs():
     # Args defaulted differently by the macro
     attrs["npm_package_target_name"] = attr.string(default = "pkg")
     attrs["patch_args"] = attr.string_list_dict(default = {"*": ["-p0"]})
-
-    # Args not supported or unnecessary in bzlmod
-    attrs.pop("repositories_bzl_filename")
-    attrs.pop("exclude_package_contents")  # Use npm_exclude_package_contents tag instead
 
     return attrs
 
