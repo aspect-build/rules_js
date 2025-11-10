@@ -36,16 +36,3 @@ npm_translate_lock(
 load("@npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
-
-local_repository(
-    name = "rules_foo",
-    path = "../rules_foo",
-)
-
-load("@rules_foo//foo:repositories.bzl", "foo_repositories")
-
-foo_repositories()
-
-load("@foo//:npm_repositories.bzl", foo_npm_repositories = "npm_repositories")
-
-foo_npm_repositories()
