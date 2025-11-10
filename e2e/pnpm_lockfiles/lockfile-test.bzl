@@ -249,8 +249,6 @@ def lockfile_test(npm_link_all_packages, name = None):
             "@aspect_bazel_lib//lib:bzlmod": [],
             "//conditions:default": ["@platforms//:incompatible"],
         }),
-        # Target names may be different on bazel versions
-        tags = ["skip-on-bazel6"],
     )
 
     # buildifier: disable=no-effect
@@ -286,6 +284,4 @@ def lockfile_test(npm_link_all_packages, name = None):
             "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
             "//conditions:default": [],
         }),
-        # Target names may be different on bazel versions
-        tags = ["skip-on-bazel6"],
     )
