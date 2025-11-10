@@ -539,19 +539,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 def _generate_repositories(rctx, npm_imports, link_workspace):
     repositories_bzl = []
 
-    if len(npm_imports) > 0:
+    if npm_imports:
         repositories_bzl.append("""load("@aspect_rules_js//npm:repositories.bzl", "npm_import")""")
         repositories_bzl.append("")
 
     repositories_bzl.append("# Generated npm_import repository rules corresponding to npm packages in {}".format(str(rctx.attr.pnpm_lock)))
     repositories_bzl.append("# buildifier: disable=function-docstring")
     repositories_bzl.append("def npm_repositories():")
-    if len(npm_imports) == 0:
+    if not npm_imports:
         repositories_bzl.append("    pass")
         repositories_bzl.append("")
 
-    for _, _import in enumerate(npm_imports):
-        repositories_bzl.append(_gen_npm_import(rctx, _import, link_workspace))
+    for npm_import in npm_imports:
+        repositories_bzl.append(_gen_npm_import(rctx, npm_import, link_workspace))
 
     return repositories_bzl
 
@@ -559,15 +559,15 @@ def _gen_npm_import(rctx, _import, link_workspace):
     maybe_integrity = ("""
         integrity = "%s",""" % _import.integrity) if _import.integrity else ""
     maybe_deps = ("""
-        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if len(_import.deps) > 0 else ""
+        deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if _import.deps else ""
     maybe_transitive_closure = ("""
         transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
     maybe_patch_tool = ("""
         patch_tool = "%s",""" % _import.patch_tool) if _import.patch_tool else ""
     maybe_patches = ("""
-        patches = %s,""" % _import.patches) if len(_import.patches) > 0 else ""
+        patches = %s,""" % _import.patches) if _import.patches else ""
     maybe_patch_args = ("""
-        patch_args = %s,""" % _import.patch_args) if len(_import.patches) > 0 and len(_import.patch_args) > 0 else ""
+        patch_args = %s,""" % _import.patch_args) if _import.patches and _import.patch_args else ""
     maybe_custom_postinstall = ("""
         custom_postinstall = \"%s\",""" % _import.custom_postinstall) if _import.custom_postinstall else ""
     maybe_lifecycle_hooks = ("""
@@ -579,7 +579,7 @@ def _gen_npm_import(rctx, _import, link_workspace):
     maybe_lifecycle_hooks_use_default_shell_env = ("""
         lifecycle_hooks_use_default_shell_env = True,""") if _import.lifecycle_hooks_use_default_shell_env else ""
     maybe_bins = ("""
-        bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if len(_import.bins) > 0 else ""
+        bins = %s,""" % starlark_codegen_utils.to_dict_attr(_import.bins, 2)) if _import.bins else ""
     maybe_generate_bzl_library_targets = ("""
         generate_bzl_library_targets = True,""") if rctx.attr.generate_bzl_library_targets else ""
     maybe_commit = ("""
