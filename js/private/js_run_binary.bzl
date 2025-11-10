@@ -10,9 +10,9 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 ```
 """
 
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
-load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
+load("@bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
+load("@bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
+load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
 load(":js_library.bzl", _js_library = "js_library")
@@ -46,7 +46,7 @@ def js_run_binary(
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         use_default_shell_env = None,
         **kwargs):
-    """Wrapper around @aspect_bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
+    """Wrapper around @bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
 
     This rule does not require Bash `native.genrule`.
 
@@ -234,7 +234,7 @@ def js_run_binary(
             May introduce non-determinism when True; use with care!
             See e.g. https://github.com/bazelbuild/bazel/issues/4912
 
-            Requires a minimum of aspect_bazel_lib v1.40.3 or v2.4.2.
+            Requires a minimum of bazel_lib v1.40.3 or v2.4.2.
 
             Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
 
@@ -372,9 +372,9 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
     # Pass use_default_shell_env via kwargs and only if it is not None since older versions of
-    # aspect_bazel_lib run_binary don't support this attribute. We set the correct 1.x minimum for
+    # bazel_lib run_binary don't support this attribute. We set the correct 1.x minimum for
     # bzlmod but users could have a 2.x version < 2.4.2. For users using WORKSPACE, an older
-    # aspect_bazel_lib may sneak in since order matters for WORKSPACE deps.
+    # bazel_lib may sneak in since order matters for WORKSPACE deps.
     if use_default_shell_env != None:
         kwargs["use_default_shell_env"] = use_default_shell_env
 

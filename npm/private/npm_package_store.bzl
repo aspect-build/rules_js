@@ -1,6 +1,6 @@
 "npm_package_store rule"
 
-load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
+load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 # buildifier: disable=bzl-visibility
@@ -266,7 +266,7 @@ def _npm_package_store_impl(ctx):
                     ctx,
                     src = src,
                     dst = package_store_directory,
-                    copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
+                    copy_directory_bin = ctx.toolchains["@bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
                     # Hardlinking source files in external repositories as was done under the hood
                     # prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
                     # failures as reported in https://github.com/aspect-build/rules_js/issues/1412.
@@ -445,7 +445,7 @@ npm_package_store_lib = struct(
     implementation = _npm_package_store_impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
     toolchains = [
-        Label("@aspect_bazel_lib//lib:copy_directory_toolchain_type"),
+        Label("@bazel_lib//lib:copy_directory_toolchain_type"),
         tar_lib.toolchain_type,
     ],
 )

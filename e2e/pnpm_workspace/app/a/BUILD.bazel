@@ -1,5 +1,5 @@
-load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library", "js_test")
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 load("@npm//app/a:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")

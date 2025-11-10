@@ -37,7 +37,7 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(name = "pnpm")
 use_repo(pnpm, "pnpm", "pnpm__links")
 
-bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+bazel_lib_toolchains = use_extension("@bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(
     bazel_lib_toolchains,
     "coreutils_toolchains",
@@ -84,12 +84,12 @@ bazel_dep(name = "buildifier_prebuilt", version = "8.0.1", dev_dependency = True
 bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
 
 host = use_extension(
-    "@aspect_bazel_lib//lib:extensions.bzl",
+    "@bazel_lib//lib:extensions.bzl",
     "host",
     dev_dependency = True,
 )
 host.host()
-use_repo(host, "aspect_bazel_lib_host")
+use_repo(host, "bazel_lib_host")
 
 node_dev = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",

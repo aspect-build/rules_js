@@ -9,9 +9,9 @@ See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API 
 for a given lockfile.
 """
 
-load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
+load("@bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
+load("@bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
     "@bazel_tools//tools/build_defs/repo:git_worker.bzl",

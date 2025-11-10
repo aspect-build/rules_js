@@ -1,6 +1,6 @@
 "Make shorter assertions"
 
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
 # buildifier: disable=function-docstring

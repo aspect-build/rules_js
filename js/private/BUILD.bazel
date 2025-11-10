@@ -36,12 +36,12 @@ bzl_library(
     deps = [
         ":bash",
         ":js_helpers",
-        "@aspect_bazel_lib//lib:copy_to_bin",
         "@aspect_bazel_lib//lib:directory_path",
-        "@aspect_bazel_lib//lib:expand_make_vars",
-        "@aspect_bazel_lib//lib:paths",
-        "@aspect_bazel_lib//lib:windows_utils",
+        "@bazel_lib//lib:copy_to_bin",
         "@bazel_lib//lib:directory_path",
+        "@bazel_lib//lib:expand_make_vars",
+        "@bazel_lib//lib:paths",
+        "@bazel_lib//lib:windows_utils",
         "@bazel_skylib//lib:dicts",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
     ],
@@ -59,7 +59,7 @@ bzl_library(
     deps = [
         ":js_info",
         "//npm:providers",
-        "@aspect_bazel_lib//lib:copy_to_bin",
+        "@bazel_lib//lib:copy_to_bin",
     ],
 )
 
@@ -69,7 +69,7 @@ bzl_library(
     deps = [
         ":js_helpers",
         ":js_info",
-        "@aspect_bazel_lib//lib:copy_to_bin",
+        "@bazel_lib//lib:copy_to_bin",
         "@bazel_skylib//lib:dicts",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
     ],
@@ -88,8 +88,8 @@ bzl_library(
         ":js_helpers",
         ":js_info_files",
         ":js_library",
-        "@aspect_bazel_lib//lib:copy_to_bin",
-        "@aspect_bazel_lib//lib:run_binary",
+        "@bazel_lib//lib:copy_to_bin",
+        "@bazel_lib//lib:run_binary",
         "@bazel_skylib//lib:dicts",
     ],
 )

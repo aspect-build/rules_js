@@ -1,5 +1,5 @@
-load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
 load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:jasmine/package_json.bzl", jasmine_bin = "bin")
