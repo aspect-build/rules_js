@@ -36,7 +36,6 @@ write_source_files(
         "snapshots/launcher.sh": ":shell_launcher_sed",
     },
     tags = [
-        "skip-on-bazel6",
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],

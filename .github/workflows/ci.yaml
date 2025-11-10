@@ -31,7 +31,6 @@ jobs:
                   a=(
                     "major:$m, version:\"$v\""
                     "major:8, version:\"8.1.1\""
-                    "major:6, version:\"6.5.0\""
                   )
                   printf -v j '{%s},' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
@@ -133,16 +132,6 @@ jobs:
                     # Don't run bzlmod smoke test under workspace
                     - bzlmod: 0
                       folder: e2e/bzlmod
-                    # Don't run replace_packages test with bzlmod+Bazel 6 due to use of Bazel 7 bzlmod features
-                    - bazel-version:
-                          major: 6
-                      bzlmod: 1
-                      folder: e2e/npm_translate_lock_replace_packages
-                    # Don't run workspace tests with Bazel 6 to reduce the size of the test matrix
-                    # and remove the need for bazel 6 workspace support for local development.
-                    - bazel-version:
-                          major: 6
-                      bzlmod: 0
                     # Don't run workspace tests unit tests.
                     - bzlmod: 0
                       folder: .
@@ -170,24 +159,6 @@ jobs:
                       folder: e2e/npm_link_package
                     - bzlmod: 1
                       folder: e2e/rules_foo
-                    # gyp_no_install_script+patch_from_repo+js_run_devserver are broken in an usual way on 6.5.0
-                    # that is not worth investigating as we're dropping Bazel 6 support soon
-                    - bazel-version:
-                          major: 6
-                      folder: e2e/gyp_no_install_script
-                    - bazel-version:
-                          major: 6
-                      folder: e2e/patch_from_repo
-                    # devservers on bazel6+bzlmod also broken in an odd way
-                    - bazel-version:
-                          major: 6
-                      folder: e2e/js_run_devserver
-                    - bazel-version:
-                          major: 6
-                      folder: e2e/webpack_devserver
-                    - bazel-version:
-                          major: 6
-                      folder: e2e/webpack_devserver_esm
                     # @bazel/runfiles seems broken with non-bzlmod + bazel7
                     # https://github.com/bazel-contrib/rules_nodejs/issues/3797
                     - bzlmod: 0
@@ -216,20 +187,6 @@ jobs:
                     - bazel-version:
                           major: 7
                           version: 7.4.0
-                      bzlmod: 1
-                      os: macos
-                      config: local
-                      folder: e2e/bzlmod
-                    - bazel-version:
-                          major: 6
-                          version: 6.5.0
-                      bzlmod: 1
-                      os: windows
-                      config: local
-                      folder: e2e/bzlmod
-                    - bazel-version:
-                          major: 6
-                          version: 6.5.0
                       bzlmod: 1
                       os: macos
                       config: local

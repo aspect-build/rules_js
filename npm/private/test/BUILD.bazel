@@ -44,7 +44,6 @@ write_source_files(
         "snapshots/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8//npm/private/test:package_json.bzl",
     },
     tags = [
-        "skip-on-bazel6",
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],

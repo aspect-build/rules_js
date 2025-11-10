@@ -31,21 +31,14 @@ If you need to replace a package in a non-root module move the npm_replace_packa
 For more information, see: https://github.com/aspect-build/rules_js/blob/main/docs/pnpm.md
 """
 
-def _fail_on_non_root_overrides(module_ctx, module, tag_class):
+def _fail_on_non_root_overrides(module, tag_class):
     """Prevents non-root modules from using restricted tags.
 
     Args:
-        module_ctx: The module extension context
         module: The module being processed
         tag_class: The name of the tag class to check (e.g., "npm_replace_package")
     """
     if module.is_root:
-        return
-
-    # Isolated module extension usages only contain tags from a single module, so we can allow
-    # overrides. The is_isolated property was added in Bazel 6.3.0 but requires the
-    # --experimental_isolated_extension_usages flag to be available.
-    if getattr(module_ctx, "is_isolated", False):
         return
 
     if getattr(module.tags, tag_class):
@@ -55,9 +48,9 @@ def _fail_on_non_root_overrides(module_ctx, module, tag_class):
         ))
 
 def _npm_extension_impl(module_ctx):
-    if not bazel_lib_utils.is_bazel_6_or_greater():
+    if not bazel_lib_utils.is_bazel_7_or_greater():
         # ctx.actions.declare_symlink was added in Bazel 6
-        fail("A minimum version of Bazel 6 required to use rules_js")
+        fail("A minimum version of Bazel 7 required to use rules_js")
 
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
@@ -66,7 +59,7 @@ def _npm_extension_impl(module_ctx):
     replace_packages = {}
     for mod in module_ctx.modules:
         # Validate that only root modules (or isolated extensions) use npm_replace_package
-        _fail_on_non_root_overrides(module_ctx, mod, "npm_replace_package")
+        _fail_on_non_root_overrides(mod, "npm_replace_package")
 
         for attr in mod.tags.npm_replace_package:
             if attr.package in replace_packages:

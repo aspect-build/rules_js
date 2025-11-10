@@ -1,6 +1,5 @@
 "Internal implementation details"
 
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -21,7 +20,8 @@ bzl_library(
     srcs = ["js_info_files.bzl"],
     deps = [
         ":js_helpers",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+    ],
 )
 
 bzl_library(
@@ -37,7 +37,8 @@ bzl_library(
         "@aspect_bazel_lib//lib:windows_utils",
         "@bazel_lib//lib:directory_path",
         "@bazel_skylib//lib:dicts",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+    ],
 )
 
 bzl_library(
@@ -58,7 +59,8 @@ bzl_library(
         ":js_info",
         "@aspect_bazel_lib//lib:copy_to_bin",
         "@bazel_skylib//lib:dicts",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+    ],
 )
 
 bzl_library(
@@ -81,7 +83,8 @@ bzl_library(
         ":js_binary",
         ":js_helpers",
         "@bazel_skylib//lib:dicts",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+    ],
 )
 
 bzl_library(
@@ -102,5 +105,6 @@ bzl_library(
     deps = [
         "@aspect_bazel_lib//lib:tar",
         "@bazel_skylib//lib:paths",
-    ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
+        "@bazel_tools//tools/build_defs/repo:cache.bzl",
+    ],
 )
