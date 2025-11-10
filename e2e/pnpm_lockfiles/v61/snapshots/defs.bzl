@@ -171,6 +171,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_70(name)
         _npm_local_package_store(
             link_root_name = name,
+            package_store_name = "a-types@file+..+projects+a-types",
+            src = "//projects/a-types:pkg",
+            package = "a-types",
+            version = "file:../projects/a-types",
+            deps = {
+                "//<LOCKVERSION>:.aspect_rules_js/{}/@types+node@18.19.54".format(name): "@types/node",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
             package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
@@ -337,8 +349,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_65("{}/tslib".format(name), False, name, "tslib")
             link_66("{}/typescript".format(name), False, name, "typescript")
             link_68("{}/uvu".format(name), False, name, "uvu")
-            _fp_link_0(name)
-            _fp_link_2(name)
+            _fp_link_1(name)
             _fp_link_3(name)
             _fp_link_4(name)
             _fp_link_5(name)
@@ -346,6 +357,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             _fp_link_7(name)
             _fp_link_8(name)
             _fp_link_9(name)
+            _fp_link_10(name)
             link_targets = [
                 ":{}/@aspect-test-a-bad-scope".format(name),
                 ":{}/@aspect-test-custom-scope/a".format(name),
@@ -443,9 +455,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "projects/peer-types":
             link_14("{}/jsonify".format(name), True, name, "jsonify")
             link_36("{}/hello".format(name), True, name, "hello")
-            _fp_link_0(name)
-            _fp_link_2(name)
+            _fp_link_1(name)
             _fp_link_3(name)
+            _fp_link_4(name)
             link_targets = [
                 ":{}/jsonify".format(name),
                 ":{}/hello".format(name),
@@ -468,8 +480,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "projects/b":
             link_22("{}/@types/node".format(name), True, name, "@types/node")
-            _fp_link_2(name)
-            _fp_link_10(name)
+            _fp_link_3(name)
+            _fp_link_11(name)
             link_targets = [
                 ":{}/@scoped/a".format(name),
                 ":{}/@types/node".format(name),
@@ -491,11 +503,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/lodash-4.17.21-file".format(name),
             ]
         elif bazel_package == "projects/c":
-            _fp_link_2(name)
+            _fp_link_0(name)
             _fp_link_3(name)
+            _fp_link_4(name)
             link_targets = [
                 ":{}/@scoped/a".format(name),
                 ":{}/@scoped/b".format(name),
+                ":{}/a-types".format(name),
             ]
             scope_targets = {
                 "@scoped": [
@@ -504,8 +518,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "projects/d":
-            _fp_link_2(name)
             _fp_link_3(name)
+            _fp_link_4(name)
             link_targets = [
                 ":{}/@scoped/a".format(name),
                 ":{}/@scoped/b".format(name),
@@ -651,6 +665,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/@scoped/a".format(name),
                 ":{}/@scoped/b".format(name),
             ])
+        if dev:
+            link_targets.extend([":{}/a-types".format(name)])
     elif bazel_package == "projects/d":
         if prod:
             link_targets.extend([
@@ -660,9 +676,17 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     return link_targets
 
 
-# Generated npm_link_package_store for linking of first-party "@scoped/c" package
+# Generated npm_link_package_store for linking of first-party "a-types" package
 # buildifier: disable=function-docstring
 def _fp_link_0(name):
+    _npm_local_link_package_store(
+        name = "{}/a-types".format(name),
+        src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@file+..+projects+a-types".format(name),
+    )
+
+# Generated npm_link_package_store for linking of first-party "@scoped/c" package
+# buildifier: disable=function-docstring
+def _fp_link_1(name):
     _npm_local_link_package_store(
         name = "{}/@scoped/c".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+c@file+..+projects+c_at_scoped_b_projects+b".format(name),
@@ -670,7 +694,7 @@ def _fp_link_0(name):
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package
 # buildifier: disable=function-docstring
-def _fp_link_2(name):
+def _fp_link_3(name):
     _npm_local_link_package_store(
         name = "{}/@scoped/a".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+a@0.0.0".format(name),
@@ -678,7 +702,7 @@ def _fp_link_2(name):
 
 # Generated npm_link_package_store for linking of first-party "@scoped/b" package
 # buildifier: disable=function-docstring
-def _fp_link_3(name):
+def _fp_link_4(name):
     _npm_local_link_package_store(
         name = "{}/@scoped/b".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+b@0.0.0".format(name),
@@ -686,7 +710,7 @@ def _fp_link_3(name):
 
 # Generated npm_link_package_store for linking of first-party "@scoped/d" package
 # buildifier: disable=function-docstring
-def _fp_link_4(name):
+def _fp_link_5(name):
     _npm_local_link_package_store(
         name = "{}/@scoped/d".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/@scoped+d@0.0.0".format(name),
@@ -694,7 +718,7 @@ def _fp_link_4(name):
 
 # Generated npm_link_package_store for linking of first-party "alias-project-a" package
 # buildifier: disable=function-docstring
-def _fp_link_5(name):
+def _fp_link_6(name):
     _npm_local_link_package_store(
         name = "{}/alias-project-a".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/alias-project-a@0.0.0".format(name),
@@ -702,7 +726,7 @@ def _fp_link_5(name):
 
 # Generated npm_link_package_store for linking of first-party "scoped/bad" package
 # buildifier: disable=function-docstring
-def _fp_link_6(name):
+def _fp_link_7(name):
     _npm_local_link_package_store(
         name = "{}/scoped/bad".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/scoped+bad@0.0.0".format(name),
@@ -710,7 +734,7 @@ def _fp_link_6(name):
 
 # Generated npm_link_package_store for linking of first-party "test-c200-d200" package
 # buildifier: disable=function-docstring
-def _fp_link_7(name):
+def _fp_link_8(name):
     _npm_local_link_package_store(
         name = "{}/test-c200-d200".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c200-d200@0.0.0".format(name),
@@ -718,7 +742,7 @@ def _fp_link_7(name):
 
 # Generated npm_link_package_store for linking of first-party "test-c201-d200" package
 # buildifier: disable=function-docstring
-def _fp_link_8(name):
+def _fp_link_9(name):
     _npm_local_link_package_store(
         name = "{}/test-c201-d200".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-c201-d200@0.0.0".format(name),
@@ -726,7 +750,7 @@ def _fp_link_8(name):
 
 # Generated npm_link_package_store for linking of first-party "test-peer-types" package
 # buildifier: disable=function-docstring
-def _fp_link_9(name):
+def _fp_link_10(name):
     _npm_local_link_package_store(
         name = "{}/test-peer-types".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/test-peer-types@0.0.0".format(name),
@@ -734,7 +758,7 @@ def _fp_link_9(name):
 
 # Generated npm_link_package_store for linking of first-party "a-types" package
 # buildifier: disable=function-docstring
-def _fp_link_10(name):
+def _fp_link_11(name):
     _npm_local_link_package_store(
         name = "{}/a-types".format(name),
         src = "//<LOCKVERSION>:.aspect_rules_js/{}/a-types@0.0.0".format(name),

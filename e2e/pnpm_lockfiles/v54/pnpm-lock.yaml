@@ -142,8 +142,11 @@ importers:
   ../projects/c:
     specifiers:
       '@scoped/a': link:../a
+      a-types: file:../a-types
     dependencies:
       '@scoped/a': link:../a
+    devDependencies:
+      a-types: file:../projects/a-types
 
   ../projects/d:
     specifiers:
@@ -577,6 +580,13 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
     name: hello
     version: 1.0.0
+
+  file:../projects/a-types:
+    resolution: {directory: ../projects/a-types, type: directory}
+    name: a-types
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node/18.19.54
+    dev: true
 
   file:../projects/c_@scoped+b@projects+b:
     resolution: {directory: ../projects/c, type: directory}

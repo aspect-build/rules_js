@@ -493,9 +493,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "projects/c":
             _fp_link_2(name)
             _fp_link_3(name)
+            _fp_link_10(name)
             link_targets = [
                 ":{}/@scoped/a".format(name),
                 ":{}/@scoped/b".format(name),
+                ":{}/a-types".format(name),
             ]
             scope_targets = {
                 "@scoped": [
@@ -651,6 +653,8 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/@scoped/a".format(name),
                 ":{}/@scoped/b".format(name),
             ])
+        if dev:
+            link_targets.extend([":{}/a-types".format(name)])
     elif bazel_package == "projects/d":
         if prod:
             link_targets.extend([
