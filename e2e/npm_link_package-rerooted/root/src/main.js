@@ -24,11 +24,6 @@ console.log(wrapper.id())
 console.log(wrapper.libId())
 console.log(wrapper.subdirId())
 console.log(wrapper.pkgId())
-const rulesFooA = require('../../../foo/node_modules/@aspect-test/a')
-console.log('--rulesFooA--')
-console.log(rulesFooA.id())
-console.log(rulesFooA.idB())
-console.log(rulesFooA.idC())
 const sharp = require('sharp')
 const roundedCorners = Buffer.from(
     '<svg><rect x="0" y="0" width="200" height="200" rx="50" ry="50"/></svg>'

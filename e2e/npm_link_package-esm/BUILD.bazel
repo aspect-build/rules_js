@@ -1,7 +1,6 @@
 load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
 load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@foo//:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
@@ -20,10 +19,6 @@ npm_link_package(
 npm_link_package(
     name = "node_modules/@e2e/wrapper-lib",
     src = "//wrapper-lib:wrapper-lib_pkg",
-)
-
-aspect_test_a_bin.bin_a_test(
-    name = "aspect_test_a_bin_test",
 )
 
 output_files(

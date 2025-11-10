@@ -1,6 +1,6 @@
 docs/*_*.md linguist-generated=true
 pnpm-lock.yaml linguist-generated=true
-e2e/rules_foo/npm_repositories.bzl linguist-generated=true
+e2e/npm_translate_lock_link_workspace/npm_repositories.bzl linguist-generated=true
 **/snapshots/** linguist-generated=true
 js/private/coverage/coverage.js linguist-generated=true
 js/private/devserver/js_run_devserver.mjs linguist-generated=true
