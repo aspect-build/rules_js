@@ -222,7 +222,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 {validation_call}
 """.format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
-            link_packages_comma_separated = "\"'\" + \"', '\".join(_IMPORTER_PACKAGES) + \"'\"" if len(package_to_importer) else "\"\"",
+            link_packages_comma_separated = "\"'\" + \"', '\".join(_IMPORTER_PACKAGES) + \"'\"" if package_to_importer else "\"\"",
             root_package = root_package,
             pnpm_lock_label = rctx.attr.pnpm_lock,
             validation_call = validation_call,
@@ -386,9 +386,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         ))
 
         # Generate a single _FP_DIRECT_TMPL block with all link packages
-        if len(fp_link["link_packages"]) > 0:
+        if fp_link["link_packages"]:
             package_visibility, _ = helpers.gather_values_from_matching_names(True, rctx.attr.package_visibility, "*", fp_package)
-            if len(package_visibility) == 0:
+            if not package_visibility:
                 package_visibility = None
 
             link_factories_bzl.append(_FP_DIRECT_TMPL.format(
@@ -405,7 +405,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 links_pkg_bzl[link_package] = []
             links_pkg_bzl[link_package].append("""            _fp_link_{i}(name)""".format(i = i))
 
-    if len(stores_bzl) > 0:
+    if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
         npm_link_all_packages_bzl.extend(stores_bzl)
 
@@ -416,7 +416,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 """)
 
     # Invoke and collect link targets based on package
-    if len(links_pkg_bzl) > 0:
+    if links_pkg_bzl:
         npm_link_all_packages_bzl.append("""    if link:""")
         first_link = True
         for link_package, bzl in links_pkg_bzl.items():
@@ -426,12 +426,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             ))
             npm_link_all_packages_bzl.extend(bzl)
 
-            if link_package in links_targets and (len(links_targets[link_package]["prod"]) > 0 or len(links_targets[link_package]["dev"]) > 0):
+            if link_package in links_targets and (links_targets[link_package]["prod"] or links_targets[link_package]["dev"]):
                 npm_link_all_packages_bzl.append("""            link_targets = {targets}""".format(
                     targets = starlark_codegen_utils.to_list_attr(links_targets[link_package]["prod"] + links_targets[link_package]["dev"], 3, 4, quote_value = False),
                 ))
 
-            if link_package in links_scope_targets and len(links_scope_targets[link_package]) > 0:
+            if links_scope_targets.get(link_package):
                 npm_link_all_packages_bzl.append("""            scope_targets = {targets}""".format(
                     targets = starlark_codegen_utils.to_dict_list_attr(links_scope_targets[link_package], 3, 4, quote_list_value = False),
                 ))
@@ -565,7 +565,7 @@ def _gen_npm_import(rctx, _import, link_workspace):
     maybe_deps = ("""
         deps = %s,""" % starlark_codegen_utils.to_dict_attr(_import.deps, 2)) if _import.deps else ""
     maybe_transitive_closure = ("""
-        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if len(_import.transitive_closure) > 0 else ""
+        transitive_closure = %s,""" % starlark_codegen_utils.to_dict_list_attr(_import.transitive_closure, 2)) if _import.transitive_closure else ""
     maybe_patch_tool = ("""
         patch_tool = "%s",""" % _import.patch_tool) if _import.patch_tool else ""
     maybe_patches = ("""
@@ -702,13 +702,14 @@ def _generate_npm_package_locations(fp_links, npm_imports):
     for _import in npm_imports:
         if _import.link_packages:
             for link_package, link_aliases in _import.link_packages.items():
-                aliases_to_add = link_aliases if link_aliases else [_import.package]
+                aliases_to_add = link_aliases or [_import.package]
                 for alias in aliases_to_add:
                     if link_package not in location_to_packages:
                         location_to_packages[link_package] = []
                     if alias not in location_to_packages[link_package]:
                         location_to_packages[link_package].append(alias)
 
+    # TODO(zbarsky): `sorted_map` could just return the dict's items which is what `to_dict_attr` wants anyway.
     location_to_packages = utils.sorted_map(location_to_packages)
 
     return "_NPM_PACKAGE_LOCATIONS = {}".format(
