@@ -8,6 +8,8 @@ load(":utils.bzl", "utils")
 
 ################################################################################
 
+_DEFS_BZL_FILENAME = "defs.bzl"
+
 _BIN_TMPL = \
     """load("{repo_package_json_bzl}", _bin = "bin")
 bin = _bin
@@ -67,7 +69,7 @@ js_binary(name = "sync", entry_point = "noop.js")
 """,
             "",
             "exports_files({})".format(starlark_codegen_utils.to_list_attr([
-                rctx.attr.defs_bzl_filename,
+                _DEFS_BZL_FILENAME,
             ])),
         ],
     }
@@ -208,7 +210,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         fail(msg)
 {validation_call}
 """.format(
-            defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
+            defs_bzl_file = "@{}//:{}".format(rctx.name, _DEFS_BZL_FILENAME),
             link_packages_comma_separated = "\"'\" + \"', '\".join(_IMPORTER_PACKAGES) + \"'\"" if package_to_importer else "\"\"",
             root_package = root_package,
             pnpm_lock_label = rctx.attr.pnpm_lock,
@@ -499,7 +501,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         "\n".join(link_factories_bzl),
     ])
 
-    rctx_files[rctx.attr.defs_bzl_filename] = defs_bzl_contents
+    rctx_files[_DEFS_BZL_FILENAME] = defs_bzl_contents
 
     for filename, contents in rctx.attr.additional_file_contents.items():
         if not rctx_files.get(filename, False):

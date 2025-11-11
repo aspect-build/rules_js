@@ -10,14 +10,13 @@ def foo_repositories():
         link_workspace = "foo",
         # Override the Bazel package where pnpm-lock.yaml is located and link to the specified package instead
         root_package = "",
-        defs_bzl_filename = "npm_link_all_packages.bzl",
         additional_file_contents = {
             "BUILD.bazel": [
                 """load("//:npm_link_all_packages.bzl", "npm_link_all_packages")""",
                 """npm_link_all_packages()""",
             ],
             # Test that we can add statements to the generated defs bzl file
-            "npm_link_all_packages.bzl": [
+            "defs.bzl": [
                 """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")""",
                 """def js_run_binary(**kwargs):
     _js_run_binary(**kwargs)""",
