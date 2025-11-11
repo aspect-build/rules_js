@@ -38,57 +38,10 @@ def js_info(
         A JsInfo provider
     """
 
-    # Handle backward compat for rules_js 1.x js_info factory parameters:
-    # TODO(3.0): remove backward compat handling
+    # Any addition non arguments should be considered invalid
     if len(kwargs):
-        # - declarations
-        declarations = kwargs.pop("declarations", None)
-        if declarations != None:
-            if types != None:
-                fail("Cannot set both types and declarations")
-
-            # buildifier: disable=print
-            print("""
-    WARNING: js_info 'declarations' is deprecated. Use 'types' instead.""")
-            types = declarations
-
-        # - transitive_declarations
-        transitive_declarations = kwargs.pop("transitive_declarations", None)
-        if transitive_declarations != None:
-            if transitive_types != None:
-                fail("Cannot set both transitive_types and transitive_declarations")
-
-            # buildifier: disable=print
-            print("""
-    WARNING: js_info 'transitive_declarations' is deprecated. Use 'transitive_types' instead.""")
-            transitive_types = transitive_declarations
-
-        # - npm_package_store_deps
-        npm_package_store_deps = kwargs.pop("npm_package_store_deps", None)
-        if npm_package_store_deps != None:
-            if npm_package_store_infos != None:
-                fail("Cannot set both npm_package_store_infos and npm_package_store_deps")
-
-            # buildifier: disable=print
-            print("""
-    WARNING: js_info 'npm_package_store_deps' is deprecated. Use 'npm_package_store_infos' instead.""")
-            npm_package_store_infos = npm_package_store_deps
-
-        # - transitive_npm_linked_package_files
-        transitive_npm_linked_package_files = kwargs.pop("transitive_npm_linked_package_files", None)
-        if transitive_npm_linked_package_files != None:
-            if npm_sources != None:
-                fail("Cannot set both npm_sources and transitive_npm_linked_package_files")
-
-            # buildifier: disable=print
-            print("""
-    WARNING: js_info 'transitive_npm_linked_package_files' is deprecated. Use 'npm_sources' instead.""")
-            npm_sources = transitive_npm_linked_package_files
-
-        # Any addition non arguments should be considered invalid
-        if len(kwargs):
-            msg = "Invalid js_info parameter '{}'".format(kwargs.keys()[0])
-            fail(msg)
+        msg = "Invalid js_info parameter '{}'".format(kwargs.keys()[0])
+        fail(msg)
 
     # Default to depset()
 
