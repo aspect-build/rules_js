@@ -170,6 +170,8 @@ jobs:
                       folder: e2e/npm_link_package
                     - bzlmod: 1
                       folder: e2e/rules_foo
+                      bazel-version:
+                          major: 6
                     # gyp_no_install_script+patch_from_repo+js_run_devserver are broken in an usual way on 6.5.0
                     # that is not worth investigating as we're dropping Bazel 6 support soon
                     - bazel-version:
