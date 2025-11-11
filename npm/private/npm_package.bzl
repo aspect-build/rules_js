@@ -428,15 +428,9 @@ def npm_package(
             name = files_target,
             srcs = srcs,
             include_sources = include_sources,
-            include_types = select({
-                Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
-                "//conditions:default": include_types,
-            }),
+            include_types = include_types,
             include_transitive_sources = include_transitive_sources,
-            include_transitive_types = select({
-                Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
-                "//conditions:default": include_transitive_types,
-            }),
+            include_transitive_types = include_transitive_types,
             include_npm_sources = include_npm_sources,
             include_runfiles = include_runfiles,
             # Always tag the target manual since we should only build it when the final target is built.
