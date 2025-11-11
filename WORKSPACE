@@ -4,4 +4,4 @@
 # https://github.com/bazel-contrib/bazel-gazelle/issues/2012
 # https://github.com/bazelbuild/bazel-watcher/issues/646
 
-fail("Local WORKSPACE development unsupported")
+fail("WORKSPACE unsupported")

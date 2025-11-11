@@ -56,38 +56,28 @@ echo "========================================"
 
 print_category "E2E TEST SNAPSHOTS"
 
-# pnpm_lockfiles - Multiple versions (bzlmod only, no workspace mode in this repo)
+# pnpm_lockfiles - Multiple versions
 for version in v90 v101; do
-    run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:repos" "pnpm_lockfiles/$version" "--enable_bzlmod=true"
+    run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:repos" "pnpm_lockfiles/$version"
 done
-for version in v90 v101; do
-    run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:wksp-repos" "pnpm_lockfiles/$version" "--enable_bzlmod=false"
-done
-
-# npm_translate_lock
-run_target "$REPO_ROOT/e2e/npm_translate_lock" "//:write_npm_translate_lock_wksp" "npm_translate_lock" "--enable_bzlmod=false"
 
 # npm_translate_lock_empty
 run_target "$REPO_ROOT/e2e/npm_translate_lock_empty" "//:write_npm_translate_lock_bzlmod" "npm_translate_lock_empty"
-run_target "$REPO_ROOT/e2e/npm_translate_lock_empty" "//:write_npm_translate_lock_wksp" "npm_translate_lock_empty" "--enable_bzlmod=false"
 
 # npm_translate_lock_replace_packages
-run_target "$REPO_ROOT/e2e/npm_translate_lock_replace_packages" "//:write_npm_translate_lock_wksp" "npm_translate_lock_replace_packages (wksp)" "--enable_bzlmod=false"
-run_target "$REPO_ROOT/e2e/npm_translate_lock_replace_packages" "//:write_npm_translate_lock_bzlmod" "npm_translate_lock_replace_packages (bzlmod)" "--enable_bzlmod=true"
+run_target "$REPO_ROOT/e2e/npm_translate_lock_replace_packages" "//:write_npm_translate_lock_bzlmod" "npm_translate_lock_replace_packages"
 
 # npm_translate_lock_disable_hooks
-run_target "$REPO_ROOT/e2e/npm_translate_lock_disable_hooks" "//:write_npm_translate_lock_wksp" "npm_translate_lock_disable_hooks (wksp)" "--enable_bzlmod=false"
-run_target "$REPO_ROOT/e2e/npm_translate_lock_disable_hooks" "//:write_npm_translate_lock_defs" "npm_translate_lock_disable_hooks (defs)" "--enable_bzlmod=true"
+run_target "$REPO_ROOT/e2e/npm_translate_lock_disable_hooks" "//:write_npm_translate_lock_defs" "npm_translate_lock_disable_hooks (defs)"
 
 # gyp_no_install_script
-run_target "$REPO_ROOT/e2e/gyp_no_install_script" "//:write_npm_translate_lock_wksp" "gyp_no_install_script (wksp)" "--enable_bzlmod=false"
-run_target "$REPO_ROOT/e2e/gyp_no_install_script" "//:write_npm_translate_lock_bzlmod" "gyp_no_install_script (bzlmod)" "--enable_bzlmod=true"
+run_target "$REPO_ROOT/e2e/gyp_no_install_script" "//:write_npm_translate_lock_bzlmod" "gyp_no_install_script"
 
 # pnpm_workspace
-run_target "$REPO_ROOT/e2e/pnpm_workspace" "//:repos" "pnpm_workspace" "--enable_bzlmod=true"
+run_target "$REPO_ROOT/e2e/pnpm_workspace" "//:repos" "pnpm_workspace"
 
 # pnpm_workspace_rerooted
-run_target "$REPO_ROOT/e2e/pnpm_workspace_rerooted" "//:repos" "pnpm_workspace_rerooted" "--enable_bzlmod=true"
+run_target "$REPO_ROOT/e2e/pnpm_workspace_rerooted" "//:repos" "pnpm_workspace_rerooted"
 
 ##############################################################################
 # ROOT TEST SNAPSHOTS
@@ -96,17 +86,17 @@ run_target "$REPO_ROOT/e2e/pnpm_workspace_rerooted" "//:repos" "pnpm_workspace_r
 print_category "ROOT TEST SNAPSHOTS"
 
 # npm/private/test - npm translation test snapshots
-run_target "$REPO_ROOT" "//npm/private/test:write_npm_translate_lock" "npm/private/test" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//npm/private/test:write_npm_translate_lock" "npm/private/test"
 
 # js/private/test - js_binary launcher snapshot
-run_target "$REPO_ROOT" "//js/private/test:write_launcher" "js/private/test" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test:write_launcher" "js/private/test"
 
 # js/private/test/image - js_image_layer test snapshots
-run_target "$REPO_ROOT" "//js/private/test/image:checksum_test_test" "js/private/test/image checksum" "--enable_bzlmod=true"
-run_target "$REPO_ROOT" "//js/private/test/image:default_test_update_all" "js/private/test/image default" "--enable_bzlmod=true"
-run_target "$REPO_ROOT" "//js/private/test/image:custom_owner_test_update_all" "js/private/test/image custom_owner" "--enable_bzlmod=true"
-run_target "$REPO_ROOT" "//js/private/test/image:regex_edge_cases_test_update_all" "js/private/test/image regex_edge_cases" "--enable_bzlmod=true"
-run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_update_all" "js/private/test/image custom_layers_nomatch" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/test/image:checksum_test_test" "js/private/test/image checksum"
+run_target "$REPO_ROOT" "//js/private/test/image:default_test_update_all" "js/private/test/image default"
+run_target "$REPO_ROOT" "//js/private/test/image:custom_owner_test_update_all" "js/private/test/image custom_owner"
+run_target "$REPO_ROOT" "//js/private/test/image:regex_edge_cases_test_update_all" "js/private/test/image regex_edge_cases"
+run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_update_all" "js/private/test/image custom_layers_nomatch"
 
 ##############################################################################
 # GENERATED SOURCES
@@ -115,19 +105,19 @@ run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_upda
 print_category "GENERATED SOURCES"
 
 # Watch protocol
-run_target "$REPO_ROOT" "//js/private/watch:watch_checked" "Watch protocol" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/watch:watch_checked" "Watch protocol"
 
 # Devserver bundle
-run_target "$REPO_ROOT" "//js/private/devserver:watch_checked" "Devserver bundle" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/devserver:watch_checked" "Devserver bundle"
 
 # Worker bundle
-run_target "$REPO_ROOT" "//js/private/worker:worker_checked" "Worker bundle" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/worker:worker_checked" "Worker bundle"
 
 # Node patches
-run_target "$REPO_ROOT" "//js/private/node-patches:checked_in_compile" "Node patches" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/node-patches:checked_in_compile" "Node patches"
 
 # Coverage bundle
-run_target "$REPO_ROOT" "//js/private/coverage:coverage_checked" "Coverage bundle" "--enable_bzlmod=true"
+run_target "$REPO_ROOT" "//js/private/coverage:coverage_checked" "Coverage bundle"
 
 ##############################################################################
 # SUMMARY

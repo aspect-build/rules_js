@@ -70,10 +70,7 @@ oci_image(
     ],
     visibility = ["//visibility:public"],
     # This is `cmd` + `.runfiles/[workspace name]`
-    workdir = select({
-        "@aspect_bazel_lib//lib:bzlmod": "/app/src/bin.runfiles/_main",
-        "//conditions:default": "/app/src/bin.runfiles/__main__",
-    }),
+    workdir = "/app/src/bin.runfiles/_main",
 )
 
 container_structure_test(

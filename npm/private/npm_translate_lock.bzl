@@ -41,7 +41,6 @@ load(":utils.bzl", "utils")
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
 
 ################################################################################
-DEFAULT_REPOSITORIES_BZL_FILENAME = "repositories.bzl"
 DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 
 def _normalize_exclude_package_contents(exclude_package_contents):
@@ -72,7 +71,6 @@ def _normalize_exclude_package_contents(exclude_package_contents):
 _ATTRS = {
     "additional_file_contents": attr.string_list_dict(),
     "bins": attr.string_list_dict(),
-    "bzlmod": attr.bool(),
     "custom_postinstalls": attr.string_dict(),
     "data": attr.label_list(),
     "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
@@ -101,7 +99,6 @@ _ATTRS = {
     "prod": attr.bool(),
     "public_hoist_packages": attr.string_list_dict(),
     "quiet": attr.bool(default = True),
-    "repositories_bzl_filename": attr.string(default = DEFAULT_REPOSITORIES_BZL_FILENAME),
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
     "update_pnpm_lock": attr.bool(),
     "use_home_npmrc": attr.bool(),
@@ -119,7 +116,7 @@ npm_translate_lock_lib = struct(
 def _npm_translate_lock_impl(rctx):
     rctx.report_progress("Initializing")
 
-    state = npm_translate_lock_state.new(rctx.name, rctx, rctx.attr, rctx.attr.bzlmod)
+    state = npm_translate_lock_state.new(rctx.name, rctx, rctx.attr)
 
     # If a pnpm lock file has not been specified then we need to bootstrap by running `pnpm
     # import` in the user's repository
@@ -170,7 +167,6 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.default_registry(),
         state.npm_registries(),
         state.npm_auth(),
-        state.link_workspace(),
     )
 
     # Support bazel <v8.3 by returning None if repo_metadata is not defined
@@ -585,7 +581,6 @@ def npm_translate_lock(
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)
     additional_file_contents = kwargs.pop("additional_file_contents", {})
-    repositories_bzl_filename = kwargs.pop("repositories_bzl_filename", None)
     defs_bzl_filename = kwargs.pop("defs_bzl_filename", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
 
@@ -663,7 +658,6 @@ def npm_translate_lock(
         link_workspace = link_workspace,
         root_package = root_package,
         additional_file_contents = additional_file_contents,
-        repositories_bzl_filename = repositories_bzl_filename,
         defs_bzl_filename = defs_bzl_filename,
         generate_bzl_library_targets = generate_bzl_library_targets,
         data = data,
@@ -673,7 +667,6 @@ def npm_translate_lock(
         use_pnpm = use_pnpm,
         yq_toolchain_prefix = yq_toolchain_prefix,
         npm_package_target_name = npm_package_target_name,
-        bzlmod = False,
     )
 
 def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_package_contents = []):
@@ -895,20 +888,15 @@ INFO: {} file has changed""".format(pnpm_lock_relative_path))
 
 ################################################################################
 def _fail_if_frozen_pnpm_lock(rctx, state):
-    repo_reference_symbol = "@"
-    if rctx.attr.bzlmod:
-        repo_reference_symbol = "@@"
-
     if RULES_JS_FROZEN_PNPM_LOCK_ENV in rctx.os.environ.keys() and rctx.os.environ[RULES_JS_FROZEN_PNPM_LOCK_ENV]:
         fail("""
 
 ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To update run,
 
-           bazel run {repo_reference_symbol}{rctx_name}//:sync
+           bazel run @@{rctx_name}//:sync
 
 """.format(
             action_cache = state.label_store.relative_path("action_cache"),
             pnpm_lock = state.label_store.relative_path("pnpm_lock"),
-            repo_reference_symbol = repo_reference_symbol,
             rctx_name = rctx.name,
         ))

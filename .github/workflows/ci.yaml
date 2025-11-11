@@ -76,7 +76,6 @@ jobs:
                     e2e/webpack_devserver
                     e2e/webpack_devserver_esm
                     e2e/worker
-                    e2e/workspace
                   )
                   if [[ "${{ env.ASPECT_GHTESTER_SSH_KEY }}" ]]; then
                     a+=(
@@ -122,7 +121,6 @@ jobs:
             fail-fast: false
             matrix:
                 bazel-version: ${{ fromJSON(needs.matrix-prep.outputs.bazel-version) }}
-                bzlmod: [1, 0]
                 os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
                 folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
@@ -130,59 +128,40 @@ jobs:
                     - os: windows
                     # Exclude MacOS by default, will opt-in to includes
                     - os: macos
-                    # Don't run bzlmod smoke test under workspace
-                    - bzlmod: 0
-                      folder: e2e/bzlmod
-                    # Don't run workspace tests unit tests.
-                    - bzlmod: 0
-                      folder: .
                     # Don't run tests with Bazel 8 by default
                     - bazel-version:
                           major: 8
-                    # Don't run workspace smoke test under bzlmod
-                    - bzlmod: 1
-                      folder: e2e/workspace
                     # rules_docker is not compatible with Bazel 7
                     - bazel-version:
                           major: 7
                       folder: e2e/js_image_docker
                     # TODO: un-exclude the following bzlmod tests once they work
-                    - bzlmod: 1
-                      folder: e2e/js_image_docker
+                    - folder: e2e/js_image_docker
                     # TODO: js_image_oci with bazel 7.6.1 and non-bzlmod fails
                     - bazel-version:
                           major: 7
-                      bzlmod: 0
                       folder: e2e/js_image_oci
-                    # @bazel/runfiles seems broken with non-bzlmod + bazel7
-                    # https://github.com/bazel-contrib/rules_nodejs/issues/3797
-                    - bzlmod: 0
-                      folder: e2e/runfiles
                 include:
                     # Include unit tests with bazel8
                     - bazel-version:
                           major: 8
-                      bzlmod: 1
                       folder: .
                       os: ubuntu
                       config: local
                     - bazel-version:
                           major: 7
                           version: 7.4.0
-                      bzlmod: 1
                       folder: docs
                       os: ubuntu
                     - bazel-version:
                           major: 7
                           version: 7.4.0
-                      bzlmod: 1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 7
                           version: 7.4.0
-                      bzlmod: 1
                       os: macos
                       config: local
                       folder: e2e/bzlmod
@@ -213,11 +192,11 @@ jobs:
                       ~/.cache/bazel
                       ~/.cache/bazelisk
                   key: >-
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
+                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.os }}-${{ matrix.folder }}-
                       ${{ hashFiles('.bazelrc', '.bazelversion', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
                       ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
+                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.os }}-${{ matrix.folder }}-
 
             - name: Configure Bazel version
               shell: bash
@@ -238,7 +217,7 @@ jobs:
                     --incompatible_merge_fixed_and_default_shell_env \
                     --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --enable_bzlmod=${{ matrix.bzlmod }} \
+                    --enable_bzlmod=1 \
                     //...
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
@@ -278,7 +257,7 @@ jobs:
                     --incompatible_merge_fixed_and_default_shell_env \
                     --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --enable_bzlmod=${{ matrix.bzlmod }} \
+                    --enable_bzlmod=1 \
                     --instrument_test_targets \
                     //...
               env:
@@ -290,9 +269,8 @@ jobs:
               # Run if there is a test.sh file in the folder.
               if: matrix.os != 'windows' && hashFiles(format('{0}//test.sh', matrix.folder)) != ''
               shell: bash
-              # Run the script potentially setting BZLMOD_FLAG=--enable_bzlmod={1,0}. All test.sh
-              # scripts that run bazel directly should make use of this variable.
-              run: BZLMOD_FLAG=--enable_bzlmod=${{ matrix.bzlmod }} ./test.sh
+              # All test.sh scripts that run bazel directly should make use of this variable.
+              run: BZLMOD_FLAG=--enable_bzlmod=1 ./test.sh
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
