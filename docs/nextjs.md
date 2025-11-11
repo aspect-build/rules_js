@@ -50,6 +50,8 @@ For [standalone applications](https://nextjs.org/docs/app/api-reference/config/n
 ## nextjs
 
 <pre>
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs")
+
 nextjs(<a href="#nextjs-name">name</a>, <a href="#nextjs-srcs">srcs</a>, <a href="#nextjs-next_js_binary">next_js_binary</a>, <a href="#nextjs-config">config</a>, <a href="#nextjs-data">data</a>, <a href="#nextjs-serve_data">serve_data</a>, <a href="#nextjs-kwargs">kwargs</a>)
 </pre>
 
@@ -129,6 +131,8 @@ ibazel run //app:next.start
 ## nextjs_build
 
 <pre>
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_build")
+
 nextjs_build(<a href="#nextjs_build-name">name</a>, <a href="#nextjs_build-config">config</a>, <a href="#nextjs_build-srcs">srcs</a>, <a href="#nextjs_build-next_js_binary">next_js_binary</a>, <a href="#nextjs_build-data">data</a>, <a href="#nextjs_build-kwargs">kwargs</a>)
 </pre>
 
@@ -155,6 +159,8 @@ See https://nextjs.org/docs/pages/api-reference/cli/next#build
 ## nextjs_dev
 
 <pre>
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_dev")
+
 nextjs_dev(<a href="#nextjs_dev-name">name</a>, <a href="#nextjs_dev-config">config</a>, <a href="#nextjs_dev-srcs">srcs</a>, <a href="#nextjs_dev-data">data</a>, <a href="#nextjs_dev-next_js_binary">next_js_binary</a>, <a href="#nextjs_dev-kwargs">kwargs</a>)
 </pre>
 
@@ -181,6 +187,8 @@ See https://nextjs.org/docs/pages/api-reference/cli/next#next-dev-options
 ## nextjs_standalone_build
 
 <pre>
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_build")
+
 nextjs_standalone_build(<a href="#nextjs_standalone_build-name">name</a>, <a href="#nextjs_standalone_build-config">config</a>, <a href="#nextjs_standalone_build-srcs">srcs</a>, <a href="#nextjs_standalone_build-next_js_binary">next_js_binary</a>, <a href="#nextjs_standalone_build-data">data</a>, <a href="#nextjs_standalone_build-kwargs">kwargs</a>)
 </pre>
 
@@ -217,6 +225,8 @@ Issues worked around by the generated config include:
 ## nextjs_standalone_server
 
 <pre>
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_server")
+
 nextjs_standalone_server(<a href="#nextjs_standalone_server-name">name</a>, <a href="#nextjs_standalone_server-app">app</a>, <a href="#nextjs_standalone_server-pkg">pkg</a>, <a href="#nextjs_standalone_server-data">data</a>, <a href="#nextjs_standalone_server-kwargs">kwargs</a>)
 </pre>
 
@@ -247,6 +257,8 @@ or deployed in a container image etc.
 ## nextjs_start
 
 <pre>
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_start")
+
 nextjs_start(<a href="#nextjs_start-name">name</a>, <a href="#nextjs_start-config">config</a>, <a href="#nextjs_start-app">app</a>, <a href="#nextjs_start-next_js_binary">next_js_binary</a>, <a href="#nextjs_start-data">data</a>, <a href="#nextjs_start-kwargs">kwargs</a>)
 </pre>
 

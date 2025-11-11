@@ -7,7 +7,7 @@ local_path_override(
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.7", dev_dependency = True)
 bazel_dep(name = "container_structure_test", version = "1.21.1", dev_dependency = True)
 bazel_dep(name = "platforms", version = "0.0.10", dev_dependency = True)
-bazel_dep(name = "rules_nodejs", version = "6.3.0", dev_dependency = True)
+bazel_dep(name = "rules_nodejs", version = "6.6.0", dev_dependency = True)
 bazel_dep(name = "rules_oci", version = "2.0.0-alpha2", dev_dependency = True)
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)

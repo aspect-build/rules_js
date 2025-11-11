@@ -31,6 +31,8 @@ Advanced users may want to directly fetch a package from npm rather than start f
 ## list_patches
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_translate_lock.bzl", "list_patches")
+
 list_patches(<a href="#list_patches-name">name</a>, <a href="#list_patches-out">out</a>, <a href="#list_patches-include_patterns">include_patterns</a>, <a href="#list_patches-exclude_package_contents">exclude_package_contents</a>)
 </pre>
 
@@ -57,6 +59,8 @@ file stays up to date.
 ## npm_translate_lock
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_translate_lock.bzl", "npm_translate_lock")
+
 npm_translate_lock(<a href="#npm_translate_lock-name">name</a>, <a href="#npm_translate_lock-pnpm_lock">pnpm_lock</a>, <a href="#npm_translate_lock-npm_package_lock">npm_package_lock</a>, <a href="#npm_translate_lock-yarn_lock">yarn_lock</a>, <a href="#npm_translate_lock-update_pnpm_lock">update_pnpm_lock</a>,
                    <a href="#npm_translate_lock-node_toolchain_prefix">node_toolchain_prefix</a>, <a href="#npm_translate_lock-yq_toolchain_prefix">yq_toolchain_prefix</a>, <a href="#npm_translate_lock-preupdate">preupdate</a>, <a href="#npm_translate_lock-npmrc">npmrc</a>, <a href="#npm_translate_lock-use_home_npmrc">use_home_npmrc</a>, <a href="#npm_translate_lock-data">data</a>,
                    <a href="#npm_translate_lock-patches">patches</a>, <a href="#npm_translate_lock-exclude_package_contents">exclude_package_contents</a>, <a href="#npm_translate_lock-patch_tool">patch_tool</a>, <a href="#npm_translate_lock-patch_args">patch_args</a>, <a href="#npm_translate_lock-custom_postinstalls">custom_postinstalls</a>,

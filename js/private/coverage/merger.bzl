@@ -13,23 +13,11 @@ _ATTRS = {
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
-# Do the opposite of _to_manifest_path in
-# https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
-# to get back to the short_path.
-# TODO(3.0): remove this after a grace period for the DEPRECATED toolchain attributes
-# buildifier: disable=unused-variable
-def _deprecated_target_tool_path_to_short_path(tool_path):
-    return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
-
 def _coverage_merger_impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
     nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
 
-    if hasattr(nodeinfo, "node"):
-        node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
+    node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
@@ -51,12 +39,8 @@ def _coverage_merger_impl(ctx):
 
     runfiles = [ctx.file.entry_point]
 
-    if hasattr(nodeinfo, "node"):
-        if nodeinfo.node:
-            runfiles.append(nodeinfo.node)
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        runfiles.extend(nodeinfo.tool_files)
+    if nodeinfo.node:
+        runfiles.append(nodeinfo.node)
 
     return DefaultInfo(
         executable = launcher,

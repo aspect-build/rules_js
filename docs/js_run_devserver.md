@@ -7,6 +7,8 @@ Implementation details for js_run_devserver rule
 ## js_run_devserver
 
 <pre>
+load("@aspect_rules_js//js/private:js_run_devserver.bzl", "js_run_devserver")
+
 js_run_devserver(<a href="#js_run_devserver-name">name</a>, <a href="#js_run_devserver-tool">tool</a>, <a href="#js_run_devserver-command">command</a>, <a href="#js_run_devserver-grant_sandbox_write_permissions">grant_sandbox_write_permissions</a>, <a href="#js_run_devserver-use_execroot_entry_point">use_execroot_entry_point</a>,
                  <a href="#js_run_devserver-allow_execroot_entry_point_with_no_copy_data_to_bin">allow_execroot_entry_point_with_no_copy_data_to_bin</a>, <a href="#js_run_devserver-kwargs">kwargs</a>)
 </pre>

@@ -13,6 +13,8 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 ## npm_package
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_package.bzl", "npm_package")
+
 npm_package(<a href="#npm_package-name">name</a>, <a href="#npm_package-srcs">srcs</a>, <a href="#npm_package-data">data</a>, <a href="#npm_package-args">args</a>, <a href="#npm_package-out">out</a>, <a href="#npm_package-package">package</a>, <a href="#npm_package-version">version</a>, <a href="#npm_package-root_paths">root_paths</a>,
             <a href="#npm_package-include_external_repositories">include_external_repositories</a>, <a href="#npm_package-include_srcs_packages">include_srcs_packages</a>, <a href="#npm_package-exclude_srcs_packages">exclude_srcs_packages</a>,
             <a href="#npm_package-include_srcs_patterns">include_srcs_patterns</a>, <a href="#npm_package-exclude_srcs_patterns">exclude_srcs_patterns</a>, <a href="#npm_package-replace_prefixes">replace_prefixes</a>, <a href="#npm_package-allow_overwrites">allow_overwrites</a>,
@@ -121,6 +123,8 @@ To stamp the current git tag as the "version" in the package.json file, see
 ## npm_package_lib.implementation
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_package.bzl", "npm_package_lib")
+
 npm_package_lib.implementation(<a href="#npm_package_lib.implementation-ctx">ctx</a>)
 </pre>
 
@@ -139,6 +143,8 @@ npm_package_lib.implementation(<a href="#npm_package_lib.implementation-ctx">ctx
 ## stamped_package_json
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_package.bzl", "stamped_package_json")
+
 stamped_package_json(<a href="#stamped_package_json-name">name</a>, <a href="#stamped_package_json-stamp_var">stamp_var</a>, <a href="#stamped_package_json-kwargs">kwargs</a>)
 </pre>
 

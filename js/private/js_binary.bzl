@@ -332,14 +332,6 @@ _ENV_SET = """export {var}=\"{value}\""""
 _ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
 _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 
-# Do the opposite of _to_manifest_path in
-# https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
-# to get back to the short_path.
-# TODO(3.0): remove this after a grace period for the DEPRECATED toolchain attributes
-# buildifier: disable=unused-variable
-def _deprecated_target_tool_path_to_short_path(tool_path):
-    return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
-
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
@@ -440,11 +432,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     npm_path = ""
     if ctx.attr.include_npm:
-        if hasattr(nodeinfo, "npm"):
-            npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
-        else:
-            # TODO(3.0): drop support for deprecated toolchain attributes
-            npm_path = _deprecated_target_tool_path_to_short_path(nodeinfo.npm_path)
+        npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
         if is_windows:
             npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
             ctx.actions.expand_template(
@@ -463,11 +451,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
             )
         toolchain_files.append(npm_wrapper)
 
-    if hasattr(nodeinfo, "node"):
-        node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
+    node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     launcher_subst = {
         "{{target_label}}": str(ctx.label),
@@ -526,12 +510,8 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     launcher_files = [bash_launcher]
     launcher_files.extend(toolchain_files)
-    if hasattr(nodeinfo, "node"):
-        if nodeinfo.node:
-            launcher_files.append(nodeinfo.node)
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        launcher_files.extend(nodeinfo.tool_files)
+    if nodeinfo.node:
+        launcher_files.append(nodeinfo.node)
 
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     transitive_launcher_files = None
