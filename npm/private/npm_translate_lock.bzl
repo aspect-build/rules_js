@@ -41,7 +41,6 @@ load(":utils.bzl", "utils")
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
 
 ################################################################################
-DEFAULT_DEFS_BZL_FILENAME = "defs.bzl"
 
 def _normalize_exclude_package_contents(exclude_package_contents):
     """Normalize exclude_package_contents dictionary for string_list_dict format."""
@@ -73,7 +72,6 @@ _ATTRS = {
     "bins": attr.string_list_dict(),
     "custom_postinstalls": attr.string_dict(),
     "data": attr.label_list(),
-    "defs_bzl_filename": attr.string(default = DEFAULT_DEFS_BZL_FILENAME),
     "dev": attr.bool(),
     "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache()),
     "generate_bzl_library_targets": attr.bool(),
@@ -581,7 +579,6 @@ def npm_translate_lock(
     # Gather undocumented attributes
     root_package = kwargs.pop("root_package", None)
     additional_file_contents = kwargs.pop("additional_file_contents", {})
-    defs_bzl_filename = kwargs.pop("defs_bzl_filename", None)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
 
     if len(kwargs):
@@ -658,7 +655,6 @@ def npm_translate_lock(
         link_workspace = link_workspace,
         root_package = root_package,
         additional_file_contents = additional_file_contents,
-        defs_bzl_filename = defs_bzl_filename,
         generate_bzl_library_targets = generate_bzl_library_targets,
         data = data,
         preupdate = preupdate,

@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
 load("@foo//:@aspect-test/a/package_json.bzl", "bin")
-load("@foo//:npm_link_all_packages.bzl", "js_run_binary")
+load("@foo//:defs.bzl", "js_run_binary")
 
 bin.bin_a_binary(name = "main")
 

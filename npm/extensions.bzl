@@ -163,7 +163,6 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         verify_patches = attr.verify_patches,
         yarn_lock = attr.yarn_lock,
         exclude_package_contents = exclude_package_contents_config,
-        defs_bzl_filename = attr.defs_bzl_filename,
         additional_file_contents = attr.additional_file_contents,
     )
 
