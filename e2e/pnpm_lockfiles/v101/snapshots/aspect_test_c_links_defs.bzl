@@ -29,7 +29,6 @@ def npm_imported_package_store(link_root_name):
         lc_deps = {
             ":.aspect_rules_js/{link_root_name}/@aspect-test+c@2.0.0/pkg_pre_lc_lite": "@aspect-test/c",
         },
-        dev_only = False,
         has_lifecycle_build_target = True,
         transitive_closure_pattern = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_c__2.0.0//:pkg",

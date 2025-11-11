@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
 JQ_FILTER='[
     .versions[]
-    | select(.version | test("^[0-9.]+$"))
+    | select(.version | test("^(9|10)\\.[0-9.]+$"))
     | {key: .version, value: .dist.integrity}
 ] | sort_by(
     .key

@@ -293,9 +293,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         friendly_version = package_info.get("friendly_version")
         deps = package_info.get("dependencies")
         optional_deps = package_info.get("optional_dependencies")
-        dev_only = package_info.get("dev_only")
         optional = package_info.get("optional")
-        requires_build = package_info.get("requires_build")
         transitive_closure = package_info.get("transitive_closure")
         resolution = package_info.get("resolution")
 
@@ -317,14 +315,6 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         elif not integrity and not tarball:
             msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package_key)
             fail(msg)
-
-        if attr.prod and dev_only:
-            # When prod attribute is set, skip deps explicitly marked as dev in the lockfile.
-            #
-            # NOTE: this only excludes packages explicitly marked as dev-only in the lockfile
-            # to avoid further processing. Some packages may be used as both dev and non-dev within
-            # the workspace and therefor will not be marked as dev in the lockfile.
-            continue
 
         if attr.no_optional and optional:
             # when no_optional attribute is set, skip optionalDependencies
@@ -418,7 +408,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build)
+        run_lifecycle_hooks = all_lifecycle_hooks and only_built_dependencies != None and name in only_built_dependencies
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
             lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
@@ -492,7 +482,6 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             version = version,
             bins = bins,
             package_info = package_info,
-            dev_only = dev_only,
             replace_package = replace_package,
         )
 

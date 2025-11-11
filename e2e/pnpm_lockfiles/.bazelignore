@@ -3,8 +3,6 @@ cases/versionless-patch-v9/node_modules
 cases/docusaurus-direct-peer-v9/node_modules
 cases/isaacs-cliui-v90/node_modules
 cases/override-with-alias-url-v9/node_modules
-cases/docusaurus-direct-peer-v6/node_modules
-cases/tarball-no-url-v54/node_modules
 projects/a/node_modules
 projects/a-types/node_modules
 projects/alts/node_modules
@@ -14,9 +12,6 @@ projects/d/node_modules
 projects/peer-types/node_modules
 projects/peers-combo-1/node_modules
 projects/peers-combo-2/node_modules
-v54/node_modules/
-v60/node_modules/
-v61/node_modules/
 v90/node_modules/
 v101/node_modules/
 vendored/is-number/node_modules

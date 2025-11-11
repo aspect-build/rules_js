@@ -14,6 +14,5 @@ NpmPackageStoreInfo = provider(
         "package_store_directory": "the TreeArtifact of this npm package's package store location",
         "files": "depset of files that are part of the npm package",
         "transitive_files": "depset of the files that are part of the npm package and its transitive deps",
-        "dev": "DEPRECATED: whether or not this npm package is a dev dependency",
     },
 )

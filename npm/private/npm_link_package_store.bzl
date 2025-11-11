@@ -67,11 +67,6 @@ def _npm_link_package_store_impl(ctx):
     store_info = ctx.attr.src[NpmPackageStoreInfo]
     store_js_info = ctx.attr.src[JsInfo]
 
-    # Ensure the DEPRECATED NpmPackageStoreInfo.dev flag is never True when linking
-    # as a non-devDependency
-    if store_info.dev and not ctx.attr.dev:
-        fail("cannot link a devDependency package as a non-devDependency")
-
     package_store_directory = store_info.package_store_directory
     if not package_store_directory:
         fail("src must be a npm_link_package that provides a package_store_directory")

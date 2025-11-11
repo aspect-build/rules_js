@@ -128,9 +128,6 @@ If unset, the package version in the `NpmPackageInfo` src must be set.
 If set, takes precendance over the package version in the `NpmPackageInfo` src.
 """,
     ),
-    "dev_only": attr.bool(
-        doc = """Whether this npm package is *only* a dev dependency""",
-    ),
     "hardlink": attr.string(
         values = ["auto", "off", "on"],
         default = "auto",
@@ -424,7 +421,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             package_store_directory = package_store_directory,
             files = files_depset,
             transitive_files = transitive_files_depset,
-            dev = ctx.attr.dev_only,
         ),
     ]
 
