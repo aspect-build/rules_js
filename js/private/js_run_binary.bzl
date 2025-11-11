@@ -247,25 +247,6 @@ def js_run_binary(
     if "deps" in kwargs.keys():
         fail("Use srcs instead of deps in js_run_binary: https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_binary#srcs")
 
-    # For backward compat
-    # TODO(3.0): remove backward compat handling
-    include_npm_linked_packages = kwargs.pop("include_npm_linked_packages", None)
-    if include_npm_linked_packages != None:
-        # buildifier: disable=print
-        print("""
-WARNING: js_run_binary 'include_npm_linked_packages' is deprecated. Use 'include_npm_sources' instead.""")
-        include_npm_sources = include_npm_linked_packages
-
-    # For backward compat
-    # TODO(3.0): remove backward compat handling
-    include_declarations = kwargs.pop("include_declarations", False)
-    if include_declarations:
-        # buildifier: disable=print
-        print("""
-WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' instead.""")
-        include_types = include_declarations
-        include_transitive_types = include_declarations
-
     extra_srcs = []
 
     # Hoist js provider files to DefaultInfo
