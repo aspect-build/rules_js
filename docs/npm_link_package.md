@@ -7,6 +7,8 @@ npm_link_package rule
 ## npm_link_package
 
 <pre>
+load("@aspect_rules_js//npm/private:npm_link_package.bzl", "npm_link_package")
+
 npm_link_package(<a href="#npm_link_package-name">name</a>, <a href="#npm_link_package-root_package">root_package</a>, <a href="#npm_link_package-link">link</a>, <a href="#npm_link_package-src">src</a>, <a href="#npm_link_package-deps">deps</a>, <a href="#npm_link_package-fail_if_no_link">fail_if_no_link</a>, <a href="#npm_link_package-auto_manual">auto_manual</a>, <a href="#npm_link_package-visibility">visibility</a>,
                  <a href="#npm_link_package-kwargs">kwargs</a>)
 </pre>

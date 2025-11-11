@@ -21,6 +21,8 @@ js_binary(
 ## js_binary
 
 <pre>
+load("@aspect_rules_js//js/private:js_binary.bzl", "js_binary")
+
 js_binary(<a href="#js_binary-name">name</a>, <a href="#js_binary-data">data</a>, <a href="#js_binary-chdir">chdir</a>, <a href="#js_binary-copy_data_to_bin">copy_data_to_bin</a>, <a href="#js_binary-enable_runfiles">enable_runfiles</a>, <a href="#js_binary-entry_point">entry_point</a>, <a href="#js_binary-env">env</a>, <a href="#js_binary-expand_args">expand_args</a>,
           <a href="#js_binary-expand_env">expand_env</a>, <a href="#js_binary-expected_exit_code">expected_exit_code</a>, <a href="#js_binary-fixed_args">fixed_args</a>, <a href="#js_binary-include_npm">include_npm</a>, <a href="#js_binary-include_npm_sources">include_npm_sources</a>,
           <a href="#js_binary-include_sources">include_sources</a>, <a href="#js_binary-include_transitive_sources">include_transitive_sources</a>, <a href="#js_binary-include_transitive_types">include_transitive_types</a>, <a href="#js_binary-include_types">include_types</a>,
@@ -100,6 +102,8 @@ The following environment variables are made available to the Node.js runtime ba
 ## js_test
 
 <pre>
+load("@aspect_rules_js//js/private:js_binary.bzl", "js_test")
+
 js_test(<a href="#js_test-name">name</a>, <a href="#js_test-data">data</a>, <a href="#js_test-chdir">chdir</a>, <a href="#js_test-copy_data_to_bin">copy_data_to_bin</a>, <a href="#js_test-enable_runfiles">enable_runfiles</a>, <a href="#js_test-entry_point">entry_point</a>, <a href="#js_test-env">env</a>, <a href="#js_test-env_inherit">env_inherit</a>,
         <a href="#js_test-expand_args">expand_args</a>, <a href="#js_test-expand_env">expand_env</a>, <a href="#js_test-expected_exit_code">expected_exit_code</a>, <a href="#js_test-fixed_args">fixed_args</a>, <a href="#js_test-include_npm">include_npm</a>, <a href="#js_test-include_npm_sources">include_npm_sources</a>,
         <a href="#js_test-include_sources">include_sources</a>, <a href="#js_test-include_transitive_sources">include_transitive_sources</a>, <a href="#js_test-include_transitive_types">include_transitive_types</a>, <a href="#js_test-include_types">include_types</a>,
@@ -165,6 +169,8 @@ the contract between Bazel and a test runner.
 ## js_binary_lib.create_launcher
 
 <pre>
+load("@aspect_rules_js//js/private:js_binary.bzl", "js_binary_lib")
+
 js_binary_lib.create_launcher(<a href="#js_binary_lib.create_launcher-ctx">ctx</a>, <a href="#js_binary_lib.create_launcher-log_prefix_rule_set">log_prefix_rule_set</a>, <a href="#js_binary_lib.create_launcher-log_prefix_rule">log_prefix_rule</a>, <a href="#js_binary_lib.create_launcher-fixed_args">fixed_args</a>, <a href="#js_binary_lib.create_launcher-fixed_env">fixed_env</a>)
 </pre>
 
@@ -187,6 +193,8 @@ js_binary_lib.create_launcher(<a href="#js_binary_lib.create_launcher-ctx">ctx</
 ## js_binary_lib.implementation
 
 <pre>
+load("@aspect_rules_js//js/private:js_binary.bzl", "js_binary_lib")
+
 js_binary_lib.implementation(<a href="#js_binary_lib.implementation-ctx">ctx</a>)
 </pre>
 

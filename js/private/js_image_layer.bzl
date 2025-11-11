@@ -409,11 +409,7 @@ else {
     )
 
     nodeinfo = ctx.attr._current_node[platform_common.ToolchainInfo].nodeinfo
-    if hasattr(nodeinfo, "node"):
-        node_exec = nodeinfo.node
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        node_exec = nodeinfo.target_tool_path
+    node_exec = nodeinfo.node
     ctx.actions.run(
         inputs = inputs,
         arguments = [splitter.path],

@@ -16,6 +16,8 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 ## js_run_binary
 
 <pre>
+load("@aspect_rules_js//js/private:js_run_binary.bzl", "js_run_binary")
+
 js_run_binary(<a href="#js_run_binary-name">name</a>, <a href="#js_run_binary-tool">tool</a>, <a href="#js_run_binary-env">env</a>, <a href="#js_run_binary-srcs">srcs</a>, <a href="#js_run_binary-outs">outs</a>, <a href="#js_run_binary-out_dirs">out_dirs</a>, <a href="#js_run_binary-args">args</a>, <a href="#js_run_binary-chdir">chdir</a>, <a href="#js_run_binary-stdout">stdout</a>, <a href="#js_run_binary-stderr">stderr</a>, <a href="#js_run_binary-exit_code_out">exit_code_out</a>,
               <a href="#js_run_binary-silent_on_success">silent_on_success</a>, <a href="#js_run_binary-use_execroot_entry_point">use_execroot_entry_point</a>, <a href="#js_run_binary-copy_srcs_to_bin">copy_srcs_to_bin</a>, <a href="#js_run_binary-include_sources">include_sources</a>,
               <a href="#js_run_binary-include_types">include_types</a>, <a href="#js_run_binary-include_transitive_sources">include_transitive_sources</a>, <a href="#js_run_binary-include_transitive_types">include_transitive_types</a>,

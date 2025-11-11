@@ -19,6 +19,8 @@ js_image_layer(
 ## js_image_layer
 
 <pre>
+load("@aspect_rules_js//js/private:js_image_layer.bzl", "js_image_layer")
+
 js_image_layer(<a href="#js_image_layer-name">name</a>, <a href="#js_image_layer-binary">binary</a>, <a href="#js_image_layer-compression">compression</a>, <a href="#js_image_layer-directory_mode">directory_mode</a>, <a href="#js_image_layer-file_mode">file_mode</a>, <a href="#js_image_layer-generate_empty_layers">generate_empty_layers</a>,
                <a href="#js_image_layer-layer_groups">layer_groups</a>, <a href="#js_image_layer-owner">owner</a>, <a href="#js_image_layer-platform">platform</a>, <a href="#js_image_layer-preserve_symlinks">preserve_symlinks</a>, <a href="#js_image_layer-root">root</a>)
 </pre>
@@ -308,6 +310,8 @@ The default layer groups are as follows and always created.
 ## js_image_layer_lib.implementation
 
 <pre>
+load("@aspect_rules_js//js/private:js_image_layer.bzl", "js_image_layer_lib")
+
 js_image_layer_lib.implementation(<a href="#js_image_layer_lib.implementation-ctx">ctx</a>)
 </pre>
 
