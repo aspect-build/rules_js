@@ -73,7 +73,7 @@ def _js_run_devserver_impl(ctx):
     entries.add("[")
     entries.add_joined(
         depset(transitive = transitive_runfiles + [dep.files for dep in ctx.attr.data] + default_data_runfiles),
-        expand_directories = False,
+        expand_directories = True,
         map_each = _file_to_entry_json,
         join_with = ",",
     )
