@@ -96,9 +96,9 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
     importers_deps = {}
     for importPath in importers.keys():
         lock_importer = importers[importPath]
-        prod_deps = {} if dev else lock_importer.get("dependencies")
-        dev_deps = {} if prod else lock_importer.get("dev_dependencies")
-        opt_deps = {} if no_optional else lock_importer.get("optional_dependencies")
+        prod_deps = {} if dev else lock_importer["dependencies"]
+        dev_deps = {} if prod else lock_importer["dev_dependencies"]
+        opt_deps = {} if no_optional else lock_importer["optional_dependencies"]
 
         deps = prod_deps | opt_deps
         all_deps = prod_deps | dev_deps | opt_deps

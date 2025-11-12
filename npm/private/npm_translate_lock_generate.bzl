@@ -83,12 +83,12 @@ js_binary(name = "sync", entry_point = "noop.js")
     # Collect first-party file: links in packages
     fp_links = {}
     for package_info in packages.values():
-        name = package_info.get("name")
-        version = package_info.get("version")
-        deps = package_info.get("dependencies")
-        resolution = package_info.get("resolution")
+        name = package_info["name"]
+        version = package_info["version"]
+        deps = package_info["dependencies"]
+        resolution = package_info["resolution"]
         if resolution.get("type", None) == "directory":
-            dep_path = helpers.link_package(root_package, resolution.get("directory"))
+            dep_path = helpers.link_package(root_package, resolution["directory"])
             dep_key = "{}+{}".format(name, version)
             transitive_deps = {}
             for raw_package, raw_version in deps.items():
@@ -145,7 +145,7 @@ js_binary(name = "sync", entry_point = "noop.js")
                     transitive_deps = {}
                     raw_deps = {}
                     if importers.get(dep_link, False):
-                        raw_deps = importers.get(dep_link).get("deps")
+                        raw_deps = importers.get(dep_link)["deps"]
                     for raw_package, raw_version in raw_deps.items():
                         package_store_name = utils.package_store_name(raw_package, raw_version)
                         dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
@@ -160,8 +160,17 @@ js_binary(name = "sync", entry_point = "noop.js")
 
                     for dep_store_target in transitive_deps.keys():
                         transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+
+                    # note this is the (first) name used to reference this package and not
+                    # necessarily the proper self-declared packge name
+                    package = dep_package
+
+                    # rules_js using 0.0.0 to indicate local first-party packages
+                    version = "0.0.0"
+
                     fp_links[dep_key] = {
-                        "package": dep_package,
+                        "package": package,
+                        "version": version,
                         "path": dep_path,
                         "link_packages": {},
                         "deps": transitive_deps,
@@ -307,7 +316,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 rctx_files[build_file].append("exports_files([\"{}\"])".format(resolved_json_rel_path))
 
             # the package_json.bzl for this package
-            if _import.package_info.get("has_bin"):
+            if _import.package_info["has_bin"]:
                 if rctx.attr.generate_bzl_library_targets:
                     rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
 
@@ -338,10 +347,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     # Generate the first-party package stores and linking of first-party packages
     for i, fp_link in enumerate(fp_links.values()):
-        fp_package = fp_link.get("package")
-        fp_version = fp_link.get("version", "0.0.0")
-        fp_path = fp_link.get("path")
-        fp_deps = fp_link.get("deps")
+        fp_package = fp_link["package"]
+        fp_version = fp_link["version"]
+        fp_path = fp_link["path"]
+        fp_deps = fp_link["deps"]
         fp_target = "//{}:{}".format(
             fp_path,
             rctx.attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
@@ -579,8 +588,8 @@ def _generate_npm_package_locations(fp_links, npm_imports):
 
     # Add first-party packages
     for fp_link in fp_links.values():
-        fp_package = fp_link.get("package")
-        fp_link_packages = list(fp_link.get("link_packages").keys())
+        fp_package = fp_link["package"]
+        fp_link_packages = list(fp_link["link_packages"].keys())
         for location in fp_link_packages:
             if location not in location_to_packages:
                 location_to_packages[location] = []
