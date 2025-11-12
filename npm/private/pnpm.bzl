@@ -91,8 +91,8 @@ def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
 def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
+        specifier = attributes["specifier"]
+        version = attributes["version"]
 
         # Transition version[(patch)(peer)(data)] to a rules_js version format
         version = _convert_pnpm_v6_v9_version_peer_dep(version)
@@ -189,7 +189,7 @@ def _convert_v9_packages(packages, snapshots):
             optional_dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("optionalDependencies", {})),
             has_bin = package_data.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
-            resolution = package_data.get("resolution"),
+            resolution = package_data["resolution"],
         )
 
         if package_key in result:
