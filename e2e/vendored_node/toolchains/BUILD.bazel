@@ -26,6 +26,23 @@ load("@rules_nodejs//nodejs:toolchain.bzl", "nodejs_toolchain")
     ]
 ]
 
+[
+    toolchain(
+        name = "node_vendored_%s_runtime" % os,
+        target_compatible_with = [
+            "@platforms//os:" + os,
+            "@platforms//cpu:x86_64",
+        ],
+        toolchain = ":node_" + os,
+        toolchain_type = "@rules_nodejs//nodejs:runtime_toolchain_type",
+    )
+    for os in [
+        "linux",
+        "macos",
+        "windows",
+    ]
+]
+
 nodejs_toolchain(
     name = "node_linux",
     node = "@vendored_node_linux_amd64//:bin/node",
