@@ -591,13 +591,6 @@ def _normalize_bazelignore(lines):
 
 ################################################################################
 def _verify_lifecycle_hooks_specified(_, state):
-    # lockfiles <9.0 specify the `requiresBuild` flag in the lockfile.
-    #
-    # lockfiles >=9.0 no longer specify if packages have lifecycle hooks,
-    # and declaration of hooks must be done manually in the `pnpm.onlyBuiltDependencies`.
-    if state.lockfile_version() < 9.0:
-        return
-
     if state.only_built_dependencies() == None:
         fail("""\
 ERROR: pnpm.onlyBuiltDependencies required in pnpm workspace root package.json when using pnpm v9 or later

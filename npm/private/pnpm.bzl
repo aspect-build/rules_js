@@ -224,12 +224,12 @@ def _parse_lockfile(parsed, err):
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
     if err != None or parsed == None or parsed == {}:
-        return {}, {}, {}, None, err
+        return {}, {}, {}, err
 
     if not types.is_dict(parsed):
-        return {}, {}, {}, None, "lockfile should be a starlark dict"
+        return {}, {}, {}, "lockfile should be a starlark dict"
     if not parsed.get("lockfileVersion", False):
-        return {}, {}, {}, None, "expected lockfileVersion key in lockfile"
+        return {}, {}, {}, "expected lockfileVersion key in lockfile"
 
     # Lockfile version may be a float such as 5.4 or a string such as '6.0'
     lockfile_version = str(parsed["lockfileVersion"])
@@ -245,9 +245,6 @@ def _parse_lockfile(parsed, err):
     packages = parsed.get("packages", {})
     patched_dependencies = parsed.get("patchedDependencies", {})
 
-    if lockfile_version != 9.0:
-        fail("Only pnpm lockfile version 9.0+ is supported in npm_translate_lock. Found version {}".format(lockfile_version))
-
     snapshots = parsed.get("snapshots", {})
     importers = _convert_v9_importers(importers)
     packages = _convert_v9_packages(packages, snapshots)
@@ -257,7 +254,7 @@ def _parse_lockfile(parsed, err):
 
     _validate_lockfile_data(importers, packages)
 
-    return importers, packages, patched_dependencies, lockfile_version, None
+    return importers, packages, patched_dependencies, None
 
 def _validate_lockfile_data(importers, packages):
     for name, deps in importers.items():
@@ -301,7 +298,7 @@ def _assert_lockfile_version(version, testonly = False):
     msg = None
 
     if version < min_lock_version:
-        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v7 or greater.".format(
+        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v9 or greater.".format(
             min = min_lock_version,
             actual = version,
         )
