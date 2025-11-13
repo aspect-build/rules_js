@@ -110,9 +110,14 @@ npm_translate_lock_lib = struct(
     attrs = _ATTRS,
 )
 
-################################################################################
-def _npm_translate_lock_impl(rctx):
-    rctx.report_progress("Initializing")
+def parse_and_verify_lock(rctx):
+    """Helper to parse and validate the lockfile
+
+    Args:
+        rctx: repository context
+    Returns:
+        state, importers, and packages
+    """
 
     state = npm_translate_lock_state.new(rctx.name, rctx, rctx.attr)
 
@@ -152,6 +157,14 @@ See https://github.com/aspect-build/rules_js/issues/1445
         rctx.attr.dev,
         rctx.attr.no_optional,
     )
+
+    return state, importers, packages
+
+################################################################################
+def _npm_translate_lock_impl(rctx):
+    rctx.report_progress("Initializing")
+
+    state, importers, packages = parse_and_verify_lock(rctx)
 
     rctx.report_progress("Generating starlark for npm dependencies")
 

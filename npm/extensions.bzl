@@ -69,13 +69,23 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages)
+            state = npm_translate_lock_state.new(attr.name, module_ctx, attr)
+
+            importers, packages = translate_to_transitive_closure(
+                state.importers(),
+                state.packages(),
+                attr.prod,
+                attr.dev,
+                attr.no_optional,
+            )
+
+            _npm_translate_lock_bzlmod(attr, state, importers, packages, exclude_package_contents_config, replace_packages)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages)
+                _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -108,7 +118,7 @@ def _build_exclude_package_contents_config(module_ctx):
 
     return exclusions
 
-def _npm_translate_lock_bzlmod(attr, exclude_package_contents_config, replace_packages):
+def _npm_translate_lock_bzlmod(attr, state, importers, packages, exclude_package_contents_config, replace_packages):
     # TODO(3.0): remove this warning when replace_packages attribute is removed
     if attr.replace_packages:
         # buildifier: disable=print
@@ -131,6 +141,10 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
             if package in replace_packages:
                 fail("Package replacement conflict: {} specified in both replace_packages attribute and npm_replace_package tag".format(package))
             replace_packages[package] = replacement
+
+    # TODO(zbarsky): Use these
+    # buildifier: disable=unused-variable
+    _ = state, importers, packages
 
     npm_translate_lock_rule(
         name = attr.name,
@@ -165,17 +179,7 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         additional_file_contents = attr.additional_file_contents,
     )
 
-def _npm_lock_imports_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
-    state = npm_translate_lock_state.new(attr.name, module_ctx, attr)
-
-    importers, packages = translate_to_transitive_closure(
-        state.importers(),
-        state.packages(),
-        attr.prod,
-        attr.dev,
-        attr.no_optional,
-    )
-
+def _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
     registries = {}
     npm_auth = {}
     if attr.npmrc:
