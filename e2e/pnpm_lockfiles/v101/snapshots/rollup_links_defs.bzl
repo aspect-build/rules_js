@@ -45,7 +45,7 @@ def npm_imported_package_store():
 # Generated npm_package_store and npm_link_package_store targets for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
 def npm_link_imported_package_store(name, dev, link_alias):
-    return _npm_link_imported_package_store(
+    _npm_link_imported_package_store(
         name,
         dev,
         link_alias,

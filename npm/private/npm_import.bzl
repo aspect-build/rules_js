@@ -250,13 +250,11 @@ def npm_link_imported_package_store_internal(
         tags = ["manual"],
     )
 
-    return [":{}".format(name)] if public_visibility else []
-
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package_store(name, dev, link_alias):
-    return _npm_link_imported_package_store(
+    _npm_link_imported_package_store(
         name,
         dev,
         link_alias,
