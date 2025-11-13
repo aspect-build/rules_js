@@ -516,13 +516,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     transitive_launcher_files = None
     if ctx.attr.include_npm:
-        if hasattr(nodeinfo, "npm_sources"):
-            transitive_launcher_files = nodeinfo.npm_sources
-        else:
-            # TODO(3.0): drop support for deprecated toolchain attributes
-            if not hasattr(nodeinfo, "npm_files"):
-                fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
-            launcher_files.extend(nodeinfo.npm_files)
+        transitive_launcher_files = nodeinfo.npm_sources
 
     runfiles = gather_runfiles(
         ctx = ctx,
