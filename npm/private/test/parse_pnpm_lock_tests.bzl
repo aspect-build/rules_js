@@ -17,9 +17,10 @@ def _parse_empty_lock_test_impl(ctx):
 
 expected_importers = {
     ".": {
+        "project": ".",
         "dependencies": {
-            "@aspect-test/a": "5.0.0",
-            "lodash": "file:lodash-4.17.21.tgz",
+            "@aspect-test/a": "@aspect-test/a@5.0.0",
+            "lodash": "lodash@file:lodash-4.17.21.tgz",
         },
         "dev_dependencies": {},
         "optional_dependencies": {},
@@ -27,9 +28,8 @@ expected_importers = {
 }
 expected_packages = {
     "@aspect-test/a@5.0.0": {
+        "key": "@aspect-test/a@5.0.0",
         "name": "@aspect-test/a",
-        "dependencies": {},
-        "optional_dependencies": {},
         "has_bin": True,
         "optional": False,
         "version": "5.0.0",
@@ -38,10 +38,9 @@ expected_packages = {
             "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         },
     },
-    "file:lodash-4.17.21.tgz": {
+    "lodash@file:lodash-4.17.21.tgz": {
+        "key": "lodash@file:lodash-4.17.21.tgz",
         "name": "lodash",
-        "dependencies": {},
-        "optional_dependencies": {},
         "has_bin": False,
         "optional": False,
         "version": "file:lodash-4.17.21.tgz",
@@ -50,6 +49,20 @@ expected_packages = {
             "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
             "tarball": "file:lodash-4.17.21.tgz",
         },
+    },
+}
+expected_snapshots = {
+    "@aspect-test/a@5.0.0": {
+        "key": "@aspect-test/a@5.0.0",
+        "package": "@aspect-test/a@5.0.0",
+        "dependencies": {},
+        "optional_dependencies": {},
+    },
+    "lodash@file:lodash-4.17.21.tgz": {
+        "key": "lodash@file:lodash-4.17.21.tgz",
+        "package": "lodash@file:lodash-4.17.21.tgz",
+        "dependencies": {},
+        "optional_dependencies": {},
     },
 }
 
@@ -101,15 +114,10 @@ def _parse_lockfile_v9_test_impl(ctx):
 }
 """)
 
-    # NOTE: unknown properties in >=v9, convert to <v9 defaults for test assertions
-    v9_expected_packages = dict(expected_packages)
-    v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
-    v9_expected_packages["lodash@file:lodash-4.17.21.tgz"] = dict(v9_expected_packages["file:lodash-4.17.21.tgz"])
-    v9_expected_packages.pop("file:lodash-4.17.21.tgz")  # renamed with lodash@ in v9
-
     expected = (
         expected_importers,
-        v9_expected_packages,
+        expected_packages,
+        expected_snapshots,
         {},
         None,
     )

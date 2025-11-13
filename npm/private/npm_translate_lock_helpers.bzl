@@ -252,7 +252,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
+def _get_npm_imports(importers, packages, snapshots, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -268,33 +268,28 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
             "link_package": _link_package(root_package, import_path),
         }
         linked_packages = {}
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
+        for dep_package, dep_package_key in dependencies.items():
+            if dep_package_key.startswith("link:"):
                 continue
-            if dep_version.startswith("npm:"):
-                # special case for alias dependencies such as npm:alias-to@version
-                maybe_package = dep_version[4:]
-            elif dep_version not in packages:
-                maybe_package = utils.package_key(dep_package, dep_version)
+            if dep_package_key not in linked_packages:
+                linked_packages[dep_package_key] = [dep_package]
             else:
-                maybe_package = dep_version
-            if maybe_package not in linked_packages:
-                linked_packages[maybe_package] = [dep_package]
-            else:
-                linked_packages[maybe_package].append(dep_package)
+                linked_packages[dep_package_key].append(dep_package)
         links["packages"] = linked_packages
         importer_links[import_path] = links
 
     patches_used = []
     result = {}
-    for package_key, package_info in packages.items():
+    for snapshot_key, snapshot_info in snapshots.items():
+        package_key = snapshot_info["package"]
+        package_info = packages[package_key]
         name = package_info["name"]
         version = package_info["version"]
         friendly_version = package_info["friendly_version"]
-        deps = package_info["dependencies"]
-        optional_deps = package_info["optional_dependencies"]
+        deps = snapshot_info["dependencies"]
+        optional_deps = snapshot_info["optional_dependencies"]
         optional = package_info["optional"]
-        transitive_closure = package_info["transitive_closure"]
+        transitive_closure = snapshot_info["transitive_closure"]
         resolution = package_info["resolution"]
 
         resolution_type = resolution.get("type", None)
@@ -384,7 +379,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
-        repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
+        repo_name = utils.package_repo_name(attr.name, snapshot_key)
 
         # gather package visibility
         package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
@@ -395,7 +390,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         link_packages = {}
         for links in importer_links.values():
             linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key)
+            link_names = linked_packages.get(snapshot_key)
             if link_names:
                 link_packages[links["link_package"]] = link_names
 
@@ -459,7 +454,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             deps = deps,
             integrity = integrity,
             link_packages = link_packages,
-            name = repo_name,
+            repo_name = repo_name,
+            snapshot_key = snapshot_key,
             package = name,
             package_visibility = package_visibility,
             patch_tool = attr.patch_tool,

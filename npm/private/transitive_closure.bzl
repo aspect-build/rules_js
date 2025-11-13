@@ -2,7 +2,7 @@
 
 load(":utils.bzl", "utils")
 
-def gather_transitive_closure(packages, package, no_optional, cache = {}):
+def gather_transitive_closure(packages, snapshots, snapshot, no_optional, cache = {}):
     """Walk the dependency tree, collecting the transitive closure of dependencies and their versions.
 
     This is needed to resolve npm dependency cycles.
@@ -10,20 +10,21 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
     where each iteration takes one item from the stack, and possibly adds many new items to the stack.
 
     Args:
-        packages: dictionary from pnpm lock
-        package: the package to collect deps for
+        packages: all packages
+        snapshots: all snapshots
+        snapshot: the package snapshot to collect deps for
         no_optional: whether to exclude optionalDependencies
         cache: a dictionary of results from previous invocations
 
     Returns:
         A dictionary of transitive dependencies, mapping package names to dependent versions.
     """
-    root_package = packages[package]
+    root_package = packages[snapshots[snapshot]["package"]]
 
     transitive_closure = {}
-    transitive_closure[root_package["name"]] = [root_package["version"]]
+    transitive_closure[snapshot] = [root_package["name"]]
 
-    stack = [_get_package_info_deps(root_package, no_optional)]
+    stack = [_get_snapshot_deps(snapshots[snapshot], no_optional)]
     iteration_max = 999999
     for i in range(0, iteration_max + 1):
         if not len(stack):
@@ -32,50 +33,43 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
             msg = "gather_transitive_closure exhausted the iteration limit of {} - please report this issue".format(iteration_max)
             fail(msg)
         deps = stack.pop()
-        for name in deps.keys():
-            version = deps[name]
-            if version.startswith("npm:"):
-                # an aliased dependency
-                package_key = version[4:]
-                name, version = package_key.rsplit("@", 1)
-            elif version not in packages:
-                package_key = utils.package_key(name, version)
-            else:
-                package_key = version
-            transitive_closure[name] = transitive_closure.get(name, [])
-            if version in transitive_closure[name]:
+        for name, dep_key in deps.items():
+            transitive_closure[dep_key] = transitive_closure.get(dep_key, [])
+            if name in transitive_closure[dep_key]:
                 continue
-            transitive_closure[name].append(version)
-            if version.startswith("link:"):
+            transitive_closure[dep_key].append(name)
+
+            if dep_key.startswith("link:"):
                 # we don't need to drill down through first-party links for the transitive closure since there are no cycles
                 # allowed in first-party links
                 continue
 
-            if package_key in cache:
+            if dep_key in cache:
                 # Already computed for this dep, merge the cached results
-                for transitive_name in cache[package_key].keys():
+                for transitive_name in cache[dep_key].keys():
                     transitive_closure[transitive_name] = transitive_closure.get(transitive_name, [])
-                    for transitive_version in cache[package_key][transitive_name]:
+                    for transitive_version in cache[dep_key][transitive_name]:
                         if transitive_version not in transitive_closure[transitive_name]:
                             transitive_closure[transitive_name].append(transitive_version)
-            elif package_key in packages:
+            elif dep_key in snapshots:
                 # Recurse into the next level of dependencies
-                stack.append(_get_package_info_deps(packages[package_key], no_optional))
+                stack.append(_get_snapshot_deps(snapshots[dep_key], no_optional))
             else:
-                msg = "Unknown package key: {} ({} @ {}) in {}".format(package_key, name, version, packages.keys())
+                msg = "Unknown package key: {} in {}".format(dep_key, snapshots.keys())
                 fail(msg)
 
     return utils.sorted_map(transitive_closure)
 
-def _get_package_info_deps(package_info, no_optional):
-    return package_info["dependencies"] if no_optional else (package_info["dependencies"] | package_info["optional_dependencies"])
+def _get_snapshot_deps(snapshot, no_optional):
+    return snapshot["dependencies"] if no_optional else snapshot["dependencies"] | snapshot["optional_dependencies"]
 
-def translate_to_transitive_closure(importers, packages, prod = False, dev = False, no_optional = False):
+def translate_to_transitive_closure(importers, packages, snapshots, prod = False, dev = False, no_optional = False):
     """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
 
     Args:
         importers: workspace projects (pnpm "importers")
         packages: all package info by name
+        snapshots: snapshots
         prod: If true, only install dependencies
         dev: If true, only install devDependencies
         no_optional: If true, optionalDependencies are not installed
@@ -83,14 +77,6 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
     Returns:
         Nested dictionary suitable for further processing in our repository rule
     """
-
-    # Packages resolved to a different version
-    package_version_map = {}
-
-    # tarbal versions
-    for package_key, package_info in packages.items():
-        if package_info["resolution"].get("tarball", None) and package_info["resolution"]["tarball"].startswith("file:"):
-            package_version_map[package_key] = package_info
 
     # Collect deps of each importer (workspace projects)
     importers_deps = {}
@@ -103,13 +89,6 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
         deps = prod_deps | opt_deps
         all_deps = prod_deps | dev_deps | opt_deps
 
-        # Package versions mapped to alternate versions
-        for info in package_version_map.values():
-            if info["name"] in deps:
-                deps[info["name"]] = info["version"]
-            if info["name"] in all_deps:
-                all_deps[info["name"]] = info["version"]
-
         importers_deps[importPath] = {
             # deps this importer should pass on if it is linked as a first-party package; this does
             # not include devDependencies
@@ -121,15 +100,16 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
 
     # Collect transitive dependencies for each package
     cache = {}
-    for package in packages.keys():
+    for snapshot in snapshots.keys():
         transitive_closure = gather_transitive_closure(
             packages,
-            package,
+            snapshots,
+            snapshot,
             no_optional,
             cache,
         )
 
-        packages[package]["transitive_closure"] = transitive_closure
-        cache[package] = transitive_closure
+        snapshots[snapshot]["transitive_closure"] = transitive_closure
+        cache[snapshot] = transitive_closure
 
-    return (importers_deps, packages)
+    return (importers_deps, packages, snapshots)

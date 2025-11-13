@@ -53,6 +53,9 @@ importers:
       alias-project-a:
         specifier: link:../projects/a
         version: link:../projects/a
+      alternate-versions:
+        specifier: workspace:*
+        version: link:../projects/alts
       aspect-test-a-no-scope:
         specifier: npm:@aspect-test/a
         version: '@aspect-test/a@5.0.2'
