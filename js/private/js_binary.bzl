@@ -288,7 +288,7 @@ _ATTRS = {
         """,
     ),
     "node_toolchain": attr.label(
-        doc = """The Node.js toolchain to use for this target.
+        doc = """The Node.js runtime toolchain to use for this target.
 
         See https://bazel-contrib.github.io/rules_nodejs/Toolchains.html
 
@@ -490,7 +490,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     if ctx.attr.node_toolchain:
         nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
     else:
-        nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
+        nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:runtime_toolchain_type"].nodeinfo
 
     directory_path_provider = DirectoryPathInfo if DirectoryPathInfo in ctx.attr.entry_point else _LegacyDirectoryPathInfo
     if directory_path_provider in ctx.attr.entry_point:
@@ -612,7 +612,7 @@ js_binary_lib = struct(
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
-        "@rules_nodejs//nodejs:toolchain_type",
+        "@rules_nodejs//nodejs:runtime_toolchain_type",
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )
 
