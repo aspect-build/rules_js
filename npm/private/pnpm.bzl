@@ -207,7 +207,7 @@ def _convert_v5_packages(packages):
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
-            resolution = package_snapshot.get("resolution"),
+            resolution = package_snapshot["resolution"],
         )
 
         if package_key in result:
@@ -257,8 +257,8 @@ def _strip_v6_default_registry_to_version(name, version):
 def _convert_pnpm_v6_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
+        specifier = attributes["specifier"]
+        version = attributes["version"]
 
         if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
             # Keep the npm: specifier for aliased dependencies
@@ -379,7 +379,7 @@ def _convert_v6_packages(packages):
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
-            resolution = package_snapshot.get("resolution"),
+            resolution = package_snapshot["resolution"],
         )
 
         if package_key in result:
@@ -412,8 +412,8 @@ def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
 def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
+        specifier = attributes["specifier"]
+        version = attributes["version"]
 
         # Transition version[(patch)(peer)(data)] to a rules_js version format
         version = _convert_pnpm_v6_v9_version_peer_dep(version)
@@ -512,7 +512,7 @@ def _convert_v9_packages(packages, snapshots):
             has_bin = package_data.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = None,  # Unknown from lockfile in v9
-            resolution = package_data.get("resolution"),
+            resolution = package_data["resolution"],
         )
 
         if package_key in result:

@@ -260,7 +260,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
     # make a lookup table of package to link name for each importer
     importer_links = {}
     for import_path, importer in importers.items():
-        dependencies = importer.get("all_deps")
+        dependencies = importer["all_deps"]
         if type(dependencies) != "dict":
             msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
             fail(msg)
@@ -288,16 +288,16 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
     patches_used = []
     result = {}
     for package_key, package_info in packages.items():
-        name = package_info.get("name")
-        version = package_info.get("version")
-        friendly_version = package_info.get("friendly_version")
-        deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optional_dependencies")
-        dev_only = package_info.get("dev_only")
-        optional = package_info.get("optional")
-        requires_build = package_info.get("requires_build")
-        transitive_closure = package_info.get("transitive_closure")
-        resolution = package_info.get("resolution")
+        name = package_info["name"]
+        version = package_info["version"]
+        friendly_version = package_info["friendly_version"]
+        deps = package_info["dependencies"]
+        optional_deps = package_info["optional_dependencies"]
+        dev_only = package_info["dev_only"]
+        optional = package_info["optional"]
+        requires_build = package_info["requires_build"]
+        transitive_closure = package_info["transitive_closure"]
+        resolution = package_info["resolution"]
 
         resolution_type = resolution.get("type", None)
         if resolution_type == "directory":
