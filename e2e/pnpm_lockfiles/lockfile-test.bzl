@@ -138,7 +138,6 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_at_scoped_b_projects%sb" % ("_" if lock_version == "v54" else "+"),  # is declared as a file: instead of link:
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
-            ":.aspect_rules_js/node_modules/scoped+bad@0.0.0",
 
             # file: 4.17.21.tgz tarbal
             ":node_modules/lodash",

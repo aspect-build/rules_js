@@ -1160,7 +1160,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "inline-fixtures", "jsonpath-plus", "typescript"],
     "examples/js_binary": ["@mycorp/pkg-a"],
     "examples/js_lib_pkg/a": ["@types/node"],
-    "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias_1", "js_lib_pkg_a-alias_2", "@types/node"],
+    "examples/js_lib_pkg/b": ["js_lib_pkg_a", "@types/node"],
     "examples/linked_consumer": ["@lib/test", "@lib/test2"],
     "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
     "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
@@ -2383,24 +2383,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "js_lib_pkg_a-alias_1@0.0.0",
-            src = "//examples/js_lib_pkg/a:pkg",
-            package = "js_lib_pkg_a-alias_1",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        _npm_local_package_store(
-            package_store_name = "js_lib_pkg_a-alias_2@0.0.0",
-            src = "//examples/js_lib_pkg/a:pkg",
-            package = "js_lib_pkg_a-alias_2",
-            version = "0.0.0",
-            deps = {},
-            visibility = ["//visibility:public"],
-            tags = ["manual"],
-        )
-        _npm_local_package_store(
             package_store_name = "@lib+test@0.0.0",
             src = "//examples/linked_pkg:pkg",
             package = "@lib/test",
@@ -2502,7 +2484,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "js/private/test/image":
             link_6("node_modules/acorn", False, "acorn")
             _fp_link_2()
-            _fp_link_8()
+            _fp_link_6()
             link_targets = [
                 ":node_modules/acorn",
                 ":node_modules/@mycorp/pkg-a",
@@ -2529,8 +2511,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_952("node_modules/rollup", True, "rollup")
             link_1089("node_modules/uvu", True, "uvu")
             _fp_link_2()
-            _fp_link_8()
-            _fp_link_9()
+            _fp_link_6()
+            _fp_link_7()
             link_targets = [
                 ":node_modules/acorn",
                 ":node_modules/@aspect-test/a",
@@ -2678,7 +2660,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_1070("node_modules/typescript", True, "typescript")
             link_1082("node_modules/unused", True, "unused")
             link_1099("node_modules/webpack-bundle-analyzer", True, "webpack-bundle-analyzer")
-            _fp_link_10()
+            _fp_link_8()
             link_targets = [
                 ":node_modules/@fastify/send",
                 ":node_modules/@figma/nodegit",
@@ -2770,8 +2752,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "examples/js_lib_pkg/b":
             link_277("node_modules/@types/node", True, "@types/node")
             _fp_link_3()
-            _fp_link_4()
-            _fp_link_5()
+            _fp_link_3("js_lib_pkg_a-alias_1")
+            _fp_link_3("js_lib_pkg_a-alias_2")
             link_targets = [
                 ":node_modules/js_lib_pkg_a",
                 ":node_modules/js_lib_pkg_a-alias_1",
@@ -2843,8 +2825,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@mycorp": [":node_modules/@mycorp/pkg-a"],
             }
         elif bazel_package == "examples/linked_consumer":
-            _fp_link_6()
-            _fp_link_7()
+            _fp_link_4()
+            _fp_link_5()
             link_targets = [
                 ":node_modules/@lib/test",
                 ":node_modules/@lib/test2",
@@ -2856,7 +2838,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "examples/npm_package/packages/pkg_e":
-            _fp_link_8()
+            _fp_link_6()
             link_targets = [":node_modules/@mycorp/pkg-d"]
             scope_targets = {
                 "@mycorp": [":node_modules/@mycorp/pkg-d"],
@@ -3126,75 +3108,66 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
 # buildifier: disable=function-docstring
-def _fp_link_2():
+def _fp_link_2(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/@mycorp/pkg-a",
+        name = "node_modules/@mycorp/pkg-a" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-a@0.0.0",
         link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a" package
 # buildifier: disable=function-docstring
-def _fp_link_3():
+def _fp_link_3(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/js_lib_pkg_a",
+        name = "node_modules/js_lib_pkg_a" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a@0.0.0",
-    )
-
-# Generated npm_link_package_store for linking of first-party "js_lib_pkg_a-alias_1" package
-# buildifier: disable=function-docstring
-def _fp_link_4():
-    _npm_local_link_package_store(
-        name = "node_modules/js_lib_pkg_a-alias_1",
-        src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a-alias_1@0.0.0",
-    )
-
-# Generated npm_link_package_store for linking of first-party "js_lib_pkg_a-alias_2" package
-# buildifier: disable=function-docstring
-def _fp_link_5():
-    _npm_local_link_package_store(
-        name = "node_modules/js_lib_pkg_a-alias_2",
-        src = "//:.aspect_rules_js/node_modules/js_lib_pkg_a-alias_2@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test" package
 # buildifier: disable=function-docstring
-def _fp_link_6():
+def _fp_link_4(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/@lib/test",
+        name = "node_modules/@lib/test" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/@lib+test@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/test2" package
 # buildifier: disable=function-docstring
-def _fp_link_7():
+def _fp_link_5(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/@lib/test2",
+        name = "node_modules/@lib/test2" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/@lib+test2@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-d" package
 # buildifier: disable=function-docstring
-def _fp_link_8():
+def _fp_link_6(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/@mycorp/pkg-d",
+        name = "node_modules/@mycorp/pkg-d" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-d@0.0.0",
         link_visibility = ["//examples:__subpackages__", "//js/private/test/image:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-e" package
 # buildifier: disable=function-docstring
-def _fp_link_9():
+def _fp_link_7(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/@mycorp/pkg-e",
+        name = "node_modules/@mycorp/pkg-e" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-e@0.0.0",
         link_visibility = ["//examples:__subpackages__"],
     )
 
 # Generated npm_link_package_store for linking of first-party "test-npm_package" package
 # buildifier: disable=function-docstring
-def _fp_link_10():
+def _fp_link_8(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/test-npm_package",
+        name = "node_modules/test-npm_package" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
         src = "//:.aspect_rules_js/node_modules/test-npm_package@0.0.0",
     )

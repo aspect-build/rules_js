@@ -30,9 +30,10 @@ _FP_DIRECT_TMPL = \
     """
 # Generated npm_link_package_store for linking of first-party "{pkg}" package
 # buildifier: disable=function-docstring
-def _fp_link_{i}():
+def _fp_link_{i}(alias = None):
     _npm_local_link_package_store(
-        name = "node_modules/{pkg}",
+        name = "node_modules/{pkg}" if alias == None else "node_modules/{{}}".format(alias),
+        package = alias,
         src = "//{root_package}:{package_store_root}/node_modules/{package_store_name}",{maybe_visibility}
     )"""
 
@@ -134,14 +135,14 @@ js_binary(name = "sync", entry_point = "noop.js")
 
                     msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
                     fail(msg)
-                fp_links[dep_key]["link_packages"][link_package] = is_dev
+                if link_package not in fp_links[dep_key]["link_packages"]:
+                    fp_links[dep_key]["link_packages"][link_package] = {}
+                fp_links[dep_key]["link_packages"][link_package][dep_package] = is_dev
             elif dep_version.startswith("link:"):
                 dep_link = dep_version[len("link:"):]
                 dep_path = helpers.link_package(root_package, dep_link)
-                dep_key = "{}+{}".format(dep_package, dep_path)
-                if fp_links.get(dep_key, False):
-                    fp_links[dep_key]["link_packages"][link_package] = is_dev
-                else:
+                dep_key = "link:{}".format(dep_path)
+                if not fp_links.get(dep_key, False):
                     transitive_deps = {}
                     raw_deps = {}
                     if importers.get(dep_link, False):
@@ -175,7 +176,10 @@ js_binary(name = "sync", entry_point = "noop.js")
                         "link_packages": {},
                         "deps": transitive_deps,
                     }
-                    fp_links[dep_key]["link_packages"][link_package] = is_dev
+
+                if link_package not in fp_links[dep_key]["link_packages"]:
+                    fp_links[dep_key]["link_packages"][link_package] = {}
+                fp_links[dep_key]["link_packages"][link_package][dep_package] = is_dev
 
     npm_link_packages_const = """_IMPORTER_PACKAGES = {pkgs}""".format(
         pkgs = str(package_to_importer.keys()),
@@ -358,21 +362,22 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         fp_package_store_name = utils.package_store_name(fp_package, fp_version)
 
         # Add first-party package links to npm_link_targets for each package that uses it
-        for fp_link_package, is_dev in fp_link.get("link_packages", {}).items():
+        for fp_link_package, aliases in fp_link["link_packages"].items():
             if fp_link_package not in links_targets:
                 links_targets[fp_link_package] = {"prod": [], "dev": []}
 
-            link_target = '":node_modules/{alias}"'.format(alias = fp_package)
+            for alias, is_dev in aliases.items():
+                link_target = '":node_modules/{alias}"'.format(alias = alias)
 
-            links_targets[fp_link_package]["dev" if is_dev else "prod"].append(link_target)
+                links_targets[fp_link_package]["dev" if is_dev else "prod"].append(link_target)
 
-            if fp_package[0] == "@":
-                package_scope = fp_package[:fp_package.find("/", 1)]
-                if fp_link_package not in links_scope_targets:
-                    links_scope_targets[fp_link_package] = {}
-                if package_scope not in links_scope_targets[fp_link_package]:
-                    links_scope_targets[fp_link_package][package_scope] = []
-                links_scope_targets[fp_link_package][package_scope].append(link_target)
+                if alias[0] == "@":
+                    package_scope = alias[:alias.find("/", 1)]
+                    if fp_link_package not in links_scope_targets:
+                        links_scope_targets[fp_link_package] = {}
+                    if package_scope not in links_scope_targets[fp_link_package]:
+                        links_scope_targets[fp_link_package][package_scope] = []
+                    links_scope_targets[fp_link_package][package_scope].append(link_target)
 
         stores_bzl.append(_FP_STORE_TMPL.format(
             deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
@@ -398,10 +403,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 package_store_root = utils.package_store_root,
             ))
 
-        for link_package in fp_link["link_packages"].keys():
+        for link_package, aliases in fp_link["link_packages"].items():
             if link_package not in links_pkg_bzl:
                 links_pkg_bzl[link_package] = []
-            links_pkg_bzl[link_package].append("""            _fp_link_{i}()""".format(i = i))
+            for alias in aliases.keys():
+                if alias == fp_package:
+                    links_pkg_bzl[link_package].append("""            _fp_link_{i}()""".format(i = i))
+                else:
+                    links_pkg_bzl[link_package].append("""            _fp_link_{i}("{alias}")""".format(i = i, alias = alias))
 
     if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
