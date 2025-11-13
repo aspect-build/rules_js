@@ -470,7 +470,6 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     importers = {}
     packages = {}
     patched_dependencies = {}
-    lock_version = None
     lock_parse_err = None
 
     host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else ""))
@@ -483,9 +482,8 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     if result.return_code:
         lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        importers, packages, patched_dependencies, lock_version, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        importers, packages, patched_dependencies, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
 
-    priv["lock_version"] = lock_version
     priv["importers"] = importers
     priv["packages"] = packages
     priv["patched_dependencies"] = patched_dependencies
@@ -514,9 +512,6 @@ def _should_update_pnpm_lock(priv):
 
 def _default_registry(priv):
     return priv["default_registry"]
-
-def _lockfile_version(priv):
-    return priv["lock_version"]
 
 def _importers(priv):
     return priv["importers"]
@@ -575,7 +570,6 @@ def _new(rctx_name, rctx, attr):
         label_store = label_store,  # pass-through access to the label store
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
-        lockfile_version = lambda: _lockfile_version(priv),
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
         patched_dependencies = lambda: _patched_dependencies(priv),

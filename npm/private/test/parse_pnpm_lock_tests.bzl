@@ -8,7 +8,7 @@ def _parse_empty_lock_test_impl(ctx):
 
     parsed_json_a = pnpm.parse_pnpm_lock_json("")
     parsed_json_b = pnpm.parse_pnpm_lock_json("{}")
-    expected = ({}, {}, {}, None, None)
+    expected = ({}, {}, {}, None)
 
     asserts.equals(env, expected, parsed_json_a)
     asserts.equals(env, expected, parsed_json_b)
@@ -111,7 +111,6 @@ def _parse_lockfile_v9_test_impl(ctx):
         expected_importers,
         v9_expected_packages,
         {},
-        9.0,
         None,
     )
 
@@ -125,15 +124,15 @@ def _test_version_supported(ctx):
 
     # Unsupported versions + msgs
     msg = pnpm.assert_lockfile_version(5.3, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 5.3. Please upgrade to pnpm v7 or greater.", msg)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 5.3. Please upgrade to pnpm v9 or greater.", msg)
     msg = pnpm.assert_lockfile_version(1.2, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 1.2. Please upgrade to pnpm v7 or greater.", msg)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 1.2. Please upgrade to pnpm v9 or greater.", msg)
     msg = pnpm.assert_lockfile_version(5.4, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 5.4. Please upgrade to pnpm v7 or greater.", msg)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 5.4. Please upgrade to pnpm v9 or greater.", msg)
     msg = pnpm.assert_lockfile_version(6.0, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 6.0. Please upgrade to pnpm v7 or greater.", msg)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 6.0. Please upgrade to pnpm v9 or greater.", msg)
     msg = pnpm.assert_lockfile_version(6.1, testonly = True)
-    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 6.1. Please upgrade to pnpm v7 or greater.", msg)
+    asserts.equals(env, "npm_translate_lock requires lock_version at least 9.0, but found 6.1. Please upgrade to pnpm v9 or greater.", msg)
     msg = pnpm.assert_lockfile_version(99.99, testonly = True)
     asserts.equals(env, "npm_translate_lock currently supports a maximum lock_version of 9.0, but found 99.99. Please file an issue on rules_js", msg)
 
