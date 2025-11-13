@@ -36,6 +36,6 @@ build_test(
     targets = [
         ":node_modules/@lib/b",
         ":node_modules/@lib/b_alias",
-        "//root:.aspect_rules_js/node_modules/@lib+b_alias@0.0.0",
+        "//root:.aspect_rules_js/node_modules/@lib+b@0.0.0",
     ],
 )
