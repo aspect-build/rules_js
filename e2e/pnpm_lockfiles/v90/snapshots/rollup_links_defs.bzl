@@ -61,8 +61,7 @@ def npm_link_imported_package_store(name, dev, link_alias):
 def npm_link_imported_package(
         name = "node_modules",
         dev = False,
-        link = None,
-        fail_if_no_link = True):
+        link = None):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
@@ -77,5 +76,4 @@ def npm_link_imported_package(
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,
         npm_imported_package_store_macro = npm_imported_package_store,
-        fail_if_no_link = fail_if_no_link,
     )

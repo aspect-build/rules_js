@@ -279,8 +279,7 @@ def npm_link_imported_package_internal(
         link_packages,
         public_visibility,
         npm_link_imported_package_store_macro,
-        npm_imported_package_store_macro,
-        fail_if_no_link = True):
+        npm_imported_package_store_macro):
     bazel_package = native.package_name()
 
     if link_packages and link != None:
@@ -289,7 +288,7 @@ def npm_link_imported_package_internal(
     is_link = (link == True) or (link == None and bazel_package in link_packages)
     is_root = bazel_package == root_package
 
-    if fail_if_no_link and not is_root and not link:
+    if not is_root and not link:
         msg = "Nothing to link in bazel package '{bazel_package}' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package.".format(
             bazel_package = bazel_package,
             package = package,
@@ -332,8 +331,7 @@ _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 def npm_link_imported_package(
         name = "node_modules",
         dev = False,
-        link = {link_default},
-        fail_if_no_link = True):
+        link = {link_default}):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
@@ -346,7 +344,6 @@ def npm_link_imported_package(
         public_visibility = {public_visibility},
         npm_link_imported_package_store_macro = npm_link_imported_package_store,
         npm_imported_package_store_macro = npm_imported_package_store,
-        fail_if_no_link = fail_if_no_link,
     )
 """
 
