@@ -155,8 +155,9 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     rctx.report_progress("Generating starlark for npm dependencies")
 
-    generate_repository_files(
-        rctx,
+    files = generate_repository_files(
+        rctx.name,
+        rctx.attr,
         importers,
         packages,
         state.patched_dependencies(),
@@ -166,6 +167,9 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.npm_registries(),
         state.npm_auth(),
     )
+
+    for filename, contents in files.items():
+        rctx.file(filename, contents)
 
     # Support bazel <v8.3 by returning None if repo_metadata is not defined
     if not hasattr(rctx, "repo_metadata"):
