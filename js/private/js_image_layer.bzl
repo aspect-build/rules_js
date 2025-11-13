@@ -437,9 +437,6 @@ def _repo_mapping_manifest(files_to_run):
 _ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"repo_name":"%s"},\n%s:"%s"'
 
 def _js_image_layer_impl(ctx):
-    if ctx.attr.generate_empty_layers:
-        # buildifier: disable=print
-        print("The `generate_empty_layers` attribute is deprecated and will be removed in the next major release. Its behavior is now implicitly `True`")
     if len(ctx.attr.binary) != 1:
         fail("binary attribute has more than one transition")
 
@@ -655,11 +652,6 @@ js_image_layer_lib = struct(
         ),
         "platform": attr.label(
             doc = "Platform to transition.",
-        ),
-        "generate_empty_layers": attr.bool(
-            # TODO(3.0): remove this attribute.
-            doc = """DEPRECATED. An empty layer is always generated if the layer group have no matching files.""",
-            default = False,
         ),
         "preserve_symlinks": attr.string(
             doc = """Preserve symlinks for entries matching the pattern.
