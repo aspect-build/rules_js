@@ -121,7 +121,7 @@ def _npm_translate_lock_impl(rctx):
     if not rctx.attr.pnpm_lock:
         _bootstrap_import(rctx, state)
 
-    if rctx.attr.pnpm_lock and hasattr(rctx, "watch"):
+    if rctx.attr.pnpm_lock:
         rctx.watch(rctx.attr.pnpm_lock)
 
     if state.should_update_pnpm_lock():
