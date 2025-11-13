@@ -225,8 +225,7 @@ def npm_link_imported_package_store_internal(
         root_package,
         link_visibility,
         bins,
-        package_store_name,
-        public_visibility):
+        package_store_name):
     store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
 
     # terminal package store target to link
@@ -262,7 +261,6 @@ def npm_link_imported_package_store(name, dev, link_alias):
         link_visibility = {link_visibility},
         bins = {bins},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = {public_visibility},
     )
 """
 

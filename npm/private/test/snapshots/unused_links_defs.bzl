@@ -60,7 +60,6 @@ def npm_link_imported_package_store(name, dev, link_alias):
         link_visibility = ["//npm/private/test:__subpackages__"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = False,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package unused@0.2.2

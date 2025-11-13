@@ -51,7 +51,6 @@ def npm_link_imported_package_store(name, dev, link_alias):
         link_visibility = ["//visibility:public"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = True,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package @aspect-test/c@2.0.0
