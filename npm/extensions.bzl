@@ -8,13 +8,13 @@ load("@bazel_features//:features.bzl", "bazel_features")
 load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
-load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "npm_translate_lock_rule")
+load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
+load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
-load("//npm/private:npm_translate_lock_state.bzl", "npm_translate_lock_state", _DEFAULT_ROOT_PACKAGE = "DEFAULT_ROOT_PACKAGE")
+load("//npm/private:npm_translate_lock_state.bzl", _DEFAULT_ROOT_PACKAGE = "DEFAULT_ROOT_PACKAGE")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
-load("//npm/private:transitive_closure.bzl", "translate_to_transitive_closure")
 
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
@@ -69,16 +69,9 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            state = npm_translate_lock_state.new(attr.name, module_ctx, attr)
+            state, importers, packages = parse_and_verify_lock(module_ctx, attr.name, attr)
 
-            importers, packages = translate_to_transitive_closure(
-                state.importers(),
-                state.packages(),
-                attr.no_dev,
-                attr.no_optional,
-            )
-
-            _npm_translate_lock_bzlmod(attr, state, importers, packages, exclude_package_contents_config, replace_packages)
+            _npm_translate_lock_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
@@ -117,7 +110,27 @@ def _build_exclude_package_contents_config(module_ctx):
 
     return exclusions
 
-def _npm_translate_lock_bzlmod(attr, state, importers, packages, exclude_package_contents_config, replace_packages):
+def _hub_repo_impl(rctx):
+    for path, contents in rctx.attr.contents.items():
+        rctx.file(path, contents)
+
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = True)
+
+_hub_repo = repository_rule(
+    implementation = _hub_repo_impl,
+    attrs = {
+        "contents": attr.string_dict(
+            doc = "A mapping of file names to text they should contain.",
+            mandatory = True,
+        ),
+    },
+)
+
+def _npm_translate_lock_bzlmod(mctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
     # TODO(3.0): remove this warning when replace_packages attribute is removed
     if attr.replace_packages:
         # buildifier: disable=print
@@ -141,11 +154,9 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
                 fail("Package replacement conflict: {} specified in both replace_packages attribute and npm_replace_package tag".format(package))
             replace_packages[package] = replacement
 
-    # TODO(zbarsky): Use these
-    # buildifier: disable=unused-variable
-    _ = state, importers, packages
+    mctx.report_progress("Generating starlark for npm dependencies")
 
-    npm_translate_lock_rule(
+    attr = struct(
         name = attr.name,
         bins = attr.bins,
         custom_postinstalls = attr.custom_postinstalls,
@@ -153,12 +164,17 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         no_dev = attr.no_dev,
         external_repository_action_cache = attr.external_repository_action_cache,
         generate_bzl_library_targets = attr.generate_bzl_library_targets,
+        lifecycle_hooks_envs = attr.lifecycle_hooks_envs,
+        lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
+        lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
+        lifecycle_hooks = attr.lifecycle_hooks,
         link_workspace = attr.link_workspace,
         no_optional = attr.no_optional,
         npmrc = attr.npmrc,
         npm_package_lock = attr.npm_package_lock,
         npm_package_target_name = attr.npm_package_target_name,
         package_visibility = attr.package_visibility,
+        patch_tool = attr.patch_tool,
         patches = attr.patches,
         patch_args = attr.patch_args,
         pnpm_lock = attr.pnpm_lock,
@@ -175,6 +191,24 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         yarn_lock = attr.yarn_lock,
         exclude_package_contents = exclude_package_contents_config,
         additional_file_contents = attr.additional_file_contents,
+    )
+
+    files = generate_repository_files(
+        attr.name,
+        attr,
+        importers,
+        packages,
+        state.patched_dependencies(),
+        state.only_built_dependencies(),
+        state.root_package(),
+        state.default_registry(),
+        state.npm_registries(),
+        state.npm_auth(),
+    )
+
+    _hub_repo(
+        name = attr.name,
+        contents = files,
     )
 
 def _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
