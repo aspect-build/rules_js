@@ -69,7 +69,7 @@ def npm_link_imported_package(
         link = link,
         link_packages = {
             "<LOCKVERSION>": [PACKAGE],
-            "projects/alts": ["lodash", "lodash-4.17.21-file"],
+            "projects/alts": ["lodash-4.17.21-file"],
         },
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,

@@ -84,14 +84,6 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
         Nested dictionary suitable for further processing in our repository rule
     """
 
-    # Packages resolved to a different version
-    package_version_map = {}
-
-    # tarbal versions
-    for package_key, package_info in packages.items():
-        if package_info["resolution"].get("tarball", None) and package_info["resolution"]["tarball"].startswith("file:"):
-            package_version_map[package_key] = package_info
-
     # Collect deps of each importer (workspace projects)
     importers_deps = {}
     for importPath in importers.keys():
@@ -102,13 +94,6 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
 
         deps = prod_deps | opt_deps
         all_deps = prod_deps | dev_deps | opt_deps
-
-        # Package versions mapped to alternate versions
-        for info in package_version_map.values():
-            if info["name"] in deps:
-                deps[info["name"]] = info["version"]
-            if info["name"] in all_deps:
-                all_deps[info["name"]] = info["version"]
 
         importers_deps[importPath] = {
             # deps this importer should pass on if it is linked as a first-party package; this does
