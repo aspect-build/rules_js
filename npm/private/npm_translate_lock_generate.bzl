@@ -253,7 +253,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     for (i, _import) in enumerate(npm_imports):
         if _import.link_packages:
             defs_bzl_header.append(
-                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store", store_{i} = "npm_imported_package_store")""".format(
+                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store_internal", store_{i} = "npm_imported_package_store_internal")""".format(
                     i = i,
                     links_repo_suffix = utils.links_repo_suffix,
                     repo_name = _import.name,
@@ -261,7 +261,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             )
         else:
             defs_bzl_header.append(
-                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store")""".format(
+                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store_internal")""".format(
                     i = i,
                     links_repo_suffix = utils.links_repo_suffix,
                     repo_name = _import.name,
