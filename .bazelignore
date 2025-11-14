@@ -1,5 +1,4 @@
 # Nested modules
-docs/
 e2e/
 
 # TODO(bazel 8): move to REPO.bazel
