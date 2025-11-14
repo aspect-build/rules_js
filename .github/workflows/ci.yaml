@@ -196,7 +196,7 @@ jobs:
                       ${{ hashFiles('.bazelrc', '.bazelversion', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
                       ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
-                      bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.os }}-${{ matrix.folder }}-
+                      bazel-cache-v2${{ matrix.bazel-version.version }}-${{ matrix.os }}-${{ matrix.folder }}-
 
             - name: Configure Bazel version
               shell: bash
@@ -217,7 +217,6 @@ jobs:
                     --incompatible_merge_fixed_and_default_shell_env \
                     --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --enable_bzlmod=1 \
                     //...
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
@@ -257,7 +256,6 @@ jobs:
                     --incompatible_merge_fixed_and_default_shell_env \
                     --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --enable_bzlmod=1 \
                     --instrument_test_targets \
                     //...
               env:
@@ -269,8 +267,7 @@ jobs:
               # Run if there is a test.sh file in the folder.
               if: matrix.os != 'windows' && hashFiles(format('{0}//test.sh', matrix.folder)) != ''
               shell: bash
-              # All test.sh scripts that run bazel directly should make use of this variable.
-              run: BZLMOD_FLAG=--enable_bzlmod=1 ./test.sh
+              run: ./test.sh
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}

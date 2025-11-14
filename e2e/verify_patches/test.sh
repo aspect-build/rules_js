@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
-BZLMOD_FLAG="${BZLMOD_FLAG:---enable_bzlmod=1}"
-
 print_step() {
     printf "\n\n+----------------------------------------------------------------------+"
     # shellcheck disable=SC2059,SC2145
@@ -22,15 +20,15 @@ _sedi() {
 }
 
 print_step "Should initially succeed"
-if ! bazel build "$BZLMOD_FLAG" //...; then
-    echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+if ! bazel build //...; then
+    echo "ERROR: expected 'bazel build //...' to pass"
     exit 1
 fi
 
 print_step "Should pass the generated patch list test when adding an excluded patch format"
 touch patches/foo.diff
-if ! bazel test "$BZLMOD_FLAG" //patches:patches_update_test; then
-    echo "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to pass"
+if ! bazel test //patches:patches_update_test; then
+    echo "ERROR: expected 'bazel test //patches:patches_update_test' to pass"
     exit 1
 fi
 rm patches/foo.diff
@@ -47,39 +45,35 @@ index bdc8c4e..4f9c0fb 100755
 +console.log(\"foobar\")"
 echo "$patch" >patches/foo.patch
 
-if bazel test "$BZLMOD_FLAG" //patches:patches_update_test; then
-    echo "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to fail"
+if bazel test //patches:patches_update_test; then
+    echo "ERROR: expected 'bazel test //patches:patches_update_test' to fail"
     exit 1
 fi
 
 print_step "Should succeed running the patches update target"
-if ! bazel run "$BZLMOD_FLAG" //patches:patches_update; then
-    echo "ERROR: expected 'bazel run $BZLMOD_FLAG //patches:patches_update' to pass"
+if ! bazel run //patches:patches_update; then
+    echo "ERROR: expected 'bazel run //patches:patches_update' to pass"
     exit 1
 fi
 
 print_step "Should fail the build because the new patch isn't in 'patches'"
-if bazel build "$BZLMOD_FLAG" //...; then
-    echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to fail"
+if bazel build //...; then
+    echo "ERROR: expected 'bazel build //...' to fail"
     exit 1
 fi
 
 print_step "Should pass the build after adding the new patch to 'patches'"
-if [[ "$BZLMOD_FLAG" == "--enable_bzlmod=1" ]]; then
-    _sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' MODULE.bazel
-else
-    _sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' WORKSPACE
-fi
+_sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' MODULE.bazel
 
-if ! bazel build "$BZLMOD_FLAG" //...; then
-    echo "ERROR: expected 'bazel build $BZLMOD_FLAG //...' to pass"
+if ! bazel build //...; then
+    echo "ERROR: expected 'bazel build //...' to pass"
     exit 1
 fi
 
 print_step "Should succeed the generated patch list test"
 
-if ! bazel test "$BZLMOD_FLAG" //patches:patches_update_test; then
-    echo "ERROR: expected 'bazel test $BZLMOD_FLAG //patches:patches_update_test' to pass"
+if ! bazel test //patches:patches_update_test; then
+    echo "ERROR: expected 'bazel test //patches:patches_update_test' to pass"
     exit 1
 fi
 
