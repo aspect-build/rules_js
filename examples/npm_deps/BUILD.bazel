@@ -11,7 +11,7 @@ load("@npm//examples/npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
 # Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
 # Just to show what the syntax de-sugaring looks like, and to test that
 # bare `npm_import` produces working binaries.
-load("@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
+load("@npm__rollup__2.70.2//:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
 
 ###########################
 

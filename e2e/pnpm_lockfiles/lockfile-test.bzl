@@ -22,8 +22,8 @@ BZLMOD_FILES = {
 
     # hasBin, optional deps, deps and across versions
     "rollup_links_defs.bzl": "@REPO_NAME__rollup__2.14.0__links//:defs.bzl",
-    "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//VERSION:package_json.bzl",
-    "rollup3_package_json.bzl": "@REPO_NAME__rollup__3.29.4//VERSION:package_json.bzl",
+    "rollup_package_json.bzl": "@REPO_NAME__rollup__2.14.0//:package_json.bzl",
+    "rollup3_package_json.bzl": "@REPO_NAME__rollup__3.29.4//:package_json.bzl",
 
     # file: tarball packages
     "lodash_resolved.json": "@REPO_NAME//VERSION:lodash/resolved.json",

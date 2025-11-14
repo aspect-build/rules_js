@@ -66,8 +66,6 @@ def npm_link_imported_package(
         dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
-        link_packages = {
-        },
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store_internal,
         npm_imported_package_store_macro = npm_imported_package_store_internal,

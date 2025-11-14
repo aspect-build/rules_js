@@ -65,7 +65,7 @@ def npm_link_imported_package_store_internal(link_name = PACKAGE, dev = False):
 def npm_link_imported_package(
         name = "node_modules",
         dev = False,
-        link = None):
+        link = True):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package_internal(
@@ -74,9 +74,6 @@ def npm_link_imported_package(
         dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
-        link_packages = {
-            "<LOCKVERSION>": ["@aspect-test-a-bad-scope", "@aspect-test-custom-scope/a", "@aspect-test/a", "@aspect-test/a2", "aspect-test-a-no-scope", "aspect-test-a/no-at"],
-        },
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store_internal,
         npm_imported_package_store_macro = npm_imported_package_store_internal,
