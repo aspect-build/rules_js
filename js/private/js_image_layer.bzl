@@ -13,8 +13,8 @@ js_image_layer(
 ```
 """
 
-load("@aspect_bazel_lib//lib:tar.bzl", "tar_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 _DEFAULT_LAYER_GROUPS = {
     "node": "/js/private/node-patches/|/bin/nodejs/",
@@ -588,7 +588,7 @@ def _js_image_layer_impl(ctx):
             outputs = [output],
             mnemonic = "JsImageLayer",
             progress_message = "JsImageLayer " + typ + " %{label}",
-            toolchain = "@aspect_bazel_lib//lib:tar_toolchain_type",
+            toolchain = tar_lib.toolchain_type,
         )
 
     return [

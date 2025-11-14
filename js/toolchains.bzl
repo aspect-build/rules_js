@@ -7,10 +7,10 @@ load(
     _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains",
     _register_coreutils_toolchains = "register_coreutils_toolchains",
     _register_jq_toolchains = "register_jq_toolchains",
-    _register_tar_toolchains = "register_tar_toolchains",
     _register_yq_toolchains = "register_yq_toolchains",
 )
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains", _DEFAULT_NODE_REPOSITORY = "DEFAULT_NODE_REPOSITORY", _DEFAULT_NODE_VERSION = "DEFAULT_NODE_VERSION")
+load("@tar.bzl//tar:extensions.bzl", _tar_create_repositories = "create_repositories")
 
 DEFAULT_NODE_REPOSITORY = _DEFAULT_NODE_REPOSITORY
 DEFAULT_NODE_VERSION = _DEFAULT_NODE_VERSION
@@ -69,7 +69,8 @@ def rules_js_register_toolchains(
     if kwargs.pop("register_jq_toolchain", True) and not native.existing_rule("jq_toolchains"):
         _register_jq_toolchains()
     if kwargs.pop("register_tar_toolchain", True) and not native.existing_rule("tar_toolchains"):
-        _register_tar_toolchains()
+        _tar_create_repositories()
+        native.register_toolchains("@bsd_tar_toolchains//:all")
     if kwargs.pop("register_yq_toolchain", True) and not native.existing_rule("yq_toolchains"):
         _register_yq_toolchains()
     if kwargs.pop("register_nodejs_toolchain", True) and not native.existing_rule("{}_toolchains".format(DEFAULT_NODE_REPOSITORY)):

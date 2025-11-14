@@ -103,8 +103,8 @@ bzl_library(
     name = "js_image_layer",
     srcs = ["js_image_layer.bzl"],
     deps = [
-        "@aspect_bazel_lib//lib:tar",
         "@bazel_skylib//lib:paths",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
+        "@tar.bzl//tar",
     ],
 )
