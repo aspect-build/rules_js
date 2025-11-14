@@ -1162,8 +1162,8 @@ _NPM_PACKAGE_LOCATIONS = {
     "examples/js_lib_pkg/a": ["@types/node"],
     "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias_1", "js_lib_pkg_a-alias_2", "@types/node"],
     "examples/linked_consumer": ["@lib/test", "@lib/test2"],
-    "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
-    "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
+    "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
+    "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
     "examples/macro": ["mocha-junit-reporter", "mocha-multi-reporters", "mocha"],
     "examples/nextjs": ["@tailwindcss/postcss", "next", "react-dom", "react", "tailwindcss"],
     "examples/npm_deps": ["@mycorp/pkg-a", "@mycorp/pkg-d", "@mycorp/pkg-e", "acorn", "@aspect-test/a", "@aspect-test/c", "@gregmagolan/test-b", "@rollup/plugin-commonjs", "debug", "meaning-of-life", "mobx-react", "mobx", "ms", "react", "rollup", "uvu"],
@@ -2595,17 +2595,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "examples/linked_lib":
             link_45("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
             link_45("{}/alias-e".format(name), False, name, "alias-e")
+            link_45("{}/@aspect-test/e-dev".format(name), True, name, "@aspect-test/e-dev")
             link_46("{}/@aspect-test/f".format(name), True, name, "@aspect-test/f")
             link_276("{}/@types/node".format(name), True, name, "@types/node")
             link_targets = [
                 ":{}/@aspect-test/e".format(name),
                 ":{}/alias-e".format(name),
+                ":{}/@aspect-test/e-dev".format(name),
                 ":{}/@aspect-test/f".format(name),
                 ":{}/@types/node".format(name),
             ]
             scope_targets = {
                 "@aspect-test": [
                     ":{}/@aspect-test/e".format(name),
+                    ":{}/@aspect-test/e-dev".format(name),
                     ":{}/@aspect-test/f".format(name),
                 ],
                 "@types": [":{}/@types/node".format(name)],
@@ -2613,17 +2616,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "examples/linked_pkg":
             link_45("{}/@aspect-test/e".format(name), False, name, "@aspect-test/e")
             link_45("{}/alias-e".format(name), False, name, "alias-e")
+            link_45("{}/@aspect-test/e-dev".format(name), True, name, "@aspect-test/e-dev")
             link_46("{}/@aspect-test/f".format(name), True, name, "@aspect-test/f")
             link_276("{}/@types/node".format(name), True, name, "@types/node")
             link_targets = [
                 ":{}/@aspect-test/e".format(name),
                 ":{}/alias-e".format(name),
+                ":{}/@aspect-test/e-dev".format(name),
                 ":{}/@aspect-test/f".format(name),
                 ":{}/@types/node".format(name),
             ]
             scope_targets = {
                 "@aspect-test": [
                     ":{}/@aspect-test/e".format(name),
+                    ":{}/@aspect-test/e-dev".format(name),
                     ":{}/@aspect-test/f".format(name),
                 ],
                 "@types": [":{}/@types/node".format(name)],
@@ -2978,6 +2984,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
         if dev:
             link_targets.extend([
+                ":{}/@aspect-test/e-dev".format(name),
                 ":{}/@aspect-test/f".format(name),
                 ":{}/@types/node".format(name),
             ])
@@ -2989,6 +2996,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
         if dev:
             link_targets.extend([
+                ":{}/@aspect-test/e-dev".format(name),
                 ":{}/@aspect-test/f".format(name),
                 ":{}/@types/node".format(name),
             ])
