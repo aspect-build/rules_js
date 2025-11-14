@@ -110,6 +110,8 @@ def translate_to_transitive_closure(importers, packages, no_dev = False, no_opti
                 all_deps[info["name"]] = info["version"]
 
         importers_deps[importPath] = {
+            "name": lock_importer["name"],
+
             # deps this importer should pass on if it is linked as a first-party package; this does
             # not include devDependencies
             "deps": deps,

@@ -8,8 +8,9 @@ load(":utils.bzl", "utils")
 #
 # Metadata may come from different locations depending on the lockfile, this struct should
 # have data normalized across lockfiles.
-def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
+def _new_import_info(package_name, dependencies, dev_dependencies, optional_dependencies):
     return {
+        "name": package_name,
         "dependencies": dependencies,
         "dev_dependencies": dev_dependencies,
         "optional_dependencies": optional_dependencies,
@@ -136,9 +137,12 @@ def _convert_v9_importers(importers):
     # Convert pnpm lockfile v9 importers to a rules_js compatible ~v5 format.
     # Almost identical to v6 but with fewer odd edge cases.
 
+    importer_names = _collect_v9_project_names_from_importers(importers)
+
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
+            package_name = importer_names.get(import_path, None),
             dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("dependencies", {})),
             dev_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("devDependencies", {})),
             optional_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
@@ -223,6 +227,38 @@ def _convert_v9_packages(packages, snapshots):
         result[package_key] = package_info
 
     return result
+
+def _collect_v9_project_names_from_importers(importers):
+    # pnpm lockfile v9 does not explicitly state project package names, but workspace:*
+    # specifiers will resolve the package name to a project with that exact name.
+    #
+    # This util searches lockfile importers (pnpm workspace projects) for resolved workspace:*
+    # deps to map workpsace project paths to package names.
+    found_project_names = {}
+    for importer_path, importer in importers.items():
+        for depType in ["dependencies", "devDependencies", "optionalDependencies"]:
+            for name, attributes in importer.get(depType, {}).items():
+                if attributes["specifier"] == "workspace:*":
+                    version = attributes["version"]
+                    if version.startswith("link:"):
+                        workspace_rel_link = paths.normalize(paths.join(importer_path, version[5:]))
+
+                        if workspace_rel_link not in importers:
+                            msg = "Import {} ({}) from project '{}' has invalid link path: {}".format(name, version, importer_path, workspace_rel_link)
+                            fail(msg)
+
+                        if workspace_rel_link in found_project_names and found_project_names[workspace_rel_link] != name:
+                            msg = "Import {} ({}) from project '{}' has conflicting name with previous import {} for link path: {}".format(
+                                name,
+                                version,
+                                importer_path,
+                                found_project_names[workspace_rel_link],
+                                workspace_rel_link,
+                            )
+                            fail(msg)
+
+                        found_project_names[workspace_rel_link] = name
+    return found_project_names
 
 ######################### Pnpm API #########################
 
