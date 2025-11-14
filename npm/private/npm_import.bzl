@@ -41,9 +41,9 @@ load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_packag
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store = "npm_imported_package_store_internal",
-    _npm_link_imported_package = "npm_link_imported_package_internal",
-    _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
+    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
+    _npm_link_imported_package_internal = "npm_link_imported_package_internal",
+    _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal")
 """
 
 _LINK_JS_PACKAGE_TMPL = """\
@@ -52,10 +52,10 @@ VERSION = "{version}"
 _ROOT_PACKAGE = "{root_package}"
 _PACKAGE_STORE_NAME = "{package_store_name}"
 
-# Generated npm_package_store targets for npm package {package}@{version}
+# Generated npm_imported_package_store_internal() wrapper target for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_imported_package_store():
-    _npm_imported_package_store(
+def npm_imported_package_store_internal():
+    _npm_imported_package_store_internal(
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
@@ -251,10 +251,10 @@ def npm_link_imported_package_store_internal(
     )
 
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
-# Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
+# Generated npm_link_imported_package_store_internal() for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
-    _npm_link_imported_package_store(
+def npm_link_imported_package_store_internal(link_name = PACKAGE, dev = False):
+    _npm_link_imported_package_store_internal(
         link_name,
         dev,
         root_package = _ROOT_PACKAGE,
@@ -321,7 +321,7 @@ def npm_link_imported_package_internal(
     return (link_targets, scoped_targets)
 
 _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
-# Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
+# Generated public npm_package_store() and npm_link_package_store() targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
         name = "node_modules",
@@ -329,7 +329,7 @@ def npm_link_imported_package(
         link = {link_default}):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
-    return _npm_link_imported_package(
+    return _npm_link_imported_package_internal(
         package = PACKAGE,
         version = VERSION,
         dev = dev,
@@ -337,8 +337,8 @@ def npm_link_imported_package(
         link = link,
         link_packages = {link_packages},
         public_visibility = {public_visibility},
-        npm_link_imported_package_store_macro = npm_link_imported_package_store,
-        npm_imported_package_store_macro = npm_imported_package_store,
+        npm_link_imported_package_store_macro = npm_link_imported_package_store_internal,
+        npm_imported_package_store_macro = npm_imported_package_store_internal,
     )
 """
 

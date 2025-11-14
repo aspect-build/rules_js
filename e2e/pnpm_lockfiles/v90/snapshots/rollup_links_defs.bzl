@@ -5,19 +5,19 @@ load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_packag
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store = "npm_imported_package_store_internal",
-    _npm_link_imported_package = "npm_link_imported_package_internal",
-    _npm_link_imported_package_store = "npm_link_imported_package_store_internal")
+    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
+    _npm_link_imported_package_internal = "npm_link_imported_package_internal",
+    _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal")
 
 PACKAGE = "rollup"
 VERSION = "2.14.0"
 _ROOT_PACKAGE = "<LOCKVERSION>"
 _PACKAGE_STORE_NAME = "rollup@2.14.0"
 
-# Generated npm_package_store targets for npm package rollup@2.14.0
+# Generated npm_imported_package_store_internal() wrapper target for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
-def npm_imported_package_store():
-    _npm_imported_package_store(
+def npm_imported_package_store_internal():
+    _npm_imported_package_store_internal(
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
@@ -42,10 +42,10 @@ def npm_imported_package_store():
         exclude_package_contents = [],
     )
 
-# Generated npm_package_store and npm_link_package_store targets for npm package rollup@2.14.0
+# Generated npm_link_imported_package_store_internal() for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
-    _npm_link_imported_package_store(
+def npm_link_imported_package_store_internal(link_name = PACKAGE, dev = False):
+    _npm_link_imported_package_store_internal(
         link_name,
         dev,
         root_package = _ROOT_PACKAGE,
@@ -54,7 +54,7 @@ def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
         package_store_name = _PACKAGE_STORE_NAME,
     )
 
-# Generated npm_package_store and npm_link_package_store targets for npm package rollup@2.14.0
+# Generated public npm_package_store() and npm_link_package_store() targets for npm package rollup@2.14.0
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
         name = "node_modules",
@@ -62,7 +62,7 @@ def npm_link_imported_package(
         link = None):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
-    return _npm_link_imported_package(
+    return _npm_link_imported_package_internal(
         package = PACKAGE,
         version = VERSION,
         dev = dev,
@@ -72,6 +72,6 @@ def npm_link_imported_package(
             "<LOCKVERSION>": [PACKAGE],
         },
         public_visibility = True,
-        npm_link_imported_package_store_macro = npm_link_imported_package_store,
-        npm_imported_package_store_macro = npm_imported_package_store,
+        npm_link_imported_package_store_macro = npm_link_imported_package_store_internal,
+        npm_imported_package_store_macro = npm_imported_package_store_internal,
     )
