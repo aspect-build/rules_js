@@ -2445,17 +2445,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "js/private/worker/src":
-            link_1("abortcontroller-polyfill", True)
-            link_212("@rollup/plugin-commonjs", True)
-            link_213("@rollup/plugin-json", True)
-            link_214("@rollup/plugin-node-resolve", True)
-            link_215("@rollup/plugin-typescript", True)
-            link_269("@types/google-protobuf", True)
-            link_277("@types/node", True)
-            link_589("google-protobuf", False)
-            link_953("rollup", True)
-            link_1059("tslib", True)
-            link_1070("typescript", True)
+            link_1(dev=True)
+            link_212(dev=True)
+            link_213(dev=True)
+            link_214(dev=True)
+            link_215(dev=True)
+            link_269(dev=True)
+            link_277(dev=True)
+            link_589()
+            link_953(dev=True)
+            link_1059(dev=True)
+            link_1070(dev=True)
             link_targets = [
                 ":node_modules/google-protobuf",
                 ":node_modules/abortcontroller-polyfill",
@@ -2482,7 +2482,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "js/private/test/image":
-            link_6("acorn", False)
+            link_6()
             _fp_link_2()
             _fp_link_6()
             link_targets = [
@@ -2497,19 +2497,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "examples/npm_deps":
-            link_8("acorn", True)
-            link_41("@aspect-test/a", True)
-            link_43("@aspect-test/c", True)
-            link_149("@gregmagolan/test-b", True)
-            link_211("@rollup/plugin-commonjs", True)
-            link_439("debug", True)
-            link_755("meaning-of-life", True)
-            link_790("mobx-react", True)
-            link_791("mobx", True)
-            link_808("ms", True)
-            link_923("react", True)
-            link_952("rollup", True)
-            link_1089("uvu", True)
+            link_8(dev=True)
+            link_41(dev=True)
+            link_43(dev=True)
+            link_149(dev=True)
+            link_211(dev=True)
+            link_439(dev=True)
+            link_755(dev=True)
+            link_790(dev=True)
+            link_791(dev=True)
+            link_808(dev=True)
+            link_923(dev=True)
+            link_952(dev=True)
+            link_1089(dev=True)
             _fp_link_2()
             _fp_link_6()
             _fp_link_7()
@@ -2545,32 +2545,32 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "examples/npm_package/packages/pkg_a":
-            link_8("acorn", False)
-            link_1088("uuid", False)
+            link_8()
+            link_1088()
             link_targets = [
                 ":node_modules/acorn",
                 ":node_modules/uuid",
             ]
         elif bazel_package == "examples/npm_package/packages/pkg_b":
-            link_8("acorn", False)
-            link_1088("uuid", False)
+            link_8()
+            link_1088()
             link_targets = [
                 ":node_modules/acorn",
                 ":node_modules/uuid",
             ]
         elif bazel_package == "examples/npm_package/packages/pkg_d":
-            link_8("acorn", False)
-            link_1088("uuid", False)
+            link_8()
+            link_1088()
             link_targets = [
                 ":node_modules/acorn",
                 ":node_modules/uuid",
             ]
         elif bazel_package == "examples/linked_lib":
-            link_45("@aspect-test/e", False)
-            link_45("alias-e", False)
-            link_45("@aspect-test/e-dev", True)
-            link_46("@aspect-test/f", True)
-            link_276("@types/node", True)
+            link_45()
+            link_45("alias-e")
+            link_45("@aspect-test/e-dev", dev=True)
+            link_46(dev=True)
+            link_276(dev=True)
             link_targets = [
                 ":node_modules/@aspect-test/e",
                 ":node_modules/alias-e",
@@ -2587,11 +2587,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/linked_pkg":
-            link_45("@aspect-test/e", False)
-            link_45("alias-e", False)
-            link_45("@aspect-test/e-dev", True)
-            link_46("@aspect-test/f", True)
-            link_276("@types/node", True)
+            link_45()
+            link_45("alias-e")
+            link_45("@aspect-test/e-dev", dev=True)
+            link_46(dev=True)
+            link_276(dev=True)
             link_targets = [
                 ":node_modules/@aspect-test/e",
                 ":node_modules/alias-e",
@@ -2608,14 +2608,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "":
-            link_47("@babel/cli", True)
-            link_50("@babel/core", True)
-            link_63("@babel/plugin-transform-modules-commonjs", True)
-            link_277("@types/node", True)
-            link_356("chalk", True)
-            link_632("inline-fixtures", True)
-            link_699("jsonpath-plus", True)
-            link_1070("typescript", True)
+            link_47(dev=True)
+            link_50(dev=True)
+            link_63(dev=True)
+            link_277(dev=True)
+            link_356(dev=True)
+            link_632(dev=True)
+            link_699(dev=True)
+            link_1070(dev=True)
             link_targets = [
                 ":node_modules/@babel/cli",
                 ":node_modules/@babel/core",
@@ -2635,37 +2635,37 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/runfiles":
-            link_68("@bazel/runfiles", False)
+            link_68()
             link_targets = [":node_modules/@bazel/runfiles"]
             scope_targets = {
                 "@bazel": [":node_modules/@bazel/runfiles"],
             }
         elif bazel_package == "npm/private/test":
-            link_144("@fastify/send", True)
-            link_145("@figma/nodegit", True)
-            link_180("@kubernetes/client-node", True)
-            link_208("@plotly/regl", True)
-            link_208("regl", True)
-            link_339("bufferutil", True)
-            link_442("debug", True)
-            link_497("esbuild", True)
-            link_607("hello", True)
-            link_608("handlebars-helpers/helper-date", True)
-            link_609("hot-shots", True)
-            link_633("inline-fixtures", True)
-            link_693("json-stable-stringify", True)
-            link_736("lodash", True)
-            link_824("node-gyp", True)
-            link_888("plotly.js", True)
-            link_889("pngjs", True)
-            link_907("protoc-gen-grpc", True)
-            link_915("puppeteer", True)
-            link_964("segfault-handler", True)
-            link_965("semver-first-satisfied", True)
-            link_1026("syncpack", True)
-            link_1070("typescript", True)
-            link_1082("unused", True)
-            link_1099("webpack-bundle-analyzer", True)
+            link_144(dev=True)
+            link_145(dev=True)
+            link_180(dev=True)
+            link_208(dev=True)
+            link_208("regl", dev=True)
+            link_339(dev=True)
+            link_442(dev=True)
+            link_497(dev=True)
+            link_607(dev=True)
+            link_608("handlebars-helpers/helper-date", dev=True)
+            link_609(dev=True)
+            link_633(dev=True)
+            link_693(dev=True)
+            link_736(dev=True)
+            link_824(dev=True)
+            link_888(dev=True)
+            link_889(dev=True)
+            link_907(dev=True)
+            link_915(dev=True)
+            link_964(dev=True)
+            link_965(dev=True)
+            link_1026(dev=True)
+            link_1070(dev=True)
+            link_1082(dev=True)
+            link_1099(dev=True)
             _fp_link_8()
             link_targets = [
                 ":node_modules/@fastify/send",
@@ -2701,11 +2701,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@plotly": [":node_modules/@plotly/regl"],
             }
         elif bazel_package == "js/private/coverage/bundle":
-            link_212("@rollup/plugin-commonjs", True)
-            link_213("@rollup/plugin-json", True)
-            link_214("@rollup/plugin-node-resolve", True)
-            link_341("c8", False)
-            link_953("rollup", True)
+            link_212(dev=True)
+            link_213(dev=True)
+            link_214(dev=True)
+            link_341()
+            link_953(dev=True)
             link_targets = [
                 ":node_modules/c8",
                 ":node_modules/@rollup/plugin-commonjs",
@@ -2721,9 +2721,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "js/private/devserver/src":
-            link_214("@rollup/plugin-node-resolve", True)
-            link_277("@types/node", True)
-            link_953("rollup", True)
+            link_214(dev=True)
+            link_277(dev=True)
+            link_953(dev=True)
             link_targets = [
                 ":node_modules/@rollup/plugin-node-resolve",
                 ":node_modules/@types/node",
@@ -2734,11 +2734,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/nextjs":
-            link_255("@tailwindcss/postcss", True)
-            link_819("next", False)
-            link_922("react-dom", False)
-            link_924("react", False)
-            link_1027("tailwindcss", True)
+            link_255(dev=True)
+            link_819()
+            link_922()
+            link_924()
+            link_1027(dev=True)
             link_targets = [
                 ":node_modules/next",
                 ":node_modules/react-dom",
@@ -2750,13 +2750,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@tailwindcss": [":node_modules/@tailwindcss/postcss"],
             }
         elif bazel_package == "examples/js_lib_pkg/a":
-            link_277("@types/node", True)
+            link_277(dev=True)
             link_targets = [":node_modules/@types/node"]
             scope_targets = {
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/js_lib_pkg/b":
-            link_277("@types/node", True)
+            link_277(dev=True)
             _fp_link_3()
             _fp_link_3("js_lib_pkg_a-alias_1")
             _fp_link_3("js_lib_pkg_a-alias_2")
@@ -2770,8 +2770,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "js/private/test/js_run_devserver":
-            link_277("@types/node", False)
-            link_677("jasmine", False)
+            link_277()
+            link_677()
             link_targets = [
                 ":node_modules/@types/node",
                 ":node_modules/jasmine",
@@ -2780,13 +2780,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/webpack_cli":
-            link_288("@vanilla-extract/css", False)
-            link_291("@vanilla-extract/webpack-plugin", True)
-            link_411("css-loader", False)
-            link_753("mathjs", False)
-            link_763("mini-css-extract-plugin", True)
-            link_1100("webpack-cli", True)
-            link_1103("webpack", True)
+            link_288()
+            link_291(dev=True)
+            link_411()
+            link_753()
+            link_763(dev=True)
+            link_1100(dev=True)
+            link_1103(dev=True)
             link_targets = [
                 ":node_modules/@vanilla-extract/css",
                 ":node_modules/css-loader",
@@ -2803,26 +2803,26 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "examples/npm_package/libs/lib_a":
-            link_355("chalk", False)
+            link_355()
             link_targets = [":node_modules/chalk"]
         elif bazel_package == "npm/private/test/npm_package":
-            link_355("chalk", False)
-            link_356("chalk-alt", False)
+            link_355()
+            link_356("chalk-alt")
             link_targets = [
                 ":node_modules/chalk",
                 ":node_modules/chalk-alt",
             ]
         elif bazel_package == "examples/macro":
-            link_792("mocha-junit-reporter", True)
-            link_793("mocha-multi-reporters", True)
-            link_794("mocha", True)
+            link_792(dev=True)
+            link_793(dev=True)
+            link_794(dev=True)
             link_targets = [
                 ":node_modules/mocha-junit-reporter",
                 ":node_modules/mocha-multi-reporters",
                 ":node_modules/mocha",
             ]
         elif bazel_package == "examples/stack_traces":
-            link_991("source-map-support", True)
+            link_991(dev=True)
             link_targets = [":node_modules/source-map-support"]
         elif bazel_package == "examples/js_binary":
             _fp_link_2()

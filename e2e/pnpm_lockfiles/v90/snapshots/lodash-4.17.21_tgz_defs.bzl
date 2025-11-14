@@ -40,7 +40,7 @@ def npm_imported_package_store():
 
 # Generated npm_package_store and npm_link_package_store targets for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(link_name, dev):
+def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
     _npm_link_imported_package_store(
         link_name,
         dev,

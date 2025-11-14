@@ -274,40 +274,40 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "<LOCKVERSION>":
-            link_4("@aspect-test-a-bad-scope", False)
-            link_4("@aspect-test-custom-scope/a", False)
-            link_4("@aspect-test/a", False)
-            link_4("@aspect-test/a2", False)
-            link_4("aspect-test-a-no-scope", False)
-            link_4("aspect-test-a/no-at", False)
-            link_5("@aspect-test/b", True)
-            link_6("@aspect-test/c", False)
-            link_12("@aspect-test/e", False)
-            link_13("@aspect-test/h-is-only-optional", False)
-            link_14("jsonify", False)
-            link_15("@isaacs/cliui", False)
-            link_16("rollup-plugin-with-peers", False)
-            link_18("@types/archiver", True)
-            link_22("@types/node", True)
-            link_22("alias-types-node", True)
-            link_23("alias-only-sizzle", True)
-            link_26("debug", False)
-            link_36("hello", False)
-            link_39("is-odd-v0", False)
-            link_40("is-odd-v1", False)
-            link_41("is-odd-v2", False)
-            link_42("is-odd-v3", False)
-            link_43("is-odd", False)
-            link_43("is-odd-alias", False)
-            link_44("jquery-git-ssh-399b201", False)
-            link_45("jquery-git-ssh-e61fccb", False)
-            link_50("lodash", False)
-            link_51("meaning-of-life", False)
-            link_57("rollup", False)
-            link_58("rollup3", False)
-            link_65("tslib", False)
-            link_66("typescript", False)
-            link_68("uvu", False)
+            link_4("@aspect-test-a-bad-scope")
+            link_4("@aspect-test-custom-scope/a")
+            link_4()
+            link_4("@aspect-test/a2")
+            link_4("aspect-test-a-no-scope")
+            link_4("aspect-test-a/no-at")
+            link_5(dev=True)
+            link_6()
+            link_12()
+            link_13("@aspect-test/h-is-only-optional")
+            link_14("jsonify")
+            link_15()
+            link_16("rollup-plugin-with-peers")
+            link_18(dev=True)
+            link_22(dev=True)
+            link_22("alias-types-node", dev=True)
+            link_23("alias-only-sizzle", dev=True)
+            link_26()
+            link_36()
+            link_39("is-odd-v0")
+            link_40("is-odd-v1")
+            link_41("is-odd-v2")
+            link_42("is-odd-v3")
+            link_43()
+            link_43("is-odd-alias")
+            link_44("jquery-git-ssh-399b201")
+            link_45("jquery-git-ssh-e61fccb")
+            link_50()
+            link_51()
+            link_57()
+            link_58("rollup3")
+            link_65()
+            link_66()
+            link_68()
             _fp_link_0()
             _fp_link_2()
             _fp_link_2("alias-project-a")
@@ -386,8 +386,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "projects/peers-combo-2":
-            link_6("@aspect-test/c", False)
-            link_9("@aspect-test/d", False)
+            link_6()
+            link_9()
             link_targets = [
                 ":node_modules/@aspect-test/c",
                 ":node_modules/@aspect-test/d",
@@ -399,8 +399,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "projects/peers-combo-1":
-            link_7("@aspect-test/c", False)
-            link_10("@aspect-test/d", False)
+            link_7()
+            link_10()
             link_targets = [
                 ":node_modules/@aspect-test/c",
                 ":node_modules/@aspect-test/d",
@@ -412,8 +412,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "projects/peer-types":
-            link_14("jsonify", True)
-            link_36("hello", True)
+            link_14("jsonify", dev=True)
+            link_36(dev=True)
             _fp_link_0()
             _fp_link_2()
             _fp_link_3()
@@ -432,13 +432,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "projects/a-types":
-            link_22("@types/node", False)
+            link_22()
             link_targets = [":node_modules/@types/node"]
             scope_targets = {
                 "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "projects/b":
-            link_22("@types/node", True)
+            link_22(dev=True)
             _fp_link_2()
             _fp_link_8()
             link_targets = [
@@ -451,10 +451,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@scoped": [":node_modules/@scoped/a"],
             }
         elif bazel_package == "projects/alts":
-            link_48("lodash-4.17.20", False)
-            link_49("lodash-4.17.21", False)
-            link_50("lodash", False)
-            link_50("lodash-4.17.21-file", False)
+            link_48("lodash-4.17.20")
+            link_49("lodash-4.17.21")
+            link_50()
+            link_50("lodash-4.17.21-file")
             link_targets = [
                 ":node_modules/lodash-4.17.20",
                 ":node_modules/lodash-4.17.21",

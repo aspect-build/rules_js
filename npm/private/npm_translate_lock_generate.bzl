@@ -290,12 +290,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             # for each alias of this package
             for link_alias in link_aliases:
+                is_alias = link_alias != _import.package
                 is_dev = link_alias not in link_prod_deps
 
-                links_pkg_bzl[link_package].append("""            link_{i}("{alias}", {dev})""".format(
+                links_pkg_bzl[link_package].append("""            link_{i}({maybe_alias}{maybe_dev})""".format(
                     i = i,
-                    dev = is_dev,
-                    alias = link_alias,
+                    maybe_alias = '"{}"'.format(link_alias) if is_alias else "",
+                    maybe_dev = (", " if is_alias else "") + "dev=True" if is_dev else "",
                 ))
 
                 if "//visibility:public" in _import.package_visibility:

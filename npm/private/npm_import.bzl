@@ -253,7 +253,7 @@ def npm_link_imported_package_store_internal(
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(link_name, dev):
+def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
     _npm_link_imported_package_store(
         link_name,
         dev,
