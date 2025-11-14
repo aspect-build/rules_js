@@ -24,9 +24,9 @@ npm = use_extension(
 npm.npm_translate_lock(
     name = "npm",
     data = ["//:package.json"],
+    no_dev = True,
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
-    prod = True,
     update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
