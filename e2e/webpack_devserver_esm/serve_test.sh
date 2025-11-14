@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
-BZLMOD_FLAG="${BZLMOD_FLAG:---enable_bzlmod=1}"
-
 # sedi makes `sed -i` work on both OSX & Linux
 # See https://stackoverflow.com/questions/2320564/i-need-my-sed-i-command-for-in-place-editing-to-work-with-both-gnu-sed-and-bsd
 _sedi() {
@@ -18,7 +16,7 @@ echo "TEST - $0: $1"
 
 ibazel_logs=$(mktemp)
 echo "Capturing ibazel logs to $ibazel_logs"
-./node_modules/.bin/ibazel run "$1" "$BZLMOD_FLAG" >"$ibazel_logs" 2>&1 &
+./node_modules/.bin/ibazel run "$1" >"$ibazel_logs" 2>&1 &
 ibazel_pid="$!"
 
 function _exit {

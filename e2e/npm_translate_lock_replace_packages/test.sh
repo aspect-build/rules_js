@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
-BZLMOD_FLAG="${BZLMOD_FLAG:---enable_bzlmod=1}"
-
 print_step() {
     printf "\n\n+----------------------------------------------------------------------+"
     # shellcheck disable=SC2059,SC2145
@@ -31,7 +29,7 @@ npm_utils.npm_replace_package(\
 )' utils_module/MODULE.bazel
 
 # Build should fail with the expected error
-output=$(bazel build "$BZLMOD_FLAG" //... 2>&1) || true
+output=$(bazel build //... 2>&1) || true
 
 if echo "$output" | grep -q 'The "npm.npm_replace_package" tag can only be used in the root Bazel module'; then
     echo "SUCCESS: Got expected error about npm_replace_package in non-root module"

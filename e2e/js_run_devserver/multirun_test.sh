@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
-BZLMOD_FLAG="${BZLMOD_FLAG:---enable_bzlmod=1}"
-
 TARGET="$1"
 
 # The ports configured in src/BUILD.bazel for the multi-port tests
@@ -22,7 +20,7 @@ _sedi() {
 
 echo "$$: TEST - $0: $TARGET @ $PORT1 & $PORT2"
 
-./node_modules/.bin/ibazel run "$TARGET" "$BZLMOD_FLAG" 2>&1 &
+./node_modules/.bin/ibazel run "$TARGET" 2>&1 &
 ibazel_pid="$!"
 
 function _exit {
