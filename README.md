@@ -41,7 +41,7 @@ Follow instructions from the release you wish to use:
 
 ## Usage
 
-See the documentation in the [docs](docs/) folder.
+See the documentation in the [docs](docs/) folder and generated API docs at https://registry.bazel.build/docs/aspect_rules_js.
 
 ## Examples
 

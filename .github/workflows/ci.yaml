@@ -151,11 +151,6 @@ jobs:
                     - bazel-version:
                           major: 7
                           version: 7.4.0
-                      folder: docs
-                      os: ubuntu
-                    - bazel-version:
-                          major: 7
-                          version: 7.4.0
                       os: windows
                       config: local
                       folder: e2e/bzlmod
