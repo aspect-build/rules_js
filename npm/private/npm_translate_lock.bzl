@@ -25,6 +25,7 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](./npm_import) does this.
 """
 
+load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -713,6 +714,17 @@ def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exc
     )
 
 ################################################################################
+def _host_node_path(rctx):
+    # Note that we must reference the node binary under the platform-specific node
+    # toolchain repository rather than under @nodejs_host since running rctx.path
+    # (called outside this function) on the alias in the host repo fails under bzlmod.
+    # It appears to fail because the platform-specific repository does not exist
+    # unless we reference the label here.
+    #
+    # TODO: Try to understand this better and see if we can go back to using
+    #  Label("@nodejs_host//:bin/node")
+    return rctx.path(Label("@{}_{}//:bin/node".format(rctx.attr.node_toolchain_prefix, repo_utils.platform(rctx))))
+
 def _bootstrap_import(rctx, state):
     pnpm_lock_label = state.label_store.label("pnpm_lock")
     pnpm_lock_path = state.label_store.path("pnpm_lock")
@@ -746,8 +758,8 @@ INFO: Running initial `pnpm import` in `{wd}` to bootstrap the pnpm-lock.yaml fi
 
     result = rctx.execute(
         [
-            state.label_store.path("host_node"),
-            state.label_store.path("pnpm_entry"),
+            _host_node_path(rctx),
+            rctx.path(rctx.attr.use_pnpm),
             "import",
         ],
         working_directory = bootstrap_working_directory,
@@ -791,7 +803,7 @@ def _execute_preupdate_scripts(rctx, state):
 
         result = rctx.execute(
             [
-                state.label_store.path("host_node"),
+                _host_node_path(rctx),
                 state.label_store.path(script_key),
             ],
             # To keep things simple, run at the root of the external repository
@@ -847,8 +859,8 @@ INFO: Updating `{pnpm_lock}` file as its inputs have changed since the last upda
 
     result = rctx.execute(
         [
-            state.label_store.path("host_node"),
-            state.label_store.path("pnpm_entry"),
+            _host_node_path(rctx),
+            rctx.path(rctx.attr.use_pnpm),
         ] + update_cmd,
         # Run pnpm in the external repository so that we are hermetic and all data files that are required need
         # to be specified. This requirement means that if any data file changes then the update command will be
