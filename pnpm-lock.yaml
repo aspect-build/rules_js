@@ -9,11 +9,11 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 317d4b6ce1de48c4819a6fafc025ffb3
+packageExtensionsChecksum: sha256-CRVPjZW8vd64frLpqSR0tFm71XKB1deEsXYeQq7rGH8=
 
 patchedDependencies:
   meaning-of-life@1.0.0:
-    hash: o3deharooos255qt5xdujc3cuq
+    hash: 33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0
     path: examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch
 
 importers:
@@ -184,7 +184,7 @@ importers:
         version: 3.2.7
       meaning-of-life:
         specifier: 1.0.0
-        version: 1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)
+        version: 1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0)
       mobx:
         specifier: 6.3.0
         version: 6.3.0
@@ -354,8 +354,8 @@ importers:
         specifier: 18.19.54
         version: 18.19.54
       abortcontroller-polyfill:
-        specifier: 1.7.5
-        version: 1.7.5
+        specifier: 1.7.8
+        version: 1.7.8
       rollup:
         specifier: 4.39.0
         version: 4.39.0
@@ -1769,8 +1769,8 @@ packages:
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
 
-  abortcontroller-polyfill@1.7.5:
-    resolution: {integrity: sha512-JMJ5soJWP18htbbxJjG7bG6yuI6pRhgJ0scHHTfkUjf6wjP912xZWvM+A4sJK3gqd9E8fcPbDnOefbA9Th/FIQ==}
+  abortcontroller-polyfill@1.7.8:
+    resolution: {integrity: sha512-9f1iZ2uWh92VcrU9Y8x+LdM4DLj75VE0MJB8zuF1iUnroEptStw+DQ8EQPMUdfe5k+PkB1uUfDQfWbhstH8LrQ==}
 
   abs-svg-path@0.1.1:
     resolution: {integrity: sha512-d8XPSGjfyzlXC3Xx891DJRyZfqk5JU0BJrDQcsWomFIV1/BIzPW5HDH5iDdWpqWaav0YVIEzT1RHTwWr0FFshA==}
@@ -4265,7 +4265,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 24.15.0 is no longer supported
 
   qs@6.5.3:
     resolution: {integrity: sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==}
@@ -6334,7 +6334,7 @@ snapshots:
 
   abbrev@1.1.1: {}
 
-  abortcontroller-polyfill@1.7.5: {}
+  abortcontroller-polyfill@1.7.8: {}
 
   abs-svg-path@0.1.1: {}
 
@@ -8240,7 +8240,7 @@ snapshots:
       crypt: 0.0.2
       is-buffer: 1.1.6
 
-  meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq): {}
+  meaning-of-life@1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0): {}
 
   media-query-parser@2.0.2:
     dependencies:
