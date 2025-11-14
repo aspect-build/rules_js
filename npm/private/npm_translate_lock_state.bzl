@@ -37,10 +37,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_patches_labels(priv, rctx, attr, label_store)
 
-    if _should_update_pnpm_lock(priv) or not attr.pnpm_lock:
-        # labels only needed when updating or bootstrapping the pnpm lock file
-        _init_pnpm_labels(rctx, attr, label_store)
-
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr, label_store)
@@ -112,20 +108,6 @@ def _init_common_labels(priv, attr, label_store):
 
     # pnpm-workspace.yaml file
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
-
-################################################################################
-def _init_pnpm_labels(rctx, attr, label_store):
-    # Note that we must reference the node binary under the platform-specific node
-    # toolchain repository rather than under @nodejs_host since running rctx.path
-    # (called outside this function) on the alias in the host repo fails under bzlmod.
-    # It appears to fail because the platform-specific repository does not exist
-    # unless we reference the label here.
-    #
-    # TODO: Try to understand this better and see if we can go back to using
-    #  Label("@nodejs_host//:bin/node")
-    label_store.add("host_node", Label("@{}_{}//:bin/node".format(attr.node_toolchain_prefix, repo_utils.platform(rctx))))
-
-    label_store.add("pnpm_entry", attr.use_pnpm)
 
 ################################################################################
 def _init_update_labels(priv, _, attr, label_store):
