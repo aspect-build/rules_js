@@ -105,6 +105,6 @@ bzl_library(
     deps = [
         "@bazel_skylib//lib:paths",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
-        "@tar.bzl//lib:tar",
+        "@tar.bzl//tar",
     ],
 )

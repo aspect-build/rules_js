@@ -532,7 +532,7 @@ def _download_and_extract_archive(rctx, package_json_only):
             exclude_pattern_args.append("--exclude")
             exclude_pattern_args.append(pattern)
 
-    tar = Label("@bsd_tar_toolchains_{}//:bsdtar_toolchain{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
+    tar = Label("@bsd_tar_toolchains_{}//:tar{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
 
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
