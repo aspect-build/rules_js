@@ -70,15 +70,14 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
 def _get_package_info_deps(package_info, no_optional):
     return package_info["dependencies"] if no_optional else (package_info["dependencies"] | package_info["optional_dependencies"])
 
-def translate_to_transitive_closure(importers, packages, prod = False, dev = False, no_optional = False):
+def translate_to_transitive_closure(importers, packages, no_dev = False, no_optional = False):
     """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
 
     Args:
         importers: workspace projects (pnpm "importers")
         packages: all package info by name
-        prod: If true, only install dependencies
-        dev: If true, only install devDependencies
-        no_optional: If true, optionalDependencies are not installed
+        no_dev: if True, devDependencies are not included
+        no_optional: If true, optionalDependencies are not included
 
     Returns:
         Nested dictionary suitable for further processing in our repository rule
@@ -96,8 +95,8 @@ def translate_to_transitive_closure(importers, packages, prod = False, dev = Fal
     importers_deps = {}
     for importPath in importers.keys():
         lock_importer = importers[importPath]
-        prod_deps = {} if dev else lock_importer["dependencies"]
-        dev_deps = {} if prod else lock_importer["dev_dependencies"]
+        prod_deps = lock_importer["dependencies"]
+        dev_deps = {} if no_dev else lock_importer["dev_dependencies"]
         opt_deps = {} if no_optional else lock_importer["optional_dependencies"]
 
         deps = prod_deps | opt_deps

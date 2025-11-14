@@ -74,8 +74,7 @@ def _npm_extension_impl(module_ctx):
             importers, packages = translate_to_transitive_closure(
                 state.importers(),
                 state.packages(),
-                attr.prod,
-                attr.dev,
+                attr.no_dev,
                 attr.no_optional,
             )
 
@@ -151,7 +150,7 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         bins = attr.bins,
         custom_postinstalls = attr.custom_postinstalls,
         data = attr.data,
-        dev = attr.dev,
+        no_dev = attr.no_dev,
         external_repository_action_cache = attr.external_repository_action_cache,
         generate_bzl_library_targets = attr.generate_bzl_library_targets,
         link_workspace = attr.link_workspace,
@@ -165,7 +164,6 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         pnpm_lock = attr.pnpm_lock,
         use_pnpm = attr.use_pnpm,
         preupdate = attr.preupdate,
-        prod = attr.prod,
         public_hoist_packages = attr.public_hoist_packages,
         quiet = attr.quiet,
         replace_packages = replace_packages,

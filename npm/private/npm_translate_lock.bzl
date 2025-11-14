@@ -73,7 +73,6 @@ _ATTRS = {
     "bins": attr.string_list_dict(),
     "custom_postinstalls": attr.string_dict(),
     "data": attr.label_list(),
-    "dev": attr.bool(),
     "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache()),
     "generate_bzl_library_targets": attr.bool(),
     "replace_packages": attr.string_dict(),
@@ -82,6 +81,7 @@ _ATTRS = {
     "lifecycle_hooks_use_default_shell_env": attr.string_dict(),
     "lifecycle_hooks": attr.string_list_dict(),
     "link_workspace": attr.string(),
+    "no_dev": attr.bool(),
     "no_optional": attr.bool(),
     "node_toolchain_prefix": attr.string(default = "nodejs"),
     "npm_package_lock": attr.label(),
@@ -95,7 +95,6 @@ _ATTRS = {
     "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs"),  # bzlmod pnpm extension
     "pnpm_lock": attr.label(),
     "preupdate": attr.label_list(),
-    "prod": attr.bool(),
     "public_hoist_packages": attr.string_list_dict(),
     "quiet": attr.bool(default = True),
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
@@ -154,8 +153,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
     importers, packages = translate_to_transitive_closure(
         state.importers(),
         state.packages(),
-        rctx.attr.prod,
-        rctx.attr.dev,
+        rctx.attr.no_dev,
         rctx.attr.no_optional,
     )
 
@@ -214,9 +212,8 @@ def npm_translate_lock(
         patch_args = {"*": ["-p0"]},
         custom_postinstalls = {},
         package_visibility = {},
-        prod = False,
         public_hoist_packages = {},
-        dev = False,
+        no_dev = False,
         no_optional = False,
         run_lifecycle_hooks = True,
         lifecycle_hooks = {},
@@ -378,8 +375,6 @@ def npm_translate_lock(
             If there are no matches then the package's generated node_modules link targets default to public visibility
             (`["//visibility:public"]`).
 
-        prod: If True, only install `dependencies` but not `devDependencies`.
-
         public_hoist_packages: A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree when linking.
 
@@ -397,7 +392,7 @@ def npm_translate_lock(
             List of public hoist packages are additive when there are multiple matches for a package. More specific matches
             are appended to previous matches.
 
-        dev: If True, only install `devDependencies`
+        no_dev: If True, `devDependencies` are not included
 
         no_optional: If True, `optionalDependencies` are not installed.
 
@@ -657,9 +652,8 @@ def npm_translate_lock(
         patch_args = patch_args,
         custom_postinstalls = custom_postinstalls,
         package_visibility = package_visibility,
-        prod = prod,
         public_hoist_packages = public_hoist_packages,
-        dev = dev,
+        no_dev = no_dev,
         no_optional = no_optional,
         lifecycle_hooks = lifecycle_hooks if lifecycle_hooks else {},
         lifecycle_hooks_envs = lifecycle_hooks_envs,
