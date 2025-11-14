@@ -93,6 +93,9 @@ importers:
         specifier: npm:@aspect-test/e
         version: '@aspect-test/e@1.0.0'
     devDependencies:
+      '@aspect-test/e-dev':
+        specifier: npm:@aspect-test/e
+        version: '@aspect-test/e@1.0.0'
       '@aspect-test/f':
         specifier: 1.0.0
         version: 1.0.0
@@ -109,6 +112,9 @@ importers:
         specifier: npm:@aspect-test/e
         version: '@aspect-test/e@1.0.0'
     devDependencies:
+      '@aspect-test/e-dev':
+        specifier: npm:@aspect-test/e
+        version: '@aspect-test/e@1.0.0'
       '@aspect-test/f':
         specifier: 1.0.0
         version: 1.0.0

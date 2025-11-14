@@ -1162,8 +1162,8 @@ _NPM_PACKAGE_LOCATIONS = {
     "examples/js_lib_pkg/a": ["@types/node"],
     "examples/js_lib_pkg/b": ["js_lib_pkg_a", "@types/node"],
     "examples/linked_consumer": ["@lib/test", "@lib/test2"],
-    "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
-    "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/f", "@types/node"],
+    "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
+    "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
     "examples/macro": ["mocha-junit-reporter", "mocha-multi-reporters", "mocha"],
     "examples/nextjs": ["@tailwindcss/postcss", "next", "react-dom", "react", "tailwindcss"],
     "examples/npm_deps": ["@mycorp/pkg-a", "@mycorp/pkg-d", "@mycorp/pkg-e", "acorn", "@aspect-test/a", "@aspect-test/c", "@gregmagolan/test-b", "@rollup/plugin-commonjs", "debug", "meaning-of-life", "mobx-react", "mobx", "ms", "react", "rollup", "uvu"],
@@ -2568,17 +2568,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "examples/linked_lib":
             link_45("node_modules/@aspect-test/e", False, "@aspect-test/e")
             link_45("node_modules/alias-e", False, "alias-e")
+            link_45("node_modules/@aspect-test/e-dev", True, "@aspect-test/e-dev")
             link_46("node_modules/@aspect-test/f", True, "@aspect-test/f")
             link_276("node_modules/@types/node", True, "@types/node")
             link_targets = [
                 ":node_modules/@aspect-test/e",
                 ":node_modules/alias-e",
+                ":node_modules/@aspect-test/e-dev",
                 ":node_modules/@aspect-test/f",
                 ":node_modules/@types/node",
             ]
             scope_targets = {
                 "@aspect-test": [
                     ":node_modules/@aspect-test/e",
+                    ":node_modules/@aspect-test/e-dev",
                     ":node_modules/@aspect-test/f",
                 ],
                 "@types": [":node_modules/@types/node"],
@@ -2586,17 +2589,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         elif bazel_package == "examples/linked_pkg":
             link_45("node_modules/@aspect-test/e", False, "@aspect-test/e")
             link_45("node_modules/alias-e", False, "alias-e")
+            link_45("node_modules/@aspect-test/e-dev", True, "@aspect-test/e-dev")
             link_46("node_modules/@aspect-test/f", True, "@aspect-test/f")
             link_276("node_modules/@types/node", True, "@types/node")
             link_targets = [
                 ":node_modules/@aspect-test/e",
                 ":node_modules/alias-e",
+                ":node_modules/@aspect-test/e-dev",
                 ":node_modules/@aspect-test/f",
                 ":node_modules/@types/node",
             ]
             scope_targets = {
                 "@aspect-test": [
                     ":node_modules/@aspect-test/e",
+                    ":node_modules/@aspect-test/e-dev",
                     ":node_modules/@aspect-test/f",
                 ],
                 "@types": [":node_modules/@types/node"],
@@ -2953,6 +2959,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
         if dev:
             link_targets.extend([
+                ":node_modules/@aspect-test/e-dev",
                 ":node_modules/@aspect-test/f",
                 ":node_modules/@types/node",
             ])
@@ -2964,6 +2971,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
         if dev:
             link_targets.extend([
+                ":node_modules/@aspect-test/e-dev",
                 ":node_modules/@aspect-test/f",
                 ":node_modules/@types/node",
             ])
