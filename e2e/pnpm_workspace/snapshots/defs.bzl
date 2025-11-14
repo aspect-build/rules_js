@@ -132,11 +132,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "":
-            link_0("node_modules/@aspect-test/a", False, "@aspect-test/a")
-            link_1("node_modules/@aspect-test/b", True, "@aspect-test/b")
-            link_2("node_modules/@aspect-test/c", False, "@aspect-test/c")
-            link_10("node_modules/lodash", False, "lodash")
-            link_11("node_modules/typescript", False, "typescript")
+            link_0()
+            link_1(dev=True)
+            link_2()
+            link_10()
+            link_11()
             link_targets = [
                 ":node_modules/@aspect-test/a",
                 ":node_modules/@aspect-test/c",
@@ -152,8 +152,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
             }
         elif bazel_package == "app/a":
-            link_0("node_modules/@aspect-test/a", False, "@aspect-test/a")
-            link_6("node_modules/@aspect-test/g", False, "@aspect-test/g")
+            link_0()
+            link_6()
             _fp_link_2()
             link_targets = [
                 ":node_modules/@aspect-test/a",
@@ -168,8 +168,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@lib": [":node_modules/@lib/a"],
             }
         elif bazel_package == "app/c":
-            link_0("node_modules/@aspect-test/a", False, "@aspect-test/a")
-            link_6("node_modules/@aspect-test/g", False, "@aspect-test/g")
+            link_0()
+            link_6()
             _fp_link_4()
             link_targets = [
                 ":node_modules/@aspect-test/a",
@@ -184,8 +184,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@lib": [":node_modules/@lib/c"],
             }
         elif bazel_package == "lib/d":
-            link_3("node_modules/@aspect-test/d", False, "@aspect-test/d")
-            link_8("node_modules/alias-2", False, "alias-2")
+            link_3()
+            link_8("alias-2")
             link_targets = [
                 ":node_modules/@aspect-test/d",
                 ":node_modules/alias-2",
@@ -194,7 +194,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@aspect-test": [":node_modules/@aspect-test/d"],
             }
         elif bazel_package == "lib/a":
-            link_4("node_modules/@aspect-test/e", False, "@aspect-test/e")
+            link_4()
             _fp_link_0()
             _fp_link_1()
             _fp_link_3()
@@ -209,8 +209,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@lib": [":node_modules/@lib/b"],
             }
         elif bazel_package == "lib/b":
-            link_5("node_modules/@aspect-test/f", False, "@aspect-test/f")
-            link_9("node_modules/alias-1", False, "alias-1")
+            link_5()
+            link_9("alias-1")
             link_targets = [
                 ":node_modules/@aspect-test/f",
                 ":node_modules/alias-1",
@@ -219,13 +219,13 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@aspect-test": [":node_modules/@aspect-test/f"],
             }
         elif bazel_package == "lib/c":
-            link_5("node_modules/@aspect-test/f", False, "@aspect-test/f")
+            link_5()
             link_targets = [":node_modules/@aspect-test/f"]
             scope_targets = {
                 "@aspect-test": [":node_modules/@aspect-test/f"],
             }
         elif bazel_package == "app/d":
-            link_6("node_modules/@aspect-test/g", False, "@aspect-test/g")
+            link_6()
             _fp_link_5()
             link_targets = [
                 ":node_modules/@aspect-test/g",
@@ -236,7 +236,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@lib": [":node_modules/@lib/d"],
             }
         elif bazel_package == "app/b":
-            link_7("node_modules/@aspect-test/h", False, "@aspect-test/h")
+            link_7()
             _fp_link_3()
             _fp_link_3("@lib/b_alias")
             link_targets = [

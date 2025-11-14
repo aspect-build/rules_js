@@ -42,16 +42,14 @@ def npm_imported_package_store():
 
 # Generated npm_package_store and npm_link_package_store targets for npm package fsevents@2.3.3
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, dev, link_alias):
-    return _npm_link_imported_package_store(
-        name,
+def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
+    _npm_link_imported_package_store(
+        link_name,
         dev,
-        link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = ["//visibility:public"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = True,
     )
 
 # Generated npm_package_store and npm_link_package_store targets for npm package fsevents@2.3.3
@@ -59,8 +57,7 @@ def npm_link_imported_package_store(name, dev, link_alias):
 def npm_link_imported_package(
         name = "node_modules",
         dev = False,
-        link = True,
-        fail_if_no_link = True):
+        link = True):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
@@ -74,5 +71,4 @@ def npm_link_imported_package(
         public_visibility = True,
         npm_link_imported_package_store_macro = npm_link_imported_package_store,
         npm_imported_package_store_macro = npm_imported_package_store,
-        fail_if_no_link = fail_if_no_link,
     )

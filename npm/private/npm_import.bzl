@@ -219,21 +219,21 @@ def npm_imported_package_store_internal(
         )
 
 def npm_link_imported_package_store_internal(
-        name,
+        name,  # the package name to link the package as
         dev,
-        link_alias,
         root_package,
         link_visibility,
         bins,
-        package_store_name,
-        public_visibility):
+        package_store_name):
     store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
+
+    target_name = "node_modules/{}".format(name)
 
     # terminal package store target to link
     npm_link_package_store(
-        name = name,
+        name = target_name,
         dev = dev,
-        package = link_alias,
+        package = name,
         src = "//%s:%s" % (root_package, store_target_name),
         visibility = link_visibility,
         tags = ["manual"],
@@ -243,28 +243,24 @@ def npm_link_imported_package_store_internal(
     # filegroup target that provides a single file which is
     # package directory for use in $(execpath) and $(rootpath)
     native.filegroup(
-        name = "{}/dir".format(name),
-        srcs = [":" + name],
+        name = "{}/dir".format(target_name),
+        srcs = [":" + target_name],
         output_group = utils.package_directory_output_group,
         visibility = link_visibility,
         tags = ["manual"],
     )
 
-    return [":{}".format(name)] if public_visibility else []
-
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, dev, link_alias):
-    return _npm_link_imported_package_store(
-        name,
+def npm_link_imported_package_store(link_name = PACKAGE, dev = False):
+    _npm_link_imported_package_store(
+        link_name,
         dev,
-        link_alias,
         root_package = _ROOT_PACKAGE,
         link_visibility = {link_visibility},
         bins = {bins},
         package_store_name = _PACKAGE_STORE_NAME,
-        public_visibility = {public_visibility},
     )
 """
 
@@ -279,8 +275,7 @@ def npm_link_imported_package_internal(
         link_packages,
         public_visibility,
         npm_link_imported_package_store_macro,
-        npm_imported_package_store_macro,
-        fail_if_no_link = True):
+        npm_imported_package_store_macro):
     bazel_package = native.package_name()
 
     if link_packages and link != None:
@@ -289,7 +284,7 @@ def npm_link_imported_package_internal(
     is_link = (link == True) or (link == None and bazel_package in link_packages)
     is_root = bazel_package == root_package
 
-    if fail_if_no_link and not is_root and not link:
+    if not is_root and not link:
         msg = "Nothing to link in bazel package '{bazel_package}' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package.".format(
             bazel_package = bazel_package,
             package = package,
@@ -309,14 +304,13 @@ def npm_link_imported_package_internal(
         for link_alias in link_aliases:
             link_target_name = "node_modules/{}".format(link_alias)
             npm_link_imported_package_store_macro(
-                name = link_target_name,
+                link_name = link_alias,
                 dev = dev,
-                link_alias = link_alias,
             )
             if public_visibility:
                 link_targets.append(":" + link_target_name)
-                link_scope = link_alias[:link_alias.find("/", 1)] if link_alias[0] == "@" else None
-                if link_scope:
+                if link_alias[0] == "@":
+                    link_scope = link_alias[:link_alias.find("/", 1)]
                     if link_scope not in scoped_targets:
                         scoped_targets[link_scope] = []
                     scoped_targets[link_scope].append(link_target_name)
@@ -332,8 +326,7 @@ _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 def npm_link_imported_package(
         name = "node_modules",
         dev = False,
-        link = {link_default},
-        fail_if_no_link = True):
+        link = {link_default}):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package(
@@ -346,7 +339,6 @@ def npm_link_imported_package(
         public_visibility = {public_visibility},
         npm_link_imported_package_store_macro = npm_link_imported_package_store,
         npm_imported_package_store_macro = npm_imported_package_store,
-        fail_if_no_link = fail_if_no_link,
     )
 """
 
