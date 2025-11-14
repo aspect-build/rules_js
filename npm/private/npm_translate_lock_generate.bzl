@@ -292,7 +292,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             for link_alias in link_aliases:
                 is_dev = link_alias not in link_prod_deps
 
-                links_pkg_bzl[link_package].append("""            link_{i}("node_modules/{alias}", {dev}, "{alias}")""".format(
+                links_pkg_bzl[link_package].append("""            link_{i}("{alias}", {dev})""".format(
                     i = i,
                     dev = is_dev,
                     alias = link_alias,

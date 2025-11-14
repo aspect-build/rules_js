@@ -33,8 +33,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     if link:
         if bazel_package == "":
-            link_0("node_modules/chalk", False, "chalk")
-            link_1("node_modules/lodash", False, "lodash")
+            link_0("chalk", False)
+            link_1("lodash", False)
             link_targets = [
                 ":node_modules/chalk",
                 ":node_modules/lodash",
