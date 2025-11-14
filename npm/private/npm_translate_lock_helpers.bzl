@@ -255,34 +255,6 @@ def _select_npm_auth(url, npm_auth):
 def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
-    # make a lookup table of package to link name for each importer
-    importer_links = {}
-    for import_path, importer in importers.items():
-        dependencies = importer["all_deps"]
-        if type(dependencies) != "dict":
-            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
-            fail(msg)
-        links = {
-            "link_package": _link_package(root_package, import_path),
-        }
-        linked_packages = {}
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
-                continue
-            if dep_version.startswith("npm:"):
-                # special case for alias dependencies such as npm:alias-to@version
-                maybe_package = dep_version[4:]
-            elif dep_version not in packages:
-                maybe_package = utils.package_key(dep_package, dep_version)
-            else:
-                maybe_package = dep_version
-            if maybe_package not in linked_packages:
-                linked_packages[maybe_package] = [dep_package]
-            else:
-                linked_packages[maybe_package].append(dep_package)
-        links["packages"] = linked_packages
-        importer_links[import_path] = links
-
     patches_used = []
     result = {}
     for package_key, package_info in packages.items():
@@ -389,22 +361,6 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
-        # gather all of the importers (workspace packages) that this npm package should be linked at which names
-        link_packages = {}
-        for links in importer_links.values():
-            linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key)
-            if link_names:
-                link_packages[links["link_package"]] = link_names
-
-        # check if this package should be hoisted via public_hoist_packages
-        public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
-        for public_hoist_package in public_hoist_packages:
-            if public_hoist_package not in link_packages:
-                link_packages[public_hoist_package] = [name]
-            elif name not in link_packages[public_hoist_package]:
-                link_packages[public_hoist_package].append(name)
-
         run_lifecycle_hooks = all_lifecycle_hooks and only_built_dependencies != None and name in only_built_dependencies
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
@@ -453,10 +409,10 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
         result_pkg = struct(
+            package_key = package_key,
             custom_postinstall = custom_postinstall,
             deps = deps,
             integrity = integrity,
-            link_packages = link_packages,
             name = repo_name,
             package = name,
             package_visibility = package_visibility,
@@ -508,9 +464,84 @@ Either remove this patch file if it is no longer needed or change its key to mat
             fail(msg)
 
     # check all links and fail if there are duplicates which can happen with public hoisting
-    _check_for_conflicting_public_links(result, attr.public_hoist_packages)
+    # _check_for_conflicting_public_links(result, attr.public_hoist_packages)
 
     return result
+
+################################################################################
+def _to_package_key(importers, packages, name, version):
+    if version.startswith("npm:"):
+        version = version[4:]
+    if version in packages:
+        return version
+    if version.startswith("link:"):
+        return version[5:]
+    if version.startswith("file:") and version[5:] in importers:
+        return version[5:]
+
+    nv = "{}@{}".format(name, version)
+    if nv in packages:
+        return nv
+
+    fail("unable to resolve package '{}' at version '{}' in packages: {}".format(name, version, packages.keys()))
+    
+def _get_npm_links(importers, packages, root_package):
+    "Collects all first-party packages and all their dependents"
+
+    # A collection of all links between packages where the key is package being linked to.
+    # linked_packages[which][from] = [alias1, alias2, ...]
+    tp_links = {}
+
+    # An extension of both 'packages' and 'importers'
+    fp_links = {}
+
+    # Packages resolving to a directory are first-party links.
+    # Packages resolving to a tarball are treated as third-party packages.
+    for package_info in packages.values():
+        resolution = package_info["resolution"]
+        if resolution.get("type", None) == "directory":
+            fp_links[resolution["directory"]] = package_info | {
+                # fp-link properties
+                "fp_type": "directory",
+                "link_packages": {},
+
+                # Props on the parent 'importers' type
+                "deps": package_info["dependencies"],
+                "all_deps": package_info["dependencies"] | package_info["optional_dependencies"],
+            }
+
+    # All importers with a name are first-party links
+    for import_path, importer in importers.items():
+        if importer["name"] != None:
+            fp_links[import_path] = importer | {
+                # fp-link properties
+                "fp_type": "importer",
+                "link_packages": {},
+
+                # Props on the parent 'package_info' type
+                "version": "0.0.0",
+            }
+
+    # Collect references between first-party packages
+    for import_path, importer in importers.items():
+        link_package = _link_package(root_package, import_path)
+        prod_deps = importer.get("deps", {})
+        for dep_package, dep_version in importer.get("all_deps", {}).items():
+            pk = _to_package_key(importers, packages, dep_package, dep_version)
+            is_dev = dep_package not in prod_deps
+            if pk in fp_links:
+                fp_links[pk]["link_packages"].setdefault(link_package, {})[dep_package] = is_dev
+            else:
+                tp_links.setdefault(pk, {}).setdefault(import_path, {})[dep_package] = is_dev
+
+    # Collect references from third-party to first-party packages.
+    for package_key, package_info in packages.items():
+        for dep_type in ["dependencies", "optional_dependencies"]:
+            for dep_package, dep_version in package_info[dep_type].items():
+                if dep_version in fp_links:
+                    fp_links[dep_version]["link_packages"].setdefault(package_key, {})[dep_package] = False
+
+    return fp_links, tp_links
 
 ################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
@@ -639,6 +670,7 @@ helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
+    get_npm_links = _get_npm_links,
     link_package = _link_package,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
