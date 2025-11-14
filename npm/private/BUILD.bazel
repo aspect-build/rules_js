@@ -66,6 +66,7 @@ bzl_library(
         "//js:providers",
         "@aspect_bazel_lib//lib:copy_directory",
         "@bazel_skylib//lib:paths",
+        "@tar.bzl//tar",
     ],
 )
 
