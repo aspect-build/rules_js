@@ -1,6 +1,7 @@
 "npm_package_store rule"
 
 load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
+load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
@@ -229,7 +230,7 @@ def _npm_package_store_impl(ctx):
                 # tho the name is not predictable we can use the --strip-components 1 argument with
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
-                bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+                bsdtar = ctx.toolchains[tar_lib.toolchain_type]
 
                 args = ctx.actions.args()
                 args.add("--extract")
@@ -440,7 +441,7 @@ npm_package_store_lib = struct(
     provides = [DefaultInfo, NpmPackageStoreInfo],
     toolchains = [
         Label("@aspect_bazel_lib//lib:copy_directory_toolchain_type"),
-        Label("@aspect_bazel_lib//lib:tar_toolchain_type"),
+        tar_lib.toolchain_type,
     ],
 )
 

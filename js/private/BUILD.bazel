@@ -100,7 +100,7 @@ bzl_library(
     name = "js_image_layer",
     srcs = ["js_image_layer.bzl"],
     deps = [
-        "@aspect_bazel_lib//lib:tar",
         "@bazel_skylib//lib:paths",
+        "@tar.bzl//tar",
     ] + (["@bazel_tools//tools/build_defs/repo:cache.bzl"] if bazel_lib_utils.is_bazel_7_or_greater() else []),
 )
