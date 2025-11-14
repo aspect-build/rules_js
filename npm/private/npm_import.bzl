@@ -272,16 +272,11 @@ def npm_link_imported_package_internal(
         dev,
         root_package,
         link,
-        link_packages,
         public_visibility,
         npm_link_imported_package_store_macro,
         npm_imported_package_store_macro):
     bazel_package = native.package_name()
 
-    if link_packages and link != None:
-        fail("link attribute cannot be specified when link_packages are set")
-
-    is_link = (link == True) or (link == None and bazel_package in link_packages)
     is_root = bazel_package == root_package
 
     if not is_root and not link:
@@ -295,25 +290,20 @@ def npm_link_imported_package_internal(
     link_targets = []
     scoped_targets = {}
 
-    if is_link:
-        link_aliases = []
-        if bazel_package in link_packages:
-            link_aliases = link_packages[bazel_package]
-        if not link_aliases:
-            link_aliases = [package]
-        for link_alias in link_aliases:
-            link_target_name = "node_modules/{}".format(link_alias)
-            npm_link_imported_package_store_macro(
-                link_name = link_alias,
-                dev = dev,
-            )
-            if public_visibility:
-                link_targets.append(":" + link_target_name)
-                if link_alias[0] == "@":
-                    link_scope = link_alias[:link_alias.find("/", 1)]
-                    if link_scope not in scoped_targets:
-                        scoped_targets[link_scope] = []
-                    scoped_targets[link_scope].append(link_target_name)
+    if link:
+        link_alias = package
+        link_target_name = "node_modules/{}".format(link_alias)
+        npm_link_imported_package_store_macro(
+            link_name = link_alias,
+            dev = dev,
+        )
+        if public_visibility:
+            link_targets.append(":" + link_target_name)
+            if link_alias[0] == "@":
+                link_scope = link_alias[:link_alias.find("/", 1)]
+                if link_scope not in scoped_targets:
+                    scoped_targets[link_scope] = []
+                scoped_targets[link_scope].append(link_target_name)
 
     if is_root:
         npm_imported_package_store_macro()
@@ -326,7 +316,7 @@ _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 def npm_link_imported_package(
         name = "node_modules",
         dev = False,
-        link = {link_default}):
+        link = True):
     if name != "node_modules":
         fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package_internal(
@@ -335,7 +325,6 @@ def npm_link_imported_package(
         dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
-        link_packages = {link_packages},
         public_visibility = {public_visibility},
         npm_link_imported_package_store_macro = npm_link_imported_package_store_internal,
         npm_imported_package_store_macro = npm_imported_package_store_internal,
@@ -623,17 +612,15 @@ def _npm_import_rule_impl(rctx):
     if rctx.attr.extra_build_content:
         rctx_files["BUILD.bazel"].append("\n" + rctx.attr.extra_build_content)
 
-    # If this package has binaries and is linked into any other packages:
+    # Generate the bzl representation of package.json
     # - generate the bin bzl and build files
-    # - write ^ into each package linking to this package.
-    if rctx.attr.link_packages:
+    if rctx.attr.generate_package_json_bzl:
         pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
         bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
         if bins:
             package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
             package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
-
             bin_bzl = [
                 generated_by_prefix,
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
@@ -673,20 +660,16 @@ def _npm_import_rule_impl(rctx):
                 bin_fields = "\n".join(bin_fields),
             ))
 
-            # Duplicate the bzl+BUILD into each linking package
-            for link_package in rctx.attr.link_packages.keys():
-                rctx_files["{}/{}".format(link_package, _PACKAGE_JSON_BZL_FILENAME) if link_package else _PACKAGE_JSON_BZL_FILENAME] = bin_bzl
+            rctx_files[_PACKAGE_JSON_BZL_FILENAME] = bin_bzl
 
-                build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
-                if build_file not in rctx_files:
-                    rctx_files[build_file] = [generated_by_prefix]
-                if rctx.attr.generate_bzl_library_targets:
-                    rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
-                    rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                        name = link_package[link_package.rfind("/") + 1] if link_package else package_name_no_scope,
-                        src = _PACKAGE_JSON_BZL_FILENAME,
-                    ))
-                rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
+            if rctx.attr.generate_bzl_library_targets:
+                rctx_files["BUILD.bazel"].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
+                rctx_files["BUILD.bazel"].append(_BZL_LIBRARY_TMPL.format(
+                    name = package_name_no_scope,
+                    src = _PACKAGE_JSON_BZL_FILENAME,
+                ))
+
+            rctx_files["BUILD.bazel"].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
 
     rules_js_metadata = {}
     if rctx.attr.lifecycle_hooks:
@@ -795,20 +778,6 @@ def _npm_import_links_rule_impl(rctx):
             npm_import_sources_repo_name,
         )
 
-    link_packages = "{\n"
-    indent = " " * 12
-    for package, link_aliases in rctx.attr.link_packages.items():
-        if link_aliases and link_aliases != [rctx.attr.package]:
-            link_packages += indent + '"{package}": {link_aliases},\n'.format(
-                package = package,
-                link_aliases = repr(link_aliases),
-            )
-        else:
-            link_packages += indent + '"{package}": [PACKAGE],\n'.format(
-                package = package,
-            )
-    link_packages += " " * 8 + "}"
-
     # collapse link aliases lists into comma separated strings
     for dep in deps.keys():
         deps[dep] = ",".join(deps[dep])
@@ -836,13 +805,11 @@ def _npm_import_links_rule_impl(rctx):
 
     npm_link_pkg_bzl_vars = dict(
         deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
-        link_default = "None" if rctx.attr.link_packages else "True",
         npm_package_target = npm_package_target,
         lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 2, quote_key = False),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
-        link_packages = link_packages,
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package = rctx.attr.package,
@@ -880,13 +847,13 @@ def _npm_import_links_rule_impl(rctx):
     return rctx.repo_metadata(reproducible = True)
 
 _COMMON_ATTRS = {
-    "link_packages": attr.string_list_dict(),
     "package": attr.string(mandatory = True),
     "root_package": attr.string(),
     "version": attr.string(mandatory = True),
 }
 
 _ATTRS_LINKS = _COMMON_ATTRS | {
+    "link_packages": attr.string_list_dict(),
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "dev": attr.bool(),
@@ -906,6 +873,7 @@ _ATTRS = _COMMON_ATTRS | {
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
     "exclude_package_contents": attr.string_list(default = []),
+    "generate_package_json_bzl": attr.bool(),
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
@@ -963,7 +931,6 @@ def npm_import(
         transitive_closure = {},
         root_package = "",
         link_workspace = "",
-        link_packages = {},
         lifecycle_hooks = [],
         lifecycle_hooks_execution_requirements = ["no-sandbox"],
         lifecycle_hooks_env = [],
@@ -1115,13 +1082,6 @@ def npm_import(
 
             Can be left unspecified if the link workspace is the user workspace.
 
-        link_packages: Dict of paths where links may be created at for this package to
-            a list of link aliases to link as in each package. If aliases are an
-            empty list this indicates to link as the package name.
-
-            Defaults to {} which indicates that links may be created in any package as specified by
-            the `direct` attribute of the generated npm_link_package.
-
         lifecycle_hooks: List of lifecycle hook `package.json` scripts to run for this package if they exist.
 
         lifecycle_hooks_env: Environment variables set for the lifecycle hooks action for this npm
@@ -1260,6 +1220,7 @@ def npm_import(
         **kwargs: Internal use only
     """
 
+    generate_package_json_bzl = kwargs.pop("generate_package_json_bzl", True)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
     if len(kwargs):
@@ -1274,7 +1235,6 @@ def npm_import(
         version = version,
         root_package = root_package,
         link_workspace = link_workspace,
-        link_packages = link_packages,
         integrity = integrity,
         url = url,
         commit = commit,
@@ -1290,6 +1250,7 @@ def npm_import(
         extra_build_content = (
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
         ),
+        generate_package_json_bzl = generate_package_json_bzl,
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
@@ -1306,7 +1267,6 @@ def npm_import(
         version = version,
         dev = dev,
         root_package = root_package,
-        link_packages = link_packages,
         deps = deps,
         transitive_closure = transitive_closure,
         lifecycle_build_target = has_lifecycle_hooks or has_custom_postinstall,

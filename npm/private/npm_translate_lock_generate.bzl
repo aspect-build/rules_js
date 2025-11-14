@@ -331,18 +331,17 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                         rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
                             name = link_alias,
                             src = ":{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME),
-                            dep = "@{repo_name}//{link_package}:{package_name}_bzl_library".format(
+                            dep = "@{repo_name}//:{package_name}_bzl_library".format(
                                 repo_name = helpers.to_apparent_repo_name(_import.name),
-                                link_package = link_package,
-                                package_name = link_package[link_package.rfind("/") + 1] if link_package else link_alias.split("/")[-1],
+                                package_name = link_alias.split("/")[-1],
                             ),
                         ))
 
+                # re-export the package_json.bzl for each linkage of this package
                 for link_alias in link_aliases:
                     package_json_bzl_file_path = "{}/{}/{}".format(link_package, link_alias, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME)
-                    repo_package_json_bzl = "@@{repo_name}//{link_package}:{package_json_bzl}".format(
+                    repo_package_json_bzl = "@@{repo_name}//:{package_json_bzl}".format(
                         repo_name = _import.name,
-                        link_package = link_package,
                         package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,
                     )
                     rctx_files[package_json_bzl_file_path] = [_BIN_TMPL.format(
